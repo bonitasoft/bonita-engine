@@ -49,9 +49,10 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         super();
     }
 
-    public SApplicationImpl(final String name, final String version, final String path, final long creationDate, final long createdBy, final String state) {
+    public SApplicationImpl(final String name, final String displayName, final String version, final String path, final long creationDate, final long createdBy, final String state) {
         super();
         this.name = name;
+        this.displayName = displayName;
         this.version = version;
         this.path = path;
         this.creationDate = creationDate;
@@ -74,10 +75,6 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
     @Override
     public String getDisplayName() {
         return displayName;
-    }
-
-    public void setDisplayName(final String displayName) {
-        this.displayName = displayName;
     }
 
     @Override

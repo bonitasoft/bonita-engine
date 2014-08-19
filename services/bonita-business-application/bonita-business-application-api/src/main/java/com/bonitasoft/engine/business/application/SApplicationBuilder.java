@@ -17,8 +17,6 @@ public interface SApplicationBuilder {
 
     SApplication done();
 
-    SApplicationBuilder setDisplayName(String displayName);
-
     SApplicationBuilder setDescription(String description);
 
     SApplicationBuilder setIconPath(String iconPath);

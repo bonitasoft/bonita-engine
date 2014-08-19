@@ -42,10 +42,9 @@ public class ApplicationConvertor {
         final String description = (String) fields.get(ApplicationField.DESCRIPTION);
         final String path = (String) fields.get(ApplicationField.PATH);
         final String iconPath = (String) fields.get(ApplicationField.ICON_PATH);
-        final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(name, version, path, creatorUserId);
+        final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(name, displayName, version, path, creatorUserId);
         builder.setDescription(description);
         builder.setIconPath(iconPath);
-        builder.setDisplayName(displayName);
         return builder.done();
     }
 

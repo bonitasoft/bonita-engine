@@ -91,7 +91,7 @@ public class ApplicationAPIApplicationPageIT extends CommonAPISPTest {
     @Test
     public void createApplicationPage_returns_applicationPage_based_on_the_given_parameters() throws Exception {
         //given
-        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
 
         //when
         final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
@@ -144,7 +144,7 @@ public class ApplicationAPIApplicationPageIT extends CommonAPISPTest {
     @Test
     public void setApplicationHomePage_should_update_the_application_homePage() throws Exception {
         //given
-        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
         final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
 
         //when
@@ -163,7 +163,7 @@ public class ApplicationAPIApplicationPageIT extends CommonAPISPTest {
     @Test
     public void getApplicationPage_byNameAndAppName_returns_the_applicationPage_corresponding_to_the_given_parameters() throws Exception {
         //given
-        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
         final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
 
         //when
@@ -179,7 +179,7 @@ public class ApplicationAPIApplicationPageIT extends CommonAPISPTest {
     @Test
     public void getApplicationPage_byId_returns_the_applicationPage_corresponding_to_the_given_Id() throws Exception {
         //given
-        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
         final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
 
         //when
@@ -195,7 +195,7 @@ public class ApplicationAPIApplicationPageIT extends CommonAPISPTest {
     @Test
     public void deleteApplication_should_also_delete_related_applicationPage() throws Exception {
         //given
-        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
         final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
 
         //when
@@ -215,7 +215,7 @@ public class ApplicationAPIApplicationPageIT extends CommonAPISPTest {
     @Test
     public void deleteApplicationPage_should_delete_applicationPage_with_the_given_id() throws Exception {
         //given
-        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
         final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
 
         //when
@@ -235,7 +235,7 @@ public class ApplicationAPIApplicationPageIT extends CommonAPISPTest {
     @Test
     public void getApplicationHomePage_should_return_application_homePage() throws Exception {
         //given
-        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
         final ApplicationPage appPage = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
         applicationAPI.setApplicationHomePage(application.getId(), appPage.getId());
 
@@ -254,7 +254,7 @@ public class ApplicationAPIApplicationPageIT extends CommonAPISPTest {
     @Test
     public void searchApplicationPages_without_filters_and_search_term_should_return_all_applicationPages_pagged() throws Exception {
         //given
-        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
         final ApplicationPage appPage1 = applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
         final ApplicationPage appPage2 = applicationAPI.createApplicationPage(application.getId(), page.getId(), "secondPage");
         final ApplicationPage appPage3 = applicationAPI.createApplicationPage(application.getId(), page.getId(), "thirdPage");
@@ -280,7 +280,7 @@ public class ApplicationAPIApplicationPageIT extends CommonAPISPTest {
     @Test
     public void searchApplicationPages_can_filter_on_name() throws Exception {
         //given
-        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
         applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
         final ApplicationPage appPage2 = applicationAPI.createApplicationPage(application.getId(), page.getId(), "secondPage");
         applicationAPI.createApplicationPage(application.getId(), page.getId(), "thirdPage");
@@ -303,8 +303,8 @@ public class ApplicationAPIApplicationPageIT extends CommonAPISPTest {
     @Test
     public void searchApplicationPages_can_filter_on_applicationId() throws Exception {
         //given
-        final Application application1 = applicationAPI.createApplication(new ApplicationCreator("app1", "1.0", "/app1"));
-        final Application application2 = applicationAPI.createApplication(new ApplicationCreator("app2", "1.0", "/app2"));
+        final Application application1 = applicationAPI.createApplication(new ApplicationCreator("app1", "My app 1", "1.0", "/app1"));
+        final Application application2 = applicationAPI.createApplication(new ApplicationCreator("app2", "My app 2", "1.0", "/app2"));
         final ApplicationPage appPage1 = applicationAPI.createApplicationPage(application1.getId(), page.getId(), "firstPage");
         applicationAPI.createApplicationPage(application2.getId(), page.getId(), "secondPage");
         final ApplicationPage appPage3 = applicationAPI.createApplicationPage(application1.getId(), page.getId(), "thirdPage");
@@ -328,7 +328,7 @@ public class ApplicationAPIApplicationPageIT extends CommonAPISPTest {
     public void searchApplicationPages_can_filter_on_pageId() throws Exception {
         //given
         final Page page2 = createPage("custompage_MyPage2");
-        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
         applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
         final ApplicationPage appPage2 = applicationAPI.createApplicationPage(application.getId(), page2.getId(), "secondPage");
         final ApplicationPage appPage3 = applicationAPI.createApplicationPage(application.getId(), page2.getId(), "thirdPage");
@@ -351,7 +351,7 @@ public class ApplicationAPIApplicationPageIT extends CommonAPISPTest {
     @Test
     public void searchApplicationPages_can_filter_on_id() throws Exception {
         //given
-        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "1.0", "/app"));
+        final Application application = applicationAPI.createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
         applicationAPI.createApplicationPage(application.getId(), page.getId(), "firstPage");
         final ApplicationPage appPage2 = applicationAPI.createApplicationPage(application.getId(), page.getId(), "secondPage");
         applicationAPI.createApplicationPage(application.getId(), page.getId(), "thirdPage");

@@ -82,6 +82,8 @@ public class ApplicationAPIDelegateTest {
 
     private static final String APP_NAME = "app";
 
+    private static final String APP_DISP_NAME = "My app";
+
     private static final String APP_PAGE_NAME = "firstPage";
 
     private static final String VERSION = "1.0";
@@ -99,7 +101,7 @@ public class ApplicationAPIDelegateTest {
     @Test
     public void createApplication_should_call_applicationService_createApplication_and_return_created_application() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, VERSION, PATH);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION, PATH);
         creator.setDescription(DESCRIPTION);
         final SApplicationImpl sApp = getDefaultApplication();
         sApp.setDescription(DESCRIPTION);
@@ -116,15 +118,15 @@ public class ApplicationAPIDelegateTest {
     }
 
     private SApplicationImpl getDefaultApplication() {
-        final SApplicationImpl sApp = new SApplicationImpl(APP_NAME, VERSION, PATH, System.currentTimeMillis(), LOGGED_USER_ID,
-                SApplicationState.DEACTIVATED.name());
+        final SApplicationImpl sApp = new SApplicationImpl(APP_NAME, APP_DISP_NAME, VERSION, PATH, System.currentTimeMillis(),
+                LOGGED_USER_ID, SApplicationState.DEACTIVATED.name());
         return sApp;
     }
 
     @Test(expected = AlreadyExistsException.class)
     public void createApplication_should_throw_AlreadyExistsException_when_applicationService_throws_SObjectAlreadyExistsException() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, VERSION, PATH);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION, PATH);
         final SApplicationImpl sApp = getDefaultApplication();
         given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(applicationService.createApplication(sApp)).willThrow(new SObjectAlreadyExistsException(""));
@@ -138,7 +140,7 @@ public class ApplicationAPIDelegateTest {
     @Test(expected = CreationException.class)
     public void createApplication_should_throw_CreationException_when_applicationService_throws_SObjectCreationException() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, VERSION, PATH);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION, PATH);
         final SApplicationImpl sApp = getDefaultApplication();
         given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(applicationService.createApplication(sApp)).willThrow(new SObjectCreationException(""));
@@ -152,7 +154,7 @@ public class ApplicationAPIDelegateTest {
     @Test(expected = InvalidNameException.class)
     public void createApplication_should_throw_InvalidNameException_when_applicationService_throws_SInvalidNameException() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, VERSION, PATH);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION, PATH);
         final SApplicationImpl sApp = getDefaultApplication();
         given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(applicationService.createApplication(sApp)).willThrow(new SInvalidNameException(""));

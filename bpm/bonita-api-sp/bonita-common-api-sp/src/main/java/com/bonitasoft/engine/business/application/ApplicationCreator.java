@@ -27,20 +27,16 @@ public class ApplicationCreator implements Serializable {
 
     private final Map<ApplicationField, Serializable> fields;
 
-    public ApplicationCreator(final String name, final String version, final String path) {
+    public ApplicationCreator(final String name, String displayName, final String version, final String path) {
         fields = new HashMap<ApplicationField, Serializable>(2);
         fields.put(ApplicationField.NAME, name);
         fields.put(ApplicationField.VERSION, version);
         fields.put(ApplicationField.PATH, path);
+        fields.put(ApplicationField.DISPLAY_NAME, displayName);
     }
 
     public String getName() {
         return fields.get(ApplicationField.NAME).toString();
-    }
-
-    public ApplicationCreator setDisplayName(final String displayName) {
-        fields.put(ApplicationField.DISPLAY_NAME, displayName);
-        return this;
     }
 
     public ApplicationCreator setDescription(final String description) {

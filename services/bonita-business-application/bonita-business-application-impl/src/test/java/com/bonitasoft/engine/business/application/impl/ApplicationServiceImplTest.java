@@ -63,6 +63,8 @@ public class ApplicationServiceImplTest {
 
     private static final String APPLICATION_NAME = "app";
 
+    private static final String APPLICATION_DISP_NAME = "My app";
+
     @Mock
     private Recorder recorder;
 
@@ -80,12 +82,12 @@ public class ApplicationServiceImplTest {
     @Before
     public void setUp() throws Exception {
         when(queriableLogService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(true);
-        application = buildApplication(APPLICATION_NAME);
+        application = buildApplication(APPLICATION_NAME, APPLICATION_DISP_NAME);
         application.setId(10L);
     }
 
-    private SApplication buildApplication(final String applicationName) {
-        return new SApplicationBuilderFactoryImpl().createNewInstance(applicationName, "1.0", "/" + applicationName, CREATED_BY).done();
+    private SApplication buildApplication(final String applicationName, final String applicationDisplayName) {
+        return new SApplicationBuilderFactoryImpl().createNewInstance(applicationName, applicationDisplayName, "1.0", "/" + applicationName, CREATED_BY).done();
     }
 
     @Test
@@ -117,7 +119,23 @@ public class ApplicationServiceImplTest {
     @Test(expected = SInvalidNameException.class)
     public void createApplication_should_throw_SInvalidApplicationName_when_name_is_invalid() throws Exception {
         //when
-        applicationService.createApplication(buildApplication("name with spaces"));
+        applicationService.createApplication(buildApplication("name with spaces", APPLICATION_DISP_NAME));
+
+        //then exception
+    }
+
+    @Test(expected = SObjectCreationException.class)
+    public void createApplication_should_throw_SObjectCreationException_when_displayname_is_null() throws Exception {
+        //when
+        applicationService.createApplication(buildApplication(APPLICATION_NAME, null));
+
+        //then exception
+    }
+
+    @Test(expected = SObjectCreationException.class)
+    public void createApplication_should_throw_SObjectCreationException_when_displayname_is_empty_after_trim() throws Exception {
+        //when
+        applicationService.createApplication(buildApplication(APPLICATION_NAME, " "));
 
         //then exception
     }
@@ -129,7 +147,7 @@ public class ApplicationServiceImplTest {
         given(persistenceService.selectOne(new SelectOneDescriptor<SApplication>("getApplicationByName", Collections.<String, Object> singletonMap("name",
                 name), SApplication.class))).willReturn(application);
 
-        final SApplication newApp = buildApplication(APPLICATION_NAME);
+        final SApplication newApp = buildApplication(APPLICATION_NAME, APPLICATION_DISP_NAME);
 
         //when
         try {

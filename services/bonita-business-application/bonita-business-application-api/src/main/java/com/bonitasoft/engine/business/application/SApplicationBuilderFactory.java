@@ -15,7 +15,7 @@ package com.bonitasoft.engine.business.application;
  */
 public interface SApplicationBuilderFactory {
 
-    SApplicationBuilder createNewInstance(String name, String version, String path, final long createdBy);
+    SApplicationBuilder createNewInstance(String name, String displayName, String version, String path, final long createdBy);
 
     String getIdKey();
 

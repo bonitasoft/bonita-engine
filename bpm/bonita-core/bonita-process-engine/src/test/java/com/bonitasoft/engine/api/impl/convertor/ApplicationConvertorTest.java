@@ -42,10 +42,9 @@ public class ApplicationConvertorTest {
     @Test
     public void buildSApplication_should_map_all_information_from_creator_and_initialize_mandatory_fields() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_VERSION, APP_PATH);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, APP_PATH);
         creator.setDescription(APP_DESC);
         creator.setIconPath(ICON_PATH);
-        creator.setDisplayName(APP_DISPLAY_NAME);
         final long userId = 10;
         final long before = System.currentTimeMillis();
 
@@ -72,14 +71,13 @@ public class ApplicationConvertorTest {
         //given
         final long currentDate = System.currentTimeMillis();
         final String state = SApplicationState.DEACTIVATED.name();
-        final SApplicationImpl sApp = new SApplicationImpl(APP_NAME, APP_VERSION, APP_PATH, currentDate, CREATOR_ID,
-                state);
+        final SApplicationImpl sApp = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, APP_PATH, currentDate,
+                CREATOR_ID, state);
         sApp.setDescription(APP_DESC);
         sApp.setId(ID);
         sApp.setTenantId(TENANT_ID);
         sApp.setIconPath(ICON_PATH);
         sApp.setHomePageId(HOME_PAGE_ID);
-        sApp.setDisplayName(APP_DISPLAY_NAME);
 
         //when
         final Application application = convertor.toApplication(sApp);
@@ -104,8 +102,10 @@ public class ApplicationConvertorTest {
     @Test
     public void toApplicationList_should_call_toApplition_for_each_element_in_the_list_and_return_the_list_of_converted_values() throws Exception {
         //given
-        final SApplicationImpl sApp1 = new SApplicationImpl(APP_NAME, APP_VERSION, APP_PATH, System.currentTimeMillis(), CREATOR_ID, SApplicationState.DEACTIVATED.name());
-        final SApplicationImpl sApp2 = new SApplicationImpl("app2", APP_VERSION, "/app2", System.currentTimeMillis(), CREATOR_ID, SApplicationState.DEACTIVATED.name());
+        final SApplicationImpl sApp1 = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, APP_PATH, System.currentTimeMillis(), CREATOR_ID,
+                SApplicationState.DEACTIVATED.name());
+        final SApplicationImpl sApp2 = new SApplicationImpl("app2", " my app2", APP_VERSION, "/app2", System.currentTimeMillis(), CREATOR_ID,
+                SApplicationState.DEACTIVATED.name());
         final ApplicationImpl app1 = new ApplicationImpl(APP_NAME, APP_VERSION, APP_PATH, APP_DESC);
         final ApplicationImpl app2 = new ApplicationImpl("app2", APP_VERSION, "/app2", APP_DESC);
         final ApplicationConvertor convertorMock = spy(convertor);

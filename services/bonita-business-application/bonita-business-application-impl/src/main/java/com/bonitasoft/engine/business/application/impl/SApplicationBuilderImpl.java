@@ -30,12 +30,6 @@ public class SApplicationBuilderImpl implements SApplicationBuilder {
     }
 
     @Override
-    public SApplicationBuilder setDisplayName(final String displayName) {
-        application.setDisplayName(displayName);
-        return this;
-    }
-
-    @Override
     public SApplicationBuilder setDescription(final String description) {
         application.setDescription(description);
         return this;

@@ -26,6 +26,7 @@ public class ApplicationBuilder extends PersistentObjectBuilder<SApplicationImpl
     private String name;
     private String version;
     private String path;
+    private String displayName;
 
     public static ApplicationBuilder anApplication() {
         return new ApplicationBuilder();
@@ -33,11 +34,16 @@ public class ApplicationBuilder extends PersistentObjectBuilder<SApplicationImpl
 
     @Override
     SApplicationImpl _build() {
-        return new SApplicationImpl(name, version, path, System.currentTimeMillis(), 21, SApplicationState.DEACTIVATED.name());
+        return new SApplicationImpl(name, displayName, version, path, System.currentTimeMillis(), 21, SApplicationState.DEACTIVATED.name());
     }
 
     public ApplicationBuilder withName(final String name) {
         this.name = name;
+        return this;
+    }
+
+    public ApplicationBuilder withDispalyName(final String displayName) {
+        this.displayName = displayName;
         return this;
     }
 
