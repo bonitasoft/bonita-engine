@@ -44,7 +44,7 @@ public class EqualsBuilderTest extends CompilableCode {
 
     @After
     public void tearDown() throws Exception {
-        destDir.delete();
+        IOUtil.deleteDir(destDir);
     }
 
     @Test
