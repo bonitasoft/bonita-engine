@@ -63,14 +63,7 @@ public class BusinessArchiveFactory {
             barFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("tempBusinessArchive");
             IOUtil.unzipToFolder(inputStream, barFolder);
 
-            final BusinessArchive businessArchive = new BusinessArchive();
-
-            for (final BusinessArchiveContribution contribution : contributions) {
-                if (!contribution.readFromBarFolder(businessArchive, barFolder) && contribution.isMandatory()) {
-                    throw new InvalidBusinessArchiveFormatException("Invalid format, can't read '" + contribution.getName() + "' from the BAR file");
-                }
-            }
-            return businessArchive;
+            return getBusinessArchive(barFolder);
         } catch (final InvalidBusinessArchiveFormatException e) {
             throw e;
         } catch (final Exception e) {
@@ -97,20 +90,25 @@ public class BusinessArchiveFactory {
             throw new FileNotFoundException("the file does not exists: " + barOrFolder.getAbsolutePath());
         }
         if (barOrFolder.isDirectory()) {
-            final BusinessArchive businessArchive = new BusinessArchive();
-            for (final BusinessArchiveContribution contribution : contributions) {
-                if (!contribution.readFromBarFolder(businessArchive, barOrFolder) && contribution.isMandatory()) {
-                    throw new InvalidBusinessArchiveFormatException("Invalid format, can't read " + contribution.getName() + " from the BAR file");
-                }
-            }
-            return businessArchive;
+            return getBusinessArchive(barOrFolder);
         }
+
         final FileInputStream inputStream = new FileInputStream(barOrFolder);
         try {
             return readBusinessArchive(inputStream);
         } finally {
             inputStream.close();
         }
+    }
+
+    private static BusinessArchive getBusinessArchive(File barFolder) throws IOException, InvalidBusinessArchiveFormatException {
+        final BusinessArchive businessArchive = new BusinessArchive();
+        for (final BusinessArchiveContribution contribution : contributions) {
+            if (!contribution.readFromBarFolder(businessArchive, barFolder) && contribution.isMandatory()) {
+                throw new InvalidBusinessArchiveFormatException("Invalid format, can't read '" + contribution.getName() + "' from the BAR file");
+            }
+        }
+        return businessArchive;
     }
 
     /**

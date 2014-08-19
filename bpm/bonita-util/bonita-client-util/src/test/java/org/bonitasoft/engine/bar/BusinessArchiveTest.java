@@ -164,8 +164,12 @@ public class BusinessArchiveTest {
         assertTrue(barFile.exists());
 
         final InputStream inputStream = new FileInputStream(barFile);
-        final BusinessArchive businessArchive2 = BusinessArchiveFactory.readBusinessArchive(inputStream);
-        inputStream.close();
+        final BusinessArchive businessArchive2;
+        try {
+            businessArchive2 = BusinessArchiveFactory.readBusinessArchive(inputStream);
+        } finally {
+            inputStream.close();
+        }
         final ProcessDefinition result = businessArchive2.getProcessDefinition();
 
         assertEquals(process, result);
@@ -250,10 +254,14 @@ public class BusinessArchiveTest {
         BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
 
         final InputStream inputStream = new FileInputStream(barFile);
-        final BusinessArchive businessArchive2 = BusinessArchiveFactory.readBusinessArchive(inputStream);
-        inputStream.close();
-        final ProcessDefinition result = businessArchive2.getProcessDefinition();
+        final BusinessArchive businessArchive2;
+        try {
+            businessArchive2 = BusinessArchiveFactory.readBusinessArchive(inputStream);
+        } finally {
+            inputStream.close();
+        }
 
+        final ProcessDefinition result = businessArchive2.getProcessDefinition();
         assertEquals(process, result);
     }
 
@@ -271,13 +279,17 @@ public class BusinessArchiveTest {
     public void importOldBusinessArchiveFileFail() throws Exception {
         final InputStream inputStream = this.getClass().getResourceAsStream("MyProcess--1.0.bar");
         final OutputStream out = new FileOutputStream(barFile);
-        final byte buf[] = new byte[1024];
-        int len;
-        while ((len = inputStream.read(buf)) > 0) {
-            out.write(buf, 0, len);
+        try {
+            final byte buf[] = new byte[1024];
+            int len;
+            while ((len = inputStream.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+        } finally {
+            out.close();
+            inputStream.close();
         }
-        out.close();
-        inputStream.close();
+
         BusinessArchiveFactory.readBusinessArchive(barFile);
     }
 
@@ -371,10 +383,14 @@ public class BusinessArchiveTest {
         BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
 
         final InputStream inputStream = new FileInputStream(barFile);
-        final BusinessArchive businessArchive2 = BusinessArchiveFactory.readBusinessArchive(inputStream);
-        inputStream.close();
-        final DesignProcessDefinition result = businessArchive2.getProcessDefinition();
+        final BusinessArchive businessArchive2;
+        try {
+            businessArchive2 = BusinessArchiveFactory.readBusinessArchive(inputStream);
+        } finally {
+            inputStream.close();
+        }
 
+        final DesignProcessDefinition result = businessArchive2.getProcessDefinition();
         final List<DocumentDefinition> documentDefinitions = result.getProcessContainer().getDocumentDefinitions();
         final DocumentDefinition testDoc1 = documentDefinitions.get(0);
         assertEquals("testDoc", testDoc1.getName());
@@ -945,10 +961,14 @@ public class BusinessArchiveTest {
         BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
 
         final InputStream inputStream = new FileInputStream(barFile);
-        final BusinessArchive businessArchive2 = BusinessArchiveFactory.readBusinessArchive(inputStream);
-        inputStream.close();
-        final DesignProcessDefinition result = businessArchive2.getProcessDefinition();
+        final BusinessArchive businessArchive2;
+        try {
+            businessArchive2 = BusinessArchiveFactory.readBusinessArchive(inputStream);
+        } finally {
+            inputStream.close();
+        }
 
+        final DesignProcessDefinition result = businessArchive2.getProcessDefinition();
         assertEquals(process.getName(), result.getName());
         assertEquals(process.getVersion(), result.getVersion());
         assertEquals(process.getProcessContainer().getStartEvents().size(), result.getProcessContainer().getStartEvents().size());
@@ -1124,7 +1144,12 @@ public class BusinessArchiveTest {
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void readBarWithConnectorFailActionsFails() throws Exception {
-        BusinessArchiveFactory.readBusinessArchive(BusinessArchiveTest.class.getResourceAsStream("testBuy_a_mini_extended--6.1.bar"));
+        final InputStream resourceAsStream = BusinessArchiveTest.class.getResourceAsStream("testBuy_a_mini_extended--6.1.bar");
+        try {
+            BusinessArchiveFactory.readBusinessArchive(resourceAsStream);
+        } finally {
+            resourceAsStream.close();
+        }
     }
 
 }

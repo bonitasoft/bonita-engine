@@ -460,6 +460,7 @@ public class IOUtil {
         try {
             extractZipEntries(zipInputstream, outputFolder);
         } finally {
+            zipInputstream.closeEntry();
             zipInputstream.close();
         }
     }
@@ -494,23 +495,21 @@ public class IOUtil {
     private static void writeZipInputToFile(final ZipInputStream zipInputstream, final File outputFile) throws FileNotFoundException, IOException {
         // The input is a file. An FileOutputStream is created to write the content of the new file.
         mkdirs(outputFile.getParentFile());
+        final FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
         try {
-            final FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
-            try {
-                // The contents of the new file, that is read from the ZipInputStream using a buffer (byte []), is written.
-                int bytesRead;
-                final byte[] buffer = new byte[BUFFER_SIZE];
-                while ((bytesRead = zipInputstream.read(buffer)) > -1) {
-                    fileOutputStream.write(buffer, 0, bytesRead);
-                }
-                fileOutputStream.flush();
-            } finally {
-                fileOutputStream.close();
+            // The contents of the new file, that is read from the ZipInputStream using a buffer (byte []), is written.
+            int bytesRead;
+            final byte[] buffer = new byte[BUFFER_SIZE];
+            while ((bytesRead = zipInputstream.read(buffer)) > -1) {
+                fileOutputStream.write(buffer, 0, bytesRead);
             }
+            fileOutputStream.flush();
         } catch (final IOException ioe) {
             // In case of error, the file is deleted
             outputFile.delete();
             throw ioe;
+        } finally {
+            fileOutputStream.close();
         }
     }
 
