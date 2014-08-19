@@ -12,7 +12,7 @@ CREATE TABLE business_app (
   updatedBy NUMERIC(19, 0) NOT NULL,
   state NVARCHAR(30) NOT NULL,
   homePageId NUMERIC(19, 0),
-  displayName NVARCHAR(255)
+  displayName NVARCHAR(255) NOT NULL
 )
 GO
 
@@ -29,7 +29,7 @@ CREATE TABLE business_app_page (
   id NUMERIC(19, 0) NOT NULL,
   applicationId NUMERIC(19, 0) NOT NULL,
   pageId NUMERIC(19, 0) NOT NULL,
-  name NVARCHAR(255)
+  name NVARCHAR(255) NOT NULL
 )
 GO
 

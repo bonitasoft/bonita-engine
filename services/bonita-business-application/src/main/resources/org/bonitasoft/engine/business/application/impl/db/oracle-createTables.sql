@@ -12,7 +12,7 @@ CREATE TABLE business_app (
   updatedBy NUMBER(19, 0) NOT NULL,
   state VARCHAR2(30) NOT NULL,
   homePageId NUMBER(19, 0),
-  displayName VARCHAR2(255)
+  displayName VARCHAR2(255) NOT NULL
 );
 
 ALTER TABLE business_app ADD CONSTRAINT pk_business_app PRIMARY KEY (tenantid, id);
@@ -25,7 +25,7 @@ CREATE TABLE business_app_page (
   id NUMBER(19, 0) NOT NULL,
   applicationId NUMBER(19, 0) NOT NULL,
   pageId NUMBER(19, 0) NOT NULL,
-  name VARCHAR2(255)
+  name VARCHAR2(255) NOT NULL
 );
 
 ALTER TABLE business_app_page ADD CONSTRAINT pk_business_app_page PRIMARY KEY (tenantid, id);
