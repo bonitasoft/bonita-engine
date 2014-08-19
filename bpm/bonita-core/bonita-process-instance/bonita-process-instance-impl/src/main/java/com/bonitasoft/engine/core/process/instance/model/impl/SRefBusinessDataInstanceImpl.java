@@ -15,13 +15,11 @@ import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstanc
 /**
  * @author Matthieu Chaffotte
  */
-public class SRefBusinessDataInstanceImpl extends SPersistenceObjectImpl implements SRefBusinessDataInstance {
+public abstract class SRefBusinessDataInstanceImpl extends SPersistenceObjectImpl implements SRefBusinessDataInstance {
 
     private static final long serialVersionUID = 6616497495062704471L;
 
     private String name;
-
-    private long processInstanceId;
 
     private String dataClassName;
 
@@ -41,15 +39,6 @@ public class SRefBusinessDataInstanceImpl extends SPersistenceObjectImpl impleme
 
     public void setName(final String name) {
         this.name = name;
-    }
-
-    @Override
-    public long getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public void setProcessInstanceId(final long processInstanceId) {
-        this.processInstanceId = processInstanceId;
     }
 
     @Override

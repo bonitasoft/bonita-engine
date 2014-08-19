@@ -59,16 +59,19 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
             final ContainerState containerState) throws SExpressionDependencyMissingException, SExpressionEvaluationException {
-        final String bizDataName = expression.getContent();
-        if (context.containsKey(bizDataName)) {
-            return context.get(bizDataName);
+        final String businessDataName = expression.getContent();
+        if (context.containsKey(businessDataName)) {
+            return context.get(businessDataName);
         }
         long processInstanceId = -1;
         try {
-            processInstanceId = flowNodeInstanceService.getProcessInstanceId((Long) context.get(SExpressionContext.CONTAINER_ID_KEY),
-                    (String) context.get(SExpressionContext.CONTAINER_TYPE_KEY));
-            final SRefBusinessDataInstance refBusinessDataInstance = refBusinessDataService.getRefBusinessDataInstance(
-                    bizDataName, processInstanceId);
+            final Long containerId = (Long) context.get(SExpressionContext.CONTAINER_ID_KEY);
+            final String containerType = (String) context.get(SExpressionContext.CONTAINER_TYPE_KEY);
+            if ("PROCESS_INSTANCE".equals(containerType)) {
+                processInstanceId = containerId;
+            }
+            final SRefBusinessDataInstance refBusinessDataInstance = getRefBusinessDataInstance(businessDataName, containerId, containerType);
+
             final Class<Entity> bizClass = (Class<Entity>) Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
             if (refBusinessDataInstance instanceof SSimpleRefBusinessDataInstance) {
                 final SSimpleRefBusinessDataInstance reference = (SSimpleRefBusinessDataInstance) refBusinessDataInstance;
@@ -78,7 +81,7 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
                 return businessDataRepository.findByIds(bizClass, reference.getDataIds());
             }
         } catch (final SBonitaReadException e) {
-            throw new SExpressionEvaluationException("Unable to retrieve business data instance with name " + bizDataName, expression.getName());
+            throw new SExpressionEvaluationException("Unable to retrieve business data instance with name " + businessDataName, expression.getName());
         } catch (final SBonitaException e) {
             if (processInstanceId != -1) {
                 e.setProcessInstanceIdOnContext(processInstanceId);
@@ -86,6 +89,20 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
             throw new SExpressionEvaluationException(e, expression.getName());
         } catch (final ClassNotFoundException e) {
             throw new SExpressionEvaluationException(e, expression.getName());
+        }
+    }
+
+    protected SRefBusinessDataInstance getRefBusinessDataInstance(final String businessDataName, final long containerId, final String containerType)
+            throws SBonitaException {
+        if ("PROCESS_INSTANCE".equals(containerType)) {
+            final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
+            return refBusinessDataService.getRefBusinessDataInstance(businessDataName, processInstanceId);
+        }
+        try {
+            return refBusinessDataService.getFlowNodeRefBusinessDataInstance(businessDataName, containerId);
+        } catch (final SBonitaException sbe) {
+            final long processInstanceId = flowNodeInstanceService.getProcessInstanceId(containerId, containerType);
+            return refBusinessDataService.getRefBusinessDataInstance(businessDataName, processInstanceId);
         }
     }
 
