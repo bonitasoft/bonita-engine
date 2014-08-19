@@ -10,6 +10,7 @@
 
  <logger name="org.bonitasoft" level="INFO"/>
  <logger name="org.hibernate.engine.jdbc.internal.JdbcCoordinatorImpl" level="ERROR"/>
+ <logger name="org.bonitasoft.engine.classloader" level="DEBUG"/>
 
   <root level="WARN">
     <appender-ref ref="STDOUT" />

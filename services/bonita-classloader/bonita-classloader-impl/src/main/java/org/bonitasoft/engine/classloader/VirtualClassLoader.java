@@ -103,7 +103,15 @@ public class VirtualClassLoader extends ClassLoader {
 
     @Override
     public String toString() {
-        return super.toString() + ", type=" + artifactType + ", id=" + artifactId + " delegate: " + this.classloader;
+        return super.toString() + ", type=" + artifactType + ", id=" + artifactId + " delegate: " + classloader;
+    }
+
+    public String getArtifactType() {
+        return artifactType;
+    }
+
+    public long getArtifactId() {
+        return artifactId;
     }
 
 }
