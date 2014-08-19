@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
@@ -28,13 +29,31 @@ import org.bonitasoft.engine.tracking.AbstractTimeTrackerTest;
 import org.bonitasoft.engine.tracking.FlushResult;
 import org.bonitasoft.engine.tracking.Record;
 import org.bonitasoft.engine.tracking.TimeTracker;
+import org.junit.After;
 import org.junit.Test;
 
 public class CSVFlushEventListenerTest extends AbstractTimeTrackerTest {
 
+    @After
+    public void after() {
+        final FilenameFilter filter = new FilenameFilter() {
+
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.matches("(.*)bonita_timetracker(.*).csv");
+            }
+        };
+
+        final File temp_dir = new File(IOUtil.TMP_DIRECTORY);
+        final String[] list = temp_dir.list(filter);
+        for (final String fileName : list) {
+            IOUtil.deleteFile(new File(temp_dir, fileName), 1, 0);
+        }
+    }
+
     public void should_work_if_output_folder_is_a_folder() {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        new CSVFlushEventListener(logger, System.getProperty("java.io.tmpdir"), ";");
+        new CSVFlushEventListener(logger, IOUtil.TMP_DIRECTORY, ";");
     }
 
     @Test(expected = RuntimeException.class)
