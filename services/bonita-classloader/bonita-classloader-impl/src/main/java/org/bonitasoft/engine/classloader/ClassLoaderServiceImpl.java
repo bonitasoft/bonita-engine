@@ -62,6 +62,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
         this.logger = logger;
         final String temporaryFolderName = buildTemporaryFolderName(temporaryFolder);
+        // BS-9304 : Create the temporary directory with the IOUtil class, to delete it at the end of the JVM
         this.temporaryFolder = IOUtil.createTempDirectory(new File(temporaryFolderName, "bos-engine").toURI()).getAbsolutePath();
     }
 
