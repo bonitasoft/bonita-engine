@@ -975,11 +975,6 @@ public class BusinessArchiveTest {
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void readInvalidProcessFromBusinessArchive() throws Exception {
-        tempFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("readInvalidProcessFromBusinessArchive_businessArchiveFolder");
-        tempFolder.delete();
-        barFile = IOUtil.createTempFileInDefaultTempDirectory("readInvalidProcessFromBusinessArchive_businessArchive", ".bar");
-        barFile.delete();
-
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         processDefinitionBuilder.addActor("Truck Driver").addDescription("A man that is driving bigs trucks");
         processDefinitionBuilder.addStartEvent("start1");
@@ -1010,11 +1005,6 @@ public class BusinessArchiveTest {
 
     @Test(expected = InvalidBusinessArchiveFormatException.class)
     public void readInvalidXMLProcessFromBusinessArchive() throws Exception {
-        tempFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("readInvalidXMLProcessFromBusinessArchive_businessArchiveFolder");
-        tempFolder.delete();
-        barFile = IOUtil.createTempFileInDefaultTempDirectory("readInvalidXMLProcessFromBusinessArchive_businessArchive", ".bar");
-        barFile.delete();
-
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
         processDefinitionBuilder.addActor("Truck Driver").addDescription("A man that is driving bigs trucks");
         processDefinitionBuilder.addStartEvent("start1");

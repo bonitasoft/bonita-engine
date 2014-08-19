@@ -193,10 +193,6 @@ public class XMLHandler {
         }
     }
 
-    public void validate(final Reader content) throws ValidationException, IOException {
-        validate(new StreamSource(content));
-    }
-
     public byte[] write(final XMLNode rootNode) {
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] xmlContent = null;

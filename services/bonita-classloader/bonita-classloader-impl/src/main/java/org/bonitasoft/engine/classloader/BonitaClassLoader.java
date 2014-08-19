@@ -61,7 +61,10 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
         nonJarResources = new HashMap<String, byte[]>();
         urls = new HashSet<URL>();
-        this.temporaryDirectory = IOUtil.createTempDirectory(temporaryDirectoryUri);
+        this.temporaryDirectory = new File(temporaryDirectoryUri);
+        if (!this.temporaryDirectory.exists()) {
+            this.temporaryDirectory.mkdirs();
+        }
         addResources(resources);
         addURLs(urls.toArray(new URL[urls.size()]));
     }
