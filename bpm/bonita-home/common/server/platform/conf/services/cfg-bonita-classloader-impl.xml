@@ -7,7 +7,7 @@
     
     <bean id="classLoaderService" class="org.bonitasoft.engine.classloader.ClassLoaderServiceImpl">
         <constructor-arg name="parentClassLoaderResolver" ref="parentClassLoaderResolver" />
-		<constructor-arg name="temporaryFolder" value="${java.io.tmpdir}" />
+		<constructor-arg name="temporaryFolder" value="${bonita.home}/server/platform/tmp" />
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
