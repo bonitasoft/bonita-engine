@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.classloader;
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,8 +63,9 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
         this.logger = logger;
         final String temporaryFolderName = buildTemporaryFolderName(temporaryFolder);
+        final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
         // BS-9304 : Create the temporary directory with the IOUtil class, to delete it at the end of the JVM
-        this.temporaryFolder = IOUtil.createTempDirectory(new File(temporaryFolderName, "bos-engine").toURI()).getAbsolutePath();
+        this.temporaryFolder = IOUtil.createTempDirectory(new File(temporaryFolderName, "bonita_engine_" + jvmName).toURI()).getAbsolutePath();
     }
 
     private String buildTemporaryFolderName(final String temporaryFolder) {

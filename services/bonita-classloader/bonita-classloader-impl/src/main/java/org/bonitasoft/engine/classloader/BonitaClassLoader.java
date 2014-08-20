@@ -77,7 +77,6 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
                     try {
                         final File file = IOUtil.createTempFile(resource.getKey(), null, temporaryDirectory);
                         IOUtil.write(file, data);
-                        FileUtils.copyFile(file, new File("/tmp", file.getName()));
                         final String path = file.getAbsolutePath();
                         final URL url = new File(path).toURI().toURL();
                         urls.add(url);

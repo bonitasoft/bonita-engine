@@ -323,14 +323,13 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     @Test
     public void testLoadSharedClassUsingBadLocalClassLoader() throws Exception {
         initializeClassLoaderService();
-        // getTransactionService().begin();
+        // Should not be found with ID2 (bad scope):
         final ClassLoader classLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID2);
         final Class<?> clazz = classLoader.loadClass("org.bonitasoft.engine.classloader.SharedClass1");
         final ClassLoader classLoader2 = clazz.getClassLoader();
         checkGlobalClassLoader(classLoader2);
 
         assertNotSame(classLoader, classLoader2);
-        // getTransactionService().complete();
     }
 
     @Test
@@ -569,10 +568,10 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     }
 
     private void checkLocalClassLoader(final ClassLoader classLoader) {
-        final boolean isGlobal = classLoader instanceof BonitaClassLoader
+        final boolean isLocal = classLoader instanceof BonitaClassLoader
                 && !((BonitaClassLoader) classLoader).getType().equals(ClassLoaderServiceImpl.GLOBAL_TYPE);
         try {
-            assertTrue(isGlobal);
+            assertTrue(isLocal);
         } catch (final AssertionError e) {
             System.out.println("ClassLoader should be LOCAL: " + classLoader.toString());
             throw e;
