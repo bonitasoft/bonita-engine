@@ -106,12 +106,4 @@ public class VirtualClassLoader extends ClassLoader {
         return super.toString() + ", type=" + artifactType + ", id=" + artifactId + " delegate: " + classloader;
     }
 
-    public String getArtifactType() {
-        return artifactType;
-    }
-
-    public long getArtifactId() {
-        return artifactId;
-    }
-
 }

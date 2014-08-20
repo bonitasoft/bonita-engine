@@ -138,13 +138,13 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getLocalClassLoader"));
         }
-        final VirtualClassLoader virtualClassLoader = localClassLoaders.get(key);
-        final String newKey = getKey(virtualClassLoader.getArtifactType(), virtualClassLoader.getArtifactId());
-        if (!key.equals(newKey)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "***************** WARNING: getLocalClassLoader() returning wrong Local CL. key: " + newKey
-                    + "  *******************");
-        }
-        return virtualClassLoader;
+        // final VirtualClassLoader virtualClassLoader = localClassLoaders.get(key);
+        // final String newKey = getKey(virtualClassLoader.getArtifactType(), virtualClassLoader.getArtifactId());
+        // if (!key.equals(newKey)) {
+        // logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "***************** WARNING: getLocalClassLoader() returning wrong Local CL. key: " + newKey
+        // + "  *******************");
+        // }
+        return localClassLoaders.get(key);
     }
 
     @Override
@@ -222,10 +222,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     @Override
     public void refreshLocalClassLoader(final String type, final long id, final Map<String, byte[]> resources) {
         final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getLocalClassLoader(type, id);
-        logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Refreshing " + virtualClassloader.toString());
         refreshLocalClassLoader(virtualClassloader, resources, type, id, getLocalTemporaryFolder(type, id), new ParentRedirectClassLoader(
                 getGlobalClassLoader(), parentClassLoaderResolver, this, type, id));
-        logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "After refreshing " + virtualClassloader.toString());
     }
 
     private void refreshLocalClassLoader(final VirtualClassLoader virtualClassloader, final Map<String, byte[]> resources, final String type, final long id,

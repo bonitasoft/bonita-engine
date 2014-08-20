@@ -394,7 +394,6 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
 
         // check the refresh has been done using the service
         final ClassLoader localClassLoader2 = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
-        System.err.println("************* localClassLoader: " + localClassLoader2 + " ****************");
         checkLocalClassLoader(localClassLoader2.loadClass("org.bonitasoft.engine.classloader.GlobalClass2")
                 .getClassLoader());
 
@@ -436,7 +435,6 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         // getTransactionService().begin();
 
         final ClassLoader globalClassLoader = classLoaderService.getGlobalClassLoader();
-        System.err.println("************* globalClassLoader: " + globalClassLoader + " ****************");
         final Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathGlobalClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
         checkGlobalClassLoader(classLoader);
@@ -452,7 +450,6 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         // getTransactionService().begin();
 
         final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
-        System.err.println("************* localClassLoader: " + localClassLoader + " ****************");
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathGlobalClass1");
         checkGlobalClassLoader(clazz.getClassLoader());
         assertNotSameClassloader(localClassLoader, clazz.getClassLoader());
@@ -467,7 +464,6 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         // getTransactionService().begin();
 
         final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
-        System.err.println("************* localClassLoader: " + localClassLoader + " ****************");
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathLocalClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
         checkLocalClassLoader(classLoader);
@@ -483,7 +479,6 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         // getTransactionService().begin();
 
         final ClassLoader classLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID2);
-        System.err.println("************* classLoader: " + classLoader + " ****************");
         // getTransactionService().complete();
         classLoader.loadClass("org.bonitasoft.classloader.test.NotInPathLocalClass1");
         fail("load class with wrong classloader");
@@ -496,7 +491,6 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         // getTransactionService().begin();
 
         final ClassLoader globalClassLoader = classLoaderService.getGlobalClassLoader();
-        System.err.println("************* globalClassLoader: " + globalClassLoader + " ****************");
         final Class<?> clazz = globalClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathSharedClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
         checkGlobalClassLoader(classLoader);
@@ -512,7 +506,6 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
         // getTransactionService().begin();
 
         final ClassLoader localClassLoader = classLoaderService.getLocalClassLoader(TYPE1.name(), ID1);
-        System.err.println("************* localClassLoader: " + localClassLoader + " ****************");
         final Class<?> clazz = localClassLoader.loadClass("org.bonitasoft.classloader.test.NotInPathSharedClass1");
         final ClassLoader classLoader = clazz.getClassLoader();
         checkGlobalClassLoader(classLoader);
