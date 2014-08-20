@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.execution.state;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +114,7 @@ public class ExecutingLoopActivityStateImpl implements FlowNodeState {
             }
 
             final SStandardLoopCharacteristics standardLoop = loopCharacteristics;
-            final Map<String, Serializable> input = new HashMap<String, Serializable>(1);
+            final Map<String, Object> input = new HashMap<String, Object>(1);
             input.put(ExpressionConstants.LOOP_COUNTER.getEngineConstantName(), loopActivity.getLoopCounter());
             final SExpressionContext sExpressionContext = new SExpressionContext(loopActivity.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), input);
             loop = (Boolean) expressionResolverService.evaluate(standardLoop.getLoopCondition(), sExpressionContext);

@@ -3,22 +3,32 @@ package org.bonitasoft.engine.activity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
+import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.RuleDefinition;
+import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
+import org.bonitasoft.engine.connectors.TestConnectorWithAPICall;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.operation.OperationBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -105,6 +115,9 @@ public class UserTaskContractTest extends CommonAPITest {
         final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask("task1", ACTOR_NAME);
         userTaskBuilder.addContract().addInput("numberOfDays", Integer.class.getName(), null)
         .addRule("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
+        userTaskBuilder.addIntegerData("result", null);
+        userTaskBuilder.addOperation(new OperationBuilder().createSetDataOperation("result",
+                new ExpressionBuilder().createGroovyScriptExpression("input", "numberOfDays", Integer.class.getName())));
         builder.addUserTask("task2", ACTOR_NAME).addTransition("task1", "task2");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
@@ -116,6 +129,9 @@ public class UserTaskContractTest extends CommonAPITest {
         inputs.put("numberOfDays", 8);
         getProcessAPI().executeFlowNode(userTask.getId(), inputs);
         waitForUserTask("task2");
+
+        final ArchivedDataInstance archivedResult = getProcessAPI().getArchivedActivityDataInstance("result", userTask.getId());
+        assertThat(archivedResult.getValue()).isEqualTo(8);
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -153,6 +169,44 @@ public class UserTaskContractTest extends CommonAPITest {
         }
 
         disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void executeConnectorWithJNDILookupAndAPICall() throws Exception {
+        final Expression localDataExpression = new ExpressionBuilder().createConstantLongExpression(0L);
+        final Expression processNameExpression = new ExpressionBuilder().createConstantStringExpression(PROCESS_NAME);
+        final Expression processVersionExpression = new ExpressionBuilder()
+        .createGroovyScriptExpression("inputVersion", "inputVersion", String.class.getName());
+        final Expression outputExpression = new ExpressionBuilder().createInputExpression("processInputId", Long.class.getName());
+
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        designProcessDefinition.addActor(ACTOR_NAME);
+        designProcessDefinition.addLongData("processId", localDataExpression);
+        final UserTaskDefinitionBuilder userTaskBuilder = designProcessDefinition.addUserTask("task3", ACTOR_NAME);
+        userTaskBuilder.addConnector("myConnector", "org.bonitasoft.engine.connectors.TestConnectorWithAPICall", "1.0", ConnectorEvent.ON_FINISH)
+        .addInput("processName", processNameExpression).addInput("processVersion", processVersionExpression)
+        .addOutput(new OperationBuilder().createSetDataOperation("processId", outputExpression));
+        userTaskBuilder.addContract().addInput("inputVersion", String.class.getName(), null).addInput("processInputId", Long.class.getName(), null);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnectorWithAPICall(designProcessDefinition);
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("task3");
+
+        getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
+        final Map<String, Object> inputs = new HashMap<String, Object>();
+        inputs.put("inputVersion", PROCESS_VERSION);
+        inputs.put("processInputId", 45L);
+        getProcessAPI().executeFlowNode(userTask.getId(), inputs);
+
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.COMPLETED);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithTestConnectorWithAPICall(final ProcessDefinitionBuilder processDefinitionBuilder)
+            throws InvalidBusinessArchiveFormatException, BonitaException, IOException {
+        return deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, ACTOR_NAME, matti, "TestConnectorWithAPICall.impl",
+                TestConnectorWithAPICall.class, "TestConnectorWithAPICall.jar");
     }
 
 }

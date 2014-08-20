@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
@@ -26,6 +27,8 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -85,6 +88,7 @@ import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
@@ -189,13 +193,16 @@ public class StateBehaviors {
 
     private final TokenService tokenService;
 
+    private final CacheService cacheService;
+
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
             final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
             final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
             final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
-            final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService, final SchedulerService schedulerService,
-            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final TokenService tokenService) {
+            final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceSevice, final SchedulerService schedulerService,
+            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final TokenService tokenService,
+            final CacheService cacheService) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -210,12 +217,13 @@ public class StateBehaviors {
         this.operationService = operationService;
         this.workService = workService;
         this.containerRegistry = containerRegistry;
-        this.eventInstanceService = eventInstanceService;
+        eventInstanceService = eventInstanceSevice;
         this.schedulerService = schedulerService;
         this.commentService = commentService;
         this.identityService = identityService;
         this.logger = logger;
         this.tokenService = tokenService;
+        this.cacheService = cacheService;
     }
 
     public void setProcessExecutor(final ProcessExecutor processExecutor) {
@@ -664,10 +672,16 @@ public class StateBehaviors {
                 final List<SOperation> sOperations = activityDefinition.getSOperations();
                 final SExpressionContext sExpressionContext = new SExpressionContext(activityInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                         processDefinition.getId());
+                if (activityInstance instanceof SUserTaskInstance) {
+                    final Map<String, Object> inputs = (Map<String, Object>) cacheService.get("USER_TASK_CONTRACT", activityInstance.getId());
+                    sExpressionContext.setInputValues(inputs);
+                }
                 operationService.execute(sOperations, sExpressionContext);
             }
         } catch (final SOperationExecutionException e) {
             throw new SActivityStateExecutionException(e);
+        } catch (final SCacheException sce) {
+            throw new SActivityStateExecutionException(sce);
         }
     }
 
@@ -743,8 +757,14 @@ public class StateBehaviors {
         final String connectorDefinitionName = sConnectorDefinition.getName();
         try {
             connectorInstanceService.setState(connector, ConnectorState.EXECUTING.name());
+            Map<String, Object> inputs = null;
+            try {
+                inputs = (Map<String, Object>) cacheService.get("USER_TASK_CONTRACT", flowNodeInstanceId);
+            } catch (final SCacheException sce) {
+                throw new SActivityStateExecutionException(sce);
+            }
             workService.registerWork(WorkFactory.createExecuteConnectorOfActivity(processDefinitionId, processInstanceId, flowNodeDefinitionId,
-                    flowNodeInstanceId, connectorInstanceId, connectorDefinitionName));
+                    flowNodeInstanceId, connectorInstanceId, connectorDefinitionName, inputs));
         } catch (final SConnectorInstanceModificationException e) {
             throw new SActivityStateExecutionException("Unable to set ConnectorState to EXECUTING", e);
         } catch (final SWorkRegisterException e) {

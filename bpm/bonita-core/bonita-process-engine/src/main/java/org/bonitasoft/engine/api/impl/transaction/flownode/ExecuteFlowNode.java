@@ -13,11 +13,15 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.flownode;
 
+import java.util.Map;
+
 import org.bonitasoft.engine.api.impl.SessionInfos;
+import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -40,17 +44,24 @@ public class ExecuteFlowNode implements TransactionContent {
 
     private final IdentityService identityService;
 
+    private final CacheService cacheService;
+
     private final SFlowNodeInstance flowNodeInstance;
 
     private final long userId;
 
-    public ExecuteFlowNode(final TenantServiceAccessor tenantAccessor, final long userId, final SFlowNodeInstance flowNodeInstance) {
+    private final Map<String, Object> inputs;
+
+    public ExecuteFlowNode(final TenantServiceAccessor tenantAccessor, final long userId, final SFlowNodeInstance flowNodeInstance,
+            final Map<String, Object> inputs) {
         processExecutor = tenantAccessor.getProcessExecutor();
         logger = tenantAccessor.getTechnicalLoggerService();
         commentService = tenantAccessor.getCommentService();
         identityService = tenantAccessor.getIdentityService();
+        cacheService = tenantAccessor.getCacheService();
         this.flowNodeInstance = flowNodeInstance;
         this.userId = userId;
+        this.inputs = inputs;
     }
 
     @Override
@@ -65,6 +76,10 @@ public class ExecuteFlowNode implements TransactionContent {
                 executerUserId = userId;
             }
             final boolean isFirstState = flowNodeInstance.getStateId() == 0;
+
+            if (flowNodeInstance instanceof SUserTaskInstance) {
+                cacheService.store("USER_TASK_CONTRACT", flowNodeInstance.getId(), inputs);
+            }
             // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
             processExecutor.executeFlowNode(flowNodeInstance.getId(), null, null, flowNodeInstance.getParentProcessInstanceId(), executerUserId,
                     executerSubstituteUserId);

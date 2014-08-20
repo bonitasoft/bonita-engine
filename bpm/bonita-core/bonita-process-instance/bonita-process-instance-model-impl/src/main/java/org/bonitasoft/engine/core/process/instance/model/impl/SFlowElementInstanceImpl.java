@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -19,6 +19,7 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Matthieu Chaffotte
  */
 public abstract class SFlowElementInstanceImpl extends SNamedElementImpl implements SFlowElementInstance {
 
@@ -209,7 +210,7 @@ public abstract class SFlowElementInstanceImpl extends SNamedElementImpl impleme
         result = prime * result + (stable ? 1231 : 1237);
         result = prime * result + (stateCategory == null ? 0 : stateCategory.hashCode());
         result = prime * result + (terminal ? 1231 : 1237);
-        result = prime * result + (int) (tokenRefId ^ tokenRefId >>> 32);
+        result = prime * result + (tokenRefId == null ? 0 : tokenRefId.hashCode());
         return result;
     }
 
@@ -259,7 +260,11 @@ public abstract class SFlowElementInstanceImpl extends SNamedElementImpl impleme
         if (terminal != other.terminal) {
             return false;
         }
-        if (tokenRefId != other.tokenRefId) {
+        if (tokenRefId == null) {
+            if (other.tokenRefId != null) {
+                return false;
+            }
+        } else if (!tokenRefId.equals(other.tokenRefId)) {
             return false;
         }
         return true;

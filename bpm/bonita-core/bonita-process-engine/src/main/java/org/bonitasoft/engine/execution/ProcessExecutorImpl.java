@@ -34,6 +34,8 @@ import org.bonitasoft.engine.bpm.connector.InvalidEvaluationConnectorConditionEx
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -91,6 +93,7 @@ import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.SToken;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
@@ -176,6 +179,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private final ConnectorInstanceService connectorInstanceService;
 
+    private final CacheService cacheService;
+
     public ProcessExecutorImpl(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
             final TechnicalLoggerService logger, final FlowNodeExecutor flowNodeExecutor, final WorkService workService,
             final ProcessDefinitionService processDefinitionService, final GatewayInstanceService gatewayInstanceService,
@@ -184,7 +189,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final ExpressionResolverService expressionResolverService, final EventService eventService,
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
-            final TokenService tokenService, final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager) {
+            final TokenService tokenService, final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager, final CacheService cacheService) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;
@@ -205,6 +210,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.sessionAccessor = sessionAccessor;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
+        this.cacheService = cacheService;
         // dependency injection because of circular references...
         flowNodeStateManager.setProcessExecutor(this);
         eventsHandler.setProcessExecutor(this);
@@ -262,7 +268,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                     if ((defaultTransition = getDefaultTransition(sDefinition, flowNodeInstance)) == null) {
                         chosenTransitionDefinitions = new ArrayList<STransitionDefinition>(1);
                     } else {
-                        List<STransitionDefinition> transitions = new ArrayList<STransitionDefinition>(1);
+                        final List<STransitionDefinition> transitions = new ArrayList<STransitionDefinition>(1);
                         transitions.add(defaultTransition);
                         return transitions;
                     }
@@ -315,7 +321,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private void throwSActivityExecutionException(final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance)
             throws SActivityExecutionException {
-        SActivityExecutionException exception = new SActivityExecutionException("There is no default transition on " + flowNodeInstance.getName()
+        final SActivityExecutionException exception = new SActivityExecutionException("There is no default transition on " + flowNodeInstance.getName()
                 + ", but no outgoing transition had a valid condition.");
         exception.setProcessDefinitionNameOnContext(sDefinition.getName());
         exception.setProcessDefinitionVersionOnContext(sDefinition.getVersion());
@@ -669,6 +675,14 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         final SUserTaskInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
         final long processInstanceId = sFlowNodeInstanceChild.getLogicalGroup(flowNodeKeyProvider.getParentProcessInstanceIndex());
 
+        if (sFlowNodeInstanceChild instanceof SUserTaskInstance) {
+            try {
+                cacheService.remove("USER_TASK_CONTRACT", flowNodeInstanceId);
+            } catch (final SCacheException sce) {
+                throw new SFlowNodeExecutionException(sce);
+            }
+        }
+
         SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
         final int tokensOfProcess = executeValidOutgoingTransitionsAndUpdateTokens(sProcessDefinition, sFlowNodeInstanceChild, sProcessInstance);
         if (tokensOfProcess == 0) {
@@ -740,7 +754,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     /**
      * Evaluate the split of the element
      * The element contains the current token it received
-     * 
+     *
      * @return
      *         number of token of the process
      */
@@ -795,8 +809,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private int updateTokens(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance,
             final int numberOfTokenToMerge, final FlowNodeTransitionsWrapper transitionsDescriptor, final FlowMerger merger)
-            throws SObjectModificationException, SObjectNotFoundException, SObjectReadException, SObjectCreationException, SGatewayModificationException,
-            SWorkRegisterException, SBonitaException {
+                    throws SObjectModificationException, SObjectNotFoundException, SObjectReadException, SObjectCreationException, SGatewayModificationException,
+                    SWorkRegisterException, SBonitaException {
         // handle token creation/deletion
         if (merger.mustConsumeInputTokenOnTakingTransition()) {
             tokenService.deleteTokens(sProcessInstance.getId(), child.getTokenRefId(), numberOfTokenToMerge);
@@ -878,7 +892,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     public SProcessInstance start(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final long starterId, final long starterSubstituteId,
             final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
             final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final long callerId, final long subProcessDefinitionId)
-            throws SProcessInstanceCreationException {
+                    throws SProcessInstanceCreationException {
         try {
             final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
             final FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, getFilter(targetSFlowNodeDefinitionId), subProcessDefinitionId);
@@ -915,7 +929,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
             final boolean isInitializing = initialize(starterId, sProcessDefinition, sProcessInstance, expressionContext,
                     operations != null ? new ArrayList<SOperation>(operations) : operations, context, selector.getContainer(), connectors,
-                    selector);
+                            selector);
             try {
                 handleEventSubProcess(sProcessDefinition, sProcessInstance, selector.getSubProcessDefinitionId());
             } catch (final SProcessInstanceCreationException e) {
@@ -983,8 +997,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     @Override
-    public SProcessInstance startElements(final SProcessInstance sProcessInstance, final FlowNodeSelector selector) throws SProcessInstanceCreationException,
-            SFlowNodeExecutionException {
+    public SProcessInstance startElements(final SProcessInstance sProcessInstance, final FlowNodeSelector selector)
+            throws SProcessInstanceCreationException, SFlowNodeExecutionException {
         final List<SFlowNodeInstance> flowNodeInstances = initializeFirstExecutableElements(sProcessInstance, selector);
         // process is initialized and now the engine trigger jobs to execute other activities, give the hand back
         ProcessInstanceState state;
@@ -1030,7 +1044,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         // Execute Activities
         for (final SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
             workService
-                    .registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, parentProcessInstanceId, sFlowNodeInstance.getId(), null, null));
+            .registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, parentProcessInstanceId, sFlowNodeInstance.getId(), null, null));
         }
     }
 

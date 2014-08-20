@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2014 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -154,7 +154,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             throw new SConnectorException(e);
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-            String message = "Executed connector " + buildConnectorContextMessage(sConnectorInstance)
+            final String message = "Executed connector " + buildConnectorContextMessage(sConnectorInstance)
                     + buildConnectorInputMessage(inputParameters);
             logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
         }
@@ -163,12 +163,12 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     /**
      * Build the log message using the connector instance's context (name, version, connector id, connector instance id, container type, container id)
-     * 
+     *
      * @param conectorInstance
      * @return the log message built using the connector instance's context
      */
     private static String buildConnectorContextMessage(final SConnectorInstance conectorInstance) {
-        StringBuilder stb = new StringBuilder();
+        final StringBuilder stb = new StringBuilder();
         stb.append(" [name: <");
         stb.append(conectorInstance.getName());
         stb.append(">, version: <");
@@ -188,7 +188,7 @@ public class ConnectorServiceImpl implements ConnectorService {
     }
 
     private static String buildConnectorInputMessage(final Map<String, Object> inputParameters) {
-        StringBuilder stb = new StringBuilder();
+        final StringBuilder stb = new StringBuilder();
         if (inputParameters != null && !inputParameters.isEmpty()) {
             stb.append(LINE_SEPARATOR);
             stb.append("Inputs: ");
@@ -207,18 +207,18 @@ public class ConnectorServiceImpl implements ConnectorService {
             throws SConnectorException {
         final long startTime = System.currentTimeMillis();
         try {
-            expressionContext.setInputValues(new HashMap<String, Object>(result.getResult()));
+            expressionContext.putAllInputValues(result.getResult());
             operationService.execute(outputs, expressionContext.getContainerId(), expressionContext.getContainerType(), expressionContext);// data is in
             disconnect(result);
         } catch (final SOperationExecutionException e) {
             throw new SConnectorException(e);
         } finally {
-            if (this.timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_OUTPUT_OPERATIONS)) {
+            if (timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_OUTPUT_OPERATIONS)) {
                 final long endTime = System.currentTimeMillis();
                 final StringBuilder desc = new StringBuilder();
                 desc.append("ConnectorResult: ");
                 desc.append(result);
-                this.timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_OUTPUT_OPERATIONS, desc.toString(), (endTime - startTime));
+                timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_OUTPUT_OPERATIONS, desc.toString(), endTime - startTime);
             }
         }
     }
@@ -231,12 +231,12 @@ public class ConnectorServiceImpl implements ConnectorService {
         } catch (final org.bonitasoft.engine.connector.exception.SConnectorException e) {
             throw new SConnectorException(e);
         } finally {
-            if (this.timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_DISCONNECT)) {
+            if (timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_DISCONNECT)) {
                 final long endTime = System.currentTimeMillis();
                 final StringBuilder desc = new StringBuilder();
                 desc.append("ConnectorResult: ");
                 desc.append(result);
-                this.timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_DISCONNECT, desc.toString(), (endTime - startTime));
+                timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_DISCONNECT, desc.toString(), endTime - startTime);
             }
         }
     }
@@ -245,7 +245,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             final String version) throws SConnectorException, SCacheException {
         SConnectorImplementationDescriptor descriptor;
         try {
-            String key = buildConnectorImplementationKey(rootDefinitionId, connectorId, version);
+            final String key = buildConnectorImplementationKey(rootDefinitionId, connectorId, version);
 
             descriptor = (SConnectorImplementationDescriptor) cacheService.get(CONNECTOR_CACHE_NAME, key);
             if (descriptor == null) {
@@ -262,26 +262,26 @@ public class ConnectorServiceImpl implements ConnectorService {
     }
 
     private void storeImplementation(final long processDefinitionId, final SConnectorImplementationDescriptor connectorImplementation) throws SCacheException {
-        String key = buildConnectorImplementationKey(processDefinitionId, connectorImplementation.getDefinitionId(),
+        final String key = buildConnectorImplementationKey(processDefinitionId, connectorImplementation.getDefinitionId(),
                 connectorImplementation.getDefinitionVersion());
         cacheService.store(CONNECTOR_CACHE_NAME, key, connectorImplementation);
     }
 
     private String buildConnectorImplementationKey(final long rootDefinitionId, final String connectorId, final String version) {
         return new StringBuilder()
-                .append(rootDefinitionId)
-                .append(":")
-                .append(connectorId)
-                .append("-")
-                .append(version)
-                .toString();
+        .append(rootDefinitionId)
+        .append(":")
+        .append(connectorId)
+        .append("-")
+        .append(version)
+        .toString();
     }
 
     @Override
     public ConnectorResult executeMutipleEvaluation(final long processDefinitionId, final String connectorDefinitionId,
             final String connectorDefinitionVersion, final Map<String, SExpression> connectorInputParameters,
             final Map<String, Map<String, Serializable>> inputValues, final ClassLoader classLoader, final SExpressionContext sexpContext)
-            throws SConnectorException {
+                    throws SConnectorException {
         try {
             final SConnectorImplementationDescriptor implementation = getImplementation(processDefinitionId, String.valueOf(sessionAccessor.getTenantId()),
                     connectorDefinitionId, connectorDefinitionVersion);
@@ -355,14 +355,14 @@ public class ConnectorServiceImpl implements ConnectorService {
                 }
             }
         } finally {
-            if (this.timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_INPUT_EXPRESSIONS)) {
+            if (timeTracker.isTrackable(TimeTrackerRecords.EXECUTE_CONNECTOR_INPUT_EXPRESSIONS)) {
                 final long endTime = System.currentTimeMillis();
                 final StringBuilder desc = new StringBuilder();
                 desc.append("Connector ID: ");
                 desc.append(connectorId);
                 desc.append(" - input parameters: ");
                 desc.append(inputParameters);
-                this.timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_INPUT_EXPRESSIONS, desc.toString(), (endTime - startTime));
+                timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_INPUT_EXPRESSIONS, desc.toString(), endTime - startTime);
             }
         }
         return inputParameters;
@@ -439,7 +439,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         // deploy new ones from the filesystem (bonita-home):
         final File processFolder = new File(new File(BonitaHomeServer.getInstance().getProcessesFolder(tenantId)), String.valueOf(processDefinitionId));
         final File file = new File(processFolder, CLASSPATH_FOLDER);
-        ArrayList<SDependency> dependencies = new ArrayList<SDependency>();
+        final ArrayList<SDependency> dependencies = new ArrayList<SDependency>();
         if (file.exists() && file.isDirectory()) {
             final File[] listFiles = file.listFiles();
             for (final File jarFile : listFiles) {

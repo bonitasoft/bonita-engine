@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -53,6 +53,7 @@ import org.bonitasoft.engine.work.WorkService;
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
@@ -62,28 +63,31 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
     private final long flowNodeDefinitionId;
 
-    ExecuteConnectorOfActivity(final long processDefinitionId, final long flowNodeDefinitionId, final long flowNodeInstanceId,
-            final long connectorInstanceId, final String connectorDefinitionName) {
+    private final Map<String, Object> inputs;
+
+    ExecuteConnectorOfActivity(final long processDefinitionId, final long flowNodeDefinitionId, final long flowNodeInstanceId, final long connectorInstanceId,
+            final String connectorDefinitionName, final Map<String, Object> inputs) {
         super(processDefinitionId, connectorInstanceId, connectorDefinitionName, new SExpressionContext(flowNodeInstanceId,
-                DataInstanceContainer.ACTIVITY_INSTANCE.name(), processDefinitionId));
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(), processDefinitionId), inputs);
         this.flowNodeDefinitionId = flowNodeDefinitionId;
         this.flowNodeInstanceId = flowNodeInstanceId;
+        this.inputs = inputs;
     }
 
     @Override
     protected void evaluateOutput(final Map<String, Object> context, final ConnectorResult result, final SConnectorDefinition sConnectorDefinition)
             throws STransactionException, SBonitaException {
-        evaluateOutput(context, result, sConnectorDefinition, flowNodeInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name());
+        evaluateOutput(context, result, sConnectorDefinition, flowNodeInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), inputs);
     }
 
     @Override
     protected void continueFlow(final Map<String, Object> context) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        FlowNodeInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        WorkService workService = tenantAccessor.getWorkService();
+        final FlowNodeInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final WorkService workService = tenantAccessor.getWorkService();
         final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
         final long parentProcessInstanceId = sFlowNodeInstance.getParentProcessInstanceId();
-        BonitaWork executeFlowNodeWork = WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getProcessDefinitionId(), parentProcessInstanceId,
+        final BonitaWork executeFlowNodeWork = WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getProcessDefinitionId(), parentProcessInstanceId,
                 flowNodeInstanceId, null, null);
         workService.registerWork(executeFlowNodeWork);
     }

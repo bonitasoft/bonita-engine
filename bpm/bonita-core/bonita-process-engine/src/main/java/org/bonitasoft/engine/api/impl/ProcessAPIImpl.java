@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2014 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -897,7 +897,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @CustomTransactions
     @Override
     public void executeFlowNode(final long userId, final long flownodeInstanceId) throws FlowNodeExecutionException {
-        executeFlowNode(userId, flownodeInstanceId, Collections.<String, Object> emptyMap());
+        executeFlowNode(userId, flownodeInstanceId, new HashMap<String, Object>());
     }
 
     @CustomTransactions
@@ -916,7 +916,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction, final Map<String, Object> parameters)
+    protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction, final Map<String, Object> inputs)
             throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -931,7 +931,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             executeTransactionContent(tenantAccessor, contractOfUserTaskInstance, wrapInTransaction);
             final SContractDefinition contractDefinition = contractOfUserTaskInstance.getResult();
             final ContractValidator validator = new ContractValidator();
-            if (!validator.isValid(contractDefinition, parameters)) {
+            if (!validator.isValid(contractDefinition, inputs)) {
                 throw new SFlowNodeExecutionException("Contract is not valid: " + validator.getComments());
             }
         }
@@ -939,7 +939,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final BonitaLock lock = lockService.lock(flowNodeInstance.getParentProcessInstanceId(), SFlowElementsContainerType.PROCESS.name(),
                 tenantAccessor.getTenantId());
         try {
-            final ExecuteFlowNode executeFlowNode = new ExecuteFlowNode(tenantAccessor, userId, flowNodeInstance);
+            final ExecuteFlowNode executeFlowNode = new ExecuteFlowNode(tenantAccessor, userId, flowNodeInstance, inputs);
             executeTransactionContent(tenantAccessor, executeFlowNode, wrapInTransaction);
         } finally {
             lockService.unlock(lock, tenantAccessor.getTenantId());

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -78,7 +78,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     @Override
     protected void evaluateOutput(final Map<String, Object> context, final ConnectorResult result, final SConnectorDefinition sConnectorDefinition)
             throws SBonitaException {
-        evaluateOutput(context, result, sConnectorDefinition, processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name());
+        evaluateOutput(context, result, sConnectorDefinition, processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name(), null);
     }
 
     @Override
@@ -152,8 +152,8 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     }
 
     @Override
-    protected SConnectorDefinition getSConnectorDefinition(final ProcessDefinitionService processDefinitionService) throws SProcessDefinitionNotFoundException,
-            SProcessDefinitionReadException, SConnectorDefinitionNotFoundException {
+    protected SConnectorDefinition getSConnectorDefinition(final ProcessDefinitionService processDefinitionService)
+            throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException, SConnectorDefinitionNotFoundException {
         final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         // final SConnectorDefinition sConnectorDefinition = processContainer.getConnectorDefinition(connectorDefinitionId);// FIXME: Uncomment when generate id

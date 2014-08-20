@@ -29,6 +29,7 @@
 		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
 		<constructor-arg name="workService" ref="workService" />
+		<constructor-arg name="cacheService" ref="cacheService"/>
 	</bean>
 
 	<bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">
@@ -70,6 +71,7 @@
 		<constructor-arg name="workService" ref="workService"/>
 		<constructor-arg name="tokenService" ref="tokenService"/>
 		<constructor-arg name="identityService" ref="identityService"/>
+		<constructor-arg name="cacheService" ref="cacheService"/>
 	</bean>
 
 	<bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">
@@ -118,6 +120,7 @@
 		<constructor-arg name="tokenService" ref="tokenService"/>
 		<constructor-arg name="eventsHandler" ref="eventsHandler" />
 		<constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
+		<constructor-arg name="cacheService" ref="cacheService"/>
 	</bean>
 
 	<bean id="transactionalProcessInstanceInterruptor" class="org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor">

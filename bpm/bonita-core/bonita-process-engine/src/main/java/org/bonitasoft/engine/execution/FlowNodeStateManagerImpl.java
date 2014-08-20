@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -24,6 +24,7 @@ import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -191,14 +192,14 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
             final TechnicalLoggerService logger, final DocumentMappingService documentMappingService, final SCommentService commentService,
             final EventsHandler eventsHandler, final UserFilterService userFilterService, final ActorMappingService actorMappingService,
-            final WorkService workService, final TokenService tokenService, final IdentityService identityService) {
+            final WorkService workService, final TokenService tokenService, final IdentityService identityService, final CacheService cacheService) {
         this(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, classLoaderService,
                 expressionResolverService, schedulerService, dataInstanceService, eventInstanceService, operationService, bpmInstancesCreator,
                 containerRegistry, archiveService, logger, documentMappingService, commentService, eventsHandler, userFilterService, actorMappingService,
                 workService, tokenService, identityService, new StateBehaviors(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService,
                         classLoaderService, actorMappingService, connectorInstanceService, expressionResolverService, processDefinitionService,
                         dataInstanceService, operationService, workService, containerRegistry, eventInstanceService, schedulerService, commentService,
-                        identityService, logger, tokenService));
+                        identityService, logger, tokenService, cacheService));
     }
 
     protected FlowNodeStateManagerImpl(final ProcessDefinitionService processDefinitionService, final ProcessInstanceService processInstanceService,

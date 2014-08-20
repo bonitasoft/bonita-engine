@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013-2014 BonitaSoft S.A.
+ * Copyright (C) 2013, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -54,11 +54,17 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
 
     public ExecuteConnectorWork(final long processDefinitionId, final long connectorInstanceId, final String connectorDefinitionName,
             final SExpressionContext inputParametersContext) {
+        this(processDefinitionId, connectorInstanceId, connectorDefinitionName, inputParametersContext, null);
+    }
+
+    public ExecuteConnectorWork(final long processDefinitionId, final long connectorInstanceId, final String connectorDefinitionName,
+            final SExpressionContext inputParametersContext, final Map<String, Object> inputs) {
         super();
         this.processDefinitionId = processDefinitionId;
         this.connectorInstanceId = connectorInstanceId;
         this.connectorDefinitionName = connectorDefinitionName;
         this.inputParametersContext = inputParametersContext;
+        this.inputParametersContext.setInputValues(inputs);
     }
 
     protected abstract void errorEventOnFail(Map<String, Object> context, SConnectorDefinition sConnectorDefinition, Exception Exception)
@@ -94,12 +100,13 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
     }
 
     protected void evaluateOutput(final Map<String, Object> context, final ConnectorResult result, final SConnectorDefinition sConnectorDefinition,
-            final Long id, final String containerType) throws SBonitaException {
+            final Long id, final String containerType, final Map<String, Object> inputs) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final List<SOperation> outputs = sConnectorDefinition.getOutputs();
         final SExpressionContext sExpressionContext = new SExpressionContext(id, containerType, processDefinitionId);
+        sExpressionContext.setInputValues(inputs);
         connectorService.executeOutputOperation(outputs, sExpressionContext, result);
         connectorInstanceService.setState(connectorInstanceService.getConnectorInstance(connectorInstanceId), ConnectorService.DONE);
     }
@@ -138,7 +145,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
                 desc.append(" - ");
                 desc.append("connectorInstanceId: ");
                 desc.append(connectorInstanceId);
-                timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_WORK, desc.toString(), (endTime - startTime));
+                timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_WORK, desc.toString(), endTime - startTime);
             }
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }

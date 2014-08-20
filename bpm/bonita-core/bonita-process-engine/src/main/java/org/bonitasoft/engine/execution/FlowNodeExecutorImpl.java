@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2014 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -19,6 +19,8 @@ import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -29,8 +31,6 @@ import org.bonitasoft.engine.core.process.comment.api.SCommentAddException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.api.SystemCommentType;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -38,14 +38,13 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecu
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilderFactory;
@@ -98,11 +97,13 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
 
     private final WorkService workService;
 
+    private final CacheService cacheService;
+
     public FlowNodeExecutorImpl(final FlowNodeStateManager flowNodeStateManager, final ActivityInstanceService activityInstanceManager,
             final OperationService operationService, final ArchiveService archiveService, final DataInstanceService dataInstanceService,
             final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService, final SCommentService commentService,
             final ProcessInstanceService processInstanceService, final ConnectorInstanceService connectorInstanceService,
-            final ClassLoaderService classLoaderService, final WorkService workService) {
+            final ClassLoaderService classLoaderService, final WorkService workService, final CacheService cacheService) {
         super();
         this.flowNodeStateManager = flowNodeStateManager;
         activityInstanceService = activityInstanceManager;
@@ -117,6 +118,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         containerRegistry.addContainerExecutor(this);
         this.processDefinitionService = processDefinitionService;
         this.commentService = commentService;
+        this.cacheService = cacheService;
     }
 
     @Override
@@ -195,7 +197,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                         // we notify in a work: transitions and so on will be executed
                         workService.registerWork(WorkFactory.createNotifyChildFinishedWork(processDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(),
                                 sFlowNodeInstance.getId(), sFlowNodeInstance
-                                        .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name()));
+                                .getParentContainerId(), sFlowNodeInstance.getParentContainerType().name()));
                     } catch (final SWorkRegisterException e) {
                         throw new SFlowNodeExecutionException(e);
                     }
@@ -247,13 +249,13 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
     }
 
     @Override
-    public void childFinished(final long processDefinitionId, final long flowNodeInstanceId, final long parentId) throws SFlowNodeNotFoundException,
-            SFlowNodeReadException, SProcessDefinitionNotFoundException, SProcessDefinitionReadException, SArchivingException, SFlowNodeModificationException,
-            SFlowNodeExecutionException {
+    public void childFinished(final long processDefinitionId, final long flowNodeInstanceId, final long parentId) throws SBonitaException {
         final SFlowNodeInstance sFlowNodeInstanceChild = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
 
         // TODO check deletion here
         archiveFlowNodeInstance(sFlowNodeInstanceChild, true, processDefinitionId);
+
+        deleteContractInputs(sFlowNodeInstanceChild);
 
         final SActivityInstance activityInstanceParent = (SActivityInstance) activityInstanceService.getFlowNodeInstance(parentId);
         decrementToken(activityInstanceParent);
@@ -263,6 +265,12 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         if (hit) {// we continue parent if hit of the parent return true
             // in a new work?
             stepForward(parentId, null, null, sFlowNodeInstanceChild.getParentProcessInstanceId(), null, null);
+        }
+    }
+
+    private void deleteContractInputs(final SFlowNodeInstance flowNodeInstance) throws SCacheException {
+        if (flowNodeInstance instanceof SUserTaskInstance) {
+            cacheService.remove("USER_TASK_CONTRACT", flowNodeInstance.getId());
         }
     }
 

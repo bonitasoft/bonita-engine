@@ -24,6 +24,11 @@
 		<property name="name" value="BREAKPOINTS_BY_INSTANCE" />
 	</bean>
 
+	<bean id="contractCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
+		<property name="name" value="USER_TASK_CONTRACT" />
+		<property name="inMemoryOnly" value="true" />
+	</bean>
+
 	<bean id="groovyScriptCacheConfig" class="org.bonitasoft.engine.cache.CacheConfiguration">
 		<property name="name" value="GROOVY_SCRIPT_CACHE_NAME" />
 		<property name="maxElementsInMemory" value="10000" />
