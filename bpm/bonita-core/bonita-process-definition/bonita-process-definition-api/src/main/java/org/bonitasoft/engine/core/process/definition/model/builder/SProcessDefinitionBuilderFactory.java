@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.builder;
 
-import java.io.InputStream;
+import java.net.URL;
 
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -23,6 +23,7 @@ import org.bonitasoft.engine.xml.XMLNode;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface SProcessDefinitionBuilderFactory {
 
@@ -30,7 +31,7 @@ public interface SProcessDefinitionBuilderFactory {
 
     ElementBindingsFactory getElementsBindings();
 
-    InputStream getModelSchema();
+    URL getModelSchemaUrl();
 
     XMLNode getXMLProcessDefinition(SProcessDefinition definition);
 

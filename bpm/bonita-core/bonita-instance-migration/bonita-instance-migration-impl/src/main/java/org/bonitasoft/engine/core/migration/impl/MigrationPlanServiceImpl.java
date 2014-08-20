@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,8 +14,8 @@
 package org.bonitasoft.engine.core.migration.impl;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +42,6 @@ import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -61,7 +60,6 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.xml.ElementBindingsFactory;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
@@ -92,8 +90,7 @@ public class MigrationPlanServiceImpl implements MigrationPlanService {
     protected final QueriableLoggerService queriableLoggerService;
 
     public MigrationPlanServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final EventService eventService,
-            final ParserFactory parserFactory,
-            final CacheService cacheService, final ReadSessionAccessor sessionAccessor, final ProcessInstanceService processInstanceService,
+            final ParserFactory parserFactory, final CacheService cacheService, final ProcessInstanceService processInstanceService,
             final QueriableLoggerService queriableLoggerService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
@@ -104,12 +101,8 @@ public class MigrationPlanServiceImpl implements MigrationPlanService {
         final ElementBindingsFactory bindingsFactory = new SMigrationPlanElementBindings();
         parser = parserFactory.createParser(bindingsFactory);
         // the schema is in common-api
-        final InputStream schemaStream = this.getClass().getResourceAsStream("/org/bonitasoft/engine/bpm/migration/MigrationPlan.xsd");
-        try {
-            parser.setSchema(schemaStream);
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException("Unable to configure Migration Plan Service", e);
-        }
+        final URL schemaUrl = this.getClass().getResource("/org/bonitasoft/engine/bpm/migration/MigrationPlan.xsd");
+        parser.setSchemaUrl(schemaUrl);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -57,6 +58,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class XMLHandler {
 
@@ -66,7 +68,7 @@ public class XMLHandler {
 
     private final SchemaFactory factory;
 
-    private Schema schema;
+    private URL schemaUrl;
 
     private final DocumentBuilder documentBuilder;
 
@@ -114,9 +116,8 @@ public class XMLHandler {
         }
         if (parentNode == null) {
             return element;
-        } else {
-            return parentNode.appendChild(element);
         }
+        return parentNode.appendChild(element);
     }
 
     private Document getDocument(final XMLNode rootNode) {
@@ -129,21 +130,26 @@ public class XMLHandler {
     }
 
     public Object getObjectFromXML(final File file) throws XMLParseException, FileNotFoundException, IOException {
-        final InputStreamReader isr = new InputStreamReader(new FileInputStream(file), ENCODING);
-        Object objectFromXML = null;
+        FileInputStream inputStream = null;
+        InputStreamReader isr = null;
         try {
-            objectFromXML = getObjectFromXML(isr);
+            inputStream = new FileInputStream(file);
+            isr = new InputStreamReader(inputStream, ENCODING);
+            return getObjectFromXML(isr);
         } finally {
-            isr.close();
+            if (isr != null) {
+                isr.close();
+            }
+            if (inputStream != null) {
+                inputStream.close();
+            }
         }
-        return objectFromXML;
     }
 
     public Object getObjectFromXML(final Reader xmlReader) throws IOException, XMLParseException {
-        final BindingHandler handler;
-        handler = new BindingHandler(bindings);
-        final XMLParserErrorHandler errorhandler = new XMLParserErrorHandler();
         try {
+            final BindingHandler handler = new BindingHandler(bindings);
+            final XMLParserErrorHandler errorhandler = new XMLParserErrorHandler();
             final XMLReader reader = XMLReaderFactory.createXMLReader();
             reader.setContentHandler(handler);
             reader.setErrorHandler(errorhandler);
@@ -155,32 +161,36 @@ public class XMLHandler {
         }
     }
 
-    public void setSchema(final InputStream schemaStream) throws InvalidSchemaException {
-        try {
-            schema = factory.newSchema(new StreamSource(schemaStream));
-        } catch (final SAXException e) {
-            throw new InvalidSchemaException(e);
-        }
+    public void setSchemaUrl(final URL schemaUrl) {
+        this.schemaUrl = schemaUrl;
     }
 
     public void validate(final File file) throws ValidationException, IOException {
-        validate(new StreamSource(file));
+        // BS-9304 : If you create a new StreamSource with a file, the streamSource keep a lock on the file when there is an exception.
+        // If the file is temporary, the temporary file is never delete at the end of the jvm, even if you call all methods to delete its.
+        // So you need to use the InputStream to close it, even there is an exception, to unlock the file.
+        final InputStream openStream = file.toURI().toURL().openStream();
+        try {
+            validate(new StreamSource(openStream));
+        } finally {
+            openStream.close();
+        }
     }
 
     private void validate(final StreamSource source) throws ValidationException, IOException {
+        if (schemaUrl == null) {
+            throw new ValidationException("No schema defined");
+        }
+        final InputStream inputStream = schemaUrl.openStream();
         try {
-            if (schema == null) {
-                throw new ValidationException("No schema defined");
-            }
+            final Schema schema = factory.newSchema(new StreamSource(inputStream));
             final Validator validator = schema.newValidator();
             validator.validate(source);
         } catch (final SAXException e) {
             throw new ValidationException(e);
+        } finally {
+            inputStream.close();
         }
-    }
-
-    public void validate(final Reader content) throws ValidationException, IOException {
-        validate(new StreamSource(content));
     }
 
     public byte[] write(final XMLNode rootNode) {

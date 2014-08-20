@@ -15,7 +15,7 @@ package org.bonitasoft.engine.core.process.definition;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,7 +60,6 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
-import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.OrderByOption;
@@ -141,12 +140,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         this.dependencyService = dependencyService;
         final ElementBindingsFactory bindings = BuilderFactory.get(SProcessDefinitionBuilderFactory.class).getElementsBindings();// FIXME
         parser = parserFactory.createParser(bindings);
-        final InputStream schemaStream = BuilderFactory.get(SProcessDefinitionBuilderFactory.class).getModelSchema();
-        try {
-            parser.setSchema(schemaStream);
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException("Unable to configure process definition service", e);
-        }
+        final URL schemaStream = BuilderFactory.get(SProcessDefinitionBuilderFactory.class).getModelSchemaUrl();
+        parser.setSchemaUrl(schemaStream);
     }
 
     @Override

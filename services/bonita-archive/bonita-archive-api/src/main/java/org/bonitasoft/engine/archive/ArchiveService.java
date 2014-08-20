@@ -42,7 +42,8 @@ public interface ArchiveService {
      * 
      * @param time
      *            the time of archiving
-     * @param record
+     * @param records
+     *            Archive inserts record containing the entity to be archived
      * @throws SRecorderException
      *             in case of a write error
      */
@@ -73,7 +74,7 @@ public interface ArchiveService {
     SArchiveDescriptor getDefinitiveArchiveDescriptor();
 
     /**
-     * @param sourceObject
+     * @param sourceObjectClass
      *            Persistent object to be judged achievable or not
      * @return Return true if the objects of the given class can be archived.
      */

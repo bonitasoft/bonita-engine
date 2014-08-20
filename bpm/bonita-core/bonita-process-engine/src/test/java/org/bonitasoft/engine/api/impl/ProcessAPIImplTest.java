@@ -13,17 +13,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.data.DataInstance;
-import org.bonitasoft.engine.bpm.data.impl.IntegerDataInstanceImpl;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
+import org.bonitasoft.engine.bpm.data.DataInstance;
+import org.bonitasoft.engine.bpm.data.impl.IntegerDataInstanceImpl;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
+import org.bonitasoft.engine.core.operation.OperationService;
+import org.bonitasoft.engine.core.operation.model.SOperation;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
+import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
@@ -36,8 +42,15 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
+import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
+import org.bonitasoft.engine.operation.LeftOperand;
+import org.bonitasoft.engine.operation.LeftOperandBuilder;
+import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.OperationBuilder;
+import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -68,7 +81,16 @@ public class ProcessAPIImplTest {
     private TransientDataService transientDataService;
 
     @Mock
+    private OperationService operationService;
+
+    @Mock
     private ActivityInstanceService activityInstanceService;
+
+    @Mock
+    private DataInstanceService dataInstanceService;
+
+    @Mock
+    private ProcessDefinitionService processDefinitionService;
 
     @Mock
     private ClassLoaderService classLoaderService;
@@ -83,6 +105,9 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getTransientDataService()).thenReturn(transientDataService);
         when(tenantAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
         when(tenantAccessor.getClassLoaderService()).thenReturn(classLoaderService);
+        when(tenantAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
+        when(tenantAccessor.getDataInstanceService()).thenReturn(dataInstanceService);
+        when(tenantAccessor.getOperationService()).thenReturn(operationService);
     }
 
     @Test
@@ -129,14 +154,14 @@ public class ProcessAPIImplTest {
         doReturn(tenantAccessor).when(processAPI).getTenantAccessor();
         doReturn(dataInstanceService).when(tenantAccessor).getDataInstanceService();
 
-        SDataInstance sDataFoo = mock(SDataInstance.class);
+        final SDataInstance sDataFoo = mock(SDataInstance.class);
         doReturn("foo").when(sDataFoo).getName();
-        SDataInstance sDataBar = mock(SDataInstance.class);
+        final SDataInstance sDataBar = mock(SDataInstance.class);
         doReturn("bar").when(sDataBar).getName();
         doReturn(asList(sDataFoo, sDataBar)).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString());
 
         // Then update the data instances
-        Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
+        final Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
         dataNameValues.put("foo", "go");
         dataNameValues.put("bar", "go");
         processAPI.updateProcessDataInstances(processInstanceId, dataNameValues);
@@ -162,13 +187,13 @@ public class ProcessAPIImplTest {
         doThrow(new SDataInstanceReadException("Mocked")).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString());
 
         // Then update the data instances
-        Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
+        final Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
         dataNameValues.put("foo", "go");
         dataNameValues.put("bar", "go");
         try {
             processAPI.updateProcessDataInstances(processInstanceId, dataNameValues);
             fail("An exception should have been thrown.");
-        } catch (UpdateException e) {
+        } catch (final UpdateException e) {
             // Ok
         }
 
@@ -179,8 +204,8 @@ public class ProcessAPIImplTest {
     @Test
     @SuppressWarnings("unchecked")
     public void replayingAFailedJobNoParamShouldExecuteAgainSchedulerServiceWithNoParameters() throws Exception {
-        long jobDescriptorId = 25L;
-        SchedulerService schedulerService = mock(SchedulerService.class);
+        final long jobDescriptorId = 25L;
+        final SchedulerService schedulerService = mock(SchedulerService.class);
         when(tenantAccessor.getSchedulerService()).thenReturn(schedulerService);
         doNothing().when(schedulerService).executeAgain(anyLong(), anyList());
 
@@ -194,8 +219,8 @@ public class ProcessAPIImplTest {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void replayingAFailedJobShouldExecuteAgainSchedulerServiceWithSomeParameters() throws Exception {
         final Map<String, Serializable> parameters = Collections.singletonMap("anyparam", (Serializable) Boolean.FALSE);
-        long jobDescriptorId = 544L;
-        SchedulerService schedulerService = mock(SchedulerService.class);
+        final long jobDescriptorId = 544L;
+        final SchedulerService schedulerService = mock(SchedulerService.class);
         when(tenantAccessor.getSchedulerService()).thenReturn(schedulerService);
         doNothing().when(schedulerService).executeAgain(anyLong(), anyList());
 
@@ -208,7 +233,7 @@ public class ProcessAPIImplTest {
 
     @Test
     public void replayingAFailedJobWithNoParamShouldCallWithNullParams() throws Exception {
-        long jobDescriptorId = 544L;
+        final long jobDescriptorId = 544L;
 
         // This spy is specific to this test method:
         final ProcessAPIImpl myProcessAPI = spy(new ProcessAPIImpl());
@@ -222,27 +247,27 @@ public class ProcessAPIImplTest {
     @Test
     public void getJobParametersShouldConvertMapIntoList() {
         // given:
-        Map<String, Serializable> parameters = new HashMap<String, Serializable>(2);
-        String key1 = "mon param 1";
-        String key2 = "my second param";
-        SJobParameter expectedValue1 = mockSJobParameter(key1);
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>(2);
+        final String key1 = "mon param 1";
+        final String key2 = "my second param";
+        final SJobParameter expectedValue1 = mockSJobParameter(key1);
         parameters.put(expectedValue1.getKey(), expectedValue1.getValue());
 
-        SJobParameter expectedValue2 = mockSJobParameter(key2);
+        final SJobParameter expectedValue2 = mockSJobParameter(key2);
         parameters.put(expectedValue2.getKey(), expectedValue2.getValue());
 
         doReturn(expectedValue1).when(processAPI).buildSJobParameter(eq(key1), any(Serializable.class));
         doReturn(expectedValue2).when(processAPI).buildSJobParameter(eq(key2), any(Serializable.class));
 
         // when:
-        List<SJobParameter> jobParameters = processAPI.getJobParameters(parameters);
+        final List<SJobParameter> jobParameters = processAPI.getJobParameters(parameters);
 
         // then:
         assertThat(jobParameters).containsOnly(expectedValue1, expectedValue2);
     }
 
     private SJobParameter mockSJobParameter(final String key) {
-        SJobParameter jobParam = mock(SJobParameter.class);
+        final SJobParameter jobParam = mock(SJobParameter.class);
         when(jobParam.getKey()).thenReturn(key);
         when(jobParam.getValue()).thenReturn(Integer.MAX_VALUE);
         return jobParam;
@@ -250,24 +275,24 @@ public class ProcessAPIImplTest {
 
     @Test
     public void testGetActivityTransientDataInstances() throws Exception {
-        String dataValue = "TestOfCourse";
-        long activityInstanceId = 13244;
-        String dataName = "TransientName";
+        final String dataValue = "TestOfCourse";
+        final long activityInstanceId = 13244;
+        final String dataName = "TransientName";
         doNothing().when(processAPI).updateTransientData(dataName, activityInstanceId, dataValue, transientDataService);
-        SFlowNodeInstance flowNodeInstance = mock(SFlowNodeInstance.class);
+        final SFlowNodeInstance flowNodeInstance = mock(SFlowNodeInstance.class);
         when(activityInstanceService.getFlowNodeInstance(activityInstanceId)).thenReturn(flowNodeInstance);
 
-        int nbResults = 100;
-        int startIndex = 0;
+        final int nbResults = 100;
+        final int startIndex = 0;
         final SDataInstance sDataInstance = mock(SDataInstance.class);
         when(sDataInstance.getClassName()).thenReturn(Integer.class.getName());
-        List<SDataInstance> sDataInstances = Lists.newArrayList(sDataInstance);
+        final List<SDataInstance> sDataInstances = Lists.newArrayList(sDataInstance);
         when(transientDataService.getDataInstances(activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), startIndex, nbResults))
-                .thenReturn(sDataInstances);
-        IntegerDataInstanceImpl dataInstance = mock(IntegerDataInstanceImpl.class);
+        .thenReturn(sDataInstances);
+        final IntegerDataInstanceImpl dataInstance = mock(IntegerDataInstanceImpl.class);
         doReturn(Lists.newArrayList(dataInstance)).when(processAPI).convertModelToDataInstances(sDataInstances);
 
-        List<DataInstance> dis = processAPI.getActivityTransientDataInstances(activityInstanceId, startIndex, nbResults);
+        final List<DataInstance> dis = processAPI.getActivityTransientDataInstances(activityInstanceId, startIndex, nbResults);
 
         assertThat(dis).contains(dataInstance);
 
@@ -283,20 +308,20 @@ public class ProcessAPIImplTest {
 
     @Test
     public void testGetActivityTransientDataInstance() throws Exception {
-        String dataValue = "TestOfCourse";
-        int activityInstanceId = 13244;
-        String dataName = "TransientName";
+        final String dataValue = "TestOfCourse";
+        final int activityInstanceId = 13244;
+        final String dataName = "TransientName";
         doNothing().when(processAPI).updateTransientData(dataName, activityInstanceId, dataValue, transientDataService);
-        SFlowNodeInstance flowNodeInstance = mock(SFlowNodeInstance.class);
+        final SFlowNodeInstance flowNodeInstance = mock(SFlowNodeInstance.class);
         when(activityInstanceService.getFlowNodeInstance(activityInstanceId)).thenReturn(flowNodeInstance);
 
         final SDataInstance sDataInstance = mock(SDataInstance.class);
         when(sDataInstance.getClassName()).thenReturn(Integer.class.getName());
         when(transientDataService.getDataInstance(dataName, activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name())).thenReturn(sDataInstance);
-        IntegerDataInstanceImpl dataInstance = mock(IntegerDataInstanceImpl.class);
+        final IntegerDataInstanceImpl dataInstance = mock(IntegerDataInstanceImpl.class);
         doReturn(dataInstance).when(processAPI).convertModeltoDataInstance(sDataInstance);
 
-        DataInstance di = processAPI.getActivityTransientDataInstance(dataName, activityInstanceId);
+        final DataInstance di = processAPI.getActivityTransientDataInstance(dataName, activityInstanceId);
 
         assertThat(di).isEqualTo(dataInstance);
 
@@ -312,11 +337,11 @@ public class ProcessAPIImplTest {
 
     @Test
     public void testUpdateActivityTransientDataInstance_should_call_update() throws Exception {
-        String dataValue = "TestOfCourse";
-        int activityInstanceId = 13244;
-        String dataName = "TransientName";
+        final String dataValue = "TestOfCourse";
+        final int activityInstanceId = 13244;
+        final String dataName = "TransientName";
         doNothing().when(processAPI).updateTransientData(dataName, activityInstanceId, dataValue, transientDataService);
-        SFlowNodeInstance flowNodeInstance = mock(SFlowNodeInstance.class);
+        final SFlowNodeInstance flowNodeInstance = mock(SFlowNodeInstance.class);
         when(activityInstanceService.getFlowNodeInstance(activityInstanceId)).thenReturn(flowNodeInstance);
 
         processAPI.updateActivityTransientDataInstance(dataName, activityInstanceId, dataValue);
@@ -332,11 +357,11 @@ public class ProcessAPIImplTest {
 
     @Test(expected = UpdateException.class)
     public void testUpdateActivityTransientDataInstance_should_throw_Exception() throws Exception {
-        String dataValue = "TestOfCourse";
-        int activityInstanceId = 13244;
-        String dataName = "TransientName";
+        final String dataValue = "TestOfCourse";
+        final int activityInstanceId = 13244;
+        final String dataName = "TransientName";
         doThrow(new SDataInstanceException("")).when(processAPI).updateTransientData(dataName, activityInstanceId, dataValue, transientDataService);
-        SFlowNodeInstance flowNodeInstance = mock(SFlowNodeInstance.class);
+        final SFlowNodeInstance flowNodeInstance = mock(SFlowNodeInstance.class);
         when(activityInstanceService.getFlowNodeInstance(activityInstanceId)).thenReturn(flowNodeInstance);
 
         processAPI.updateActivityTransientDataInstance(dataName, activityInstanceId, dataValue);
@@ -344,9 +369,9 @@ public class ProcessAPIImplTest {
 
     @Test
     public void testUpdateTransientData() throws Exception {
-        String dataValue = "TestOfCourse";
-        int activityInstanceId = 13244;
-        String dataName = "TransientName";
+        final String dataValue = "TestOfCourse";
+        final int activityInstanceId = 13244;
+        final String dataName = "TransientName";
         final SDataInstance sDataInstance = mock(SDataInstance.class);
         when(transientDataService.getDataInstance(dataName, activityInstanceId,
                 DataInstanceContainer.ACTIVITY_INSTANCE.toString())).thenReturn(sDataInstance);
@@ -358,16 +383,16 @@ public class ProcessAPIImplTest {
 
     public void getUserIdsForActor_returns_result_of_actor_mapping_service() throws Exception {
         // given
-        SActor actor = mock(SActor.class);
+        final SActor actor = mock(SActor.class);
         when(actor.getId()).thenReturn(ACTOR_ID);
 
-        ActorMappingService actorMappingService = mock(ActorMappingService.class);
+        final ActorMappingService actorMappingService = mock(ActorMappingService.class);
         when(tenantAccessor.getActorMappingService()).thenReturn(actorMappingService);
         when(actorMappingService.getPossibleUserIdsOfActorId(ACTOR_ID, 0, 10)).thenReturn(Arrays.asList(1L, 10L));
         when(actorMappingService.getActor(ACTOR_NAME, PROCESS_DEFINITION_ID)).thenReturn(actor);
 
         // when
-        List<Long> userIdsForActor = processAPI.getUserIdsForActor(PROCESS_DEFINITION_ID, ACTOR_NAME, 0, 10);
+        final List<Long> userIdsForActor = processAPI.getUserIdsForActor(PROCESS_DEFINITION_ID, ACTOR_NAME, 0, 10);
 
         // then
         assertThat(userIdsForActor).containsExactly(1L, 10L);
@@ -376,10 +401,10 @@ public class ProcessAPIImplTest {
     @Test
     public void getUserIdsForActor_throws_RetrieveException_when_actorMappingService_throws_SBonitaException() throws Exception {
         // given
-        SActor actor = mock(SActor.class);
+        final SActor actor = mock(SActor.class);
         when(actor.getId()).thenReturn(ACTOR_ID);
 
-        ActorMappingService actorMappingService = mock(ActorMappingService.class);
+        final ActorMappingService actorMappingService = mock(ActorMappingService.class);
         when(tenantAccessor.getActorMappingService()).thenReturn(actorMappingService);
         when(actorMappingService.getActor(ACTOR_NAME, PROCESS_DEFINITION_ID)).thenThrow(new SActorNotFoundException(""));
 
@@ -387,10 +412,45 @@ public class ProcessAPIImplTest {
         try {
             processAPI.getUserIdsForActor(PROCESS_DEFINITION_ID, ACTOR_NAME, 0, 10);
             fail("Exception expected");
-        } catch (RetrieveException e) {
+        } catch (final RetrieveException e) {
             // then ok
         }
 
+    }
+
+    @Test
+    public void updateActivityInstanceVariables_should_load_processDef_classes() throws Exception {
+        final String dataInstanceName = "acase";
+
+        final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName)
+                .setType(LeftOperand.TYPE_DATA).done();
+        final String customDataTypeName = "com.bonitasoft.support.Case";
+        final Expression expression = new ExpressionBuilder().createGroovyScriptExpression("updateDataCaseTest",
+                "new com.bonitasoft.support.Case(\"title\", \"description\")",
+                customDataTypeName);
+        final Operation operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
+                .setRightOperand(expression).done();
+        final ClassLoader contextClassLoader = mock(ClassLoader.class);
+        when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(contextClassLoader);
+        final SProcessDefinition processDef = mock(SProcessDefinition.class);
+        when(processDefinitionService.getProcessDefinition(anyLong())).thenReturn(processDef);
+        final SActivityInstance activityInstance = mock(SActivityInstance.class);
+        when(activityInstanceService.getActivityInstance(anyLong())).thenReturn(activityInstance);
+        final SFlowElementContainerDefinition flowElementContainerDefinition = mock(SFlowElementContainerDefinition.class);
+        when(processDef.getProcessContainer()).thenReturn(flowElementContainerDefinition);
+        when(flowElementContainerDefinition.getFlowNode(anyLong())).thenReturn(mock(SActivityDefinition.class));
+
+        final SDataInstance dataInstance = mock(SDataInstance.class);
+        when(dataInstanceService.getDataInstances(any(List.class), anyLong(),
+                eq(DataInstanceContainer.ACTIVITY_INSTANCE.toString()))).thenReturn(Arrays.asList(dataInstance));
+
+        doReturn(mock(SOperation.class)).when(processAPI).convertOperation(operation);
+
+        final List<Operation> operations = new ArrayList<Operation>();
+        operations.add(operation);
+        processAPI.updateActivityInstanceVariables(operations, 2, null);
+
+        verify(classLoaderService).getLocalClassLoader(anyString(), anyLong());
     }
 
 }

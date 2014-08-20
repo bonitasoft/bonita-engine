@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,15 +17,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-
-import javax.xml.transform.Source;
+import java.net.URL;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface XMLSchemaValidator {
-
-    void setSchemaSource(Source source) throws SInvalidSchemaException;
 
     void validate(Reader reader) throws SValidationException, IOException;
 
@@ -34,5 +32,7 @@ public interface XMLSchemaValidator {
     void validate(String filePath) throws SValidationException, IOException;
 
     void validate(File file) throws SValidationException, IOException;
+
+    void setSchemaUrl(URL schemaUrl);
 
 }

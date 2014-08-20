@@ -73,7 +73,7 @@ public class GatewayExecutionTest extends CommonAPITest {
     @Test
     public void archiveGatewayInstance() throws Exception {
         createTrueAndFalseExpression();
-        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("My_Process", PROCESS_VERSION);
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("My_Process", PROCESS_VERSION);
         builder.addActor(ACTOR_NAME).addDescription("description");
         builder.addAutomaticTask("step1");
         builder.addUserTask("step2", ACTOR_NAME);
@@ -109,7 +109,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         SearchOptionsBuilder builder1 = new SearchOptionsBuilder(0, 10);
         builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.FLOW_NODE_TYPE, "gate");
         builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId());
-        SearchResult<ArchivedFlowNodeInstance> searchResult1 = getProcessAPI().searchArchivedFlowNodeInstances(builder1.done());
+        final SearchResult<ArchivedFlowNodeInstance> searchResult1 = getProcessAPI().searchArchivedFlowNodeInstances(builder1.done());
         // we expect all normal gateway states to be archived:
         assertEquals(getProcessAPI().getSupportedStates(FlowNodeType.GATEWAY).size(), searchResult1.getCount());
 
@@ -119,7 +119,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId());
         builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.NAME, "gatewayOne");
         builder1.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, "completed");
-        ArchivedFlowNodeInstance gatewayOne = getProcessAPI().searchArchivedFlowNodeInstances(builder1.done()).getResult().get(0);
+        final ArchivedFlowNodeInstance gatewayOne = getProcessAPI().searchArchivedFlowNodeInstances(builder1.done()).getResult().get(0);
         // we expect all normal gateway states to be archived:
         assertThat(gatewayOne.getDisplayName()).isEqualTo("display name");
         assertThat(gatewayOne.getDisplayDescription()).isEqualTo("description after completion");
@@ -170,6 +170,7 @@ public class GatewayExecutionTest extends CommonAPITest {
      */
     @Test
     public void processWithParallelGatewayMerge() throws Exception {
+        //given
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
         .createNewInstance("My_Process_with_parallel_gateway", PROCESS_VERSION).addActor(ACTOR_NAME)
         .addAutomaticTask("step1").addAutomaticTask("step2").addAutomaticTask("step3").addUserTask("step4", ACTOR_NAME)
@@ -178,19 +179,13 @@ public class GatewayExecutionTest extends CommonAPITest {
         .addTransition("gateway2", "step4").getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
-        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
-        // test execution
+
+        // when
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        // we should have 2 elements ready:
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, true, 1, user);
-        assertTrue("there was no pending task for john (expected step4)", checkNbPendingTaskOf.waitUntil());
-        final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
-        assertEquals(1, pendingTasks.size());
-        final HumanTaskInstance humanTaskInstance = pendingTasks.get(0);
-        assertEquals("step4", humanTaskInstance.getName());
-        getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
-        getProcessAPI().executeFlowNode(humanTaskInstance.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
+
+        // then
+        waitForUserTaskAndExecuteIt("step4", processInstance, user);
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -1051,8 +1046,8 @@ public class GatewayExecutionTest extends CommonAPITest {
         builder.addEndEvent("end");
         builder.addTransition("sem", "step");
         builder.addTransition("step", "end");
-        Set<TransitionDefinition> transitions = builder.done().getProcessContainer().getTransitions();
-        for (TransitionDefinition transitionDefinition : transitions) {
+        final Set<TransitionDefinition> transitions = builder.done().getProcessContainer().getTransitions();
+        for (final TransitionDefinition transitionDefinition : transitions) {
             System.out.println(transitionDefinition.getName());
         }
         assertJohnHasGotTheExpectedTaskPending(ACTOR_NAME, builder.getProcess(), "step");
@@ -1083,7 +1078,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("Step1", processInstance);
-        List<HumanTaskInstance> taskInstances = getProcessAPI().getHumanTaskInstances(processInstance.getId(), "Step1", 0, 1);
+        final List<HumanTaskInstance> taskInstances = getProcessAPI().getHumanTaskInstances(processInstance.getId(), "Step1", 0, 1);
         assignAndExecuteStep(taskInstances.get(0).getId(), user.getId());
         waitForUserTaskAndExecuteIt("Step3", processInstance, user.getId());
         waitForTaskToFail(processInstance);
@@ -1105,7 +1100,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final long flowNodeInstanceId = waitForFlowNodeInState(processInstance, "join", TestStates.getExecutingState(), false);
 
@@ -1122,7 +1117,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         // To be sure asynchronous restart works have been executed:
         Thread.sleep(200);
 
-        FlowNodeInstance joinGateway = getProcessAPI().getFlowNodeInstance(flowNodeInstanceId);
+        final FlowNodeInstance joinGateway = getProcessAPI().getFlowNodeInstance(flowNodeInstanceId);
         assertEquals(TestStates.getExecutingState(), joinGateway.getState());
 
         disableAndDeleteProcess(processDefinition);

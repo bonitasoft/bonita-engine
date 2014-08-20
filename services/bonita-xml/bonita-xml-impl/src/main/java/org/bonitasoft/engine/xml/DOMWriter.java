@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -33,8 +34,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -151,15 +152,17 @@ public class DOMWriter implements XMLWriter {
         }
         if (parentNode == null) {
             return element;
-        } else {
-            return parentNode.appendChild(element);
         }
+        return parentNode.appendChild(element);
     }
 
     @Override
     public void setSchema(final File xsdSchema) throws SInvalidSchemaException {
-        xsdSource = new StreamSource(xsdSchema);
-        validator.setSchemaSource(xsdSource);
+        try {
+            validator.setSchemaUrl(xsdSchema.toURI().toURL());
+        } catch (final MalformedURLException e) {
+            throw new SBonitaRuntimeException(e);
+        }
     }
 
 }

@@ -24,7 +24,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
 
 /**
  * Execute works using an ExecutorService
- * 
+ *
  * @author Charles Souillard
  * @author Baptiste Mesta
  * @author Celine Souchet
@@ -50,7 +50,7 @@ public class ExecutorWorkService implements WorkService {
     private final int workTerminationTimeout;
 
     /**
-     * 
+     *
      * @param transactionService
      * @param workSynchronizationFactory
      * @param loggerService
@@ -76,7 +76,7 @@ public class ExecutorWorkService implements WorkService {
             logExecutorStateWarn(work);
             return;
         }
-        final AbstractWorkSynchronization synchro = getContinuationSynchronization(work);
+        final AbstractWorkSynchronization synchro = getContinuationSynchronization();
         if (synchro != null) {
             synchro.addWork(work);
         }
@@ -95,17 +95,17 @@ public class ExecutorWorkService implements WorkService {
         }
         try {
             work.setTenantId(sessionAccessor.getTenantId());
-        } catch (STenantIdNotSetException e) {
+        } catch (final STenantIdNotSetException e) {
             throw new SWorkRegisterException("Unable to read tenant id from session.", e);
         }
         executor.submit(work);
     }
 
-    private AbstractWorkSynchronization getContinuationSynchronization(final BonitaWork work) throws SWorkRegisterException {
+    private AbstractWorkSynchronization getContinuationSynchronization() throws SWorkRegisterException {
         synchronized (getSynchroLock) {
             AbstractWorkSynchronization synchro = synchronizations.get();
-            if (synchro == null || synchro.isExecuted()) {
-                synchro = workSynchronizationFactory.getWorkSynchronization(executor, loggerService, sessionAccessor);
+            if (synchro == null) {
+                synchro = workSynchronizationFactory.getWorkSynchronization(executor, loggerService, sessionAccessor, this);
                 try {
                     transactionService.registerBonitaSynchronization(synchro);
                 } catch (final STransactionNotFoundException e) {
@@ -132,7 +132,7 @@ public class ExecutorWorkService implements WorkService {
             }
             shutdownExecutor();
             awaitTermination();
-        } catch (SWorkException e) {
+        } catch (final SWorkException e) {
             if (e.getCause() != null) {
                 loggerService.log(getClass(), TechnicalLogSeverity.WARNING, e.getMessage(), e.getCause());
             } else {
@@ -185,5 +185,13 @@ public class ExecutorWorkService implements WorkService {
         if (!isStopped()) {
             executor.notifyNodeStopped(nodeName);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeSynchronization() {
+        synchronizations.remove();
     }
 }

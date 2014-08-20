@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,18 +15,21 @@ package org.bonitasoft.engine.classloader;
 
 import java.util.Map;
 
+import org.bonitasoft.engine.commons.PlatformLifecycleService;
+
 /**
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  * @since 6.0
  */
-public interface ClassLoaderService {
+public interface ClassLoaderService extends PlatformLifecycleService {
 
     /**
      * Get the global ClassLoader. If no global ClassLoader already exists, create it.
      * 
      * @return the global ClassLoader
      * @throws SClassLoaderException
-     *             Error thrown if it's impossible to get the global ClassLoader
+     *         Error thrown if it's impossible to get the global ClassLoader
      */
     ClassLoader getGlobalClassLoader() throws SClassLoaderException;
 
@@ -49,12 +52,12 @@ public interface ClassLoaderService {
      * a new one is created.
      * 
      * @param type
-     *            The classloader's type identifier
+     *        The classloader's type identifier
      * @param id
-     *            The local ClassLoader's id
+     *        The local ClassLoader's id
      * @return the local ClassLoader for the given type and id
      * @throws SClassLoaderException
-     *             Error thrown if it's impossible to get a local ClassLoader for the given type and id
+     *         Error thrown if it's impossible to get a local ClassLoader for the given type and id
      */
     ClassLoader getLocalClassLoader(final String type, final long id) throws SClassLoaderException;
 
@@ -62,9 +65,9 @@ public interface ClassLoaderService {
      * Remove the local ClassLoader identified by the given type and id;
      * 
      * @param type
-     *            The classloader's type identifier
+     *        The classloader's type identifier
      * @param id
-     *            The local ClassLoader's id
+     *        The local ClassLoader's id
      */
     void removeLocalClassLoader(final String type, final long id);
 
@@ -72,7 +75,7 @@ public interface ClassLoaderService {
      * Remove all local ClassLoaders associated to the given type
      * 
      * @param type
-     *            the ClassLoader's type
+     *        the ClassLoader's type
      */
     void removeAllLocalClassLoaders(final String type);
 

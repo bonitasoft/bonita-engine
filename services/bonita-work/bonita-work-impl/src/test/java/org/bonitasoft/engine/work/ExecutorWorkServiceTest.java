@@ -62,7 +62,7 @@ public class ExecutorWorkServiceTest {
         queue = mock(Queue.class);
 
         doReturn(abstractWorkSynchronization).when(workSynchronizationFactory).getWorkSynchronization(any(BonitaExecutorService.class),
-                any(TechnicalLoggerService.class), any(SessionAccessor.class));
+                any(TechnicalLoggerService.class), any(SessionAccessor.class), any(WorkService.class));
         doReturn(1L).when(sessionAccessor).getTenantId();
         doReturn(executorService).when(bonitaExecutorServiceFactory).createExecutorService();
         doReturn(false).when(executorService).isShutdown();
