@@ -11,6 +11,7 @@ package com.bonitasoft.engine.execution;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
@@ -60,14 +61,14 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
             final DocumentMappingService documentMappingService, final SCommentService commentService,
             final BreakpointService breakpointService, final EventsHandler eventsHandler, final UserFilterService userFilterService,
             final ActorMappingService actorMappingService, final WorkService workService, final TokenService tokenService,
-            final IdentityService identityService, final RefBusinessDataService refBusinessDataService) {
+            final IdentityService identityService, final RefBusinessDataService refBusinessDataService, final CacheService cacheService) {
         super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, classLoaderService,
                 expressionResolverService, schedulerService, dataInstanceService, eventInstanceService,
                 operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentMappingService, commentService,
                 eventsHandler, userFilterService, actorMappingService, workService, tokenService, identityService, new StateBehaviorsExt(bpmInstancesCreator,
                         eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService, connectorInstanceService,
                         expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService, containerRegistry,
-                        eventInstanceService, schedulerService, commentService, identityService, logger, tokenService, refBusinessDataService));
+                        eventInstanceService, schedulerService, commentService, identityService, logger, tokenService, refBusinessDataService, cacheService));
         this.breakpointService = breakpointService;
     }
 

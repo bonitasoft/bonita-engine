@@ -18,6 +18,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.InvalidEvaluationConnectorConditionException;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -92,11 +93,11 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
             final TokenService tokenService, final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager,
-            final BusinessDataRepository businessDataRepository, final RefBusinessDataService refBusinessDataService) {
+            final BusinessDataRepository businessDataRepository, final RefBusinessDataService refBusinessDataService, final CacheService cacheService) {
         super(activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService, gatewayInstanceService,
                 transitionService, eventInstanceService, connectorService, connectorInstanceService, classLoaderService, operationService,
                 expressionResolverService, eventService, handlers, processDocumentService, sessionAccessor, containerRegistry, bpmInstancesCreator,
-                tokenService, eventsHandler, flowNodeStateManager);
+                tokenService, eventsHandler, flowNodeStateManager, cacheService);
         this.businessDataRepository = businessDataRepository;
         this.refBusinessDataService = refBusinessDataService;
     }

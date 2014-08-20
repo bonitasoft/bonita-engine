@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.execution;
 
 import java.util.ArrayList;
@@ -5,6 +13,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
+import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -45,7 +54,9 @@ import com.bonitasoft.engine.core.process.instance.model.SFlowNodeSimpleRefBusin
 import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
 
-
+/**
+ * @author Matthieu Chaffotte
+ */
 public class StateBehaviorsExt extends StateBehaviors {
 
     private final RefBusinessDataService refBusinessDataService;
@@ -57,10 +68,10 @@ public class StateBehaviorsExt extends StateBehaviors {
             final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
             final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceSevice, final SchedulerService schedulerService,
             final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final TokenService tokenService,
-            final RefBusinessDataService refBusinessDataService) {
+            final RefBusinessDataService refBusinessDataService, final CacheService cacheService) {
         super(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService,
                 connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService,
-                containerRegistry, eventInstanceSevice, schedulerService, commentService, identityService, logger, tokenService);
+                containerRegistry, eventInstanceSevice, schedulerService, commentService, identityService, logger, tokenService, cacheService);
         this.refBusinessDataService = refBusinessDataService;
     }
 

@@ -13,7 +13,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -141,7 +140,7 @@ public class BusinessDataLeftOperandHandlerTest {
 
         final BusinessDataLeftOperandHandler spy = spy(leftOperandHandler);
         doReturn(myTravel).when(spy).getBusinessData(anyString(), anyLong(), anyString());
-        final Map<String, Serializable> inputValues = new HashMap<String, Serializable>(1);
+        final Map<String, Object> inputValues = new HashMap<String, Object>(1);
         final SExpressionContext expressionContext = new SExpressionContext(-1L, "unused", inputValues);
         final SLeftOperand leftOperand = createLeftOperand(bizDataName);
         // when:
