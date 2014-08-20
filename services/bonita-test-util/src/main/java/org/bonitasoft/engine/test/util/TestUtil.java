@@ -111,7 +111,9 @@ public class TestUtil {
         PlatformUtil.deleteDefaultTenant(txService, platformService, sessionAccessor, sessionService);
     }
 
-    public static void deletePlatForm(final TransactionService txService, final PlatformService platformService) throws Exception {
+    public static void deletePlatForm(final TransactionService txService, final PlatformService platformService, final SchedulerService schedulerService)
+            throws Exception {
+        stopScheduler(schedulerService, txService);
         PlatformUtil.deletePlatform(txService, platformService);
     }
 
