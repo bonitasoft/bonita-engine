@@ -38,7 +38,7 @@ public class SAXValidator implements XMLSchemaValidator {
     private URL schemaUrl;
 
     public SAXValidator() {
-        this.factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     }
 
     @Override
@@ -60,9 +60,9 @@ public class SAXValidator implements XMLSchemaValidator {
 
     @Override
     public void validate(final File file) throws SValidationException, IOException {
-        // BS-9304 : If you create a new StreamSource with a file, the streamSource keep a lock on the file when there is an exception.
-        // If the file is temporary, the temporary file is never delete at the end of the jvm, even if you call all methods to delete its.
-        // So you need to use the InputStream to close it, even there is an exception, to unlock the file.
+        // BS-9304 : If you create a new StreamSource with a file, the streamSource keeps a lock on the file when there is an exception.
+        // If the file is temporary, the temporary file is never deleted at the end of the jvm, even if you call all methods to delete it.
+        // So you need to use the InputStream to close it, even if there is an exception, to unlock the file.
         final InputStream openStream = file.toURI().toURL().openStream();
         try {
             validate(new StreamSource(openStream));
@@ -81,15 +81,17 @@ public class SAXValidator implements XMLSchemaValidator {
         if (schemaUrl == null) {
             throw new SValidationException("No schema defined");
         }
-        final InputStream inputStream = schemaUrl.openStream();
-        try {
-            final Schema schema = factory.newSchema(new StreamSource(inputStream));
-            final Validator validator = schema.newValidator();
-            validator.validate(source);
-        } catch (final SAXException e) {
-            throw new SValidationException(e);
-        } finally {
-            inputStream.close();
+        synchronized (schemaUrl) {
+            final InputStream inputStream = schemaUrl.openStream();
+            try {
+                final Schema schema = factory.newSchema(new StreamSource(inputStream));
+                final Validator validator = schema.newValidator();
+                validator.validate(source);
+            } catch (final SAXException e) {
+                throw new SValidationException(e);
+            } finally {
+                inputStream.close();
+            }
         }
     }
 
