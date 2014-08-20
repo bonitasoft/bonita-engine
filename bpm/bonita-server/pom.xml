@@ -287,11 +287,6 @@
     <!-- Logs -->
     <dependency>
       <groupId>org.bonitasoft.engine.log</groupId>
-      <artifactId>bonita-log-model-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.log</groupId>
       <artifactId>bonita-log-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -773,11 +768,10 @@
                   <include>org.bonitasoft.engine.core.login:bonita-login-api</include>
                   <include>org.bonitasoft.engine.core.login:bonita-login-api-impl</include>
                   <!-- Logs -->
-                  <include>org.bonitasoft.engine.log:bonita-log-model</include>
-                  <include>org.bonitasoft.engine.log:bonita-log-model-impl</include>
                   <include>org.bonitasoft.engine.log:bonita-log-api</include>
-                  <include>com.bonitasoft.engine.log:bonita-log-api-impl</include>
                   <include>org.bonitasoft.engine.log:bonita-log-impl</include>
+                  <include>com.bonitasoft.engine.log:bonita-log-api-impl</include>
+
                   <!-- Monitoring -->
                   <include>com.bonitasoft.engine.monitoring:bonita-monitoring-api</include>
                   <include>com.bonitasoft.engine.monitoring:bonita-monitoring-api-impl</include>
