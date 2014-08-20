@@ -192,7 +192,7 @@
 		<!-- Logs -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-model-impl</artifactId>
+			<artifactId>bonita-log-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

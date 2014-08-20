@@ -15,8 +15,6 @@
 	<name>Bonita Log</name>
 
 	<modules>
-		<module>bonita-log-model</module>
-		<module>bonita-log-model-impl</module>
 		<module>bonita-log-api</module>
 		<module>bonita-log-impl</module>
 		<module>bonita-log-technical-api</module>
