@@ -93,9 +93,9 @@ public class BusinessArchiveTest {
     @Before
     public void before() throws IOException {
         tempFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("businessArchiveFolder");
-        tempFolder.delete();
+        IOUtil.deleteDir(tempFolder);
         barFile = IOUtil.createTempFileInDefaultTempDirectory("businessArchive", ".bar");
-        barFile.delete();
+        IOUtil.deleteFile(barFile, 2, 3);
     }
 
     @After
@@ -230,8 +230,8 @@ public class BusinessArchiveTest {
     @Test
     public void exportBusinessArchiveAsFile() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        final DesignProcessDefinition process = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinitionBuilder.done())
+                .done();
         BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
         assertTrue(barFile.exists());
         assertFalse(barFile.isDirectory());
@@ -296,8 +296,7 @@ public class BusinessArchiveTest {
     @Test
     public void manageBusinessArchiveResources() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("MyProcess", "1.0");
-        final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition)
+        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinitionBuilder.done())
                 .addExternalResource(new BarResource("dummy.txt", new byte[] { 'a', 'b', 'c', 'd' })).done();
 
         // Add a resource to the biz archive:

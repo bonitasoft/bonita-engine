@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>services</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.3.4-SNAPSHOT</version>
 	</parent>
 
 	<groupId>org.bonitasoft.engine.log</groupId>
@@ -15,8 +15,6 @@
 	<name>Bonita Log</name>
 
 	<modules>
-		<module>bonita-log-model</module>
-		<module>bonita-log-model-impl</module>
 		<module>bonita-log-api</module>
 		<module>bonita-log-impl</module>
 		<module>bonita-log-technical-api</module>

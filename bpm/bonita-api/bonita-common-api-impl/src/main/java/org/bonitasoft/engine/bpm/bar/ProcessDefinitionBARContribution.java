@@ -176,10 +176,22 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         bindings.add(SubProcessDefinitionBinding.class);
         bindings.add(FlowElementBinding.class);
 
+        //        final InputStream schemaStream = ProcessDefinitionBARContribution.class.getResourceAsStream("ProcessDefinition.xsd");
+        //        try {
+        //            handler = new XMLHandler(bindings, schemaStream);
+        //        } catch (final Exception e) {
+        //            throw new BonitaRuntimeException(e);
+        //        } finally {
+        //            try {
+        //                schemaStream.close();
+        //            } catch (final IOException e) {
+        //                throw new BonitaRuntimeException(e);
+        //            }
+        //        }
+
         final URL schemaUrl = ProcessDefinitionBARContribution.class.getResource("ProcessDefinition.xsd");
         try {
-            handler = new XMLHandler(bindings);
-            handler.setSchemaUrl(schemaUrl);
+            handler = new XMLHandler(bindings, schemaUrl);
         } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }

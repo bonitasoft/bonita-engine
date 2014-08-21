@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URI;
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -30,12 +29,6 @@ public interface Parser {
     List<Class<? extends ElementBinding>> getBinders();
 
     void setBindings(List<Class<? extends ElementBinding>> bindings);
-
-    /**
-     * @param schemaUrl
-     * @since 6.3.4
-     */
-    void setSchemaUrl(URL schemaUrl);
 
     Object getObjectFromXML(URI xmlURI) throws SXMLParseException, IOException;
 
@@ -56,5 +49,7 @@ public interface Parser {
     void validate(InputStream xmlStream) throws SValidationException, IOException;
 
     void validate(Reader xmlReader) throws SValidationException, IOException;
+
+    void setSchema(InputStream resourceAsStream) throws SInvalidSchemaException;
 
 }
