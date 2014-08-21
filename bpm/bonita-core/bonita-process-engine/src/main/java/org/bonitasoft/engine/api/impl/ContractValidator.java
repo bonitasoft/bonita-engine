@@ -20,6 +20,8 @@ import java.util.Map;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.mvel2.MVEL;
 
 /**
@@ -27,10 +29,13 @@ import org.mvel2.MVEL;
  */
 public class ContractValidator {
 
+    private final TechnicalLoggerService loggerService;
+
     private final List<String> comments;
 
-    public ContractValidator() {
+    public ContractValidator(final TechnicalLoggerService loggerService) {
         comments = new ArrayList<String>();
+        this.loggerService = loggerService;
     }
 
     public boolean isValid(final SContractDefinition contract, final Map<String, Object> variables) {
@@ -44,13 +49,21 @@ public class ContractValidator {
             }
         } else {
             for (final SRuleDefinition rule : rules) {
+                log(TechnicalLogSeverity.DEBUG, "Evaluating rule [" + rule.getName() + "] on input(s) " + rule.getInputNames());
                 final Boolean valid = MVEL.evalToBoolean(rule.getExpression(), variables);
                 if (!valid) {
+                    log(TechnicalLogSeverity.WARNING, "Rule [" + rule.getName() + "] on input(s) " + rule.getInputNames() + " is not valid");
                     comments.add(rule.getExplanation());
                 }
             }
         }
         return comments.isEmpty();
+    }
+
+    private void log(final TechnicalLogSeverity severity, final String message) {
+        if (loggerService.isLoggable(ContractValidator.class, severity)) {
+            loggerService.log(ContractValidator.class, severity, message);
+        }
     }
 
     public List<String> getComments() {

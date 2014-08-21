@@ -936,7 +936,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     (SUserTaskInstance) flowNodeInstance);
             executeTransactionContent(tenantAccessor, contractOfUserTaskInstance, wrapInTransaction);
             final SContractDefinition contractDefinition = contractOfUserTaskInstance.getResult();
-            final ContractValidator validator = new ContractValidator();
+            final ContractValidator validator = new ContractValidator(tenantAccessor.getTechnicalLoggerService());
             if (!validator.isValid(contractDefinition, inputs)) {
                 throw new ContractViolationException("Contract is not valid: ", validator.getComments());
             }
@@ -5878,6 +5878,5 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new RetrieveException(sbe);
         }
     }
-
 
 }
