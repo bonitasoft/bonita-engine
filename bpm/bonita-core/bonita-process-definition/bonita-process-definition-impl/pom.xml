@@ -106,7 +106,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-model</artifactId>
+			<artifactId>bonita-expression-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -128,7 +128,7 @@
 		<!-- Tests -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-model-impl</artifactId>
+			<artifactId>bonita-expression-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

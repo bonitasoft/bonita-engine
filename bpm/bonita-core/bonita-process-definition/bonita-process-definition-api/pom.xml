@@ -26,7 +26,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-model</artifactId>
+			<artifactId>bonita-expression-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
