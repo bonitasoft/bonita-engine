@@ -49,6 +49,7 @@ import com.bonitasoft.engine.business.application.SApplicationLogBuilder;
 import com.bonitasoft.engine.business.application.SApplicationPage;
 import com.bonitasoft.engine.business.application.SApplicationPageLogBuilder;
 import com.bonitasoft.engine.business.application.SInvalidNameException;
+import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 
 
@@ -72,8 +73,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     ApplicationServiceImpl(final Manager manager, final Recorder recorder, final ReadPersistenceService persistenceService,
             final QueriableLoggerService queriableLoggerService) {
-        //        active = manager.isFeatureActive(Features.BUSINESS_APPLICATIONS);
-        active = true;
+        active = manager.isFeatureActive(Features.BUSINESS_APPLICATIONS);
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.queriableLoggerService = queriableLoggerService;
