@@ -53,7 +53,7 @@ public class SupervisorTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
 
         createUsers();
         createGroups();

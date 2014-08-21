@@ -79,7 +79,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+         loginOnDefaultTenantWithDefaultTechnicalUser();
         john = createUser(JOHN, "bpm");
         jack = createUser(JACK, "bpm");
         jenny = createUser(JENNY, "bpm");

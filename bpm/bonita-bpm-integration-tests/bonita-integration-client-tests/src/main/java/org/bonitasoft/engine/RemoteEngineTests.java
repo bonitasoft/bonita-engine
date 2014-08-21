@@ -39,7 +39,7 @@ public class RemoteEngineTests extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+         loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     /*

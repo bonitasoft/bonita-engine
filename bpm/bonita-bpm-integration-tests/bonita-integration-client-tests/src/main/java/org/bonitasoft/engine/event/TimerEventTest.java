@@ -46,7 +46,7 @@ public class TimerEventTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+         loginOnDefaultTenantWithDefaultTechnicalUser();
         user = createUser(USERNAME, PASSWORD);
         logoutThenloginAs(USERNAME, PASSWORD);
     }

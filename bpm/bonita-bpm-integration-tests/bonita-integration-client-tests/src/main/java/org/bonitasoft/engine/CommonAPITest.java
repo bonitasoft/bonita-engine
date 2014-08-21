@@ -83,7 +83,7 @@ public abstract class CommonAPITest extends APITestUtil {
      * @throws BonitaException
      */
     private List<String> clean() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
 
         final List<String> messages = new ArrayList<String>();
         messages.addAll(checkNoCommands());

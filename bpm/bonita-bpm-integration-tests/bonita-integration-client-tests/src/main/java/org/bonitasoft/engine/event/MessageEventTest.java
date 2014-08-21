@@ -91,7 +91,7 @@ public class MessageEventTest extends CommonAPITest {
 
     @Before
     public void setUp() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         user = getIdentityAPI().createUser("john", "bpm");
     }
 

@@ -42,7 +42,7 @@ public class SearchCommentTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @Test
@@ -390,7 +390,7 @@ public class SearchCommentTest extends CommonAPITest {
         getProcessAPI().addProcessComment(pi4.getId(), commentContent6);
 
         logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
 
         final SearchOptionsBuilder builder3 = new SearchOptionsBuilder(0, 10);
         final SearchResult<Comment> searchResult3 = getProcessAPI().searchCommentsManagedBy(jack.getId(), builder3.done());

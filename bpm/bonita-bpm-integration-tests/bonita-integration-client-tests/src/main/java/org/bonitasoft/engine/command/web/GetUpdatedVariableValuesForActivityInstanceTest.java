@@ -56,7 +56,7 @@ public class GetUpdatedVariableValuesForActivityInstanceTest extends CommonAPITe
 
     @Before
     public void before() throws Exception {
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+         loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @After

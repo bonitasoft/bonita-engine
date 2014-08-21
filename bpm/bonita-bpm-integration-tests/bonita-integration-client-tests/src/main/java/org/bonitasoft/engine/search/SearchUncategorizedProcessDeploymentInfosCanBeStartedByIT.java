@@ -72,7 +72,7 @@ public class SearchUncategorizedProcessDeploymentInfosCanBeStartedByIT extends C
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
 
         categories = new ArrayList<Category>();
 

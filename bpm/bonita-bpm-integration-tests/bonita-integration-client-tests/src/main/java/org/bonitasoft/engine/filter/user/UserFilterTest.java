@@ -69,7 +69,7 @@ public class UserFilterTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         john = createUser(JOHN, "bpm");
         jack = createUser(JACK, "bpm");
         james = createUser(JAMES, "bpm");

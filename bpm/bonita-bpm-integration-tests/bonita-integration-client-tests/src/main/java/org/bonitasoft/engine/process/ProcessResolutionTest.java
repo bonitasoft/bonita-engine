@@ -42,7 +42,7 @@ public class ProcessResolutionTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+         loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @Cover(classes = { Problem.class, ProcessDefinition.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-531", keywords = { "process resolution" }, exceptions = { ProcessDefinitionNotFoundException.class })

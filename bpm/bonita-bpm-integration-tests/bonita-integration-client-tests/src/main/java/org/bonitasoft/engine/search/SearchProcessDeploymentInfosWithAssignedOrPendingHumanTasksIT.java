@@ -57,7 +57,7 @@ public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksIT exten
 
     @Before
     public void beforeTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         // create users
         users = new ArrayList<User>(2);
         users.add(createUser("chicobento", "bpm"));

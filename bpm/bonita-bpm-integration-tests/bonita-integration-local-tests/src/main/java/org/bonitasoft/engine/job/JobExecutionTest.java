@@ -32,7 +32,7 @@ public class JobExecutionTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         matti = createUser("matti", "keltainen");
     }
 

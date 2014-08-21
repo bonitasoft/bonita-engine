@@ -41,7 +41,7 @@ public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         cebolinha = createUser("cebolinha", "bpm");
         cascao = createUser("cascao", "bpm");
     }

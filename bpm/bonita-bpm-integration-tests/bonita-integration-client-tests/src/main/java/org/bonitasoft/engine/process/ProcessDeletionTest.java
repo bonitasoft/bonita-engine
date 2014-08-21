@@ -49,7 +49,7 @@ public class ProcessDeletionTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+         loginOnDefaultTenantWithDefaultTechnicalUser();
         pedro = getIdentityAPI().createUser(USERNAME, PASSWORD);
         processDefinitions = new ArrayList<ProcessDefinition>();
     }
