@@ -250,12 +250,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- Expression Resolver -->
 		<dependency>
@@ -699,11 +693,6 @@
 			<artifactId>bonita-business-data-api</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-model</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.data.instance</groupId>
