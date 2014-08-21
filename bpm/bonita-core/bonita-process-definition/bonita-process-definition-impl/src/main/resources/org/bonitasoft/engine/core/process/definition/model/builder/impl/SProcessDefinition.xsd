@@ -372,7 +372,7 @@
 				<xs:sequence>
 					<xs:element name="conditionalExpression" type="xs:string" />
 					<xs:element name="explanation" type="xs:string" />
-					<xs:element name="inputDefinitionNames">
+					<xs:element name="inputDefinitionNames" minOccurs="1" maxOccurs="unbounded">
 						<xs:complexType>
 							<xs:sequence>
 								<xs:element name="inputDefinitionName" type="xs:string" />
