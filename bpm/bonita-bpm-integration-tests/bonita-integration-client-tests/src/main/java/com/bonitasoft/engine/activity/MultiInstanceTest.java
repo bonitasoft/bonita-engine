@@ -40,7 +40,7 @@ public class MultiInstanceTest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         john = createUser(JOHN, "bpm");
        logoutOnTenant();
         loginOnDefaultTenantWith(JOHN, "bpm");

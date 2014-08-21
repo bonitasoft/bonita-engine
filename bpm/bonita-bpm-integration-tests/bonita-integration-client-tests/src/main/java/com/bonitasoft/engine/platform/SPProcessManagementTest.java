@@ -53,7 +53,7 @@ public class SPProcessManagementTest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     private void logoutThenloginAs(final String userName, final String password, final long tenantId) throws BonitaException {
@@ -73,7 +73,7 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         platformAPI.activateTenant(tenantId);
         logoutOnPlatform(platformSession);
 
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
 
         assertEquals(0, getProcessAPI().getNumberOfProcessDeploymentInfos());
         List<Long> ids = createProcessDefinitionWithTwoHumanStepsAndDeployBusinessArchive(10);
@@ -114,7 +114,7 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         platformAPI.deleteTenant(tenantId);
         logoutOnPlatform(platformSession);
 
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @Test
@@ -156,7 +156,7 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         deleteUser(user1);
         ClientEventUtil.undeployCommand(getSession());
         logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         disableAndDeleteProcess(processDefinition);
         deleteUser(user);
         BPMTestSPUtil.deactivateAndDeleteTenant(tenant1, "hamme", "saari");

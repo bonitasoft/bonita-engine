@@ -46,7 +46,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
 
     @Before
     public void setUp() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         john = createUser("john", PASSWORD);
         jack = createUser("jack", PASSWORD);
     }

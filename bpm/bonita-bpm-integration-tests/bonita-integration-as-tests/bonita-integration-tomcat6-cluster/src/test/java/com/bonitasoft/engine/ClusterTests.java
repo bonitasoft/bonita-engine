@@ -74,7 +74,7 @@ public class ClusterTests extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         user = createUser(USERNAME, PASSWORD);
         logoutOnTenant();
         // init the context here
@@ -262,7 +262,7 @@ public class ClusterTests extends CommonAPISPTest {
         } catch (InvalidSessionException e) {
             // ok
         }
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         // should work on both nodes
         try {
             System.out.println("[test] try to call getNumberOfProcess with tech user on node 1");
@@ -296,7 +296,7 @@ public class ClusterTests extends CommonAPISPTest {
         assertFalse(isExecuted(systemProperty, processDefinitionOnTheOtherTenant));
 
         logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         System.out.println("[test] resume on node 2");
         getTenantManagementAPI().resume();
         // wait that quartz launch its jobs

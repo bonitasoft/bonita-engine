@@ -113,7 +113,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         businessUser = createUser(USERNAME, PASSWORD);
        logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);

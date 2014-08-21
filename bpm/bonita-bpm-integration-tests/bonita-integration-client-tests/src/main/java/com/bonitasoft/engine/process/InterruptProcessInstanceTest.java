@@ -26,7 +26,7 @@ public class InterruptProcessInstanceTest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         pedro = createUser("pedro", "secreto");
     }
 

@@ -51,7 +51,7 @@ public class ProfileMemberSPITest extends AbstractProfileSPTest {
         final User userTenant2 = createUser("userName_tenant2", "UserPwd_tenant2", "UserFirstName_tenant2", "UserLastName_tenant2");
         getProfileAPI().createProfileMember(Long.valueOf(1), userTenant2.getId(), null, null);
         logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
 
         // Create UserProfile1
         final ProfileMember addProfileMemberResult = getProfileAPI().createProfileMember(Long.valueOf(1), user1.getId(), null, null);
@@ -81,7 +81,7 @@ public class ProfileMemberSPITest extends AbstractProfileSPTest {
         platformAPI.deactiveTenant(tenant2Id);
         platformAPI.deleteTenant(tenant2Id);
 
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @Test

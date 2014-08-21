@@ -171,7 +171,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
     @Before
     public void setUp() throws Exception {
         clientFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("bdr_it_client");
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         matti = createUser("matti", "bpm");
 
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
@@ -461,7 +461,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
     @Test(expected = BusinessDataRepositoryException.class)
     public void should_undeploy_delete_generate_client_bdm_jar_in_bonita_home() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         getTenantManagementAPI().pause();
         getTenantManagementAPI().uninstallBusinessDataModel();
         getTenantManagementAPI().resume();

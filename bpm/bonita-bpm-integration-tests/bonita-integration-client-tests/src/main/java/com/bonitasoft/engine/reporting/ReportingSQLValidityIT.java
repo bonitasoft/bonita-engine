@@ -42,7 +42,7 @@ public class ReportingSQLValidityIT extends CommonAPISPTest {
 
     @Before
     public void setUp() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     /* expect no exception */

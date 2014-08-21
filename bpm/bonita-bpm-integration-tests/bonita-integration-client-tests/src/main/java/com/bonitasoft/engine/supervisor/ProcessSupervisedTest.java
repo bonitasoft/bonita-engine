@@ -47,7 +47,7 @@ public class ProcessSupervisedTest extends CommonAPISPTest {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
 
         users = new ArrayList<User>();
         users.add(createUser(USERNAME, PASSWORD));
