@@ -151,6 +151,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
+import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
@@ -275,7 +276,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SAProcessInsta
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceHierarchicalDeletionException;
@@ -897,18 +897,24 @@ public class ProcessAPIImpl implements ProcessAPI {
     @CustomTransactions
     @Override
     public void executeFlowNode(final long userId, final long flownodeInstanceId) throws FlowNodeExecutionException {
-        executeFlowNode(userId, flownodeInstanceId, new HashMap<String, Object>());
+        try {
+            executeFlowNode(userId, flownodeInstanceId, new HashMap<String, Object>());
+        } catch (final ContractViolationException e) {
+            throw new FlowNodeExecutionException("The userTask has a contract with needs inputs to order to be executed");
+        }
     }
 
     @CustomTransactions
     @Override
-    public void executeFlowNode(final long flownodeInstanceId, final Map<String, Object> parameters) throws FlowNodeExecutionException {
+    public void executeFlowNode(final long flownodeInstanceId, final Map<String, Object> parameters)
+            throws FlowNodeExecutionException, ContractViolationException {
         executeFlowNode(0, flownodeInstanceId, parameters);
     }
 
     @CustomTransactions
     @Override
-    public void executeFlowNode(final long userId, final long flownodeInstanceId, final Map<String, Object> parameters) throws FlowNodeExecutionException {
+    public void executeFlowNode(final long userId, final long flownodeInstanceId, final Map<String, Object> parameters)
+            throws FlowNodeExecutionException, ContractViolationException {
         try {
             executeFlowNode(userId, flownodeInstanceId, true, parameters);
         } catch (final SBonitaException e) {
@@ -917,7 +923,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction, final Map<String, Object> inputs)
-            throws SBonitaException {
+            throws SBonitaException, ContractViolationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final LockService lockService = tenantAccessor.getLockService();
@@ -932,7 +938,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final SContractDefinition contractDefinition = contractOfUserTaskInstance.getResult();
             final ContractValidator validator = new ContractValidator();
             if (!validator.isValid(contractDefinition, inputs)) {
-                throw new SFlowNodeExecutionException("Contract is not valid: " + validator.getComments());
+                throw new ContractViolationException("Contract is not valid: ", validator.getComments());
             }
         }
 

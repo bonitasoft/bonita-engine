@@ -28,6 +28,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
+import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -505,40 +506,6 @@ public interface ProcessRuntimeAPI {
      * @since 6.0.1
      */
     void executeFlowNode(long userId, long flownodeInstanceId) throws FlowNodeExecutionException;
-
-    /**
-     * Executes a flow node that is in a stable state.
-     * Will move the activity to the next stable state and then continue the execution of the process.
-     * The parameters are only used for user tasks.
-     *
-     * @param flownodeInstanceId
-     *        The identifier of the flow node to execute.
-     * @param parameters
-     *        the parameters to used for user task
-     * @throws FlowNodeExecutionException
-     *         If an execution exception occurs.
-     * @since 6.0
-     */
-    void executeFlowNode(long flownodeInstanceId, Map<String, Object> parameters) throws FlowNodeExecutionException;
-
-    /**
-     * Executes a flow node that is in a stable state on behalf of a given user
-     * Will make the flow node go in the next stable state and then continue the execution of the process
-     * If userId equals 0, the logged-in user is declared as the executer of the flow node.
-     * The user, who executed the flow node on behalf of a given user, is declared as a executer delegate.
-     * The parameters are only used for user tasks.
-     * 
-     * @param userId
-     *        The identifier of the user for which you want to execute the flow node
-     * @param flownodeInstanceId
-     *        The identifier of the flow node to execute
-     * @param parameters
-     *        the parameters to used for user task
-     * @throws FlowNodeExecutionException
-     *         If an execution exception occurs
-     * @since 6.0.1
-     */
-    void executeFlowNode(long userId, long flownodeInstanceId, Map<String, Object> parameters) throws FlowNodeExecutionException;
 
     /**
      * Returns all activities (active and finished) of a process instance.
@@ -2355,5 +2322,39 @@ public interface ProcessRuntimeAPI {
      *         if identifier does not refer to a real user task.
      */
     ContractDefinition getUserTaskContract(long userTaskId) throws UserTaskNotFoundException;
+
+    /**
+     * Executes a flow node that is in a stable state.
+     * Will move the activity to the next stable state and then continue the execution of the process.
+     * The parameters are only used for user tasks.
+     *
+     * @param flownodeInstanceId
+     *        The identifier of the flow node to execute.
+     * @param parameters
+     *        the parameters to used for user task
+     * @throws FlowNodeExecutionException
+     *         If an execution exception occurs.
+     * @since 7.0
+     */
+    void executeFlowNode(long flownodeInstanceId, Map<String, Object> parameters) throws ContractViolationException, FlowNodeExecutionException;
+
+    /**
+     * Executes a flow node that is in a stable state on behalf of a given user
+     * Will make the flow node go in the next stable state and then continue the execution of the process
+     * If userId equals 0, the logged-in user is declared as the executer of the flow node.
+     * The user, who executed the flow node on behalf of a given user, is declared as a executer delegate.
+     * The parameters are only used for user tasks.
+     *
+     * @param userId
+     *        The identifier of the user for which you want to execute the flow node
+     * @param flownodeInstanceId
+     *        The identifier of the flow node to execute
+     * @param parameters
+     *        the parameters to used for user task
+     * @throws FlowNodeExecutionException
+     *         If an execution exception occurs
+     * @since 7.0
+     */
+    void executeFlowNode(long userId, long flownodeInstanceId, Map<String, Object> parameters) throws ContractViolationException, FlowNodeExecutionException;
 
 }

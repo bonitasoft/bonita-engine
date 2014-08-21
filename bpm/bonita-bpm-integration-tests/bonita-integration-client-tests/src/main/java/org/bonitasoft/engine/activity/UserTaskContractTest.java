@@ -12,6 +12,7 @@ import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
+import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.RuleDefinition;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
@@ -101,7 +102,7 @@ public class UserTaskContractTest extends CommonAPITest {
         try {
             getProcessAPI().executeFlowNode(userTask.getId(), Collections.<String, Object> emptyMap());
             fail("The contract is not enforced");
-        } catch (final FlowNodeExecutionException e) {
+        } catch (final ContractViolationException e) {
             final String state = getProcessAPI().getActivityInstanceState(userTask.getId());
             assertThat(state).isEqualTo("ready");
         }
@@ -153,7 +154,7 @@ public class UserTaskContractTest extends CommonAPITest {
             inputs.put("numberOfDays", null);
             getProcessAPI().executeFlowNode(userTask.getId(), inputs);
             fail("The contract is not enforced");
-        } catch (final FlowNodeExecutionException e) {
+        } catch (final ContractViolationException e) {
             final String state = getProcessAPI().getActivityInstanceState(userTask.getId());
             assertThat(state).isEqualTo("ready");
         }
