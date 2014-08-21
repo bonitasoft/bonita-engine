@@ -30,10 +30,10 @@ public class LicenseTest extends CommonAPISPTest {
             logoutOnPlatform(session);
         }
         try {
-            loginOnDefaultTenantWithDefaultTechnicalLogger();
+            loginOnDefaultTenantWithDefaultTechnicalUser();
         } catch (final LoginException le) {
             startNode();
-            loginOnDefaultTenantWithDefaultTechnicalLogger();
+            loginOnDefaultTenantWithDefaultTechnicalUser();
            logoutOnTenant();
         }
     }
