@@ -44,7 +44,6 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -54,6 +53,8 @@ import com.bonitasoft.engine.business.application.SApplication;
 import com.bonitasoft.engine.business.application.SApplicationPage;
 import com.bonitasoft.engine.business.application.SApplicationUpdateBuilder;
 import com.bonitasoft.engine.business.application.SInvalidNameException;
+import com.bonitasoft.manager.Features;
+import com.bonitasoft.manager.Manager;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -66,6 +67,12 @@ public class ApplicationServiceImplTest {
     private static final String APPLICATION_DISP_NAME = "My app";
 
     @Mock
+    private Manager managerActiveFeature;
+
+    @Mock
+    private Manager managerDisabledFeature;
+
+    @Mock
     private Recorder recorder;
 
     @Mock
@@ -76,11 +83,17 @@ public class ApplicationServiceImplTest {
 
     private SApplication application;
 
-    @InjectMocks
-    private ApplicationServiceImpl applicationService;
+    private ApplicationServiceImpl applicationServiceActive;
+
+    private ApplicationServiceImpl applicationServiceDisabled;
 
     @Before
     public void setUp() throws Exception {
+        given(managerActiveFeature.isFeatureActive(Features.BUSINESS_APPLICATIONS)).willReturn(true);
+        given(managerDisabledFeature.isFeatureActive(Features.BUSINESS_APPLICATIONS)).willReturn(false);
+        applicationServiceActive = new ApplicationServiceImpl(managerActiveFeature, recorder, persistenceService, queriableLogService);
+        applicationServiceDisabled = new ApplicationServiceImpl(managerDisabledFeature, recorder, persistenceService, queriableLogService);
+
         when(queriableLogService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(true);
         application = buildApplication(APPLICATION_NAME, APPLICATION_DISP_NAME);
         application.setId(10L);
@@ -98,7 +111,7 @@ public class ApplicationServiceImplTest {
         final InsertRecord record = new InsertRecord(application);
 
         //when
-        final SApplication createdApplication = applicationService.createApplication(application);
+        final SApplication createdApplication = applicationServiceActive.createApplication(application);
 
         //then
         assertThat(createdApplication).isEqualTo(application);
@@ -111,7 +124,7 @@ public class ApplicationServiceImplTest {
         doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
 
         //when
-        applicationService.createApplication(application);
+        applicationServiceActive.createApplication(application);
 
         //then exception
     }
@@ -119,7 +132,7 @@ public class ApplicationServiceImplTest {
     @Test(expected = SInvalidNameException.class)
     public void createApplication_should_throw_SInvalidApplicationName_when_name_is_invalid() throws Exception {
         //when
-        applicationService.createApplication(buildApplication("name with spaces", APPLICATION_DISP_NAME));
+        applicationServiceActive.createApplication(buildApplication("name with spaces", APPLICATION_DISP_NAME));
 
         //then exception
     }
@@ -127,7 +140,7 @@ public class ApplicationServiceImplTest {
     @Test(expected = SObjectCreationException.class)
     public void createApplication_should_throw_SObjectCreationException_when_displayname_is_null() throws Exception {
         //when
-        applicationService.createApplication(buildApplication(APPLICATION_NAME, null));
+        applicationServiceActive.createApplication(buildApplication(APPLICATION_NAME, null));
 
         //then exception
     }
@@ -135,7 +148,15 @@ public class ApplicationServiceImplTest {
     @Test(expected = SObjectCreationException.class)
     public void createApplication_should_throw_SObjectCreationException_when_displayname_is_empty_after_trim() throws Exception {
         //when
-        applicationService.createApplication(buildApplication(APPLICATION_NAME, " "));
+        applicationServiceActive.createApplication(buildApplication(APPLICATION_NAME, " "));
+
+        //then exception
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void createApplication_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+        //when
+        applicationServiceDisabled.createApplication(buildApplication(APPLICATION_NAME, APPLICATION_DISP_NAME));
 
         //then exception
     }
@@ -151,7 +172,7 @@ public class ApplicationServiceImplTest {
 
         //when
         try {
-            applicationService.createApplication(newApp);
+            applicationServiceActive.createApplication(newApp);
             fail("Exception expected");
         } catch (final SObjectAlreadyExistsException e) {
             //then
@@ -167,7 +188,7 @@ public class ApplicationServiceImplTest {
         given(persistenceService.selectById(new SelectByIdDescriptor<SApplication>("getApplicationById", SApplication.class, 10L))).willReturn(application);
 
         //when
-        final SApplication retrievedApp = applicationService.getApplication(10L);
+        final SApplication retrievedApp = applicationServiceActive.getApplication(10L);
 
         //then
         assertThat(retrievedApp).isEqualTo(application);
@@ -181,13 +202,21 @@ public class ApplicationServiceImplTest {
 
         //when
         try {
-            applicationService.getApplication(applicationId);
+            applicationServiceActive.getApplication(applicationId);
             fail("Exception expected");
         } catch (final SObjectNotFoundException e) {
             //then
             assertThat(e.getMessage()).isEqualTo("No application found with id '" + applicationId + "'.");
         }
 
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void getApplication_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+        //when
+        applicationServiceDisabled.getApplication(15L);
+
+        //then exception
     }
 
     @Test
@@ -197,7 +226,7 @@ public class ApplicationServiceImplTest {
         given(persistenceService.selectById(new SelectByIdDescriptor<SApplication>("getApplicationById", SApplication.class, applicationId))).willReturn(application);
 
         //when
-        applicationService.deleteApplication(applicationId);
+        applicationServiceActive.deleteApplication(applicationId);
 
         //then
         final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION)
@@ -212,7 +241,7 @@ public class ApplicationServiceImplTest {
         given(persistenceService.selectById(new SelectByIdDescriptor<SApplication>("getApplicationById", SApplication.class, applicationId))).willReturn(null);
 
         //when
-        applicationService.deleteApplication(applicationId);
+        applicationServiceActive.deleteApplication(applicationId);
 
         //then exception
     }
@@ -226,7 +255,15 @@ public class ApplicationServiceImplTest {
         doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
 
         //when
-        applicationService.deleteApplication(applicationId);
+        applicationServiceActive.deleteApplication(applicationId);
+
+        //then exception
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void deleteApplication_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+        //when
+        applicationServiceDisabled.deleteApplication(15L);
 
         //then exception
     }
@@ -239,10 +276,18 @@ public class ApplicationServiceImplTest {
         given(persistenceService.getNumberOfEntities(SApplication.class, options, null)).willReturn(count);
 
         //when
-        final long nbOfApp = applicationService.getNumberOfApplications(options);
+        final long nbOfApp = applicationServiceActive.getNumberOfApplications(options);
 
         //then
         assertThat(nbOfApp).isEqualTo(count);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void getNumberOfApplications_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+        //when
+        applicationServiceDisabled.getNumberOfApplications(new QueryOptions(0, 10));
+
+        //then exception
     }
 
     @Test
@@ -254,7 +299,7 @@ public class ApplicationServiceImplTest {
         given(persistenceService.searchEntity(SApplication.class, options, null)).willReturn(applications);
 
         //when
-        final List<SApplication> retrievedApplications = applicationService.searchApplications(options);
+        final List<SApplication> retrievedApplications = applicationServiceActive.searchApplications(options);
 
         //then
         assertThat(retrievedApplications).isEqualTo(applications);
@@ -264,10 +309,18 @@ public class ApplicationServiceImplTest {
     public void searchApplications_should_throw_SBonitaSearchException_when_persistenceSevice_throws_SBonitaReadException() throws Exception {
         //given
         final QueryOptions options = new QueryOptions(0, 10);
-        given(applicationService.searchApplications(options)).willThrow(new SBonitaReadException(""));
+        given(applicationServiceActive.searchApplications(options)).willThrow(new SBonitaReadException(""));
 
         //when
-        applicationService.searchApplications(options);
+        applicationServiceActive.searchApplications(options);
+
+        //then exception
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void searchApplications_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+        //when
+        applicationServiceDisabled.searchApplications(new QueryOptions(0, 10));
 
         //then exception
     }
@@ -286,7 +339,7 @@ public class ApplicationServiceImplTest {
         final InsertRecord record = new InsertRecord(applicationPage);
 
         //when
-        final SApplicationPage createdApplicationPage = applicationService.createApplicationPage(applicationPage);
+        final SApplicationPage createdApplicationPage = applicationServiceActive.createApplicationPage(applicationPage);
 
         //then
         assertThat(createdApplicationPage).isEqualTo(applicationPage);
@@ -301,7 +354,7 @@ public class ApplicationServiceImplTest {
         doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
 
         //when
-        applicationService.createApplicationPage(applicationPage);
+        applicationServiceActive.createApplicationPage(applicationPage);
 
         //then exception
     }
@@ -313,7 +366,7 @@ public class ApplicationServiceImplTest {
         applicationPage.setId(15);
 
         //when
-        applicationService.createApplicationPage(applicationPage);
+        applicationServiceActive.createApplicationPage(applicationPage);
 
         //then exception
     }
@@ -333,7 +386,15 @@ public class ApplicationServiceImplTest {
         //when
         final SApplicationPage applicationPageToCreate = buildApplicationPage(5, 16, "mainDashBoard");
         applicationPageToCreate.setId(7);
-        applicationService.createApplicationPage(applicationPageToCreate);
+        applicationServiceActive.createApplicationPage(applicationPageToCreate);
+
+        //then exception
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void createApplicationPage_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+        //when
+        applicationServiceDisabled.createApplicationPage(buildApplicationPage(5, 15, "mainDashBoard"));
 
         //then exception
     }
@@ -346,7 +407,7 @@ public class ApplicationServiceImplTest {
                 applicationPage);
 
         //when
-        final SApplicationPage retrievedAppPage = applicationService.getApplicationPage(10L);
+        final SApplicationPage retrievedAppPage = applicationServiceActive.getApplicationPage(10L);
 
         //then
         assertThat(retrievedAppPage).isEqualTo(applicationPage);
@@ -364,7 +425,7 @@ public class ApplicationServiceImplTest {
                 ))).willReturn(applicationPage);
 
         //when
-        final SApplicationPage retrievedAppPage = applicationService.getApplicationPage("app", "firstPage");
+        final SApplicationPage retrievedAppPage = applicationServiceActive.getApplicationPage("app", "firstPage");
 
         //then
         assertThat(retrievedAppPage).isEqualTo(applicationPage);
@@ -376,7 +437,15 @@ public class ApplicationServiceImplTest {
         given(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SApplicationPage>> any())).willReturn(null);
 
         //when
-        applicationService.getApplicationPage("app", "firstPage");
+        applicationServiceActive.getApplicationPage("app", "firstPage");
+
+        //then exception
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void getApplicationPage_by_name_and_appName_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+        //when
+        applicationServiceDisabled.getApplicationPage(APPLICATION_NAME, "myPage");
 
         //then exception
     }
@@ -391,12 +460,49 @@ public class ApplicationServiceImplTest {
         .willReturn(applicationPage);
 
         //when
-        applicationService.deleteApplicationPage(applicationPageId);
+        applicationServiceActive.deleteApplicationPage(applicationPageId);
 
         //then
         final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_PAGE)
                 .setObject(applicationPage).done();
         verify(recorder, times(1)).recordDelete(new DeleteRecord(applicationPage), event);
+    }
+
+    @Test(expected = SObjectNotFoundException.class)
+    public void deleteApplicationPage_should_throw_SObjectNotFound_when_there_is_no_applicationPage_for_the_given_id() throws Exception {
+        //given
+        final long applicationPageId = 10L;
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationPage>("getApplicationPageById", SApplicationPage.class, applicationPageId)))
+        .willReturn(null);
+
+        //when
+        applicationServiceActive.deleteApplicationPage(applicationPageId);
+
+        //then exception
+    }
+
+    @Test(expected = SObjectModificationException.class)
+    public void deleteApplicationPage_should_throw_SObjectModificationException_when_recorder_throws_SRecorderException() throws Exception {
+        //given
+        final long applicationPageId = 10L;
+        final SApplicationPage applicationPage = buildApplicationPage(20, 30, "myPage");
+        applicationPage.setId(27);
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationPage>("getApplicationPageById", SApplicationPage.class, applicationPageId)))
+        .willReturn(applicationPage);
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+
+        //when
+        applicationServiceActive.deleteApplicationPage(applicationPageId);
+
+        //then exception
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void deleteApplicationPage_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+        //when
+        applicationServiceDisabled.deleteApplicationPage(10L);
+
+        //then exception
     }
 
     @Test
@@ -411,7 +517,7 @@ public class ApplicationServiceImplTest {
                 application);
 
         //when
-        final SApplication updatedApplication = applicationService.updateApplication(applicationId, updateDescriptor);
+        final SApplication updatedApplication = applicationServiceActive.updateApplication(applicationId, updateDescriptor);
 
         //then
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(application,
@@ -432,7 +538,17 @@ public class ApplicationServiceImplTest {
         doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
 
         //when
-        applicationService.updateApplication(applicationId, updateDescriptor);
+        applicationServiceActive.updateApplication(applicationId, updateDescriptor);
+
+        //then exception
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void updateApplicationPage_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+        //when
+        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
+        updateDescriptor.addField("name", "newName");
+        applicationServiceDisabled.updateApplication(10L, updateDescriptor);
 
         //then exception
     }
@@ -448,7 +564,7 @@ public class ApplicationServiceImplTest {
                 ))).willReturn(applicationPage);
 
         //when
-        final SApplicationPage homePage = applicationService.getApplicationHomePage(100);
+        final SApplicationPage homePage = applicationServiceActive.getApplicationHomePage(100);
 
         //then
         assertThat(homePage).isEqualTo(applicationPage);
@@ -464,7 +580,15 @@ public class ApplicationServiceImplTest {
                 ))).willReturn(null);
 
         //when
-        applicationService.getApplicationHomePage(100);
+        applicationServiceActive.getApplicationHomePage(100);
+
+        //then exception
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void getApplicationHomePage_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+        //when
+        applicationServiceDisabled.getApplicationHomePage(11L);
 
         //then exception
     }
@@ -477,10 +601,18 @@ public class ApplicationServiceImplTest {
         given(persistenceService.getNumberOfEntities(SApplicationPage.class, options, null)).willReturn(count);
 
         //when
-        final long nbOfApp = applicationService.getNumberOfApplicationPages(options);
+        final long nbOfApp = applicationServiceActive.getNumberOfApplicationPages(options);
 
         //then
         assertThat(nbOfApp).isEqualTo(count);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void getNumberOfApplicationPages_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+        //when
+        applicationServiceDisabled.getNumberOfApplicationPages(new QueryOptions(0, 10));
+
+        //then exception
     }
 
     @Test
@@ -492,7 +624,7 @@ public class ApplicationServiceImplTest {
         given(persistenceService.searchEntity(SApplicationPage.class, options, null)).willReturn(applicationPages);
 
         //when
-        final List<SApplicationPage> retrievedAppPages = applicationService.searchApplicationPages(options);
+        final List<SApplicationPage> retrievedAppPages = applicationServiceActive.searchApplicationPages(options);
 
         //then
         assertThat(retrievedAppPages).isEqualTo(applicationPages);
@@ -502,10 +634,18 @@ public class ApplicationServiceImplTest {
     public void searchApplicationPages_should_throw_SBonitaSearchException_when_persistenceSevice_throws_SBonitaReadException() throws Exception {
         //given
         final QueryOptions options = new QueryOptions(0, 10);
-        given(applicationService.searchApplicationPages(options)).willThrow(new SBonitaReadException(""));
+        given(applicationServiceActive.searchApplicationPages(options)).willThrow(new SBonitaReadException(""));
 
         //when
-        applicationService.searchApplicationPages(options);
+        applicationServiceActive.searchApplicationPages(options);
+
+        //then exception
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void searchApplicationPages_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+        //when
+        applicationServiceDisabled.searchApplicationPages(new QueryOptions(0, 10));
 
         //then exception
     }

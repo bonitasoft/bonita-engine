@@ -49,6 +49,8 @@ import com.bonitasoft.engine.business.application.SApplicationLogBuilder;
 import com.bonitasoft.engine.business.application.SApplicationPage;
 import com.bonitasoft.engine.business.application.SApplicationPageLogBuilder;
 import com.bonitasoft.engine.business.application.SInvalidNameException;
+import com.bonitasoft.manager.Features;
+import com.bonitasoft.manager.Manager;
 
 
 /**
@@ -63,7 +65,15 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     private final QueriableLoggerService queriableLoggerService;
 
+    private final boolean active;
+
     public ApplicationServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final QueriableLoggerService queriableLoggerService) {
+        this(Manager.getInstance(), recorder, persistenceService, queriableLoggerService);
+    }
+
+    ApplicationServiceImpl(final Manager manager, final Recorder recorder, final ReadPersistenceService persistenceService,
+            final QueriableLoggerService queriableLoggerService) {
+        active = manager.isFeatureActive(Features.BUSINESS_APPLICATIONS);
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.queriableLoggerService = queriableLoggerService;
@@ -72,6 +82,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public SApplication createApplication(final SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException,
     SInvalidNameException {
+        check();
         final String methodName = "createApplication";
         final SApplicationLogBuilder logBuilder = getApplicationLog(ActionType.CREATED, "Creating application named " + application.getName());
         try {
@@ -90,6 +101,12 @@ public class ApplicationServiceImpl implements ApplicationService {
             handleCreationException(application, logBuilder, e, methodName);
         }
         return application;
+    }
+
+    private final void check() {
+        if (!active) {
+            throw new IllegalStateException("Living application is not an active feature.");
+        }
     }
 
     private void validateApplication(final SApplication application) throws SInvalidNameException, SBonitaReadException, SObjectAlreadyExistsException,
@@ -162,6 +179,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public SApplication getApplication(final long applicationId) throws SBonitaReadException, SObjectNotFoundException {
+        check();
         final SApplication application = persistenceService
                 .selectById(new SelectByIdDescriptor<SApplication>("getApplicationById", SApplication.class, applicationId));
         if (application == null) {
@@ -172,6 +190,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public void deleteApplication(final long applicationId) throws SObjectModificationException, SObjectNotFoundException {
+        check();
         final String methodName = "deleteApplication";
         final SApplicationLogBuilder logBuilder = getApplicationLog(ActionType.CREATED, "Deleting application with id " + applicationId);
         try {
@@ -191,6 +210,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public SApplication updateApplication(final long applicationId, final EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException {
+        check();
         final String methodName = "updateApplication";
         final SApplicationLogBuilder logBuilder = getApplicationLog(ActionType.CREATED, "Updating application with id " + applicationId);
         try {
@@ -210,11 +230,13 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public long getNumberOfApplications(final QueryOptions options) throws SBonitaReadException {
+        check();
         return persistenceService.getNumberOfEntities(SApplication.class, options, null);
     }
 
     @Override
     public List<SApplication> searchApplications(final QueryOptions options) throws SBonitaSearchException {
+        check();
         try {
             return persistenceService.searchEntity(SApplication.class, options, null);
         } catch (final SBonitaReadException e) {
@@ -225,6 +247,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public SApplicationPage createApplicationPage(final SApplicationPage applicationPage) throws SObjectCreationException, SObjectAlreadyExistsException,
     SInvalidNameException {
+        check();
         final String methodName = "createApplicationPage";
         final SApplicationPageLogBuilder logBuilder = getApplicationPageLog(ActionType.CREATED, "Creating application page named " + applicationPage.getName());
         final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ApplicationService.APPLICATION_PAGE)
@@ -282,6 +305,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public SApplicationPage getApplicationPage(final String applicationName, final String applicationPageName) throws SBonitaReadException,
     SObjectNotFoundException {
+        check();
         final Map<String, Object> inputParameters = new HashMap<String, Object>(2);
         inputParameters.put("applicationName", applicationName);
         inputParameters.put("applicationPageName", applicationPageName);
@@ -311,6 +335,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public void deleteApplicationPage(final long applicationpPageId) throws SObjectModificationException, SObjectNotFoundException {
+        check();
         final String methodName = "deleteApplicationPage";
         final SApplicationLogBuilder logBuilder = getApplicationLog(ActionType.CREATED, "Deleting application page with id " + applicationpPageId);
         try {
@@ -330,6 +355,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public SApplicationPage getApplicationHomePage(final long applicationId) throws SBonitaReadException, SObjectNotFoundException {
+        check();
         final Map<String, Object> inputParameters = new HashMap<String, Object>(2);
         inputParameters.put("applicationId", applicationId);
         final SApplicationPage applicationPage = persistenceService
@@ -346,11 +372,13 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public long getNumberOfApplicationPages(final QueryOptions options) throws SBonitaReadException {
+        check();
         return persistenceService.getNumberOfEntities(SApplicationPage.class, options, null);
     }
 
     @Override
     public List<SApplicationPage> searchApplicationPages(final QueryOptions options) throws SBonitaSearchException {
+        check();
         try {
             return persistenceService.searchEntity(SApplicationPage.class, options, null);
         } catch (final SBonitaReadException e) {
