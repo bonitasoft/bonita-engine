@@ -21,14 +21,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URI;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
+
+import javax.xml.transform.stream.StreamSource;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.ElementBindingsFactory;
 import org.bonitasoft.engine.xml.Parser;
+import org.bonitasoft.engine.xml.SInvalidSchemaException;
 import org.bonitasoft.engine.xml.SValidationException;
 import org.bonitasoft.engine.xml.SXMLParseException;
 import org.bonitasoft.engine.xml.XMLSchemaValidator;
@@ -122,8 +124,8 @@ public class SAXParser implements Parser {
     }
 
     @Override
-    public void setSchemaUrl(final URL schemaUrl) {
-        validator.setSchemaUrl(schemaUrl);
+    public void setSchema(final InputStream xsdInputStream) throws SInvalidSchemaException {
+        validator.setSchema(new StreamSource(xsdInputStream));
     }
 
     @Override

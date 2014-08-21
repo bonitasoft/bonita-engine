@@ -16,10 +16,10 @@ package org.bonitasoft.engine.xml;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -34,6 +34,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.w3c.dom.Document;
@@ -158,10 +159,18 @@ public class DOMWriter implements XMLWriter {
 
     @Override
     public void setSchema(final File xsdSchema) throws SInvalidSchemaException {
+        InputStream openStream = null;
         try {
-            validator.setSchemaUrl(xsdSchema.toURI().toURL());
-        } catch (final MalformedURLException e) {
+            openStream = xsdSchema.toURI().toURL().openStream();
+            validator.setSchema(new StreamSource(openStream));
+        } catch (final Exception e) {
             throw new SBonitaRuntimeException(e);
+        } finally {
+            try {
+                openStream.close();
+            } catch (final IOException e) {
+                throw new SBonitaRuntimeException(e);
+            }
         }
     }
 

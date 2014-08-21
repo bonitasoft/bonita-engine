@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.net.URL;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
@@ -35,15 +34,19 @@ public class SAXValidator implements XMLSchemaValidator {
 
     private final SchemaFactory factory;
 
-    private URL schemaUrl;
+    private Schema schema;
 
     public SAXValidator() {
         factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     }
 
     @Override
-    public void setSchemaUrl(final URL schemaUrl) {
-        this.schemaUrl = schemaUrl;
+    public void setSchema(final StreamSource source) throws SInvalidSchemaException {
+        try {
+            schema = factory.newSchema(source);
+        } catch (final SAXException saxe) {
+            throw new SInvalidSchemaException(saxe);
+        }
     }
 
     @Override
@@ -78,20 +81,14 @@ public class SAXValidator implements XMLSchemaValidator {
     }
 
     private void validate(final StreamSource source) throws SValidationException, IOException {
-        if (schemaUrl == null) {
-            throw new SValidationException("No schema defined");
-        }
-        synchronized (schemaUrl) {
-            final InputStream inputStream = schemaUrl.openStream();
-            try {
-                final Schema schema = factory.newSchema(new StreamSource(inputStream));
-                final Validator validator = schema.newValidator();
-                validator.validate(source);
-            } catch (final SAXException e) {
-                throw new SValidationException(e);
-            } finally {
-                inputStream.close();
+        try {
+            if (schema == null) {
+                throw new SValidationException("No schema defined");
             }
+            final Validator validator = this.schema.newValidator();
+            validator.validate(source);
+        } catch (final SAXException e) {
+            throw new SValidationException(e);
         }
     }
 
