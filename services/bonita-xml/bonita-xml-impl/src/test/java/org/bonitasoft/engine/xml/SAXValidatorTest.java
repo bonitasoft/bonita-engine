@@ -37,8 +37,8 @@ public class SAXValidatorTest {
     private void check_xml_file_is_valid(final String xsdResource, final String xmlResource) throws URISyntaxException, SInvalidSchemaException,
     SValidationException, IOException {
         //given
-        final File processClientXml = new File(this.getClass().getClassLoader().getResource(xmlResource).toURI());
-        final File processClientXsd = new File(this.getClass().getClassLoader().getResource(xsdResource).toURI());
+        final File processClientXml = new File(Thread.currentThread().getContextClassLoader().getResource(xmlResource).getFile());
+        final File processClientXsd = new File(Thread.currentThread().getContextClassLoader().getResource(xsdResource).getFile());
         final Source source = new StreamSource(processClientXsd);
         assertThat(processClientXml).as("file should exists:" + processClientXml.getAbsolutePath()).canRead();
         assertThat(processClientXsd).as("file should exists:" + processClientXml.getAbsolutePath()).canRead();
