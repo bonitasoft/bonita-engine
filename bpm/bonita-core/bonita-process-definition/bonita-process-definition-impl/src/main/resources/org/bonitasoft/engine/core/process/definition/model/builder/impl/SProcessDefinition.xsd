@@ -341,14 +341,14 @@
 
 	<xs:complexType name="SContractDefinition">
 		<xs:sequence>
-			<xs:element name="inputDefinitions" minOccurs="0">
+			<xs:element name="inputDefinitions" minOccurs="0" maxOccurs="1">
 				<xs:complexType>
 					<xs:sequence>
 						<xs:element name="inputDefinition" type="definition:SInputDefinition" minOccurs="0" maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="ruleDefinitions" minOccurs="0">
+			<xs:element name="ruleDefinitions" minOccurs="0" maxOccurs="1">
             	<xs:complexType>
             		<xs:sequence>
             			<xs:element name="ruleDefinition" type="definition:SRuleDefinition" minOccurs="0" maxOccurs="unbounded"/>
@@ -372,9 +372,9 @@
 				<xs:sequence>
 					<xs:element name="conditionalExpression" type="xs:string" />
 					<xs:element name="explanation" type="xs:string" />
-					<xs:element name="inputDefinitionNames" minOccurs="1" maxOccurs="unbounded">
+					<xs:element name="inputDefinitionNames" minOccurs="0" maxOccurs="1">
 						<xs:complexType>
-							<xs:sequence>
+							<xs:sequence minOccurs="1" maxOccurs="unbounded">
 								<xs:element name="inputDefinitionName" type="xs:string" />
 							</xs:sequence>
 						</xs:complexType>
