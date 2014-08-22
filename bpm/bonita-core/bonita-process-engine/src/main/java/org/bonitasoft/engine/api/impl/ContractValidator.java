@@ -16,6 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
@@ -40,17 +41,30 @@ public class ContractValidator {
 
     public boolean isValid(final SContractDefinition contract, final Map<String, Object> variables) {
         comments.clear();
+
         final List<SRuleDefinition> rules = contract.getRules();
         if (rules.isEmpty()) {
+            final Set<String> variableKeys = variables.keySet();
             for (final SInputDefinition input : contract.getInputs()) {
                 if (!variables.containsKey(input.getName())) {
                     comments.add(input.getName() + " is not defined");
+                } else {
+                    variableKeys.remove(input.getName());
                 }
+            }
+            for (final String key : variableKeys) {
+                comments.add("variable " + key + " is not expected");
+
             }
         } else {
             for (final SRuleDefinition rule : rules) {
                 log(TechnicalLogSeverity.DEBUG, "Evaluating rule [" + rule.getName() + "] on input(s) " + rule.getInputNames());
-                final Boolean valid = MVEL.evalToBoolean(rule.getExpression(), variables);
+                Boolean valid;
+                try {
+                    valid = MVEL.evalToBoolean(rule.getExpression(), variables);
+                } catch (final Exception e) {
+                    valid = Boolean.FALSE;
+                }
                 if (!valid) {
                     log(TechnicalLogSeverity.WARNING, "Rule [" + rule.getName() + "] on input(s) " + rule.getInputNames() + " is not valid");
                     comments.add(rule.getExplanation());
