@@ -34,7 +34,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-api</artifactId>
+			<artifactId>bonita-process-instance-api-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -113,7 +113,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-impl</artifactId>
+			<artifactId>bonita-process-instance-impl-sp</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

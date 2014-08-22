@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -18,6 +17,12 @@
       <groupId>com.bonitasoft.engine.core</groupId>
       <artifactId>bonita-process-engine</artifactId>
       <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bonita-common-api</artifactId>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                </exclusion>
+            </exclusions>
     </dependency>
 
         <!-- Builder Factory -->
@@ -186,11 +191,6 @@
     </dependency>
 
     <!-- Event -->
-    <dependency>
-      <groupId>org.bonitasoft.engine.events</groupId>
-      <artifactId>bonita-events-model-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.bonitasoft.engine.events</groupId>
       <artifactId>bonita-events-api-impl</artifactId>
@@ -439,8 +439,14 @@
     <!-- Process Instance -->
     <dependency>
       <groupId>com.bonitasoft.engine.core.process.instance</groupId>
-      <artifactId>bonita-process-instance-impl</artifactId>
+            <artifactId>bonita-process-instance-impl-sp</artifactId>
       <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bonita-common-api</artifactId>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                </exclusion>
+            </exclusions>
     </dependency>
 
     <!-- Recorder -->
@@ -631,6 +637,12 @@
       <groupId>com.bonitasoft.engine</groupId>
       <artifactId>bonita-common-sp</artifactId>
       <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bonita-common-api</artifactId>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                </exclusion>
+            </exclusions>
     </dependency>
 
     <!-- add hazel cast here because hibernate cache use it by configuration -->
@@ -730,8 +742,6 @@
                   <include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-api</include>
                   <include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-api-impl</include>
                   <!-- Event -->
-                  <include>org.bonitasoft.engine.events:bonita-events-model</include>
-                  <include>org.bonitasoft.engine.events:bonita-events-model-impl</include>
                   <include>org.bonitasoft.engine.events:bonita-events-api</include>
                   <include>org.bonitasoft.engine.events:bonita-events-api-impl</include>
                   <include>com.bonitasoft.engine.events:bonita-events-api-impl</include>
@@ -814,12 +824,10 @@
                   <include>org.bonitasoft.engine.core.process.document:bonita-process-document-api</include>
                   <include>org.bonitasoft.engine.core.process.document:bonita-process-document-impl</include>
                   <!-- Process Instance -->
-                  <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model</include>
-                  <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl</include>
                   <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
-                  <include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
                   <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>
-                  <include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>
+                                    <include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-api-sp</include>
+                                    <include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-impl-sp</include>
                   <!-- Recorder -->
                   <include>org.bonitasoft.engine.recorder:bonita-recorder-model</include>
                   <include>org.bonitasoft.engine.recorder:bonita-recorder-api</include>
