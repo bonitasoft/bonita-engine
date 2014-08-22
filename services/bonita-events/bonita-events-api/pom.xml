@@ -15,8 +15,8 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-model</artifactId>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
