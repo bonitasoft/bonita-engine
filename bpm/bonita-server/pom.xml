@@ -148,11 +148,6 @@
 		<!-- Event -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-model-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.events</groupId>
 			<artifactId>bonita-events-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -335,11 +330,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
 			<artifactId>bonita-process-instance-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -566,8 +556,6 @@
 									<include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-api</include>
 									<include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-api-impl</include>
 									<!-- Event -->
-									<include>org.bonitasoft.engine.events:bonita-events-model</include>
-									<include>org.bonitasoft.engine.events:bonita-events-model-impl</include>
 									<include>org.bonitasoft.engine.events:bonita-events-api</include>
 									<include>org.bonitasoft.engine.events:bonita-events-api-impl</include>
 									<!-- Expression -->
@@ -635,8 +623,6 @@
 									<include>org.bonitasoft.engine.core.process.document:bonita-process-document-api</include>
 									<include>org.bonitasoft.engine.core.process.document:bonita-process-document-impl</include>
 									<!-- Process Instance -->
-									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model</include>
-									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>
 									<!-- Recorder -->
