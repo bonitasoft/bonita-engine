@@ -226,12 +226,6 @@
 		<!-- Event -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.events</groupId>
 			<artifactId>bonita-events-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
