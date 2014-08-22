@@ -7,7 +7,7 @@
 		<version>6.3.4-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-process-instance-api</artifactId>
+	<artifactId>bonita-process-instance-api-sp</artifactId>
 
 	<name>Bonita Process Instance: Service API</name>
 

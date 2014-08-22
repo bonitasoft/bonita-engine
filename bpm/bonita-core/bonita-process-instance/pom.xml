@@ -1,20 +1,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<artifactId>bonita-core</artifactId>
-		<groupId>com.bonitasoft.engine.core</groupId>
-		<version>6.3.4-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <artifactId>bonita-core</artifactId>
+        <groupId>com.bonitasoft.engine.core</groupId>
+        <version>6.3.4-SNAPSHOT</version>
+    </parent>
 
-	<groupId>com.bonitasoft.engine.core.process.instance</groupId>
-	<artifactId>bonita-process-instance</artifactId>
-	<packaging>pom</packaging>
+    <groupId>com.bonitasoft.engine.core.process.instance</groupId>
+    <artifactId>bonita-process-instance</artifactId>
+    <packaging>pom</packaging>
 
-	<name>Bonita Process Instance</name>
+    <name>Bonita Process Instance</name>
 
-	<modules>
-		<module>bonita-process-instance-api</module>
-		<module>bonita-process-instance-impl</module>
-	</modules>
+    <modules>
+        <module>bonita-process-instance-api-sp</module>
+        <module>bonita-process-instance-impl-sp</module>
+    </modules>
 </project>
