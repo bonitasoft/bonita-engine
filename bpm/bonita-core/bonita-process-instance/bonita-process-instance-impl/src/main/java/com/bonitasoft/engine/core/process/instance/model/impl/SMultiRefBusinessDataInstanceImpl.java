@@ -15,7 +15,7 @@ import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataIn
 /**
  * @author Matthieu Chaffotte
  */
-public class SMultiRefBusinessDataInstanceImpl extends SRefBusinessDataInstanceImpl implements SMultiRefBusinessDataInstance {
+public abstract class SMultiRefBusinessDataInstanceImpl extends SRefBusinessDataInstanceImpl implements SMultiRefBusinessDataInstance {
 
     private static final long serialVersionUID = -7182225911903915352L;
 
