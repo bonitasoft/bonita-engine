@@ -16,7 +16,9 @@ import java.util.Map;
  * @author Elias Ricken de Medeiros
  *
  */
-public class ApplicationMenuCreator {
+public class ApplicationMenuCreator implements Serializable {
+
+    private static final long serialVersionUID = 5253969343647340983L;
 
     public enum ApplicationMenuField {
         DISPLAY_NAME, APPLICATION_ID, PARENT_ID, POSITION;
