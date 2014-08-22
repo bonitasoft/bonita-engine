@@ -14,7 +14,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-model</artifactId>
+			<artifactId>bonita-process-instance-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

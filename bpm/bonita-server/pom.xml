@@ -807,11 +807,9 @@
                   <include>org.bonitasoft.engine.core.process.document:bonita-process-document-api</include>
                   <include>org.bonitasoft.engine.core.process.document:bonita-process-document-impl</include>
                   <!-- Process Instance -->
-                  <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model</include>
-                  <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl</include>
                   <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
-                  <include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
                   <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>
+                  <include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
                   <include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>
                   <!-- Recorder -->
                   <include>org.bonitasoft.engine.recorder:bonita-recorder-model</include>
