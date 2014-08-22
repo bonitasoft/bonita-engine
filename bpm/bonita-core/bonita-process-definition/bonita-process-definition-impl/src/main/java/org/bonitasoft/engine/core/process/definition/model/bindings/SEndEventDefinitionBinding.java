@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -40,8 +40,7 @@ public class SEndEventDefinitionBinding extends SThrowEventDefinitionBinding {
         super.setChildObject(name, value);
         if (XMLSProcessDefinition.TERMINATE_EVENT_TRIGGER_NODE.equals(name)) {
             terminateEventTrigger = (STerminateEventTriggerDefinition) value;
-        }
-        if (XMLSProcessDefinition.THROW_ERROR_EVENT_TRIGGER_NODE.equals(name)) {
+        } else if (XMLSProcessDefinition.THROW_ERROR_EVENT_TRIGGER_NODE.equals(name)) {
             errorEventTriggers.add((SThrowErrorEventTriggerDefinition) value);
         }
     }

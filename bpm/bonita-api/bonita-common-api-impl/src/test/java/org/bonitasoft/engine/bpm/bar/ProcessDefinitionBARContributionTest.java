@@ -64,7 +64,7 @@ public class ProcessDefinitionBARContributionTest {
         assertEquals(designProcessDefinition, resultDesignProcessDefinition);
 
         // Clean up
-        File[] listFiles = processDesignFolder.listFiles();
+        final File[] listFiles = processDesignFolder.listFiles();
         for (int i = 0; i < listFiles.length; i++) {
             listFiles[i].delete();
         }
@@ -105,7 +105,7 @@ public class ProcessDefinitionBARContributionTest {
         final File createTempFile = IOUtil.createTempFileInDefaultTempDirectory("old", "process.xml");
 
         try {
-            IOUtil.writeContentToFile(allContentFrom, createTempFile);
+        IOUtil.writeContentToFile(allContentFrom, createTempFile);
             new ProcessDefinitionBARContribution().deserializeProcessDefinition(createTempFile);
         } finally {
             createTempFile.delete();

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.ObjectSeeker;
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
@@ -34,6 +36,8 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
 
     private final List<DataDefinition> dataDefinitions;
 
+    private final List<BusinessDataDefinition> businessDataDefinitions;
+
     private final List<Operation> operations;
 
     private LoopCharacteristics loopCharacteristics;
@@ -45,6 +49,7 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
         dataDefinitions = new ArrayList<DataDefinition>();
         operations = new ArrayList<Operation>();
         boundaryEventDefinitions = new ArrayList<BoundaryEventDefinition>(1);
+        businessDataDefinitions = new ArrayList<BusinessDataDefinition>(3);
     }
 
     public ActivityDefinitionImpl(final String name) {
@@ -52,6 +57,7 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
         dataDefinitions = new ArrayList<DataDefinition>();
         operations = new ArrayList<Operation>();
         boundaryEventDefinitions = new ArrayList<BoundaryEventDefinition>(1);
+        businessDataDefinitions = new ArrayList<BusinessDataDefinition>(3);
     }
 
     @Override
@@ -91,10 +97,20 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
     }
 
     @Override
+    public List<BusinessDataDefinition> getBusinessDataDefinitions() {
+        return businessDataDefinitions;
+    }
+
+    public void addBusinessDataDefinition(final BusinessDataDefinition businessDataDefinition) {
+        businessDataDefinitions.add(businessDataDefinition);
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (boundaryEventDefinitions == null ? 0 : boundaryEventDefinitions.hashCode());
+        result = prime * result + (businessDataDefinitions == null ? 0 : businessDataDefinitions.hashCode());
         result = prime * result + (dataDefinitions == null ? 0 : dataDefinitions.hashCode());
         result = prime * result + (loopCharacteristics == null ? 0 : loopCharacteristics.hashCode());
         result = prime * result + (operations == null ? 0 : operations.hashCode());
@@ -120,6 +136,13 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
         } else if (!boundaryEventDefinitions.equals(other.boundaryEventDefinitions)) {
             return false;
         }
+        if (businessDataDefinitions == null) {
+            if (other.businessDataDefinitions != null) {
+                return false;
+            }
+        } else if (!businessDataDefinitions.equals(other.businessDataDefinitions)) {
+            return false;
+        }
         if (dataDefinitions == null) {
             if (other.dataDefinitions != null) {
                 return false;
@@ -142,6 +165,16 @@ public abstract class ActivityDefinitionImpl extends FlowNodeDefinitionImpl impl
             return false;
         }
         return true;
+    }
+
+    @Override
+    public BusinessDataDefinition getBusinessDataDefinition(final String name) {
+        return ObjectSeeker.getNamedElement(businessDataDefinitions, name);
+    }
+
+    @Override
+    public DataDefinition getDataDefinition(final String name) {
+        return ObjectSeeker.getNamedElement(dataDefinitions, name);
     }
 
 }

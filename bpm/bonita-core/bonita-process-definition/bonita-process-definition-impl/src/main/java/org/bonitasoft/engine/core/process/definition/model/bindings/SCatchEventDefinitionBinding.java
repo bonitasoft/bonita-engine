@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -61,11 +61,9 @@ public abstract class SCatchEventDefinitionBinding extends SFlowNodeDefinitionBi
         super.setChildObject(name, value);
         if (XMLSProcessDefinition.TIMER_EVENT_TRIGGER_NODE.equals(name)) {
             timerEventTriggers.add((STimerEventTriggerDefinition) value);
-        }
-        if (XMLSProcessDefinition.CATCH_MESSAGE_EVENT_TRIGGER_NODE.equals(name)) {
+        } else if (XMLSProcessDefinition.CATCH_MESSAGE_EVENT_TRIGGER_NODE.equals(name)) {
             messageEventTriggers.add((SCatchMessageEventTriggerDefinition) value);
-        }
-        if (XMLSProcessDefinition.CATCH_SIGNAL_EVENT_TRIGGER_NODE.equals(name)) {
+        } else if (XMLSProcessDefinition.CATCH_SIGNAL_EVENT_TRIGGER_NODE.equals(name)) {
             signalEventTriggers.add((SCatchSignalEventTriggerDefinition) value);
         }
     }

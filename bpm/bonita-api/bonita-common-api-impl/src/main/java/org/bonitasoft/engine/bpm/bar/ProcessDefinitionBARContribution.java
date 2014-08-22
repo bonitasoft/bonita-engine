@@ -251,7 +251,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         if (!find) {
             throw new InvalidBusinessArchiveFormatException("There is no bonitasoft process namespace declaration");
         }
-        final String group = matcher.group();
+        final String group = matcher.group(1);
         if (!group.equals("3")) {
             throw new InvalidBusinessArchiveFormatException("Wrong version of your process definition, 6." + group
                     + " namespace is not compatible with your current version. Use the studio to update it.");

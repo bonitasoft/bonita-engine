@@ -87,7 +87,7 @@ import org.bonitasoft.engine.work.WorkService;
 
 /**
  * Default implementation of the activity state manager.
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
@@ -192,18 +192,35 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             final TechnicalLoggerService logger, final DocumentMappingService documentMappingService, final SCommentService commentService,
             final EventsHandler eventsHandler, final UserFilterService userFilterService, final ActorMappingService actorMappingService,
             final WorkService workService, final TokenService tokenService, final IdentityService identityService) {
+        this(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, classLoaderService,
+                expressionResolverService, schedulerService, dataInstanceService, eventInstanceService, operationService, bpmInstancesCreator,
+                containerRegistry, archiveService, logger, documentMappingService, commentService, eventsHandler, userFilterService, actorMappingService,
+                workService, tokenService, identityService, new StateBehaviors(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService,
+                        classLoaderService, actorMappingService, connectorInstanceService, expressionResolverService, processDefinitionService,
+                        dataInstanceService, operationService, workService, containerRegistry, eventInstanceService, schedulerService, commentService,
+                        identityService, logger, tokenService));
+    }
+
+    protected FlowNodeStateManagerImpl(final ProcessDefinitionService processDefinitionService, final ProcessInstanceService processInstanceService,
+            final ActivityInstanceService activityInstanceService, final ConnectorInstanceService connectorInstanceService,
+            final ClassLoaderService classLoaderService, final ExpressionResolverService expressionResolverService, final SchedulerService schedulerService,
+            final DataInstanceService dataInstanceService, final EventInstanceService eventInstanceService, final OperationService operationService,
+            final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
+            final TechnicalLoggerService logger, final DocumentMappingService documentMappingService, final SCommentService commentService,
+            final EventsHandler eventsHandler, final UserFilterService userFilterService, final ActorMappingService actorMappingService,
+            final WorkService workService, final TokenService tokenService, final IdentityService identityService, final StateBehaviors stateBehaviors) {
         initStates(connectorInstanceService, classLoaderService, expressionResolverService, schedulerService, dataInstanceService, eventInstanceService,
                 operationService, activityInstanceService, bpmInstancesCreator, containerRegistry, processDefinitionService, processInstanceService,
                 archiveService, logger, documentMappingService, commentService, eventsHandler, userFilterService, actorMappingService, workService,
-                tokenService, identityService);
+                tokenService, identityService, stateBehaviors);
         defineTransitionsForAllNodesType();
         initializeFirstStatesIdsOnBPMInstanceCreator(bpmInstancesCreator);
     }
 
     private void initializeFirstStatesIdsOnBPMInstanceCreator(final BPMInstancesCreator bpmInstancesCreator) {
         final Set<Entry<SFlowNodeType, Map<Integer, FlowNodeState>>> entrySet = normalTransitions.entrySet();
-        final HashMap<SFlowNodeType, Integer> firstStateIds = new HashMap<SFlowNodeType, Integer>(entrySet.size());
-        final HashMap<SFlowNodeType, String> firstStateNames = new HashMap<SFlowNodeType, String>(entrySet.size());
+        final Map<SFlowNodeType, Integer> firstStateIds = new HashMap<SFlowNodeType, Integer>(entrySet.size());
+        final Map<SFlowNodeType, String> firstStateNames = new HashMap<SFlowNodeType, String>(entrySet.size());
         for (final Entry<SFlowNodeType, Map<Integer, FlowNodeState>> entry : entrySet) {
             firstStateIds.put(entry.getKey(), entry.getValue().get(-1).getId());
             firstStateNames.put(entry.getKey(), entry.getValue().get(-1).getName());
@@ -341,10 +358,8 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             final ProcessInstanceService processInstanceService, final ArchiveService archiveService, final TechnicalLoggerService logger,
             final DocumentMappingService documentMappingService, final SCommentService commentService, final EventsHandler eventsHandler,
             final UserFilterService userFilterService, final ActorMappingService actorMappingService, final WorkService workService,
-            final TokenService tokenService, final IdentityService identityService) {
-        stateBehaviors = new StateBehaviors(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService,
-                actorMappingService, connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService, operationService,
-                workService, containerRegistry, eventInstanceService, schedulerService, commentService, identityService, logger, tokenService);
+            final TokenService tokenService, final IdentityService identityService, final StateBehaviors stateBehaviors) {
+        this.stateBehaviors = stateBehaviors;
         failed = new FailedActivityStateImpl();
         initializing = new InitializingActivityStateImpl(stateBehaviors);
         initializingActivityWithBoundary = new InitializingActivityWithBoundaryEventsStateImpl(stateBehaviors);
@@ -373,9 +388,9 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         cancellingActivityWithBoundary = new CancellingActivityWithBoundaryStateImpl(stateBehaviors);
         cancellingReceiveTask = new CancellingReceiveTaskStateImpl(stateBehaviors);
         initializingMultiInstance = new InitializingMultiInstanceActivityStateImpl(expressionResolverService, bpmInstancesCreator, activityInstanceService,
-                dataInstanceService, stateBehaviors);
-        executingMultiInstance = new ExecutingMultiInstanceActivityStateImpl(expressionResolverService, bpmInstancesCreator, containerRegistry,
-                activityInstanceService, dataInstanceService, stateBehaviors);
+                stateBehaviors);
+        executingMultiInstance = new ExecutingMultiInstanceActivityStateImpl(expressionResolverService, containerRegistry, activityInstanceService,
+                stateBehaviors);
         abortingContainer = new AbortingFlowNodeContainerStateImpl(stateBehaviors);
         abortingCallActivity = new AbortingCallActivityStateImpl(activityInstanceService, processInstanceService, containerRegistry, archiveService,
                 commentService, dataInstanceService, documentMappingService, logger, processDefinitionService, connectorInstanceService);
@@ -387,8 +402,8 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         interruptedFlowNodeState = new InterruptedFlowNodeState();
         completingSubTaskState = new CompletingSubTaskStateImpl(stateBehaviors);
 
-        final HashSet<Integer> unstableStatesModifiable = new HashSet<Integer>();
-        final HashSet<Integer> stableStatesModifiable = new HashSet<Integer>();
+        final Set<Integer> unstableStatesModifiable = new HashSet<Integer>();
+        final Set<Integer> stableStatesModifiable = new HashSet<Integer>();
 
         // fill map of states
         addToMap(failed);
@@ -463,7 +478,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
 
     private void defineTransitionsForFlowNode(final SFlowNodeType flowNodeType, final Map<SFlowNodeType, Map<Integer, FlowNodeState>> transitions,
             final FlowNodeState... states) {
-        final HashMap<Integer, FlowNodeState> taskTransitions = new HashMap<Integer, FlowNodeState>();
+        final Map<Integer, FlowNodeState> taskTransitions = new HashMap<Integer, FlowNodeState>();
         int stateIndex = 0;
         taskTransitions.put(-1, states[0]);
         while (stateIndex < states.length - 1) {

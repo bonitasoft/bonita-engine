@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.NamedElement;
+import org.bonitasoft.engine.bpm.ObjectSeeker;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
@@ -385,6 +386,16 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
             return false;
         }
         return true;
+    }
+
+    @Override
+    public BusinessDataDefinition getBusinessDataDefinition(final String name) {
+        return ObjectSeeker.getNamedElement(businessDataDefinitions, name);
+    }
+
+    @Override
+    public DataDefinition getDataDefinition(final String name) {
+        return ObjectSeeker.getNamedElement(dataDefinitions, name);
     }
 
 }
