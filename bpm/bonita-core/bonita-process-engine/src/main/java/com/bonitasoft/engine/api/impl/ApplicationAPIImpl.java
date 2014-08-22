@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -25,6 +28,9 @@ import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationP
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
+import com.bonitasoft.engine.business.application.ApplicationMenu;
+import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
+import com.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
@@ -92,7 +98,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String name) throws AlreadyExistsException,
-            CreationException, InvalidNameException {
+    CreationException, InvalidNameException {
         return getDelegate().createApplicationPage(applicationId, pagedId, name);
     }
 
@@ -124,6 +130,36 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public ApplicationPage getApplicationHomePage(final long applicationId) throws ApplicationPageNotFoundException {
         return getDelegate().getApplicationHomePage(applicationId);
+    }
+
+    @Override
+    public ApplicationMenu createApplicationMenu(final ApplicationMenuCreator applicationMenuCreator) throws AlreadyExistsException, CreationException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ApplicationMenu getApplicationMenu(final long applicationMenuId) throws ApplicationMenuNotFoundException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void deleteApplicationMenu(final long applicationMenuId) throws DeletionException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public List<ApplicationMenu> getApplicationMenus(final long applicationId) {
+        // TODO Auto-generated method stub
+        return Collections.emptyList();
+    }
+
+    @Override
+    public SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions) throws SearchException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

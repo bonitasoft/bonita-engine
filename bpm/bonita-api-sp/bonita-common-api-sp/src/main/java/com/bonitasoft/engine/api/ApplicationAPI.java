@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
+import java.util.List;
+
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -18,6 +20,9 @@ import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
+import com.bonitasoft.engine.business.application.ApplicationMenu;
+import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
+import com.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
@@ -96,7 +101,7 @@ public interface ApplicationAPI {
      *
      * @param applicationPageId the application page identifier
      * @return the {@link ApplicationPage} from its identifier
-     * @throws ApplicationPageNotFoundException if no {@link ApplicationPage} for the given identifier
+     * @throws ApplicationPageNotFoundException if no {@link ApplicationPage} is found for the given identifier
      */
     ApplicationPage getApplicationPage(long applicationPageId) throws ApplicationPageNotFoundException;
 
@@ -112,8 +117,8 @@ public interface ApplicationAPI {
      * Searches for application pages with specific search criteria.
      *
      * @param searchOptions the search options. See {@link SearchOptions} for details.
-     * @return SearchException a {@link SearchResult} containing the number and the list of application pages matching the search criteria.
-     * @throws if an error occurs during search
+     * @return a {@link SearchResult} containing the number and the list of application pages matching the search criteria.
+     * @throws SearchException if an error occurs during search
      */
     SearchResult<ApplicationPage> searchApplicationPages(final SearchOptions searchOptions) throws SearchException;
 
@@ -134,5 +139,49 @@ public interface ApplicationAPI {
      * @throws ApplicationPageNotFoundException if no home page is found for the given application
      */
     ApplicationPage getApplicationHomePage(long applicationId) throws ApplicationPageNotFoundException;
+
+    /**
+     * Creates a new {@link ApplicationMenu} based on the supplied {@link ApplicationMenuCreator}
+     *
+     * @param applicationMenuCreator creator describing characteristics of application menu to be created
+     * @return the created {@link ApplicationMenu}
+     * @throws AlreadyExistsException if an application menu already exists with the same display name and parent
+     * @throws CreationException if an error occurs during the creation
+     */
+    ApplicationMenu createApplicationMenu(ApplicationMenuCreator applicationMenuCreator) throws AlreadyExistsException, CreationException;
+
+    /**
+     * Retrieves the {@link ApplicationMenu} from its identifier
+     *
+     * @param applicationMenuId the application menu identifier
+     * @return the {@link ApplicationMenu} from its identifier
+     * @throws ApplicationMenuNotFoundException if no {@link ApplicationMenu} is found for the given identifier
+     */
+    ApplicationMenu getApplicationMenu(long applicationMenuId) throws ApplicationMenuNotFoundException;
+
+    /**
+     * Deletes an {@link ApplicationMenu} by its identifier
+     *
+     * @param applicationMenuId the {@link ApplicationMenu} identifier
+     * @throws DeletionException if an error occurs during the deletion
+     */
+    void deleteApplicationMenu(long applicationMenuId) throws DeletionException;
+
+    /**
+     * Retrieves the list of menus for the given application.
+     *
+     * @param applicationId the application identifier
+     * @return the list of menus for the given application.
+     */
+    List<ApplicationMenu> getApplicationMenus(long applicationId);
+
+    /**
+     * Searches for application menus with specific search criteria.
+     *
+     * @param searchOptions the search options. See {@link SearchOptions} for details.
+     * @return a {@link SearchResult} containing the number and the list of application menus matching the search criteria.
+     * @throws SearchException if an error occurs during search
+     */
+    SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions) throws SearchException;
 
 }
