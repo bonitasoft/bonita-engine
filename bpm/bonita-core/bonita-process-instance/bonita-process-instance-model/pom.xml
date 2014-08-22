@@ -10,7 +10,7 @@
 		<version>6.3.4-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-process-instance-model</artifactId>
+	<artifactId>bonita-process-instance-api</artifactId>
 
 	<name>Bonita Process Instance: Model Interfaces</name>
 

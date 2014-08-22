@@ -9,14 +9,14 @@
 		<version>6.3.4-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-process-instance-model-impl</artifactId>
+	<artifactId>bonita-process-instance-impl</artifactId>
 
 	<name>Bonita Process Instance: Model Implementation</name>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-model</artifactId>
+			<artifactId>bonita-process-instance-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
