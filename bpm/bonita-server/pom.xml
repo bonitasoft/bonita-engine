@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bpm</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.3.4-SNAPSHOT</version>
+		<version>6.4.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-server</artifactId>
@@ -19,6 +19,12 @@
 			<groupId>org.bonitasoft.engine.core</groupId>
 			<artifactId>bonita-process-engine</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+			    <exclusion>
+			        <artifactId>bonita-common-api</artifactId>
+			        <groupId>org.bonitasoft.engine.api</groupId>
+			    </exclusion>
+			</exclusions>
 		</dependency>
         
         <!-- Builder Factory -->
@@ -331,6 +337,12 @@
 			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
 			<artifactId>bonita-process-instance-impl</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+			    <exclusion>
+			        <artifactId>bonita-common-api</artifactId>
+			        <groupId>org.bonitasoft.engine.api</groupId>
+			    </exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Recorder -->
@@ -485,6 +497,12 @@
 			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-common</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+			    <exclusion>
+			        <artifactId>bonita-common-api</artifactId>
+			        <groupId>org.bonitasoft.engine.api</groupId>
+			    </exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 
