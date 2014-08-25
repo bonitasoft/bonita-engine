@@ -69,6 +69,20 @@
 								<inputDefinitionName>comment</inputDefinitionName>
 							</inputDefinitionNames>
 						</ruleDefinition>
+						<ruleDefinition name="special char rule">
+							<conditionalExpression>comment.length 	> 5 </conditionalExpression>
+							<explanation>comment should have at min 5 char </explanation>
+							<inputDefinitionNames>
+								<inputDefinitionName>comment</inputDefinitionName>
+							</inputDefinitionNames>
+						</ruleDefinition>
+						<ruleDefinition name="special char rule">
+							<conditionalExpression><![CDATA[comment.equals"<comment>"]]></conditionalExpression>
+							<explanation>comment should have at min 5 char </explanation>
+							<inputDefinitionNames>
+								<inputDefinitionName>comment</inputDefinitionName>
+							</inputDefinitionNames>
+						</ruleDefinition>
 					</ruleDefinitions>
 				</contract>
 			</userTask>

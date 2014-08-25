@@ -81,6 +81,65 @@ public class UserTaskContractTest extends CommonAPITest {
     }
 
     @Test
+    public void should_create_a_contract_with_special_char() throws Exception {
+        final String[] badValues = { "0", "366" };
+        for (int index = 0; index < badValues.length; index++) {
+            check_invalid_contract_with_special_char(badValues[index]);
+        }
+    }
+
+    private void check_invalid_contract_with_special_char(final String inputValue) throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
+        builder.addActor(ACTOR_NAME);
+        final String expectedExplanation = "numberOfDays must between one day and one year";
+        builder.addUserTask("task1", ACTOR_NAME).addContract().addInput("numberOfDays", Integer.class.getName(), null)
+        .addRule("mandatory", "numberOfDays>1 && numberOfDays<365", expectedExplanation, "numberOfDays");
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        getProcessAPI().startProcess(processDefinition.getId());
+
+        //when
+        final HumanTaskInstance task = waitForUserTask("task1");
+        final Map<String, Object> inputs = new HashMap<String, Object>();
+        inputs.put("numberOfDays", inputValue);
+        try {
+            getProcessAPI().executeFlowNode(task.getId(), inputs);
+            fail("should throw ContractViolationException");
+        } catch (final ContractViolationException e) {
+            //then
+            assertThat(e.getExplanations()).as("rule should be violated").hasSize(1).containsExactly(expectedExplanation);
+        } finally {
+            disableAndDeleteProcess(processDefinition);
+
+        }
+
+    }
+
+    @Test
+    public void should_execute_a_contract_with_xml_tag_in_rule() throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
+        builder.addActor(ACTOR_NAME);
+        final String expectedExplanation = "numberOfDays must between one day and one year";
+        builder.addUserTask("task1", ACTOR_NAME).addContract().addInput("comment", Integer.class.getName(), null)
+        .addRule("mandatory", "comment.equals(\"<tag>\")", expectedExplanation, "comment");
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        getProcessAPI().startProcess(processDefinition.getId());
+
+        //when
+        final HumanTaskInstance task = waitForUserTask("task1");
+        getProcessAPI().assignUserTask(task.getId(), matti.getId());
+
+        //then no exceptions
+        final Map<String, Object> inputs = new HashMap<String, Object>();
+        inputs.put("comment", "<tag>");
+        getProcessAPI().executeFlowNode(task.getId(), inputs);
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
     public void getExceptionWhenContractIsNotValid() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
