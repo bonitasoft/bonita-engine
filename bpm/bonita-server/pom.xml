@@ -829,7 +829,6 @@
                                     <include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-api-sp</include>
                                     <include>com.bonitasoft.engine.core.process.instance:bonita-process-instance-impl-sp</include>
                                     <!-- Recorder -->
-                                    <include>org.bonitasoft.engine.recorder:bonita-recorder-model</include>
                                     <include>org.bonitasoft.engine.recorder:bonita-recorder-api</include>
                                     <include>org.bonitasoft.engine.recorder:bonita-recorder-impl</include>
                                     <!-- Reporting -->
