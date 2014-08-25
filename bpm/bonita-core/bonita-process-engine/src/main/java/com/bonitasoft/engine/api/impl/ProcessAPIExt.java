@@ -45,6 +45,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.connector.ConnectorStateReset;
 import org.bonitasoft.engine.bpm.connector.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
+import org.bonitasoft.engine.bpm.contract.Input;
 import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
@@ -370,7 +371,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             }
 
             final SManualTaskInstance createManualUserTask = createManualUserTask(activityInstanceService, fields, taskPriority, humanTaskId);
-            executeFlowNode(loggedUserId, createManualUserTask.getId(), false /* wrapInTransaction */, new HashMap<String, Object>());// put it in ready
+            executeFlowNode(loggedUserId, createManualUserTask.getId(), false /* wrapInTransaction */, new ArrayList<Input>());// put it in ready
             addActivityInstanceTokenCount(activityInstanceService, activityInstance);
             return ModelConvertor.toManualTask(createManualUserTask, flowNodeStateManager);
         } catch (final SBonitaException e) {
