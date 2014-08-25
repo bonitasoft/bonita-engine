@@ -59,14 +59,14 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
         assertTrue("Expected 2 pending tasks", checkNbPendingTaskOf.waitUntil());
 
         getProcessAPI().cancelProcessInstance(processInstance.getId());
-        waitForProcessToFinish(processInstance, TestStates.getCancelledState());
+        waitForProcessToFinish(processInstance, TestStates.CANCELLED);
 
         final List<HumanTaskInstance> pendingTasks = checkNbPendingTaskOf.getPendingHumanTaskInstances();
         final ArchivedActivityInstance archivedTask1 = getProcessAPI().getArchivedActivityInstance(pendingTasks.get(0).getId());
-        assertEquals(TestStates.getCancelledState(), archivedTask1.getState());
+        assertEquals(TestStates.CANCELLED.getStateName(), archivedTask1.getState());
 
         final ArchivedActivityInstance archivedTask2 = getProcessAPI().getArchivedActivityInstance(pendingTasks.get(1).getId());
-        assertEquals(TestStates.getCancelledState(), archivedTask2.getState());
+        assertEquals(TestStates.CANCELLED.getStateName(), archivedTask2.getState());
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -92,13 +92,13 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
         assertEquals(targetProcessDef.getId(), targetProcessInstance.getProcessDefinitionId());
 
         final CheckNbOfActivities checkNbOfActivities = new CheckNbOfActivities(getProcessAPI(), 50, 5000, true, parentProcessInstance, 2,
-                TestStates.getReadyState());
+                TestStates.READY);
         assertTrue(checkNbOfActivities.waitUntil());
 
         getProcessAPI().cancelProcessInstance(parentProcessInstance.getId());
 
-        waitForProcessToFinish(parentProcessInstance, TestStates.getCancelledState());
-        waitForProcessToFinish(targetProcessInstance, TestStates.getCancelledState());
+        waitForProcessToFinish(parentProcessInstance, TestStates.CANCELLED);
+        waitForProcessToFinish(targetProcessInstance, TestStates.CANCELLED);
 
         checkWasntExecuted(targetProcessInstance, autoTaskName);
         checkWasntExecuted(parentProcessInstance, taskName2);
@@ -128,7 +128,7 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
         assertEquals(1, searchResult.getCount());
 
         getProcessAPI().cancelProcessInstance(receiveProcessInstance.getId());
-        waitForProcessToFinish(receiveProcessInstance, TestStates.getCancelledState());
+        waitForProcessToFinish(receiveProcessInstance, TestStates.CANCELLED);
 
         searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
         assertEquals(0, searchResult.getCount());
@@ -159,7 +159,7 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
         assertEquals(1, searchResult.getCount());
 
         getProcessAPI().cancelProcessInstance(receiveProcessInstance.getId());
-        waitForProcessToFinish(receiveProcessInstance, TestStates.getCancelledState());
+        waitForProcessToFinish(receiveProcessInstance, TestStates.CANCELLED);
 
         searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
         assertEquals(0, searchResult.getCount());

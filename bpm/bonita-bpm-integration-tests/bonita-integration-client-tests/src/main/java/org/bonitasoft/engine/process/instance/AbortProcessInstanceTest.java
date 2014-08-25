@@ -72,12 +72,12 @@ public class AbortProcessInstanceTest extends AbstractProcessInstanceTest {
         assignAndExecuteStep(humanTaskInst2ToExecute, pedro.getId());
 
         // the target process instances that exceed the max loop must be in aborted state
-        waitForProcessToFinish(procInstToAbort, TestStates.getAbortedState());
+        waitForProcessToFinish(procInstToAbort, TestStates.ABORTED);
 
         // task1 not executed must be in aborted state
-        waitForArchivedActivity(humanTaskInst1ToAbort.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(humanTaskInst1ToAbort.getId(), TestStates.ABORTED);
         // task2 not executed must be in aborted state
-        waitForArchivedActivity(humanTaskInst2ToAbort.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(humanTaskInst2ToAbort.getId(), TestStates.ABORTED);
 
         // check the automatic task in the aborted process instance was not created
         checkWasntExecuted(procInstToAbort, autoTaskName);

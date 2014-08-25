@@ -186,7 +186,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
 
         final FlowNodeInstance eventSubProcessActivity = waitForFlowNodeInExecutingState(processInstance, SUB_PROCESS_NAME, false);
         final ActivityInstance subStep = waitForUserTask(SUB_STEP, processInstance);
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
         // the parent process instance is supposed to be aborted, so no more waiting events are expected
         checkNumberOfWaitingEvents(SUB_PROCESS_START, 0);
 
@@ -197,9 +197,9 @@ public class SignalEventSubProcessTest extends EventsAPITest {
 
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
         assignAndExecuteStep(subStep, john.getId());
-        waitForArchivedActivity(eventSubProcessActivity.getId(), TestStates.getNormalFinalState());
+        waitForArchivedActivity(eventSubProcessActivity.getId(), TestStates.NORMAL_FINAL);
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.getAbortedState());
+        waitForProcessToFinish(processInstance, TestStates.ABORTED);
 
         // check that the transition wasn't taken
         checkWasntExecuted(processInstance, PARENT_END);
@@ -235,7 +235,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
 
         assignAndExecuteStep(step1, john.getId());
 
-        waitForArchivedActivity(step1.getId(), TestStates.getNormalFinalState());
+        waitForArchivedActivity(step1.getId(), TestStates.NORMAL_FINAL);
         waitForProcessToFinish(processInstance);
 
         // the parent process instance has completed, so no more waiting events are expected
@@ -283,7 +283,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
 
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.getAbortedState());
+        waitForProcessToFinish(processInstance, TestStates.ABORTED);
 
         disableAndDeleteProcess(process);
     }
@@ -315,10 +315,10 @@ public class SignalEventSubProcessTest extends EventsAPITest {
         final ProcessInstance calledProcInst = getProcessAPI().getProcessInstance(step1.getParentProcessInstanceId());
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(calledProcInst, TestStates.getAbortedState());
+        waitForProcessToFinish(calledProcInst, TestStates.ABORTED);
 
         waitForUserTaskAndExecuteIt("step2", processInstance.getId(), john.getId());
         waitForProcessToFinish(processInstance);

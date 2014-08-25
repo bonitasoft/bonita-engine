@@ -46,7 +46,7 @@ public class TimerEventTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         user = createUser(USERNAME, PASSWORD);
         logoutThenloginAs(USERNAME, PASSWORD);
     }
@@ -67,7 +67,7 @@ public class TimerEventTest extends CommonAPITest {
         waitForEventInWaitingState(processInstance, "intermediateCatchEvent");
         final long processInstanceId = processInstance.getId();
         EventInstance eventInstance = getEventInstance(processInstanceId, "intermediateCatchEvent");
-        checkIntermediateCatchEventInstance(eventInstance, "intermediateCatchEvent", TestStates.getWaitingState());
+        checkIntermediateCatchEventInstance(eventInstance, "intermediateCatchEvent", TestStates.WAITING);
         // wait trigger activation
         Thread.sleep(3000);
         eventInstance = getEventInstance(processInstanceId, "intermediateCatchEvent");
@@ -95,9 +95,9 @@ public class TimerEventTest extends CommonAPITest {
 
         assignAndExecuteStep(userTask, getIdentityAPI().getUserByUserName(USERNAME).getId());
 
-        waitForFlowNodeInState(processInstance, "intermediateCatchEvent", TestStates.getWaitingState(), true);
+        waitForFlowNodeInState(processInstance, "intermediateCatchEvent", TestStates.WAITING, true);
         final EventInstance eventInstance = getEventInstance(processInstance.getId(), "intermediateCatchEvent");
-        checkIntermediateCatchEventInstance(eventInstance, "intermediateCatchEvent", TestStates.getWaitingState());
+        checkIntermediateCatchEventInstance(eventInstance, "intermediateCatchEvent", TestStates.WAITING);
         // wait trigger activation
         waitForUserTask(step2Name, processInstance);
         final long now = System.currentTimeMillis();
@@ -195,14 +195,14 @@ public class TimerEventTest extends CommonAPITest {
         return searchedEventInstance;
     }
 
-    private void checkIntermediateCatchEventInstance(final EventInstance eventInstance, final String eventName, final String state) {
+    private void checkIntermediateCatchEventInstance(final EventInstance eventInstance, final String eventName, final TestStates state) {
         assertTrue(eventInstance instanceof IntermediateCatchEventInstance);
         checkEventInstance(eventInstance, eventName, state);
     }
 
-    private void checkEventInstance(final EventInstance eventInstance, final String eventName, final String state) {
+    private void checkEventInstance(final EventInstance eventInstance, final String eventName, final TestStates state) {
         assertEquals(eventName, eventInstance.getName());
-        assertEquals(state, eventInstance.getState());
+        assertEquals(state.getStateName(), eventInstance.getState());
         // if(TestStates.getNormalFinalState(eventInstance).equals(state)) {
         // assertTrue(eventInstance.getEndDate() > 0);
         // }

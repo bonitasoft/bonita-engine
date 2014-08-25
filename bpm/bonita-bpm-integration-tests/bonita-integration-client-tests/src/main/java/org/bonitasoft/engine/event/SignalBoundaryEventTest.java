@@ -30,7 +30,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         donaBenta = createUser(USERNAME, PASSWORD);
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
@@ -39,7 +39,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
     @After
     public void afterTest() throws BonitaException {
         logoutOnTenant();
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalLogger();
         deleteUser(donaBenta.getId());
         logoutOnTenant();
     }
@@ -75,7 +75,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
         assignAndExecuteStep(executionStep, donaBenta.getId());
 
         waitForProcessToFinish(processInstance);
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
 
         checkWasntExecuted(processInstance, "step2");
 
@@ -95,7 +95,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
         // Thread.sleep(500);
         getProcessAPI().sendSignal("MySignal1");
 
-        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.getReadyState(),
+        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.READY,
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 
@@ -125,10 +125,10 @@ public class SignalBoundaryEventTest extends CommonAPITest {
         final ActivityInstance executionStep = waitForUserTask("exceptionStep", processInstance);
         assignAndExecuteStep(executionStep, donaBenta.getId());
 
-        waitForProcessToFinish(calledProcessInstance, TestStates.getAbortedState());
+        waitForProcessToFinish(calledProcessInstance, TestStates.ABORTED);
         waitForProcessToFinish(processInstance);
 
-        waitForArchivedActivity(calledStep.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(calledStep.getId(), TestStates.ABORTED);
 
         checkWasntExecuted(processInstance, "step2");
 
@@ -155,7 +155,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
 
         getProcessAPI().sendSignal("MySignal");
 
-        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.getReadyState(),
+        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.READY,
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 
@@ -233,7 +233,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
         assignAndExecuteStep(executionStep, donaBenta.getId());
 
         waitForProcessToFinish(processInstance);
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
 
         checkWasntExecuted(processInstance, "step2");
 
@@ -256,7 +256,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
 
         getProcessAPI().sendSignal("MySignal1");
 
-        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.getReadyState(),
+        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.READY,
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 
@@ -286,7 +286,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
         assignAndExecuteStep(executionStep, donaBenta.getId());
 
         waitForProcessToFinish(processInstance);
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
 
         checkWasntExecuted(processInstance, "step2");
 
@@ -309,7 +309,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
 
         getProcessAPI().sendSignal("MySignal1");
 
-        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.getReadyState(),
+        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.READY,
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 
@@ -355,7 +355,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
         assignAndExecuteStep(executionStep, donaBenta.getId());
 
         waitForProcessToFinish(processInstance);
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
 
         checkWasntExecuted(processInstance, "step2");
 
@@ -377,7 +377,7 @@ public class SignalBoundaryEventTest extends CommonAPITest {
 
         getProcessAPI().sendSignal("MySignal1");
 
-        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.getReadyState(),
+        final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, "exceptionStep", processInstance.getId(), TestStates.READY,
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 

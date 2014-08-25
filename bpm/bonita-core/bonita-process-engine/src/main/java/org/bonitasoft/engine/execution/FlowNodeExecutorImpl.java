@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.execution;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.SArchivingException;
@@ -45,7 +47,9 @@ import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilderFactory;
@@ -56,6 +60,10 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.execution.work.WorkFactory;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
@@ -237,6 +245,11 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             archiveFlowNodeInstance(sFlowNodeInstance, false, sProcessDefinitionId);
             activityInstanceService.setState(sFlowNodeInstance, state);
             if (state.isTerminal()) {
+                // For Manual Task
+                if (sFlowNodeInstance instanceof SHumanTaskInstance) {
+                    abortNonCompletedChildren((SHumanTaskInstance) sFlowNodeInstance);
+                }
+
                 // reschedule this work but without the operations
                 workService.registerWork(WorkFactory.createNotifyChildFinishedWork(sProcessDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(),
                         sFlowNodeInstance.getId(), sFlowNodeInstance.getParentContainerId(), sFlowNodeInstance.getParentContainerType().name()));
@@ -244,6 +257,29 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);
         }
+    }
+
+    private void abortNonCompletedChildren(final SHumanTaskInstance parentHumanTaskInstance) throws SBonitaException {
+        final SUserTaskInstanceBuilderFactory keyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
+
+        final OrderByOption orderByOption = new OrderByOption(SActivityInstance.class, keyProvider.getNameKey(), OrderByType.ASC);
+        final List<FilterOption> filters = new ArrayList<FilterOption>(2);
+        filters.add(new FilterOption(SActivityInstance.class, keyProvider.getParentActivityInstanceKey(), parentHumanTaskInstance.getId()));
+        filters.add(new FilterOption(SActivityInstance.class, keyProvider.getTerminalKey(), false));
+        filters.add(new FilterOption(SActivityInstance.class, keyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
+        QueryOptions queryOptions = new QueryOptions(0, 100, Collections.singletonList(orderByOption), filters, null);
+
+        List<SActivityInstance> children;
+        do {
+            children = activityInstanceService.searchActivityInstances(SActivityInstance.class, queryOptions);
+            for (final SActivityInstance child : children) {
+                activityInstanceService.setStateCategory(child, SStateCategory.ABORTING);
+                if (child.isStable()) {
+                    containerRegistry.executeFlowNode(parentHumanTaskInstance.getProcessDefinitionId(), child.getLogicalGroup(3), child.getId(), null, null);
+                }
+            }
+            queryOptions = QueryOptions.getNextPage(queryOptions);
+        } while (!children.isEmpty());
     }
 
     @Override
