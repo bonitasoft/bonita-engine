@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.api.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,15 +45,19 @@ public class ContractValidator {
 
         final List<SRuleDefinition> rules = contract.getRules();
         if (rules.isEmpty()) {
-            final Set<String> variableKeys = variables.keySet();
+            final Map<String, Object> copy = new HashMap<String, Object>();
+            for (final String key : variables.keySet()) {
+                copy.put(key, "");
+            }
+            final Set<String> keys = copy.keySet();
             for (final SInputDefinition input : contract.getInputs()) {
                 if (!variables.containsKey(input.getName())) {
                     comments.add(input.getName() + " is not defined");
                 } else {
-                    variableKeys.remove(input.getName());
+                    keys.remove(input.getName());
                 }
             }
-            for (final String key : variableKeys) {
+            for (final String key : keys) {
                 comments.add("variable " + key + " is not expected");
 
             }
