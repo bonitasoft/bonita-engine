@@ -15,10 +15,11 @@
 package org.bonitasoft.engine.bpm.comment;
 
 import org.bonitasoft.engine.bpm.BonitaObject;
+import org.bonitasoft.engine.session.APISession;
 
 /**
  * The comment associated to a process instance
- * 
+ *
  * @author Hongwen Zang
  * @author Celine Souchet
  */

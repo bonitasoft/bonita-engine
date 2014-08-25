@@ -15,8 +15,6 @@
 	<name>Bonita Expression</name>
 
 	<modules>
-		<module>bonita-expression-model</module>
-		<module>bonita-expression-model-impl</module>
 		<module>bonita-expression-api</module>
 		<module>bonita-expression-api-impl</module>
 	</modules>

@@ -14,7 +14,8 @@
  */
 package org.bonitasoft.engine.bpm;
 
-import java.net.URL;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +59,7 @@ import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceServic
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
@@ -107,6 +109,7 @@ import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
+import org.bonitasoft.engine.xml.SInvalidSchemaException;
 import org.bonitasoft.engine.xml.XMLWriter;
 
 /**
@@ -452,9 +455,19 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         bindings.add(RoleNamesBinding.class);
         bindings.add(GroupPathsBinding.class);
         final Parser parser = getParserFactgory().createParser(bindings);
-        final URL resource = Thread.currentThread().getContextClassLoader().getResource("profiles.xsd");
-        parser.setSchemaUrl(resource);
-        return parser;
+        final InputStream resource = Thread.currentThread().getContextClassLoader().getResourceAsStream("profiles.xsd");
+        try {
+            parser.setSchema(resource);
+            return parser;
+        } catch (final SInvalidSchemaException ise) {
+            throw new BonitaRuntimeException(ise);
+        } finally {
+            try {
+                resource.close();
+            } catch (final IOException ioe) {
+                throw new BonitaRuntimeException(ioe);
+            }
+        }
     }
 
     @Override

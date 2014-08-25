@@ -19,6 +19,12 @@
 			<groupId>org.bonitasoft.engine.core</groupId>
 			<artifactId>bonita-process-engine</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+			    <exclusion>
+			        <artifactId>bonita-common-api</artifactId>
+			        <groupId>org.bonitasoft.engine.api</groupId>
+			    </exclusion>
+			</exclusions>
 		</dependency>
         
         <!-- Builder Factory -->
@@ -148,11 +154,6 @@
 		<!-- Event -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-model-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.events</groupId>
 			<artifactId>bonita-events-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -161,11 +162,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.expression</groupId>
 			<artifactId>bonita-expression-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-model-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -225,11 +221,6 @@
 		</dependency>
 
 		<!-- Logs -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-model-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.log</groupId>
 			<artifactId>bonita-log-impl</artifactId>
@@ -346,11 +337,12 @@
 			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
 			<artifactId>bonita-process-instance-impl</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-model-impl</artifactId>
-			<version>${project.version}</version>
+			<exclusions>
+			    <exclusion>
+			        <artifactId>bonita-common-api</artifactId>
+			        <groupId>org.bonitasoft.engine.api</groupId>
+			    </exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Recorder -->
@@ -505,6 +497,12 @@
 			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-common</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+			    <exclusion>
+			        <artifactId>bonita-common-api</artifactId>
+			        <groupId>org.bonitasoft.engine.api</groupId>
+			    </exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 
@@ -576,13 +574,9 @@
 									<include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-api</include>
 									<include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-api-impl</include>
 									<!-- Event -->
-									<include>org.bonitasoft.engine.events:bonita-events-model</include>
-									<include>org.bonitasoft.engine.events:bonita-events-model-impl</include>
 									<include>org.bonitasoft.engine.events:bonita-events-api</include>
 									<include>org.bonitasoft.engine.events:bonita-events-api-impl</include>
 									<!-- Expression -->
-									<include>org.bonitasoft.engine.expression:bonita-expression-model</include>
-									<include>org.bonitasoft.engine.expression:bonita-expression-model-impl</include>
 									<include>org.bonitasoft.engine.expression:bonita-expression-api</include>
 									<include>org.bonitasoft.engine.expression:bonita-expression-api-impl</include>
 									<!-- Expression Resolver -->
@@ -606,8 +600,6 @@
 									<include>org.bonitasoft.engine.core.login:bonita-login-api</include>
 									<include>org.bonitasoft.engine.core.login:bonita-login-api-impl</include>
 									<!-- Logs -->
-									<include>org.bonitasoft.engine.log:bonita-log-model</include>
-									<include>org.bonitasoft.engine.log:bonita-log-model-impl</include>
 									<include>org.bonitasoft.engine.log:bonita-log-api</include>
 									<include>org.bonitasoft.engine.log:bonita-log-impl</include>
 									<!-- Operation -->
@@ -649,8 +641,6 @@
 									<include>org.bonitasoft.engine.core.process.document:bonita-process-document-api</include>
 									<include>org.bonitasoft.engine.core.process.document:bonita-process-document-impl</include>
 									<!-- Process Instance -->
-									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model</include>
-									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-model-impl</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
 									<include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>
 									<!-- Recorder -->

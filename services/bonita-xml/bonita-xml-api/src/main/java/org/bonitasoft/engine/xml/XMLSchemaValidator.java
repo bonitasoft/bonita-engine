@@ -17,11 +17,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.net.URL;
+
+import javax.xml.transform.stream.StreamSource;
 
 /**
  * @author Matthieu Chaffotte
- * @author Celine Souchet
  */
 public interface XMLSchemaValidator {
 
@@ -33,6 +33,6 @@ public interface XMLSchemaValidator {
 
     void validate(File file) throws SValidationException, IOException;
 
-    void setSchemaUrl(URL schemaUrl);
+    void setSchema(StreamSource streamSource) throws SInvalidSchemaException;
 
 }
