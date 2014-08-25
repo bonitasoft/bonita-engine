@@ -73,24 +73,32 @@ public class ContractValidatorTest {
 
     @Test
     public void isValid_should_be_true_an_retrun_an_empty_list() throws Exception {
+        //given
         final Map<String, Object> variables = new HashMap<String, Object>();
         variables.put(IS_VALID, true);
         variables.put(COMMENT, null);
         final SContractDefinition contract = buildContractWithInputsAndRules();
 
+        //when
         final boolean valid = validator.isValid(contract, variables);
+
+        //then
         assertThat(valid).isTrue();
         assertThat(validator.getComments()).isEmpty();
     }
 
     @Test
     public void isValid_should_be_false_an_retrun_explanations() throws Exception {
+        //given
         final Map<String, Object> variables = new HashMap<String, Object>();
         variables.put(IS_VALID, false);
         variables.put(COMMENT, null);
         final SContractDefinition contract = buildContractWithInputsAndRules();
 
+        //when
         final boolean valid = validator.isValid(contract, variables);
+
+        //then
         assertThat(valid).isFalse();
         final List<String> explanations = validator.getComments();
         assertThat(explanations).hasSize(1);
@@ -99,6 +107,7 @@ public class ContractValidatorTest {
 
     @Test
     public void isValid_should_log_all_rules_in_debug_mode() throws Exception {
+        //given
         final Map<String, Object> variables = new HashMap<String, Object>();
         variables.put(IS_VALID, false);
         variables.put(COMMENT, NICE_COMMENT);
@@ -106,8 +115,10 @@ public class ContractValidatorTest {
         when(loggerService.isLoggable(ContractValidator.class, TechnicalLogSeverity.DEBUG)).thenReturn(true);
         when(loggerService.isLoggable(ContractValidator.class, TechnicalLogSeverity.WARNING)).thenReturn(true);
 
+        //when
         validator.isValid(contract, variables);
 
+        //then
         verify(loggerService).log(ContractValidator.class, TechnicalLogSeverity.DEBUG, "Evaluating rule [Mandatory] on input(s) [isValid]");
         verify(loggerService).log(ContractValidator.class, TechnicalLogSeverity.DEBUG,
                 "Evaluating rule [Comment_Needed_If_Not_Valid] on input(s) [isValid, comment]");
@@ -116,6 +127,7 @@ public class ContractValidatorTest {
 
     @Test
     public void isValid_should_log_invalid_rules_in_warning_mode() throws Exception {
+        //given
         final Map<String, Object> variables = new HashMap<String, Object>();
         variables.put(IS_VALID, false);
         variables.put(COMMENT, null);
@@ -123,8 +135,10 @@ public class ContractValidatorTest {
         when(loggerService.isLoggable(ContractValidator.class, TechnicalLogSeverity.DEBUG)).thenReturn(false);
         when(loggerService.isLoggable(ContractValidator.class, TechnicalLogSeverity.WARNING)).thenReturn(true);
 
+        //when
         validator.isValid(contract, variables);
 
+        //then
         verify(loggerService).log(ContractValidator.class, TechnicalLogSeverity.WARNING,
                 "Rule [Comment_Needed_If_Not_Valid] on input(s) [isValid, comment] is not valid");
         verify(loggerService, never()).log(eq(ContractValidator.class), eq(TechnicalLogSeverity.DEBUG), anyString());
