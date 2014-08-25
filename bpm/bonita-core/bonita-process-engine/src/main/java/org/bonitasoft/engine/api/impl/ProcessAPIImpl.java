@@ -898,22 +898,22 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void executeFlowNode(final long userId, final long flownodeInstanceId) throws FlowNodeExecutionException {
         try {
-            executeFlowNode(userId, flownodeInstanceId, new HashMap<String, Object>());
-        } catch (final ContractViolationException e) {
-            throw new FlowNodeExecutionException("The userTask has a contract with needs inputs to order to be executed");
+            executeFlowNode(userId, flownodeInstanceId, true, new HashMap<String, Object>());
+        } catch (final Exception e) {
+            throw new FlowNodeExecutionException(e);
         }
     }
 
     @CustomTransactions
     @Override
-    public void executeFlowNode(final long flownodeInstanceId, final Map<String, Object> parameters)
+    public void executeUserTask(final long flownodeInstanceId, final Map<String, Object> parameters)
             throws FlowNodeExecutionException, ContractViolationException {
-        executeFlowNode(0, flownodeInstanceId, parameters);
+        executeUserTask(0, flownodeInstanceId, parameters);
     }
 
     @CustomTransactions
     @Override
-    public void executeFlowNode(final long userId, final long flownodeInstanceId, final Map<String, Object> parameters)
+    public void executeUserTask(final long userId, final long flownodeInstanceId, final Map<String, Object> parameters)
             throws FlowNodeExecutionException, ContractViolationException {
         try {
             executeFlowNode(userId, flownodeInstanceId, true, parameters);
@@ -925,10 +925,8 @@ public class ProcessAPIImpl implements ProcessAPI {
     protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction, final Map<String, Object> inputs)
             throws SBonitaException, ContractViolationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final LockService lockService = tenantAccessor.getLockService();
 
-        final GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(activityInstanceService, flownodeInstanceId);
+        final GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(tenantAccessor.getActivityInstanceService(), flownodeInstanceId);
         executeTransactionContent(tenantAccessor, getFlowNodeInstance, wrapInTransaction);
         final SFlowNodeInstance flowNodeInstance = getFlowNodeInstance.getResult();
         if (flowNodeInstance instanceof SUserTaskInstance) {
@@ -942,6 +940,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             }
         }
 
+        final LockService lockService = tenantAccessor.getLockService();
         final BonitaLock lock = lockService.lock(flowNodeInstance.getParentProcessInstanceId(), SFlowElementsContainerType.PROCESS.name(),
                 tenantAccessor.getTenantId());
         try {

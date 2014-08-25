@@ -45,38 +45,46 @@ public class ContractValidator {
 
         final List<SRuleDefinition> rules = contract.getRules();
         if (rules.isEmpty()) {
-            final Map<String, Object> copy = new HashMap<String, Object>();
-            for (final String key : variables.keySet()) {
-                copy.put(key, "");
-            }
-            final Set<String> keys = copy.keySet();
-            for (final SInputDefinition input : contract.getInputs()) {
-                if (!variables.containsKey(input.getName())) {
-                    comments.add(input.getName() + " is not defined");
-                } else {
-                    keys.remove(input.getName());
-                }
-            }
-            for (final String key : keys) {
-                comments.add("variable " + key + " is not expected");
-
-            }
+            validateContract(contract, variables);
         } else {
-            for (final SRuleDefinition rule : rules) {
-                log(TechnicalLogSeverity.DEBUG, "Evaluating rule [" + rule.getName() + "] on input(s) " + rule.getInputNames());
-                Boolean valid;
-                try {
-                    valid = MVEL.evalToBoolean(rule.getExpression(), variables);
-                } catch (final Exception e) {
-                    valid = Boolean.FALSE;
-                }
-                if (!valid) {
-                    log(TechnicalLogSeverity.WARNING, "Rule [" + rule.getName() + "] on input(s) " + rule.getInputNames() + " is not valid");
-                    comments.add(rule.getExplanation());
-                }
-            }
+            validateRules(variables, rules);
         }
         return comments.isEmpty();
+    }
+
+    private void validateRules(final Map<String, Object> variables, final List<SRuleDefinition> rules) {
+        for (final SRuleDefinition rule : rules) {
+            log(TechnicalLogSeverity.DEBUG, "Evaluating rule [" + rule.getName() + "] on input(s) " + rule.getInputNames());
+            Boolean valid;
+            try {
+                valid = MVEL.evalToBoolean(rule.getExpression(), variables);
+            } catch (final Exception e) {
+                valid = Boolean.FALSE;
+            }
+            if (!valid) {
+                log(TechnicalLogSeverity.WARNING, "Rule [" + rule.getName() + "] on input(s) " + rule.getInputNames() + " is not valid");
+                comments.add(rule.getExplanation());
+            }
+        }
+    }
+
+    private void validateContract(final SContractDefinition contract, final Map<String, Object> variables) {
+        final Map<String, Object> copy = new HashMap<String, Object>();
+        for (final String key : variables.keySet()) {
+            copy.put(key, "");
+        }
+        final Set<String> keys = copy.keySet();
+        for (final SInputDefinition input : contract.getInputs()) {
+            if (!variables.containsKey(input.getName())) {
+                comments.add(input.getName() + " is not defined");
+            } else {
+                keys.remove(input.getName());
+            }
+        }
+        for (final String key : keys) {
+            comments.add("variable " + key + " is not expected");
+
+        }
     }
 
     private void log(final TechnicalLogSeverity severity, final String message) {
