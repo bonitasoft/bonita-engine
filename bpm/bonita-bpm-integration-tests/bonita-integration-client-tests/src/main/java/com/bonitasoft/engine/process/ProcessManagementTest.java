@@ -35,7 +35,10 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.WaitUntil;
+import org.bonitasoft.engine.test.annotation.Cover;
+import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbAssignedTaskOf;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.bonitasoft.engine.test.wait.WaitForCompletedArchivedStep;
@@ -43,7 +46,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.bonitasoft.engine.BuildTestUtilSP;
 import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
@@ -54,7 +59,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
     @After
     public void afterTest() throws BonitaException {
         deleteUser(john);
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     @Before
@@ -65,7 +70,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
 
     @Test
     public void searchArchivedSubTasks() throws Exception {
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
@@ -145,7 +150,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
 
         final User jack = createUser("jack", "bpm");
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         getProcessAPI().startProcess(processDefinition.getId());
@@ -208,7 +213,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
 
     @Test
     public void executingSubTasks() throws Exception {
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
@@ -261,7 +266,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
     public void createHumanTaskAndExecutingItWithOtherUser() throws Exception {
         final User userWhoCreateTheManualTask = createUser("userWhoCreateTheManualTask", PASSWORD);
 
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith("userWhoCreateTheManualTask", PASSWORD);
 
         final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
@@ -276,7 +281,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
                 new Date(System.currentTimeMillis()), TaskPriority.NORMAL);
         final ManualTaskInstance manualUserTask = getProcessAPI().addManualUserTask(taskCreator);
 
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         // archive sub task:
@@ -293,81 +298,6 @@ public class ProcessManagementTest extends CommonAPISPTest {
         // Clean up
         disableAndDeleteProcess(processDefinition);
         deleteUser(userWhoCreateTheManualTask);
-    }
-
-    // @Test
-    public void executeTaskShouldCancelSubtasks() throws Exception {
-        loginOnDefaultTenantWith(USERNAME, PASSWORD);
-
-        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("testArchiveTaskShouldArchiveSubtasks", "1.0");
-        final String userTaskName = "userTask";
-        processBuilder.addActor(ACTOR_NAME).addDescription("test Archive Task Should Archive Subtasks").addUserTask(userTaskName, ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
-        getProcessAPI().startProcess(john.getId(), processDefinition.getId());
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 30, 3000, true, 1, john);
-        assertTrue("Expected activity not found", checkNbPendingTaskOf.waitUntil());
-
-        final List<HumanTaskInstance> pendingTasks = checkNbPendingTaskOf.getPendingHumanTaskInstances();
-        final HumanTaskInstance parentTask = pendingTasks.get(0);
-        getProcessAPI().assignUserTask(parentTask.getId(), john.getId());
-        final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
-        assertEquals(1, toDoTasks.size());
-        assertEquals(userTaskName, toDoTasks.get(0).getName());
-        // add sub task
-        final Date dueDate = new Date(System.currentTimeMillis());
-        final TaskPriority newPriority = TaskPriority.ABOVE_NORMAL;
-        ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newManualTask1", john.getId(), "add new manual user task 1", dueDate,
-                newPriority);
-        getProcessAPI().addManualUserTask(taskCreator);
-        taskCreator = buildManualTaskCreator(parentTask.getId(), "newManualTask2", john.getId(), "add new manual user task 2", dueDate, newPriority);
-        getProcessAPI().addManualUserTask(taskCreator);
-        assertTrue("Expecting 3 assigned task for Jack", new WaitUntil(20, 500) {
-
-            @Override
-            protected boolean check() {
-                return getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null).size() == 3;
-            }
-        }.waitUntil());
-
-        assignAndExecuteStep(parentTask, john.getId());
-
-        assertTrue("Expecting no more task assigned to Jack", new WaitUntil(20, 1000) {
-
-            @Override
-            protected boolean check() {
-                return getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null).size() == 0;
-            }
-        }.waitUntil());
-
-        // let's archive children tasks:
-        assertTrue("Expected 1 task to be completed", new WaitUntil(100, 2000) {
-
-            @Override
-            protected boolean check() throws Exception {
-                final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-                builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition.getId());
-                builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.COMPLETED_STATE);
-                return getProcessAPI().searchArchivedHumanTasks(builder.done()).getCount() == 1;
-            }
-        }.waitUntil());
-
-        assertTrue("Expected 2 subtasks to be cancelled", new WaitUntil(100, 2000) {
-
-            @Override
-            protected boolean check() throws Exception {
-                final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-                builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition.getId());
-                builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.ABORTED_STATE);
-                return getProcessAPI().searchArchivedHumanTasks(builder.done()).getCount() == 2;
-            }
-        }.waitUntil());
-
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
-        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.ASSIGNEE_ID, john.getId());
-        assertEquals("Expecting 0 tasks as a result of searchHumanTasksInstances", 0, getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done())
-                .getCount());
-
-        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
@@ -440,4 +370,32 @@ public class ProcessManagementTest extends CommonAPISPTest {
         disableAndDeleteProcess(process1);
     }
 
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.SUB_TASK, jira = "BS-2735", keywords = { "Sub-task", "Human task", "Skipped" })
+    @Test
+    public void executeHumanTaskShouldAbortedSubtasks() throws Exception {
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
+
+        final ProcessDefinitionBuilderExt processBuilder = BuildTestUtilSP
+                .buildProcessDefinitionWithFailedConnectorOnUserTask("testArchiveTaskShouldArchiveSubtasks");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorThatThrowException(processBuilder, ACTOR_NAME, john);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(john.getId(), processDefinition.getId());
+        final ActivityInstance parentTask = waitForUserTaskAndAssigneIt("StepWithFailedConnector", processInstance, john);
+
+        // add sub task
+        final ManualTaskCreator taskCreator = new ManualTaskCreator(parentTask.getId(), "newManualTask1").setAssignTo(john.getId());
+        getProcessAPI().addManualUserTask(taskCreator);
+        waitForFlowNodeInReadyState(processInstance, "newManualTask1", true);
+
+        // Execute parent task to failed it
+        assignAndExecuteStep(parentTask, john.getId());
+        waitForFlowNodeInFailedState(processInstance);
+        skipTask(parentTask.getId());
+        waitForFlowNodeInState(processInstance, parentTask.getName(), TestStates.SKIPPED, true);
+        waitForFlowNodeInState(processInstance, "newManualTask1", TestStates.ABORTED, true);
+
+        // No active tasks
+        checkNbOfOpenActivities(processInstance, 0);
+
+        disableAndDeleteProcess(processDefinition);
+    }
 }
