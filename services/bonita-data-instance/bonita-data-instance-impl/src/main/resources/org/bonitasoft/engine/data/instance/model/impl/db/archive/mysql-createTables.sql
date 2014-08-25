@@ -37,4 +37,5 @@ CREATE TABLE arch_data_mapping (
 	PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 
-CREATE INDEX idx1_arch_data_mapping ON arch_data_mapping (tenantId,containerId, dataInstanceId, sourceObjectId); 
+CREATE INDEX idx1_arch_data_mapping ON arch_data_mapping (tenantId,containerId, dataInstanceId, sourceObjectId);
+CREATE INDEX idx2_arch_data_mapping_on_tenant_and_contId_and_contType ON arch_data_mapping (tenantid, containerId, containerType);

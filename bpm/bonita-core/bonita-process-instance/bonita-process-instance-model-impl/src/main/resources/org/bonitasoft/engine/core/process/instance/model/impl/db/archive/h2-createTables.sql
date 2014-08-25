@@ -101,6 +101,8 @@ CREATE TABLE arch_transition_instance (
   PRIMARY KEY (tenantid, id)
 );
 
+CREATE INDEX idx1_arch_transition_instance_on_tenant_and_rootContainer ON arch_transition_instance (tenantid, rootcontainerid);
+
 CREATE TABLE arch_connector_instance (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -117,3 +119,4 @@ CREATE TABLE arch_connector_instance (
 );
 
 CREATE INDEX idx1_arch_connector_instance ON arch_connector_instance (tenantId, containerId, containerType);
+CREATE INDEX idx2_arch_connector_instance_on_tenant_and_contId_and_contType ON arch_connector_instance (tenantid, containerId, containerType);
