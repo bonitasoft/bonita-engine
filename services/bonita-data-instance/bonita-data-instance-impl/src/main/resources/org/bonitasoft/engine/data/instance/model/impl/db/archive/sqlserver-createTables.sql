@@ -42,5 +42,5 @@ GO
 
 CREATE INDEX idx1_arch_data_mapping ON arch_data_mapping (tenantId,containerId, dataInstanceId, sourceObjectId)
 GO
-CREATE INDEX idx2_arch_data_mapping_on_tenant_and_contId_and_contType ON arch_data_mapping (tenantid, containerId, containerType)
+CREATE INDEX idx2_arch_data_mapping ON arch_data_mapping (tenantid, containerId, containerType)
 GO
