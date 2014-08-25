@@ -13,6 +13,12 @@
  **/
 package org.bonitasoft.engine.connectors;
 
+import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -38,7 +44,6 @@ import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.DocumentsSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ActivityStates;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.ErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
@@ -74,16 +79,11 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.BuildTestUtil;
+import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("javadoc")
 public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
@@ -109,9 +109,9 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         designProcessDefinition.addLongData("processId", localDataExpression);
         designProcessDefinition.addAutomaticTask("start");
         designProcessDefinition.addAutomaticTask("step1")
-        .addConnector("myConnector", "org.bonitasoft.engine.connectors.TestConnectorWithAPICall", "1.0", ConnectorEvent.ON_FINISH)
-        .addInput("processName", processNameExpression).addInput("processVersion", processVersionExpression)
-        .addOutput(new OperationBuilder().createSetDataOperation("processId", outputExpression));
+                .addConnector("myConnector", "org.bonitasoft.engine.connectors.TestConnectorWithAPICall", "1.0", ConnectorEvent.ON_FINISH)
+                .addInput("processName", processNameExpression).addInput("processVersion", processVersionExpression)
+                .addOutput(new OperationBuilder().createSetDataOperation("processId", outputExpression));
         designProcessDefinition.addAutomaticTask("end");
         designProcessDefinition.addTransition("start", "step1");
         designProcessDefinition.addTransition("step1", "end");
@@ -138,11 +138,11 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addUserTask("step0", ACTOR_NAME);
         processDefinitionBuilder
-        .addAutomaticTask("step1")
-        .addConnector("myConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH)
-        .addInput(CONNECTOR_INPUT_NAME, input1Expression)
-        .addOutput(new LeftOperandBuilder().createNewInstance().setName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
-                new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
+                .addAutomaticTask("step1")
+                .addConnector("myConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH)
+                .addInput(CONNECTOR_INPUT_NAME, input1Expression)
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
+                        new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step0", "step1");
         processDefinitionBuilder.addTransition("step1", "step2");
@@ -228,15 +228,15 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         taskBuilder.addMultiInstance(isSequential, new ExpressionBuilder().createConstantIntegerExpression(nbOfInstances));
         taskBuilder.addLongData(localDataName, new ExpressionBuilder().createConstantLongExpression(1L));
         taskBuilder
-        .addConnector("connector", "connectorInJar", "1.0.0", activationEvent)
-        .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createDataExpression(localDataName, Long.class.getName()))
-        .addOutput(
-                new LeftOperandBuilder().createDataLeftOperand(globalDataName),
-                OperatorType.ASSIGNMENT,
-                "=",
-                "",
-                new ExpressionBuilder().createGroovyScriptExpression("Script", globalDataName + " + 1", Long.class.getName(),
-                        new ExpressionBuilder().createDataExpression(globalDataName, Long.class.getName())));
+                .addConnector("connector", "connectorInJar", "1.0.0", activationEvent)
+                .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createDataExpression(localDataName, Long.class.getName()))
+                .addOutput(
+                        new LeftOperandBuilder().createDataLeftOperand(globalDataName),
+                        OperatorType.ASSIGNMENT,
+                        "=",
+                        "",
+                        new ExpressionBuilder().createGroovyScriptExpression("Script", globalDataName + " + 1", Long.class.getName(),
+                                new ExpressionBuilder().createDataExpression(globalDataName, Long.class.getName())));
 
         // final UserTaskDefinitionBuilder taskBuilder = builder.addUserTask(multiTaskName, ACTOR_NAME);
         // taskBuilder.addMultiInstance(isSequential, new ExpressionBuilder().createConstantIntegerExpression(nbOfInstances));
@@ -284,16 +284,16 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final int nbOfConnectors = 25;
         for (int i = 0; i < nbOfConnectors; i++) {
             addAutomaticTask
-            .addConnector("myConnector" + i, CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH)
-            .addInput(inputName, input1Expression)
-            .addOutput(
-                    new LeftOperandBuilder().createNewInstance().setName(dataName).done(),
-                    OperatorType.ASSIGNMENT,
-                    "=",
-                    "",
-                    new ExpressionBuilder().createGroovyScriptExpression("concat", "myData1+output1", String.class.getName(),
-                            new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()),
-                            new ExpressionBuilder().createDataExpression("myData1", String.class.getName())));
+                    .addConnector("myConnector" + i, CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_FINISH)
+                    .addInput(inputName, input1Expression)
+                    .addOutput(
+                            new LeftOperandBuilder().createNewInstance().setName(dataName).done(),
+                            OperatorType.ASSIGNMENT,
+                            "=",
+                            "",
+                            new ExpressionBuilder().createGroovyScriptExpression("concat", "myData1+output1", String.class.getName(),
+                                    new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()),
+                                    new ExpressionBuilder().createDataExpression("myData1", String.class.getName())));
         }
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step0", "step1");
@@ -424,7 +424,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithConnector", "1.0");
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addAutomaticTask("step1").addConnector("myConnector", connectorId, "1.0", ConnectorEvent.ON_ENTER)
-        .addInput(CONNECTOR_INPUT_NAME, input1Expression);
+                .addInput(CONNECTOR_INPUT_NAME, input1Expression);
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
 
@@ -472,11 +472,11 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addShortTextData("outputOfConnector", outputOfConnectorExpression);
         processDefinitionBuilder
-        .addAutomaticTask("step1")
-        .addConnector("theConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER)
-        .addInput(CONNECTOR_INPUT_NAME, groovyExpression)
-        .addOutput(new LeftOperandBuilder().createNewInstance().setName("outputOfConnector").done(), OperatorType.ASSIGNMENT, "=", "",
-                new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
+                .addAutomaticTask("step1")
+                .addConnector("theConnector", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER)
+                .addInput(CONNECTOR_INPUT_NAME, groovyExpression)
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName("outputOfConnector").done(), OperatorType.ASSIGNMENT, "=", "",
+                        new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
 
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorWithOutput(processDefinitionBuilder, ACTOR_NAME, johnUser);
         final long processDefinitionId = processDefinition.getId();
@@ -1009,7 +1009,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
             // the connector must trigger this exception step
             waitForUserTask("errorTask", startProcess);
 
-            waitForFlowNodeInState(startProcess, "step1", ActivityStates.ABORTED_STATE, false);
+            waitForFlowNodeInState(startProcess, "step1", TestStates.ABORTED, false);
         } finally {
             // clean up
             disableAndDeleteProcess(processDefinition);
@@ -1117,7 +1117,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         processDefinitionBuilder.addConnector("myConnectorOnProcess", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER).addInput(CONNECTOR_INPUT_NAME,
                 new ExpressionBuilder().createConstantStringExpression("value1"));
         processDefinitionBuilder.addAutomaticTask("step1").addConnector("myConnectorOnStep", CONNECTOR_WITH_OUTPUT_ID, "1.0", ConnectorEvent.ON_ENTER)
-        .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value1"));
+                .addInput(CONNECTOR_INPUT_NAME, new ExpressionBuilder().createConstantStringExpression("value1"));
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
         processDefinitionBuilder.addTransition("step1", "step2");
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorWithOutput(processDefinitionBuilder, ACTOR_NAME, johnUser);
@@ -1169,9 +1169,9 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         addUserTask.addData("dataActivity", java.lang.Object.class.getName(),
                 new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org.bonitasoft.dfgdfg.Restaurant()", java.lang.Object.class.getName()));
         addUserTask
-        .addConnector("myConnector1", "connectorInJar", "1.0.0", ConnectorEvent.ON_ENTER)
-        .addInput("input",
-                new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org.bonitasoft.dfgdfg.Restaurant()", Object.class.getName()))
+                .addConnector("myConnector1", "connectorInJar", "1.0.0", ConnectorEvent.ON_ENTER)
+                .addInput("input",
+                        new ExpressionBuilder().createGroovyScriptExpression("myScript", "new org.bonitasoft.dfgdfg.Restaurant()", Object.class.getName()))
                 .addOutput(
                         new OperationBuilder().createSetDataOperation("dataActivity", new ExpressionBuilder().createGroovyScriptExpression("myScript",
                                 "new org.bonitasoft.dfgdfg.Restaurant()", "org.bonitasoft.dfgdfg.Restaurant")));
@@ -1254,8 +1254,8 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addIntegerData(dataName, null);// data to store the list size
         processDefinitionBuilder.addUserTask(userTaskName, ACTOR_NAME)
-        .addConnector("myConnector", "org.bonitasoft.connector.testConnectorWithConnectedResource", "1.0", ConnectorEvent.ON_ENTER)
-        .addOutput(new OperationBuilder().createSetDataOperation(dataName, rightSideOperation));
+                .addConnector("myConnector", "org.bonitasoft.connector.testConnectorWithConnectedResource", "1.0", ConnectorEvent.ON_ENTER)
+                .addOutput(new OperationBuilder().createSetDataOperation(dataName, rightSideOperation));
 
         return deployProcessWithActorAndTestConnectorWithConnectedResource(processDefinitionBuilder, ACTOR_NAME, johnUser);
     }
@@ -1328,8 +1328,8 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addLongData(dataName, null);// data to store the connector output
         processDefinitionBuilder.addUserTask(step1, ACTOR_NAME)
-        .addConnector("myConnector", "org.bonitasoft.connector.testConnectorEngineExecutionContext", "1.0", ConnectorEvent.ON_FINISH)
-        .addOutput(new OperationBuilder().createSetDataOperation(dataName, connectorOutPutExpr));
+                .addConnector("myConnector", "org.bonitasoft.connector.testConnectorEngineExecutionContext", "1.0", ConnectorEvent.ON_FINISH)
+                .addOutput(new OperationBuilder().createSetDataOperation(dataName, connectorOutPutExpr));
         processDefinitionBuilder.addUserTask(step2, ACTOR_NAME);
         processDefinitionBuilder.addTransition(step1, step2);
 

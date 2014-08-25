@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2009-2014 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.process;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,6 +49,7 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
@@ -112,7 +126,7 @@ public class ProcessManagementTest extends CommonAPITest {
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         deleteProcess(processDefinition);
         assertNotNull(processDeploymentInfo);
-        assertEquals(TestStates.getProcessDepInfoResolvedState(), processDeploymentInfo.getConfigurationState());
+        assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
         assertEquals(APITestUtil.PROCESS_NAME, processDeploymentInfo.getName());
         assertEquals(APITestUtil.PROCESS_VERSION, processDeploymentInfo.getVersion());
         assertEquals(getSession().getUserId(), processDeploymentInfo.getDeployedBy());
@@ -136,7 +150,7 @@ public class ProcessManagementTest extends CommonAPITest {
         addUserToFirstActorOfProcess(user.getId(), processDefinition);
 
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
-        assertEquals(TestStates.getProcessDepInfoResolvedState(), processDeploymentInfo.getConfigurationState());
+        assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
 
         try {
             getProcessAPI().startProcess(user.getId(), processDefinition.getId());
@@ -155,10 +169,10 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
-        assertEquals(TestStates.getProcessDepInfoEnabledState(), processDeploymentInfo.getActivationState());
+        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         getProcessAPI().disableProcess(processDefinition.getId());
         processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
-        assertEquals(TestStates.getProcessDepInfoResolvedState(), processDeploymentInfo.getConfigurationState());
+        assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
 
         deleteProcess(processDefinition);
         deleteUser(user);
@@ -192,7 +206,7 @@ public class ProcessManagementTest extends CommonAPITest {
         try {
             getProcessAPI().enableProcess(processDefinition.getId());
             final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
-            assertEquals(TestStates.getProcessDepInfoResolvedState(), processDeploymentInfo.getConfigurationState());
+            assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
             fail("expected a ProcessEnablementException");
         } catch (final ProcessEnablementException e) {
             // ok
@@ -404,14 +418,14 @@ public class ProcessManagementTest extends CommonAPITest {
                 ActivityInstanceCriterion.DEFAULT);
         for (final ActivityInstance activityInstance : openedActivityInstances) {
             // Check that all TestStates are Open (Ready):
-            assertEquals(activityInstance.getState(), TestStates.getReadyState());
+            assertEquals(activityInstance.getState(), TestStates.READY.getStateName());
         }
 
         checkNbOfOpenActivities(processInstance2, 2);
         openedActivityInstances = getProcessAPI().getOpenActivityInstances(processInstance1.getId(), 0, 200, ActivityInstanceCriterion.DEFAULT);
         for (final ActivityInstance activityInstance : openedActivityInstances) {
             // Check that all TestStates are Open (Ready):
-            assertEquals(activityInstance.getState(), TestStates.getReadyState());
+            assertEquals(activityInstance.getState(), TestStates.READY.getStateName());
         }
 
         disableAndDeleteProcess(processDefinition1, processDefinition2);
@@ -1084,7 +1098,7 @@ public class ProcessManagementTest extends CommonAPITest {
         getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
         getProcessAPI().executeFlowNode(humanTaskInstance.getId());
         // look in archive
-        assertEquals(reachedDate, getProcessAPI().getActivityReachedStateDate(humanTaskInstance.getId(), TestStates.getReadyState()));
+        assertEquals(reachedDate, getProcessAPI().getActivityReachedStateDate(humanTaskInstance.getId(), TestStates.READY.getStateName()));
         disableAndDeleteProcess(processDefinition1);
         deleteUser(user);
     }
@@ -1202,7 +1216,7 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessInstance startedProcess = getProcessAPI().startProcess(definition.getId());
         assertTrue("expected 2 activities",
-                new CheckNbOfActivities(getProcessAPI(), 200, 5000, true, startedProcess, 3, TestStates.getReadyState()).waitUntil());
+                new CheckNbOfActivities(getProcessAPI(), 200, 5000, true, startedProcess, 3, TestStates.READY).waitUntil());
         // add lucy to actor
         getProcessAPI().addUserToActor(ACTOR_NAME, definition, lucy.getId());
         // assign first user task to jack, second one to john, leaving the third pending
@@ -1247,7 +1261,7 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessInstance startedProcess = getProcessAPI().startProcess(definition.getId());
         assertTrue("expected 2 activities",
-                new CheckNbOfActivities(getProcessAPI(), 200, 5000, true, startedProcess, 3, TestStates.getReadyState()).waitUntil());
+                new CheckNbOfActivities(getProcessAPI(), 200, 5000, true, startedProcess, 3, TestStates.READY).waitUntil());
         // add lucy to actor
         getProcessAPI().addUserToActor(ACTOR_NAME, definition, lucy.getId());
         // assign first user task to jack, second one to john, leaving the third pending
@@ -1488,18 +1502,15 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("cantResolveDataInExpressionInDataDefaultValue", "1");
         processBuilder.addActor(ACTOR_NAME).addDescription("Process to test archiving mechanism");
-
         processBuilder.addShortTextData("name", new ExpressionBuilder().createConstantStringExpression("a value"));
-
         final AutomaticTaskDefinitionBuilder automaticTaskDefinitionBuilder = processBuilder.addAutomaticTask("activity");
         automaticTaskDefinitionBuilder.addShortTextData("taskData", aExpression);
         automaticTaskDefinitionBuilder.addShortTextData("taskDataFromString", aScript);
-
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, jack);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(jack.getId(), processDefinition.getId());
         try {
-            waitForProcessToFinish(processInstance, TestStates.getNormalFinalState());
+            waitForProcessToFinish(processInstance, TestStates.NORMAL_FINAL);
         } catch (final Exception e) {
             fail("Process should finish");
         }

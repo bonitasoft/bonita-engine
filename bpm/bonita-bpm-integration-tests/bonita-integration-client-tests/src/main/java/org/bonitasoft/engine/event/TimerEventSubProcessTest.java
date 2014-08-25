@@ -142,11 +142,11 @@ public class TimerEventSubProcessTest extends CommonAPITest {
         assertTrue("start date=" + subProcInst.getStartDate().getTime() + " should be >= than " + (startDate + timerDuration), subProcInst.getStartDate()
                 .getTime() >= startDate + timerDuration);
 
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
         assignAndExecuteStep(subStep, john.getId());
-        waitForArchivedActivity(eventSubProcessActivity.getId(), TestStates.getNormalFinalState());
+        waitForArchivedActivity(eventSubProcessActivity.getId(), TestStates.NORMAL_FINAL);
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.getAbortedState());
+        waitForProcessToFinish(processInstance, TestStates.ABORTED);
 
         disableAndDeleteProcess(process.getId());
     }
@@ -196,7 +196,7 @@ public class TimerEventSubProcessTest extends CommonAPITest {
 
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.getAbortedState());
+        waitForProcessToFinish(processInstance, TestStates.ABORTED);
 
         disableAndDeleteProcess(process.getId());
     }
@@ -226,10 +226,10 @@ public class TimerEventSubProcessTest extends CommonAPITest {
         final ProcessInstance calledProcInst = getProcessAPI().getProcessInstance(step1.getParentProcessInstanceId());
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(calledProcInst, TestStates.getAbortedState());
+        waitForProcessToFinish(calledProcInst, TestStates.ABORTED);
 
         waitForUserTaskAndExecuteIt("step2", processInstance, john);
         waitForProcessToFinish(processInstance);

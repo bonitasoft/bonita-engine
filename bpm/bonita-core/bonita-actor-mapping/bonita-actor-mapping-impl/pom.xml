@@ -50,11 +50,6 @@
 			<artifactId>bonita-log-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.recorder</groupId>
-			<artifactId>bonita-recorder-model</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<!-- Tests -->
 		<dependency>
 			<groupId>junit</groupId>
