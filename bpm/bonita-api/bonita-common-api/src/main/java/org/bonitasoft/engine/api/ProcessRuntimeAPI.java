@@ -29,6 +29,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
+import org.bonitasoft.engine.bpm.contract.Input;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -2327,15 +2328,15 @@ public interface ProcessRuntimeAPI {
      * Executes a user task that is in a stable state.
      * Will move the activity to the next stable state and then continue the execution of the process.
      *
-     * @param flownodeInstanceId
-     *        The identifier of the flow node to execute.
-     * @param parameters
-     *        the parameters to used for user task
+     * @param userTaskInstanceId
+     *        The identifier of the user task to execute.
+     * @param inputs
+     *        the inputs used for user task execution
      * @throws FlowNodeExecutionException
      *         If an execution exception occurs.
      * @since 7.0
      */
-    void executeUserTask(long flownodeInstanceId, Map<String, Object> parameters) throws ContractViolationException, FlowNodeExecutionException;
+    void executeUserTask(long userTaskInstanceId, List<Input> inputs) throws ContractViolationException, FlowNodeExecutionException;
 
     /**
      * Executes a user task that is in a stable state on behalf of a given user
@@ -2345,14 +2346,14 @@ public interface ProcessRuntimeAPI {
      *
      * @param userId
      *        The identifier of the user for which you want to execute the flow node
-     * @param flownodeInstanceId
-     *        The identifier of the flow node to execute
-     * @param parameters
-     *        the parameters to used for user task
+     * @param userTaskInstanceId
+     *        The identifier of the user task to execute
+     * @param inputs
+     *        the input used for user task execution
      * @throws FlowNodeExecutionException
      *         If an execution exception occurs
      * @since 7.0
      */
-    void executeUserTask(long userId, long flownodeInstanceId, Map<String, Object> parameters) throws ContractViolationException, FlowNodeExecutionException;
+    void executeUserTask(long userId, long userTaskInstanceId, List<Input> inputs) throws ContractViolationException, FlowNodeExecutionException;
 
 }

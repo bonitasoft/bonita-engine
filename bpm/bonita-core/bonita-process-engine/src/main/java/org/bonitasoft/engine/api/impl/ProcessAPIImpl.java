@@ -152,6 +152,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
+import org.bonitasoft.engine.bpm.contract.Input;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
@@ -898,7 +899,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void executeFlowNode(final long userId, final long flownodeInstanceId) throws FlowNodeExecutionException {
         try {
-            executeFlowNode(userId, flownodeInstanceId, true, new HashMap<String, Object>());
+            executeFlowNode(userId, flownodeInstanceId, true, new ArrayList<Input>());
         } catch (final Exception e) {
             throw new FlowNodeExecutionException(e);
         }
@@ -906,36 +907,37 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @CustomTransactions
     @Override
-    public void executeUserTask(final long flownodeInstanceId, final Map<String, Object> parameters)
+    public void executeUserTask(final long flownodeInstanceId, final List<Input> inputs)
             throws FlowNodeExecutionException, ContractViolationException {
-        executeUserTask(0, flownodeInstanceId, parameters);
+        executeUserTask(0, flownodeInstanceId, inputs);
     }
 
     @CustomTransactions
     @Override
-    public void executeUserTask(final long userId, final long flownodeInstanceId, final Map<String, Object> parameters)
+    public void executeUserTask(final long userId, final long flownodeInstanceId, List<Input> inputs)
             throws FlowNodeExecutionException, ContractViolationException {
         try {
-            executeFlowNode(userId, flownodeInstanceId, true, parameters);
+            executeFlowNode(userId, flownodeInstanceId, true, inputs);
         } catch (final SBonitaException e) {
             throw new FlowNodeExecutionException(e);
         }
     }
 
-    protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction, final Map<String, Object> inputs)
+    protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction, final List<Input> inputs)
             throws SBonitaException, ContractViolationException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(tenantAccessor.getActivityInstanceService(), flownodeInstanceId);
         executeTransactionContent(tenantAccessor, getFlowNodeInstance, wrapInTransaction);
         final SFlowNodeInstance flowNodeInstance = getFlowNodeInstance.getResult();
+        Map<String, Object> variables = buildMap(inputs);
         if (flowNodeInstance instanceof SUserTaskInstance) {
             final GetContractOfUserTaskInstance contractOfUserTaskInstance = new GetContractOfUserTaskInstance(tenantAccessor.getProcessDefinitionService(),
                     (SUserTaskInstance) flowNodeInstance);
             executeTransactionContent(tenantAccessor, contractOfUserTaskInstance, wrapInTransaction);
             final SContractDefinition contractDefinition = contractOfUserTaskInstance.getResult();
             final ContractValidator validator = new ContractValidator(tenantAccessor.getTechnicalLoggerService());
-            if (!validator.isValid(contractDefinition, inputs)) {
+            if (!validator.isValid(contractDefinition, variables)) {
                 throw new ContractViolationException("Contract is not valid: ", validator.getComments());
             }
         }
@@ -944,13 +946,21 @@ public class ProcessAPIImpl implements ProcessAPI {
         final BonitaLock lock = lockService.lock(flowNodeInstance.getParentProcessInstanceId(), SFlowElementsContainerType.PROCESS.name(),
                 tenantAccessor.getTenantId());
         try {
-            final ExecuteFlowNode executeFlowNode = new ExecuteFlowNode(tenantAccessor, userId, flowNodeInstance, inputs);
+            final ExecuteFlowNode executeFlowNode = new ExecuteFlowNode(tenantAccessor, userId, flowNodeInstance, variables);
             executeTransactionContent(tenantAccessor, executeFlowNode, wrapInTransaction);
         } finally {
             lockService.unlock(lock, tenantAccessor.getTenantId());
         }
     }
 
+    private Map<String, Object> buildMap(List<Input> inputs) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        for (Input input : inputs) {
+            map.put(input.getName(), input.getValue());
+        }
+        return map;
+    }
+    
     private void executeTransactionContent(final TenantServiceAccessor tenantAccessor, final TransactionContent transactionContent,
             final boolean wrapInTransaction) throws SBonitaException {
         if (wrapInTransaction) {
