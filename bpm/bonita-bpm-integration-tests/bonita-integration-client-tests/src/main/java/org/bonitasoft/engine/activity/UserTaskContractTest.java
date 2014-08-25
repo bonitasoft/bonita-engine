@@ -164,7 +164,7 @@ public class UserTaskContractTest extends CommonAPITest {
             inputs.put("numberOfDay", 9);
             getProcessAPI().executeFlowNode(userTask.getId(), inputs);
             fail("The contract is not enforced");
-        } catch (final BonitaRuntimeException e) {
+        } catch (final ContractViolationException e) {
             final String state = getProcessAPI().getActivityInstanceState(userTask.getId());
             assertThat(state).isEqualTo("ready");
         }
