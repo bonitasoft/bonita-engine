@@ -92,4 +92,8 @@ public class ContractDefinitionImpl implements ContractDefinition {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "ContractDefinitionImpl [inputs=" + inputs + ", rules=" + rules + "]";
+    }
 }

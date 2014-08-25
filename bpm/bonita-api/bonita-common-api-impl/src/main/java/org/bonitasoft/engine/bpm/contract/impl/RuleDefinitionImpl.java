@@ -17,26 +17,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.RuleDefinition;
-import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class RuleDefinitionImpl extends NamedElementImpl implements RuleDefinition {
+public class RuleDefinitionImpl implements RuleDefinition {
 
     private static final long serialVersionUID = 2793703451225519896L;
 
+    private final String name;
     private final String expression;
-
     private final String explanation;
-
     private final List<String> inputNames;
 
     public RuleDefinitionImpl(final String name, final String expression, final String explanation) {
-        super(name);
+        this.name = name;
         inputNames = new ArrayList<String>();
         this.explanation = explanation;
         this.expression = expression;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -73,13 +76,17 @@ public class RuleDefinitionImpl extends NamedElementImpl implements RuleDefiniti
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
         if (getClass() != obj.getClass()) {
             return false;
         }
         final RuleDefinitionImpl other = (RuleDefinitionImpl) obj;
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
         if (explanation == null) {
             if (other.explanation != null) {
                 return false;

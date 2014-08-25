@@ -422,7 +422,7 @@ public class ProcessAPIImplTest {
     }
 
     @Test
-    public void testName() throws Exception {
+    public void getUserTaskContract_should_return_contract_associated_to_a_given_task() throws Exception {
         final long userTaskInstanceId= 786454L;
         final long processDefinitionId = 464684354L;
         final long userTaskDefinitionId = 786454L;
@@ -432,7 +432,6 @@ public class ProcessAPIImplTest {
         when(activityInstanceService.getUserTaskInstance(userTaskInstanceId)).thenReturn(instance);
         when(instance.getProcessDefinitionId()).thenReturn(processDefinitionId);
         when(instance.getFlowNodeDefinitionId()).thenReturn(userTaskDefinitionId);
-
         final ProcessDefinitionService processDefinitionService = mock(ProcessDefinitionService.class);
         final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
         final SFlowElementContainerDefinition container = mock(SFlowElementContainerDefinition.class);
@@ -442,12 +441,14 @@ public class ProcessAPIImplTest {
         when(processDefinition.getProcessContainer()).thenReturn(container);
         when(container.getFlowNode(userTaskDefinitionId)).thenReturn(definition);
         final SContractDefinitionImpl contractDefinitionImpl = new SContractDefinitionImpl();
-        contractDefinitionImpl.addInput(new SInputDefinitionImpl("name"));
+        InputDefinitionImpl input = new InputDefinitionImpl("name", "aType", "aDescription");
+        contractDefinitionImpl.addInput(new SInputDefinitionImpl(input));
         when(definition.getContract()).thenReturn(contractDefinitionImpl);
         final ContractDefinitionImpl contractDefinition = new ContractDefinitionImpl();
-        contractDefinition.addInput(new InputDefinitionImpl("name", null, null));
+        contractDefinition.addInput(input);
 
         final ContractDefinition contract = processAPI.getUserTaskContract(userTaskInstanceId);
+        
         assertThat(contract).isEqualTo(contractDefinition);
     }
 

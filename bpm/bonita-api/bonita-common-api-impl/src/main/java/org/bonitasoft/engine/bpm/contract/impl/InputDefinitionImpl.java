@@ -14,25 +14,37 @@
 package org.bonitasoft.engine.bpm.contract.impl;
 
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
-import org.bonitasoft.engine.bpm.internal.DescriptionElementImpl;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class InputDefinitionImpl extends DescriptionElementImpl implements InputDefinition {
+public class InputDefinitionImpl implements InputDefinition {
 
     private static final long serialVersionUID = 2836592506382887928L;
 
     private final String type;
+    private final String description;
+    private final String name;
 
     public InputDefinitionImpl(final String name, final String type, final String description) {
-        super(name, description);
+        this.description = description;
+        this.name = name;
         this.type = type;
     }
 
     @Override
     public String getType() {
         return type;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -48,9 +60,6 @@ public class InputDefinitionImpl extends DescriptionElementImpl implements Input
         if (this == obj) {
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
         if (getClass() != obj.getClass()) {
             return false;
         }
@@ -62,7 +71,26 @@ public class InputDefinitionImpl extends DescriptionElementImpl implements Input
         } else if (!type.equals(other.type)) {
             return false;
         }
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
+        if (description == null) {
+            if (other.description != null) {
+                return false;
+            }
+        } else if (!description.equals(other.description)) {
+            return false;
+        }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "InputDefinitionImpl [type=" + type + ", description=" + description + ", name=" + name + "]";
     }
 
 }
