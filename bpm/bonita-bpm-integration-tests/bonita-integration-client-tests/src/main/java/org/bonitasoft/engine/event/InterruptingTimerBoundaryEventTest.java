@@ -95,7 +95,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         waitForProcessToFinishAndBeArchived(processInstance);
 
         final ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStepCA.getId());
-        assertEquals(TestStates.ABORTED, archActivityInst.getState());
+        assertEquals(TestStates.ABORTED.getStateName(), archActivityInst.getState());
 
         checkFlowNodeWasntExecuted(processInstance.getId(), parentUserTaskName);
 
@@ -148,7 +148,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         waitForProcessToFinishAndBeArchived(processInstance);
 
         final ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(step1.getId());
-        assertEquals(TestStates.ABORTED, archActivityInst.getState());
+        assertEquals(TestStates.ABORTED.getStateName(), archActivityInst.getState());
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "step2");
 
