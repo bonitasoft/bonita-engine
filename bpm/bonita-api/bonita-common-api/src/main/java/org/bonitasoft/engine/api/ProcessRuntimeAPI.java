@@ -2332,11 +2332,15 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the user task to execute.
      * @param inputs
      *        the inputs used for user task execution
+     * @throws UserTaskNotFoundException
+     *         If user task to execute is not found
+     * @throws ContractViolationException
+     *         If inputs don't fit with task contract
      * @throws FlowNodeExecutionException
-     *         If an execution exception occurs.
+     *         If an execution exception occurs
      * @since 7.0
      */
-    void executeUserTask(long userTaskInstanceId, List<Input> inputs) throws ContractViolationException, FlowNodeExecutionException;
+    void executeUserTask(long userTaskInstanceId, List<Input> inputs) throws UserTaskNotFoundException, ContractViolationException, FlowNodeExecutionException;
 
     /**
      * Executes a user task that is in a stable state on behalf of a given user
@@ -2350,10 +2354,14 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the user task to execute
      * @param inputs
      *        the input used for user task execution
+     * @throws UserTaskNotFoundException
+     *         If user task to execute is not found
+     * @throws ContractViolationException
+     *         If inputs don't fit with task contract
      * @throws FlowNodeExecutionException
      *         If an execution exception occurs
      * @since 7.0
      */
-    void executeUserTask(long userId, long userTaskInstanceId, List<Input> inputs) throws ContractViolationException, FlowNodeExecutionException;
+    void executeUserTask(long userId, long userTaskInstanceId, List<Input> inputs) throws UserTaskNotFoundException, ContractViolationException, FlowNodeExecutionException;
 
 }

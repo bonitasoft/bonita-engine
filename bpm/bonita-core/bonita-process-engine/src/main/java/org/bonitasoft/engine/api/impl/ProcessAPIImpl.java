@@ -907,24 +907,24 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @CustomTransactions
     @Override
-    public void executeUserTask(final long flownodeInstanceId, final List<Input> inputs)
-            throws FlowNodeExecutionException, ContractViolationException {
+    public void executeUserTask(final long flownodeInstanceId, final List<Input> inputs) throws FlowNodeExecutionException, ContractViolationException, UserTaskNotFoundException {
         executeUserTask(0, flownodeInstanceId, inputs);
     }
 
     @CustomTransactions
     @Override
-    public void executeUserTask(final long userId, final long flownodeInstanceId, List<Input> inputs)
-            throws FlowNodeExecutionException, ContractViolationException {
+    public void executeUserTask(final long userId, final long flownodeInstanceId, List<Input> inputs) throws FlowNodeExecutionException, ContractViolationException, UserTaskNotFoundException {
         try {
             executeFlowNode(userId, flownodeInstanceId, true, inputs);
+        } catch (SFlowNodeNotFoundException e) {
+             throw new UserTaskNotFoundException(e);
         } catch (final SBonitaException e) {
             throw new FlowNodeExecutionException(e);
         }
     }
 
     protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction, final List<Input> inputs)
-            throws SBonitaException, ContractViolationException {
+            throws ContractViolationException, SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(tenantAccessor.getActivityInstanceService(), flownodeInstanceId);
