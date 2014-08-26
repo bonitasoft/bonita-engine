@@ -28,6 +28,7 @@ import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
@@ -226,10 +227,10 @@ public class TimerEventSubProcessTest extends CommonAPITest {
         final ProcessInstance calledProcInst = getProcessAPI().getProcessInstance(step1.getParentProcessInstanceId());
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
-        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
+        waitForFlowNodeInState(processInstance, "step1", TestStates.ABORTED, true);
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(calledProcInst, TestStates.ABORTED);
+        waitForProcessToBeInState(calledProcInst, ProcessInstanceState.ABORTED);
 
         waitForUserTaskAndExecuteIt("step2", processInstance, john);
         waitForProcessToFinish(processInstance);
