@@ -28,8 +28,9 @@ public class BuildTestUtilSP {
         final ConnectorDefinitionBuilder connectorDefinitionBuilder = userTaskBuilder.addConnector("testConnectorThatThrowException",
                 "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_FINISH);
         connectorDefinitionBuilder.addInput("kind", new ExpressionBuilder().createConstantStringExpression("plop"));
+        builder.addUserTask("Step2", BuildTestUtil.ACTOR_NAME);
         builder.addEndEvent("end");
-        builder.addTransition("start", "StepWithFailedConnector").addTransition("StepWithFailedConnector", "end");
+        builder.addTransition("start", "StepWithFailedConnector").addTransition("StepWithFailedConnector", "Step2").addTransition("Step2", "end");
         return builder;
     }
 }
