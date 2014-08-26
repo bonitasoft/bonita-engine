@@ -21,6 +21,7 @@ import org.bonitasoft.engine.bpm.contract.RuleDefinition;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.UserTaskNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -192,6 +193,29 @@ public class UserTaskContractTest extends CommonAPITest {
         assertThat(archivedResult.getValue()).isEqualTo(8);
 
         disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void execute_user_task_should_throwrunTaskWhenContractIsValid() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
+        builder.addActor(ACTOR_NAME);
+        final UserTaskDefinitionBuilder userTaskBuilder = builder.addAutomaticTask("automaticTask").addUserTask("task1", ACTOR_NAME);
+        userTaskBuilder.addContract().addInput("numberOfDays", Integer.class.getName(), null)
+        .addRule("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("task1");
+        getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
+
+        try {
+            //when
+            getProcessAPI().executeUserTask(-1l, asList(new Input("numberOfDays", 8)));
+            fail("should have a UserTaskNotFoundException ");
+        } catch (final UserTaskNotFoundException e) {
+            //when
+        } finally {
+            disableAndDeleteProcess(processDefinition);
+        }
     }
 
     @Test

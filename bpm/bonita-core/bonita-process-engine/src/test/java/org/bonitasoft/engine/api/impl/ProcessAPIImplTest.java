@@ -31,13 +31,18 @@ import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
+import org.bonitasoft.engine.bpm.contract.ContractViolationException;
+import org.bonitasoft.engine.bpm.contract.Input;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.impl.IntegerDataInstanceImpl;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.UserTaskNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
@@ -50,6 +55,7 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinition
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
@@ -102,6 +108,15 @@ public class ProcessAPIImplTest {
     private ClassLoaderService classLoaderService;
 
     private ProcessAPIImpl processAPI;
+
+    @Mock
+    private TransactionExecutor transactionExecutor;
+
+    @Mock
+    private ContractValidator contractValidator;
+
+    @Mock
+    private LockService lockService;
 
     @Before
     public void setup() {
@@ -423,7 +438,7 @@ public class ProcessAPIImplTest {
 
     @Test
     public void getUserTaskContract_should_return_contract_associated_to_a_given_task() throws Exception {
-        final long userTaskInstanceId= 786454L;
+        final long userTaskInstanceId = 786454L;
         final long processDefinitionId = 464684354L;
         final long userTaskDefinitionId = 786454L;
         final SUserTaskInstance instance = mock(SUserTaskInstance.class);
@@ -441,14 +456,14 @@ public class ProcessAPIImplTest {
         when(processDefinition.getProcessContainer()).thenReturn(container);
         when(container.getFlowNode(userTaskDefinitionId)).thenReturn(definition);
         final SContractDefinitionImpl contractDefinitionImpl = new SContractDefinitionImpl();
-        InputDefinitionImpl input = new InputDefinitionImpl("name", "aType", "aDescription");
+        final InputDefinitionImpl input = new InputDefinitionImpl("name", "aType", "aDescription");
         contractDefinitionImpl.addInput(new SInputDefinitionImpl(input));
         when(definition.getContract()).thenReturn(contractDefinitionImpl);
         final ContractDefinitionImpl contractDefinition = new ContractDefinitionImpl();
         contractDefinition.addInput(input);
 
         final ContractDefinition contract = processAPI.getUserTaskContract(userTaskInstanceId);
-        
+
         assertThat(contract).isEqualTo(contractDefinition);
     }
 
@@ -473,8 +488,8 @@ public class ProcessAPIImplTest {
     }
 
     @Test(expected = UserTaskNotFoundException.class)
-    public void getUserTaskContractThrowsAExceptionWhenTheIdDoesNotReferToAnExistingProcess()throws Exception {
-        final long userTaskInstanceId= 786454L;
+    public void getUserTaskContractThrowsAExceptionWhenTheIdDoesNotReferToAnExistingProcess() throws Exception {
+        final long userTaskInstanceId = 786454L;
         final long processDefinitionId = 464684354L;
         final SUserTaskInstance instance = mock(SUserTaskInstance.class);
         final ActivityInstanceService activityInstanceService = mock(ActivityInstanceService.class);
@@ -504,6 +519,73 @@ public class ProcessAPIImplTest {
         when(processDefinitionService.getProcessDefinition(processDefinitionId)).thenThrow(new SProcessDefinitionReadException("proc"));
 
         processAPI.getUserTaskContract(userTaskInstanceId);
+    }
+
+    //    @CustomTransactions
+    //    @Override
+    //    public void executeUserTask(final long flownodeInstanceId, final List<Input> inputs) throws FlowNodeExecutionException, ContractViolationException, UserTaskNotFoundException {
+    //        executeUserTask(0, flownodeInstanceId, inputs);
+    //    }
+    //
+    //
+
+    @Test(expected = FlowNodeExecutionException.class)
+    public void executeUserTask_should_throw_FlowNodeExecutionException() throws Exception {
+        final long userId = 1l;
+        final long flownodeInstanceId = 2l;
+        final List<Input> inputs = new ArrayList<Input>();
+        final SBonitaException sBonitaException = new SBonitaException() {
+
+            @Override
+            public synchronized Throwable getCause() {
+                return new Exception("message");
+            }
+        };
+        //given
+        doThrow(sBonitaException).when(processAPI).executeFlowNode(userId, flownodeInstanceId, true, inputs);
+
+        //when
+        processAPI.executeUserTask(userId, flownodeInstanceId, inputs);
+
+        //then exception
+    }
+
+    @Test(expected = ContractViolationException.class)
+    public void executeUserTask_should_throw_ContractViolationException() throws Exception {
+        final long userId = 1l;
+        final long flownodeInstanceId = 2l;
+        final List<Input> inputs = new ArrayList<Input>();
+        final SBonitaException sBonitaException = new SBonitaException() {
+
+            @Override
+            public synchronized Throwable getCause() {
+                return new Exception("message");
+            }
+        };
+        //given
+        doThrow(ContractViolationException.class).when(processAPI).executeFlowNode(userId, flownodeInstanceId, true, inputs);
+
+        //when
+        processAPI.executeUserTask(userId, flownodeInstanceId, inputs);
+
+        //then exception
+    }
+
+    @Test(expected = UserTaskNotFoundException.class)
+    public void executeUserTask_should_throw_UserTaskNotFoundException() throws Exception {
+        final long userId = 1l;
+        final long flownodeInstanceId = 2l;
+        final List<Input> inputs = new ArrayList<Input>();
+        final SFlowNodeNotFoundException sFlowNodeNotFoundException = new SFlowNodeNotFoundException(flownodeInstanceId);
+
+        //given
+        doThrow(sFlowNodeNotFoundException).when(processAPI).executeFlowNode(userId, flownodeInstanceId, true, inputs);
+
+        //when
+        processAPI.executeUserTask(userId, flownodeInstanceId, inputs);
+
+        //then exception
+
     }
 
 }

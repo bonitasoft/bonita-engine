@@ -913,24 +913,24 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @CustomTransactions
     @Override
-    public void executeUserTask(final long userId, final long flownodeInstanceId, List<Input> inputs) throws FlowNodeExecutionException, ContractViolationException, UserTaskNotFoundException {
+    public void executeUserTask(final long userId, final long flownodeInstanceId, final List<Input> inputs) throws FlowNodeExecutionException, ContractViolationException, UserTaskNotFoundException {
         try {
             executeFlowNode(userId, flownodeInstanceId, true, inputs);
-        } catch (SFlowNodeNotFoundException e) {
-             throw new UserTaskNotFoundException(e);
+        } catch (final SFlowNodeNotFoundException e) {
+            throw new UserTaskNotFoundException(e);
         } catch (final SBonitaException e) {
             throw new FlowNodeExecutionException(e);
         }
     }
 
     protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction, final List<Input> inputs)
-            throws ContractViolationException, SBonitaException {
+            throws ContractViolationException, SBonitaException, SFlowNodeNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(tenantAccessor.getActivityInstanceService(), flownodeInstanceId);
         executeTransactionContent(tenantAccessor, getFlowNodeInstance, wrapInTransaction);
         final SFlowNodeInstance flowNodeInstance = getFlowNodeInstance.getResult();
-        Map<String, Object> variables = buildMap(inputs);
+        final Map<String, Object> variables = buildMap(inputs);
         if (flowNodeInstance instanceof SUserTaskInstance) {
             final GetContractOfUserTaskInstance contractOfUserTaskInstance = new GetContractOfUserTaskInstance(tenantAccessor.getProcessDefinitionService(),
                     (SUserTaskInstance) flowNodeInstance);
@@ -953,14 +953,14 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    private Map<String, Object> buildMap(List<Input> inputs) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        for (Input input : inputs) {
+    private Map<String, Object> buildMap(final List<Input> inputs) {
+        final Map<String, Object> map = new HashMap<String, Object>();
+        for (final Input input : inputs) {
             map.put(input.getName(), input.getValue());
         }
         return map;
     }
-    
+
     private void executeTransactionContent(final TenantServiceAccessor tenantAccessor, final TransactionContent transactionContent,
             final boolean wrapInTransaction) throws SBonitaException {
         if (wrapInTransaction) {
