@@ -6,8 +6,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import com.bonitasoft.engine.business.application.SApplication;
+import com.bonitasoft.engine.business.application.SApplicationMenu;
 import com.bonitasoft.engine.business.application.SApplicationPage;
 import com.bonitasoft.engine.business.application.impl.SApplicationImpl;
+import com.bonitasoft.engine.business.application.impl.SApplicationMenuImpl;
 import com.bonitasoft.engine.business.application.impl.SApplicationPageImpl;
 import com.bonitasoft.engine.page.SPageWithContent;
 import com.bonitasoft.engine.page.impl.SPageWithContentImpl;
@@ -58,6 +60,12 @@ public class TestRepository {
         getSession().save(applicationPage);
         return (SApplicationPage) getSession().get(applicationPage.getClass(),
                 new PersistentObjectId(applicationPage.getId(), applicationPage.getTenantId()));
+    }
+
+    public SApplicationMenu add(final SApplicationMenuImpl applicationMenu) {
+        getSession().save(applicationMenu);
+        return (SApplicationMenu) getSession().get(applicationMenu.getClass(),
+                new PersistentObjectId(applicationMenu.getId(), applicationMenu.getTenantId()));
     }
 
     public void update(final SApplicationImpl application) {

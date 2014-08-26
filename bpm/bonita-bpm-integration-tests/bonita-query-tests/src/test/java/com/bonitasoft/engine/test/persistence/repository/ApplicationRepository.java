@@ -17,6 +17,7 @@ import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 
 import com.bonitasoft.engine.business.application.SApplication;
+import com.bonitasoft.engine.business.application.SApplicationMenu;
 import com.bonitasoft.engine.business.application.SApplicationPage;
 
 
@@ -66,6 +67,12 @@ public class ApplicationRepository extends TestRepository {
         final Query namedQuery = getNamedQuery("getApplicationHomePage");
         namedQuery.setParameter("applicationId", applicationId);
         return (SApplicationPage) namedQuery.uniqueResult();
+    }
+
+    public SApplicationMenu getApplicationMenu(final long applicationMenuId) {
+        final Query namedQuery = getNamedQuery("getApplicationMenuById");
+        namedQuery.setParameter("id", applicationMenuId);
+        return (SApplicationMenu) namedQuery.uniqueResult();
     }
 
 }

@@ -30,6 +30,8 @@ public interface ApplicationService {
 
     String APPLICATION_PAGE = "APPLICATION_PAGE";
 
+    String APPLICATION_MENU = "APPLICATION_MENU";
+
     SApplication createApplication(SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException, SInvalidNameException;
 
     SApplication getApplication(long applicationId) throws SBonitaReadException, SObjectNotFoundException;
@@ -55,4 +57,15 @@ public interface ApplicationService {
     long getNumberOfApplicationPages(final QueryOptions options) throws SBonitaReadException;
 
     List<SApplicationPage> searchApplicationPages(final QueryOptions options) throws SBonitaSearchException;
+
+    SApplicationMenu createApplicationMenu(SApplicationMenu applicationMenu) throws SObjectCreationException, SObjectAlreadyExistsException;
+
+    SApplicationMenu getApplicationMenu(long applicationMenuId) throws SBonitaReadException, SObjectNotFoundException;
+
+    void deleteApplicationMenu(long applicationMenuId) throws SObjectModificationException, SObjectNotFoundException;
+
+    long getNumberOfApplicationMenus(QueryOptions options) throws SBonitaReadException;
+
+    List<SApplicationMenu> searchApplicationMenus(QueryOptions options) throws SBonitaSearchException;
+
 }
