@@ -74,20 +74,6 @@
 			<artifactId>bonita-tomcat-h2-listener</artifactId>
 			<version>1.0.1</version>
 		</dependency>
-		<dependency>
-			<groupId>com.oracle</groupId>
-			<artifactId>ojdbc</artifactId>
-			<version>6</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/ojdbc6.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>com.microsoft.jdbc</groupId>
-			<artifactId>sqlserver</artifactId>
-			<version>4.0.2206.100</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/sqljdbc-4.0.2206.100.jar</systemPath>
-		</dependency>
 	</dependencies>
 
 	<profiles>
@@ -153,6 +139,18 @@
                                             <artifactId>postgresql</artifactId>
                                             <outputDirectory>${project.build.directory}/driver</outputDirectory>
                                         </artifactItem>
+                                        <artifactItem>
+											<groupId>com.oracle</groupId>
+											<artifactId>ojdbc</artifactId>
+											<version>6</version>
+											<outputDirectory>${project.build.directory}/driver</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.microsoft.jdbc</groupId>
+											<artifactId>sqlserver</artifactId>
+											<version>4.0.2206.100</version>
+											<outputDirectory>${project.build.directory}/driver</outputDirectory>
+										</artifactItem>
                                         <artifactItem>
 		                  <groupId>org.bonitasoft.tomcat</groupId>
 		                  <artifactId>bonita-tomcat-h2-listener</artifactId>
@@ -287,9 +285,6 @@
 		                                    <fileset dir="target/tx-manager">
                                                 <include name="*jar"/>
 		                                    </fileset>
-											<fileset dir="lib">
-                                                <include name="*jar"/>
-											</fileset>
 		                                </copy>
                                         <copy tofile="${tomcat.deploy.dir}/bonita.war"
                                               file="${distrib.dir}/war/bonita-deploy-war-sp-${project.version}.war"/>
