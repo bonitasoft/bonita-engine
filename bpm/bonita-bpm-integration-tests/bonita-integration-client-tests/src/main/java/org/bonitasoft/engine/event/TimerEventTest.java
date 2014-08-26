@@ -1,9 +1,6 @@
 package org.bonitasoft.engine.event;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -57,7 +54,7 @@ public class TimerEventTest extends CommonAPITest {
         final String step1Name = "step1";
         final String step2Name = "step2";
         final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(1000); // the timer intermediate catch event will wait one
-                                                                                                       // second
+        // second
         final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEventAndUserTask(TimerType.DURATION, timerExpression, step1Name, step2Name);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
@@ -69,8 +66,14 @@ public class TimerEventTest extends CommonAPITest {
         EventInstance eventInstance = getEventInstance(processInstanceId, "intermediateCatchEvent");
         checkIntermediateCatchEventInstance(eventInstance, "intermediateCatchEvent", TestStates.WAITING);
         // wait trigger activation
-        Thread.sleep(3000);
-        eventInstance = getEventInstance(processInstanceId, "intermediateCatchEvent");
+        int cnt = 0;
+
+        // BS-9586 : for mysql, we wait longer
+        while (cnt < 10 && eventInstance != null) {
+            Thread.sleep(1000);
+            eventInstance = getEventInstance(processInstanceId, "intermediateCatchEvent");
+            cnt++;
+        }
         assertNull(eventInstance);// finished
 
         waitForUserTask(step2Name, processInstance);
@@ -116,7 +119,7 @@ public class TimerEventTest extends CommonAPITest {
         // created in one second
         final ProcessDefinition definition = deployProcessWithTimerStartEventAndUserTask(TimerType.DATE, timerExpression, stepName);
 
-        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
+        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
         assertTrue(processInstances.isEmpty());
 
         // wait for process instance creation
