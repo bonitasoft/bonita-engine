@@ -372,7 +372,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.SUB_TASK, jira = "BS-2735", keywords = { "Sub-task", "Human task", "Skipped" })
     @Test
-    public void executeHumanTaskShouldAbortedSubtasks() throws Exception {
+    public void executeHumanTaskShouldAbortSubtasks() throws Exception {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         final ProcessDefinitionBuilderExt processBuilder = BuildTestUtilSP
