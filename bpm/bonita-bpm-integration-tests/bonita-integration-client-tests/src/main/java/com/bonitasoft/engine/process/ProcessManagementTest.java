@@ -372,7 +372,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.SUB_TASK, jira = "BS-2735", keywords = { "Sub-task", "Human task", "Skipped" })
     @Test
-    public void executeHumanTaskShouldAbortSubtasks() throws Exception {
+    public void skipHumanTaskShouldAbortSubtasks() throws Exception {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         final ProcessDefinitionBuilderExt processBuilder = BuildTestUtilSP
@@ -383,18 +383,55 @@ public class ProcessManagementTest extends CommonAPISPTest {
 
         // add sub task
         final ManualTaskCreator taskCreator = new ManualTaskCreator(parentTask.getId(), "newManualTask1").setAssignTo(john.getId());
-        getProcessAPI().addManualUserTask(taskCreator);
-        waitForFlowNodeInReadyState(processInstance, "newManualTask1", true);
+        final ManualTaskInstance manualUserTask = getProcessAPI().addManualUserTask(taskCreator);
+        waitForFlowNodeInReadyState(processInstance, manualUserTask.getName(), true);
 
         // Execute parent task to failed it
         assignAndExecuteStep(parentTask, john.getId());
         waitForFlowNodeInFailedState(processInstance);
         skipTask(parentTask.getId());
-        waitForFlowNodeInState(processInstance, parentTask.getName(), TestStates.SKIPPED, true);
-        waitForFlowNodeInState(processInstance, "newManualTask1", TestStates.ABORTED, true);
+        waitForUserTask("Step2");
 
-        // No active tasks
-        checkNbOfOpenActivities(processInstance, 0);
+        // One tasks
+        checkNbOfOpenActivities(processInstance, 1);
+
+        waitForFlowNodeInState(processInstance, parentTask.getName(), TestStates.SKIPPED, true);
+        waitForFlowNodeInState(processInstance, manualUserTask.getName(), TestStates.ABORTED, true);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void executeTaskShouldAbortSubtasks() throws Exception {
+        loginOnDefaultTenantWith(USERNAME, PASSWORD);
+
+        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("testArchiveTaskShouldArchiveSubtasks", "1.0");
+        final String userTaskName = "userTask";
+        processBuilder.addActor(ACTOR_NAME).addDescription("test Archive Task Should Archive Subtasks").addUserTask(userTaskName, ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(john.getId(), processDefinition.getId());
+        final ActivityInstance parentTask = waitForUserTaskAndAssigneIt(userTaskName, processInstance, john);
+
+        // add sub task
+        final Date dueDate = new Date(System.currentTimeMillis());
+        final TaskPriority newPriority = TaskPriority.ABOVE_NORMAL;
+        ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newManualTask1", john.getId(), "add new manual user task 1", dueDate,
+                newPriority);
+        getProcessAPI().addManualUserTask(taskCreator);
+        taskCreator = buildManualTaskCreator(parentTask.getId(), "newManualTask2", john.getId(), "add new manual user task 2", dueDate, newPriority);
+        getProcessAPI().addManualUserTask(taskCreator);
+        assertTrue("Expecting 3 assigned task for Jack", new WaitUntil(200, 1000) {
+
+            @Override
+            protected boolean check() {
+                return getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null).size() == 3;
+            }
+        }.waitUntil());
+
+        assignAndExecuteStep(parentTask, john.getId());
+        waitForFlowNodeInState(processInstance, parentTask.getName(), TestStates.NORMAL_FINAL, true);
+        waitForFlowNodeInState(processInstance, "newManualTask1", TestStates.ABORTED, true);
+        waitForFlowNodeInState(processInstance, "newManualTask2", TestStates.ABORTED, true);
 
         disableAndDeleteProcess(processDefinition);
     }
