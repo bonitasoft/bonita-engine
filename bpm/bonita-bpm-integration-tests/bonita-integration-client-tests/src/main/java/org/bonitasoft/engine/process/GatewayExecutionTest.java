@@ -821,10 +821,8 @@ public class GatewayExecutionTest extends CommonAPITest {
 
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        // we should have 2 elements ready:
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 10000, true, 3, user);
-        checkNbPendingTaskOf.waitUntil();
-        final List<HumanTaskInstance> pendingHumanTaskInstances = checkNbPendingTaskOf.getPendingHumanTaskInstances();
+        // we should have 3 elements ready:
+        final List<HumanTaskInstance> pendingHumanTaskInstances = checkNbPendingTaskOf(3, user).getPendingHumanTaskInstances();
         assertEquals(3, pendingHumanTaskInstances.size());
         assertEquals("step5", pendingHumanTaskInstances.get(0).getName());
         assertEquals("step5", pendingHumanTaskInstances.get(1).getName());
