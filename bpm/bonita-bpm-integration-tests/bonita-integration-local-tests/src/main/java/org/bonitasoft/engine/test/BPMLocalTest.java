@@ -78,7 +78,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
 
     @Before
     public void beforeTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         john = createUser(USERNAME, PASSWORD);
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
@@ -459,7 +459,7 @@ public class BPMLocalTest extends CommonAPILocalTest {
         platformAPI.startNode();
         System.out.println("node started");
         logoutOnPlatform(loginPlatform);
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         // check we have all task ready
         waitForPendingTasks(john.getId(), 3);
         disableAndDeleteProcess(p1.getId());

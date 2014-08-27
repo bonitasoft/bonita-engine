@@ -43,7 +43,7 @@ public class CustomUserInfoIT extends CommonAPITest {
 
     @Before
     public void before() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         user = getIdentityAPI().createUser("john", "doe");
     }
 

@@ -50,6 +50,7 @@ public class ProfileImportCommandTest extends AbstractCommandProfileTest {
         final List<User> users = createUsers();
         final InputStream xmlStream1 = ProfileImportCommandTest.class.getResourceAsStream("AllProfiles.xml");
         final byte[] xmlContent1 = IOUtils.toByteArray(xmlStream1);
+        xmlStream1.close();
 
         final Map<String, Serializable> importParameters1 = new HashMap<String, Serializable>();
         importParameters1.put("xmlContent", xmlContent1);
@@ -85,6 +86,7 @@ public class ProfileImportCommandTest extends AbstractCommandProfileTest {
 
         final InputStream xmlStream = ProfileImportCommandTest.class.getResourceAsStream("deleteExistingProfile.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream);
+        xmlStream.close();
 
         final Map<String, Serializable> importParameters = new HashMap<String, Serializable>();
         importParameters.put("xmlContent", xmlContent);

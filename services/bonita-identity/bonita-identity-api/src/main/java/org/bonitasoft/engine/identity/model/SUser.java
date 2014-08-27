@@ -36,6 +36,9 @@ public interface SUser extends PersistentObject {
 
     String getJobTitle();
 
+    /**
+     * @return The identifier of the manager. If at the creation of the user, the field is not setting, the value is 0.
+     */
     long getManagerUserId();
 
     String getDelegeeUserName();

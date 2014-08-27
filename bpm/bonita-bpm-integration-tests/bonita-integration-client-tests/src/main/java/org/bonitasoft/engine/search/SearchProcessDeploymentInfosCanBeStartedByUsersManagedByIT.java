@@ -66,7 +66,7 @@ public class SearchProcessDeploymentInfosCanBeStartedByUsersManagedByIT extends 
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         // create users
         users = new ArrayList<User>(10);
         users.add(createUser("magali", "bpm"));

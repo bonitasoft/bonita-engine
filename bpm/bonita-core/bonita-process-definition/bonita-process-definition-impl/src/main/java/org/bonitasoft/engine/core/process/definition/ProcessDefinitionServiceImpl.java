@@ -15,6 +15,7 @@ package org.bonitasoft.engine.core.process.definition;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
@@ -146,6 +147,12 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             parser.setSchema(schemaStream);
         } catch (final Exception e) {
             throw new BonitaRuntimeException("Unable to configure process definition service", e);
+        } finally {
+            try {
+                schemaStream.close();
+            } catch (final IOException e) {
+                throw new BonitaRuntimeException(e);
+            }
         }
     }
 

@@ -40,7 +40,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         john = createUser(USERNAME, "bpm");
     }
 

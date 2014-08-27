@@ -183,7 +183,7 @@ public class APITestUtil extends PlatformTestUtil {
     @After
     public void clearSynchroRepository() {
         try {
-            loginOnDefaultTenantWithDefaultTechnicalLogger();
+            loginOnDefaultTenantWithDefaultTechnicalUser();
             ClientEventUtil.clearRepo(getCommandAPI());
             logoutOnTenant();
         } catch (final Exception e) {
@@ -197,7 +197,7 @@ public class APITestUtil extends PlatformTestUtil {
         setAPIs();
     }
 
-    public void loginOnDefaultTenantWithDefaultTechnicalLogger() throws BonitaException {
+    public void loginOnDefaultTenantWithDefaultTechnicalUser() throws BonitaException {
         final LoginAPI loginAPI = getLoginAPI();
         setSession(loginAPI.login(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD));
         setAPIs();
@@ -224,7 +224,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public void logoutThenlogin() throws BonitaException {
         logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     public void logoutThenloginAs(final String userName, final String password) throws BonitaException {

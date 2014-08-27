@@ -31,7 +31,7 @@ public class CommandTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @After

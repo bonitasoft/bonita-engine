@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,19 +13,16 @@
  **/
 package org.bonitasoft.engine.bpm.bar;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileChannel.MapMode;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bonitasoft.engine.io.IOUtil;
+
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public abstract class ResourceInSpecificFolderContribution implements BusinessArchiveContribution {
 
@@ -34,27 +31,9 @@ public abstract class ResourceInSpecificFolderContribution implements BusinessAr
         final File folder = new File(barFolder, getFolderName());
         if (folder.exists() && !folder.isFile()) {
             final File[] listFiles = folder.listFiles();
-            FileChannel ch = null;
-            FileInputStream fin = null;
             for (final File file : listFiles) {
-                try {
-                    fin = new FileInputStream(file);
-                    ch = fin.getChannel();
-                    final int size = (int) ch.size();
-                    final MappedByteBuffer buf = ch.map(MapMode.READ_ONLY, 0, size);
-                    final byte[] bytes = new byte[size];
-                    buf.get(bytes);
-                    businessArchive.addResource(getFolderName() + '/' + file.getName(), bytes);
-                } finally {
-                    if (fin != null) {
-                        fin.close();
-                    }
-                    if (ch != null) {
-                        ch.close();
-                    }
-                }
-                ch = null;
-                fin = null;
+                final byte[] content = IOUtil.getContent(file);
+                businessArchive.addResource(getFolderName() + '/' + file.getName(), content);
             }
             return listFiles.length > 0;
         }
@@ -69,24 +48,10 @@ public abstract class ResourceInSpecificFolderContribution implements BusinessAr
         folder.mkdir();
         final int beginIndex = getFolderName().length();
         final Map<String, byte[]> resources = businessArchive.getResources("^" + getFolderName() + "/.*$");
-        FileOutputStream fos = null;
-        BufferedOutputStream bos = null;
+
         for (final Entry<String, byte[]> entry : resources.entrySet()) {
-            try {
-                fos = new FileOutputStream(new File(folder, entry.getKey().substring(beginIndex)));
-                bos = new BufferedOutputStream(fos);
-                bos.write(entry.getValue());
-            } finally {
-                if (bos != null) {
-                    bos.close();
-                } else {
-                    if (fos != null) {
-                        fos.close();
-                    }
-                }
-            }
-            fos = null;
-            bos = null;
+            final File file = new File(folder, entry.getKey().substring(beginIndex));
+            IOUtil.write(file, entry);
         }
     }
 

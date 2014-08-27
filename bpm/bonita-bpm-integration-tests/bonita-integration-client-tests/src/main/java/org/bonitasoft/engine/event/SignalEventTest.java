@@ -31,14 +31,14 @@ public class SignalEventTest extends CommonAPITest {
 
     @Before
     public void setUp() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         john = createUser(USERNAME, PASSWORD);
     }
 
     @After
     public void tearDown() throws Exception {
         logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         if (john != null) {
             getIdentityAPI().deleteUser(john.getId());
         }

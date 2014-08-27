@@ -212,7 +212,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     protected PlatformServiceAccessor getPlatformAccessor() throws BonitaHomeNotSetException, InstantiationException, IllegalAccessException,
-    ClassNotFoundException, IOException, BonitaHomeConfigurationException {
+            ClassNotFoundException, IOException, BonitaHomeConfigurationException {
         return ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
     }
 
@@ -234,7 +234,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     @CustomTransactions
     @AvailableOnStoppedNode
     public void startNode() throws StartNodeException {
-
 
         final PlatformServiceAccessor platformAccessor;
         SessionAccessor sessionAccessor = null;
@@ -294,7 +293,8 @@ public class PlatformAPIImpl implements PlatformAPI {
      * @param tenants
      * @throws SBonitaException
      */
-    private void afterServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor, final List<STenant> tenants)
+    private void afterServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
+            final List<STenant> tenants)
             throws SBonitaException {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlaformConfiguration();
         final SessionService sessionService = platformAccessor.getSessionService();
@@ -405,7 +405,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private void startPlatformServices(final PlatformServiceAccessor platformAccessor) throws  SBonitaException {
+    private void startPlatformServices(final PlatformServiceAccessor platformAccessor) throws SBonitaException {
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
         final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
         final NodeConfiguration platformConfiguration = platformAccessor.getPlaformConfiguration();
@@ -447,7 +447,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     protected TenantServiceAccessor getTenantServiceAccessor(final long tenantId) throws SBonitaException, BonitaHomeNotSetException, IOException,
-    BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+            BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         return ServiceAccessorFactory.getInstance().createTenantServiceAccessor(tenantId);
     }
 
@@ -645,7 +645,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     private String getUserName(final STenant tenant, final Long tenantId, final String targetDir) throws IOException, STenantDeletionException,
-    STenantCreationException {
+            STenantCreationException {
         try {
             return getUserName(tenantId);
         } catch (final Exception e) {
@@ -700,8 +700,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     protected void importProfiles(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> profilesFromXML,
-            final TenantServiceAccessor tenantServiceAccessor)
-                    throws ExecutionException {
+            final TenantServiceAccessor tenantServiceAccessor) throws ExecutionException {
         new ProfilesImporter(profileService, identityService, profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES).importProfiles(-1);
     }
 

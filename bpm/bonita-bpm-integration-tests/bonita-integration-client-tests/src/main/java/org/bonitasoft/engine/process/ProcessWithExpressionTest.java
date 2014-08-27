@@ -60,7 +60,7 @@ public class ProcessWithExpressionTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         john = createUser(USERNAME, PASSWORD);
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
@@ -138,6 +138,7 @@ public class ProcessWithExpressionTest extends CommonAPITest {
         final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/mylibrary-jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
+        stream.close();
         builder.addClasspathResource(new BarResource("mylibrary.jar", byteArray));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
 
@@ -194,12 +195,14 @@ public class ProcessWithExpressionTest extends CommonAPITest {
     private BarResource getMyLibrary() throws IOException {
         final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/mylibrary-jar.bak");
         final byte[] byteArray = IOUtils.toByteArray(stream);
+        stream.close();
         return new BarResource("mylibrary.jar", byteArray);
     }
 
     private BarResource getMyLibrary2() throws IOException {
         final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/mylibrary2-jar.bak");
         final byte[] byteArray = IOUtils.toByteArray(stream);
+        stream.close();
         return new BarResource("mylibrary.jar", byteArray);
     }
 

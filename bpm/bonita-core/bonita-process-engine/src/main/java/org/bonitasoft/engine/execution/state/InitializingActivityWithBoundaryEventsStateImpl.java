@@ -94,6 +94,7 @@ public class InitializingActivityWithBoundaryEventsStateImpl extends FlowNodeSta
     protected void onEnterToOnFinish(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
             throws SActivityStateExecutionException {
         stateBehaviors.updateDisplayNameAndDescription(processDefinition, flowNodeInstance);
+        stateBehaviors.addAssignmentSystemCommentIfTaskWasAutoAssign(flowNodeInstance);
         stateBehaviors.handleCallActivity(processDefinition, flowNodeInstance);
     }
 

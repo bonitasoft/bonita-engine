@@ -58,37 +58,39 @@ public class TCPServerAPI implements ServerAPI {
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
             final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException {
-        Socket remoteServerAPI = null;
-        ObjectOutputStream oos = null;
-        ObjectInputStream ois = null;
         try {
-            final TcpDestination tcpDestination = destinations.get(random.nextInt(destinations.size()));
-            remoteServerAPI = new Socket(tcpDestination.getHost(), tcpDestination.getPort());
-            final InputStream socketInputStream = remoteServerAPI.getInputStream();
-            oos = new ObjectOutputStream(remoteServerAPI.getOutputStream());
-            final MethodCall methodCall = new MethodCall(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
-            oos.writeObject(methodCall);
-            oos.flush();
-            ois = new ObjectInputStream(socketInputStream);
-            final Object callReturn = ois.readObject();
-            return checkInvokeMethodReturn(callReturn);
+            Socket remoteServerAPI = null;
+            ObjectOutputStream oos = null;
+            ObjectInputStream ois = null;
+            try {
+                final TcpDestination tcpDestination = destinations.get(random.nextInt(destinations.size()));
+                remoteServerAPI = new Socket(tcpDestination.getHost(), tcpDestination.getPort());
+                final InputStream socketInputStream = remoteServerAPI.getInputStream();
+                oos = new ObjectOutputStream(remoteServerAPI.getOutputStream());
+                final MethodCall methodCall = new MethodCall(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
+                oos.writeObject(methodCall);
+                oos.flush();
+                ois = new ObjectInputStream(socketInputStream);
+                final Object callReturn = ois.readObject();
+                return checkInvokeMethodReturn(callReturn);
+
+            } finally {
+                try {
+                    if (oos != null) {
+                        oos.close();
+                    }
+                    if (ois != null) {
+                        ois.close();
+                    }
+                    if (remoteServerAPI != null) {
+                        remoteServerAPI.close();
+                    }
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (final Exception e) {
             throw new ServerWrappedException(e);
-        } finally {
-
-            try {
-                if (oos != null) {
-                    oos.close();
-                }
-                if (ois != null) {
-                    ois.close();
-                }
-                if (remoteServerAPI != null) {
-                    remoteServerAPI.close();
-                }
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 

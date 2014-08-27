@@ -75,9 +75,9 @@ public abstract class ServletCall {
      * Default constructor.
      * 
      * @param request
-     *            The request made to access this servletCall.
+     *        The request made to access this servletCall.
      * @param response
-     *            The response to return.
+     *        The response to return.
      * @throws IOException
      * @throws FileUploadException
      */
@@ -206,7 +206,7 @@ public abstract class ServletCall {
      * Get a parameter values by its name
      * 
      * @param name
-     *            The name of the parameter (case sensitive)
+     *        The name of the parameter (case sensitive)
      * @return This method returns the values of a parameter as a list of String or null if the parameter isn't defined
      */
     public final List<String> getParameterAsList(final String name) {
@@ -217,9 +217,9 @@ public abstract class ServletCall {
      * Get a parameter values by its name
      * 
      * @param name
-     *            The name of the parameter (case sensitive)
+     *        The name of the parameter (case sensitive)
      * @param defaultValue
-     *            The value to return if the parameter isn't define
+     *        The value to return if the parameter isn't define
      * @return This method returns the values of a parameter as a list of String
      */
     public final List<String> getParameterAsList(final String name, final String defaultValue) {
@@ -238,7 +238,7 @@ public abstract class ServletCall {
      * Get a parameter first value by its name
      * 
      * @param name
-     *            The name of the parameter (case sensitive)
+     *        The name of the parameter (case sensitive)
      * @return This method returns the first value of a parameter as a String or null if the parameter isn't define
      */
     public final String getParameter(final String name) {
@@ -249,9 +249,9 @@ public abstract class ServletCall {
      * Get a parameter first value by its name
      * 
      * @param name
-     *            The name of the parameter (case sensitive)
+     *        The name of the parameter (case sensitive)
      * @param defaultValue
-     *            The value to return if the parameter isn't define
+     *        The value to return if the parameter isn't define
      * @return This method returns the first value of a parameter as a String
      */
     public final String getParameter(final String name, final String defaultValue) {
@@ -269,9 +269,9 @@ public abstract class ServletCall {
      * Write into the output header.
      * 
      * @param name
-     *            The name of the header to write.
+     *        The name of the header to write.
      * @param value
-     *            The value of the header to write.
+     *        The value of the header to write.
      */
     protected final void head(final String name, final String value) {
         response.addHeader(name, value);
@@ -281,7 +281,7 @@ public abstract class ServletCall {
      * Output a file
      * 
      * @param file
-     *            The file to output
+     *        The file to output
      */
     protected final void output(final File file) {
         try {
@@ -295,9 +295,9 @@ public abstract class ServletCall {
      * Output a stream as a file
      * 
      * @param stream
-     *            The stream to output
+     *        The stream to output
      * @param filename
-     *            The name of the file to retrieve with the stream.
+     *        The name of the file to retrieve with the stream.
      */
     protected void output(final InputStream stream, final String filename) {
         response.addHeader("Content-Disposition", "attachment; filename=" + filename + ";");
@@ -308,7 +308,7 @@ public abstract class ServletCall {
      * Output a stream as a file
      * 
      * @param stream
-     *            The stream to output
+     *        The stream to output
      */
     protected void output(final InputStream stream) {
         response.setContentType("application/octet-stream");
@@ -328,19 +328,20 @@ public abstract class ServletCall {
      * Write into the output
      * 
      * @param string
-     *            The string to output
+     *        The string to output
      */
     protected final void output(final String string) {
         final PrintWriter outputWriter = getOutputWriter();
         outputWriter.print(string);
         outputWriter.flush();
+        outputWriter.close();
     }
 
     /**
      * Write into the output
      * 
      * @param object
-     *            An object that will be transform into JSon
+     *        An object that will be transform into JSon
      */
     protected final void output(final Object object) {
         final PrintWriter outputWriter = getOutputWriter();
@@ -348,6 +349,7 @@ public abstract class ServletCall {
 
         outputWriter.print(object.toString());
         outputWriter.flush();
+        outputWriter.close();
     }
 
     /**

@@ -27,7 +27,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-model-impl</artifactId>
+			<artifactId>bonita-log-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -48,11 +48,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
 			<artifactId>bonita-process-instance-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -77,7 +72,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-model</artifactId>
+			<artifactId>bonita-expression-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -87,7 +82,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-model</artifactId>
+			<artifactId>bonita-log-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

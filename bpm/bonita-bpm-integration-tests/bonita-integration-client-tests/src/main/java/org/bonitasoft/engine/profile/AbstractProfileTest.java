@@ -72,7 +72,7 @@ public abstract class AbstractProfileTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
 
         user1 = createUser("userName1", "User1Pwd", "User1FirstName", "User1LastName");
         user2 = createUser("userName2", "User2Pwd", "User2FirstName", "User2LastName");

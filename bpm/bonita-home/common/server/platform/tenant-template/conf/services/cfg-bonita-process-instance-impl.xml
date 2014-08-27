@@ -38,7 +38,6 @@
         <constructor-arg name="recorder" ref="recorderSync" />
         <constructor-arg name="eventService" ref="eventService" />
         <constructor-arg name="persistenceRead" ref="persistenceService" />
-        <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="tokenService" ref="tokenService" />
     </bean>

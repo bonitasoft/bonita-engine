@@ -1,6 +1,5 @@
 package org.bonitasoft.engine.tracking;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -91,7 +90,7 @@ public class TimeTracker implements TenantLifecycleService {
         }
     }
 
-    public List<FlushResult> flush() throws IOException {
+    public List<FlushResult> flush() {
         if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Flushing...");
         }
@@ -121,7 +120,7 @@ public class TimeTracker implements TenantLifecycleService {
         return flushResults;
     }
 
-    public List<Record> getRecords() throws IOException {
+    public List<Record> getRecords() {
         return Arrays.asList(this.records.toArray(new Record[] {}));
     }
 

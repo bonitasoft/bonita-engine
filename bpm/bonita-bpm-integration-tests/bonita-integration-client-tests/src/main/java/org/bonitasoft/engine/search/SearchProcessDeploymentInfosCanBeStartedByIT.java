@@ -70,7 +70,7 @@ public class SearchProcessDeploymentInfosCanBeStartedByIT extends CommonAPITest 
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         // create users
         users = new ArrayList<User>(2);
         users.add(createUser("chicobento", "bpm"));

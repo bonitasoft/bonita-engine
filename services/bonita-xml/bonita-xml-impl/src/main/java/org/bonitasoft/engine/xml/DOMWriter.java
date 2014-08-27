@@ -16,6 +16,7 @@ package org.bonitasoft.engine.xml;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -35,6 +36,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -151,15 +153,25 @@ public class DOMWriter implements XMLWriter {
         }
         if (parentNode == null) {
             return element;
-        } else {
-            return parentNode.appendChild(element);
         }
+        return parentNode.appendChild(element);
     }
 
     @Override
     public void setSchema(final File xsdSchema) throws SInvalidSchemaException {
-        xsdSource = new StreamSource(xsdSchema);
-        validator.setSchemaSource(xsdSource);
+        InputStream openStream = null;
+        try {
+            openStream = xsdSchema.toURI().toURL().openStream();
+            validator.setSchema(new StreamSource(openStream));
+        } catch (final Exception e) {
+            throw new SBonitaRuntimeException(e);
+        } finally {
+            try {
+                openStream.close();
+            } catch (final IOException e) {
+                throw new SBonitaRuntimeException(e);
+            }
+        }
     }
 
 }

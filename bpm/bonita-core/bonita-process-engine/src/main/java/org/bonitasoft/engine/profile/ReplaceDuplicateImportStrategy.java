@@ -26,7 +26,6 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
  * @author Baptiste Mesta
- * 
  */
 public class ReplaceDuplicateImportStrategy extends ProfileImportStategy {
 
@@ -48,10 +47,9 @@ public class ReplaceDuplicateImportStrategy extends ProfileImportStategy {
         if (exportedProfile.isDefault() || existingProfile.isDefault()) {
             // only update LastUpdatedBy and LastUpdateDate
             return getProfileService().updateProfile(existingProfile, getProfileUpdateDescriptor(exportedProfile, importerId, false));
-        } else {
-            getProfileService().deleteAllProfileEntriesOfProfile(existingProfile);
-            return getProfileService().updateProfile(existingProfile, getProfileUpdateDescriptor(exportedProfile, importerId, true));
         }
+        getProfileService().deleteAllProfileEntriesOfProfile(existingProfile);
+        return getProfileService().updateProfile(existingProfile, getProfileUpdateDescriptor(exportedProfile, importerId, true));
     }
 
     @Override

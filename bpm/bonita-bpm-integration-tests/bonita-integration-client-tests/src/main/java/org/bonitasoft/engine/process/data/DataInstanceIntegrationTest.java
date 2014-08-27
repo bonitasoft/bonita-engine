@@ -54,7 +54,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
     @Before
     public void before() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         user = createUser("pedro", "secreto");
     }
 

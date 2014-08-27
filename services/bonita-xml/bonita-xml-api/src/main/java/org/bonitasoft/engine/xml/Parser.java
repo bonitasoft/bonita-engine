@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -22,22 +22,13 @@ import java.util.List;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface Parser {
 
     List<Class<? extends ElementBinding>> getBinders();
 
     void setBindings(List<Class<? extends ElementBinding>> bindings);
-
-    void setSchema(URI xmlURI) throws SInvalidSchemaException;
-
-    void setSchema(String pathname) throws SInvalidSchemaException;
-
-    void setSchema(File xsdSchema) throws SInvalidSchemaException;
-
-    void setSchema(InputStream xmlStream) throws SInvalidSchemaException;
-
-    void setSchema(Reader xmlReader) throws SInvalidSchemaException;
 
     Object getObjectFromXML(URI xmlURI) throws SXMLParseException, IOException;
 
@@ -58,5 +49,7 @@ public interface Parser {
     void validate(InputStream xmlStream) throws SValidationException, IOException;
 
     void validate(Reader xmlReader) throws SValidationException, IOException;
+
+    void setSchema(InputStream resourceAsStream) throws SInvalidSchemaException;
 
 }

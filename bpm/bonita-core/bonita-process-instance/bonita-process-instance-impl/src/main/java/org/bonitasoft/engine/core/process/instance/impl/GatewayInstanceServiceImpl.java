@@ -50,7 +50,6 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
-import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * @author Feng Hui
@@ -72,8 +71,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
     private final TechnicalLoggerService logger;
 
     public GatewayInstanceServiceImpl(final Recorder recorder, final EventService eventService, final ReadPersistenceService persistenceRead,
-            final QueriableLoggerService queriableLoggerService, final TechnicalLoggerService logger,
-            final TokenService tokenService) {
+            final TechnicalLoggerService logger, final TokenService tokenService) {
         this.recorder = recorder;
         this.eventService = eventService;
         this.persistenceRead = persistenceRead;

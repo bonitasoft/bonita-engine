@@ -42,7 +42,7 @@ public class HumanTasksTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         user = createUser(USERNAME, PASSWORD);
     }
 

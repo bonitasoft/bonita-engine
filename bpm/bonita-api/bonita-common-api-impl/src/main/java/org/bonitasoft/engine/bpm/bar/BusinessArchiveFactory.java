@@ -52,24 +52,18 @@ public class BusinessArchiveFactory {
      * @return
      *         the business archived that was in the input stream
      * @throws IOException
-     *             in case of issue reading/writing on file system
+     *         in case of issue reading/writing on file system
      * @throws InvalidBusinessArchiveFormatException
-     *             if the inpu stream does not contains a valide business archive
+     *         if the inpu stream does not contains a valide business archive
      */
     public static BusinessArchive readBusinessArchive(final InputStream inputStream) throws IOException, InvalidBusinessArchiveFormatException {
-        final File barFolder = File.createTempFile("tempBusinessArchive", "tmp");
-        barFolder.delete();
-        barFolder.mkdir();
-        IOUtil.unzipToFolder(inputStream, barFolder);
+        File barFolder = null;
 
-        final BusinessArchive businessArchive = new BusinessArchive();
         try {
-            for (final BusinessArchiveContribution contribution : contributions) {
-                if (!contribution.readFromBarFolder(businessArchive, barFolder) && contribution.isMandatory()) {
-                    throw new InvalidBusinessArchiveFormatException("Invalid format, can't read '" + contribution.getName() + "' from the BAR file");
-                }
-            }
-            return businessArchive;
+            barFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("tempBusinessArchive");
+            IOUtil.unzipToFolder(inputStream, barFolder);
+
+            return getBusinessArchive(barFolder);
         } catch (final InvalidBusinessArchiveFormatException e) {
             throw e;
         } catch (final Exception e) {
@@ -83,34 +77,38 @@ public class BusinessArchiveFactory {
      * Create a business archive from a valid file or folder
      * 
      * @param barOrFolder
-     *            the folder or file that contains the business archive to read
+     *        the folder or file that contains the business archive to read
      * @return
      *         the business archived that was in the file or folder
      * @throws IOException
-     *             in case of issue reading/writing on file system
+     *         in case of issue reading/writing on file system
      * @throws InvalidBusinessArchiveFormatException
-     *             if the input stream does not contains a valid business archive
+     *         if the input stream does not contains a valid business archive
      */
     public static BusinessArchive readBusinessArchive(final File barOrFolder) throws InvalidBusinessArchiveFormatException, IOException {
         if (!barOrFolder.exists()) {
             throw new FileNotFoundException("the file does not exists: " + barOrFolder.getAbsolutePath());
         }
         if (barOrFolder.isDirectory()) {
-            final BusinessArchive businessArchive = new BusinessArchive();
-            for (final BusinessArchiveContribution contribution : contributions) {
-                if (!contribution.readFromBarFolder(businessArchive, barOrFolder) && contribution.isMandatory()) {
-                    throw new InvalidBusinessArchiveFormatException("Invalid format, can't read " + contribution.getName() + " from the BAR file");
-                }
-            }
-            return businessArchive;
-        } else {
-            final FileInputStream inputStream = new FileInputStream(barOrFolder);
-            try {
-                return readBusinessArchive(inputStream);
-            } finally {
-                inputStream.close();
+            return getBusinessArchive(barOrFolder);
+        }
+
+        final FileInputStream inputStream = new FileInputStream(barOrFolder);
+        try {
+            return readBusinessArchive(inputStream);
+        } finally {
+            inputStream.close();
+        }
+    }
+
+    private static BusinessArchive getBusinessArchive(File barFolder) throws IOException, InvalidBusinessArchiveFormatException {
+        final BusinessArchive businessArchive = new BusinessArchive();
+        for (final BusinessArchiveContribution contribution : contributions) {
+            if (!contribution.readFromBarFolder(businessArchive, barFolder) && contribution.isMandatory()) {
+                throw new InvalidBusinessArchiveFormatException("Invalid format, can't read '" + contribution.getName() + "' from the BAR file");
             }
         }
+        return businessArchive;
     }
 
     /**
@@ -119,22 +117,18 @@ public class BusinessArchiveFactory {
      * the written business archive the uncompressed version of {@link #writeBusinessArchiveToFile(BusinessArchive, File)}
      * 
      * @param businessArchive
-     *            the {@link BusinessArchive} to write
+     *        the {@link BusinessArchive} to write
      * @param folderPath
-     *            the folder into the business archive must be written
+     *        the folder into the business archive must be written
      * @throws IOException
      */
     public static void writeBusinessArchiveToFolder(final BusinessArchive businessArchive, final File folderPath) throws IOException {
         if (folderPath.exists()) {
             if (!folderPath.isDirectory()) {
                 throw new IOException("unable to create Business archive on a file " + folderPath);
-                // } else {
-                // if (folderPath.listFiles().length > 0) {
-                // throw new IOException("unable to create Business archive on a non empty folder " + folderPath);
-                // }
             }
         } else {
-            folderPath.mkdir();
+            folderPath.mkdirs();
         }
         for (final BusinessArchiveContribution contribution : contributions) {
             contribution.saveToBarFolder(businessArchive, folderPath);
@@ -147,18 +141,20 @@ public class BusinessArchiveFactory {
      * this file can then be read using {@link #readBusinessArchive(File)}
      * 
      * @param businessArchive
-     *            the {@link BusinessArchive} to write
+     *        the {@link BusinessArchive} to write
      * @param folderPath
-     *            the folder into the business archive must be written
+     *        the folder into the business archive must be written
      * @throws IOException
      */
     public static void writeBusinessArchiveToFile(final BusinessArchive businessArchive, final File businessArchiveFile) throws IOException {
-        final File tempFile = File.createTempFile("businessArchiveFolder", "tmp");// FIXME put it in tmp folder of the bonita home
-        tempFile.delete();
-        tempFile.mkdir();
-        writeBusinessArchiveToFolder(businessArchive, tempFile);
-        zipBarFolder(businessArchiveFile, tempFile);
-        IOUtil.deleteDir(tempFile);
+        // FIXME put it in tmp folder of the bonita home
+        final File tempFile = IOUtil.createTempDirectoryInDefaultTempDirectory("tempBusinessArchiveFolder");
+        try {
+            writeBusinessArchiveToFolder(businessArchive, tempFile);
+            zipBarFolder(businessArchiveFile, tempFile);
+        } finally {
+            IOUtil.deleteDir(tempFile);
+        }
     }
 
     /**
@@ -181,11 +177,14 @@ public class BusinessArchiveFactory {
         if (businessArchiveFile.exists()) {
             throw new IOException("The destination file already exists " + businessArchiveFile.getAbsolutePath());
         }
-        final ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(businessArchiveFile));
+
+        final FileOutputStream fileOutput = new FileOutputStream(businessArchiveFile);
+        final ZipOutputStream zos = new ZipOutputStream(fileOutput);
         try {
             IOUtil.zipDir(folder.getAbsolutePath(), zos, folder.getAbsolutePath());
         } finally {
             zos.close();
+            fileOutput.close();
         }
     }
 

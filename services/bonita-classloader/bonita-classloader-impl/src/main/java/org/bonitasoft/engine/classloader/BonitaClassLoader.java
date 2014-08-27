@@ -13,18 +13,18 @@
  **/
 package org.bonitasoft.engine.classloader;
 
-import static org.apache.commons.io.FileUtils.deleteQuietly;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.io.IOUtil;
 
@@ -44,7 +44,7 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     protected Set<URL> urls;
 
-    private final File temporaryFolder;
+    private final File temporaryDirectory;
 
     private boolean isActive = true;
 
@@ -53,17 +53,17 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
      */
     // TODO logger
 
-    BonitaClassLoader(final Map<String, byte[]> resources, final String type, final long id, final String temporaryFolder, final ClassLoader parent) {
+    BonitaClassLoader(final Map<String, byte[]> resources, final String type, final long id, final URI temporaryDirectoryUri, final ClassLoader parent) {
         super(type + "__" + id, new URL[] {}, parent);
-        NullCheckingUtil.checkArgsNotNull(resources, type, id, temporaryFolder, parent);
+        NullCheckingUtil.checkArgsNotNull(resources, type, id, temporaryDirectoryUri, parent);
         this.type = type;
         this.id = id;
 
         nonJarResources = new HashMap<String, byte[]>();
         urls = new HashSet<URL>();
-        this.temporaryFolder = new File(temporaryFolder);
-        if (!this.temporaryFolder.exists()) {
-            this.temporaryFolder.mkdirs();
+        temporaryDirectory = new File(temporaryDirectoryUri);
+        if (!temporaryDirectory.exists()) {
+            temporaryDirectory.mkdirs();
         }
         addResources(resources);
         addURLs(urls.toArray(new URL[urls.size()]));
@@ -75,12 +75,11 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
                 if (resource.getKey().matches(".*\\.jar")) {
                     final byte[] data = resource.getValue();
                     try {
-                        final File file = IOUtil.createTempFile(resource.getKey(), null, temporaryFolder);
+                        final File file = IOUtil.createTempFile(resource.getKey(), null, temporaryDirectory);
                         IOUtil.write(file, data);
                         final String path = file.getAbsolutePath();
                         final URL url = new File(path).toURI().toURL();
                         urls.add(url);
-                        file.deleteOnExit();
                     } catch (final MalformedURLException e) {
                         e.printStackTrace();
                     } catch (final Exception e) {
@@ -95,11 +94,6 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     @Override
     public InputStream getResourceAsStream(final String name) {
-        /*
-         * if (!isActive) {
-         * throw new RuntimeException(this.toString() + " is not active anymore. Don't use it.");
-         * }
-         */
         InputStream is = getInternalInputstream(name);
         if (is == null && name.length() > 0 && name.charAt(0) == '/') {
             is = getInternalInputstream(name.substring(1));
@@ -128,11 +122,6 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
 
     @Override
     protected Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
-        /*
-         * if (!isActive) {
-         * throw new RuntimeException(this.toString() + " is not active anymore. Don't use it.");
-         * }
-         */
         Class<?> c = null;
         c = findLoadedClass(name);
         if (c == null) {
@@ -160,8 +149,10 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
         return c;
     }
 
-    public void release() {
-        deleteQuietly(temporaryFolder);
+    @Override
+    public void destroy() {
+        super.destroy();
+        FileUtils.deleteQuietly(temporaryDirectory);
         isActive = false;
     }
 
@@ -174,7 +165,7 @@ public class BonitaClassLoader extends MonoParentJarFileClassLoader {
     }
 
     public File getTemporaryFolder() {
-        return temporaryFolder;
+        return temporaryDirectory;
     }
 
     @Override

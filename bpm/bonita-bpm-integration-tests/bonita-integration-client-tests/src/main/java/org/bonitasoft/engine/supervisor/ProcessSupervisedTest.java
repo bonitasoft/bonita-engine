@@ -103,7 +103,7 @@ public class ProcessSupervisedTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
 
         john = createUser("john", "bpm");
         matti = createUser("matti", "bpm");

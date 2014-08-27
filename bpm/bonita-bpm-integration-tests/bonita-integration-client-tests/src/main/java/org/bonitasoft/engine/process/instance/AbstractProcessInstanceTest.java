@@ -17,7 +17,7 @@ public abstract class AbstractProcessInstanceTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         pedro = createUser("pedro", "secreto");
     }
 

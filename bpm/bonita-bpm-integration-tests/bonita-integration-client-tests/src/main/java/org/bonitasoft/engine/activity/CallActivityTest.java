@@ -88,7 +88,7 @@ public class CallActivityTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         cebolinha = createUser("cebolinha", "bpm");
         cascao = createUser("cascao", "bpm");
     }

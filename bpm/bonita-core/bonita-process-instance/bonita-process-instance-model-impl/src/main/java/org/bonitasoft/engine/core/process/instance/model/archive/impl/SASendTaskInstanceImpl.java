@@ -51,7 +51,7 @@ public class SASendTaskInstanceImpl extends SAActivityInstanceImpl implements SA
 
     @Override
     public Class<? extends PersistentObject> getPersistentObjectInterface() {
-        return SReceiveTaskInstance.class;
+        return SSendTaskInstance.class;
     }
 
 }

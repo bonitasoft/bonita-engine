@@ -49,6 +49,7 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.api.DocumentMappingService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
@@ -223,6 +224,8 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private ThemeService themeService;
 
     private TenantConfiguration tenantConfiguration;
+
+    private GatewayInstanceService gatewayInstanceService;
 
     private TransientDataService transientDataService;
     private TimeTracker timeTracker;
@@ -768,6 +771,14 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             transientDataService = beanAccessor.getService(TransientDataService.class);
         }
         return transientDataService;
+    }
+
+    @Override
+    public GatewayInstanceService getGatewayInstanceService() {
+        if (gatewayInstanceService == null) {
+            gatewayInstanceService = beanAccessor.getService(GatewayInstanceService.class);
+        }
+        return gatewayInstanceService;
     }
 
     @Override

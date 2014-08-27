@@ -322,6 +322,7 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return getInstanceOf(CategoryService.class);
     }
 
+    @Override
     public GatewayInstanceService getGatewayInstanceService() {
         return getInstanceOf(GatewayInstanceService.class);
     }

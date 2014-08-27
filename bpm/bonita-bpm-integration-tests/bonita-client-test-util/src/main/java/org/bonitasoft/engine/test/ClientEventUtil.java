@@ -130,9 +130,8 @@ public class ClientEventUtil {
             LOGGER.error("error while executing wait server command for element:" + event, e);
             if (e.getMessage().toLowerCase().contains("timeout")) {
                 throw new TimeoutException("Timeout (" + defaultTimeout + " ms) when looking for element: " + event);
-            } else {
-                throw e;
             }
+            throw e;
         }
     }
 
