@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>services</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.3.4.RC1</version>
+		<version>6.3.4-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-services-integration-tests</artifactId>
