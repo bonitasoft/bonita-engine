@@ -54,7 +54,7 @@ public class MemoryLockServiceTest {
         public void run() {
             try {
                 lock = memoryLockService.lock(id, type, tenantId);
-            } catch (SLockException e) {
+            } catch (final SLockException e) {
                 // NOTHING
             }
         }
@@ -96,13 +96,19 @@ public class MemoryLockServiceTest {
                 memoryLockService.unlock(lock, tenantId);
                 lock = null;
                 System.out.println(name2 + " unlocked");
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        public boolean isLockObtained() {
-            return lock != null;
+        public void waitForLockToBeObtained(final long maxTime) throws InterruptedException {
+            final long initialTimestamp = System.currentTimeMillis();
+            while (maxTime >= System.currentTimeMillis() - initialTimestamp) {
+                if (lock != null) {
+                    return;
+                }
+            }
+            throw new InterruptedException("lock not obtained in a sufficient amount time");
         }
     }
 
@@ -118,8 +124,8 @@ public class MemoryLockServiceTest {
     @Test
     public void testUnlock() throws Exception {
 
-        BonitaLock lock = memoryLockService.lock(5, "a", tenantId);
-        LockThread lockThread = new LockThread(5, "a");
+        final BonitaLock lock = memoryLockService.lock(5, "a", tenantId);
+        final LockThread lockThread = new LockThread(5, "a");
         lockThread.start();
         Thread.sleep(100);
         memoryLockService.unlock(lock, tenantId);
@@ -136,7 +142,7 @@ public class MemoryLockServiceTest {
     @Test
     public void testLock() throws Exception {
         memoryLockService.lock(3, "a", tenantId);
-        LockThread lockThread = new LockThread(4, "a");
+        final LockThread lockThread = new LockThread(4, "a");
         lockThread.start();
         lockThread.join(100);
         assertTrue("should able to lock", lockThread.isLockObtained());
@@ -145,7 +151,7 @@ public class MemoryLockServiceTest {
     @Test
     public void testLockTimeout() throws Exception {
         memoryLockService.lock(2, "a", tenantId);
-        LockThread lockThread = new LockThread(2, "a");
+        final LockThread lockThread = new LockThread(2, "a");
         lockThread.start();
         lockThread.join(1200);
         assertFalse("should not be able to lock", lockThread.isLockObtained());
@@ -163,12 +169,12 @@ public class MemoryLockServiceTest {
      */
     @Test
     public void testRemoveLockFromMap() throws Exception {
-        Semaphore s1 = new Semaphore(1);
-        Semaphore s2 = new Semaphore(1);
-        Semaphore s3 = new Semaphore(1);
-        TryLockThread t1 = new TryLockThread("t1", 1, "t", s1);
-        TryLockThread t2 = new TryLockThread("t2", 1, "t", s2);
-        TryLockThread t3 = new TryLockThread("t3", 1, "t", s3);
+        final Semaphore s1 = new Semaphore(1);
+        final Semaphore s2 = new Semaphore(1);
+        final Semaphore s3 = new Semaphore(1);
+        final TryLockThread t1 = new TryLockThread("t1", 1, "t", s1);
+        final TryLockThread t2 = new TryLockThread("t2", 1, "t", s2);
+        final TryLockThread t3 = new TryLockThread("t3", 1, "t", s3);
         s1.acquire();
         s2.acquire();
         s3.acquire();
@@ -181,20 +187,24 @@ public class MemoryLockServiceTest {
         // t1 take the lock | state : S1 ∈ T1, S2 ∈ T, S3 ∈ T, S1 <- T1, S2 <- T2, S3 <- T3, BL ∈ T1
         s2.release();
         Thread.sleep(5);
-        // t2 is locked | state : S1 ∈ T1, S2 ∈ T2, S3 ∈ T, S1 <- T1, S3 <- T3, BL ∈ T1, BL <- T2
+        // t2 is locked | state : S1 ∈ T1, S2 ∈ T2, S3 ∈ T, S1 <- T1, S3 <- T3, BL ∈ T1, BL <- T1
         s1.release();
         Thread.sleep(20);
         // t1 unlock & t2 have the lock | state : S1, S2 ∈ T2, S3 ∈ T, S3 <- T3, BL ∈ T2
-        assertTrue(t2.isLockObtained());
+        t2.waitForLockToBeObtained(500);
         s3.release();
         Thread.sleep(20);
         // t3 try acquire | state : S1, S2 ∈ T2, S3 ∈ T3, BL ∈ T2, BL <- T3
         // t3 should not be able to lock
-        assertFalse(t3.isLockObtained());
+        try {
+            t3.waitForLockToBeObtained(500);
+            fail();
+        } catch (final InterruptedException e) {
+        }
         s2.release();
         Thread.sleep(20);
         // now it should be able to have it | state : S1, S2, S3 ∈ T3, BL ∈ T3
-        assertTrue(t3.isLockObtained());
+        t3.waitForLockToBeObtained(500);
         s3.release();
         // state : S1, S2, S3, BL
     }
@@ -202,16 +212,16 @@ public class MemoryLockServiceTest {
     @Test
     public void getDetailsOnLockShouldReturnLockingTheadOwnerName() {
         // given:
-        MemoryLockService spiedLockService = spy(memoryLockService);
-        long objectToLockId = 151L;
-        String lockKey = "objectType_" + objectToLockId + "_" + tenantId;
-        ReentrantLock lock = spy(new ReentrantLock());
+        final MemoryLockService spiedLockService = spy(memoryLockService);
+        final long objectToLockId = 151L;
+        final String lockKey = "objectType_" + objectToLockId + "_" + tenantId;
+        final ReentrantLock lock = spy(new ReentrantLock());
         lock.lock();
         doReturn(false).when(lock).isHeldByCurrentThread();
         doReturn(lock).when(spiedLockService).getLockFromKey(lockKey);
 
         // when:
-        StringBuilder detailsOnLock = spiedLockService.getDetailsOnLock(objectToLockId, "objectType", tenantId);
+        final StringBuilder detailsOnLock = spiedLockService.getDetailsOnLock(objectToLockId, "objectType", tenantId);
 
         // then:
         assertThat(detailsOnLock).describedAs("detailsOnLock should contain 'held by thread main'").contains("held by thread main");
