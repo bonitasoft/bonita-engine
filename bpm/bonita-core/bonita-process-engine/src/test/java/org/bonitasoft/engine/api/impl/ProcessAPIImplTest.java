@@ -415,7 +415,21 @@ public class ProcessAPIImplTest {
         when(actor.getId()).thenReturn(ACTOR_ID);
 
         final ActorMappingService actorMappingService = mock(ActorMappingService.class);
-        when(tenantAccessor.get
+        when(tenantAccessor.getActorMappingService()).thenReturn(actorMappingService);
+        when(actorMappingService.getActor(ACTOR_NAME, PROCESS_DEFINITION_ID)).thenThrow(new SActorNotFoundException(""));
+
+        // when
+        try {
+            processAPI.getUserIdsForActor(PROCESS_DEFINITION_ID, ACTOR_NAME, 0, 10);
+            fail("Exception expected");
+        } catch (final RetrieveException e) {
+            // then ok
+        }
+
+
+    }
+
+
 
 
     @Test
@@ -451,18 +465,6 @@ public class ProcessAPIImplTest {
         processAPI.updateActivityInstanceVariables(operations, 2, null);
 
         verify(classLoaderService).getLocalClassLoader(anyString(), anyLong());
-    }ActorMappingService()).thenReturn(actorMappingService);
-        when(actorMappingService.getActor(ACTOR_NAME, PROCESS_DEFINITION_ID)).thenThrow(new SActorNotFoundException(""));
-
-        // when
-        try {
-            processAPI.getUserIdsForActor(PROCESS_DEFINITION_ID, ACTOR_NAME, 0, 10);
-            fail("Exception expected");
-        } catch (final RetrieveException e) {
-            // then ok
-        }
-
-
     }
 
     @Test
