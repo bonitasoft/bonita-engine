@@ -27,6 +27,7 @@ import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
 import org.bonitasoft.engine.api.impl.transaction.connector.CreateConnectorInstances;
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.api.impl.transaction.flownode.CreateGatewayInstance;
+import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -111,6 +112,7 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
+import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
@@ -149,13 +151,15 @@ public class BPMInstancesCreator {
 
     private final TransientDataService transientDataService;
 
+    private final ArchiveService archiveService;
+
     private final TechnicalLoggerService logger;
 
     public BPMInstancesCreator(final ActivityInstanceService activityInstanceService,
             final ActorMappingService actorMappingService, final GatewayInstanceService gatewayInstanceService,
             final EventInstanceService eventInstanceService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService,
-            final DataInstanceService dataInstanceService, final TechnicalLoggerService logger, final TransientDataService transientDataService) {
+            final DataInstanceService dataInstanceService, final TechnicalLoggerService logger, final TransientDataService transientDataService, ArchiveService archiveService) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.actorMappingService = actorMappingService;
@@ -166,6 +170,7 @@ public class BPMInstancesCreator {
         this.dataInstanceService = dataInstanceService;
         this.logger = logger;
         this.transientDataService = transientDataService;
+        this.archiveService = archiveService;
     }
 
     public List<SFlowNodeInstance> createFlowNodeInstances(final Long processDefinitionId, final long rootContainerId, final long parentContainerId,
@@ -205,8 +210,9 @@ public class BPMInstancesCreator {
             parentContainerType = DataInstanceContainer.PROCESS_INSTANCE.toString();
         }
         try {
+            boolean shouldArchiveMapping = ProcessArchiver.willBeArchived(flowNodeInstance, archiveService);
             dataInstanceService.addChildContainer(flowNodeInstance.getParentContainerId(), parentContainerType, flowNodeInstance.getId(),
-                    DataInstanceContainer.ACTIVITY_INSTANCE.toString());
+                    DataInstanceContainer.ACTIVITY_INSTANCE.toString(), shouldArchiveMapping);
         } catch (final SDataInstanceException e) {
             throw new SActivityStateExecutionException(e);
         }
@@ -626,12 +632,12 @@ public class BPMInstancesCreator {
                 if (SFlowNodeType.SUB_PROCESS.equals(caller.getType())) {
                     final SSubProcessActivityInstanceBuilderFactory keyProvider = BuilderFactory.get(SSubProcessActivityInstanceBuilderFactory.class);
                     dataInstanceService.addChildContainer(caller.getLogicalGroup(keyProvider.getParentProcessInstanceIndex()),
-                            DataInstanceContainer.PROCESS_INSTANCE.name(), processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name());
+                            DataInstanceContainer.PROCESS_INSTANCE.name(), processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(), true);
                 } else {
-                    dataInstanceService.createDataContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name());
+                    dataInstanceService.createDataContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(), true);
                 }
             } else {
-                dataInstanceService.createDataContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name());
+                dataInstanceService.createDataContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(), true);
             }
         }
     }

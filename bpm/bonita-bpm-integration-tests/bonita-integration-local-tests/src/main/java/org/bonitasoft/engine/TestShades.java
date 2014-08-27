@@ -46,6 +46,7 @@ public class TestShades {
             exec.getErrorStream().close();
             outputOfMaven = IOUtil.read(inputStream);
             System.out.println(outputOfMaven);
+            inputStream.close();
         } finally {
             IOUtil.deleteDir(file);
         }

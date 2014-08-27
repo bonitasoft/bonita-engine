@@ -45,7 +45,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         donaBenta = createUser("donabenta", "bpm");
         logoutOnTenant();
         loginOnDefaultTenantWith("donabenta", "bpm");
@@ -54,7 +54,7 @@ public abstract class AbstractTimerBoundaryEventTest extends CommonAPITest {
     @After
     public void afterTest() throws BonitaException {
         logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         deleteUser(donaBenta.getId());
         logoutOnTenant();
     }

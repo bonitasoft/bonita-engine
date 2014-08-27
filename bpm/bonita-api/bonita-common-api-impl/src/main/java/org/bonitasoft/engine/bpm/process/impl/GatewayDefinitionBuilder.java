@@ -40,6 +40,7 @@ public class GatewayDefinitionBuilder extends FlowElementContainerBuilder implem
 
     /**
      * Adds a default transition
+     * 
      * @param target target element
      * @return
      */
@@ -47,19 +48,19 @@ public class GatewayDefinitionBuilder extends FlowElementContainerBuilder implem
         return new TransitionDefinitionBuilder(getProcessBuilder(), getContainer(), gateway.getName(), target, true);
     }
 
+    @Override
     public GatewayDefinitionBuilder addDescription(final String description) {
         gateway.setDescription(description);
         return this;
     }
 
-
     /**
-    * Sets the display description on this gateway
-    * 
-    * @param displayDescription
-    *            expression representing the display description
-    * @return
-    */
+     * Sets the display description on this gateway
+     * 
+     * @param displayDescription
+     *        expression representing the display description
+     * @return
+     */
     public GatewayDefinitionBuilder addDisplayDescription(final Expression displayDescription) {
         gateway.setDisplayDescription(displayDescription);
         return this;
@@ -69,7 +70,7 @@ public class GatewayDefinitionBuilder extends FlowElementContainerBuilder implem
      * Sets the display name on this gateway
      * 
      * @param displayName
-     *            expression representing the display name
+     *        expression representing the display name
      * @return
      */
     public GatewayDefinitionBuilder addDisplayName(final Expression displayName) {
@@ -82,7 +83,7 @@ public class GatewayDefinitionBuilder extends FlowElementContainerBuilder implem
      * execution
      * 
      * @param displayDescriptionAfterCompletion
-     *            expression representing the new display description after the gateway completion.
+     *        expression representing the new display description after the gateway completion.
      * @return
      */
     public GatewayDefinitionBuilder addDisplayDescriptionAfterCompletion(final Expression displayDescriptionAfterCompletion) {

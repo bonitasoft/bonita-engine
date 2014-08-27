@@ -34,6 +34,7 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.TenantHibernatePersistenceService;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -79,12 +80,12 @@ public class DataInstanceServiceImplIT extends DataInstanceServiceTest {
 
         // when:
         getTransactionService().begin();
-        spy.insertDataInstanceVisibilityMapping(containerId, containerType, dataName, dataInstanceId, 0L);
+        spy.insertDataInstanceVisibilityMapping(containerId, containerType, dataName, dataInstanceId, 0L, true);
         getTransactionService().complete();
 
         mapping.setTenantId(2);
         getTransactionService().begin();
-        spy.insertDataInstanceVisibilityMapping(containerId, containerType, dataName, dataInstanceId, 0L);
+        spy.insertDataInstanceVisibilityMapping(containerId, containerType, dataName, dataInstanceId, 0L, true);
         getTransactionService().complete();
 
         // then:
@@ -102,7 +103,7 @@ public class DataInstanceServiceImplIT extends DataInstanceServiceTest {
 
         getTransactionService().begin();
         dataInstanceServiceImpl.createDataInstance(dataInstance);
-        dataInstanceServiceImpl.createDataContainer(containerId, containerType);
+        dataInstanceServiceImpl.createDataContainer(containerId, containerType, true);
         getTransactionService().complete();
 
         getTransactionService().begin();
@@ -121,7 +122,7 @@ public class DataInstanceServiceImplIT extends DataInstanceServiceTest {
         try {
             getTransactionService().begin();
             dataInstanceServiceImpl.getSADataInstanceDataVisibilityMapping(instanceName, containerId, containerType);
-            fail("Mapping was deleted");
+            fail("Mapping was not deleted");
         } catch (final SBonitaReadException sbre) {
 
         } finally {

@@ -5,19 +5,17 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
- * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.bonitasoft.engine.core.process.instance.model;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.bonitasoft.engine.test.persistence.builder.ConnectorInstanceBuilder.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.test.persistence.builder.ConnectorInstanceBuilder.aConnectorInstance;
 
 import java.util.List;
 
@@ -39,7 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Julien Reboul
- *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
@@ -86,7 +83,7 @@ public class ConnectorInstanceQueriesTest {
         expectedConnector5 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType).setActivationEvent(ConnectorEvent.ON_ENTER)
                 .setState(ConnectorState.FAILED.toString()).withFailureInfo(false)
                 .build();
-        expectedConnector6 = (SConnectorInstanceImpl) aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
+        expectedConnector6 = aConnectorInstance().setContainerId(containerId).setContainerType(containerType)
                 .setActivationEvent(ConnectorEvent.ON_FINISH)
                 .setState(ConnectorState.FAILED.toString()).withFailureInfo(false)
                 .build();
@@ -112,7 +109,6 @@ public class ConnectorInstanceQueriesTest {
         differentTenantConnector.setId(differentContainerId);
         repository.add(differentTenantConnector);// unexpected connector on different tenant
     }
-
 
     @Test
     public void getConnectorInstances() {
@@ -180,6 +176,7 @@ public class ConnectorInstanceQueriesTest {
         final List<Long> idsToFind = Lists.newArrayList(expectedConnector1.getId(), expectedConnector2.getId(), expectedConnector3.getId(),
                 expectedConnector4.getId(), expectedConnector5.getId(), expectedConnector6.getId());
         assertThat(connectors).areExactly(6, new Condition<SConnectorInstanceWithFailureInfo>() {
+
             @Override
             public boolean matches(SConnectorInstanceWithFailureInfo connector) {
                 return idsToFind.remove(connector.getId());

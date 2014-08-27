@@ -16,6 +16,13 @@
 				<ref bean="schedulerServiceRestartHandler" />
 			</list>
 		</property>
+        <property name="lifecycleServices">
+            <list>
+                <ref bean="classLoaderService" />
+                <ref bean="platformCacheService" />
+                <ref bean="cacheService" />
+            </list>
+        </property>
 	</bean>
 
 	<bean id="schedulerServiceRestartHandler" class="org.bonitasoft.engine.handler.SchedulerServiceRestartHandler">

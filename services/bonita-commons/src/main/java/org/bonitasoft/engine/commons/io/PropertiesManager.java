@@ -49,7 +49,11 @@ public class PropertiesManager {
 
     public static Properties getProperties(final URL url) throws IOException {
         final InputStreamReader reader = new InputStreamReader(url.openStream());
-        return getProperties(reader);
+        try {
+            return getProperties(reader);
+        } finally {
+            reader.close();
+        }
     }
 
     public static Properties getProperties(final String fileName) throws IOException {
@@ -58,17 +62,17 @@ public class PropertiesManager {
 
     public static Properties getProperties(final File file) throws IOException {
         final FileReader reader = new FileReader(file);
-        return getProperties(reader);
+        try {
+            return getProperties(reader);
+        } finally {
+            reader.close();
+        }
     }
 
     private static Properties getProperties(final Reader reader) throws IOException {
         final Properties properties = new Properties();
-        try {
-            properties.load(reader);
-            return properties;
-        } finally {
-            reader.close();
-        }
+        properties.load(reader);
+        return properties;
     }
 
     public static void savePropertiesToXML(final Properties properties, final File file) throws IOException {

@@ -67,14 +67,14 @@ public class ProcessExecutionTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
 
     }
 
     /**
      * there was an issue on deploy when the classloader needed to be refreshed
      * (because of Schemafactory was loading parser not in transaction)
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -218,9 +218,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         final long startDate = processInstance.getStartDate().getTime();
         assertTrue("The process instance must start between " + before + " and " + after + ", but was " + startDate, after >= startDate && startDate >= before);
         assertEquals(getSession().getUserId(), processInstance.getStartedBy());
-        assertTrue("expected 1 activity", new CheckNbOfActivities(getProcessAPI(), 20, 500, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
-        final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
-        final ActivityInstance step1 = activities.get(0);
+        final ActivityInstance step1 = waitForUserTask("step1");
         before = new Date().getTime();
         assignAndExecuteStep(step1, user.getId());
         waitForProcessToFinish(processInstance);
@@ -478,14 +476,12 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Test
-    public void systemComments() throws Exception {
+    public void systemCommentsShouldBeAutoAddedAtTaskAssignment() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
         builder.addActor("actor");
         builder.addUserTask("step1", "actor").addDisplayName(new ExpressionBuilder().createConstantStringExpression("Step1 display name"));
         builder.addUserTask("step2", "actor");
-        builder.addUserTask("step3", "actor");
         builder.addTransition("step1", "step2");
-        builder.addTransition("step2", "step3");
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(builder.done()).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
 
@@ -495,25 +491,21 @@ public class ProcessExecutionTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance step1 = waitForUserTask("step1", processInstance);
         assignAndExecuteStep(step1, user.getId());
-        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), user.getId());
-        waitForUserTask("step3", processInstance);
+        waitForUserTask("step2", processInstance);
 
-        final SearchResult<Comment> searchResult0 = getProcessAPI().searchComments(new SearchOptionsBuilder(0, 5).done());
-        final List<Comment> commentList0 = searchResult0.getResult();
-        assertEquals(2, commentList0.size());
-        assertEquals("The task \"Step1 display name\" is now assigned to Tom", commentList0.get(0).getContent());
-        assertEquals("The task \"step2\" is now assigned to Tom", commentList0.get(1).getContent());
+        final SearchResult<Comment> searchResult = getProcessAPI().searchComments(new SearchOptionsBuilder(0, 5).done());
+        final List<Comment> commentList = searchResult.getResult();
+        assertEquals(1, commentList.size());
+        assertEquals("The task \"Step1 display name\" is now assigned to Tom", commentList.get(0).getContent());
 
-        // test number of comments using the method countComments
-        final SearchOptionsBuilder builder1 = new SearchOptionsBuilder(0, 5);
-        assertEquals(2, getProcessAPI().countComments(builder1.done()));
+        assertEquals(1, getProcessAPI().countComments(new SearchOptionsBuilder(0, 5).done()));
 
         disableAndDeleteProcess(processDefinition);
         deleteUser("Tom");
     }
 
     @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "process instance" })
+    "process instance" })
     @Test
     public void getArchivedProcessDataInstance() throws Exception {
         final String dataName = "title";
@@ -535,7 +527,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "process instance" })
+    "process instance" })
     @Test
     public void getArchivedProcessDataInstanceFromAnArchivedProcess() throws Exception {
         final String dataName = "title";
@@ -579,7 +571,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "process instance" })
+    "process instance" })
     @Test
     public void getUnknownArchivedProcessDataInstance() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
@@ -600,7 +592,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "activity instance" })
+    "activity instance" })
     @Test
     public void getArchivedActivityDataInstance() throws Exception {
         final String dataName = "title";
@@ -622,7 +614,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "activity instance" })
+    "activity instance" })
     @Test
     public void getArchivedActivityDataInstanceFromAnArchivedProcess() throws Exception {
         final String dataName = "title";
@@ -646,7 +638,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "activity instance" })
+    "activity instance" })
     @Test
     public void getUnknownArchivedActivityDataInstance() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
@@ -671,7 +663,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Cover(jira = "ENGINE-1822", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "process instance" })
+    "process instance" })
     @Test
     public void getArchivedProcessDataInstances() throws Exception {
         final String dataName = "title";
@@ -740,7 +732,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Cover(jira = "ENGINE-1822", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "process instance" })
+    "process instance" })
     @Test
     public void getEmptyArchivedProcessDataInstances() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
@@ -760,7 +752,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Cover(jira = "ENGINE-1822", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-            "activity instance" })
+    "activity instance" })
     @Test
     public void getArchivedActivityDataInstances() throws Exception {
         final String dataName = "title";

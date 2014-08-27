@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.io.Reader;
 
 import javax.xml.XMLConstants;
-import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -29,6 +28,7 @@ import org.xml.sax.SAXException;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class SAXValidator implements XMLSchemaValidator {
 
@@ -37,13 +37,13 @@ public class SAXValidator implements XMLSchemaValidator {
     private Schema schema;
 
     public SAXValidator() {
-        this.factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     }
 
     @Override
-    public void setSchemaSource(final Source source) throws SInvalidSchemaException {
+    public void setSchema(final StreamSource source) throws SInvalidSchemaException {
         try {
-            this.schema = this.factory.newSchema(source);
+            schema = factory.newSchema(source);
         } catch (final SAXException saxe) {
             throw new SInvalidSchemaException(saxe);
         }
@@ -51,31 +51,38 @@ public class SAXValidator implements XMLSchemaValidator {
 
     @Override
     public void validate(final InputStream stream) throws SValidationException, IOException {
-        final Source source = new StreamSource(stream);
-        this.validate(source);
+        final StreamSource source = new StreamSource(stream);
+        validate(source);
     }
 
     @Override
     public void validate(final String filePath) throws SValidationException, IOException {
-        final Source source = new StreamSource(filePath);
-        this.validate(source);
+        final StreamSource source = new StreamSource(filePath);
+        validate(source);
     }
 
     @Override
     public void validate(final File file) throws SValidationException, IOException {
-        final Source source = new StreamSource(file);
-        this.validate(source);
+        // BS-9304 : If you create a new StreamSource with a file, the streamSource keeps a lock on the file when there is an exception.
+        // If the file is temporary, the temporary file is never deleted at the end of the jvm, even if you call all methods to delete it.
+        // So you need to use the InputStream to close it, even if there is an exception, to unlock the file.
+        final InputStream openStream = file.toURI().toURL().openStream();
+        try {
+            validate(new StreamSource(openStream));
+        } finally {
+            openStream.close();
+        }
     }
 
     @Override
     public void validate(final Reader reader) throws SValidationException, IOException {
-        final Source source = new StreamSource(reader);
-        this.validate(source);
+        final StreamSource source = new StreamSource(reader);
+        validate(source);
     }
 
-    private void validate(final Source source) throws IOException, SValidationException {
+    private void validate(final StreamSource source) throws SValidationException, IOException {
         try {
-            if (this.schema == null) {
+            if (schema == null) {
                 throw new SValidationException("No schema defined");
             }
             final Validator validator = this.schema.newValidator();

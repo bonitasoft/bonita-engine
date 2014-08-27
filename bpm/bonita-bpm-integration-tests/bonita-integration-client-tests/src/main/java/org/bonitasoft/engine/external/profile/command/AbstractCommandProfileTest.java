@@ -52,7 +52,7 @@ public abstract class AbstractCommandProfileTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         // Restoring up default profiles before tests:
         final InputStream xmlStream = ProfileImportCommandTest.class.getResourceAsStream("RestoreDefaultProfiles.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream);

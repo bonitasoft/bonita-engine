@@ -65,7 +65,7 @@ public class GetProcessDefinitionTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Category" }, jira = "")

@@ -1,19 +1,24 @@
+/**
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.process;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-
 import org.bonitasoft.engine.CommonAPITest;
-import org.bonitasoft.engine.bpm.bar.BusinessArchive;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -32,11 +37,11 @@ public class ProcessDescriptionTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @Test
-    public void testAllInstanceDescriptions() throws Exception {
+    public void allInstanceDescriptions() throws Exception {
         final User user = createUser("Jani", "kuulu");
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("descProcess", "1.0");
         processBuilder.addDescription("processDescription");
@@ -48,8 +53,7 @@ public class ProcessDescriptionTest extends CommonAPITest {
                 .addDescription("descBooleanUserTaskData");
         processBuilder.addTransition("start", "gateway");
         processBuilder.addTransition("gateway", "userTask");
-
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(getBusinessArchive(processBuilder), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals("processDescription", processInstance.getDescription());
 
@@ -62,20 +66,6 @@ public class ProcessDescriptionTest extends CommonAPITest {
 
         disableAndDeleteProcess(processDefinition);
         deleteUser(user);
-    }
-
-    private BusinessArchive getBusinessArchive(final ProcessDefinitionBuilder builder) throws Exception {
-        final File barFile = File.createTempFile("businessArchive", ".bar");
-        barFile.delete();
-        final DesignProcessDefinition process = builder.done();
-        final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(process).done();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, barFile);
-        final InputStream inputStream = new FileInputStream(barFile);
-        try {
-            return BusinessArchiveFactory.readBusinessArchive(inputStream);
-        } finally {
-            inputStream.close();
-        }
     }
 
 }

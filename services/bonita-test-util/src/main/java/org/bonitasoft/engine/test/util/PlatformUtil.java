@@ -150,7 +150,7 @@ public class PlatformUtil {
     }
 
     private static void deactiveAndDeleteAllTenants(final PlatformService platformService) throws STenantException, STenantNotFoundException,
-            STenantDeactivationException, STenantDeletionException, SDeletingActivatedTenantException {
+    STenantDeactivationException, STenantDeletionException, SDeletingActivatedTenantException {
         List<STenant> existingTenants;
         do {
             existingTenants = platformService.getTenants(new QueryOptions(0, 100, STenant.class, "id", OrderByType.ASC));

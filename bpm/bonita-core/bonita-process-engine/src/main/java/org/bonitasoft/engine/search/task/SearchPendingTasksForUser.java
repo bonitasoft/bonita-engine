@@ -47,18 +47,16 @@ public class SearchPendingTasksForUser extends AbstractHumanTaskInstanceSearchEn
     public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
         if (orAssignedToUser) {
             return activityInstanceService.getNumberOfPendingOrAssignedTasks(userId, searchOptions);
-        } else {
-            return activityInstanceService.getNumberOfPendingTasksForUser(userId, searchOptions);
         }
+        return activityInstanceService.getNumberOfPendingTasksForUser(userId, searchOptions);
     }
 
     @Override
     public List<SHumanTaskInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
         if (orAssignedToUser) {
             return activityInstanceService.searchPendingOrAssignedTasks(userId, searchOptions);
-        } else {
-            return activityInstanceService.searchPendingTasksForUser(userId, searchOptions);
         }
+        return activityInstanceService.searchPendingTasksForUser(userId, searchOptions);
     }
 
 }

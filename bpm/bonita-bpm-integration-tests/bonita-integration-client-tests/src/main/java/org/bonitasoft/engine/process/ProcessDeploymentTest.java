@@ -18,6 +18,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
@@ -46,7 +47,7 @@ public class ProcessDeploymentTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @Test
@@ -74,10 +75,9 @@ public class ProcessDeploymentTest extends CommonAPITest {
     @Test
     public void deployProcessFromFile() throws Exception {
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
-                Arrays.asList("step1", "step2"),
-                Arrays.asList(true, true));
+                Arrays.asList("step1", "step2"), Arrays.asList(true, true));
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
-        final File tempFile = File.createTempFile("testbar", ".bar");
+        final File tempFile = IOUtil.createTempFile("testbar", ".bar", new File(IOUtil.TMP_DIRECTORY));
         tempFile.delete();
         BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, tempFile);
 
@@ -95,6 +95,7 @@ public class ProcessDeploymentTest extends CommonAPITest {
         assertEquals(TestStates.getProcessDepInfoEnabledState(), processDeploymentInfo.getActivationState());
 
         // Clean up
+        tempFile.delete();
         deleteUser(user);
         disableAndDeleteProcess(processDefinition);
     }

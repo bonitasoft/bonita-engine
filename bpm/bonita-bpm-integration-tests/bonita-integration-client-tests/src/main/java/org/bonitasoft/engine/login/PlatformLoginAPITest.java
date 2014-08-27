@@ -69,6 +69,7 @@ public class PlatformLoginAPITest extends CommonAPITest {
         final InputStream stream = BPMRemoteTests.class.getResourceAsStream("/session-commands.jar.bak");
         assertNotNull(stream);
         final byte[] byteArray = IOUtils.toByteArray(stream);
+        stream.close();
         platformCommandAPI.addDependency(COMMAND_DEPENDENCY_NAME, byteArray);
         platformCommandAPI.register(COMMAND_NAME, "Delete a platform session", "org.bonitasoft.engine.command.DeletePlatformSessionCommand");
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();

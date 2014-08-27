@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -61,7 +61,6 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.xml.ElementBindingsFactory;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
@@ -92,8 +91,7 @@ public class MigrationPlanServiceImpl implements MigrationPlanService {
     protected final QueriableLoggerService queriableLoggerService;
 
     public MigrationPlanServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final EventService eventService,
-            final ParserFactory parserFactory,
-            final CacheService cacheService, final ReadSessionAccessor sessionAccessor, final ProcessInstanceService processInstanceService,
+            final ParserFactory parserFactory, final CacheService cacheService, final ProcessInstanceService processInstanceService,
             final QueriableLoggerService queriableLoggerService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
@@ -109,6 +107,12 @@ public class MigrationPlanServiceImpl implements MigrationPlanService {
             parser.setSchema(schemaStream);
         } catch (final Exception e) {
             throw new BonitaRuntimeException("Unable to configure Migration Plan Service", e);
+        } finally {
+            try {
+                schemaStream.close();
+            } catch (final IOException e) {
+                throw new BonitaRuntimeException(e);
+            }
         }
     }
 

@@ -22,7 +22,7 @@ public class MultiThreadCallsTest extends CommonAPITest {
         public void run() {
             super.run();
             try {
-                apiTestUtil.loginOnDefaultTenantWithDefaultTechnicalLogger();
+                apiTestUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
                 apiTestUtil.getIdentityAPI().getNumberOfUsers();
                 apiTestUtil.getIdentityAPI().getNumberOfGroups();
                 apiTestUtil.logoutOnTenant();

@@ -35,7 +35,7 @@ public class ExportActorMappingTest extends CommonAPITest {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
 
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+         loginOnDefaultTenantWithDefaultTechnicalUser();
         final User john = createUser(johnName, "bpm");
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
 
@@ -70,7 +70,7 @@ public class ExportActorMappingTest extends CommonAPITest {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
 
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+         loginOnDefaultTenantWithDefaultTechnicalUser();
         final Group sales = createGroup("sales");
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
 
@@ -98,7 +98,7 @@ public class ExportActorMappingTest extends CommonAPITest {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
 
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+         loginOnDefaultTenantWithDefaultTechnicalUser();
         final User john = createUser("john", "bpm");
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
 
@@ -126,7 +126,7 @@ public class ExportActorMappingTest extends CommonAPITest {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
 
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+         loginOnDefaultTenantWithDefaultTechnicalUser();
         final Group group = createGroup("group");
         final Role role = createRole("role");
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
@@ -155,7 +155,7 @@ public class ExportActorMappingTest extends CommonAPITest {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
 
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+         loginOnDefaultTenantWithDefaultTechnicalUser();
         final Group sales = createGroup("sales");
         final Group subSales = createGroup("sub", "/sales");
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
@@ -184,7 +184,7 @@ public class ExportActorMappingTest extends CommonAPITest {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
 
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+         loginOnDefaultTenantWithDefaultTechnicalUser();
         final Role sales = createRole("sales");
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive.done());
 
@@ -213,7 +213,7 @@ public class ExportActorMappingTest extends CommonAPITest {
         final BusinessArchiveBuilder businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive();
         businessArchive.setProcessDefinition(processDefinition);
 
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+         loginOnDefaultTenantWithDefaultTechnicalUser();
         final User john = createUser(johnName, "bpm");
         final Group rd = createGroup("RD");
         final Role role = createRole("dev");

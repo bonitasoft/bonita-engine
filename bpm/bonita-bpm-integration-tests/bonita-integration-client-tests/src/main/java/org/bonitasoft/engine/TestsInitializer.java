@@ -50,14 +50,16 @@ public class TestsInitializer {
         deleteTenantAndPlatform();
         closeSpringContext();
         cleanBonitaHome();
+
         // wait for thread to stop
         // FIXME To uncomment when fix BS-7731
         checkThreadsAreStopped();
     }
 
     protected void deleteTenantAndPlatform() throws BonitaException {
-        new APITestUtil().stopAndCleanPlatformAndTenant(true);
-        new APITestUtil().deletePlatformStructure();
+        final APITestUtil apiTestUtil = new APITestUtil();
+        apiTestUtil.stopAndCleanPlatformAndTenant(true);
+        apiTestUtil.deletePlatformStructure();
     }
 
     private void checkThreadsAreStopped() throws InterruptedException {

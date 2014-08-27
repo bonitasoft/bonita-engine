@@ -61,7 +61,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
     @Before
     public void beforeTest() throws BonitaException {
         processDefinitions = new ArrayList<ProcessDefinition>();
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         john = createUser("john", "bpm");
         logoutOnTenant();
         loginOnDefaultTenantWith("john", "bpm");

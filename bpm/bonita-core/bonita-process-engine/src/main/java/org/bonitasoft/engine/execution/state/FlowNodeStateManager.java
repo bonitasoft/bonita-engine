@@ -21,6 +21,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecu
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.execution.ProcessExecutor;
+import org.bonitasoft.engine.execution.StateBehaviors;
 
 /**
  * @author Baptiste Mesta
@@ -38,22 +39,9 @@ public interface FlowNodeStateManager {
 
     FlowNodeState getState(int stateId);
 
-    FlowNodeState getNormalFinalState(SFlowNodeInstance flowNodeInstance);
-
-    FlowNodeState getInitialState(SFlowNodeInstance flowNodeInstance);
-
-    Set<Integer> getUnstableStateIds();
-
-    Set<Integer> getStableStateIds();
-
-    Set<Integer> getAllStates();
-
     Set<String> getSupportedState(FlowNodeType nodeType);
-
-    FlowNodeState getSkippedState(SFlowNodeInstance flownNodeInstance);
-
-    FlowNodeState getCanceledState(SFlowNodeInstance flownNodeInstance);
 
     void setProcessExecutor(ProcessExecutor processExecutor);
 
+    StateBehaviors getStateBehaviors();
 }

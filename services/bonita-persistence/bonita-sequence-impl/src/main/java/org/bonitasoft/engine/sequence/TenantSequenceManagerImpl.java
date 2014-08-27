@@ -132,14 +132,11 @@ public class TenantSequenceManagerImpl {
                         connection.setAutoCommit(false);
 
                         // we have reach the maximum in this range
-                        final long nextAvailableId = selectById(connection,
-                                sequenceId, tenantId);
+                        final long nextAvailableId = selectById(connection, sequenceId, tenantId);
                         nextAvailableIds.put(sequenceId, nextAvailableId);
 
-                        final long nextSequenceId = nextAvailableId
-                                + getRangeSize(sequenceId);
-                        updateSequence(connection, nextSequenceId, tenantId,
-                                sequenceId);
+                        final long nextSequenceId = nextAvailableId + getRangeSize(sequenceId);
+                        updateSequence(connection, nextSequenceId, tenantId, sequenceId);
                         lastIdInRanges.put(sequenceId, nextSequenceId - 1);
 
                         connection.commit();
@@ -158,7 +155,7 @@ public class TenantSequenceManagerImpl {
                         if (connection != null) {
                             try {
                                 connection.close();
-                            } catch (SQLException e) {
+                            } catch (final SQLException e) {
                                 // Can't do anything...
                             }
                         }
@@ -197,15 +194,19 @@ public class TenantSequenceManagerImpl {
 
     protected long selectById(final Connection connection, final long id, final long tenantId) throws SQLException, SObjectNotFoundException {
         PreparedStatement selectByIdPreparedStatement = null;
+        ResultSet resultSet = null;
         try {
             selectByIdPreparedStatement = connection.prepareStatement(SELECT_BY_ID);
             selectByIdPreparedStatement.setLong(1, tenantId);
             selectByIdPreparedStatement.setLong(2, id);
-            final ResultSet resultSet = selectByIdPreparedStatement.executeQuery();
+            resultSet = selectByIdPreparedStatement.executeQuery();
             return getNextId(id, tenantId, resultSet);
         } finally {
             if (selectByIdPreparedStatement != null) {
                 selectByIdPreparedStatement.close();
+            }
+            if (resultSet != null) {
+                resultSet.close();
             }
         }
     }

@@ -79,7 +79,7 @@ public class LoginAPITest extends CommonAPITest {
 
     @Test(expected = SessionNotFoundException.class)
     public void testSessionNotFoundExceptionIsThrownAfterSessionDeletion() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         // login to create a session
         final long sessionId = getSession().getId();
 
@@ -128,7 +128,7 @@ public class LoginAPITest extends CommonAPITest {
     @Cover(classes = LoginAPI.class, concept = BPMNConcept.NONE, keywords = { "Login", "Password" }, story = "Try to login with wrong password", jira = "ENGINE-622")
     @Test(expected = LoginException.class)
     public void loginFailsWithWrongPassword() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         final String userName = "Truc";
         createUser(userName, "goodPassword");
         try {
@@ -136,7 +136,7 @@ public class LoginAPITest extends CommonAPITest {
             loginTenant.login(userName, "WrongPassword");
             fail("Should not be reached");
         } finally {
-            loginOnDefaultTenantWithDefaultTechnicalLogger();
+            loginOnDefaultTenantWithDefaultTechnicalUser();
             getIdentityAPI().deleteUser(userName);
         }
     }
@@ -150,7 +150,7 @@ public class LoginAPITest extends CommonAPITest {
 
     @Test
     public void userLoginDefaultTenant() throws BonitaException, InterruptedException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         final String userName = "matti";
         final String password = "tervetuloa";
         createUser(userName, password);
@@ -169,7 +169,7 @@ public class LoginAPITest extends CommonAPITest {
 
     @Test
     public void loginOnDefaultTenantWithExistingUserAndCheckId() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         final String userName = "corvinus";
         final String password = "underworld";
         final User user = createUser(userName, password);
@@ -184,7 +184,7 @@ public class LoginAPITest extends CommonAPITest {
 
     @Test
     public void loginOnDefaultTenantWithNonTechnicalUser() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         final User user = createUser("matti", "kieli");
         logoutOnTenant();
 
@@ -192,14 +192,14 @@ public class LoginAPITest extends CommonAPITest {
         assertTrue("Should be logged in as a NON-Technical user", !getSession().isTechnicalUser());
         logoutOnTenant();
 
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         getIdentityAPI().deleteUser(user.getId());
         logoutOnTenant();
     }
 
     @Test
     public void loginOnDefaultTenantWithTechnicalUser() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         assertTrue("Should be logged in as Technical user", getSession().isTechnicalUser());
         logoutOnTenant();
     }
@@ -207,7 +207,7 @@ public class LoginAPITest extends CommonAPITest {
     @Cover(jira = "ENGINE-1653", classes = { User.class, LoginAPI.class }, concept = BPMNConcept.NONE, keywords = { "disable user", "login" })
     @Test(expected = LoginException.class)
     public void unableToLoginWhenTheUserIsDisable() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         final String userName = "matti";
         final String password = "bpm";
         final User user = getIdentityAPI().createUser(userName, password);

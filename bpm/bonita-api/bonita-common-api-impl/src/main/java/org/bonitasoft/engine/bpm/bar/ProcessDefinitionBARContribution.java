@@ -17,15 +17,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.bind.ValidationException;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -97,7 +95,6 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.io.xml.ElementBinding;
-import org.bonitasoft.engine.io.xml.InvalidSchemaException;
 import org.bonitasoft.engine.io.xml.XMLHandler;
 import org.bonitasoft.engine.io.xml.XMLNode;
 import org.bonitasoft.engine.io.xml.XMLParseException;
@@ -179,15 +176,23 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         bindings.add(SubProcessDefinitionBinding.class);
         bindings.add(FlowElementBinding.class);
 
-        final InputStream schemaStream = ProcessDefinitionBARContribution.class.getResourceAsStream("ProcessDefinition.xsd");
+        //        final InputStream schemaStream = ProcessDefinitionBARContribution.class.getResourceAsStream("ProcessDefinition.xsd");
+        //        try {
+        //            handler = new XMLHandler(bindings, schemaStream);
+        //        } catch (final Exception e) {
+        //            throw new BonitaRuntimeException(e);
+        //        } finally {
+        //            try {
+        //                schemaStream.close();
+        //            } catch (final IOException e) {
+        //                throw new BonitaRuntimeException(e);
+        //            }
+        //        }
+
+        final URL schemaUrl = ProcessDefinitionBARContribution.class.getResource("ProcessDefinition.xsd");
         try {
-            handler = new XMLHandler(bindings);
-            handler.setSchema(schemaStream);
-        } catch (final ParserConfigurationException e) {
-            throw new BonitaRuntimeException(e);
-        } catch (final InvalidSchemaException e) {
-            throw new BonitaRuntimeException(e);
-        } catch (final TransformerConfigurationException e) {
+            handler = new XMLHandler(bindings, schemaUrl);
+        } catch (final Exception e) {
             throw new BonitaRuntimeException(e);
         }
     }
@@ -223,26 +228,20 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
     }
 
     public DesignProcessDefinition deserializeProcessDefinition(final File file) throws IOException, InvalidBusinessArchiveFormatException {
-        Object objectFromXML;
         try {
             handler.validate(file);
-            objectFromXML = handler.getObjectFromXML(file);
+            final Object objectFromXML = handler.getObjectFromXML(file);
+
+            if (!(objectFromXML instanceof DesignProcessDefinition)) {
+                throw new InvalidBusinessArchiveFormatException("The file did not contain a process, but: " + objectFromXML);
+            }
+            return (DesignProcessDefinition) objectFromXML;
         } catch (final XMLParseException e) {
             throw new InvalidBusinessArchiveFormatException(e);
         } catch (final ValidationException e) {
-            checkVersion(file);
+            checkVersion(IOUtil.read(file));
             throw new InvalidBusinessArchiveFormatException(e);
         }
-        if (objectFromXML instanceof DesignProcessDefinition) {
-            return (DesignProcessDefinition) objectFromXML;
-        } else {
-            throw new InvalidBusinessArchiveFormatException("The file did not contain a process, but: " + objectFromXML);
-        }
-    }
-
-    private void checkVersion(final File file) throws IOException, InvalidBusinessArchiveFormatException {
-        final String content = IOUtil.read(file);
-        checkVersion(content);
     }
 
     void checkVersion(final String content) throws InvalidBusinessArchiveFormatException {

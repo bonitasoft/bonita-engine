@@ -63,7 +63,7 @@ public class ProcessActorTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         user = createUser(USERNAME, PASSWORD);
     }
 

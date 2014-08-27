@@ -55,7 +55,7 @@ public class GetUpdatedVariableValuesForProcessInstanceTest extends CommonAPITes
 
     @Before
     public void before() throws Exception {
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+         loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @After
