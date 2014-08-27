@@ -1,6 +1,7 @@
 package org.bonitasoft.engine;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -128,7 +129,11 @@ public class TestsInitializer {
             final File destDir = new File(TMP_BONITA_HOME);
             System.out.println("Using BONITA_HOME: " + destDir.getAbsolutePath());
             FileUtils.deleteDirectory(destDir);
-            FileUtils.copyDirectory(new File(SOURCE_BONITA_HOME), destDir);
+            try {
+                FileUtils.copyDirectory(new File(SOURCE_BONITA_HOME), destDir);
+            } catch (FileNotFoundException e) {
+                throw new FileNotFoundException(e.getMessage() + " - Please run ant task cleanhome.xml in bonita-home module");
+            }
             System.setProperty(BONITA_HOME, destDir.getAbsolutePath());
         }
     }
