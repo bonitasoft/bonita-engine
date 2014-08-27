@@ -50,7 +50,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
 
     @Before
     public void setUp() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         getIdentityAPI().createUser("matti", "bpm", "Matti", "Mäkelä");
     }
 
@@ -313,7 +313,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
             platformAPI.deactiveTenant(tenantId);
             platformAPI.deleteTenant(tenantId);
             logoutOnPlatform(session);
-            loginOnDefaultTenantWithDefaultTechnicalLogger();
+            loginOnDefaultTenantWithDefaultTechnicalUser();
         }
     }
 

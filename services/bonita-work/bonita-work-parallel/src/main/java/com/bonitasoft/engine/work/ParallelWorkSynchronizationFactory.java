@@ -12,6 +12,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.work.AbstractWorkSynchronization;
 import org.bonitasoft.engine.work.BonitaExecutorService;
+import org.bonitasoft.engine.work.WorkService;
 import org.bonitasoft.engine.work.WorkSynchronizationFactory;
 
 /**
@@ -23,8 +24,8 @@ public class ParallelWorkSynchronizationFactory implements WorkSynchronizationFa
 
     @Override
     public AbstractWorkSynchronization getWorkSynchronization(final BonitaExecutorService executorService, final TechnicalLoggerService loggerService,
-            final SessionAccessor sessionAccessor) {
-        return new ParallelWorkSynchronization(executorService, sessionAccessor);
+            final SessionAccessor sessionAccessor, final WorkService workService) {
+        return new ParallelWorkSynchronization(executorService, sessionAccessor, workService);
     }
 
 }

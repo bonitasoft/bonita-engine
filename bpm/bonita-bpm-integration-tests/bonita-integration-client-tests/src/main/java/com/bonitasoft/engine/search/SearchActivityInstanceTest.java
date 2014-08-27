@@ -52,7 +52,7 @@ public class SearchActivityInstanceTest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @Test

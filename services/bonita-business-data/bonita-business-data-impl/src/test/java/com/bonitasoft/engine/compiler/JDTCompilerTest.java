@@ -10,11 +10,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bonitasoft.engine.commons.io.IOUtil;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author Colin PUY
+ * @author Celine Souchet
  */
 public class JDTCompilerTest {
 
@@ -24,27 +27,23 @@ public class JDTCompilerTest {
 
     private File outputdirectory;
 
+    @Before
+    public void instanciateCompiler() {
+        jdtCompiler = new JDTCompiler();
+        outputdirectory = IOUtil.createTempDirectoryInDefaultTempDirectory("testFolder");
+    }
+
+    @After
+    public void after() throws IOException {
+        IOUtil.deleteDir(outputdirectory);
+    }
+
     private File getTestResourceAsFile(final String fileName) throws URISyntaxException {
         final URL resource = JDTCompilerTest.class.getResource(fileName);
         if (resource == null) {
             throw new RuntimeException("Test resource " + fileName + " not found");
         }
         return new File(resource.toURI());
-    }
-
-    private File createTempDirectory() throws IOException {
-        final File outputdirectory = File.createTempFile("testFolder", "");
-        // in order to create a directory, we have to delete it first ... !!
-        outputdirectory.delete();
-        outputdirectory.mkdir();
-        outputdirectory.deleteOnExit();
-        return outputdirectory;
-    }
-
-    @Before
-    public void instanciateCompiler() throws IOException {
-        jdtCompiler = new JDTCompiler();
-        outputdirectory = createTempDirectory();
     }
 
     @Test

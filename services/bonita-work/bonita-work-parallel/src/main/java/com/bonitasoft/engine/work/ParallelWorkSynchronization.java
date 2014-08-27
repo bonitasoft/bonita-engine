@@ -14,6 +14,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.work.AbstractWorkSynchronization;
 import org.bonitasoft.engine.work.BonitaExecutorService;
 import org.bonitasoft.engine.work.BonitaWork;
+import org.bonitasoft.engine.work.WorkService;
 
 /**
  * @author Charles Souillard
@@ -22,8 +23,8 @@ import org.bonitasoft.engine.work.BonitaWork;
  */
 public class ParallelWorkSynchronization extends AbstractWorkSynchronization {
 
-    public ParallelWorkSynchronization(final BonitaExecutorService executorService, final SessionAccessor sessionAccessor) {
-        super(executorService, sessionAccessor);
+    public ParallelWorkSynchronization(final BonitaExecutorService executorService, final SessionAccessor sessionAccessor, final WorkService workService) {
+        super(executorService, sessionAccessor, workService);
     }
 
     @Override

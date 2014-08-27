@@ -104,7 +104,7 @@ public class SPUserTest extends CommonAPISPTest {
         final IdentityAPI identityAPI1 = TenantAPIAccessor.getIdentityAPI(session1);
         final User user1 = identityAPI1.createUser(USERNAME, "bpm");
 
-        final APISession session2 = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalLogger();
+        final APISession session2 = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
         final IdentityAPI identityAPI2 = TenantAPIAccessor.getIdentityAPI(session2);
         final User user2 = identityAPI2.createUser(USERNAME, "bos");
 

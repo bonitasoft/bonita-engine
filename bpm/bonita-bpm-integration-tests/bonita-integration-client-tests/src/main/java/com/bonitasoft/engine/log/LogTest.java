@@ -57,7 +57,7 @@ public class LogTest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @Test(expected = LogNotFoundException.class)
@@ -137,7 +137,7 @@ public class LogTest extends CommonAPISPTest {
         loginOnDefaultTenantWith("loguser2", PASSWORD);
         final User user1 = createUser("loguser1", PASSWORD);
        logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         getIdentityAPI().deleteUser(user1.getId());
         getIdentityAPI().deleteUser(user2.getId());
         getIdentityAPI().deleteUser(user3.getId());

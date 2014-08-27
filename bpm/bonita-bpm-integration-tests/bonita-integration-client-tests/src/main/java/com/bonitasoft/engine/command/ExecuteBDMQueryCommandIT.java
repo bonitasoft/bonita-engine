@@ -114,10 +114,10 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         businessUser = createUser(USERNAME, PASSWORD);
         logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
 
         final BusinessObjectModelConverter converter = new BusinessObjectModelConverter();
         final byte[] zip = converter.zip(buildBOM());
@@ -150,7 +150,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         }
 
         logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         if (!getTenantManagementAPI().isPaused()) {
             getTenantManagementAPI().pause();
             getTenantManagementAPI().cleanAndUninstallBusinessDataModel();

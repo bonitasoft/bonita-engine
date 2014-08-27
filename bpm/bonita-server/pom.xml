@@ -225,11 +225,6 @@
       <artifactId>bonita-expression-api-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.expression</groupId>
-      <artifactId>bonita-expression-model-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <!-- Expression Resolver -->
     <dependency>
@@ -297,11 +292,6 @@
     </dependency>
 
     <!-- Logs -->
-    <dependency>
-      <groupId>org.bonitasoft.engine.log</groupId>
-      <artifactId>bonita-log-model-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.bonitasoft.engine.log</groupId>
       <artifactId>bonita-log-impl</artifactId>
@@ -717,9 +707,9 @@
                   <!-- Category -->
                   <include>org.bonitasoft.engine.core.category:bonita-category-api</include>
                   <include>org.bonitasoft.engine.core.category:bonita-category-api-impl</include>
-									<include>org.bonitasoft.engine.core.category:bonita-category-model</include>
-									<include>org.bonitasoft.engine.core.category:bonita-category-model-impl</include>
-									<include>org.bonitasoft.engine.core.category:bonita-category-model-impl-hibernate</include>
+                  <include>org.bonitasoft.engine.core.category:bonita-category-model</include>
+                  <include>org.bonitasoft.engine.core.category:bonita-category-model-impl</include>
+                  <include>org.bonitasoft.engine.core.category:bonita-category-model-impl-hibernate</include>
                   <!-- Classloader -->
                   <include>org.bonitasoft.engine.classloader:bonita-classloader-api</include>
                   <include>org.bonitasoft.engine.classloader:bonita-classloader-impl</include>
@@ -763,8 +753,6 @@
                   <include>com.bonitasoft.engine.events:bonita-events-api-impl</include>
                   <include>com.bonitasoft.engine.events:bonita-events-api-clustered-impl</include>
                   <!-- Expression -->
-                  <include>org.bonitasoft.engine.expression:bonita-expression-model</include>
-                  <include>org.bonitasoft.engine.expression:bonita-expression-model-impl</include>
                   <include>org.bonitasoft.engine.expression:bonita-expression-api</include>
                   <include>org.bonitasoft.engine.expression:bonita-expression-api-impl</include>
                   <!-- Expression Resolver -->
@@ -789,11 +777,10 @@
                   <include>org.bonitasoft.engine.core.login:bonita-login-api</include>
                   <include>org.bonitasoft.engine.core.login:bonita-login-api-impl</include>
                   <!-- Logs -->
-                  <include>org.bonitasoft.engine.log:bonita-log-model</include>
-                  <include>org.bonitasoft.engine.log:bonita-log-model-impl</include>
                   <include>org.bonitasoft.engine.log:bonita-log-api</include>
-                  <include>com.bonitasoft.engine.log:bonita-log-api-impl</include>
                   <include>org.bonitasoft.engine.log:bonita-log-impl</include>
+                  <include>com.bonitasoft.engine.log:bonita-log-api-impl</include>
+
                   <!-- Monitoring -->
                   <include>com.bonitasoft.engine.monitoring:bonita-monitoring-api</include>
                   <include>com.bonitasoft.engine.monitoring:bonita-monitoring-api-impl</include>

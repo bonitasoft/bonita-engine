@@ -64,7 +64,7 @@ public class TenantMaintenanceIT extends CommonAPISPTest {
 
     @Before
     public void before() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     private void disableAndDeleteProcess(final long tenantId, final long processDefinitionId) throws Exception {
@@ -75,7 +75,7 @@ public class TenantMaintenanceIT extends CommonAPISPTest {
     @Test
     public void twoTenantPauseMode() throws Exception {
         // given
-        final long tenantId1 = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalLogger().getTenantId();
+        final long tenantId1 = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser().getTenantId();
         final User userForTenant1 = BPMTestSPUtil.createUserOnTenantWithDefaultTechnicalLogger(USERNAME, PASSWORD, tenantId1);
         final ProcessDefinition processDefinitionForTenant1 = createProcessOnTenant(tenantId1);
 
@@ -109,7 +109,7 @@ public class TenantMaintenanceIT extends CommonAPISPTest {
 
     @Test
     public void oneTenantPauseMode() throws Exception {
-        final long tenantId = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalLogger().getTenantId();
+        final long tenantId = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser().getTenantId();
         final User user = BPMTestSPUtil.createUserOnTenantWithDefaultTechnicalLogger(USERNAME, PASSWORD, tenantId);
         final ProcessDefinition processDefinition = createProcessOnTenant(tenantId);
         waitArchivedProcessCount(1, tenantId);
@@ -152,7 +152,7 @@ public class TenantMaintenanceIT extends CommonAPISPTest {
 
         // when: we stop and start the node
         stopAndStartPlatform();
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
 
         // when: resume the tenant
         getTenantManagementAPI().resume();

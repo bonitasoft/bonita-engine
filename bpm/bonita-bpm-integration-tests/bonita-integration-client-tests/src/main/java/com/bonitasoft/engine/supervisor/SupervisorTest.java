@@ -28,7 +28,7 @@ public class SupervisorTest extends CommonAPISPTest {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @After

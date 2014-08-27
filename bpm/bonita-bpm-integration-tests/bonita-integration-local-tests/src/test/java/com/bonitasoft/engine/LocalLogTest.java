@@ -39,7 +39,7 @@ public class LocalLogTest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     // run this test in local test suite only, otherwise it's necessary to use a command to set the system property on the server side
