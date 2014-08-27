@@ -255,7 +255,7 @@ public class BPMTestSPUtil {
     }
 
     public static void deleteUserOnDefaultTenant(final User user) throws BonitaException {
-        final APISession session = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalLogger();
+        final APISession session = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
         identityAPI.deleteUser(user.getId());
         BPMTestSPUtil.logoutOnTenant(session);
