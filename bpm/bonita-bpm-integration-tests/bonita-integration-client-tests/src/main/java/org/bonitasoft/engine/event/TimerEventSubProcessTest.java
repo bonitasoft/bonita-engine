@@ -13,17 +13,17 @@
  **/
 package org.bonitasoft.engine.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -128,27 +128,22 @@ public class TimerEventSubProcessTest extends CommonAPITest {
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer" }, jira = "ENGINE-536")
     @Test
     public void testTimerEventSubProcessTriggered() throws Exception {
+        //given
         final int timerDuration = 2000;
         final ProcessDefinition process = deployAndEnableProcessWithTimerEventSubProcess(timerDuration);
-        final long startDate = System.currentTimeMillis();
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
 
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
-        assertNotNull(step1);
-        final FlowNodeInstance eventSubProcessActivity = waitForFlowNodeInExecutingState(processInstance, "eventSubProcess", false);
+        //when
         final ActivityInstance subStep = waitForUserTask("subStep", processInstance);
-        assertNotNull(subStep);
-
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
-        assertTrue("start date=" + subProcInst.getStartDate().getTime() + " should be >= than " + (startDate + timerDuration), subProcInst.getStartDate()
-                .getTime() >= startDate + timerDuration);
 
-        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
+        //then
+        final Date expectedStartDate = new Date(processInstance.getStartDate().getTime() + timerDuration);
+        assertThat(subProcInst.getStartDate()).as("sub process should have been triggered").isAfterOrEqualsTo(expectedStartDate);
+
+        //cleanup
         assignAndExecuteStep(subStep, john.getId());
-        waitForArchivedActivity(eventSubProcessActivity.getId(), TestStates.NORMAL_FINAL);
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.ABORTED);
-
         disableAndDeleteProcess(process.getId());
     }
 

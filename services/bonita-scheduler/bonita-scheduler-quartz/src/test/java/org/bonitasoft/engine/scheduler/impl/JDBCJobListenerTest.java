@@ -29,9 +29,12 @@ import java.util.Map;
 
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.scheduler.JobService;
+import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNotFoundException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
@@ -68,6 +71,9 @@ public class JDBCJobListenerTest {
 
     private JobService jobService;
 
+    @Mock
+    private TechnicalLoggerService logger;
+
     @InjectMocks
     private JDBCJobListener jdbcJobListener;
 
@@ -79,15 +85,18 @@ public class JDBCJobListenerTest {
         doReturn(jobDataMap).when(jobDetail).getJobDataMap();
         doReturn(wrappedMap).when(jobDataMap).getWrappedMap();
         doReturn(String.valueOf(JOB_DESCRIPTOR_ID)).when(wrappedMap).get("jobId");
+
+        doReturn(true).when(logger).isLoggable(JDBCJobListener.class, TechnicalLogSeverity.TRACE);
+
     }
 
     @Test
     public void jobWasExecuted_shouldCallIncidentServiceIfExceptionOccurs() throws Exception {
-        IncidentService incidentService = mock(IncidentService.class);
+        final IncidentService incidentService = mock(IncidentService.class);
         doThrow(SBonitaSearchException.class).when(jobService).searchJobLogs(any(QueryOptions.class));
         doReturn("13651444").when(wrappedMap).get("tenantId");
 
-        JDBCJobListener jobListener = new JDBCJobListener(jobService, incidentService);
+        final JDBCJobListener jobListener = new JDBCJobListener(jobService, incidentService, logger);
         jobListener.jobWasExecuted(context, exeption1);
 
         verify(incidentService).report(anyLong(), any(Incident.class));
@@ -96,11 +105,11 @@ public class JDBCJobListenerTest {
     @Test
     public void create_jobLog_on_exception_if_no_previous_joblog() throws Exception {
 
-        List<SJobLog> jobLogs = Collections.emptyList();
+        final List<SJobLog> jobLogs = Collections.emptyList();
 
         doReturn(jobLogs).when(jobService).searchJobLogs(any(QueryOptions.class));
 
-        JDBCJobListener jobListener = new JDBCJobListener(jobService, null);
+        final JDBCJobListener jobListener = new JDBCJobListener(jobService, null, logger);
         jobListener.jobWasExecuted(context, exeption1);
 
         verify(jobService).createJobLog(argThat(new SJobLogMatcher(JOB_DESCRIPTOR_ID, Exception.class.getName(), 0)));
@@ -108,13 +117,13 @@ public class JDBCJobListenerTest {
 
     @Test
     public void update_jobLog_on_exception_if_previous_joblog() throws Exception {
-        SJobLogImpl jobLog = mock(SJobLogImpl.class);
+        final SJobLogImpl jobLog = mock(SJobLogImpl.class);
         doReturn(1L).when(jobLog).getRetryNumber();
-        List<SJobLog> jobLogs = Collections.singletonList((SJobLog) jobLog);
+        final List<SJobLog> jobLogs = Collections.singletonList((SJobLog) jobLog);
 
         doReturn(jobLogs).when(jobService).searchJobLogs(any(QueryOptions.class));
 
-        JDBCJobListener jobListener = new JDBCJobListener(jobService, null);
+        final JDBCJobListener jobListener = new JDBCJobListener(jobService, null, logger);
         jobListener.jobWasExecuted(context, exeption1);
 
         verify(jobLog).setLastUpdateDate(any(Long.class));
@@ -125,16 +134,16 @@ public class JDBCJobListenerTest {
 
     @Test
     public void clean_jobLog_if_no_exception_and_has_previous_jobLog() throws Exception {
-        SJobLogImpl jobLog = mock(SJobLogImpl.class);
-        List<SJobLog> jobLogs = Collections.singletonList((SJobLog) jobLog);
-        SJobDescriptor jobDesc = mock(SJobDescriptor.class);
-        SchedulerServiceImpl schedulerService = mock(SchedulerServiceImpl.class);
+        final SJobLogImpl jobLog = mock(SJobLogImpl.class);
+        final List<SJobLog> jobLogs = Collections.singletonList((SJobLog) jobLog);
+        final SJobDescriptor jobDesc = mock(SJobDescriptor.class);
+        final SchedulerServiceImpl schedulerService = mock(SchedulerServiceImpl.class);
 
         doReturn(jobLogs).when(jobService).searchJobLogs(any(QueryOptions.class));
         doReturn(jobDesc).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
         doReturn(true).when(schedulerService).isStillScheduled(jobDesc);
 
-        JDBCJobListener jobListener = new JDBCJobListener(jobService, null);
+        final JDBCJobListener jobListener = new JDBCJobListener(jobService, null, logger);
         jobListener.setBOSSchedulerService(schedulerService);
         jobListener.jobWasExecuted(context, null);
 
@@ -143,34 +152,52 @@ public class JDBCJobListenerTest {
 
     @Test
     public void should_call_deleteJob_itself_if_no_exception_and_Job_is_no_more_triggered_in_the_future() throws Exception {
-        List<SJobLog> jobLogs = Collections.emptyList();
-        SJobDescriptor jobDesc = mock(SJobDescriptor.class);
+        final List<SJobLog> jobLogs = Collections.emptyList();
+        final SJobDescriptor jobDesc = mock(SJobDescriptor.class);
         doReturn("myJob").when(jobDesc).getJobName();
-        SchedulerServiceImpl schedulerService = mock(SchedulerServiceImpl.class);
+        final SchedulerServiceImpl schedulerService = mock(SchedulerServiceImpl.class);
 
         doReturn(jobLogs).when(jobService).searchJobLogs(any(QueryOptions.class));
         doReturn(jobDesc).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
         doReturn(false).when(schedulerService).isStillScheduled(jobDesc);
 
-        JDBCJobListener jobListener = new JDBCJobListener(jobService, null);
+        final JDBCJobListener jobListener = new JDBCJobListener(jobService, null, logger);
         jobListener.setBOSSchedulerService(schedulerService);
         jobListener.jobWasExecuted(context, null);
 
-        verify(schedulerService).delete("myJob");
+        verify(schedulerService, times(1)).delete("myJob");
+    }
+
+    @Test
+    public void should_deleteJob_ignore_SJobDescriptorNotFoundException_if_job_already_deleted() throws Exception {
+        //        final List<SJobLog> jobLogs = Collections.emptyList();
+        final SJobDescriptor jobDesc = mock(SJobDescriptor.class);
+        doReturn("myJob").when(jobDesc).getJobName();
+        final SchedulerServiceImpl schedulerService = mock(SchedulerServiceImpl.class);
+
+        //when
+        doThrow(SJobDescriptorNotFoundException.class).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
+        doReturn(false).when(schedulerService).isStillScheduled(jobDesc);
+
+        final JDBCJobListener jobListener = new JDBCJobListener(jobService, null, logger);
+        jobListener.setBOSSchedulerService(schedulerService);
+        jobListener.jobWasExecuted(context, null);
+
+        verify(schedulerService, times(0)).delete("myJob");
     }
 
     @Test
     public void should_not_call_deleteJob_itself_if_no_exception_occurs_and_Job_is_still_triggered_in_the_future() throws Exception {
-        List<SJobLog> jobLogs = Collections.emptyList();
-        SJobDescriptor jobDesc = mock(SJobDescriptor.class);
+        final List<SJobLog> jobLogs = Collections.emptyList();
+        final SJobDescriptor jobDesc = mock(SJobDescriptor.class);
         doReturn("myJob").when(jobDesc).getJobName();
-        SchedulerServiceImpl schedulerService = mock(SchedulerServiceImpl.class);
+        final SchedulerServiceImpl schedulerService = mock(SchedulerServiceImpl.class);
 
         doReturn(jobLogs).when(jobService).searchJobLogs(any(QueryOptions.class));
         doReturn(jobDesc).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
         doReturn(true).when(schedulerService).isStillScheduled(jobDesc);
 
-        JDBCJobListener jobListener = new JDBCJobListener(jobService, null);
+        final JDBCJobListener jobListener = new JDBCJobListener(jobService, null, logger);
         jobListener.setBOSSchedulerService(schedulerService);
         jobListener.jobWasExecuted(context, null);
 
