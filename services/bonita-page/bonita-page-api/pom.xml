@@ -12,7 +12,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-model</artifactId>
+			<artifactId>bonita-log-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 			<dependency>

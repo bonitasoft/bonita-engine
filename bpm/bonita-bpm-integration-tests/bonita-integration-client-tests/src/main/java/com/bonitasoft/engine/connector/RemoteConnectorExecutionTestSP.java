@@ -1563,7 +1563,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         // Clean up
         BPMTestSPUtil.deactivateAndDeleteTenant(tenant2Id);
 
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         disableAndDeleteProcess(processDefinition);
     }
 }

@@ -49,7 +49,7 @@ public class TenantLocalIT extends CommonAPISPTest {
     @Test
     public void createDefaultTenant_should_deploy_provided_customPage_example() throws Exception {
         // given
-        final long tenantId = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalLogger().getTenantId();
+        final long tenantId = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser().getTenantId();
 
         // when then
         checkThatPageServiceExamplesAreDeployedOnTenant(tenantId);

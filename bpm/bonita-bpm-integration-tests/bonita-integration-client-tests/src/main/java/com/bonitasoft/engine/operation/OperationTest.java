@@ -63,14 +63,14 @@ public class OperationTest extends CommonAPITest {
     @After
     public void afterTest() throws BonitaException {
        logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         deleteUser(JOHN);
        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         john = createUser(JOHN, "bpm");
        logoutOnTenant();
         loginOnDefaultTenantWith(JOHN, "bpm");

@@ -27,7 +27,7 @@ public class JobSPTests extends CommonAPILocalTest {
 
     @Before
     public void beforeTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @Test

@@ -22,5 +22,8 @@
 <!--   <logger name="org.bonitasoft.engine.scheduler.impl.JobWrapper" level="DEBUG" /> -->
 <!--   Show lock acquire/release-->
 <!--   <logger name="org.bonitasoft.engine.lock.impl.MemoryLockService" level="DEBUG" /> -->
+<!-- to log what's going on on the Clustered event service: -->
+<!--   <logger name="com.bonitasoft.engine.events.impl" level="TRACE" /> -->
+
   
 </configuration>
