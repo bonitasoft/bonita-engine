@@ -14,13 +14,22 @@
 
 	<!-- Default set of monitored resources -->
 	<WatchedResource>WEB-INF/web.xml</WatchedResource>
+	
+	<Listener className="org.bonitasoft.tomcat.atomikos.ContextLifecycleListener" webappName="bonita" />
 
 	<!-- Configure Datasource -->
-	<Resource name="bonitaDS" 
-	    auth="Container" 
-	    type="javax.sql.DataSource"
-		factory="bitronix.tm.resource.ResourceObjectFactory"
-		uniqueName="jdbc/bonitaDSXA" />
+	<Resource
+		 name="bonitaDS"
+		 auth="Container"
+		 type="com.atomikos.jdbc.AtomikosDataSourceBean"
+		 factory="org.bonitasoft.tomcat.atomikos.AtomikosTomcatFactoryFactory"
+		 uniqueResourceName="bonitaDS"
+		 xaDataSourceClassName="#db.datasource.class#"
+		 xaProperties.user="#db.user#"
+		 xaProperties.password="#db.password#"
+		 xaProperties.URL="#db.url#"
+		 minPoolSize="5"
+		 maxPoolSize="10"/>
 
 	<Resource name="bonitaSequenceManagerDS"
 		auth="Container"

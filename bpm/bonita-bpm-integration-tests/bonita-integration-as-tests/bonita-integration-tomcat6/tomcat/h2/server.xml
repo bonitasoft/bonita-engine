@@ -33,7 +33,7 @@
 
   <Listener className="org.bonitasoft.tomcat.H2Listener" tcpPort="#db.server.port#" baseDir="${catalina.home}/bonita/server/platform/work" start="true" />
 
-  <Listener className="bitronix.tm.integration.tomcat55.BTMLifecycleListener" />
+   <Listener className="org.bonitasoft.tomcat.atomikos.AtomikosLifecycleListener" />
 
 
   <!-- Global JNDI resources

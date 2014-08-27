@@ -21,7 +21,7 @@
     <!-- Default set of monitored resources -->
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
 
-    <Transaction factory="bitronix.tm.BitronixUserTransactionObjectFactory" />
+   <Transaction factory="com.atomikos.icatch.jta.UserTransactionFactory" />
 
     <!-- Uncomment this to disable session persistence across Tomcat restarts -->
     <!--
