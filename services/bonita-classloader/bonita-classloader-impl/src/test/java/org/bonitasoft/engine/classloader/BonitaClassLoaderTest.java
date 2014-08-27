@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.junit.Test;
 
@@ -30,9 +31,10 @@ public class BonitaClassLoaderTest {
         final Map<String, byte[]> resources = new HashMap<String, byte[]>(1);
         resources.put("myJar.jar", "Salut le monde".getBytes());
         final File tempDir = new File(IOUtil.TMP_DIRECTORY, "BonitaClassLoaderTest");
-
-        // given
-        assertThat(tempDir).as("tempDir:%s should not exists before bonitaClassLoader init", tempDir.getAbsolutePath()).doesNotExist();
+        if (tempDir.exists()) {
+            FileUtils.deleteDirectory(tempDir);
+        }
+        
         final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(resources, "here", 154L, tempDir.toURI(), BonitaClassLoader.class.getClassLoader());
         assertThat(tempDir).as("bonitaClassLoader tempDir:%s should exists after bonitaClassLoader creation", tempDir.getAbsolutePath()).exists();
 
