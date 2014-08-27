@@ -65,12 +65,12 @@
       <version>${project.version}</version>
     </dependency>
 
-		<!-- Business Data -->
-		<dependency>
-			<groupId>com.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-business-data-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+	<!-- Business Data -->
+    <dependency>
+        <groupId>com.bonitasoft.engine.data</groupId>
+        <artifactId>bonita-business-data-impl</artifactId>
+        <version>${project.version}</version>
+    </dependency>
 
     <!-- Cache -->
     <dependency>
@@ -681,9 +681,9 @@
                   <include>org.bonitasoft.engine.authentication:bonita-authentication-api-impl</include>
                   <include>com.bonitasoft.engine.authentication:bonita-authentication-jaas</include>
                   <include>com.bonitasoft.engine.authentication:bonita-authentication-impl</include>
-									<!-- Business Data -->
-									<inlude>com.bonitasoft.engine.data:bonita-business-data-api</inlude>
-									<inlude>com.bonitasoft.engine.data:bonita-business-data-impl</inlude>
+					<!-- Business Data -->
+					<inlude>com.bonitasoft.engine.data:bonita-business-data-api</inlude>
+					<inlude>com.bonitasoft.engine.data:bonita-business-data-impl</inlude>
                   <!-- Cache -->
                   <include>org.bonitasoft.engine.cache:bonita-cache-api</include>
                   <include>org.bonitasoft.engine.cache:bonita-cache-ehcache</include>
@@ -691,9 +691,9 @@
                   <!-- Category -->
                   <include>org.bonitasoft.engine.core.category:bonita-category-api</include>
                   <include>org.bonitasoft.engine.core.category:bonita-category-api-impl</include>
-									<include>org.bonitasoft.engine.core.category:bonita-category-model</include>
-									<include>org.bonitasoft.engine.core.category:bonita-category-model-impl</include>
-									<include>org.bonitasoft.engine.core.category:bonita-category-model-impl-hibernate</include>
+                  <include>org.bonitasoft.engine.core.category:bonita-category-model</include>
+                  <include>org.bonitasoft.engine.core.category:bonita-category-model-impl</include>
+                  <include>org.bonitasoft.engine.core.category:bonita-category-model-impl-hibernate</include>
                   <!-- Classloader -->
                   <include>org.bonitasoft.engine.classloader:bonita-classloader-api</include>
                   <include>org.bonitasoft.engine.classloader:bonita-classloader-impl</include>

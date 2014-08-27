@@ -132,10 +132,10 @@ public class ClusterTests extends CommonAPISPTest {
         UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step0", ACTOR_NAME);
         addUserTask.addShortTextData("text", new ExpressionBuilder().createConstantStringExpression("default"));
         addUserTask
-                .addConnector("aConnector", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER)
-                .addInput("input1", new ExpressionBuilder().createConstantStringExpression("inputValue"))
-                .addOutput(
-                        new OperationBuilder().createSetDataOperation("text", new ExpressionBuilder().createInputExpression("output1", String.class.getName())));
+        .addConnector("aConnector", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER)
+        .addInput("input1", new ExpressionBuilder().createConstantStringExpression("inputValue"))
+        .addOutput(
+                new OperationBuilder().createSetDataOperation("text", new ExpressionBuilder().createInputExpression("output1", String.class.getName())));
 
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 designProcessDefinition.done());
@@ -212,20 +212,19 @@ public class ClusterTests extends CommonAPISPTest {
         loginOnDefaultTenantWithDefaultTechnicalUser();
 
         getTenantManagementAPI().pause();
-        
+
         assertThat(getTenantManagementAPI().isPaused()).isTrue();
-        
+
         changeToNode2();
-        
+
         assertThat(getTenantManagementAPI().isPaused()).isTrue();
-        
+
         getTenantManagementAPI().resume();
     }
 
     @Test
     public void should_pause_tenant_then_stop_start_node_dont_restart_elements() throws Exception {
         // given: 2 node with 1 node having running processes
-        final long tenantId = createAndActivateTenant("MyTenant_");
 
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
@@ -240,15 +239,17 @@ public class ClusterTests extends CommonAPISPTest {
         stopPlatform();
         changeToNode2();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
-        // then: node2 should finish the work
-        waitForProcessToFinishAndBeArchived(pi);
-
-        // cleanup
-        disableAndDeleteProcess(pd);
-        logoutOnTenant();
-        changeToNode1();
-        startPlatform();
-        loginOnDefaultTenantWith(USERNAME, PASSWORD);
+        try {
+            // then: node2 should finish the work
+            waitForProcessToFinishAndBeArchived(pi);
+        } finally {
+            // cleanup
+            disableAndDeleteProcess(pd);
+            logoutOnTenant();
+            changeToNode1();
+            startPlatform();
+            loginOnDefaultTenantWith(USERNAME, PASSWORD);
+        }
     }
 
 }
