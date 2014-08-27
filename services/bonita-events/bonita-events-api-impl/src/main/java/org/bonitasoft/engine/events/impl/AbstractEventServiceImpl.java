@@ -8,17 +8,17 @@ import java.util.Set;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
-import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.events.model.HandlerRegistrationException;
 import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.bonitasoft.engine.events.model.SEvent;
+import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.events.model.SHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 public abstract class AbstractEventServiceImpl implements EventService {
 
-    protected final TechnicalLoggerService logger;
+    protected static TechnicalLoggerService logger;
 
     protected AbstractEventServiceImpl(final TechnicalLoggerService logger) {
         this.logger = logger;
@@ -26,7 +26,7 @@ public abstract class AbstractEventServiceImpl implements EventService {
 
     /**
      * Fire the given Event only to interested handlers
-     * 
+     *
      * @throws SFireEventException
      */
     @Override
@@ -162,7 +162,7 @@ public abstract class AbstractEventServiceImpl implements EventService {
         if (handlers == null) {
             return Collections.emptySet();
         }
-        HashSet<SHandler<SEvent>> hashSet = new HashSet<SHandler<SEvent>>(handlers.size());
+        final HashSet<SHandler<SEvent>> hashSet = new HashSet<SHandler<SEvent>>(handlers.size());
         hashSet.addAll(handlers);
         return hashSet;
     }
