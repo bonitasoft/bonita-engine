@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bpm</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.3.4-SNAPSHOT</version>
+		<version>6.3.4.RC1</version>
 	</parent>
 
 	<artifactId>bonita-global-javadoc</artifactId>
