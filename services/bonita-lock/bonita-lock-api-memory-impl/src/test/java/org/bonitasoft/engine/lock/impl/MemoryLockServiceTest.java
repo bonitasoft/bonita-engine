@@ -107,6 +107,7 @@ public class MemoryLockServiceTest {
                 if (lock != null) {
                     return;
                 }
+                Thread.sleep(20);
             }
             throw new InterruptedException("lock not obtained in a sufficient amount time");
         }
