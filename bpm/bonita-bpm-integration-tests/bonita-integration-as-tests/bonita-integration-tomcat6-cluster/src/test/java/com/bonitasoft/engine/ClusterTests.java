@@ -64,9 +64,7 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.platform.TenantCreator;
 
 /**
- * 
  * @author Baptiste Mesta
- * 
  */
 public class ClusterTests extends CommonAPISPTest {
 
@@ -144,17 +142,16 @@ public class ClusterTests extends CommonAPISPTest {
         UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step0", ACTOR_NAME);
         addUserTask.addShortTextData("text", new ExpressionBuilder().createConstantStringExpression("default"));
         addUserTask
-        .addConnector("aConnector", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER)
-        .addInput("input1", new ExpressionBuilder().createConstantStringExpression("inputValue"))
-        .addOutput(
-                new OperationBuilder().createSetDataOperation("text", new ExpressionBuilder().createInputExpression("output1", String.class.getName())));
+                .addConnector("aConnector", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER)
+                .addInput("input1", new ExpressionBuilder().createConstantStringExpression("inputValue"))
+                .addOutput(
+                        new OperationBuilder().createSetDataOperation("text", new ExpressionBuilder().createInputExpression("output1", String.class.getName())));
 
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 designProcessDefinition.done());
 
         addConnectorImplemWithDependency(businessArchiveBuilder, "/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl",
-                "TestConnectorWithOutput.impl",
-                TestConnectorWithOutput.class, "TestConnectorWithOutput.jar");
+                "TestConnectorWithOutput.impl", TestConnectorWithOutput.class, "TestConnectorWithOutput.jar");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, user);
 
@@ -327,7 +324,7 @@ public class ClusterTests extends CommonAPISPTest {
     }
 
     private boolean isExecuted(final String systemProperty, final ProcessDefinition processDefinitionOnTheOtherTenant) throws ExpressionEvaluationException,
-    InvalidExpressionException {
+            InvalidExpressionException {
         String evaluateExpressionOnProcessDefinition = (String) getProcessAPI().evaluateExpressionOnProcessDefinition(
                 new ExpressionBuilder().createGroovyScriptExpression("getSystemProp", "return System.getProperty(\"" + systemProperty + "\")",
                         String.class.getName()), Collections.<String, Serializable> emptyMap(), processDefinitionOnTheOtherTenant.getId());
@@ -335,7 +332,7 @@ public class ClusterTests extends CommonAPISPTest {
     }
 
     private ProcessDefinition deployProcessThatSetASystemPropertyOnTheNode(final String systemProperty) throws InvalidExpressionException, BonitaException,
-    InvalidProcessDefinitionException {
+            InvalidProcessDefinitionException {
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
                 "1.0");
         designProcessDefinition.addActor(ACTOR_NAME);

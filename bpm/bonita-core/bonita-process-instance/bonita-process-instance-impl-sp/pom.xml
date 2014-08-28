@@ -2,36 +2,29 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>bonita-log</artifactId>
-        <groupId>com.bonitasoft.engine.log</groupId>
+        <artifactId>bonita-process-instance</artifactId>
+        <groupId>com.bonitasoft.engine.core.process.instance</groupId>
         <version>6.3.4-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bonita-log-api-impl</artifactId>
+    <artifactId>bonita-process-instance-impl-sp</artifactId>
 
-    <name>Bonita LOG Service API: implementation</name>
+    <name>Bonita Process Instance: Service Implementation</name>
 
     <dependencies>
         <dependency>
-            <groupId>org.bonitasoft.engine.log</groupId>
-            <artifactId>bonita-log-api</artifactId>
+            <groupId>com.bonitasoft.engine.core.process.instance</groupId>
+            <artifactId>bonita-process-instance-api-sp</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.log</groupId>
-            <artifactId>bonita-log-impl</artifactId>
+            <groupId>org.bonitasoft.engine.core.process.instance</groupId>
+            <artifactId>bonita-process-instance-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-        <!-- Tests -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
@@ -39,17 +32,20 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.scheduler</groupId>
-            <artifactId>bonita-scheduler-api</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.bonitasoft.engine</groupId>
+            <artifactId>bonita-builder-sp</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.scheduler</groupId>
-            <artifactId>bonita-scheduler-impl</artifactId>
+            <groupId>org.bonitasoft.engine.cache</groupId>
+            <artifactId>bonita-cache-api</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
-
-
     </dependencies>
+
 </project>

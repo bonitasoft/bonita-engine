@@ -40,7 +40,6 @@
 				<ref bean="jdbcJobListener" />
 			</list>
 		</constructor-arg>
-		<constructor-arg ref="sessionAccessor" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="useOptimization" value="true" />
 	</bean>
