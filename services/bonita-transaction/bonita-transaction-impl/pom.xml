@@ -36,12 +36,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.test</groupId>
-			<artifactId>bonita-test-util</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
