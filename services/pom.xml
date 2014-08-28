@@ -55,33 +55,4 @@
 		<module>bonita-time-tracker</module>
 	</modules>
 	
-	<profiles>
-		<profile>
-			<id>tests</id>
-			<modules>
-				<module>bonita-services-integration-tests</module>
-			</modules>
-		</profile>
-		
-		<profile>
-			<id>sonar</id>
-			<modules>
-				<module>bonita-services-integration-tests</module>
-			</modules>
-		</profile>
-		
-		<profile>
-			<id>all</id>
-			<modules>
-				<module>bonita-services-integration-tests</module>
-			</modules>
-		</profile>
-		
-		<profile>
-			<id>package-all</id>
-			<modules>
-				<module>bonita-services-integration-tests</module>
-			</modules>
-		</profile>
-	</profiles>
 </project>
