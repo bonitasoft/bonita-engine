@@ -49,11 +49,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.expression</groupId>
-            <artifactId>bonita-expression-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.bonitasoft.engine.log</groupId>
             <artifactId>bonita-log-impl</artifactId>
             <version>${project.version}</version>
@@ -73,11 +68,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-
 
         <dependency>
             <groupId>org.bonitasoft.engine.log</groupId>

@@ -11,7 +11,7 @@
 	<groupId>org.bonitasoft.engine.test</groupId>
 	<artifactId>bonita-test-util</artifactId>
 
-	<name>Bonita Test Tools</name>
+	<name>Bonita Test common utilitary tools</name>
 
 	<dependencies>
 		<dependency>

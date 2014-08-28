@@ -220,11 +220,6 @@
             <version>${project.version}</version>
         </dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.incident</groupId>
-			<artifactId>bonita-incident-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine.core.data</groupId>
 			<artifactId>bonita-data-instance-transient</artifactId>
 			<version>${project.version}</version>
@@ -295,17 +290,6 @@
         	<artifactId>bonita-identity-impl</artifactId>
         	<version>${project.version}</version>
         	<scope>test</scope>
-        </dependency>
-         <dependency>
-            <groupId>org.bonitasoft.engine.core.process.definition</groupId>
-			<artifactId>bonita-process-definition-impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-			<groupId>org.bonitasoft.engine.core.operation</groupId>
-			<artifactId>bonita-operation-model-impl</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
 			<groupId>org.bonitasoft.engine.core.operation</groupId>
