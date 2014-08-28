@@ -426,33 +426,12 @@
 			<version>0.7.1.RELEASE</version>
 		</dependency>
 
-		<!-- Atomikos -->
+		<!-- Transaction -->
 		<dependency>
-			<groupId>com.atomikos</groupId>
-			<artifactId>transactions</artifactId>
+			<groupId>org.codehaus.btm</groupId>
+			<artifactId>btm</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.atomikos</groupId>
-			<artifactId>transactions-api</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.atomikos</groupId>
-			<artifactId>atomikos-util</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.atomikos</groupId>
-			<artifactId>transactions-jdbc</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.atomikos</groupId>
-			<artifactId>transactions-jta</artifactId>
-			<scope>test</scope>
-		</dependency>
-		
 		<dependency>
 			<groupId>org.bonitasoft.engine.test</groupId>
 			<artifactId>bonita-test-util</artifactId>
