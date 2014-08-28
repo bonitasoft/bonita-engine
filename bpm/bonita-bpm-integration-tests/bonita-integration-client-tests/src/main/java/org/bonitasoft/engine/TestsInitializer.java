@@ -18,8 +18,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class TestsInitializer {
-    
-    
+
     private static final String SOURCE_BONITA_HOME = "../../bonita-home/target/home";
     private static final String TMP_BONITA_HOME = "target/eclipse-bonita-home";
 
@@ -125,6 +124,7 @@ public class TestsInitializer {
     }
 
     private static void setupEclipseBonitaHome() throws IOException {
+        // If we run tests inside Eclipse:
         if (System.getProperties().toString().contains("org.eclipse.osgi")) {
             final File destDir = new File(TMP_BONITA_HOME);
             System.out.println("Using BONITA_HOME: " + destDir.getAbsolutePath());
