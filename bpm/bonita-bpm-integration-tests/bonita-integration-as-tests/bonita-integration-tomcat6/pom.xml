@@ -26,7 +26,6 @@
 		<tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/${tomcat.name}.zip
 		</tomcat.url>
 		<tomcat.zip.folder>${user.home}</tomcat.zip.folder>
-		
 		<bonita.home>${tomcat.home}/bonita</bonita.home>
 		<if.task>net.sf.antcontrib.logic.IfTask</if.task>
 		<db.vendor>h2</db.vendor>
@@ -51,41 +50,14 @@
 		</dependency>
 		<!-- Transaction manager dependencies -->
 		<dependency>
-			<groupId>com.atomikos</groupId>
-			<artifactId>transactions</artifactId>
-			<version>${atomikos.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.atomikos</groupId>
-			<artifactId>transactions-api</artifactId>
-			<version>${atomikos.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.atomikos</groupId>
-			<artifactId>atomikos-util</artifactId>
-			<version>${atomikos.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.atomikos</groupId>
-			<artifactId>transactions-jdbc</artifactId>
-			<version>${atomikos.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.atomikos</groupId>
-			<artifactId>transactions-jta</artifactId>
-			<version>${atomikos.version}</version>
+			<groupId>org.codehaus.btm</groupId>
+			<artifactId>btm</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>javax.transaction</groupId>
 			<artifactId>jta</artifactId>
 			<version>1.1</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft</groupId>
-			<artifactId>tomcat-atomikos</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-		<!-- Log dependencies -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -95,7 +67,10 @@
 			<artifactId>slf4j-jdk14</artifactId>
 			<version>${slf4j.version}</version>
 		</dependency>
-		<!-- Driver dependencies -->
+		<dependency>
+			<groupId>org.codehaus.btm</groupId>
+			<artifactId>btm-tomcat55-lifecycle</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.tomcat</groupId>
 			<artifactId>bonita-tomcat-h2-listener</artifactId>
@@ -182,36 +157,10 @@
 											<artifactId>bonita-tomcat-h2-listener</artifactId>
 											<outputDirectory>${project.build.directory}/driver</outputDirectory>
 										</artifactItem>
-
-										<!-- tx-manager -->
+										<!-- http://docs.codehaus.org/display/BTM/Tomcat2x#Tomcat2x-Step1CopytheBTMjars -->
 										<artifactItem>
-											<groupId>org.bonitasoft</groupId>
-											<artifactId>tomcat-atomikos</artifactId>
-											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.atomikos</groupId>
-											<artifactId>transactions</artifactId>
-											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.atomikos</groupId>
-											<artifactId>transactions-api</artifactId>
-											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.atomikos</groupId>
-											<artifactId>atomikos-util</artifactId>
-											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.atomikos</groupId>
-											<artifactId>transactions-jdbc</artifactId>
-											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.atomikos</groupId>
-											<artifactId>transactions-jta</artifactId>
+											<groupId>org.codehaus.btm</groupId>
+											<artifactId>btm</artifactId>
 											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
 										</artifactItem>
 										<artifactItem>
@@ -227,6 +176,11 @@
 										<artifactItem>
 											<groupId>org.slf4j</groupId>
 											<artifactId>slf4j-jdk14</artifactId>
+											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.codehaus.btm</groupId>
+											<artifactId>btm-tomcat55-lifecycle</artifactId>
 											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
 										</artifactItem>
 									</artifactItems>
@@ -268,9 +222,24 @@
 
 										<!-- Update database configuration -->
 										<property file="tomcat/${db.vendor}/database.properties" />
-
-										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml"
+										<concat destfile="${tomcat.conf.dir}/bitronix-resources.properties"
+											append="true">
+											<fileset file="tomcat/${db.vendor}/ds.properties" />
+										</concat>
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties"
 											token="#db.datasource.class#" value="${db.datasource.class}" />
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties"
+											token="#db.server.name#" value="${db.server.name}" />
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties"
+											token="#db.server.port#" value="${db.server.port}" />
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties"
+											token="#db.database.name#" value="${db.database.name}" />
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties"
+											token="#db.url#" value="${db.url}" />
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties"
+											token="#db.user#" value="${db.user}" />
+										<replace file="${tomcat.conf.dir}/bitronix-resources.properties"
+											token="#db.password#" value="${db.password}" />
 										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml"
 											token="#db.driver.class#" value="${db.driver.class}" />
 										<replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml"
@@ -305,7 +274,6 @@
 										<replace file="${tomcat.conf.dir}/server.xml" token="&lt;Connector port=&quot;8009&quot;"
 											value="&lt;Connector port=&quot;${server.ajp.port}&quot;" />
 
-										<!-- Copy Libs -->
 										<copy todir="${tomcat.home}/lib">
 											<fileset dir="target/driver">
 												<include name="*jar" />
@@ -403,6 +371,11 @@
 									<javax.xml.parsers.DocumentBuilderFactory>
 										com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl
 									</javax.xml.parsers.DocumentBuilderFactory>
+
+									<!-- Bitronix properties -->
+									<btm.root>${tomcat.home}</btm.root>
+									<bitronix.tm.configuration>${tomcat.home}/conf/btm-config.properties
+									</bitronix.tm.configuration>
 								</systemProperties>
 							</container>
 							<configuration>
