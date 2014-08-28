@@ -19,6 +19,7 @@
 		<module>bonita-commons-test</module>
 		<module>bonita-services-test-conf</module>
 		<module>bonita-persistence-hibernate-test</module>
+		<module>bonita-jndi-memory</module>
 		<module>bonita-query-tests</module>
 	</modules>
 

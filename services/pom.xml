@@ -14,7 +14,6 @@
 	<name>Bonita Engine Services</name>
 
 	<modules>
-		<module>bonita-jndi</module>
 		<module>bonita-commons</module>
 		<module>bonita-log</module>
 		<module>bonita-recorder</module>
