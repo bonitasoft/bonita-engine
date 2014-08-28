@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>bonita-bpm-integration-tests</artifactId>
+		<artifactId>bonita-integration-tests</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
 		<version>6.4.0-SNAPSHOT</version>
 	</parent>
