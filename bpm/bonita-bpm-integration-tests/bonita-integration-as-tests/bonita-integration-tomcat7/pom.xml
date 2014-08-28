@@ -15,8 +15,6 @@
 	<name>Bonita - Integration Tests on Tomcat 7</name>
 
 	<properties>
-		<atomikos.version>3.9.3</atomikos.version>
-	
 		<server.port>8384</server.port>
 		<server.ajp.port>8313</server.ajp.port>
 		<provider.port>8184</provider.port>
@@ -55,27 +53,22 @@
 		<dependency>
 			<groupId>com.atomikos</groupId>
 			<artifactId>transactions</artifactId>
-			<version>${atomikos.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.atomikos</groupId>
 			<artifactId>transactions-api</artifactId>
-			<version>${atomikos.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.atomikos</groupId>
 			<artifactId>atomikos-util</artifactId>
-			<version>${atomikos.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.atomikos</groupId>
 			<artifactId>transactions-jdbc</artifactId>
-			<version>${atomikos.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.atomikos</groupId>
 			<artifactId>transactions-jta</artifactId>
-			<version>${atomikos.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.transaction</groupId>

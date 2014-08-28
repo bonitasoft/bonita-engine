@@ -8,6 +8,7 @@
 	</appender>
 
 	<logger name="org.bonitasoft" level="INFO" />
+	<logger name="com.atomikos" level="WARN" />
 
 	<root level="WARN">
 		<appender-ref ref="STDOUT" />

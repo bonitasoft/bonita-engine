@@ -13,16 +13,14 @@ http://www.springframework.org/schema/context	http://www.springframework.org/sch
 	<!-- We need 2 datasources that target the same DB : -->
 	<!-- First datasource (bonitaDataSource) for the whole Bonita platform -->
 	<!-- Second datasource (bonitaSequenceManagerDataSource) for the SequenceManager implementation in order not to be stuck when we need some new ids -->
-    <bean id="bonitaDataSource" class="bitronix.tm.resource.jdbc.PoolingDataSource" init-method="init" destroy-method="close" depends-on="dataSourceDependency">  
-        <property name="className" value="${db.datasource.class}" />
-        <property name="uniqueName" value="java:comp/env/bonitaDS" /> <!--  Is it really useful and/or used ?  --> 
-         <property name="minPoolSize" value="1" />
-        <property name="maxPoolSize" value="7" />
-		<property name="acquireIncrement" value="1" />
-        <property name="allowLocalTransactions" value="true" /> <!--  For hibernate : see if we can set it to false --> 
-        <property name="driverProperties" ref="driverProperties">
-        </property>
-    </bean>  
+    <bean id="bonitaDataSource" class="com.atomikos.jdbc.AtomikosDataSourceBean" init-method="init" destroy-method="close" depends-on="dataSourceDependency">
+		<property name="uniqueResourceName" value="java:comp/env/bonitaDS" />
+		<property name="xaDataSourceClassName" value="${db.datasource.class}"/>
+		<property name="xaProperties" ref="driverProperties" />
+		<property name="maxPoolSize" value="7" />
+		<property name="minPoolSize" value="1"/> 
+		<property name="testQuery" value = "SELECT 1 FROM DUAL" />
+	</bean>
 
 	<bean id="bonitaSequenceManagerDataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close" depends-on="dataSourceDependency">
 		<property name="driverClass" value="${db.driver.class}"/>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -55,6 +56,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<spring.version>3.1.2.RELEASE</spring.version>
+		<atomikos.version>3.9.3</atomikos.version>
 
 		<!-- Tests -->
 		<powermock.version>1.5.1</powermock.version>
@@ -62,13 +64,15 @@
 		<!-- ************************ -->
 		<!-- Sonar/Reporting settings -->
 		<!-- ************************ -->
-		<!-- Sonar/Jacoco integration. Note that these properties need to be defined outside the "coverage" profile because we want to be to able to execute mvn sonar:sonar 
-			without passing a profile -->
+		<!-- Sonar/Jacoco integration. Note that these properties need to be defined 
+			outside the "coverage" profile because we want to be to able to execute mvn 
+			sonar:sonar without passing a profile -->
 		<!-- Tells Sonar to use jacoco for coverage results -->
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<!-- Jacoco version to use -->
 		<jacoco.version>0.6.4.201312101107</jacoco.version>
-		<!-- The Sonar Jacoco Listener for JUnit to extract coverage details per test -->
+		<!-- The Sonar Jacoco Listener for JUnit to extract coverage details per 
+			test -->
 		<sonar-jacoco-listeners.version>1.4</sonar-jacoco-listeners.version>
 		<!-- Don't let Sonar execute tests. We will ask it to Maven -->
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
@@ -76,11 +80,13 @@
 		<jacoco.outputDir>${project.build.directory}</jacoco.outputDir>
 		<!-- Jacoco output file for UTs -->
 		<jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
-		<!-- Tells Sonar where the Jacoco coverage result file is located for Unit Tests -->
+		<!-- Tells Sonar where the Jacoco coverage result file is located for Unit 
+			Tests -->
 		<sonar.jacoco.reportPath>${jacoco.outputDir}/${jacoco.out.ut.file}</sonar.jacoco.reportPath>
 		<!-- Jacoco output file for ITs -->
 		<jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
-		<!-- Tells Sonar where the Jacoco coverage result file is located for Integration Tests -->
+		<!-- Tells Sonar where the Jacoco coverage result file is located for Integration 
+			Tests -->
 		<sonar.jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</sonar.jacoco.itReportPath>
 	</properties>
 
@@ -128,10 +134,10 @@
 				<version>2.1</version>
 			</dependency>
 			<dependency>
-	            <groupId>org.apache.commons</groupId>
-	            <artifactId>commons-lang3</artifactId>
-	            <version>3.1</version>
-	        </dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>3.1</version>
+			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-collections4</artifactId>
@@ -173,15 +179,32 @@
 				<artifactId>logback-classic</artifactId>
 				<version>1.0.11</version>
 			</dependency>
+			
+			<!-- Atomikos -->
 			<dependency>
-				<groupId>org.codehaus.btm</groupId>
-				<artifactId>btm</artifactId>
-				<version>2.1.4</version>
+				<groupId>com.atomikos</groupId>
+				<artifactId>transactions</artifactId>
+				<version>${atomikos.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.codehaus.btm</groupId>
-				<artifactId>btm-tomcat55-lifecycle</artifactId>
-				<version>2.1.4</version>
+				<groupId>com.atomikos</groupId>
+				<artifactId>transactions-api</artifactId>
+				<version>${atomikos.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.atomikos</groupId>
+				<artifactId>atomikos-util</artifactId>
+				<version>${atomikos.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.atomikos</groupId>
+				<artifactId>transactions-jdbc</artifactId>
+				<version>${atomikos.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.atomikos</groupId>
+				<artifactId>transactions-jta</artifactId>
+				<version>${atomikos.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -515,7 +538,8 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
-							<!-- Be aware not to omit ${jacoco.agent.it.arg} if overriding this property in lower-level pom files: -->
+							<!-- Be aware not to omit ${jacoco.agent.it.arg} if overriding this 
+								property in lower-level pom files: -->
 							<argLine>-Xmx1024m -XX:MaxPermSize=256m
 								-XX:+HeapDumpOnOutOfMemoryError ${jacoco.agent.it.arg}</argLine>
 							<!-- Listener to show coverage for each test -->
@@ -539,7 +563,8 @@
 							</includes>
 						</configuration>
 						<executions>
-							<!-- Prepares a variable, jacoco.agent.ut.arg, that contains the info to be passed to the JVM hosting the code being tested. -->
+							<!-- Prepares a variable, jacoco.agent.ut.arg, that contains the info 
+								to be passed to the JVM hosting the code being tested. -->
 							<execution>
 								<id>prepare-ut-agent</id>
 								<phase>process-test-classes</phase>
@@ -552,7 +577,8 @@
 									<append>true</append>
 								</configuration>
 							</execution>
-							<!-- Prepares a variable, jacoco.agent.it.arg, that contains the info to be passed to the JVM hosting the code being tested. -->
+							<!-- Prepares a variable, jacoco.agent.it.arg, that contains the info 
+								to be passed to the JVM hosting the code being tested. -->
 							<execution>
 								<id>prepare-it-agent</id>
 								<phase>pre-integration-test</phase>
