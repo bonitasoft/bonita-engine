@@ -211,7 +211,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.persistence</groupId>
+			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-persistence-hibernate-test</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
