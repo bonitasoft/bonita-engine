@@ -68,9 +68,9 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         getProcessAPI().executeFlowNode(task1.getId());
         getProcessAPI().executeFlowNode(task2.getId());
 
-        waitForProcessToFinish(processInstance, TestStates.getCancelledState());
-        waitForArchivedActivity(task1.getId(), TestStates.getCancelledState());
-        waitForArchivedActivity(task2.getId(), TestStates.getCancelledState());
+        waitForProcessToFinish(processInstance, TestStates.CANCELLED);
+        waitForArchivedActivity(task1.getId(), TestStates.CANCELLED);
+        waitForArchivedActivity(task2.getId(), TestStates.CANCELLED);
 
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId1));
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId2));
@@ -92,7 +92,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final WaitForEvent waitForInterrupted = waitForEvent(processInstance, "start", TestStates.getInterruptingState());
+        final WaitForEvent waitForInterrupted = waitForEvent(processInstance, "start", TestStates.INTERRUPTED);
 
         final EventInstance start = waitForInterrupted.getResult();
         assertEquals("start", start.getName());
@@ -102,7 +102,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         // resume breakpoint
         getProcessAPI().executeFlowNode(start.getId());
 
-        waitForProcessToFinish(processInstance, TestStates.getCancelledState());
+        waitForProcessToFinish(processInstance, TestStates.CANCELLED);
 
         final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(processInstance.getId(), 0, 20,
                 ActivityInstanceCriterion.NAME_ASC);
@@ -128,7 +128,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final WaitForEvent waitForInterrupted = waitForEvent(processInstance, "end1", TestStates.getInterruptingState());
+        final WaitForEvent waitForInterrupted = waitForEvent(processInstance, "end1", TestStates.INTERRUPTED);
         final EventInstance end = waitForInterrupted.getResult();
         assertEquals("end1", end.getName());
 
@@ -137,7 +137,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         // resume breakpoint
         getProcessAPI().executeFlowNode(end.getId());
 
-        waitForProcessToFinish(processInstance, TestStates.getCancelledState());
+        waitForProcessToFinish(processInstance, TestStates.CANCELLED);
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
         disableAndDeleteProcess(processDefinition);
     }
@@ -156,7 +156,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         final Long breakpointId = (Long) getCommandAPI().execute("addBreakpoint", parameters);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final WaitForEvent waitForInterrupted = waitForEvent(processInstance, "sendMessage", TestStates.getInterruptingState());
+        final WaitForEvent waitForInterrupted = waitForEvent(processInstance, "sendMessage", TestStates.INTERRUPTED);
         final EventInstance event = waitForInterrupted.getResult();
         assertEquals("sendMessage", event.getName());
 
@@ -165,7 +165,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         // resume breakpoint
         getProcessAPI().executeFlowNode(event.getId());
 
-        waitForProcessToFinish(processInstance, TestStates.getCancelledState());
+        waitForProcessToFinish(processInstance, TestStates.CANCELLED);
 
         // verify that the execution does not pass through the activity after the intermediate event
         checkWasntExecuted(processInstance, "auto2");
@@ -191,7 +191,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
 
         // resume break point
         getProcessAPI().executeFlowNode(waitForFlowNode.getId());
-        waitForProcessToFinish(processInstance, TestStates.getCancelledState());
+        waitForProcessToFinish(processInstance, TestStates.CANCELLED);
 
         // verify that the execution does not pass through the activity after the gateway
         checkWasntExecuted(processInstance, "step4");
@@ -219,7 +219,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
 
         // resume break point
         getProcessAPI().executeFlowNode(waitForFlowNode.getId());
-        waitForProcessToFinish(processInstance, TestStates.getCancelledState());
+        waitForProcessToFinish(processInstance, TestStates.CANCELLED);
 
         // verify that the execution does not pass through the activities after the gateway
         checkWasntExecuted(processInstance, "step2");
@@ -247,7 +247,7 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
 
         // resume break point
         getProcessAPI().executeFlowNode(waitForFlowNode.getId());
-        waitForProcessToFinish(processInstance, TestStates.getCancelledState());
+        waitForProcessToFinish(processInstance, TestStates.CANCELLED);
 
         // verify that the execution does not pass through the activities after the gateway
         checkWasntExecuted(processInstance, "step2");

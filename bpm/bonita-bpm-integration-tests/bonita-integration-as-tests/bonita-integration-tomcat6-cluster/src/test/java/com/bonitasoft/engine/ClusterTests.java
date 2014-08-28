@@ -212,20 +212,19 @@ public class ClusterTests extends CommonAPISPTest {
         loginOnDefaultTenantWithDefaultTechnicalUser();
 
         getTenantManagementAPI().pause();
-        
+
         assertThat(getTenantManagementAPI().isPaused()).isTrue();
-        
+
         changeToNode2();
         
         assertThat(getTenantManagementAPI().isPaused()).isTrue();
-        
+
         getTenantManagementAPI().resume();
     }
 
     @Test
     public void should_pause_tenant_then_stop_start_node_dont_restart_elements() throws Exception {
         // given: 2 node with 1 node having running processes
-        final long tenantId = createAndActivateTenant("MyTenant_");
 
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
@@ -240,15 +239,17 @@ public class ClusterTests extends CommonAPISPTest {
         stopPlatform();
         changeToNode2();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
+        try {
         // then: node2 should finish the work
         waitForProcessToFinishAndBeArchived(pi);
-
+        } finally {
         // cleanup
         disableAndDeleteProcess(pd);
         logoutOnTenant();
         changeToNode1();
         startPlatform();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
+    }
     }
 
 }
