@@ -29,17 +29,5 @@
 				<module>bonita-global-javadoc</module>
 			</modules>
 		</profile>
-		<profile>
-			<id>tests</id>
-			<modules>
-				<module>bonita-bpm-integration-tests</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>package-all</id>
-			<modules>
-				<module>bonita-bpm-integration-tests</module>
-			</modules>
-		</profile>
 	</profiles>
 </project>
