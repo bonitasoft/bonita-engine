@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<artifactId>bonita-process-instance</artifactId>
-		<groupId>org.bonitasoft.engine.core.process.instance</groupId>
+    <parent>
+        <artifactId>bonita-process-instance</artifactId>
+        <groupId>org.bonitasoft.engine.core.process.instance</groupId>
 		<version>6.4.0-SNAPSHOT</version>
-	</parent>
+    </parent>
 
-	<artifactId>bonita-process-instance-api</artifactId>
+    <artifactId>bonita-process-instance-api</artifactId>
 
-	<name>Bonita Process Instance: Servce API</name>
+    <name>Bonita Process Instance: Servce API</name>
 
-	<dependencies>
-		<dependency>
+    <dependencies>
+        <dependency>
             <groupId>org.bonitasoft.engine.identity</groupId>
             <artifactId>bonita-identity-api</artifactId>
             <version>${project.version}</version>
@@ -25,7 +25,7 @@
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.recorder</groupId>
-            <artifactId>bonita-recorder-model</artifactId>
+            <artifactId>bonita-recorder-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -36,22 +36,22 @@
         <dependency>
             <groupId>org.bonitasoft.engine.log</groupId>
             <artifactId>bonita-log-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.bonitasoft.engine.api</groupId>
             <artifactId>bonita-common-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.bonitasoft.engine.persistence</groupId>
             <artifactId>bonita-persistence-read</artifactId>
-	  		<version>${project.version}</version>
-	  	</dependency>
-	  	<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			 <scope>test</scope>
-		</dependency>
-	</dependencies>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

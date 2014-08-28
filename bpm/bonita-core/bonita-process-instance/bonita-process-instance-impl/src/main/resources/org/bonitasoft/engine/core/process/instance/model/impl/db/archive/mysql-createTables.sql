@@ -101,6 +101,8 @@ CREATE TABLE arch_transition_instance (
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 
+CREATE INDEX idx1_arch_transition_instance ON arch_transition_instance (tenantid, rootcontainerid);
+
 CREATE TABLE arch_connector_instance (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -117,4 +119,3 @@ CREATE TABLE arch_connector_instance (
 ) ENGINE = INNODB;
 
 CREATE INDEX idx1_arch_connector_instance ON arch_connector_instance (tenantId,containerId, containerType);
-

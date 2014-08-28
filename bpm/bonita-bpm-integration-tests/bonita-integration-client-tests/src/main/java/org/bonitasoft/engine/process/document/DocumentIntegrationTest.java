@@ -422,7 +422,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
             assertNotSame(beforeUpdate, afterUpdate);
 
             final HumanTaskInstance step1 = waitForUserTaskAndExecuteIt("step1", processInstance, user);
-            waitForArchivedActivity(step1.getId(), TestStates.getNormalFinalState());
+            waitForArchivedActivity(step1.getId(), TestStates.NORMAL_FINAL);
 
             final Document doc2 = BuildTestUtil.buildDocument(beforeUpdate.getName());
             getProcessAPI().attachNewDocumentVersion(processInstance.getId(), beforeUpdate.getName(), doc2.getContentFileName(), doc2.getContentMimeType(),

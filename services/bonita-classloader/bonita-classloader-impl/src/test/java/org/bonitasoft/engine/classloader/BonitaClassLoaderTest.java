@@ -29,7 +29,7 @@ public class BonitaClassLoaderTest {
     public void releaseShouldRemoveAllScopeFolderAndItsContent() {
         final Map<String, byte[]> resources = new HashMap<String, byte[]>(1);
         resources.put("myJar.jar", "Salut le monde".getBytes());
-        final File tempDir = new File(IOUtil.TMP_DIRECTORY, "BonitaClassLoaderTest");
+        final File tempDir = new File(IOUtil.TMP_DIRECTORY, "BonitaClassLoaderTest_" + System.currentTimeMillis());
 
         // given
         assertThat(tempDir).as("tempDir:%s should not exists before bonitaClassLoader init", tempDir.getAbsolutePath()).doesNotExist();

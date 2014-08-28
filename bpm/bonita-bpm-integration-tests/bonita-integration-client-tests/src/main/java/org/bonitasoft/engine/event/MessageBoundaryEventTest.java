@@ -81,7 +81,7 @@ public class MessageBoundaryEventTest extends CommonAPITest {
 
         waitForProcessToFinish(processInstance);
 
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
 
         checkWasntExecuted(processInstance, "step2");
 
@@ -123,10 +123,10 @@ public class MessageBoundaryEventTest extends CommonAPITest {
                 new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
 
         waitForUserTaskAndExecuteIt("exceptionStep", processInstance, donaBenta);
-        waitForProcessToFinish(calledProcessInstance, TestStates.getAbortedState());
+        waitForProcessToFinish(calledProcessInstance, TestStates.ABORTED);
         waitForProcessToFinish(processInstance);
 
-        waitForArchivedActivity(calledStep.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(calledStep.getId(), TestStates.ABORTED);
 
         checkWasntExecuted(processInstance, "step2");
 
@@ -225,7 +225,7 @@ public class MessageBoundaryEventTest extends CommonAPITest {
 
         waitForProcessToFinish(processInstance);
 
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
 
         checkWasntExecuted(processInstance, "step2");
 
@@ -278,7 +278,7 @@ public class MessageBoundaryEventTest extends CommonAPITest {
         waitForProcessToFinish(processInstance);
 
         for (final HumanTaskInstance humanTaskInstance : pendingTasks) {
-            waitForArchivedActivity(humanTaskInstance.getId(), TestStates.getAbortedState());
+            waitForArchivedActivity(humanTaskInstance.getId(), TestStates.ABORTED);
         }
 
         checkWasntExecuted(processInstance, "step2");
@@ -348,7 +348,7 @@ public class MessageBoundaryEventTest extends CommonAPITest {
 
         waitForProcessToFinish(processInstance);
 
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
 
         checkWasntExecuted(processInstance, "step2");
 

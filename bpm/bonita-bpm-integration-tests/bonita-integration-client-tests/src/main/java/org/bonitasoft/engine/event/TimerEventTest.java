@@ -1,9 +1,6 @@
 package org.bonitasoft.engine.event;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -67,10 +64,16 @@ public class TimerEventTest extends CommonAPITest {
         waitForEventInWaitingState(processInstance, "intermediateCatchEvent");
         final long processInstanceId = processInstance.getId();
         EventInstance eventInstance = getEventInstance(processInstanceId, "intermediateCatchEvent");
-        checkIntermediateCatchEventInstance(eventInstance, "intermediateCatchEvent", TestStates.getWaitingState());
+        checkIntermediateCatchEventInstance(eventInstance, "intermediateCatchEvent", TestStates.WAITING);
         // wait trigger activation
-        Thread.sleep(3000);
+        int cnt = 0;
+
+        // BS-9586 : for mysql, we wait longer
+        while (cnt < 10 && eventInstance != null) {
+            Thread.sleep(1000);
         eventInstance = getEventInstance(processInstanceId, "intermediateCatchEvent");
+            cnt++;
+        }
         assertNull(eventInstance);// finished
 
         waitForUserTask(step2Name, processInstance);
@@ -95,9 +98,9 @@ public class TimerEventTest extends CommonAPITest {
 
         assignAndExecuteStep(userTask, getIdentityAPI().getUserByUserName(USERNAME).getId());
 
-        waitForFlowNodeInState(processInstance, "intermediateCatchEvent", TestStates.getWaitingState(), true);
+        waitForFlowNodeInState(processInstance, "intermediateCatchEvent", TestStates.WAITING, true);
         final EventInstance eventInstance = getEventInstance(processInstance.getId(), "intermediateCatchEvent");
-        checkIntermediateCatchEventInstance(eventInstance, "intermediateCatchEvent", TestStates.getWaitingState());
+        checkIntermediateCatchEventInstance(eventInstance, "intermediateCatchEvent", TestStates.WAITING);
         // wait trigger activation
         waitForUserTask(step2Name, processInstance);
         final long now = System.currentTimeMillis();
@@ -116,7 +119,7 @@ public class TimerEventTest extends CommonAPITest {
         // created in one second
         final ProcessDefinition definition = deployProcessWithTimerStartEventAndUserTask(TimerType.DATE, timerExpression, stepName);
 
-        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
+        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
         assertTrue(processInstances.isEmpty());
 
         // wait for process instance creation
@@ -195,14 +198,14 @@ public class TimerEventTest extends CommonAPITest {
         return searchedEventInstance;
     }
 
-    private void checkIntermediateCatchEventInstance(final EventInstance eventInstance, final String eventName, final String state) {
+    private void checkIntermediateCatchEventInstance(final EventInstance eventInstance, final String eventName, final TestStates state) {
         assertTrue(eventInstance instanceof IntermediateCatchEventInstance);
         checkEventInstance(eventInstance, eventName, state);
     }
 
-    private void checkEventInstance(final EventInstance eventInstance, final String eventName, final String state) {
+    private void checkEventInstance(final EventInstance eventInstance, final String eventName, final TestStates state) {
         assertEquals(eventName, eventInstance.getName());
-        assertEquals(state, eventInstance.getState());
+        assertEquals(state.getStateName(), eventInstance.getState());
         // if(TestStates.getNormalFinalState(eventInstance).equals(state)) {
         // assertTrue(eventInstance.getEndDate() > 0);
         // }
