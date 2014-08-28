@@ -45,7 +45,6 @@
 		<module>bonita-profile</module>
 		<module>bonita-lock</module>
 		<module>bonita-work</module>
-		<module>bonita-services-test-conf</module>
 		<module>bonita-incident</module>
 		<module>bonita-builder</module>
 		<module>bonita-theme</module>
