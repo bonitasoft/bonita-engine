@@ -67,12 +67,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-commons-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine.cache</groupId>
 			<artifactId>bonita-cache-ehcache</artifactId>
 			<version>${project.version}</version>
