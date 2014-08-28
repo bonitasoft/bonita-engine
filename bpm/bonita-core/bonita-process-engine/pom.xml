@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-core</artifactId>
 		<groupId>com.bonitasoft.engine.core</groupId>
-		<version>6.3.3</version>
+		<version>6.3.4-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-process-engine</artifactId>
@@ -34,7 +34,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-api</artifactId>
+			<artifactId>bonita-process-instance-api-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -95,7 +95,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-model-impl</artifactId>
+			<artifactId>bonita-expression-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -113,7 +113,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-impl</artifactId>
+			<artifactId>bonita-process-instance-impl-sp</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

@@ -112,7 +112,7 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
             //            messages.addAll(checkNoActiveTransactions());
 
             // FIXME : Uncomment when fix bug : BS-7206
-            // messages.addAll(checkNoDataMappings());
+            //messages.addAll(checkNoDataMappings());
             logoutOnTenant();
         }
         return messages;

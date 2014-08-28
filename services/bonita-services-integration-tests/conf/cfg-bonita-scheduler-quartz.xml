@@ -26,6 +26,7 @@
 	<bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
 		<constructor-arg name="jobService" ref="jobService" />
 		<constructor-arg name="incidentService" ref="incidentService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
 	<bean id="loggerJobListener" class="org.bonitasoft.engine.scheduler.impl.TechnicalLoggerJobListener">
@@ -40,7 +41,6 @@
 				<ref bean="jdbcJobListener" />
 			</list>
 		</constructor-arg>
-		<constructor-arg ref="sessionAccessor" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="useOptimization" value="true" />
 	</bean>
@@ -49,6 +49,7 @@
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="recorder" ref="recorderSync" />
 		<constructor-arg name="readPersistenceService" ref="persistenceService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 	
 	<bean id="scheduler" class="org.bonitasoft.engine.scheduler.impl.SchedulerServiceImpl">

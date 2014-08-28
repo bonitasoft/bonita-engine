@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine</groupId>
 		<artifactId>bonita-bpm-integration-tests</artifactId>
-		<version>6.3.3</version>
+		<version>6.3.4-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-integration-local-tests-sp</artifactId>
@@ -59,8 +59,7 @@
 			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc</artifactId>
 			<version>6</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/ojdbc6.jar</systemPath>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -71,8 +70,7 @@
 			<groupId>com.microsoft.jdbc</groupId>
 			<artifactId>sqlserver</artifactId>
 			<version>4.0.2206.100</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/sqljdbc-4.0.2206.100.jar</systemPath>
+			<scope>runtime</scope>
 		</dependency>
 
 		<!-- Local JNDI implementation -->

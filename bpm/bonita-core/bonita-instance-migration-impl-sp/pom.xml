@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine.core</groupId>
 		<artifactId>bonita-core</artifactId>
-		<version>6.3.3</version>
+		<version>6.3.4-SNAPSHOT</version>
 	</parent>
 	
 	<artifactId>bonita-instance-migration-impl-sp</artifactId>
@@ -12,7 +12,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-api</artifactId>
+			<artifactId>bonita-process-instance-api-sp</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

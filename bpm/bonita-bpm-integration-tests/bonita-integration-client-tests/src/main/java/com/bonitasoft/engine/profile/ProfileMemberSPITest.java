@@ -88,42 +88,42 @@ public class ProfileMemberSPITest extends AbstractProfileSPTest {
     public void createProfileMembersMultiThreaded() throws Throwable {
 
         //given
-        Profile profile = getProfileAPI().createProfile("Mine", "My custom profile");
-        User john = getIdentityAPI().createUser("john", "bpm");
-        User jack = getIdentityAPI().createUser("jack", "bpm");
-        User james = getIdentityAPI().createUser("james", "bpm");
-        Role member = getIdentityAPI().createRole("member");
+        final Profile profile = getProfileAPI().createProfile("Mine", "My custom profile");
+        final User john = getIdentityAPI().createUser("john", "bpm");
+        final User jack = getIdentityAPI().createUser("jack", "bpm");
+        final User james = getIdentityAPI().createUser("james", "bpm");
+        final Role member = getIdentityAPI().createRole("member");
 
-        List<Group> groups = new ArrayList<Group>();
+        final List<Group> groups = new ArrayList<Group>();
         for (int i = 0; i < 20; i++) {
             groups.add(getIdentityAPI().createGroup("myGroup" + i, null));
         }
 
-        List<FailableThread> threads = new ArrayList<FailableThread>();
+        final List<FailableThread> threads = new ArrayList<FailableThread>();
 
         threads.add(createThreadForProfileMember("t1", profile.getId(), john.getId(), null, null));
         threads.add(createThreadForProfileMember("t2", profile.getId(), jack.getId(), null, null));
         threads.add(createThreadForProfileMember("t3", profile.getId(), james.getId(), null, null));
         threads.add(createThreadForProfileMember("t4", profile.getId(), null, null, member.getId()));
         threads.add(createThreadForProfileMember("t5", profile.getId(), null, groups.get(0).getId(), member.getId()));
-        for (Group group : groups) {
+        for (final Group group : groups) {
             threads.add(createThreadForProfileMember(group.getName(), profile.getId(), null, group.getId(), null));
         }
 
         //when
-        for (Thread thread : threads) {
+        for (final Thread thread : threads) {
             thread.start();
         }
 
         //then: threads are ok
-        for (Thread thread : threads) {
+        for (final Thread thread : threads) {
             thread.join(1000);
         }
-        for (Thread thread : threads) {
+        for (final Thread thread : threads) {
             thread.join(1000);
         }
 
-        for (FailableThread thread : threads) {
+        for (final FailableThread thread : threads) {
             if (thread.getException() != null) {
                 throw thread.getException();
             }
@@ -135,16 +135,14 @@ public class ProfileMemberSPITest extends AbstractProfileSPTest {
     }
 
     private FailableThread createThreadForProfileMember(final String threadName, final Long profileId, final Long userId, final Long grouId, final Long roleId) {
-        FailableThread t1 = new FailableThread(threadName, new FailableRunnable() {
+        final FailableThread t1 = new FailableThread(threadName, new FailableRunnable() {
             @Override
             public void run() {
-                System.out.println(threadName + " start");
                 try {
                     getProfileAPI().createProfileMember(profileId, userId, grouId, roleId);
-                } catch (Throwable e) {
+                } catch (final Throwable e) {
                     setException(e);
                 }
-                System.out.println(threadName + " done");
             }
         });
         return t1;

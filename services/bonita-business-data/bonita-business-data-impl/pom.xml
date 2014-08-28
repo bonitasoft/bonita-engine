@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine.data</groupId>
 		<artifactId>bonita-business-data</artifactId>
-		<version>6.3.3</version>
+		<version>6.3.4-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-business-data-impl</artifactId>
@@ -128,15 +128,13 @@
 			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc</artifactId>
 			<version>6</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/ojdbc6.jar</systemPath>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.microsoft.jdbc</groupId>
 			<artifactId>sqlserver</artifactId>
 			<version>4.0.2206.100</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/sqljdbc-4.0.2206.100.jar</systemPath>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
