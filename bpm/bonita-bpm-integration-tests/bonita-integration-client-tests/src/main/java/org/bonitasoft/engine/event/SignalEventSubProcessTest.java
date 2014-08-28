@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
@@ -24,10 +25,10 @@ import org.bonitasoft.engine.api.ProcessManagementAPI;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
@@ -173,34 +174,36 @@ public class SignalEventSubProcessTest extends EventsAPITest {
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal" }, jira = "ENGINE-536")
     @Test
     public void signalEventSubProcessTriggered() throws Exception {
+        //given
         final ProcessDefinition process = deployAndEnableProcessWithSignalEventSubProcess(false, false);
+
+        //when
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        final ActivityInstance step1 = waitForUserTask(PARENT_STEP, processInstance);
+        waitForUserTask(PARENT_STEP, processInstance);
+
+        //then
         List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
-        assertEquals(1, activities.size());
+        assertThat(activities).as("should have 1 activity").hasSize(1);
         checkNumberOfWaitingEvents(SUB_PROCESS_START, 1);
 
-        // send signal to start event sub process
-        Thread.sleep(50);
+        //when
         getProcessAPI().sendSignal(SIGNAL_NAME);
-
-        final FlowNodeInstance eventSubProcessActivity = waitForFlowNodeInExecutingState(processInstance, SUB_PROCESS_NAME, false);
         final ActivityInstance subStep = waitForUserTask(SUB_STEP, processInstance);
-        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
-        // the parent process instance is supposed to be aborted, so no more waiting events are expected
-        checkNumberOfWaitingEvents(SUB_PROCESS_START, 0);
 
+        //then
+        checkNumberOfWaitingEvents(SUB_PROCESS_START, 0);
         activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
-        assertEquals(2, activities.size());
+        assertThat(activities).as("should have 2 avtivities").hasSize(2);
         assertEquals(SUB_PROCESS_NAME, activities.get(0).getName());
         assertEquals(SUB_STEP, activities.get(1).getName());
 
+        //when
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
         assignAndExecuteStep(subStep, john.getId());
-        waitForArchivedActivity(eventSubProcessActivity.getId(), TestStates.NORMAL_FINAL);
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.ABORTED);
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
 
+        //then
         // check that the transition wasn't taken
         checkWasntExecuted(processInstance, PARENT_END);
 
@@ -208,7 +211,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal",
-            "intermediateThrowEvent" }, jira = "ENGINE-1408")
+    "intermediateThrowEvent" }, jira = "ENGINE-1408")
     @Test
     public void signalEventSubProcessTriggeredWithIntermediateThrowEvent() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithSignalEventSubProcess(true, false);
