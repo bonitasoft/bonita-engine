@@ -16,6 +16,7 @@
 	<modules>
 		<module>bonita-client-test-util</module>
 		<module>bonita-test-util</module>
+		<module>bonita-commons-test</module>
 		<module>bonita-query-tests</module>
 	</modules>
 

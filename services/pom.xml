@@ -16,7 +16,6 @@
 	<modules>
 		<module>bonita-jndi</module>
 		<module>bonita-commons</module>
-		<module>bonita-commons-test</module>
 		<module>bonita-log</module>
 		<module>bonita-recorder</module>
 		<module>bonita-identity</module>
