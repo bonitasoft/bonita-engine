@@ -30,7 +30,6 @@
 		<module>bonita-events</module>
 		<module>bonita-dependency</module>
 		<module>bonita-platform</module>
-		<module>bonita-test-util</module>
 		<module>bonita-archive</module>
 		<module>bonita-authentication</module>
 		<module>bonita-session</module>
