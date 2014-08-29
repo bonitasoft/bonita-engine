@@ -12,9 +12,8 @@
 
 	<modules>
 		<module>bonita-client-test-util</module>
-		<module>bonita-test-util</module>
 		<module>bonita-commons-test</module>
-		<module>bonita-services-test-conf</module>
+		<module>bonita-services-test-utils</module>
 		<module>bonita-jndi-memory</module>
 	</modules>
 </project>

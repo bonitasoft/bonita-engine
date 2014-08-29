@@ -460,12 +460,6 @@
 
 		<!-- Misc -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.test</groupId>
-			<artifactId>bonita-test-util</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-commons</artifactId>
 			<version>${project.version}</version>
@@ -563,7 +557,7 @@
 
 		<dependency>
 			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-services-test-conf</artifactId>
+			<artifactId>bonita-services-test-utils</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -682,7 +676,7 @@
 							<artifactItems>
 								<artifactItem>
 									<groupId>org.bonitasoft.engine</groupId>
-									<artifactId>bonita-services-test-conf</artifactId>
+									<artifactId>bonita-services-test-utils</artifactId>
 									<version>${project.version}</version>
 									<type>zip</type>
 								</artifactItem>
