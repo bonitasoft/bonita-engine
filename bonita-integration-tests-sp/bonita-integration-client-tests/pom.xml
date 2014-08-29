@@ -16,8 +16,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine</groupId>
-            <artifactId>bonita-integration-client-tests</artifactId>
+            <groupId>org.bonitasoft.engine.test</groupId>
+            <artifactId>bonita-integration-tests-client</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -38,54 +38,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.bonitasoft.engine</groupId>
-            <artifactId>bonita-server-sp</artifactId>
+            <groupId>org.bonitasoft.engine.test</groupId>
+            <artifactId>bonita-server-test-utils</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc</artifactId>
-            <version>6</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.microsoft.jdbc</groupId>
-            <artifactId>sqlserver</artifactId>
-            <version>4.0.2206.100</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.jndi</groupId>
-            <artifactId>bonita-jndi-memory</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.btm</groupId>
-            <artifactId>btm</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>jta</artifactId>
-            <version>1.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.jolbox</groupId>
-            <artifactId>bonecp</artifactId>
-            <version>0.7.1.RELEASE</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
