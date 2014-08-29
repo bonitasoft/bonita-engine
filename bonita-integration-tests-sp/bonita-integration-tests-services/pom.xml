@@ -9,7 +9,7 @@
 		<version>6.4.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-services-integration-tests</artifactId>
+	<artifactId>bonita-integration-tests-services-sp</artifactId>
 
 	<dependencies>
 		<dependency>

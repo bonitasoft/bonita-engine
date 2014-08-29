@@ -8,7 +8,7 @@
 		<version>6.4.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-bpm-services-integration-tests</artifactId>
+	<artifactId>bonita-integration-tests-services-bpm-sp</artifactId>
 
 	<properties>
 		<bonita.home>${project.build.directory}/home</bonita.home>
