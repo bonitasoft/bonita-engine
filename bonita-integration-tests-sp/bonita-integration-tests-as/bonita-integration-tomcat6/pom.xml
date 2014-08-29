@@ -117,7 +117,7 @@
 		            <configuration>
 		              <artifactItems>
 		                <artifactItem>
-                                            <groupId>com.bonitasoft.engine</groupId>
+                                            <groupId>com.bonitasoft.engine.test</groupId>
                                             <artifactId>bonita-deploy-war-sp</artifactId>
                                             <version>${project.version}</version>
                                             <type>war</type>

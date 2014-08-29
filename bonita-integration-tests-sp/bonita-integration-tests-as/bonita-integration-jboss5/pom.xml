@@ -100,7 +100,7 @@
                                 <configuration>
                                     <artifactItems>
                                         <artifactItem>
-                                            <groupId>com.bonitasoft.engine</groupId>
+                                            <groupId>com.bonitasoft.engine.test</groupId>
                                             <artifactId>bonita-deploy-ear3-sp</artifactId>
                                             <version>${project.version}</version>
                                             <type>ear</type>

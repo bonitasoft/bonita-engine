@@ -45,27 +45,46 @@
 		</dependency>
 	</dependencies>
 
-    <modules>
-        <module>bonita-deploy-ear3</module>
-        <module>bonita-deploy-war</module>
-    </modules>
-
 	<profiles>
 		<profile>
 			<id>package-all</id>
 			<modules>
+                <module>bonita-deploy-war</module>
+                <module>bonita-deploy-ear3</module>
 				<module>bonita-integration-tomcat6</module>
-				<module>bonita-integration-tomcat6-cluster</module>
 				<module>bonita-integration-tomcat7</module>
 				<module>bonita-integration-jboss5</module>
+				<module>bonita-integration-tomcat6-cluster</module>
 			</modules>
 		</profile>
 		<profile>
-			<id>slow</id>
+			<id>tomcat6_cluster</id>
 			<modules>
+                <module>bonita-deploy-war</module>
 				<module>bonita-integration-tomcat6-cluster</module>
 			</modules>
 		</profile>
-	</profiles>
+        <profile>
+            <id>jboss</id>
+            <modules>
+                <module>bonita-deploy-ear3</module>
+                <module>bonita-integration-jboss5</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>tomcat6</id>
+            <modules>
+                <module>bonita-deploy-war</module>
+                <module>bonita-integration-tomcat6</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>tomcat7</id>
+            <modules>
+                <module>bonita-deploy-war</module>
+                <module>bonita-integration-tomcat7</module>
+            </modules>
+        </profile>
+    </profiles>
 
 </project>
