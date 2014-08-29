@@ -29,7 +29,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.test</groupId>
-			<artifactId>bonita-integration-client-tests</artifactId>
+			<artifactId>bonita-integration-tests-client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
