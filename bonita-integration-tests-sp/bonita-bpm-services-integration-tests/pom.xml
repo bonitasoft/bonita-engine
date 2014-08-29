@@ -533,8 +533,8 @@
 		</dependency>
 		<!-- Misc -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.test</groupId>
-			<artifactId>bonita-test-util</artifactId>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-services-test-utils</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
