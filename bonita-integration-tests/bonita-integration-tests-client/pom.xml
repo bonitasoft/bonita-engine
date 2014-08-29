@@ -114,8 +114,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.jndi</groupId>
-			<artifactId>bonita-jndi-memory</artifactId>
+			<groupId>org.bonitasoft.engine.test</groupId>
+			<artifactId>bonita-server-test-utils</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
