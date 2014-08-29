@@ -6,7 +6,7 @@
         <delete dir="${basedir}/target/server/platform/work" includes="**/*.db"/>
         <delete dir="${basedir}/target/test-classes/conf" />
     	<copy todir="${basedir}/target/test-classes">
-    		<fileset dir="${basedir}/../bonita-services-test-conf/src/test/resources" />
+    		<fileset dir="${basedir}/../bonita-test-utils/bonita-server-test-utils/src/test/resources" />
     	</copy>
     	<copy todir="${basedir}/target/test-classes/conf">
     	    <fileset dir="${basedir}/src\test\resources\conf" />

@@ -62,6 +62,7 @@ public class CommonServiceTest {
 
         /** set bonita.services.folder to target/test-classes/conf as it is done in pom.xml -> no need to edit test configuration */
         setSystemPropertyIfNotSet("bonita.services.folder", "target/test-classes/conf");
+        setSystemPropertyIfNotSet("bonita.home", "target");
 
         // Force these system properties
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");
