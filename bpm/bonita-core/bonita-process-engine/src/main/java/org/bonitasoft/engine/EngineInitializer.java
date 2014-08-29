@@ -50,6 +50,8 @@ public class EngineInitializer {
 
     private final EngineInitializerProperties platformProperties;
 
+    private PlatformAPI platformAPI;
+
     public EngineInitializer(final PlatformTenantManager platformManager, final EngineInitializerProperties platformProperties) {
         super();
         this.platformManager = platformManager;
@@ -82,7 +84,7 @@ public class EngineInitializer {
             final PlatformSessionService platformSessionService = platformAccessor.getPlatformSessionService();
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createPlatformSession(platformSessionService, sessionAccessor);
-            final PlatformAPI platformAPI = createPlatformAPI();
+            final PlatformAPI platformAPI = getPlatformAPI();
 
             try {
                 // initialization of the platform
@@ -110,7 +112,14 @@ public class EngineInitializer {
         }
     }
 
-    protected PlatformAPIImpl createPlatformAPI() {
+    protected PlatformAPI getPlatformAPI() {
+        if (platformAPI == null) {
+            platformAPI = buildPlatformAPIInstance();
+        }
+        return platformAPI;
+    }
+
+    protected PlatformAPI buildPlatformAPIInstance() {
         return new PlatformAPIImpl();
     }
 
@@ -149,7 +158,7 @@ public class EngineInitializer {
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         platformSessionService = platformAccessor.getPlatformSessionService();
         final long sessionId = createPlatformSession(platformSessionService, sessionAccessor);
-        final PlatformAPIImpl platformAPI = createPlatformAPI();
+        final PlatformAPI platformAPI = getPlatformAPI();
         try {
             if (platformProperties.shouldStopPlatform()) {
                 LOGGER.log(Level.INFO, "Stopping the services...");
