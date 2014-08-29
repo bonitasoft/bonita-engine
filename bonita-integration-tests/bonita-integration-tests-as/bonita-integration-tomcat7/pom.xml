@@ -110,7 +110,7 @@
 								<configuration>
 									<artifactItems>
 										<artifactItem>
-                                            <groupId>org.bonitasoft.engine</groupId>
+                                            <groupId>org.bonitasoft.engine.test</groupId>
                                             <artifactId>bonita-deploy-war</artifactId>
                                             <version>${project.version}</version>
                                             <type>war</type>
