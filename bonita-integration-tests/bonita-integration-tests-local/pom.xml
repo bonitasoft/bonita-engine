@@ -8,7 +8,7 @@
 		<version>6.4.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-integration-local-tests</artifactId>
+	<artifactId>bonita-integration-tests-local</artifactId>
 
 	<name>Bonita Test: Local API</name>
 
