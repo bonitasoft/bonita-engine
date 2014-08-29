@@ -29,15 +29,15 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
- * 
+ *
  * Initialize the engine and create/start or not the platform based on bonita-platform.xml
  * properties used are:
  * platform.create -- create the platform on startup
  * node.start -- start the platform (node) on startup
  * node.stop -- stop the platform (node) on shutdown
- * 
+ *
  * @author Baptiste Mesta
- * 
+ *
  */
 public class EngineInitializer {
 
@@ -75,14 +75,14 @@ public class EngineInitializer {
     public void initializeEngine() throws Exception {
         try {
             LOGGER.log(Level.INFO, "Initializing Bonita Engine...");
-            long before = System.currentTimeMillis();
+            final long before = System.currentTimeMillis();
             LOGGER.log(Level.INFO, "Initializing Spring context...");
             // create a session to call the engine
-            PlatformServiceAccessor platformAccessor = getPlatformAccessor();
-            PlatformSessionService platformSessionService = platformAccessor.getPlatformSessionService();
+            final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
+            final PlatformSessionService platformSessionService = platformAccessor.getPlatformSessionService();
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            long sessionId = createPlatformSession(platformSessionService, sessionAccessor);
-            PlatformAPI platformAPI = createPlatformAPI();
+            final long sessionId = createPlatformSession(platformSessionService, sessionAccessor);
+            final PlatformAPI platformAPI = createPlatformAPI();
 
             try {
                 // initialization of the platform
@@ -90,7 +90,7 @@ public class EngineInitializer {
                     LOGGER.log(Level.INFO, "Initializing platform...");
                     initPlatform(platformAPI);
                     LOGGER.log(Level.INFO, "Platform initialized successfully.");
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     LOGGER.log(Level.INFO, "Platform is already initialized.", e);
                     // platform is already initialized.
                 }
@@ -102,9 +102,9 @@ public class EngineInitializer {
             } finally {
                 deletePlatformSession(platformSessionService, sessionAccessor, sessionId);
             }
-            long after = System.currentTimeMillis();
+            final long after = System.currentTimeMillis();
             LOGGER.log(Level.INFO, "Initialization of Bonita Engine done! ( took " + (after - before) + "ms)");
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOGGER.log(Level.INFO, "Exception while initializing the engine: " + e);
             throw e;
         }
@@ -121,8 +121,8 @@ public class EngineInitializer {
     }
 
     private long createPlatformSession(final PlatformSessionService platformSessionService, final SessionAccessor sessionAccessor) throws SSessionException {
-        SPlatformSession createSession = platformSessionService.createSession(platformProperties.getPlatformAdminUsername());
-        long sessionId = createSession.getId();
+        final SPlatformSession createSession = platformSessionService.createSession(platformProperties.getPlatformAdminUsername());
+        final long sessionId = createSession.getId();
         sessionAccessor.setSessionInfo(sessionId, -1);
         return sessionId;
     }
@@ -145,19 +145,19 @@ public class EngineInitializer {
         LOGGER.log(Level.INFO, "Stopping Bonita Engine...");
         // create a session to call the engine
         PlatformSessionService platformSessionService;
-        PlatformServiceAccessor platformAccessor = getPlatformAccessor();
+        final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
         final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
         platformSessionService = platformAccessor.getPlatformSessionService();
-        long sessionId = createPlatformSession(platformSessionService, sessionAccessor);
-        PlatformAPIImpl platformAPI = createPlatformAPI();
+        final long sessionId = createPlatformSession(platformSessionService, sessionAccessor);
+        final PlatformAPIImpl platformAPI = createPlatformAPI();
         try {
             if (platformProperties.shouldStopPlatform()) {
                 LOGGER.log(Level.INFO, "Stopping the services...");
                 platformManager.stopPlatform(platformAPI);
             }
-        } catch (PlatformNotFoundException e) {
+        } catch (final PlatformNotFoundException e) {
             LOGGER.log(Level.WARNING, "The platform cannot be stopped because it does not exist!");
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
             LOGGER.log(Level.SEVERE, "Issue while stopping the platform", e);
         } finally {
             deletePlatformSession(platformSessionService, sessionAccessor, sessionId);
