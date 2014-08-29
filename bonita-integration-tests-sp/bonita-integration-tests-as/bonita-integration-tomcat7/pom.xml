@@ -4,8 +4,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
+		<groupId>com.bonitasoft.engine.test</groupId>
 		<artifactId>bonita-integration-as-tests</artifactId>
-		<groupId>com.bonitasoft.engine</groupId>
 		<version>6.4.0-SNAPSHOT</version>
 	</parent>
 
