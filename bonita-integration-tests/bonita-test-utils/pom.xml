@@ -13,7 +13,7 @@
 	<modules>
 		<module>bonita-client-test-utils</module>
 		<module>bonita-services-test-utils</module>
-		<module>bonita-commons-test</module>
+		<module>bonita-common-test-utils</module>
 		<module>bonita-jndi-memory</module>
 	</modules>
 </project>
