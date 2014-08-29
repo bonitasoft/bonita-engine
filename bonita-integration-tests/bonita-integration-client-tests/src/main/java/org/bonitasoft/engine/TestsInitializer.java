@@ -19,7 +19,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class TestsInitializer {
 
-    private static final String SOURCE_BONITA_HOME = "../../bonita-home/target/home";
+    private static final String SOURCE_BONITA_HOME = "../../bpm/bonita-home/target/home";
     private static final String TMP_BONITA_HOME = "target/eclipse-bonita-home";
 
     private static final String BONITA_HOME = "bonita.home";

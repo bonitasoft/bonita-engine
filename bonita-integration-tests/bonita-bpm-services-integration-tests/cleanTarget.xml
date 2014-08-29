@@ -12,7 +12,7 @@
 
 		<delete dir="${target.dir}/conf" />
 		<copy todir="${target.dir}/conf">
-			<fileset dir="../../../services/bonita-services-test-conf/src/test/resources/conf" />
+			<fileset dir="../bonita-services-test-conf/src/test/resources/conf" />
 		</copy>
 		<copy todir="${target.dir}/conf" overwrite="true">
 			<fileset dir="${basedir}/src/test/resources/conf" includes="**/*" />
