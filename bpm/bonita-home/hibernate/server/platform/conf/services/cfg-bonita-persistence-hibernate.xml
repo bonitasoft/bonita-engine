@@ -117,6 +117,8 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SAXMLObjectDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstanceVisibilityMapping" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" />
+				<entry key="com.bonitasoft.engine.business.application.SApplication" value="com.bonitasoft.engine.business.application.impl.SApplicationImpl" />
+                <entry key="com.bonitasoft.engine.business.application.SApplicationPage" value="com.bonitasoft.engine.business.application.impl.SApplicationPageImpl" />
 
 				<!-- bpm -->
 				<entry key="org.bonitasoft.engine.actor.mapping.model.SActor" value="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" />
@@ -310,6 +312,7 @@
 				<ref bean="hbm-bos-external-identity-mapping" />
 				<ref bean="hbm-bos-reporting-model" />
 				<ref bean="hbm-bos-page-model" />
+				<ref bean="hbm-bos-application-model" />
 			</list>
 		</property>
 		<!-- L2 cache -->

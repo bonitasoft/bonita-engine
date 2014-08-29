@@ -18,6 +18,7 @@ import org.bonitasoft.engine.connector.ConnectorAPIAccessorImpl;
 import org.bonitasoft.engine.session.APISession;
 
 import com.bonitasoft.engine.api.APIAccessor;
+import com.bonitasoft.engine.api.ApplicationAPI;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
@@ -104,6 +105,11 @@ public class ConnectorAPIAccessorExt extends ConnectorAPIAccessorImpl implements
     @Override
     public PageAPI getPageAPI() {
         return getAPI(PageAPI.class, getAPISession());
+    }
+
+    @Override
+    public ApplicationAPI getApplicationAPI() {
+        return getAPI(ApplicationAPI.class, getAPISession());
     }
 
 }

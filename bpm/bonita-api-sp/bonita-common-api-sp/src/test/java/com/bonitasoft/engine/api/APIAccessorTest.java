@@ -29,7 +29,7 @@ public class APIAccessorTest {
         throw new Exception("method " + methodName + " not found");
     }
 
-    private void checkMethodReturnExpectedReturnType(String methodName, String expected) throws Exception {
+    private void checkMethodReturnExpectedReturnType(final String methodName, final String expected) throws Exception {
         final Method method = getAPIMethod(methodName);
         assertThat(method.getReturnType().getName()).as("method " + methodName + " sould return type " + expected).isEqualTo(expected);
     }
@@ -87,6 +87,11 @@ public class APIAccessorTest {
     @Test
     public void checkPageAPI() throws Exception {
         checkMethodReturnExpectedReturnType("getPageAPI", "com.bonitasoft.engine.api.PageAPI");
+    }
+
+    @Test
+    public void checkApplicationAPI() throws Exception {
+        checkMethodReturnExpectedReturnType("getApplicationAPI", "com.bonitasoft.engine.api.ApplicationAPI");
     }
 
 }
