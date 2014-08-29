@@ -25,6 +25,7 @@ import org.bonitasoft.engine.api.ProcessManagementAPI;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -171,6 +172,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
         disableAndDeleteProcess(process);
     }
 
+
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "signal" }, jira = "ENGINE-536")
     @Test
     public void signalEventSubProcessTriggered() throws Exception {
@@ -179,7 +181,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
 
         //when
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        waitForUserTask(PARENT_STEP, processInstance);
+        final HumanTaskInstance step1 = waitForUserTask(PARENT_STEP, processInstance);
 
         //then
         List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
@@ -188,6 +190,7 @@ public class SignalEventSubProcessTest extends EventsAPITest {
 
         //when
         getProcessAPI().sendSignal(SIGNAL_NAME);
+        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
         final ActivityInstance subStep = waitForUserTask(SUB_STEP, processInstance);
 
         //then
