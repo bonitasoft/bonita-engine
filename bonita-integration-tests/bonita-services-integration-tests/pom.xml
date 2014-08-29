@@ -485,6 +485,7 @@
 						</property>
 					</properties>
 					<systemPropertyVariables>
+						<bonita.home>${project.build.directory}</bonita.home>
 						<bonita.services.folder>${project.build.directory}/test-classes/conf</bonita.services.folder>
 					</systemPropertyVariables>
 					<includes>
