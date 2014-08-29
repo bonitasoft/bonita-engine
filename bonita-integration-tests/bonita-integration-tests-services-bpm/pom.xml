@@ -11,6 +11,8 @@
 
 	<artifactId>bonita-integration-tests-services-bpm</artifactId>
 
+    <name>Bonita Service BPM Integration Tests</name>
+
 	<properties>
 		<bonita.home>${project.build.directory}/home</bonita.home>
 	</properties>

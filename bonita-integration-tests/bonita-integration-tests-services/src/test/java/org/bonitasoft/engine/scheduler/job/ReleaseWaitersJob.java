@@ -18,7 +18,7 @@ public class ReleaseWaitersJob extends GroupJob {
 
     @Override
     public void execute() {
-        System.out.println("EXECUTE on " + new Date().getSeconds());
+        System.out.println("ReleaseWaitersJob EXECUTES at time " + new Date().getSeconds());
         if (semaphore != null) {
             semaphore.key = jobKey;
             semaphore.release();

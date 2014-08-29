@@ -10,8 +10,6 @@
 
 	<artifactId>bonita-integration-tests-local</artifactId>
 
-	<name>Bonita Test: Local API</name>
-
 	<properties>
 		<bonita.home>${project.build.directory}/home</bonita.home>
 	</properties>
