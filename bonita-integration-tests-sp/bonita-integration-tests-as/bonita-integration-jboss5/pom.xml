@@ -9,7 +9,7 @@
 		<version>6.4.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-integration-jboss5</artifactId>
+	<artifactId>bonita-integration-jboss5-sp</artifactId>
 	<packaging>pom</packaging>
 
 	<name>Bonita - Integration Tests on JBoss AS 5</name>
