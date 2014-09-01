@@ -24,7 +24,7 @@ CREATE TABLE arch_data_instance (
 )
 GO
 
-CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId,containerId, sourceObjectId)
+CREATE INDEX idx1_arch_data_instance ON arch_data_instance (sourceObjectId, containerId, tenantId)
 GO
 
 CREATE TABLE arch_data_mapping (
@@ -40,7 +40,7 @@ CREATE TABLE arch_data_mapping (
 )
 GO
 
-CREATE INDEX idx1_arch_data_mapping ON arch_data_mapping (tenantId,containerId, dataInstanceId, sourceObjectId)
+CREATE INDEX idx1_arch_data_mapping ON arch_data_mapping (containerId, dataInstanceId, sourceObjectId, tenantId)
 GO
-CREATE INDEX idx2_arch_data_mapping ON arch_data_mapping (tenantid, containerId, containerType)
+CREATE INDEX idx2_arch_data_mapping ON arch_data_mapping (containerId, containerType, tenantid)
 GO
