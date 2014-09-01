@@ -111,7 +111,7 @@ CREATE TABLE arch_transition_instance (
 )
 GO
 
-CREATE INDEX idx1_arch_transition_instance ON arch_transition_instance (rootcontainerid, tenantid)
+CREATE INDEX idx1_arch_transition_instance ON arch_transition_instance (rootContainerId, tenantid)
 GO
 
 CREATE TABLE arch_connector_instance (
