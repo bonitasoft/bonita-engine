@@ -149,7 +149,8 @@
 				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl" value="10060" />
 				<entry key="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" value="10070" />
 				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" value="10080" />
-				<entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentContentImpl" value="10090" />
+                <entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentImpl" value="10090" />
+                <entry key="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" value="10090" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" value="10095" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl" value="10110" />
 				<entry key="com.bonitasoft.engine.core.reporting.SSaveReportWithContentImpl" value="500" />

@@ -13,9 +13,12 @@
         </property>
         <property name="classAliasMappings">
             <map>
-                <entry key="org.bonitasoft.engine.core.document.model.SDocumentContent" value="docContent"/>
+                <entry key="org.bonitasoft.engine.core.document.model.SDocument" value="doc"/>
+                <entry key="org.bonitasoft.engine.core.document.model.SLightDocument" value="doc"/>
                 <entry key="org.bonitasoft.engine.core.document.model.SDocumentMapping" value="docmapping"/>
+                <entry key="org.bonitasoft.engine.core.document.model.SMappedDocument" value="mappeddoc"/>
                 <entry key="org.bonitasoft.engine.core.document.model.archive.SADocumentMapping" value="docmapping"/>
+                <entry key="org.bonitasoft.engine.core.document.model.archive.SAMappedDocument" value="mappeddoc"/>
             </map>
         </property>
     </bean>

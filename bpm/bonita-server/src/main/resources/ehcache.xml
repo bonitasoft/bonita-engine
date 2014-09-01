@@ -75,7 +75,7 @@
 		maxElementsInMemory="10000" timeToLiveSeconds="120"
 		memoryStoreEvictionPolicy="LRU" overflowToDisk="false" />
 	<cache
-		name="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl"
+		name="org.bonitasoft.engine.core.document.model.impl.SDocumentImpl"
 		maxElementsInMemory="10000" timeToLiveSeconds="120"
 		memoryStoreEvictionPolicy="LRU" overflowToDisk="false" />
 	<cache

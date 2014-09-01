@@ -211,41 +211,6 @@
 		<!-- L2 cache -->
 		<constructor-arg name="cacheConcurrencyStrategies">
 			<map>
-<!--                 <entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.command.model.SCommandImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentContentImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.identity.model.impl.SGroupImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.identity.model.impl.SRoleImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.identity.model.impl.SUserImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.platform.command.model.impl.SPlatformCommandImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.platform.model.impl.SPlatformImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.platform.model.impl.STenantImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.profile.model.impl.SProfileImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.identity.model.SUserMembership" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl" value="read-write"/> -->
-<!--                 <entry key="org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl" value="read-write" /> -->
             </map>
 		</constructor-arg>
 	</bean>
