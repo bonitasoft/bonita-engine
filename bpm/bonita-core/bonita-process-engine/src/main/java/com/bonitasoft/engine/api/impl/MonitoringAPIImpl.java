@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 - 2014 BonitaSoft S.A.
+ * Copyright (C) 2009, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -32,21 +32,11 @@ import com.bonitasoft.manager.Features;
  */
 public class MonitoringAPIImpl implements MonitoringAPI {
 
-    @CustomTransactions
-    @Override
-    public long getNumberOfActiveTransactions() {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.SERVICE_MONITORING);
-
-        final TenantMonitoringService tenantMonitoringService = getTenantMonitoringService();
-        return tenantMonitoringService.getNumberOfActiveTransactions();
+    protected void checkLicenceAndFeature(final String feature) {
+        LicenseChecker.getInstance().checkLicenceAndFeature(feature);
     }
 
-    private TenantMonitoringService getTenantMonitoringService() {
-        final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
-        return tenantServiceAccessor.getTenantMonitoringService();
-    }
-
-    private TenantServiceAccessor getTenantServiceAccessor() {
+    protected TenantServiceAccessor getTenantServiceAccessor() {
         long tenantId = 0;
         SessionAccessor sessionAccessor = null;
         try {
@@ -62,22 +52,31 @@ public class MonitoringAPIImpl implements MonitoringAPI {
         return TenantServiceSingleton.getInstance(tenantId);
     }
 
+    @CustomTransactions
+    @Override
+    public long getNumberOfActiveTransactions() {
+        checkLicenceAndFeature(Features.SERVICE_MONITORING);
+        final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
+        final TenantMonitoringService monitoringService = tenantServiceAccessor.getTenantMonitoringService();
+        return monitoringService.getNumberOfActiveTransactions();
+    }
+
     @Override
     public long getNumberOfExecutingProcesses() {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.BPM_MONITORING);
+        checkLicenceAndFeature(Features.BPM_MONITORING);
         // FIXME
         return 0;
     }
 
     @Override
     public long getNumberOfUsers() throws MonitoringException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.BPM_MONITORING);
-
+        checkLicenceAndFeature(Features.BPM_MONITORING);
+        final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
         try {
-            return getTenantMonitoringService().getNumberOfUsers();
-        } catch (SMonitoringException e) {
-            final TechnicalLoggerService logger = getTechnicalLogger();
-
+            final TenantMonitoringService monitoringService = tenantServiceAccessor.getTenantMonitoringService();
+            return monitoringService.getNumberOfUsers();
+        } catch (final SMonitoringException e) {
+            final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e.getMessage());
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, e);
@@ -86,8 +85,4 @@ public class MonitoringAPIImpl implements MonitoringAPI {
         }
     }
 
-    private TechnicalLoggerService getTechnicalLogger() {
-        final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor();
-        return tenantServiceAccessor.getTechnicalLoggerService();
-    }
 }

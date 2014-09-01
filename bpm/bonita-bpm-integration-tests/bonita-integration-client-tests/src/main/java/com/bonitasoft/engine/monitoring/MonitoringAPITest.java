@@ -93,11 +93,4 @@ public class MonitoringAPITest extends CommonAPISPTest {
         assertEquals(0, numberOfActiveTransactions);
     }
 
-    @Cover(classes = MonitoringAPITest.class, concept = BPMNConcept.NONE, keywords = { "Monitoring", "Active transaction" }, story = "Get number of active transaction.", jira = "")
-    @Test
-    public void getNumberOfActiveTransaction() throws BonitaException {
-        final long numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();
-        assertEquals(0L, numberOfActiveTransactions);
-    }
-
 }
