@@ -8,7 +8,7 @@
 		<version>6.4.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-client-test-util</artifactId>
+	<artifactId>bonita-client-test-utils</artifactId>
 
 	<dependencies>
 		<dependency>

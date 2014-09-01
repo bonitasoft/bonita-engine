@@ -71,7 +71,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.test</groupId>
-			<artifactId>bonita-client-test-util</artifactId>
+			<artifactId>bonita-client-test-utils</artifactId>
 			<version>${project.version}</version>
 		</dependency>
         <dependency>
