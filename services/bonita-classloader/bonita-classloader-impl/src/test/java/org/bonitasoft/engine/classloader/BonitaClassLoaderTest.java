@@ -17,6 +17,7 @@ package org.bonitasoft.engine.classloader;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class BonitaClassLoaderTest {
     public void releaseShouldRemoveAllScopeFolderAndItsContent() {
         final Map<String, byte[]> resources = new HashMap<String, byte[]>(1);
         resources.put("myJar.jar", "Salut le monde".getBytes());
-        final File tempDir = new File(IOUtil.TMP_DIRECTORY, "BonitaClassLoaderTest_" + System.currentTimeMillis());
+        final File tempDir = new File(IOUtil.TMP_DIRECTORY, "BonitaClassLoaderTest_JVM_" + ManagementFactory.getRuntimeMXBean().getName());
 
         // given
         assertThat(tempDir).as("tempDir:%s should not exists before bonitaClassLoader init", tempDir.getAbsolutePath()).doesNotExist();
