@@ -14,16 +14,25 @@
 package org.bonitasoft.engine.core.document.api.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
-import org.bonitasoft.engine.core.document.api.DocumentMappingService;
-import org.bonitasoft.engine.core.document.model.SDocumentMapping;
-import org.bonitasoft.engine.core.document.model.archive.SADocumentMapping;
-import org.bonitasoft.engine.core.document.DocumentContentService;
+import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.core.document.exception.SDocumentContentNotFoundException;
+import org.bonitasoft.engine.core.document.exception.SDocumentException;
+import org.bonitasoft.engine.core.document.model.SDocument;
+import org.bonitasoft.engine.events.EventService;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -34,93 +43,30 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class DocumentServiceImplTest {
 
     @Mock
-    private DocumentContentService documentContentService;
-
+    private Recorder recorder;
     @Mock
-    private DocumentMappingService documentServiceMapping;
-
-    private final SDocumentDownloadURLProvider urlProvider = new SDocumentDownloadURLProviderImpl("url");
-
+    private ReadPersistenceService persistenceService;
     @Mock
-    private SDocumentMapping documentMapping;
-
+    private SDocumentDownloadURLProvider urlProvider;
     @Mock
-    private SADocumentMapping archivedDocumentMapping;
+    private EventService eventService;
+    @Mock
+    private TechnicalLoggerService technicalLogger;
+    @Mock
+    private ArchiveService archiveService;
 
+    @InjectMocks
     private DocumentServiceImpl documentService;
 
     @Before
     public void setUp() throws Exception {
-        documentService = new DocumentServiceImpl(documentContentService, documentServiceMapping, urlProvider);
-        doReturn(documentMapping).when(documentServiceMapping).get(1L);
-        doReturn(documentMapping).when(documentServiceMapping).get(1L, "document");
-        doReturn(archivedDocumentMapping).when(documentServiceMapping).get(1L, "document", 1L);
 
-        doReturn("document").when(documentMapping).getDocumentContentFileName();
-        doReturn("123").when(documentMapping).getContentStorageId();
-        doReturn("whateverurl").when(documentMapping).getDocumentURL();
-
-        doReturn("document").when(archivedDocumentMapping).getDocumentContentFileName();
-        doReturn("123").when(archivedDocumentMapping).getContentStorageId();
-        doReturn("whateverurl").when(archivedDocumentMapping).getDocumentURL();
-    }
-
-    @Ignore("need to be reactived when refactor done")
-    @Test
-    public void getDocument_from_id_should_return_a_document_with_generated_url_when_it_has_content() throws Exception {
-        doReturn(true).when(documentMapping).documentHasContent();
-
-        SDocumentMapping document = documentService.getDocument(1L);
-
-        assertEquals("url?fileName=document&contentStorageId=123", document.getDocumentURL());
     }
 
     @Test
-    public void getDocument_from_id_should_return_a_document_url_when_is_external_url() throws Exception {
-        doReturn(false).when(documentMapping).documentHasContent();
-        doReturn("whateverurl").when(documentMapping).getDocumentURL();
-
-        SDocumentMapping document = documentService.getDocument(1L);
-
-        assertEquals("whateverurl", document.getDocumentURL());
+    public void generateDocumentURL_should_call_urlProvider() {
+        doReturn("generated").when(urlProvider).generateURL("name", "docId");
+        assertEquals("generated", documentService.generateDocumentURL("name", "docId"));
     }
 
-    @Ignore("change in service.. . must check url")
-    @Test
-    public void getDocument_from_process_instance_and_name_should_return_a_document_with_generated_url_when_it_has_content() throws Exception {
-        doReturn(true).when(documentMapping).documentHasContent();
-
-        SDocumentMapping document = documentService.getDocument(1L, "document");
-
-        assertEquals("url?fileName=document&contentStorageId=123", document.getDocumentURL());
-    }
-
-    @Ignore("change in service.. . must check url")
-    @Test
-    public void getDocument_from_process_instance_and_name_should_return_a_document_url_when_is_external_url() throws Exception {
-        doReturn(false).when(documentMapping).documentHasContent();
-
-        SDocumentMapping document = documentService.getDocument(1L, "document");
-
-        assertEquals("whateverurl", document.getDocumentURL());
-    }
-
-    @Ignore("change in service.. . must check url")
-    @Test
-    public void getDocument_from_process_instance_and_name_for_a_given_time_should_return_a_document_with_generated_url_when_it_has_content() throws Exception {
-        doReturn(true).when(archivedDocumentMapping).documentHasContent();
-
-        SDocumentMapping document = documentService.getDocument(1L, "document", 1L);
-
-        assertEquals("url?fileName=document&contentStorageId=123", document.getDocumentURL());
-    }
-
-    @Test
-    public void getDocument_from_process_instance_and_name_for_a_given_time_should_return_a_document_url_when_is_external_url() throws Exception {
-        doReturn(false).when(documentMapping).documentHasContent();
-
-        SDocumentMapping document = documentService.getDocument(1L, "document", 1L);
-
-        assertEquals("whateverurl", document.getDocumentURL());
-    }
 }

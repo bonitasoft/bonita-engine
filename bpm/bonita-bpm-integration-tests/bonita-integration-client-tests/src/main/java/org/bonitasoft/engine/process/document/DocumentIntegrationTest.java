@@ -14,13 +14,13 @@
  */
 package org.bonitasoft.engine.process.document;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -79,6 +79,7 @@ import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -174,7 +175,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertEquals("Process instances IDs are not the same!", attachment.getProcessInstanceId(), attachedDoc.getProcessInstanceId());
         assertEquals("Names are not the same!", attachment.getName(), attachedDoc.getName());
         assertEquals("Authors are not the same!", attachment.getAuthor(), attachedDoc.getAuthor());
-        assertEquals("Creation dates are not the same!", attachment.getCreationDate(), attachedDoc.getCreationDate());
+        assertEquals("Creation dates are not the same!", attachment.getCreationDate().getTime(), attachedDoc.getCreationDate().getTime());
         assertEquals("Has content flags are not the same!", attachment.hasContent(), attachedDoc.hasContent());
         assertEquals("File names are not the same!", attachment.getContentFileName(), attachedDoc.getContentFileName());
         assertEquals("Mime types are not the same!", attachment.getContentMimeType(), attachedDoc.getContentMimeType());
@@ -281,12 +282,13 @@ public class DocumentIntegrationTest extends CommonAPITest {
     @Test
     public void getDocumentContentTest() throws Exception {
         final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
-        buildAndAttachDocument(processInstance);
+        final String documentName = String.valueOf(System.currentTimeMillis());
+        byte[] content = documentName.getBytes();
+        Document document = getProcessAPI().attachDocument(processInstance.getId(), documentName, "myPdf.pdf", "text/plain", content);
         try {
-            final Document attachment = getAttachmentWithoutItsContent(processInstance);
-            final byte[] docContent = getProcessAPI().getDocumentContent(attachment.getContentStorageId());
-            assertNotNull(docContent);
-            assertTrue(docContent.length > 0);
+            final byte[] docContent = getProcessAPI().getDocumentContent(document.getContentStorageId());
+            assertThat(docContent).isEqualTo(content);
+            assertThat(document.getUrl()).isEqualTo("downloadDocument?fileName=myPdf.pdf&contentStorageId="+document.getContentStorageId());
 
         } finally {
             disableAndDeleteProcess(processInstance.getProcessDefinitionId());
@@ -393,6 +395,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
         final Map<Expression, Map<String, Serializable>> expressions = Collections.<Expression, Map<String, Serializable>> singletonMap(
                 new ExpressionBuilder().createDocumentReferenceExpression("document"), Collections.<String, Serializable> emptyMap());
+
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions);
 
         assertEquals("document.content", ((Document) result.get("document")).getContentFileName());
@@ -423,6 +426,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         buildAndAttachDocument(processInstance);
         try {
+            Thread.sleep(2000);
             final Document beforeUpdate = getAttachmentWithoutItsContent(processInstance);
             final Document doc = BuildTestUtil.buildDocument(beforeUpdate.getName());
             getProcessAPI().attachNewDocumentVersion(processInstance.getId(), beforeUpdate.getName(), doc.getContentFileName(), doc.getContentMimeType(),
@@ -1156,7 +1160,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
     private void check(final ProcessInstance processInstance, final int one, final int two, final int three, final int four, final int five,
             final DocumentCriterion documentCriterion) throws ProcessInstanceNotFoundException, DocumentException {
         final List<Document> lastVersionOfDocuments = getProcessAPI().getLastVersionOfDocuments(processInstance.getId(), 0, 10, documentCriterion);
-        assertThat("the order was not respected for " + documentCriterion, lastVersionOfDocuments,
+        Assert.assertThat("the order was not respected for " + documentCriterion, lastVersionOfDocuments,
                 nameAre("textFile" + one, "textFile" + two, "textFile" + three, "textFile" + four, "textFile" + five));
     }
 

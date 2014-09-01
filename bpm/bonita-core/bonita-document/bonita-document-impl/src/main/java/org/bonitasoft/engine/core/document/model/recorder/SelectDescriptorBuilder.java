@@ -17,14 +17,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.core.document.model.SDocumentMapping;
+import org.bonitasoft.engine.core.document.model.SDocument;
+import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.archive.SADocumentMapping;
-import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
-import org.bonitasoft.engine.persistence.SelectListDescriptor;
-import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
+import org.bonitasoft.engine.persistence.*;
 
 /**
  * @author Emmanuel Duchastenier
@@ -36,67 +33,50 @@ public class SelectDescriptorBuilder {
         return new SelectByIdDescriptor<T>("get" + elementName + "ById", clazz, id);
     }
 
-    public static SelectListDescriptor<SDocumentMapping> getDocumentMappingsforProcessInstance(final long processInstanceId, final int fromIndex,
-            final int maxResults, final String sortFieldOrder, final OrderByType orderBy) {
+    public static SelectListDescriptor<SMappedDocument> getDocumentMappingsForProcessInstance(final long processInstanceId, final int fromIndex,
+                                                                                              final int maxResults, final String sortFieldOrder, final OrderByType orderBy) {
         QueryOptions queryOptions = null;
-        String queryName = "getDocumentMappingsforProcessInstance";
+        String queryName = "getSMappedDocumentOfProcess";
         if (sortFieldOrder == null) {
             queryOptions = new QueryOptions(fromIndex, maxResults);
-            queryName = "getDocumentMappingsforProcessInstanceOrderedById";
+            queryName = "getSMappedDocumentOfProcessOrderedById";
         } else {
-            queryOptions = new QueryOptions(fromIndex, maxResults, SDocumentMapping.class, sortFieldOrder, orderBy);
+            queryOptions = new QueryOptions(fromIndex, maxResults, SMappedDocument.class, sortFieldOrder, orderBy);
         }
         final Map<String, Object> parameters = new HashMap<String, Object>(1);
         parameters.put("processInstanceId", processInstanceId);
-        return new SelectListDescriptor<SDocumentMapping>(queryName, parameters, SDocumentMapping.class, queryOptions);
+        return new SelectListDescriptor<SMappedDocument>(queryName, parameters, SMappedDocument.class, queryOptions);
     }
 
-    public static SelectOneDescriptor<Long> getNumberOfElement(final String elementName, final Class<? extends PersistentObject> clazz) {
-        final Map<String, Object> emptyMap = Collections.emptyMap();
-        return new SelectOneDescriptor<Long>("getNumberOf" + elementName, emptyMap, clazz, Long.class);
-    }
-
-    public static SelectListDescriptor<SDocumentMapping> getDocumentMappings(final int fromIndex, final int maxResults, final String sortFieldOrder,
-            final OrderByType orderBy) {
-        final Map<String, Object> emptyMap = Collections.emptyMap();
-        QueryOptions queryOptions = null;
-        if (sortFieldOrder == null) {
-            queryOptions = new QueryOptions(fromIndex, maxResults);
-        } else {
-            queryOptions = new QueryOptions(fromIndex, maxResults, SDocumentMapping.class, sortFieldOrder, orderBy);
-        }
-        return new SelectListDescriptor<SDocumentMapping>("getDocumentMappings", emptyMap, SDocumentMapping.class, queryOptions);
-    }
-
-    public static SelectOneDescriptor<SDocumentMapping> getDocumentByName(final long processInstanceId, final String documentName) {
+    public static SelectOneDescriptor<SMappedDocument> getSMappedDocumentOfProcessWithName(final long processInstanceId, final String documentName) {
         final Map<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("processInstanceId", processInstanceId);
-        parameters.put("documentName", documentName);
-        return new SelectOneDescriptor<SDocumentMapping>("getDocumentMappingsforProcessInstanceAndName", parameters, SDocumentMapping.class);
+        parameters.put("name", documentName);
+        return new SelectOneDescriptor<SMappedDocument>("getSMappedDocumentOfProcessWithName", parameters, SMappedDocument.class);
     }
 
-    public static SelectOneDescriptor<Long> getNumberOfDocumentMappingsforProcessInstance(final long processInstanceId) {
+    public static SelectOneDescriptor<Long> getNumberOfSMappedDocumentOfProcess(final long processInstanceId) {
         final Map<String, Object> parameters = new HashMap<String, Object>(1);
         parameters.put("processInstanceId", processInstanceId);
-        return new SelectOneDescriptor<Long>("getNumberOfDocumentMappingsforProcessInstance", parameters, SDocumentMapping.class);
+        return new SelectOneDescriptor<Long>("getNumberOfSMappedDocumentOfProcess", parameters, SDocument.class);
     }
 
-    public static SelectListDescriptor<SADocumentMapping> getArchivedDocumentByName(final long processInstanceId, final String documentName, final long time) {
+    public static SelectListDescriptor<SAMappedDocument> getSAMappedDocumentOfProcessWithName(final long processInstanceId, final String documentName, final long time) {
         final Map<String, Object> parameters = new HashMap<String, Object>(3);
         parameters.put("processInstanceId", processInstanceId);
-        parameters.put("documentName", documentName);
+        parameters.put("name", documentName);
         parameters.put("time", time);
-        return new SelectListDescriptor<SADocumentMapping>("getSADocumentMappingsforProcessInstanceAndName", parameters, SADocumentMapping.class,
+        return new SelectListDescriptor<SAMappedDocument>("getSAMappedDocumentOfProcessWithName", parameters, SAMappedDocument.class,
                 new QueryOptions(0, 1));
     }
 
-    public static SelectByIdDescriptor<SADocumentMapping> getArchivedDocumentById(final long documentId) {
-        return new SelectByIdDescriptor<SADocumentMapping>("getArchivedDocumentById", SADocumentMapping.class, documentId);
+    public static SelectByIdDescriptor<SAMappedDocument> getArchivedDocumentById(final long documentId) {
+        return new SelectByIdDescriptor<SAMappedDocument>("getArchivedDocumentById", SAMappedDocument.class, documentId);
     }
 
-    public static SelectOneDescriptor<SADocumentMapping> getArchivedVersionOdDocument(final long documentId) {
+    public static SelectOneDescriptor<SAMappedDocument> getArchivedVersionOdDocument(final long documentId) {
         final Map<String, Object> parameters = new HashMap<String, Object>(1);
         parameters.put("sourceObjectId", documentId);
-        return new SelectOneDescriptor<SADocumentMapping>("getArchivedVersionOfDocument", parameters, SADocumentMapping.class);
+        return new SelectOneDescriptor<SAMappedDocument>("getArchivedVersionOfDocument", parameters, SAMappedDocument.class);
     }
 }

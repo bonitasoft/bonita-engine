@@ -16,29 +16,14 @@ package org.bonitasoft.engine.core.document.model;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
- * @author Nicolas Chabanoles
- * @author Matthieu Chaffotte
+ * @author Baptiste Mesta
  */
 public interface SDocumentMapping extends PersistentObject {
 
     long getTenantId();
 
-    String getDocumentName();
+    long getDocumentId();
 
     long getProcessInstanceId();
-
-    String getContentStorageId();
-
-    long getDocumentAuthor();
-
-    long getDocumentCreationDate();
-
-    String getDocumentContentMimeType();
-
-    String getDocumentContentFileName();
-
-    boolean documentHasContent();
-
-    String getDocumentURL();
 
 }

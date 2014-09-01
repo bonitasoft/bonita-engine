@@ -11,7 +11,7 @@ ALTER TABLE data_instance DROP CONSTRAINT fk_data_instance_tenantId;
 ALTER TABLE data_mapping DROP CONSTRAINT fk_data_mapping_tenantId;
 ALTER TABLE dependency DROP CONSTRAINT fk_dependency_tenantId;
 ALTER TABLE dependencymapping DROP CONSTRAINT fk_dependencymapping_tenantId;
-ALTER TABLE document_content DROP CONSTRAINT fk_document_content_tenantId;
+ALTER TABLE document DROP CONSTRAINT fk_document_tenantId;
 ALTER TABLE document_mapping DROP CONSTRAINT fk_document_mapping_tenantId;
 ALTER TABLE event_trigger_instance DROP CONSTRAINT fk_event_trigger_instance_tenantId;
 ALTER TABLE external_identity_mapping DROP CONSTRAINT fk_external_identity_mapping_tenantId;

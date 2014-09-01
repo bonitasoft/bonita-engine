@@ -38,58 +38,64 @@ public class SADocumentMappingBuilderImpl implements SADocumentMappingBuilder {
     }
 
     @Override
-    public SADocumentMappingBuilder setDocumentName(final String documentName) {
-        documentMapping.setDocumentName(documentName);
+    public SADocumentMappingBuilder setDocumentId(long documentId) {
+        documentMapping.setDocumentId(documentId);
         return this;
     }
 
-    @Override
-    public SADocumentMappingBuilder setDocumentAuthor(final long author) {
-        documentMapping.setDocumentAuthor(author);
-        return this;
-    }
-
-    @Override
-    public SADocumentMappingBuilder setHasContent(final boolean hasContent) {
-        documentMapping.setDocumentHasContent(hasContent);
-        return this;
-    }
-
-    @Override
-    public SADocumentMappingBuilder setDocumentStorageId(final String storageId) {
-        documentMapping.setContentStorageId(storageId);
-        return this;
-    }
-
-    @Override
-    public SADocumentMappingBuilder setDocumentCreationDate(final long creationDate) {
-        documentMapping.setDocumentCreationDate(creationDate);
-        return this;
-    }
-
-    @Override
-    public SADocumentMappingBuilder setDocumentContentFileName(final String contentFileName) {
-        documentMapping.setDocumentContentFileName(contentFileName);
-        return this;
-    }
-
-    @Override
-    public SADocumentMappingBuilder setDocumentContentMimeType(final String contentMimeType) {
-        documentMapping.setDocumentContentMimeType(contentMimeType);
-        return this;
-    }
-
-    @Override
-    public SADocumentMappingBuilder setDocumentURL(final String url) {
-        documentMapping.setDocumentURL(url);
-        return this;
-    }
-
-    @Override
-    public SADocumentMappingBuilder setContentStorageId(final String contentStorageId) {
-        documentMapping.setContentStorageId(contentStorageId);
-        return this;
-    }
+    //    @Override
+    //    public SADocumentMappingBuilder setName(final String documentName) {
+    //        documentMapping.setName(documentName);
+    //        return this;
+    //    }
+    //
+    //    @Override
+    //    public SADocumentMappingBuilder setAuthor(final long author) {
+    //        documentMapping.setAuthor(author);
+    //        return this;
+    //    }
+    //
+    //    @Override
+    //    public SADocumentMappingBuilder setHasContent(final boolean hasContent) {
+    //        documentMapping.setDocumentHasContent(hasContent);
+    //        return this;
+    //    }
+    //
+    //    @Override
+    //    public SADocumentMappingBuilder setDocumentStorageId(final String storageId) {
+    //        documentMapping.setContentStorageId(storageId);
+    //        return this;
+    //    }
+    //
+    //    @Override
+    //    public SADocumentMappingBuilder setCreationDate(final long creationDate) {
+    //        documentMapping.setCreationDate(creationDate);
+    //        return this;
+    //    }
+    //
+    //    @Override
+    //    public SADocumentMappingBuilder setFileName(final String contentFileName) {
+    //        documentMapping.setFileName(contentFileName);
+    //        return this;
+    //    }
+    //
+    //    @Override
+    //    public SADocumentMappingBuilder setMimeType(final String contentMimeType) {
+    //        documentMapping.setMimeType(contentMimeType);
+    //        return this;
+    //    }
+    //
+    //    @Override
+    //    public SADocumentMappingBuilder setURL(final String url) {
+    //        documentMapping.setURL(url);
+    //        return this;
+    //    }
+    //
+    //    @Override
+    //    public SADocumentMappingBuilder setContentStorageId(final String contentStorageId) {
+    //        documentMapping.setContentStorageId(contentStorageId);
+    //        return this;
+    //    }
 
     @Override
     public SADocumentMapping done() {

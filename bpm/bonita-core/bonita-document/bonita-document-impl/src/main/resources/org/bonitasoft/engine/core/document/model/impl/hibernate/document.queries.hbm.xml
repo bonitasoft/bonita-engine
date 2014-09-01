@@ -3,66 +3,50 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="false">
 
-    <query name="getDocContentByDocumentId">
-        SELECT docContent
-        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentContentImpl AS docContent
-        WHERE docContent.documentId = :documentId
+
+    <query name="getSMappedDocumentOfProcessWithName">
+        SELECT mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc
+        WHERE mappeddoc.processInstanceId = :processInstanceId
+        AND mappeddoc.document.name = :name
     </query>
 
-    <!-- DocumentMapping -->
 
-
-    <query name="getNumberOfDocuments">
-        SELECT COUNT(docmapping)
-        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping
+    <query name="getSMappedDocumentOfProcess">
+        SELECT mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc
+        WHERE mappeddoc.processInstanceId = :processInstanceId
     </query>
 
-    <query name="getDocumentMappings">
-        SELECT docmapping
-        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping
+    <query name="getNumberOfSMappedDocumentOfProcess">
+        SELECT COUNT(mappeddoc)
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc
+        WHERE mappeddoc.processInstanceId = :processInstanceId
     </query>
 
-    <query name="getDocumentMappingsforProcessInstance">
-        SELECT docmapping
-        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping
-        WHERE docmapping.processInstanceId = :processInstanceId
+    <query name="getSMappedDocumentOfProcessOrderedById">
+        SELECT mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc
+        WHERE mappeddoc.processInstanceId = :processInstanceId
+        ORDER BY mappeddoc.id
     </query>
 
-    <query name="getDocumentMappingsforProcessInstanceOrderedById">
-        SELECT docmapping
-        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping
-        WHERE docmapping.processInstanceId = :processInstanceId
-        ORDER BY docmapping.id
+    <query name="getNumberOfSMappedDocument">
+        SELECT COUNT(mappeddoc.id)
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc
     </query>
 
-    <query name="getNumberOfDocumentMappingsforProcessInstance">
-        SELECT COUNT(docmapping)
-        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping
-        WHERE docmapping.processInstanceId = :processInstanceId
+    <query name="searchSMappedDocument">
+        SELECT mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc
     </query>
 
-    <query name="getDocumentMappingsforProcessInstanceAndName">
-        SELECT docmapping
-        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping
-        WHERE docmapping.processInstanceId = :processInstanceId
-        AND docmapping.documentName = :documentName
-    </query>
 
-    <query name="getNumberOfSDocumentMapping">
-        SELECT COUNT(docmapping)
-        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping
-    </query>
-
-    <query name="searchSDocumentMapping">
-        SELECT docmapping
-        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping
-    </query>
-
-    <query name="getNumberOfSDocumentMappingSupervisedBy">
-        SELECT COUNT(docmapping)
-        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping,
+    <query name="getNumberOfSMappedDocumentSupervisedBy">
+        SELECT COUNT(mappeddoc)
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc,
         org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
-        WHERE docmapping.processInstanceId = p.id
+        WHERE mappeddoc.processInstanceId = p.id
         AND p.processDefinitionId IN (
         SELECT supervisor.processDefId
         FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
@@ -82,11 +66,11 @@
         )
     </query>
 
-    <query name="searchSDocumentMappingSupervisedBy">
-        SELECT docmapping
-        FROM org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl AS docmapping,
+    <query name="searchSMappedDocumentSupervisedBy">
+        SELECT mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc,
         org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
-        WHERE docmapping.processInstanceId = p.id
+        WHERE mappeddoc.processInstanceId = p.id
         AND p.processDefinitionId IN (
         SELECT supervisor.processDefId
         FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor

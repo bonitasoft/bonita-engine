@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class InitializinAndExecutingFlowNodeStateImplTest {
+public class InitializingAndExecutingFlowNodeStateImplTest {
 
     @Mock
     private StateBehaviors stateBehaviors;
@@ -24,13 +24,13 @@ public class InitializinAndExecutingFlowNodeStateImplTest {
     private SProcessDefinition processDefinition;
 
     @InjectMocks
-    private InitializinAndExecutingFlowNodeStateImpl initializinAndExecutingFlowNodeStateImpl;
+    private InitializingAndExecutingFlowNodeStateImpl initializingAndExecutingFlowNodeStateImpl;
 
     @Test
     public void testBeforeOnEnter() throws Exception {
 
         // when
-        initializinAndExecutingFlowNodeStateImpl.beforeOnEnter(processDefinition, flowNodeInstance);
+        initializingAndExecutingFlowNodeStateImpl.beforeOnEnter(processDefinition, flowNodeInstance);
 
         // then
         verify(stateBehaviors).handleCatchEvents(processDefinition, flowNodeInstance);
@@ -42,7 +42,7 @@ public class InitializinAndExecutingFlowNodeStateImplTest {
     public void testOnEnterToOnFinish() throws Exception {
 
         // when
-        initializinAndExecutingFlowNodeStateImpl.onEnterToOnFinish(processDefinition, flowNodeInstance);
+        initializingAndExecutingFlowNodeStateImpl.onEnterToOnFinish(processDefinition, flowNodeInstance);
 
         // then
         verify(stateBehaviors).updateDisplayNameAndDescription(processDefinition, flowNodeInstance);
@@ -53,7 +53,7 @@ public class InitializinAndExecutingFlowNodeStateImplTest {
     public void testAfterOnFinish() throws Exception {
 
         // when
-        initializinAndExecutingFlowNodeStateImpl.afterOnFinish(processDefinition, flowNodeInstance);
+        initializingAndExecutingFlowNodeStateImpl.afterOnFinish(processDefinition, flowNodeInstance);
 
         // then
         verify(stateBehaviors).updateDisplayDescriptionAfterCompletion(processDefinition, flowNodeInstance);

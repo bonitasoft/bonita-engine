@@ -13,28 +13,33 @@
  **/
 package org.bonitasoft.engine.core.document.model.builder;
 
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.core.document.model.SDocument;
 
 /**
  * @author Nicolas Chabanoles
+ * @author Zhang Bole
+ * @author Baptiste Mesta
  */
-public interface SDocumentMappingUpdateBuilder {
+public interface SDocumentBuilderFactory {
 
-    SDocumentMappingUpdateBuilder setDocumentName(String documentName);
+    String getIdKey();
 
-    SDocumentMappingUpdateBuilder setDocumentAuthor(long author);
+    String getNameKey();
 
-    SDocumentMappingUpdateBuilder setDocumentCreationDate(long creationDate);
+    String getAuthorKey();
 
-    SDocumentMappingUpdateBuilder setHasContent(boolean hasContent);
+    String getCreationDateKey();
 
-    SDocumentMappingUpdateBuilder setDocumentContentFileName(String contentFileName);
+    String getHasContentKey();
 
-    SDocumentMappingUpdateBuilder setDocumentContentMimeType(String contentMimeType);
+    String getFileNameKey();
 
-    SDocumentMappingUpdateBuilder setDocumentStorageId(final String documentId);
+    String getMimeTypeKey();
 
-    SDocumentMappingUpdateBuilder setDocumentURL(String generateURL);
+    String getURLKey();
 
-    EntityUpdateDescriptor done();
+    SDocumentBuilder createNewInstance();
+
+    SDocumentBuilder createNewInstance(SDocument documentMapping);
+
 }

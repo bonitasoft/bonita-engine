@@ -20,7 +20,7 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.EventCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingBuilderFactory;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilderFactory;
@@ -221,7 +221,7 @@ public class OrderAndFields {
      * @return
      */
     public static OrderAndField getOrderAndFieldForDocument(DocumentCriterion pagingCriterion) {
-        final SDocumentMappingBuilderFactory fact = BuilderFactory.get(SDocumentMappingBuilderFactory.class);
+        final SDocumentBuilderFactory fact = BuilderFactory.get(SDocumentBuilderFactory.class);
         String field = null;
         OrderByType order = null;
         if (pagingCriterion == null) {
@@ -229,55 +229,55 @@ public class OrderAndFields {
         }
         switch (pagingCriterion) {
             case DEFAULT:
-                field = fact.getDocumentCreationDateKey();
+                field = fact.getCreationDateKey();
                 order = OrderByType.DESC;
                 break;
             case AUTHOR_ASC:
-                field = fact.getDocumentAuthorKey();
+                field = fact.getAuthorKey();
                 order = OrderByType.ASC;
                 break;
             case AUTHOR_DESC:
-                field = fact.getDocumentAuthorKey();
+                field = fact.getAuthorKey();
                 order = OrderByType.DESC;
                 break;
             case FILENAME_ASC:
-                field = fact.getDocumentContentFileNameKey();
+                field = fact.getFileNameKey();
                 order = OrderByType.ASC;
                 break;
             case FILENAME_DESC:
-                field = fact.getDocumentContentFileNameKey();
+                field = fact.getFileNameKey();
                 order = OrderByType.DESC;
                 break;
             case MIMETYPE_ASC:
-                field = fact.getDocumentContentMimeTypeKey();
+                field = fact.getMimeTypeKey();
                 order = OrderByType.ASC;
                 break;
             case MIMETYPE_DESC:
-                field = fact.getDocumentContentMimeTypeKey();
+                field = fact.getMimeTypeKey();
                 order = OrderByType.DESC;
                 break;
             case CREATION_DATE_ASC:
-                field = fact.getDocumentCreationDateKey();
+                field = fact.getCreationDateKey();
                 order = OrderByType.ASC;
                 break;
             case CREATION_DATE_DESC:
-                field = fact.getDocumentCreationDateKey();
+                field = fact.getCreationDateKey();
                 order = OrderByType.DESC;
                 break;
             case NAME_ASC:
-                field = fact.getDocumentNameKey();
+                field = fact.getNameKey();
                 order = OrderByType.ASC;
                 break;
             case NAME_DESC:
-                field = fact.getDocumentNameKey();
+                field = fact.getNameKey();
                 order = OrderByType.DESC;
                 break;
             case URL_ASC:
-                field = fact.getDocumentURLKey();
+                field = fact.getURLKey();
                 order = OrderByType.ASC;
                 break;
             case URL_DESC:
-                field = fact.getDocumentURLKey();
+                field = fact.getURLKey();
                 order = OrderByType.DESC;
                 break;
             default:

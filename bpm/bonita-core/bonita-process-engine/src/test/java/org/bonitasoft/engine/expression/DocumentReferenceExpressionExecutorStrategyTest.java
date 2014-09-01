@@ -27,10 +27,10 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.model.SDocumentMapping;
+import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
+import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -63,13 +63,13 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
     DocumentReferenceExpressionExecutorStrategy strategy;
 
     @Mock
-    SDocumentMapping document;
+    SMappedDocument document;
 
     @Mock
-    SDocumentMapping parentDocument;
+    SMappedDocument parentDocument;
 
     @Mock
-    SDocumentMapping archivedDocument;
+    SMappedDocument archivedDocument;
 
     @Mock
     SExpression expression;
@@ -81,9 +81,9 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
     public void setUp() throws Exception {
         doReturn(flowNodeInstance).when(flownodeInstanceService).getFlowNodeInstance(PROCESS_INSTANCE_ID);
         doReturn(PARENT_PROCESS_INSTANCE_ID).when(flowNodeInstance).getParentProcessInstanceId();
-        doReturn(document).when(documentService).getDocument(eq(PROCESS_INSTANCE_ID), anyString());
-        doReturn(parentDocument).when(documentService).getDocument(eq(PARENT_PROCESS_INSTANCE_ID), anyString());
-        doReturn(archivedDocument).when(documentService).getDocument(eq(PROCESS_INSTANCE_ID), anyString(), eq(A_LONG_TIME_AGO));
+        doReturn(document).when(documentService).getMappedDocument(eq(PROCESS_INSTANCE_ID), anyString());
+        doReturn(parentDocument).when(documentService).getMappedDocument(eq(PARENT_PROCESS_INSTANCE_ID), anyString());
+        doReturn(archivedDocument).when(documentService).getMappedDocument(eq(PROCESS_INSTANCE_ID), anyString(), eq(A_LONG_TIME_AGO));
     }
 
     @Test(expected = SExpressionDependencyMissingException.class)
@@ -108,6 +108,8 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
         assertThat(result).hasSize(1).contains(ModelConvertor.toDocument(document, documentService));
     }
 
+
+
     @Test
     public void evaluate_result_should_contains_parent_process_document_when_container_is_not_a_process_instance() throws Exception {
         final Map<String, Object> dependencies = new HashMap<String, Object>();
@@ -121,7 +123,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
     @Test
     public void evaluate_result_should_contains_null_when_document_can_not_be_found_for_a_process_instance() throws Exception {
-        doThrow(SDocumentNotFoundException.class).when(documentService).getDocument(eq(PROCESS_INSTANCE_ID), anyString());
+        doThrow(SDocumentNotFoundException.class).when(documentService).getMappedDocument(eq(PROCESS_INSTANCE_ID), anyString());
         final Map<String, Object> dependencies = new HashMap<String, Object>();
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "PROCESS_INSTANCE");
@@ -133,7 +135,7 @@ public class DocumentReferenceExpressionExecutorStrategyTest {
 
     @Test
     public void evaluate_result_should_contains_null_when_document_can_not_be_found_for_a_parent_process_instance() throws Exception {
-        doThrow(SDocumentNotFoundException.class).when(documentService).getDocument(eq(PARENT_PROCESS_INSTANCE_ID), anyString());
+        doThrow(SDocumentNotFoundException.class).when(documentService).getMappedDocument(eq(PARENT_PROCESS_INSTANCE_ID), anyString());
         final Map<String, Object> dependencies = new HashMap<String, Object>();
         dependencies.put("containerId", PROCESS_INSTANCE_ID);
         dependencies.put("containerType", "OTHER");

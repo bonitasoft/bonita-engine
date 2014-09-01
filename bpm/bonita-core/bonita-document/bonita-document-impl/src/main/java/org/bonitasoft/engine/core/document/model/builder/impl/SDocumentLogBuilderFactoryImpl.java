@@ -14,19 +14,19 @@
  */
 package org.bonitasoft.engine.core.document.model.builder.impl;
 
-import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingLogBuilder;
-import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingLogBuilderFactory;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentLogBuilder;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentLogBuilderFactory;
 import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilderFactory;
 
 /**
  * @author Emmanuel Duchastenier
  * @author Nicolas Chabanoles
  */
-public class SDocumentMappingLogBuilderFactoryImpl extends CRUDELogBuilderFactory implements SDocumentMappingLogBuilderFactory {
+public class SDocumentLogBuilderFactoryImpl extends CRUDELogBuilderFactory implements SDocumentLogBuilderFactory {
 
     @Override
-    public SDocumentMappingLogBuilder createNewInstance() {
-        return new SDocumentMappingLogBuilderImpl();
+    public SDocumentLogBuilder createNewInstance() {
+        return new SDocumentLogBuilderImpl();
     }
     
     @Override

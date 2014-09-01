@@ -14,7 +14,7 @@
  */
 package org.bonitasoft.engine.core.document.model.builder.impl;
 
-import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingLogBuilder;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilder;
@@ -23,7 +23,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.CRUDELogBuilder;
  * @author Emmanuel Duchastenier
  * @author Nicolas Chabanoles
  */
-public class SDocumentMappingLogBuilderImpl extends CRUDELogBuilder implements SDocumentMappingLogBuilder {
+public class SDocumentLogBuilderImpl extends CRUDELogBuilder implements SDocumentLogBuilder {
 
     private static final String PREFIX = "DOCUMENTMAPPING";
 

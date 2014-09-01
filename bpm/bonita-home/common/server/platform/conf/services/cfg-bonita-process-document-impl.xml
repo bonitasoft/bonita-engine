@@ -3,22 +3,17 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
     <bean id="documentService" class="org.bonitasoft.engine.core.document.api.impl.DocumentServiceImpl">
-        <constructor-arg name="documentContentService" ref="documentContentService"/>
-        <constructor-arg name="documentMappingService" ref="documentMappingService"/>
         <constructor-arg name="urlProvider" ref="documentURLProvider"/>
-    </bean>
-
-    <bean name="documentURLProvider"
-          class="org.bonitasoft.engine.core.document.api.impl.SDocumentDownloadURLProviderImpl">
-        <constructor-arg name="servletUrl" value="${document.servlet.url}"/>
-    </bean>
-
-    <bean id="documentMappingService" class="org.bonitasoft.engine.core.document.api.impl.DocumentMappingServiceImpl">
         <constructor-arg name="technicalLogger" ref="platformTechnicalLoggerService"/>
         <constructor-arg name="persistenceService" ref="persistenceService"/>
         <constructor-arg name="recorder" ref="recorderSync"/>
         <constructor-arg name="eventService" ref="eventService"/>
         <constructor-arg name="archiveService" ref="archiveService"/>
+    </bean>
+
+    <bean name="documentURLProvider"
+          class="org.bonitasoft.engine.core.document.api.impl.SDocumentDownloadURLProviderImpl">
+        <constructor-arg name="servletUrl" value="${document.servlet.url}"/>
     </bean>
 
 </beans>

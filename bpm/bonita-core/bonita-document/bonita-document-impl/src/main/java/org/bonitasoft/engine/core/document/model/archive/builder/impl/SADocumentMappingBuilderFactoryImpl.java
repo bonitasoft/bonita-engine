@@ -29,25 +29,25 @@ public class SADocumentMappingBuilderFactoryImpl implements SADocumentMappingBui
 
     static final String PROCESS_INSTANCE_ID = "processInstanceId";
 
-    static final String ARCHIVEDATE = "archiveDate";
+    static final String ARCHIVE_DATE = "archiveDate";
 
     static final String SOURCE_OBJECT_ID = "sourceObjectId";
 
-    static final String CONTENT_STORAGE_ID = "contentStorageId";
+    static final String DOCUMENT_ID = "documentId";
 
-    static final String DOCUMENT_URL = "documentURL";
+    static final String URL = "url";
 
-    static final String DOCUMENT_NAME = "documentName";
+    static final String NAME = "name";
 
-    static final String HAS_CONTENT = "documentHasContent";
+    static final String HAS_CONTENT = "hasContent";
 
-    static final String DOCUMENT_AUTHOR = "documentAuthor";
+    static final String AUTHOR = "author";
 
-    static final String DOCUMENT_CONTENT_FILENAME = "documentContentFileName";
+    static final String FILE_NAME = "fileName";
 
-    static final String DOCUMENT_CONTENT_MIMETYPE = "documentContentMimeType";
+    static final String MIME_TYPE = "mimeType";
 
-    static final String DOCUMENT_CREATIONDATE = "documentCreationDate";
+    static final String CREATION_DATE = "creationDate";
 
 
     @Override
@@ -57,9 +57,8 @@ public class SADocumentMappingBuilderFactoryImpl implements SADocumentMappingBui
     }
 
     @Override
-    public SADocumentMappingBuilder createNewInstance(final SDocumentMapping originalDocumentMapping) {
-        final SADocumentMappingImpl documentMapping = new SADocumentMappingImpl(originalDocumentMapping);
-        return new SADocumentMappingBuilderImpl(documentMapping);
+    public SADocumentMappingBuilder createNewInstance(SDocumentMapping documentMapping) {
+        return new SADocumentMappingBuilderImpl(new SADocumentMappingImpl(documentMapping.getDocumentId(),documentMapping.getProcessInstanceId(),System.currentTimeMillis(),documentMapping.getId()));
     }
 
     @Override
@@ -73,8 +72,8 @@ public class SADocumentMappingBuilderFactoryImpl implements SADocumentMappingBui
     }
 
     @Override
-    public String getDocumentNameKey() {
-        return DOCUMENT_NAME;
+    public String getNameKey() {
+        return NAME;
     }
 
     @Override
@@ -84,42 +83,42 @@ public class SADocumentMappingBuilderFactoryImpl implements SADocumentMappingBui
 
     @Override
     public String getArchiveDateKey() {
-        return null;
+        return ARCHIVE_DATE;
     }
 
     @Override
-    public String getDocumentAuthorKey() {
-        return DOCUMENT_AUTHOR;
+    public String getAuthorKey() {
+        return AUTHOR;
     }
 
     @Override
-    public String getDocumentCreationDateKey() {
-        return DOCUMENT_CREATIONDATE;
+    public String getCreationDateKey() {
+        return CREATION_DATE;
     }
 
     @Override
-    public String getDocumentHasContentKey() {
+    public String getHasContentKey() {
         return HAS_CONTENT;
     }
 
     @Override
-    public String getDocumentContentFileNameKey() {
-        return DOCUMENT_CONTENT_FILENAME;
+    public String getFileNameKey() {
+        return FILE_NAME;
     }
 
     @Override
-    public String getDocumentContentMimeTypeKey() {
-        return DOCUMENT_CONTENT_MIMETYPE;
+    public String getMimeTypeKey() {
+        return MIME_TYPE;
     }
 
     @Override
     public String getContentStorageIdKey() {
-        return CONTENT_STORAGE_ID;
+        return DOCUMENT_ID;
     }
 
     @Override
-    public String getDocumentURLKey() {
-        return DOCUMENT_URL;
+    public String getURLKey() {
+        return URL;
     }
 
 }

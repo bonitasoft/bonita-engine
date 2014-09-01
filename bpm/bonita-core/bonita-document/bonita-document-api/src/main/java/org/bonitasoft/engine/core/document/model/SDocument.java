@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,20 +11,15 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.document.model.builder.impl;
-
-import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingUpdateBuilder;
-import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingUpdateBuilderFactory;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+package org.bonitasoft.engine.core.document.model;
 
 /**
  * @author Nicolas Chabanoles
+ * @author Matthieu Chaffotte
+ * @author Baptiste Mesta
  */
-public class SDocumentMappingUpdateBuilderFactoryImpl implements SDocumentMappingUpdateBuilderFactory {
+public interface SDocument extends SLightDocument {
 
-    @Override
-    public SDocumentMappingUpdateBuilder createNewInstance() {
-        return new SDocumentMappingUpdateBuilderImpl(new EntityUpdateDescriptor());
-    }
+    byte[] getContent();
 
 }

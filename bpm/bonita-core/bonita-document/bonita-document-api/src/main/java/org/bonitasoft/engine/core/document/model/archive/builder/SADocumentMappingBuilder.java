@@ -24,23 +24,7 @@ public interface SADocumentMappingBuilder {
 
     SADocumentMappingBuilder setProcessInstanceId(final long processInstanceId);
 
-    SADocumentMappingBuilder setContentStorageId(final String contentStorageId);
-
-    SADocumentMappingBuilder setDocumentName(String documentName);
-
-    SADocumentMappingBuilder setDocumentAuthor(long author);
-
-    SADocumentMappingBuilder setDocumentCreationDate(long creationDate);
-
-    SADocumentMappingBuilder setHasContent(boolean hasContent);
-
-    SADocumentMappingBuilder setDocumentContentFileName(String contentFileName);
-
-    SADocumentMappingBuilder setDocumentContentMimeType(String contentMimeType);
-
-    SADocumentMappingBuilder setDocumentStorageId(final String documentId);
-
-    SADocumentMappingBuilder setDocumentURL(String generateURL);
+    SADocumentMappingBuilder setDocumentId(long documentId);
 
     SADocumentMappingBuilder setSourceObjectId(long sourceObjectId);
 

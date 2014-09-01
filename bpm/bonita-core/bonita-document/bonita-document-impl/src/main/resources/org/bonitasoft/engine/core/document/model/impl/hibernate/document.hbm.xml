@@ -1,36 +1,69 @@
 <?xml version="1.0"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="false" default-access="field" package="org.bonitasoft.engine.core.document.model.impl">
 
-	<filter-def name="tenantFilter" condition=":tenantId = tenantid">
-		<filter-param name="tenantId" type="long" />
-	</filter-def>
+    <filter-def name="tenantFilter" condition=":tenantId = tenantid">
+        <filter-param name="tenantId" type="long"/>
+    </filter-def>
 
-	<class name="SDocumentContentImpl" table="document_content">
-		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-			<key-property name="tenantId" column="tenantid" type="long" />
-			<key-property name="id" column="id" type="long" />
-		</composite-id>
-		<property name="documentId" type="java.lang.String" column="documentId" />
-		<property name="content" column="content" />
-		<filter name="tenantFilter" />
-	</class>
-
-    <class name="SDocumentMappingImpl" table="document_mapping">
+    <class name="SDocumentMappingImpl" table="document_mapping" polymorphism="explicit">
         <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-            <key-property name="tenantId" column="tenantid" type="long" />
-            <key-property name="id" column="ID" type="long" />
+            <key-property name="tenantId" column="tenantid" type="long"/>
+            <key-property name="id" column="id" type="long"/>
         </composite-id>
-        <property name="processInstanceId" type="long" column="processinstanceid" />
-        <property name="documentName" type="string" column="documentName" />
-        <property name="documentAuthor" type="long" column="documentAuthor" />
-        <property name="documentCreationDate" type="long" column="documentCreationDate" />
-        <property name="documentHasContent" type="boolean" column="documentHasContent" />
-        <property name="documentContentFileName" type="string" column="documentContentFileName" />
-        <property name="documentContentMimeType" type="string" column="documentContentMimeType" />
-        <property name="contentStorageId" type="string" column="contentStorageId" />
-        <property name="documentURL" type="string" column="documentURL" />
-
-        <filter name="tenantFilter"></filter>
+        <property name="processInstanceId" type="long" column="processinstanceid"/>
+        <property name="documentId" type="long" column="documentid"/>
+        <filter name="tenantFilter"/>
     </class>
+
+    <class name="SLightDocumentImpl" table="document" polymorphism="explicit">
+        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+            <key-property name="tenantId" column="tenantid" type="long"/>
+            <key-property name="id" column="id" type="long"/>
+        </composite-id>
+        <property name="name" type="string" column="name"/>
+        <property name="author" type="long" column="author"/>
+        <property name="creationDate" type="long" column="creationdate"/>
+        <property name="hasContent" type="boolean" column="hascontent"/>
+        <property name="fileName" type="string" column="filename"/>
+        <property name="mimeType" type="string" column="mimetype"/>
+        <property name="url" type="string" column="url"/>
+        <filter name="tenantFilter"/>
+    </class>
+
+    <class name="SDocumentImpl" table="document" polymorphism="explicit">
+        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+            <key-property name="tenantId" column="tenantid" type="long"/>
+            <key-property name="id" column="id" type="long"/>
+        </composite-id>
+        <property name="name" type="string" column="name"/>
+        <property name="author" type="long" column="author"/>
+        <property name="creationDate" type="long" column="creationdate"/>
+        <property name="hasContent" type="boolean" column="hascontent"/>
+        <property name="fileName" type="string" column="filename"/>
+        <property name="mimeType" type="string" column="mimetype"/>
+        <property name="url" type="string" column="url"/>
+        <property name="content" column="content"/>
+        <filter name="tenantFilter"/>
+    </class>
+
+
+
+    <class name="SMappedDocumentImpl" table="document_mapping" polymorphism="explicit">
+        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+            <key-property name="tenantId" column="tenantid" type="long"/>
+            <key-property name="id" column="id" type="long"/>
+        </composite-id>
+        <property name="processInstanceId" type="long" column="processinstanceid"/>
+        <property name="documentId" type="long" column="documentid"/>
+        <many-to-one name="document" class="SLightDocumentImpl" insert="false" update="false" lazy="false">
+            <column name="tenantid"/>
+            <column name="documentid"/>
+        </many-to-one>
+        <filter name="tenantFilter"/>
+    </class>
+
+
+
 </hibernate-mapping>

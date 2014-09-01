@@ -1,2 +1,2 @@
-DELETE FROM document_content;
+DELETE FROM document;
 DELETE FROM document_mapping;

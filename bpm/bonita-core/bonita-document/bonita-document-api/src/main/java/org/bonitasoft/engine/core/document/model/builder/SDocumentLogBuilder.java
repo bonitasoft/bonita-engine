@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2011 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,17 +14,15 @@
  */
 package org.bonitasoft.engine.core.document.model.builder;
 
-import org.bonitasoft.engine.core.document.model.SDocumentContent;
+import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
+import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
 
 /**
- * @author Zhao Na
+ * @author Nicolas Chabanoles
+ * @author Baptiste Mesta
  */
-public interface SDocumentContentBuilder {
+public interface SDocumentLogBuilder extends SPersistenceLogBuilder, HasCRUDEAction {
 
-    SDocumentContentBuilder setContent(byte[] content);
-
-    SDocumentContentBuilder setStorageId(String documentId);
-
-    SDocumentContent done();
+    void setProcessInstanceId(long processInstanceId);
 
 }

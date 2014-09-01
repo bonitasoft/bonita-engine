@@ -109,7 +109,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" value="10021" />
 				<entry key="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" value="10070" />
-				<entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentContentImpl" value="10090" />
+				<entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl" value="10090" />
 				<entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" value="10000" />
 				<entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl" value="10001" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl" value="10010" />
@@ -145,7 +145,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" value="10018" />
 				<entry key="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" value="10030" />
 				<entry key="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" value="10031" />
-				<entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl" value="10040" />
+				<entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentImpl" value="10040" />
 				<entry key="org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl" value="10050" />
 				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SHumanCommentImpl" value="10060" />
 				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl" value="10060" />
@@ -184,7 +184,8 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl" value="20012" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImpl" value="20013" />
-				<entry key="org.bonitasoft.engine.core.document.model.archive.impl.SADocumentMappingImpl" value="20040" />
+                <entry key="org.bonitasoft.engine.core.document.model.archive.SADocumentMapping" value="20040" />
+                <entry key="org.bonitasoft.engine.core.document.model.archive.SAMappedDocument" value="20040" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />

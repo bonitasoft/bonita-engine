@@ -16,7 +16,9 @@ package org.bonitasoft.engine.search.document;
 import java.util.List;
 
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.model.SDocumentMapping;
+import org.bonitasoft.engine.core.document.model.SDocument;
+import org.bonitasoft.engine.core.document.model.SLightDocument;
+import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.search.AbstractDocumentSearchEntity;
@@ -45,7 +47,7 @@ public class SearchDocumentsSupervisedBy extends AbstractDocumentSearchEntity {
     }
 
     @Override
-    public List<SDocumentMapping> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SMappedDocument> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
         return documentService.searchDocumentsSupervisedBy(userId, searchOptions);
     }
 

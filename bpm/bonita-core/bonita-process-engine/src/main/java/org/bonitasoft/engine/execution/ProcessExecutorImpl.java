@@ -45,6 +45,8 @@ import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
+import org.bonitasoft.engine.core.document.model.SMappedDocument;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilder;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
@@ -65,9 +67,8 @@ import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelCo
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.exception.SProcessDocumentCreationException;
-import org.bonitasoft.engine.core.document.model.SDocumentMapping;
-import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingBuilder;
-import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingBuilderFactory;
+import org.bonitasoft.engine.core.document.model.SDocument;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -623,42 +624,42 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
     }
 
-    protected SDocumentMapping attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
+    protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
             final String url, final long authorId) throws SProcessDocumentCreationException {
-        final SDocumentMapping attachment = buildExternalProcessDocumentReference(processInstanceId, documentName, fileName, mimeType, authorId, url);
-        return documentService.attachDocumentToProcessInstance(attachment);
+        final SDocument attachment = buildExternalProcessDocumentReference(documentName, fileName, mimeType, authorId, url);
+        return documentService.attachDocumentToProcessInstance(attachment, processInstanceId);
     }
 
-    protected SDocumentMapping attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
+    protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
             final byte[] documentContent, final long authorId) throws SProcessDocumentCreationException {
-        final SDocumentMapping attachment = buildProcessDocument(processInstanceId, documentName, fileName, mimeType, authorId);
-        return documentService.attachDocumentToProcessInstance(attachment, documentContent);
+        final SDocument attachment = buildProcessDocument(documentName, fileName, mimeType, authorId, documentContent);
+        return documentService.attachDocumentToProcessInstance(attachment, processInstanceId);
     }
 
-    private SDocumentMapping buildExternalProcessDocumentReference(final long processInstanceId, final String documentName, final String fileName,
+    private SDocument buildExternalProcessDocumentReference(final String documentName, final String fileName,
             final String mimeType, final long authorId, final String url) {
-        final SDocumentMappingBuilder documentBuilder = initDocumentBuilder(processInstanceId, documentName, fileName, mimeType, authorId);
-        documentBuilder.setDocumentURL(url);
+        final SDocumentBuilder documentBuilder = initDocumentBuilder(documentName, fileName, mimeType, authorId);
+        documentBuilder.setURL(url);
         documentBuilder.setHasContent(false);
         return documentBuilder.done();
     }
 
-    private SDocumentMapping buildProcessDocument(final long processInstanceId, final String documentName, final String fileName, final String mimetype,
-            final long authorId) {
-        final SDocumentMappingBuilder documentBuilder = initDocumentBuilder(processInstanceId, documentName, fileName, mimetype, authorId);
+    private SDocument buildProcessDocument(final String documentName, final String fileName, final String mimetype,
+                                           final long authorId, byte[] content) {
+        final SDocumentBuilder documentBuilder = initDocumentBuilder(documentName, fileName, mimetype, authorId);
         documentBuilder.setHasContent(true);
+        documentBuilder.setContent(content);
         return documentBuilder.done();
     }
 
-    private SDocumentMappingBuilder initDocumentBuilder(final long processInstanceId, final String documentName, final String fileName, final String mimetype,
-            final long authorId) {
-        final SDocumentMappingBuilder documentBuilder = BuilderFactory.get(SDocumentMappingBuilderFactory.class).createNewInstance();
-        documentBuilder.setDocumentName(documentName);
-        documentBuilder.setDocumentContentFileName(fileName);
-        documentBuilder.setDocumentContentMimeType(mimetype);
-        documentBuilder.setProcessInstanceId(processInstanceId);
-        documentBuilder.setDocumentAuthor(authorId);
-        documentBuilder.setDocumentCreationDate(System.currentTimeMillis());
+    private SDocumentBuilder initDocumentBuilder(final String documentName, final String fileName, final String mimetype,
+                                                 final long authorId) {
+        final SDocumentBuilder documentBuilder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance();
+        documentBuilder.setName(documentName);
+        documentBuilder.setFileName(fileName);
+        documentBuilder.setMimeType(mimetype);
+        documentBuilder.setAuthor(authorId);
+        documentBuilder.setCreationDate(System.currentTimeMillis());
         return documentBuilder;
     }
 

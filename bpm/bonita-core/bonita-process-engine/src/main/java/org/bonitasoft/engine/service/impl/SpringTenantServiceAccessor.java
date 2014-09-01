@@ -47,7 +47,6 @@ import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.api.DocumentMappingService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -164,8 +163,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     private ConnectorInstanceService connectorInstanceService;
 
     private DocumentService documentService;
-
-    private DocumentMappingService documentMappingService;
 
     private ProfileService profileService;
 
@@ -445,14 +442,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
             dependencyService = beanAccessor.getService("dependencyService", DependencyService.class);
         }
         return dependencyService;
-    }
-
-    @Override
-    public DocumentMappingService getDocumentMappingService() {
-        if (documentMappingService == null) {
-            documentMappingService = beanAccessor.getService(DocumentMappingService.class);
-        }
-        return documentMappingService;
     }
 
     @Override

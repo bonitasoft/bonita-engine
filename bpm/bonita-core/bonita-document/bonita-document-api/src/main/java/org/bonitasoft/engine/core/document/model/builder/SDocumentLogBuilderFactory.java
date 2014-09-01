@@ -14,14 +14,17 @@
  */
 package org.bonitasoft.engine.core.document.model.builder;
 
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilder;
+import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEActionFactory;
+import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilderFactory;
 
 /**
  * @author Nicolas Chabanoles
+ * @author Baptiste Mesta
  */
-public interface SDocumentMappingLogBuilder extends SPersistenceLogBuilder, HasCRUDEAction {
+public interface SDocumentLogBuilderFactory extends SPersistenceLogBuilderFactory, HasCRUDEActionFactory {
 
-    void setProcessInstanceId(long procInstanceId);
+    SDocumentLogBuilder createNewInstance();
+    
+    String getProcessInstanceIdKey();
 
 }

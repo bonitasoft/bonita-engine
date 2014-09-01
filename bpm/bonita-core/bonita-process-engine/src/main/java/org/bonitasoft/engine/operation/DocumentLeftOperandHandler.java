@@ -16,14 +16,14 @@ package org.bonitasoft.engine.operation;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilder;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.model.SDocumentMapping;
-import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingBuilder;
-import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingBuilderFactory;
+import org.bonitasoft.engine.core.document.model.SDocument;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
@@ -95,27 +95,15 @@ public class DocumentLeftOperandHandler implements LeftOperandHandler {
                 }
 
                 final DocumentValue documentValue = (DocumentValue) newValue;
-                final boolean hasContent = documentValue.hasContent();
+                final SDocument document = createDocument(documentName, authorId, documentValue, documentValue.hasContent(),
+                        documentValue.getUrl());
                 try {
                     // Let's check if the document already exists:
-                    documentService.getDocument(processInstanceId, documentName);
-
+                    documentService.getMappedDocument(processInstanceId, documentName);
                     // a document exist, update it with the new values
-                    final SDocumentMapping document = createDocument(documentName, processInstanceId, authorId, documentValue, hasContent,
-                            documentValue.getUrl());
-                    if (hasContent) {
-                        documentService.updateDocumentOfProcessInstance(document, documentValue.getContent());
-                    } else {
-                        documentService.updateDocumentOfProcessInstance(document);
-                    }
+                        documentService.updateDocumentOfProcessInstance(document, processInstanceId);
                 } catch (final SDocumentNotFoundException e) {
-                    final SDocumentMapping document = createDocument(documentName, processInstanceId, authorId, documentValue, hasContent,
-                            documentValue.getUrl());
-                    if (hasContent) {
-                        documentService.attachDocumentToProcessInstance(document, documentValue.getContent());
-                    } else {
-                        documentService.attachDocumentToProcessInstance(document);
-                    }
+                        documentService.attachDocumentToProcessInstance(document, processInstanceId);
                 }
             }
             return newValue;
@@ -125,17 +113,17 @@ public class DocumentLeftOperandHandler implements LeftOperandHandler {
 
     }
 
-    private SDocumentMapping createDocument(final String documentName, final long processInstanceId, final long authorId, final DocumentValue documentValue,
+    private SDocument createDocument(final String documentName, final long authorId, final DocumentValue documentValue,
             final boolean hasContent, final String documentUrl) {
-        final SDocumentMappingBuilder processDocumentBuilder = BuilderFactory.get(SDocumentMappingBuilderFactory.class).createNewInstance();
-        processDocumentBuilder.setDocumentName(documentName);
-        processDocumentBuilder.setDocumentContentFileName(documentValue.getFileName());
-        processDocumentBuilder.setDocumentContentMimeType(documentValue.getMimeType());
-        processDocumentBuilder.setProcessInstanceId(processInstanceId);
-        processDocumentBuilder.setDocumentAuthor(authorId);
-        processDocumentBuilder.setDocumentCreationDate(System.currentTimeMillis());
+        final SDocumentBuilder processDocumentBuilder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance();
+        processDocumentBuilder.setName(documentName);
+        processDocumentBuilder.setFileName(documentValue.getFileName());
+        processDocumentBuilder.setMimeType(documentValue.getMimeType());
+        processDocumentBuilder.setAuthor(authorId);
+        processDocumentBuilder.setCreationDate(System.currentTimeMillis());
         processDocumentBuilder.setHasContent(hasContent);
-        processDocumentBuilder.setDocumentURL(documentUrl);
+        processDocumentBuilder.setURL(documentUrl);
+        processDocumentBuilder.setContent(documentValue.getContent());
         return processDocumentBuilder.done();
     }
 

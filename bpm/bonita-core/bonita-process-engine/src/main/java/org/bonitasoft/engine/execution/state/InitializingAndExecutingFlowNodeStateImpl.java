@@ -24,11 +24,11 @@ import org.bonitasoft.engine.execution.StateBehaviors;
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  */
-public class InitializinAndExecutingFlowNodeStateImpl extends FlowNodeStateWithConnectors {
+public class InitializingAndExecutingFlowNodeStateImpl extends FlowNodeStateWithConnectors {
 
     private final StateBehaviors stateBehaviors;
 
-    public InitializinAndExecutingFlowNodeStateImpl(final StateBehaviors stateBehaviors) {
+    public InitializingAndExecutingFlowNodeStateImpl(final StateBehaviors stateBehaviors) {
         super(stateBehaviors, true, true);
         this.stateBehaviors = stateBehaviors;
     }

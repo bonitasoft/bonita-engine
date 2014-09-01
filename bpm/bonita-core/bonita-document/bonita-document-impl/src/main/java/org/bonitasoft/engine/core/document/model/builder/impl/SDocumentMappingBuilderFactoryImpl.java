@@ -50,13 +50,7 @@ public class SDocumentMappingBuilderFactoryImpl implements SDocumentMappingBuild
     @Override
     public SDocumentMappingBuilder createNewInstance() {
         final SDocumentMappingImpl documentMapping = new SDocumentMappingImpl();
-        return new SDocumentMappingBuilderImpl(documentMapping);
-    }
-
-    @Override
-    public SDocumentMappingBuilder createNewInstance(final SDocumentMapping originalDocumentMapping) {
-        final SDocumentMappingImpl documentMapping = new SDocumentMappingImpl(originalDocumentMapping);
-        return new SDocumentMappingBuilderImpl(documentMapping);
+        return null;
     }
 
     @Override
@@ -70,43 +64,10 @@ public class SDocumentMappingBuilderFactoryImpl implements SDocumentMappingBuild
     }
 
     @Override
-    public String getDocumentNameKey() {
+    public String getDocumentIdKey() {
         return DOCUMENT_NAME;
     }
 
-    @Override
-    public String getDocumentAuthorKey() {
-        return DOCUMENT_AUTHOR;
-    }
 
-    @Override
-    public String getDocumentCreationDateKey() {
-        return DOCUMENT_CREATION_DATE;
-    }
-
-    @Override
-    public String getDocumentHasContent() {
-        return DOCUMENT_HAS_CONTENT;
-    }
-
-    @Override
-    public String getDocumentContentFileNameKey() {
-        return DOCUMENT_CONTENT_FILENAME;
-    }
-
-    @Override
-    public String getDocumentContentMimeTypeKey() {
-        return DOCUMENT_CONTENT_MIMETYPE;
-    }
-
-    @Override
-    public String geContentStorageIdKey() {
-        return DOCUMENT_CONTENT_STORAGE_ID;
-    }
-
-    @Override
-    public String getDocumentURLKey() {
-        return DOCUMENT_URL;
-    }
 
 }

@@ -1,4 +1,4 @@
-DELETE FROM document_content
+DELETE FROM document
 GO
 DELETE FROM document_mapping
 GO

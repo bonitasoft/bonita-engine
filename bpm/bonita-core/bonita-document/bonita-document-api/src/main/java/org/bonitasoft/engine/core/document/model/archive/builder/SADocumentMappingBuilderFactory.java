@@ -30,21 +30,21 @@ public interface SADocumentMappingBuilderFactory {
 
     String getArchiveDateKey();
 
-    String getDocumentNameKey();
+    String getNameKey();
 
-    String getDocumentAuthorKey();
+    String getAuthorKey();
 
-    String getDocumentCreationDateKey();
+    String getCreationDateKey();
 
-    String getDocumentHasContentKey();
+    String getHasContentKey();
 
-    String getDocumentContentFileNameKey();
+    String getFileNameKey();
 
-    String getDocumentContentMimeTypeKey();
+    String getMimeTypeKey();
 
     String getContentStorageIdKey();
 
-    String getDocumentURLKey();
+    String getURLKey();
 
     SADocumentMappingBuilder createNewInstance();
 

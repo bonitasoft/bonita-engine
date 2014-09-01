@@ -328,11 +328,11 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         final ReadPersistenceService persistenceService = getArchiveService().getDefinitiveArchiveReadPersistenceService();
         final SelectOneDescriptor<SAActivityInstance> descriptor = SelectDescriptorBuilder.getMostRecentArchivedActivityInstance(activityInstanceId);
         try {
-            final SAActivityInstance activitie = persistenceService.selectOne(descriptor);
-            if (activitie == null) {
+            final SAActivityInstance activity = persistenceService.selectOne(descriptor);
+            if (activity == null) {
                 throw new SActivityInstanceNotFoundException(activityInstanceId);
             }
-            return activitie;
+            return activity;
         } catch (final SBonitaReadException e) {
             throw new SActivityReadException(e);
         }
