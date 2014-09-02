@@ -81,12 +81,12 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
     private final SCustomUserInfoValueAPI userInfoValueAPI;
 
     public ImportOrganization(final TenantServiceAccessor serviceAccessor, final String organizationContent, final ImportPolicy policy,
-            SCustomUserInfoValueAPI userInfoValueAPI)
-            throws OrganizationImportException {
+            final SCustomUserInfoValueAPI userInfoValueAPI)
+                    throws OrganizationImportException {
         this.serviceAccessor = serviceAccessor;
         this.userInfoValueAPI = userInfoValueAPI;
         identityService = serviceAccessor.getIdentityService();
-        this.organizationContent = organizationContent;
+        this.organizationContent = updateXMLNS(organizationContent);
         parser = serviceAccessor.getParserFactgory().createParser(OrganizationNodeBuilder.BINDINGS);
         logger = serviceAccessor.getTechnicalLoggerService();
         warnings = new ArrayList<String>();
@@ -103,6 +103,14 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
             default:
                 throw new OrganizationImportException("No import strategy found for " + policy);
         }
+    }
+
+    private String updateXMLNS(String content) { //Backward compatibility between 6.3 and 6.4
+        if (content != null && content.contains("http://documentation.bonitasoft.com/organization-xml-schema/")) {
+            content = content.replace("http://documentation.bonitasoft.com/organization-xml-schema/",
+                    "http://documentation.bonitasoft.com/organization-xml-schema/1.1");
+        }
+        return content;
     }
 
     @Override
@@ -123,7 +131,7 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
             final List<UserMembership> memberships = organization.getMemberships();
 
             // custom user info definitions
-            Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions = importCustomUserInfoDefinitions(organization
+            final Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions = importCustomUserInfoDefinitions(organization
                     .getCustomUserInfoDefinitionCreators());
 
             // Users
@@ -151,9 +159,9 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         }
     }
 
-    private Map<String, SCustomUserInfoDefinition> importCustomUserInfoDefinitions(List<CustomUserInfoDefinitionCreator> customUserInfoDefinitionCreators)
+    private Map<String, SCustomUserInfoDefinition> importCustomUserInfoDefinitions(final List<CustomUserInfoDefinitionCreator> customUserInfoDefinitionCreators)
             throws SIdentityException, ImportDuplicateInOrganizationException {
-        CustomUserInfoDefinitionImporter importer = new CustomUserInfoDefinitionImporter(serviceAccessor, strategy);
+        final CustomUserInfoDefinitionImporter importer = new CustomUserInfoDefinitionImporter(serviceAccessor, strategy);
         return importer.importCustomUserInfoDefinitions(customUserInfoDefinitionCreators);
     }
 
@@ -284,10 +292,10 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
         }
     }
 
-    private Map<String, SUser> importUsers(final List<ExportedUser> users, Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions)
+    private Map<String, SUser> importUsers(final List<ExportedUser> users, final Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions)
             throws SBonitaException {
-        CustomUserInfoValueImporter userInfoValueImporter = new CustomUserInfoValueImporter(userInfoValueAPI, customUserInfoDefinitions);
-        UserImporter userImporter = new UserImporter(serviceAccessor, strategy, SessionInfos.getUserIdFromSession(), userInfoValueImporter);
+        final CustomUserInfoValueImporter userInfoValueImporter = new CustomUserInfoValueImporter(userInfoValueAPI, customUserInfoDefinitions);
+        final UserImporter userImporter = new UserImporter(serviceAccessor, strategy, SessionInfos.getUserIdFromSession(), userInfoValueImporter);
         return userImporter.importUsers(users);
     }
 
