@@ -62,6 +62,11 @@
 			<artifactId>bonita-business-data-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+         <dependency>
+            <groupId>com.bonitasoft.engine.application</groupId>
+            <artifactId>bonita-business-application-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast</artifactId>
@@ -117,6 +122,12 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>com.bonitasoft.engine.application</groupId>
+            <artifactId>bonita-business-application-impl</artifactId>
+            <version>${project.version}</version>
+			<scope>test</scope>
+        </dependency>
 	</dependencies>
 
 	<build>

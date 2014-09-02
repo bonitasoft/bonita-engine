@@ -131,6 +131,13 @@
 					</profileEntry>
 				</childrenEntries>
 			</parentProfileEntry>
+			<parentProfileEntry name="Applications" isCustom="false">
+				<parentName>NULL</parentName>
+				<index>8</index>
+				<description>Applications</description>
+				<type>link</type>
+				<page>applicationslistingadmin</page>
+			</parentProfileEntry>
 		</profileEntries>
 	</profile>
 	<profile name="Process manager" isDefault="true">

@@ -87,6 +87,15 @@
 			<scope>test</scope>
 		</dependency>
 
+        <!-- Business application -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.application</groupId>
+            <artifactId>bonita-business-application</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+
 		<!-- Business Data -->
 		<dependency>
 			<groupId>com.bonitasoft.engine.data</groupId>
@@ -319,6 +328,15 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+        
+        
+        <!-- Page -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.page</groupId>
+            <artifactId>bonita-page</artifactId>
+            <version>${project.version}</version>
+			<scope>test</scope>
+        </dependency>
 
 		<!-- Platform -->
 		<dependency>
@@ -710,6 +728,12 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>com.bonitasoft.engine.application</groupId>
+            <artifactId>bonita-business-application-impl</artifactId>
+            <version>${project.version}</version>
+			<scope>test</scope>
+        </dependency>
 
 	</dependencies>
 

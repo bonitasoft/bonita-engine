@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+    <query name="getApplicationById">
+        SELECT application
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationImpl AS application
+        WHERE id = :id
+    </query>
+
+    <query name="getApplicationByName">
+        SELECT application
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationImpl AS application
+        WHERE name = :name
+    </query>
+
+    <query name="getNumberOfSApplication">
+        SELECT count(application)
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationImpl AS application
+    </query>
+
+    <query name="searchSApplication">
+        SELECT application
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationImpl AS application
+    </query>
+    
+    <query name="getApplicationPageById">
+        SELECT applicationPage
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationPageImpl as applicationPage
+        WHERE id = :id
+    </query>
+
+    <query name="getApplicationPageByNameAndApplicationName">
+        SELECT applicationPage
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationPageImpl as applicationPage, com.bonitasoft.engine.business.application.impl.SApplicationImpl as application
+        WHERE applicationPage.applicationId = application.id
+        AND applicationPage.name = :applicationPageName
+        AND application.name = :applicationName
+    </query>
+
+    <query name="getApplicationPageByNameAndApplicationId">
+        SELECT applicationPage
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationPageImpl as applicationPage
+        WHERE applicationPage.applicationId = :applicationId
+        AND applicationPage.name = :applicationPageName
+    </query>
+
+    <query name="getApplicationHomePage">
+        SELECT applicationPage
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationPageImpl as applicationPage, com.bonitasoft.engine.business.application.impl.SApplicationImpl as application
+        WHERE applicationPage.id = application.homePageId 
+        AND applicationPage.applicationId = application.id
+        AND application.id = :applicationId
+    </query>
+    
+    <query name="getNumberOfSApplicationPage">
+        SELECT count(applicationPage)
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationPageImpl as applicationPage
+    </query>
+    
+    <query name="searchSApplicationPage">
+        SELECT applicationPage
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationPageImpl as applicationPage
+    </query>
+
+</hibernate-mapping>
