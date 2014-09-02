@@ -35,7 +35,7 @@ public class OrganizationNodeBuilder {
 
     static final List<Class<? extends ElementBinding>> BINDINGS = new ArrayList<Class<? extends ElementBinding>>();
 
-    private static final String NAMESPACE = "http://documentation.bonitasoft.com/organization-xml-schema";
+    private static final String NAMESPACE = "http://documentation.bonitasoft.com/organization-xml-schema/1.1";
 
     private static final String NS_PREFIX = "organization";
 
@@ -50,12 +50,12 @@ public class OrganizationNodeBuilder {
         BINDINGS.add(GroupBinding.class);
         BINDINGS.add(MembershipBinding.class);
     }
-    
-    
+
+
     private OrganizationNodeBuilder() {
     }
 
-    public static XMLNode getDocument(Organization organization, final Map<Long, String> userNames, final Map<Long, String> groupIdParentPath) {
+    public static XMLNode getDocument(final Organization organization, final Map<Long, String> userNames, final Map<Long, String> groupIdParentPath) {
         final XMLNode document = getRootNode();
         addCustomUserInfoDefinitions(organization.getCustomUserInfoDefinitions(), document);
         addUsers(organization.getUsers(), document);
@@ -65,7 +65,7 @@ public class OrganizationNodeBuilder {
         return document;
     }
 
-    private static void addCustomUserInfoDefinitions(List<SCustomUserInfoDefinition> customUserInfoDefinitions, XMLNode document) {
+    private static void addCustomUserInfoDefinitions(final List<SCustomUserInfoDefinition> customUserInfoDefinitions, final XMLNode document) {
         final XMLNode userInfoDefsNode = new XMLNode(OrganizationMappingConstants.CUSTOM_USER_INFO_DEFINITIONS);
         document.addChild(userInfoDefsNode);
         for (final SCustomUserInfoDefinition userInfoDef : customUserInfoDefinitions) {
@@ -74,14 +74,14 @@ public class OrganizationNodeBuilder {
         }
     }
 
-    private static XMLNode getCustomUserInfoDefinitionNode(SCustomUserInfoDefinition userInfoDef) {
+    private static XMLNode getCustomUserInfoDefinitionNode(final SCustomUserInfoDefinition userInfoDef) {
         final XMLNode userInfDefNode = new XMLNode(OrganizationMappingConstants.CUSTOM_USER_INFO_DEFINITION);
         addCustomUserInfoDefinitionName(userInfoDef, userInfDefNode);
         addCustomUserInfoDefinitionDescription(userInfoDef, userInfDefNode);
         return userInfDefNode;
     }
 
-    private static void addCustomUserInfoDefinitionName(SCustomUserInfoDefinition userInfoDef, final XMLNode userInfDefNode) {
+    private static void addCustomUserInfoDefinitionName(final SCustomUserInfoDefinition userInfoDef, final XMLNode userInfDefNode) {
         if (userInfoDef.getName() != null) {
             final XMLNode node = new XMLNode(OrganizationMappingConstants.NAME);
             node.setContent(userInfoDef.getName());
@@ -89,7 +89,7 @@ public class OrganizationNodeBuilder {
         }
     }
 
-    private static void addCustomUserInfoDefinitionDescription(SCustomUserInfoDefinition userInfoDef, final XMLNode userInfDefNode) {
+    private static void addCustomUserInfoDefinitionDescription(final SCustomUserInfoDefinition userInfoDef, final XMLNode userInfDefNode) {
         if (userInfoDef.getDescription() != null) {
             final XMLNode node = new XMLNode(OrganizationMappingConstants.DESCRIPTION);
             node.setContent(userInfoDef.getDescription());
@@ -238,7 +238,7 @@ public class OrganizationNodeBuilder {
         return userNode;
     }
 
-    private static void addCustomUserInfoValuesNode(List<ExportedCustomUserInfoValue> userInfoValues, XMLNode userNode) {
+    private static void addCustomUserInfoValuesNode(final List<ExportedCustomUserInfoValue> userInfoValues, final XMLNode userNode) {
         userNode.addChild(CustomUserInfoValueNodeBuilder.buildNode(userInfoValues));
     }
 
