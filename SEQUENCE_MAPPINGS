@@ -107,6 +107,9 @@ Token -> 10110
 
 Page -> 10120
 
+SBusinessApplication -> 10200
+SBusinessApplicationPage -> 10201
+
 =Archived objects==
 
 ProcessInstance -> 20010

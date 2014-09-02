@@ -17,7 +17,7 @@ import org.bonitasoft.engine.events.model.SEvent;
 
 /**
  * Default implementation of the SEvent interface.
- * 
+ *
  * @author Christophe Havard
  */
 public class SEventImpl implements SEvent {
@@ -44,6 +44,44 @@ public class SEventImpl implements SEvent {
     @Override
     public void setObject(final Object object) {
         this.object = object;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (object == null ? 0 : object.hashCode());
+        result = prime * result + (type == null ? 0 : type.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SEventImpl other = (SEventImpl) obj;
+        if (object == null) {
+            if (other.object != null) {
+                return false;
+            }
+        } else if (!object.equals(other.object)) {
+            return false;
+        }
+        if (type == null) {
+            if (other.type != null) {
+                return false;
+            }
+        } else if (!type.equals(other.type)) {
+            return false;
+        }
+        return true;
     }
 
 }
