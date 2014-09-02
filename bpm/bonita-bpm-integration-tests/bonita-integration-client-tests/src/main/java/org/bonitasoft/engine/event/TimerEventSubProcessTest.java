@@ -140,13 +140,9 @@ public class TimerEventSubProcessTest extends CommonAPITest {
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
         final Date processStartDate = processInstance.getStartDate();
-        //then
-        final Date expectedStartDate = new Date(processStartDate.getTime() + timerDuration);
-
-        final String description = String.format("process started at %s should trigger subprocess before %s (+ %d ms) ", formatedDate(processStartDate),
-                formatedDate(subProcInst.getStartDate()), timerDuration);
         assertThat(subProcInst.getStartDate()).as(
-                description).isCloseTo(expectedStartDate, 100);
+                String.format("process started at %s should trigger subprocess at %s (+ %d ms) ", formatedDate(processStartDate),
+                        formatedDate(subProcInst.getStartDate()), timerDuration)).isAfter(processStartDate);
 
         //cleanup
         assignAndExecuteStep(subStep, john.getId());
