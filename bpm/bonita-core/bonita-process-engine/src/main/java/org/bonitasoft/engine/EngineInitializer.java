@@ -50,7 +50,7 @@ public class EngineInitializer {
 
     private final EngineInitializerProperties platformProperties;
 
-    private PlatformAPI platformAPI;
+    private static PlatformAPI platformAPI;
 
     public EngineInitializer(final PlatformTenantManager platformManager, final EngineInitializerProperties platformProperties) {
         super();
