@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.bonitasoft.engine.CommonAPITest;
@@ -49,6 +50,7 @@ import org.junit.Test;
  */
 public class TimerEventSubProcessTest extends CommonAPITest {
 
+    private static final String DATE_FORMAT_WITH_MS = "yyyyy-mm-dd hh:mm:ss SSSSS";
     private User john;
 
     @Before
@@ -137,14 +139,20 @@ public class TimerEventSubProcessTest extends CommonAPITest {
         final ActivityInstance subStep = waitForUserTask("subStep", processInstance);
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
-        //then
-        final Date expectedStartDate = new Date(processInstance.getStartDate().getTime() + timerDuration);
-        assertThat(subProcInst.getStartDate()).as("sub process should have been triggered").isAfterOrEqualsTo(expectedStartDate);
+        final Date processStartDate = processInstance.getStartDate();
+        assertThat(subProcInst.getStartDate()).as(
+                String.format("process started at %s should trigger subprocess at %s (+ %d ms) ", formatedDate(processStartDate),
+                        formatedDate(subProcInst.getStartDate()), timerDuration)).isAfter(processStartDate);
 
         //cleanup
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subProcInst);
         disableAndDeleteProcess(process.getId());
+    }
+
+    private String formatedDate(final Date date) {
+        final SimpleDateFormat dt = new SimpleDateFormat(DATE_FORMAT_WITH_MS);
+        return dt.format(date);
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer" }, jira = "ENGINE-536")

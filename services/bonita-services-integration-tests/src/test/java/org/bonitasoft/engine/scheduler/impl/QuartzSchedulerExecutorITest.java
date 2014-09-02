@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.scheduler.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -93,25 +94,32 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
 
     @Test
     public void testExecuteAJobInACron() throws Exception {
+        // given
         final String jobName = "IncrementItselfJob";
-        final Date now = new Date();
+        IncrementItselfJob.reset();
         final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                 .createNewInstance(IncrementItselfJob.class.getName(), jobName).done();
         final List<SJobParameter> parameters = new ArrayList<SJobParameter>();
         parameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance("jobName", jobName).done());
+        final Date now = new Date();
         final Trigger trigger = new UnixCronTrigger("events", now, 10, "0/1 * * * * ?");
 
+        //when
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();
+        Thread.sleep(2500);
 
-        final int value = IncrementItselfJob.getValue();
-
-        Thread.sleep(1500);
-
-        final int newValue = IncrementItselfJob.getValue();
-        final int delta = newValue - value;
-        assertTrue("expected 1,2 or 3 executions in 1.5 seconds, got: " + delta, delta == 1 || delta == 2 || delta == 3);
+        //then
+        final List<Date> executionDates = IncrementItselfJob.getExecutionDates();
+        assertThat(executionDates).as("should have triggered job").isNotEmpty();
+        Date previousDate = null;
+        for (final Date date : executionDates) {
+            if (previousDate != null) {
+                assertThat(date).as("should date diff be equal to cron interval").isAfter(previousDate);
+            }
+            previousDate = date;
+        }
     }
 
     @Test
