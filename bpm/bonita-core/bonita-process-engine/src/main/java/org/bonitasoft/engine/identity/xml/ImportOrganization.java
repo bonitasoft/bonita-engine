@@ -106,8 +106,8 @@ public class ImportOrganization implements TransactionContentWithResult<List<Str
     }
 
     private String updateXMLNS(String content) { //Backward compatibility between 6.3 and 6.4
-        if (content != null && content.contains("http://documentation.bonitasoft.com/organization-xml-schema/")) {
-            content = content.replace("http://documentation.bonitasoft.com/organization-xml-schema/",
+        if (content != null && content.contains("http://documentation.bonitasoft.com/organization-xml-schema")) {
+            content = content.replace("http://documentation.bonitasoft.com/organization-xml-schema",
                     "http://documentation.bonitasoft.com/organization-xml-schema/1.1");
         }
         return content;
