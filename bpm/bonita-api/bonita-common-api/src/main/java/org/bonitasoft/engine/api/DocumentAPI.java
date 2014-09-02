@@ -49,7 +49,7 @@ public interface DocumentAPI {
     /**
      * Attach a document by reference to the specified process instance.<br/>
      * The document itself does not contain content but is a reference to external content specified by its URL.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance
      * @param documentName
@@ -73,9 +73,37 @@ public interface DocumentAPI {
             DocumentAttachmentException;
 
     /**
+     * Attach a document by reference to the specified process instance.<br/>
+     * The document itself does not contain content but is a reference to external content specified by its URL.
+     *
+     * @param processInstanceId
+     *            The identifier of the process instance
+     * @param documentName
+     *            The name of the document
+     * @param fileName
+     *            The filename of the document content
+     * @param mimeType
+     *            The MimeType of the document content (optional)
+     * @param url
+     *            The URL of the document content
+     * @param description
+     *              The description for the document
+     * @return a document object
+     * @throws ProcessInstanceNotFoundException
+     *             when the processInstanceId does not refer to an existing process instance
+     * @throws InvalidSessionException
+     *             when the session is not valid
+     * @throws DocumentAttachmentException
+     *             when an error occurs while attaching the document
+     * @since 6.4
+     */
+    Document attachDocument(long processInstanceId, String documentName, String fileName, String mimeType, String url, String description) throws ProcessInstanceNotFoundException,
+            DocumentAttachmentException;
+
+    /**
      * Attach the given document to the specified process instance.<br />
      * The content is stored to enable later retrieval.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance
      * @param documentName
@@ -97,11 +125,39 @@ public interface DocumentAPI {
      */
     Document attachDocument(long processInstanceId, String documentName, String fileName, String mimeType, byte[] documentContent)
             throws ProcessInstanceNotFoundException, DocumentAttachmentException;
+    /**
+     * Attach the given document to the specified process instance.<br />
+     * The content is stored to enable later retrieval.
+     *
+     * @param processInstanceId
+     *            The identifier of the process instance
+     * @param documentName
+     *            The name of the document
+     * @param fileName
+     *            The name of the file containing the document
+     * @param mimeType
+     *            The MimeType of the document content (optional)
+     * @param documentContent
+     *            The content of the document
+     * @param description
+     *              The description for the document
+     * @return a document object
+     * @throws ProcessInstanceNotFoundException
+     **             when the processInstanceId does not refer to an existing process instance
+     * @throws InvalidSessionException
+     *             when the session is not valid
+     * @throws DocumentAttachmentException
+     *             when an error occurs while attaching the document
+     * @since 6.4
+     */
+    Document attachDocument(long processInstanceId, String documentName, String fileName, String mimeType, byte[] documentContent, String description)
+            throws ProcessInstanceNotFoundException, DocumentAttachmentException;
+
 
     /**
      * Attach a new version of a document by reference to the specified process instance. The referenced document is
      * a new version of the named document.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance
      * @param documentName
@@ -121,11 +177,36 @@ public interface DocumentAPI {
      */
     Document attachNewDocumentVersion(long processInstanceId, String documentName, String fileName, String mimeType, String url)
             throws DocumentAttachmentException;
+    /**
+     * Attach a new version of a document by reference to the specified process instance. The referenced document is
+     * a new version of the named document.
+     * 
+     * @param processInstanceId
+     *            The identifier of the process instance
+     * @param documentName
+     *            The name of the document
+     * @param fileName
+     *            The name of the file containing the document
+     * @param mimeType
+     *            The MimeType of the document content (optional)
+     * @param url
+     *            The URL of the document content
+     * @param description
+     *              The description for the document
+     * @return a document object
+     * @throws InvalidSessionException
+     *             when the session is not valid
+     * @throws DocumentAttachmentException
+     *             when an error occurs while attaching the new version of the document
+     * @since 6.4
+     */
+    Document attachNewDocumentVersion(long processInstanceId, String documentName, String fileName, String mimeType, String url, String description)
+            throws DocumentAttachmentException;
 
     /**
      * Attach a new document version to the specified process instance. The document is a new version of the named document.<br />
      * The content is stored to enable later retrieval.
-     * 
+     *
      * @param processInstanceId
      *            The identifier of the process instance
      * @param documentName
@@ -144,6 +225,31 @@ public interface DocumentAPI {
      * @since 6.0
      */
     Document attachNewDocumentVersion(long processInstanceId, String documentName, String contentFileName, String contentMimeType, byte[] documentContent)
+            throws DocumentAttachmentException;
+    /**
+     * Attach a new document version to the specified process instance. The document is a new version of the named document.<br />
+     * The content is stored to enable later retrieval.
+     *
+     * @param processInstanceId
+     *            The identifier of the process instance
+     * @param documentName
+     *            The name of the document
+     * @param contentFileName
+     *            The name of the file containing the content of the document
+     * @param contentMimeType
+     *            The MimeType of the document content (optional)
+     * @param documentContent
+     *            The content of the document
+     * @param description
+     *              The description for the document
+     * @return a document object
+     * @throws InvalidSessionException
+     *             when the session is not valid
+     * @throws DocumentAttachmentException
+     *             when an error occurs while attaching the new version of the document
+     * @since 6.4
+     */
+    Document attachNewDocumentVersion(long processInstanceId, String documentName, String contentFileName, String contentMimeType, byte[] documentContent, String description)
             throws DocumentAttachmentException;
 
     /**

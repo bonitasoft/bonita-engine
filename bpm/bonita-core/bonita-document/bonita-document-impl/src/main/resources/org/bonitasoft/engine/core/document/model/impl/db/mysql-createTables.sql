@@ -1,7 +1,6 @@
 CREATE TABLE document (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
   author BIGINT,
   creattiondate BIGINT NOT NULL,
   hascontent BOOLEAN NOT NULL,
@@ -16,6 +15,9 @@ CREATE TABLE document_mapping (
   id BIGINT NOT NULL,
   processinstanceid BIGINT NOT NULL,
   documentid BIGINT NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  description TEXT,
+  version VARCHAR(10) NOT NULL,
   PRIMARY KEY (tenantid, ID)
 ) ENGINE = INNODB;
 

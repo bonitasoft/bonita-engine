@@ -18,20 +18,22 @@ import org.bonitasoft.engine.core.document.model.SLightDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl;
+import org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
  * @author Baptiste Mesta
  */
-public class SAMappedDocumentImpl implements SAMappedDocument {
+public class SAMappedDocumentImpl extends SMappedDocumentImpl implements SAMappedDocument {
 
-    private long id;
-    private long tenantId;
     private long archiveDate;
     private long sourceObjectId;
-    private long documentId;
-    private long processInstanceId;
-    private SLightDocument document;
+
+    @Override
+    public Class<? extends PersistentObject> getPersistentObjectInterface() {
+        return SMappedDocument.class;
+    }
+
 
     public long getArchiveDate() {
         return archiveDate;
@@ -49,88 +51,36 @@ public class SAMappedDocumentImpl implements SAMappedDocument {
         this.sourceObjectId = sourceObjectId;
     }
 
-    public long getDocumentId() {
-        return documentId;
-    }
-
-    public void setDocumentId(long documentId) {
-        this.documentId = documentId;
-    }
-
-    public long getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public void setProcessInstanceId(long processInstanceId) {
-        this.processInstanceId = processInstanceId;
-    }
-
-    public long getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(long tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    @Override
-    public Class<? extends PersistentObject> getPersistentObjectInterface() {
-        return SMappedDocument.class;
-    }
-
-    @Override
-    public String getName() {
-        return document.getName();
-    }
-
-    @Override
-    public long getAuthor() {
-        return document.getAuthor();
-    }
-
-    @Override
-    public long getCreationDate() {
-        return document.getCreationDate();
-    }
-
-    @Override
-    public String getMimeType() {
-        return document.getMimeType();
-    }
-
-    @Override
-    public String getFileName() {
-        return document.getFileName();
-    }
-
-    @Override
-    public boolean hasContent() {
-        return document.hasContent();
-    }
-
-    @Override
-    public String getUrl() {
-        return document.getUrl();
-    }
-
-    public SLightDocument getDocument() {
-        return document;
-    }
-
-    public void setDocument(SLightDocument document) {
-        this.document = document;
-    }
-
     @Override
     public String getDiscriminator() {
         return SAMappedDocument.class.getName();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SAMappedDocumentImpl that = (SAMappedDocumentImpl) o;
+
+        if (archiveDate != that.archiveDate) return false;
+        if (sourceObjectId != that.sourceObjectId) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (archiveDate ^ (archiveDate >>> 32));
+        result = 31 * result + (int) (sourceObjectId ^ (sourceObjectId >>> 32));
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "SAMappedDocumentImpl{" +
+                "sourceObjectId=" + sourceObjectId +
+                ", archiveDate=" + archiveDate +
+                "} " + super.toString();
     }
 }

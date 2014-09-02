@@ -53,7 +53,7 @@ public class SearchArchivedDocumentDescriptor extends SearchEntityDescriptor {
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_HAS_CONTENT,
                 new FieldDescriptor(SAMappedDocument.class, "document."+fact.getHasContentKey()));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_NAME,
-                new FieldDescriptor(SAMappedDocument.class, "document."+fact.getNameKey()));
+                new FieldDescriptor(SAMappedDocument.class, fact.getNameKey()));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_URL,
                 new FieldDescriptor(SAMappedDocument.class, "document."+fact.getURLKey()));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID,
@@ -63,7 +63,7 @@ public class SearchArchivedDocumentDescriptor extends SearchEntityDescriptor {
 
         documentAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> documentFields = new HashSet<String>(7);
-        documentFields.add("document."+fact.getNameKey());
+        documentFields.add(fact.getNameKey());
         documentFields.add("document."+fact.getFileNameKey());
         documentFields.add("document."+fact.getMimeTypeKey());
         documentFields.add("document."+fact.getURLKey());

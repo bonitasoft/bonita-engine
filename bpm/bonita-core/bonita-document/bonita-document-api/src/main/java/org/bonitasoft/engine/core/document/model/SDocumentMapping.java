@@ -26,4 +26,10 @@ public interface SDocumentMapping extends PersistentObject {
 
     long getProcessInstanceId();
 
+    String getName();
+
+    String getDescription();
+
+    String getVersion();
+
 }

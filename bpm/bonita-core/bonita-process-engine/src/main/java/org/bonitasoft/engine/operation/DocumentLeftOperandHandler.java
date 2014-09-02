@@ -16,6 +16,7 @@ package org.bonitasoft.engine.operation;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilder;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
@@ -95,15 +96,15 @@ public class DocumentLeftOperandHandler implements LeftOperandHandler {
                 }
 
                 final DocumentValue documentValue = (DocumentValue) newValue;
-                final SDocument document = createDocument(documentName, authorId, documentValue, documentValue.hasContent(),
+                final SDocument document = createDocument(authorId, documentValue, documentValue.hasContent(),
                         documentValue.getUrl());
                 try {
                     // Let's check if the document already exists:
-                    documentService.getMappedDocument(processInstanceId, documentName);
+                    SMappedDocument mappedDocument = documentService.getMappedDocument(processInstanceId, documentName);
                     // a document exist, update it with the new values
-                        documentService.updateDocumentOfProcessInstance(document, processInstanceId);
+                        documentService.updateDocumentOfProcessInstance(document, processInstanceId, documentName, mappedDocument.getDescription()); //FIXME description in document value?
                 } catch (final SDocumentNotFoundException e) {
-                        documentService.attachDocumentToProcessInstance(document, processInstanceId);
+                        documentService.attachDocumentToProcessInstance(document, processInstanceId, documentName, null);
                 }
             }
             return newValue;
@@ -113,10 +114,9 @@ public class DocumentLeftOperandHandler implements LeftOperandHandler {
 
     }
 
-    private SDocument createDocument(final String documentName, final long authorId, final DocumentValue documentValue,
+    private SDocument createDocument(final long authorId, final DocumentValue documentValue,
             final boolean hasContent, final String documentUrl) {
         final SDocumentBuilder processDocumentBuilder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance();
-        processDocumentBuilder.setName(documentName);
         processDocumentBuilder.setFileName(documentValue.getFileName());
         processDocumentBuilder.setMimeType(documentValue.getMimeType());
         processDocumentBuilder.setAuthor(authorId);

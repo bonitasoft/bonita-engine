@@ -48,7 +48,7 @@ public class SearchDocumentDescriptor extends SearchEntityDescriptor {
         searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_CONTENT_MIMETYPE, new FieldDescriptor(SMappedDocument.class, "document."+fact.getMimeTypeKey()));
         searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_CREATIONDATE, new FieldDescriptor(SMappedDocument.class, "document."+fact.getCreationDateKey()));
         searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_HAS_CONTENT, new FieldDescriptor(SMappedDocument.class, "document."+fact.getHasContentKey()));
-        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_NAME, new FieldDescriptor(SMappedDocument.class, "document."+fact.getNameKey()));
+        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_NAME, new FieldDescriptor(SMappedDocument.class, fact.getNameKey()));
         searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_URL, new FieldDescriptor(SMappedDocument.class, "document."+fact.getURLKey()));
         searchEntityKeys.put(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, new FieldDescriptor(SMappedDocument.class, "processInstanceId"));
 
@@ -57,7 +57,7 @@ public class SearchDocumentDescriptor extends SearchEntityDescriptor {
 //        documentFields.add(fact.geContentStorageIdKey());
         documentFields.add("document."+fact.getFileNameKey());
         documentFields.add("document."+fact.getMimeTypeKey());
-        documentFields.add("document."+fact.getNameKey());
+        documentFields.add(fact.getNameKey());
         documentFields.add("document."+fact.getURLKey());
         documentAllFields.put(SMappedDocument.class, documentFields);
     }

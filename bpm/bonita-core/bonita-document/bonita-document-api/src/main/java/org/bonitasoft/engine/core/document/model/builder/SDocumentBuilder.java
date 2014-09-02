@@ -20,8 +20,6 @@ import org.bonitasoft.engine.core.document.model.SDocument;
  */
 public interface SDocumentBuilder {
 
-    SDocumentBuilder setName(String documentName);
-
     SDocumentBuilder setAuthor(long author);
 
     SDocumentBuilder setCreationDate(long creationDate);

@@ -113,9 +113,8 @@ public class DocumentIntegrationTest extends CommonAPITest {
         final ProcessInstance pi = deployAndEnableWithActorAndStartIt(user);
         Document attachment;
         try {
-            final String documentName = "newDocument";
             final Document doc = buildReferenceToExternalDocument();
-            attachment = getProcessAPI().attachDocument(pi.getId(), documentName, doc.getContentFileName(), doc.getContentMimeType(), doc.getUrl());
+            attachment = getProcessAPI().attachDocument(pi.getId(), doc.getName(), doc.getContentFileName(), doc.getContentMimeType(), doc.getUrl(), doc.getDescription());
             final Document attachedDoc = getProcessAPI().getDocument(attachment.getId());
             assertIsSameDocument(attachment, attachedDoc);
             assertFalse(attachedDoc.hasContent());
@@ -129,9 +128,8 @@ public class DocumentIntegrationTest extends CommonAPITest {
         Document attachment;
         try {
             //given
-            final String documentName = "newDocument";
             final Document doc = buildReferenceToExternalDocument();
-            attachment = getProcessAPI().attachDocument(pi.getId(), documentName, doc.getContentFileName(), doc.getContentMimeType(), new byte[]{1,2,3});
+            attachment = getProcessAPI().attachDocument(pi.getId(), doc.getName(), doc.getContentFileName(), doc.getContentMimeType(), new byte[]{1,2,3}, doc.getDescription());
 
             //when
             Document document = getProcessAPI().removeDocument(attachment.getId());
@@ -159,7 +157,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
             final String documentName = "newDocument";
             final Document doc = BuildTestUtil.buildDocument(documentName);
             final byte[] documentContent = BuildTestUtil.generateContent(doc);
-            attachment = getProcessAPI().attachDocument(pi.getId(), documentName, doc.getContentFileName(), doc.getContentMimeType(), documentContent);
+            attachment = getProcessAPI().attachDocument(pi.getId(), doc.getName(), doc.getContentFileName(), doc.getContentMimeType(), documentContent, doc.getDescription());
             final Document attachedDoc = getProcessAPI().getDocument(attachment.getId());
             assertIsSameDocument(attachment, attachedDoc);
             final byte[] attachedContent = getProcessAPI().getDocumentContent(attachedDoc.getContentStorageId());
@@ -181,10 +179,11 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertEquals("Mime types are not the same!", attachment.getContentMimeType(), attachedDoc.getContentMimeType());
         assertEquals("Content storage IDs are not the same!", attachment.getContentStorageId(), attachedDoc.getContentStorageId());
         assertEquals("URL are not the same!", attachment.getUrl(), attachedDoc.getUrl());
+        assertEquals("Descriptions are not the same!", attachment.getDescription(), attachedDoc.getDescription());
     }
 
     private void assertIsSameDocument(final Document attachedDoc, final long processInstanceId, final String name, final long author, final boolean hasContent,
-            final String fileName, final String mimeType, final String url) {
+            final String fileName, final String mimeType, final String url, final String description) {
         assertEquals("Process instances IDs are not the same!", processInstanceId, attachedDoc.getProcessInstanceId());
         assertEquals("Names are not the same!", name, attachedDoc.getName());
         assertEquals("Authors are not the same!", author, attachedDoc.getAuthor());
@@ -192,6 +191,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertEquals("File names are not the same!", fileName, attachedDoc.getContentFileName());
         assertEquals("Mime types are not the same!", mimeType, attachedDoc.getContentMimeType());
         assertEquals("URL are not the same!", url, attachedDoc.getUrl());
+        assertEquals("Descriptions are not the same!", description, attachedDoc.getDescription());
     }
 
     @Test
@@ -203,6 +203,8 @@ public class DocumentIntegrationTest extends CommonAPITest {
         final String url = "http://intranet.bonitasoft.com/private/docStorage/anyValue";
         final DocumentDefinitionBuilder documentDefinition = designProcessDefinition.addDocumentDefinition(docName);
         documentDefinition.addUrl(url);
+        String description = "My document with an url and a description that is inside the process";
+        documentDefinition.addDescription(description);
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive()
                 .setProcessDefinition(designProcessDefinition.getProcess()).done();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, user);
@@ -213,6 +215,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
             final Document actualDoc = docs.getResult().get(0);
             assertEquals(docName, actualDoc.getName());
             assertEquals(url, actualDoc.getUrl());
+            assertEquals(description, actualDoc.getDescription());
             assertTrue("Document Content filename should NOT be valuated", null == actualDoc.getContentFileName());
         } finally {
             disableAndDeleteProcess(processDefinition);
@@ -225,8 +228,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         Document attachment;
         try {
             final Document doc = buildReferenceToExternalDocument();
-            final String documentName = "newAttachment";
-            attachment = getProcessAPI().attachDocument(pi.getId(), documentName, doc.getContentFileName(), doc.getContentMimeType(), doc.getUrl());
+            attachment = getProcessAPI().attachDocument(pi.getId(), doc.getName(), doc.getContentFileName(), doc.getContentMimeType(), doc.getUrl(), doc.getDescription());
             final Document attachedDoc = getProcessAPI().getDocument(attachment.getId());
             assertIsSameDocument(attachment, attachedDoc);
 
@@ -239,6 +241,14 @@ public class DocumentIntegrationTest extends CommonAPITest {
         final String now = String.valueOf(System.currentTimeMillis());
         final String documentName = now + "-series";
         final DocumentBuilder builder = new DocumentBuilder().createNewInstance(documentName, true);
+        builder.setDescription("a document that points to an url");
+        builder.setURL("http://tinyurl.com/7n77prz");
+        return builder.done();
+    }
+
+    private Document buildReferenceToExternalDocument(String documentName) {
+        final DocumentBuilder builder = new DocumentBuilder().createNewInstance(documentName, true);
+        builder.setDescription("a document that points to an url");
         builder.setURL("http://tinyurl.com/7n77prz");
         return builder.done();
     }
@@ -249,12 +259,14 @@ public class DocumentIntegrationTest extends CommonAPITest {
         buildAndAttachDocument(processInstance);
         Document attachment;
         try {
-            final String documentName = getAttachmentDocumentName(processInstance);
+            Document initialDocument = getAttachmentWithoutItsContent(processInstance);
+            assertThat(initialDocument.getVersion()).isEqualTo("1");
             final Document doc = buildReferenceToExternalDocument();
-            attachment = getProcessAPI().attachNewDocumentVersion(processInstance.getId(), documentName, doc.getContentFileName(), doc.getContentMimeType(),
-                    doc.getUrl());
+            attachment = getProcessAPI().attachNewDocumentVersion(processInstance.getId(), initialDocument.getName(), doc.getContentFileName(), doc.getContentMimeType(),
+                    doc.getUrl(), doc.getDescription());
             final Document attachedDoc = getProcessAPI().getDocument(attachment.getId());
             assertIsSameDocument(attachment, attachedDoc);
+            assertThat(attachedDoc.getVersion()).isEqualTo("2");
         } finally {
             disableAndDeleteProcess(processInstance.getProcessDefinitionId());
         }
@@ -266,13 +278,15 @@ public class DocumentIntegrationTest extends CommonAPITest {
         buildAndAttachDocument(processInstance);
 
         try {
-            final String documentName = getAttachmentDocumentName(processInstance);
-            final Document doc = BuildTestUtil.buildDocument(documentName);
-            final Document attachment = getProcessAPI().attachNewDocumentVersion(processInstance.getId(), documentName, doc.getContentFileName(),
+            final Document initialDocument = getAttachmentWithoutItsContent(processInstance);
+            assertThat(initialDocument.getVersion()).isEqualTo("1");
+            final Document doc = BuildTestUtil.buildDocument(initialDocument.getName());
+            final Document attachment = getProcessAPI().attachNewDocumentVersion(processInstance.getId(), initialDocument.getName(), doc.getContentFileName(),
                     doc.getContentMimeType(),
-                    documentName.getBytes());
+                    initialDocument.getName().getBytes(), doc.getDescription());
             final Document attachedDoc = getProcessAPI().getDocument(attachment.getId());
             assertIsSameDocument(attachment, attachedDoc);
+            assertThat(attachedDoc.getVersion()).isEqualTo("2");
 
         } finally {
             disableAndDeleteProcess(processInstance.getProcessDefinitionId());
@@ -284,7 +298,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
         final String documentName = String.valueOf(System.currentTimeMillis());
         byte[] content = documentName.getBytes();
-        Document document = getProcessAPI().attachDocument(processInstance.getId(), documentName, "myPdf.pdf", "text/plain", content);
+        Document document = getProcessAPI().attachDocument(processInstance.getId(), documentName, "myPdf.pdf", "text/plain", content, "description");
         try {
             final byte[] docContent = getProcessAPI().getDocumentContent(document.getContentStorageId());
             assertThat(docContent).isEqualTo(content);
@@ -308,10 +322,10 @@ public class DocumentIntegrationTest extends CommonAPITest {
             lastVersion = getProcessAPI().getLastDocument(processInstance.getId(), documentName);
             assertIsSameDocument(attachment, lastVersion);
 
-            final Document doc = buildReferenceToExternalDocument();
-            final Document newVersion = getProcessAPI().attachNewDocumentVersion(processInstance.getId(), documentName, doc.getContentFileName(),
+            final Document doc = buildReferenceToExternalDocument(documentName);
+            final Document newVersion = getProcessAPI().attachNewDocumentVersion(processInstance.getId(), doc.getName(), doc.getContentFileName(),
                     doc.getContentMimeType(),
-                    doc.getUrl());
+                    doc.getUrl(), "description");
             lastVersion = getProcessAPI().getLastDocument(processInstance.getId(), documentName);
             assertIsSameDocument(newVersion, lastVersion);
 
@@ -326,7 +340,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         builder.addUserTask("step1", ACTOR_NAME);
         builder.addActor(ACTOR_NAME);
         builder.addDocumentDefinition("myDoc").addContentFileName("myPdfModifiedName.pdf").addDescription("a cool pdf document").addMimeType("application/pdf")
-                .addFile("myPdf.pdf");
+                .addFile("myPdf.pdf").addDescription("my description");
         final byte[] pdfContent = new byte[] { 5, 0, 1, 4, 6, 5, 2, 3, 1, 5, 6, 8, 4, 6, 6, 3, 2, 4, 5 };
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(builder.getProcess())
                 .addDocumentResource(new BarResource("myPdf.pdf", pdfContent)).done();
@@ -334,7 +348,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         try {
             final Document attachment = getAttachmentWithoutItsContent(processInstance);
             assertIsSameDocument(attachment, processInstance.getId(), "myDoc", user.getId(), true, "myPdfModifiedName.pdf", "application/pdf",
-                    attachment.getUrl());
+                    attachment.getUrl(),"my description");
             final byte[] docContent = getProcessAPI().getDocumentContent(attachment.getContentStorageId());
             assertTrue(Arrays.equals(pdfContent, docContent));
         } finally {
@@ -413,7 +427,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         final ProcessInstance processInstance = deployAndEnableProcessWithActorAndStartIt(businessArchive, user);
         try {
             final Document attachment = getAttachmentWithoutItsContent(processInstance);
-            assertIsSameDocument(attachment, processInstance.getId(), "myDoc", user.getId(), false, "file.pdf", "application/pdf", url);
+            assertIsSameDocument(attachment, processInstance.getId(), "myDoc", user.getId(), false, "file.pdf", "application/pdf", url,"a cool pdf document");
         } finally {
             // Clean up
             waitForUserTask("step1", processInstance);
@@ -430,7 +444,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
             final Document beforeUpdate = getAttachmentWithoutItsContent(processInstance);
             final Document doc = BuildTestUtil.buildDocument(beforeUpdate.getName());
             getProcessAPI().attachNewDocumentVersion(processInstance.getId(), beforeUpdate.getName(), doc.getContentFileName(), doc.getContentMimeType(),
-                    "contentOfTheDoc".getBytes());
+                    "contentOfTheDoc".getBytes(), doc.getDescription());
             final Document afterUpdate = getAttachmentWithoutItsContent(processInstance);
             assertNotSame(beforeUpdate, afterUpdate);
             final Document documentAtProcessInstantiation = getProcessAPI().getDocumentAtProcessInstantiation(processInstance.getId(), afterUpdate.getName());
@@ -448,7 +462,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
             final Document beforeUpdate = getAttachmentWithoutItsContent(processInstance);
             final Document doc = BuildTestUtil.buildDocument(beforeUpdate.getName());
             getProcessAPI().attachNewDocumentVersion(processInstance.getId(), beforeUpdate.getName(), doc.getContentFileName(), doc.getContentMimeType(),
-                    "contentOfTheDoc".getBytes());
+                    "contentOfTheDoc".getBytes(), doc.getDescription());
             final Document afterUpdate = getAttachmentWithoutItsContent(processInstance);
             assertNotSame(beforeUpdate, afterUpdate);
 
@@ -457,7 +471,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
             final Document doc2 = BuildTestUtil.buildDocument(beforeUpdate.getName());
             getProcessAPI().attachNewDocumentVersion(processInstance.getId(), beforeUpdate.getName(), doc2.getContentFileName(), doc2.getContentMimeType(),
-                    "contentOfTheDoc".getBytes());
+                    "contentOfTheDoc".getBytes(), doc.getDescription());
             final Document documentAtActivityInstanciation = getProcessAPI().getDocumentAtActivityInstanceCompletion(step1.getId(),
                     beforeUpdate.getName());
             assertEquals(afterUpdate, documentAtActivityInstanciation);
@@ -477,7 +491,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
             final String documentName = "anotherDocumentReference";
             final Document doc = buildReferenceToExternalDocument();
 
-            getProcessAPI().attachDocument(processInstance.getId(), documentName, doc.getContentFileName(), doc.getContentMimeType(), doc.getUrl());
+            getProcessAPI().attachDocument(processInstance.getId(), documentName, doc.getContentFileName(), doc.getContentMimeType(), doc.getUrl(), doc.getDescription());
             final long currentNbOfDocument = getProcessAPI().getNumberOfDocuments(processInstance.getId());
             assertEquals("Invalid number of attachments!", initialNbOfDocument + 1, currentNbOfDocument);
 
@@ -496,7 +510,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
             final String documentName = "anotherDocumentValue";
             final Document doc = BuildTestUtil.buildDocument(documentName);
 
-            getProcessAPI().attachDocument(processInstance.getId(), documentName, doc.getContentFileName(), doc.getContentMimeType(), documentName.getBytes());
+            getProcessAPI().attachDocument(processInstance.getId(), documentName, doc.getContentFileName(), doc.getContentMimeType(), documentName.getBytes(), doc.getDescription());
             final long currentNbOfDocument = getProcessAPI().getNumberOfDocuments(processInstance.getId());
             assertEquals("Invalid number of attachments!", initialNbOfDocument + 1, currentNbOfDocument);
 
@@ -571,7 +585,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
             final Document beforeUpdate = getAttachmentWithoutItsContent(processInstance);
             final Document doc = BuildTestUtil.buildDocument(beforeUpdate.getName());
             getProcessAPI().attachNewDocumentVersion(processInstance.getId(), beforeUpdate.getName(), doc.getContentFileName(), doc.getContentMimeType(),
-                    "contentOfTheDoc".getBytes());
+                    "contentOfTheDoc".getBytes(), doc.getDescription());
             final Document afterUpdate = getAttachmentWithoutItsContent(processInstance);
             getProcessAPI().getDocumentAtProcessInstantiation(processInstance.getId(), afterUpdate.getName());
 
@@ -609,7 +623,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
             final Document beforeUpdate = getAttachmentWithoutItsContent(processInstance);
             final Document doc = BuildTestUtil.buildDocument(beforeUpdate.getName());
             getProcessAPI().attachNewDocumentVersion(processInstance.getId(), beforeUpdate.getName(), doc.getContentFileName(), doc.getContentMimeType(),
-                    "contentOfTheDoc".getBytes());
+                    "contentOfTheDoc".getBytes(), doc.getDescription());
             final Document afterUpdate = getAttachmentWithoutItsContent(processInstance);
             getProcessAPI().getDocumentAtProcessInstantiation(processInstance.getId(), afterUpdate.getName());
 
@@ -638,7 +652,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
             final Document beforeUpdate = getAttachmentWithoutItsContent(processInstance);
             final Document doc = BuildTestUtil.buildDocument(beforeUpdate.getName());
             getProcessAPI().attachNewDocumentVersion(processInstance.getId(), beforeUpdate.getName(), doc.getContentFileName(), doc.getContentMimeType(),
-                    "contentOfTheDoc".getBytes());
+                    "contentOfTheDoc".getBytes(), doc.getDescription());
             final Document afterUpdate = getAttachmentWithoutItsContent(processInstance);
             getProcessAPI().getDocumentAtProcessInstantiation(processInstance.getId(), afterUpdate.getName());
 
@@ -670,7 +684,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
             final Document beforeUpdate = getAttachmentWithoutItsContent(processInstance);
             final Document doc = BuildTestUtil.buildDocument(beforeUpdate.getName());
             getProcessAPI().attachNewDocumentVersion(processInstance.getId(), beforeUpdate.getName(), doc.getContentFileName(), doc.getContentMimeType(),
-                    "contentOfTheDoc".getBytes());
+                    "contentOfTheDoc".getBytes(), doc.getDescription());
             getAttachmentWithoutItsContent(processInstance);
 
             // get archived document
@@ -704,7 +718,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
             final Document beforeUpdate = getAttachmentWithoutItsContent(processInstance);
             final Document doc = BuildTestUtil.buildDocument(beforeUpdate.getName());
             getProcessAPI().attachNewDocumentVersion(processInstance.getId(), beforeUpdate.getName(), doc.getContentFileName(), doc.getContentMimeType(),
-                    "contentOfTheDoc".getBytes());
+                    "contentOfTheDoc".getBytes(), doc.getDescription());
             getAttachmentWithoutItsContent(processInstance);
             final ArchivedDocument archivedDocument = getProcessAPI().getArchivedVersionOfProcessDocument(beforeUpdate.getId());
             assertEquals(archivedDocument, getProcessAPI().getArchivedProcessDocument(archivedDocument.getId()));

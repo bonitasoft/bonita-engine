@@ -8,7 +8,7 @@
         SELECT mappeddoc
         FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc
         WHERE mappeddoc.processInstanceId = :processInstanceId
-        AND mappeddoc.document.name = :name
+        AND mappeddoc.name = :name
     </query>
 
 

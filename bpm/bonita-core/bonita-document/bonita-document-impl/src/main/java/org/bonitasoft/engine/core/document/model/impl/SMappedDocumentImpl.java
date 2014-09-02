@@ -28,6 +28,9 @@ public class SMappedDocumentImpl implements SMappedDocument {
     private long tenantId;
     private long documentId;
     private long processInstanceId;
+    private String name;
+    private String description;
+    private String version;
     private SLightDocument document;
 
 
@@ -36,6 +39,9 @@ public class SMappedDocumentImpl implements SMappedDocument {
 
     public SMappedDocumentImpl(SDocumentMapping documentMapping, SLightDocument document) {
         this.id = documentMapping.getId();
+        this.name = documentMapping.getName();
+        this.description = documentMapping.getDescription();
+        this.version = documentMapping.getVersion();
         this.document = document;
         this.documentId = documentMapping.getDocumentId();
         this.processInstanceId = documentMapping.getProcessInstanceId();
@@ -46,6 +52,9 @@ public class SMappedDocumentImpl implements SMappedDocument {
         this.document = document;
         this.documentId = documentMapping.getDocumentId();
         this.processInstanceId = documentMapping.getProcessInstanceId();
+        this.name = documentMapping.getName();
+        this.description = documentMapping.getDescription();
+        this.version = documentMapping.getVersion();
     }
 
     public long getDocumentId() {
@@ -89,11 +98,6 @@ public class SMappedDocumentImpl implements SMappedDocument {
     }
 
     @Override
-    public String getName() {
-        return document.getName();
-    }
-
-    @Override
     public long getAuthor() {
         return document.getAuthor();
     }
@@ -123,6 +127,30 @@ public class SMappedDocumentImpl implements SMappedDocument {
         return document.getUrl();
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
     @Override
     public String getDiscriminator() {
         return SMappedDocumentImpl.class.getName();
@@ -139,7 +167,10 @@ public class SMappedDocumentImpl implements SMappedDocument {
         if (id != that.id) return false;
         if (processInstanceId != that.processInstanceId) return false;
         if (tenantId != that.tenantId) return false;
+        if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (document != null ? !document.equals(that.document) : that.document != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (version != null ? !version.equals(that.version) : that.version != null) return false;
 
         return true;
     }
@@ -150,6 +181,9 @@ public class SMappedDocumentImpl implements SMappedDocument {
         result = 31 * result + (int) (tenantId ^ (tenantId >>> 32));
         result = 31 * result + (int) (documentId ^ (documentId >>> 32));
         result = 31 * result + (int) (processInstanceId ^ (processInstanceId >>> 32));
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (version != null ? version.hashCode() : 0);
         result = 31 * result + (document != null ? document.hashCode() : 0);
         return result;
     }
@@ -161,6 +195,9 @@ public class SMappedDocumentImpl implements SMappedDocument {
                 ", tenantId=" + tenantId +
                 ", documentId=" + documentId +
                 ", processInstanceId=" + processInstanceId +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", version='" + version + '\'' +
                 ", document=" + document +
                 '}';
     }

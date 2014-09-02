@@ -1376,6 +1376,8 @@ public class ModelConvertor {
         }
         documentImpl.setProcessInstanceId(mappedDocument.getProcessInstanceId());
         documentImpl.setName(mappedDocument.getName());
+        documentImpl.setDescription(mappedDocument.getDescription());
+        documentImpl.setVersion(mappedDocument.getVersion());
         documentImpl.setAuthor(mappedDocument.getAuthor());
         documentImpl.setCreationDate(new Date(mappedDocument.getCreationDate()));
         documentImpl.setHasContent(mappedDocument.hasContent());

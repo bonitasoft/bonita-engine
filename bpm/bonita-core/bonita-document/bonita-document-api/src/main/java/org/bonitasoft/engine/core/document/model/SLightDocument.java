@@ -22,8 +22,6 @@ public interface SLightDocument extends PersistentObject {
 
     long getTenantId();
 
-    String getName();
-
     long getAuthor();
 
     long getCreationDate();

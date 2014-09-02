@@ -49,7 +49,6 @@ public class SADocumentMappingBuilderFactoryImpl implements SADocumentMappingBui
 
     static final String CREATION_DATE = "creationDate";
 
-
     @Override
     public SADocumentMappingBuilder createNewInstance() {
         final SADocumentMappingImpl documentMapping = new SADocumentMappingImpl();
@@ -58,7 +57,8 @@ public class SADocumentMappingBuilderFactoryImpl implements SADocumentMappingBui
 
     @Override
     public SADocumentMappingBuilder createNewInstance(SDocumentMapping documentMapping) {
-        return new SADocumentMappingBuilderImpl(new SADocumentMappingImpl(documentMapping.getDocumentId(),documentMapping.getProcessInstanceId(),System.currentTimeMillis(),documentMapping.getId()));
+        return new SADocumentMappingBuilderImpl(new SADocumentMappingImpl(documentMapping.getDocumentId(), documentMapping.getProcessInstanceId(),
+                System.currentTimeMillis(), documentMapping.getId(), documentMapping.getName(), documentMapping.getDescription(), documentMapping.getVersion()));
     }
 
     @Override

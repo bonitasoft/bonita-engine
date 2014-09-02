@@ -28,8 +28,6 @@ public class SLightDocumentImpl implements SLightDocument {
 
     private long tenantId;
 
-    private String name;
-
     private long author;
 
     private long creationDate;
@@ -48,7 +46,6 @@ public class SLightDocumentImpl implements SLightDocument {
     public SLightDocumentImpl(SLightDocument document) {
         this.id = document.getId();
         this.tenantId = document.getId();
-        this.name = document.getName();
         this.author = document.getAuthor();
         this.creationDate = document.getCreationDate();
         this.hasContent = document.hasContent();
@@ -78,16 +75,6 @@ public class SLightDocumentImpl implements SLightDocument {
     @Override
     public String getDiscriminator() {
         return SLightDocumentImpl.class.getName();
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-
     }
 
     @Override
@@ -167,8 +154,6 @@ public class SLightDocumentImpl implements SLightDocument {
             return false;
         if (mimeType != null ? !mimeType.equals(sDocument.mimeType) : sDocument.mimeType != null)
             return false;
-        if (name != null ? !name.equals(sDocument.name) : sDocument.name != null)
-            return false;
         if (url != null ? !url.equals(sDocument.url) : sDocument.url != null)
             return false;
 
@@ -179,7 +164,6 @@ public class SLightDocumentImpl implements SLightDocument {
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (int) (tenantId ^ (tenantId >>> 32));
-        result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (int) (author ^ (author >>> 32));
         result = 31 * result + (int) (creationDate ^ (creationDate >>> 32));
         result = 31 * result + (hasContent ? 1 : 0);
@@ -194,7 +178,6 @@ public class SLightDocumentImpl implements SLightDocument {
         return "SDocumentImpl{" +
                 "id=" + id +
                 ", tenantId=" + tenantId +
-                ", name='" + name + '\'' +
                 ", author=" + author +
                 ", creationDate=" + creationDate +
                 ", hasContent=" + hasContent +

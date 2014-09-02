@@ -613,10 +613,10 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 if (document.getFile() != null) {
                     final String file = document.getFile();// should always exists...validation on businessarchive
                     final byte[] content = FileUtils.readFileToByteArray(new File(documentsFolder, file));
-                    attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getContentMimeType(), content, authorId);
+                    attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getContentMimeType(), content, authorId, document.getDescription());
                 } else if (document.getUrl() != null) {
                     attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getContentMimeType(), document.getUrl(),
-                            authorId);
+                            authorId, document.getDescription());
                 } else {
                     throw new SProcessDocumentCreationException("Unable to create documents. A document was defined without url or content.");
                 }
@@ -625,37 +625,36 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
-            final String url, final long authorId) throws SProcessDocumentCreationException {
-        final SDocument attachment = buildExternalProcessDocumentReference(documentName, fileName, mimeType, authorId, url);
-        return documentService.attachDocumentToProcessInstance(attachment, processInstanceId);
+                                             final String url, final long authorId, String description) throws SProcessDocumentCreationException {
+        final SDocument attachment = buildExternalProcessDocumentReference(fileName, mimeType, authorId, url);
+        return documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, description);
     }
 
     protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
-            final byte[] documentContent, final long authorId) throws SProcessDocumentCreationException {
-        final SDocument attachment = buildProcessDocument(documentName, fileName, mimeType, authorId, documentContent);
-        return documentService.attachDocumentToProcessInstance(attachment, processInstanceId);
+                                             final byte[] documentContent, final long authorId, String description) throws SProcessDocumentCreationException {
+        final SDocument attachment = buildProcessDocument(fileName, mimeType, authorId, documentContent);
+        return documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, description);
     }
 
-    private SDocument buildExternalProcessDocumentReference(final String documentName, final String fileName,
+    private SDocument buildExternalProcessDocumentReference(final String fileName,
             final String mimeType, final long authorId, final String url) {
-        final SDocumentBuilder documentBuilder = initDocumentBuilder(documentName, fileName, mimeType, authorId);
+        final SDocumentBuilder documentBuilder = initDocumentBuilder(fileName, mimeType, authorId);
         documentBuilder.setURL(url);
         documentBuilder.setHasContent(false);
         return documentBuilder.done();
     }
 
-    private SDocument buildProcessDocument(final String documentName, final String fileName, final String mimetype,
+    private SDocument buildProcessDocument(final String fileName, final String mimetype,
                                            final long authorId, byte[] content) {
-        final SDocumentBuilder documentBuilder = initDocumentBuilder(documentName, fileName, mimetype, authorId);
+        final SDocumentBuilder documentBuilder = initDocumentBuilder(fileName, mimetype, authorId);
         documentBuilder.setHasContent(true);
         documentBuilder.setContent(content);
         return documentBuilder.done();
     }
 
-    private SDocumentBuilder initDocumentBuilder(final String documentName, final String fileName, final String mimetype,
+    private SDocumentBuilder initDocumentBuilder(final String fileName, final String mimetype,
                                                  final long authorId) {
         final SDocumentBuilder documentBuilder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance();
-        documentBuilder.setName(documentName);
         documentBuilder.setFileName(fileName);
         documentBuilder.setMimeType(mimetype);
         documentBuilder.setAuthor(authorId);
