@@ -13,6 +13,7 @@ import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.impl.CommandAPIImpl;
 
 import com.bonitasoft.engine.api.APIAccessor;
+import com.bonitasoft.engine.api.ApplicationAPI;
 import com.bonitasoft.engine.api.IdentityAPI;
 import com.bonitasoft.engine.api.LogAPI;
 import com.bonitasoft.engine.api.MonitoringAPI;
@@ -85,6 +86,11 @@ public class APIAccessorExt extends APIAccessorImpl implements APIAccessor {
     @Override
     public PageAPI getPageAPI() {
         return new PageAPIExt();
+    }
+
+    @Override
+    public ApplicationAPI getApplicationAPI() {
+        return new ApplicationAPIImpl();
     }
 
 }
