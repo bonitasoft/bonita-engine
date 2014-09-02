@@ -10,7 +10,6 @@
 	</parent>
 
 	<artifactId>bonita-common-test-utils</artifactId>
-	<name>Common test</name>
 
 	<dependencies>
 		<dependency>
