@@ -122,6 +122,7 @@
         <constructor-arg name="tokenService" ref="tokenService"/>
         <constructor-arg name="identityService" ref="identityService"/>
         <constructor-arg name="breakpointService" ref="breakpointService"/>
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
     </bean>
 
     <bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">
