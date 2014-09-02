@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+	<!-- DocumentMapping -->
+
+	
+	<query name="getSADocumentMappingsforProcessInstanceAndName">
+		SELECT docmapping
+		FROM org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl AS docmapping
+		WHERE docmapping.processInstanceId = :processInstanceId
+		AND docmapping.documentName = :documentName
+		AND docmapping.archiveDate >= :time
+		ORDER BY docmapping.archiveDate ASC
+	</query>
+	
+	<query name="getNumberOfSADocumentMapping">
+		SELECT COUNT(docmapping)
+		FROM org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl AS docmapping
+	</query>
+	
+	<query name="searchSADocumentMapping">
+		SELECT docmapping
+		FROM org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl AS docmapping
+	</query>
+
+	<query name="getNumberOfSADocumentMappingSupervisedBy">
+		SELECT COUNT(docmapping)
+		FROM org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl AS docmapping,
+			 org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS p
+		WHERE docmapping.processInstanceId = p.sourceObjectId
+		AND p.processDefinitionId IN (
+			SELECT supervisor.processDefId
+			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			WHERE (supervisor.userId = :userId)
+			OR (supervisor.id IN (
+					SELECT supervisor.id
+					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+					org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+					WHERE um.userId = :userId
+					AND (
+						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId) 
+					)
+				)
+			)	
+		)	 
+	</query>
+	
+	<query name="searchSADocumentMappingSupervisedBy">
+		SELECT docmapping
+		FROM org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl AS docmapping,
+			 org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS p
+		WHERE docmapping.processInstanceId = p.sourceObjectId
+		AND p.processDefinitionId IN (
+			SELECT supervisor.processDefId
+			FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+			WHERE (supervisor.userId = :userId)
+			OR (supervisor.id IN (
+					SELECT supervisor.id
+					FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+					org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+					WHERE um.userId = :userId
+					AND (
+						(supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+						OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId) 
+					)
+				)
+			)	
+		)	 
+	</query>
+
+	<query name="getArchivedDocumentById">
+		SELECT docmapping
+		FROM org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl AS docmapping
+		WHERE docmapping.id = :id
+	</query>
+
+
+	<query name="getArchivedVersionOfDocument">
+		SELECT docmapping
+		FROM org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl AS docmapping
+		WHERE docmapping.sourceObjectId = :sourceObjectId
+	</query>
+
+
+</hibernate-mapping>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns="http://documentation.bonitasoft.com/organization-xml-schema/1.1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://documentation.bonitasoft.com/organization-xml-schema/1.1">
+<xsd:schema xmlns="http://documentation.bonitasoft.com/organization-xml-schema" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://documentation.bonitasoft.com/organization-xml-schema">
 	<xsd:annotation>
 		<xsd:documentation xml:lang="en">
 			Organization Schema 1.0 for Bonita Open Solution.
