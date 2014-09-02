@@ -288,7 +288,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         try {
             final byte[] docContent = getProcessAPI().getDocumentContent(document.getContentStorageId());
             assertThat(docContent).isEqualTo(content);
-            assertThat(document.getUrl()).isEqualTo("downloadDocument?fileName=myPdf.pdf&contentStorageId="+document.getContentStorageId());
+            assertThat(document.getUrl()).isEqualTo("documentDownload?fileName=myPdf.pdf&contentStorageId="+document.getContentStorageId());
 
         } finally {
             disableAndDeleteProcess(processInstance.getProcessDefinitionId());
