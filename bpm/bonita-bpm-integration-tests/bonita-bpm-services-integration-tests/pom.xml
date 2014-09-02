@@ -39,6 +39,14 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+        
+        <!-- Business application -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.application</groupId>
+            <artifactId>bonita-business-application</artifactId>
+            <version>${project.version}</version>
+			<scope>test</scope>
+        </dependency>
 
 		<!-- Cache -->
 		<dependency>
@@ -255,6 +263,14 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+        
+        <!-- Page -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.page</groupId>
+            <artifactId>bonita-page</artifactId>
+            <version>${project.version}</version>
+			<scope>test</scope>
+        </dependency>
 
 		<!-- Platform -->
 		<dependency>

@@ -145,6 +145,8 @@
                 <entry key="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" value="10090" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" value="10095" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl" value="10110" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SBusinessApplicationImpl" value="10200" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SBusinessApplicationPageImpl" value="10201" />
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="20010" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" value="20011" />
