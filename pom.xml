@@ -134,6 +134,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+                <module>bonita-integration-tests-sp</module>
 			</modules>
 			<properties>
 				<skipTests>true</skipTests>
@@ -171,6 +172,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+                <module>bonita-integration-tests-sp</module>
 			</modules>
 			<build>
 				<plugins>

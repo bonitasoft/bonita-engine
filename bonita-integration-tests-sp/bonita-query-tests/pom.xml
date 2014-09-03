@@ -5,13 +5,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.bonitasoft.engine</groupId>
-		<artifactId>bonita-bpm-integration-tests</artifactId>
+		<groupId>com.bonitasoft.engine.test</groupId>
+		<artifactId>bonita-integration-tests-sp</artifactId>
 		<version>6.4.0-SNAPSHOT</version>
 	</parent>
 
-	<groupId>com.bonitasoft.engine.tests</groupId>
-	<artifactId>bonita-query-tests</artifactId>
+	<artifactId>bonita-query-tests-sp</artifactId>
 
 	<dependencies>
 		<dependency>
