@@ -61,6 +61,13 @@
 			<artifactId>bonita-authentication-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        
+         <!-- Business Application -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.application</groupId>
+            <artifactId>bonita-business-application</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 		<!-- Cache -->
 		<dependency>
@@ -535,6 +542,8 @@
 									<!-- Authentication -->
 									<include>org.bonitasoft.engine.authentication:bonita-authentication-api</include>
 									<include>org.bonitasoft.engine.authentication:bonita-authentication-api-impl</include>
+                                    <!-- Business application -->
+                                    <inlude>org.bonitasoft.engine.application:bonita-business-application</inlude>
 									<!-- Cache -->
 									<include>org.bonitasoft.engine.cache:bonita-cache-api</include>
 									<include>org.bonitasoft.engine.cache:bonita-cache-ehcache</include>
