@@ -42,12 +42,12 @@ public class TestsInitializer {
         System.out.println("=====================================================");
         System.out.println("=========  INITIALIZATION OF TEST ENVIRONMENT =======");
         System.out.println("=====================================================");
-        
+
         long startTime = System.currentTimeMillis();
         setSystemPropertyIfNotSet(BONITA_HOME_PROPERTY, BONITA_HOME_DEFAULT_PATH);
         setupSpringContext();
         initPlatformAndTenant();
-    
+
         System.out.println("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
     }
 
@@ -115,14 +115,19 @@ public class TestsInitializer {
         new APITestUtil().initializeAndStartPlatformWithDefaultTenant(true);
     }
 
-    private static void setupSpringContext() {
+    private void setupSpringContext() {
         setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
 
         // Force these system properties
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");
         System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.local");
 
-        springContext = new ClassPathXmlApplicationContext("datasource.xml", "jndi-setup.xml");
+        final List<String> springConfigLocations = getSpringConfigLocations();
+        springContext = new ClassPathXmlApplicationContext(springConfigLocations.toArray(new String[springConfigLocations.size()]));
+    }
+
+    protected List<String> getSpringConfigLocations() {
+        return Arrays.asList("datasource.xml", "jndi-setup.xml");
     }
 
     private void closeSpringContext() {
