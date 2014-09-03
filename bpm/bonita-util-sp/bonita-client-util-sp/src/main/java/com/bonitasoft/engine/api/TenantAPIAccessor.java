@@ -39,8 +39,10 @@ import org.bonitasoft.engine.util.APITypeManager;
  * <li>{@link ReportingAPI},</li>
  * <li>{@link LogAPI},</li>
  * <li>{@link ThemeAPI}</li>
+ * <li>{@link PageAPI}</li>
+ * <li>{@link ApplicationAPI}</li>
  * </ul>
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
@@ -68,7 +70,7 @@ public final class TenantAPIAccessor {
 
     /**
      * Refreshes the way the engine client communicates to the engine server.
-     * 
+     *
      * @see APITypeManager
      * @see ApiAccessType
      */
@@ -101,7 +103,7 @@ public final class TenantAPIAccessor {
     }
 
     public static PlatformMonitoringAPI getPlatformMonitoringAPI(final APISession session) throws BonitaHomeNotSetException, UnknownAPITypeException,
-            ServerAPIException {
+    ServerAPIException {
         return getAPI(PlatformMonitoringAPI.class, session);
     }
 
@@ -126,12 +128,16 @@ public final class TenantAPIAccessor {
     }
 
     public static TenantManagementAPI getTenantManagementAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,
-            UnknownAPITypeException {
+    UnknownAPITypeException {
         return getAPI(TenantManagementAPI.class, session);
     }
 
     public static PageAPI getPageAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(PageAPI.class, session);
+    }
+
+    public static ApplicationAPI getApplicationAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return getAPI(ApplicationAPI.class, session);
     }
 
 }

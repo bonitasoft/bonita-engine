@@ -137,7 +137,7 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public SPage addPage(final SPage page, final byte[] content) throws SObjectCreationException, SObjectAlreadyExistsException,
-            SInvalidPageZipContentException, SInvalidPageTokenException {
+    SInvalidPageZipContentException, SInvalidPageTokenException {
         check();
         Map<String, byte[]> zipContent;
         try {
@@ -146,36 +146,36 @@ public class PageServiceImpl implements PageService {
             checkPageNameIsValid(page.getName(), page.isProvided());
             checkPageDisplayNameIsValid(page.getDisplayName());
             return insertPage(page, content);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new SInvalidPageZipContentException("Error while reading zip file", e);
         }
     }
 
     @Override
     public SPage addPage(final byte[] content, final String contentName, final long userId) throws SObjectCreationException, SObjectAlreadyExistsException,
-            SInvalidPageZipContentException,
-            SInvalidPageTokenException {
+    SInvalidPageZipContentException,
+    SInvalidPageTokenException {
         return addPage(content, contentName, userId, false/* provided */);
     }
 
     private SPage addPage(final byte[] content, final String contentName, final long userId, final boolean provided) throws SInvalidPageZipContentException,
-            SInvalidPageTokenException, SObjectAlreadyExistsException, SObjectCreationException {
+    SInvalidPageTokenException, SObjectAlreadyExistsException, SObjectCreationException {
         check();
         final Properties pageProperties = loadPropertiesAndCheckZipConsistency(content, provided);
 
-        SPage page = createPage(pageProperties.getProperty(PageService.PROPERTIES_NAME), pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
+        final SPage page = createPage(pageProperties.getProperty(PageService.PROPERTIES_NAME), pageProperties.getProperty(PageService.PROPERTIES_DISPLAY_NAME),
                 pageProperties.getProperty(PageService.PROPERTIES_DESCRIPTION), contentName, userId, provided);
         return insertPage(page, content);
     }
 
     Properties loadPropertiesAndCheckZipConsistency(final byte[] content, final boolean provided) throws SInvalidPageZipContentException,
-            SInvalidPageTokenException {
+    SInvalidPageTokenException {
         final Properties pageProperties;
         if (content == null) {
             throw new SInvalidPageZipContentException("Content can't be null");
         }
         try {
-            Map<String, byte[]> zipContent = IOUtil.unzip(content);
+            final Map<String, byte[]> zipContent = IOUtil.unzip(content);
             checkZipContainsRequiredEntries(zipContent);
             pageProperties = loadPageProperties(zipContent);
             checkPageNameIsValid(pageProperties.getProperty(PageService.PROPERTIES_NAME), provided);
@@ -221,7 +221,7 @@ public class PageServiceImpl implements PageService {
     }
 
     private Properties loadPageProperties(final Map<String, byte[]> zipContent) throws SInvalidPageZipContentException, IOException {
-        byte[] pagePropertiesContent = zipContent.get(PageService.PROPERTIES_FILE_NAME);
+        final byte[] pagePropertiesContent = zipContent.get(PageService.PROPERTIES_FILE_NAME);
         if (pagePropertiesContent == null) {
             throw new SInvalidPageZipContentException(PAGE_CONTENT_DOES_NOT_CONTAINS_A_PAGE_PROPERTIES_FILE);
         }
@@ -243,8 +243,8 @@ public class PageServiceImpl implements PageService {
     }
 
     private void checkZipContainsRequiredEntries(final Map<String, byte[]> zipContent) throws SInvalidPageZipContentException {
-        Set<String> entrySet = zipContent.keySet();
-        for (String entry : entrySet) {
+        final Set<String> entrySet = zipContent.keySet();
+        for (final String entry : entrySet) {
             if (entry.equals("Index.groovy") || entry.equalsIgnoreCase("index.html")) {
                 return;
             }
@@ -268,7 +268,7 @@ public class PageServiceImpl implements PageService {
     }
 
     /**
-     * 
+     *
      */
     private final void check() {
         if (!active) {
@@ -327,7 +327,7 @@ public class PageServiceImpl implements PageService {
             final SPage page = getPage(pageId);
             deletePage(page);
         } catch (final SBonitaReadException sbe) {
-            new SObjectModificationException(sbe);
+            throw new SObjectModificationException(sbe);
         }
     }
 
@@ -374,7 +374,7 @@ public class PageServiceImpl implements PageService {
     }
 
     private void deleteParentIfNoMoreChildren(final SProfileEntry sProfileEntry) throws SBonitaSearchException, SProfileEntryNotFoundException,
-            SProfileEntryDeletionException {
+    SProfileEntryDeletionException {
         final List<OrderByOption> orderByOptions = Collections
                 .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC));
         final List<FilterOption> filters = new ArrayList<FilterOption>();
@@ -460,7 +460,7 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public SPage updatePage(final long pageId, final EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException,
-            SObjectAlreadyExistsException, SInvalidPageTokenException {
+    SObjectAlreadyExistsException, SInvalidPageTokenException {
         check();
         final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, "Update a page with id " + pageId);
         final String logMethodName = METHOD_UPDATE_PAGE;
@@ -535,15 +535,15 @@ public class PageServiceImpl implements PageService {
 
     @Override
     public void updatePageContent(final long pageId, final byte[] content, final String contentName) throws SObjectModificationException,
-            SInvalidPageZipContentException, SInvalidPageTokenException, SObjectAlreadyExistsException {
+    SInvalidPageZipContentException, SInvalidPageTokenException, SObjectAlreadyExistsException {
         check();
         final SPageLogBuilder logBuilder = getPageLog(ActionType.UPDATED, "Update a page with name " + pageId);
-        Properties pageProperties = loadPropertiesAndCheckZipConsistency(content, false);
+        final Properties pageProperties = loadPropertiesAndCheckZipConsistency(content, false);
         try {
 
             final SPageContent sPageContent = persistenceService.selectById(new SelectByIdDescriptor<SPageContent>(QUERY_GET_PAGE_CONTENT,
                     SPageContent.class, pageId));
-            SPageUpdateContentBuilder builder = BuilderFactory.get(SPageUpdateContentBuilderFactory.class)
+            final SPageUpdateContentBuilder builder = BuilderFactory.get(SPageUpdateContentBuilderFactory.class)
                     .createNewInstance(new EntityUpdateDescriptor());
             builder.updateContent(content);
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sPageContent,
@@ -561,7 +561,7 @@ public class PageServiceImpl implements PageService {
             initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, METHOD_UPDATE_PAGE);
             throw new SObjectModificationException(e);
         }
-        SPageUpdateBuilder pageBuilder = BuilderFactory.get(SPageUpdateBuilderFactory.class)
+        final SPageUpdateBuilder pageBuilder = BuilderFactory.get(SPageUpdateBuilderFactory.class)
                 .createNewInstance(new EntityUpdateDescriptor());
         pageBuilder.updateContentName(contentName);
         pageBuilder.updateDescription(pageProperties.getProperty(PROPERTIES_DESCRIPTION));
@@ -576,12 +576,13 @@ public class PageServiceImpl implements PageService {
         if (active) {
             importProvidedPage("bonita-html-page-example.zip");
             importProvidedPage("bonita-groovy-page-example.zip");
+            importProvidedPage("bonita-home-page.zip");
         }
     }
 
     private void importProvidedPage(final String zipName) throws SBonitaReadException, SObjectCreationException, SObjectAlreadyExistsException,
-            SObjectNotFoundException,
-            SObjectModificationException, SInvalidPageZipContentException, SInvalidPageTokenException {
+    SObjectNotFoundException,
+    SObjectModificationException, SInvalidPageZipContentException, SInvalidPageTokenException {
         try {
             // check if the provided pages are here or not up to date and import them from class path if needed
             final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(zipName);
@@ -590,7 +591,7 @@ public class PageServiceImpl implements PageService {
                 logger.log(getClass(), TechnicalLogSeverity.DEBUG, "No provided-" + zipName + " found in the class path, nothing will be imported");
                 return;
             }
-            byte[] providedPageContent = IOUtil.getAllContentFrom(inputStream);
+            final byte[] providedPageContent = IOUtil.getAllContentFrom(inputStream);
             final Properties pageProperties = loadPropertiesAndCheckZipConsistency(providedPageContent, true);
 
             final SPage pageByName = getPageByName(pageProperties.getProperty(PROPERTIES_NAME));
