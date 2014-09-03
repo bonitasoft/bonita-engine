@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-api</artifactId>
 		<groupId>org.bonitasoft.engine.api</groupId>
-		<version>6.3.4</version>
+		<version>6.3.4-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-client-api-http</artifactId>
