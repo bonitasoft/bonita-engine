@@ -7,7 +7,7 @@ CREATE TABLE document (
   filename VARCHAR2(255),
   mimetype VARCHAR2(255),
   url VARCHAR2(255),
-  content BLOB NOT NULL,
+  content BLOB,
   PRIMARY KEY (tenantid, id)
 );
 CREATE TABLE document_mapping (

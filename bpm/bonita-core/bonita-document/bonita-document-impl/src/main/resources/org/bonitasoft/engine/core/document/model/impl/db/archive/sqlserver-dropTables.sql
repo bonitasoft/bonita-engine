@@ -1,4 +1,2 @@
-ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_archdocmap_docid
-GO
 DROP TABLE arch_document_mapping
 GO
