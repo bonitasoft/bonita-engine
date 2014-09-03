@@ -32,8 +32,27 @@
             <artifactId>bonita-scheduler-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+         <dependency>
+            <groupId>org.bonitasoft.engine.log</groupId>
+            <artifactId>bonita-log-technical-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+         <dependency>
+            <groupId>org.bonitasoft.engine.platform</groupId>
+            <artifactId>bonita-platform-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+         <dependency>
+            <groupId>org.bonitasoft.engine.persistence</groupId>
+            <artifactId>bonita-persistence-read</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+         <dependency>
+            <groupId>org.bonitasoft.engine.persistence</groupId>
+            <artifactId>bonita-persistence-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-        <!-- Tests -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -45,12 +64,6 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.scheduler</groupId>
-            <artifactId>bonita-scheduler-impl</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
