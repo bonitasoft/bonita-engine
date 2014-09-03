@@ -5,7 +5,7 @@
     <parent>
         <artifactId>bonita-transaction-sp</artifactId>
         <groupId>com.bonitasoft.engine.transaction</groupId>
-        <version>6.3.4-SNAPSHOT</version>
+        <version>6.3.4</version>
     </parent>
 
     <artifactId>bonita-transaction-impl-sp</artifactId>
