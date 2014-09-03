@@ -1,8 +1,5 @@
 package org.bonitasoft.engine;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -11,7 +8,6 @@ import java.util.Set;
 
 import javax.naming.Context;
 
-import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.test.APITestUtil;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -19,18 +15,12 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class TestsInitializer {
 
-    private static final String SOURCE_BONITA_HOME = "../../bpm/bonita-home/target/home";
-    private static final String TMP_BONITA_HOME = "target/eclipse-bonita-home";
-
-    private static final String BONITA_HOME = "bonita.home";
+    private static final String BONITA_HOME_DEFAULT_PATH = "target/home";
+    private static final String BONITA_HOME_PROPERTY = "bonita.home";
 
     static ConfigurableApplicationContext springContext;
 
     private static TestsInitializer INSTANCE;
-
-    public static void beforeAll() throws Exception {
-        TestsInitializer.getInstance().before();
-    }
 
     private static TestsInitializer getInstance() {
         if (INSTANCE == null) {
@@ -39,9 +29,26 @@ public class TestsInitializer {
         return INSTANCE;
     }
 
+    public static void beforeAll() throws Exception {
+        TestsInitializer.getInstance().before();
+    }
+
     public static void afterAll() throws Exception {
         TestsInitializer.getInstance().after();
 
+    }
+
+    protected void before() throws Exception {
+        System.out.println("=====================================================");
+        System.out.println("=========  INITIALIZATION OF TEST ENVIRONMENT =======");
+        System.out.println("=====================================================");
+        
+        long startTime = System.currentTimeMillis();
+        setSystemPropertyIfNotSet(BONITA_HOME_PROPERTY, BONITA_HOME_DEFAULT_PATH);
+        setupSpringContext();
+        initPlatformAndTenant();
+    
+        System.out.println("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
     }
 
     protected void after() throws Exception {
@@ -51,10 +58,6 @@ public class TestsInitializer {
 
         deleteTenantAndPlatform();
         closeSpringContext();
-        cleanBonitaHome();
-
-        // wait for thread to stop
-        // FIXME To uncomment when fix BS-7731
         checkThreadsAreStopped();
     }
 
@@ -107,41 +110,9 @@ public class TestsInitializer {
         return true;
     }
 
-    protected void before() throws Exception {
-        System.out.println("=====================================================");
-        System.out.println("=========  INITIALIZATION OF TEST ENVIRONMENT =======");
-        System.out.println("=====================================================");
-        final long startTime = System.currentTimeMillis();
-        setupEclipseBonitaHome();
-        setupSpringContext();
-        initPlatformAndTenant();
-        System.out.println("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
-    }
-
     protected void initPlatformAndTenant() throws Exception {
         new APITestUtil().createPlatformStructure();
         new APITestUtil().initializeAndStartPlatformWithDefaultTenant(true);
-    }
-
-    private static void setupEclipseBonitaHome() throws IOException {
-        // If we run tests inside Eclipse:
-        if (System.getProperties().toString().contains("org.eclipse.osgi")) {
-            final File destDir = new File(TMP_BONITA_HOME);
-            System.out.println("Using BONITA_HOME: " + destDir.getAbsolutePath());
-            FileUtils.deleteDirectory(destDir);
-            try {
-                FileUtils.copyDirectory(new File(SOURCE_BONITA_HOME), destDir);
-            } catch (FileNotFoundException e) {
-                throw new FileNotFoundException(e.getMessage() + " - Please run ant task cleanhome.xml in bonita-home module");
-            }
-            System.setProperty(BONITA_HOME, destDir.getAbsolutePath());
-        }
-    }
-
-    private static void cleanBonitaHome() throws IOException {
-        if (System.getProperties().toString().contains("org.eclipse.osgi")) {
-            FileUtils.deleteDirectory(new File(TMP_BONITA_HOME));
-        }
     }
 
     private static void setupSpringContext() {
