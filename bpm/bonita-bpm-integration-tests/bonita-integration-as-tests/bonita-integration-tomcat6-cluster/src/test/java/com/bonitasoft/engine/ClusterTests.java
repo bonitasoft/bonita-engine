@@ -132,10 +132,10 @@ public class ClusterTests extends CommonAPISPTest {
         UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step0", ACTOR_NAME);
         addUserTask.addShortTextData("text", new ExpressionBuilder().createConstantStringExpression("default"));
         addUserTask
-                .addConnector("aConnector", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER)
-                .addInput("input1", new ExpressionBuilder().createConstantStringExpression("inputValue"))
-                .addOutput(
-                        new OperationBuilder().createSetDataOperation("text", new ExpressionBuilder().createInputExpression("output1", String.class.getName())));
+        .addConnector("aConnector", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER)
+        .addInput("input1", new ExpressionBuilder().createConstantStringExpression("inputValue"))
+        .addOutput(
+                new OperationBuilder().createSetDataOperation("text", new ExpressionBuilder().createInputExpression("output1", String.class.getName())));
 
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 designProcessDefinition.done());
@@ -216,7 +216,7 @@ public class ClusterTests extends CommonAPISPTest {
         assertThat(getTenantManagementAPI().isPaused()).isTrue();
 
         changeToNode2();
-        
+
         assertThat(getTenantManagementAPI().isPaused()).isTrue();
 
         getTenantManagementAPI().resume();
@@ -240,15 +240,16 @@ public class ClusterTests extends CommonAPISPTest {
         changeToNode2();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
         try {
-        // then: node2 should finish the work
-        waitForProcessToFinishAndBeArchived(pi);
+            // then: node2 should finish the work
+            waitForProcessToFinishAndBeArchived(pi);
         } finally {
-        // cleanup
-        disableAndDeleteProcess(pd);
-        logoutOnTenant();
-        changeToNode1();
-        startPlatform();
-        loginOnDefaultTenantWith(USERNAME, PASSWORD);
+            // cleanup
+            disableAndDeleteProcess(pd);
+            logoutOnTenant();
+            changeToNode1();
+            startPlatform();
+            loginOnDefaultTenantWith(USERNAME, PASSWORD);
+        }
     }
     }
 

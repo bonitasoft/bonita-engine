@@ -156,6 +156,8 @@
 				<entry key="com.bonitasoft.engine.page.impl.SPageWithContentImpl" value="10120" />
 				<entry key="com.bonitasoft.engine.page.impl.SPageImpl" value="10120" />
 				<entry key="com.bonitasoft.engine.page.impl.SPageContentImpl" value="10120" />
+                <entry key="com.bonitasoft.engine.business.application.impl.SApplicationImpl" value="10200" />
+                <entry key="com.bonitasoft.engine.business.application.impl.SApplicationPageImpl" value="10201" />
 				<!-- archived objects -->
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="20010" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" value="20011" />

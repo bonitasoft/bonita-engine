@@ -111,4 +111,9 @@ public class LicenseTest {
         valideFeature(Features.CUSTOM_PAGE);
     }
 
+    @Test
+    public void applications() throws Exception {
+        valideFeature(Features.BUSINESS_APPLICATIONS);
+    }
+
 }
