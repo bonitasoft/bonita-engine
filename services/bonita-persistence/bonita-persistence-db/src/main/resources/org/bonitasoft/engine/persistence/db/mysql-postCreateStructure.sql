@@ -17,7 +17,7 @@ CREATE INDEX fk_data_mapping_data_instanceId_idx ON data_mapping(dataInstanceId 
 CREATE INDEX fk_data_mapping_tenantId_idx ON data_mapping(tenantid ASC);
 CREATE INDEX fk_dependency_tenantId_idx ON dependency(tenantid ASC);
 CREATE INDEX fk_dependencymapping_tenantId_idx ON dependencymapping(tenantid ASC);
-CREATE INDEX fk_document_content_tenantId_idx ON document_content(tenantid ASC);
+CREATE INDEX fk_document_tenantId_idx ON document(tenantid ASC);
 CREATE INDEX fk_external_identity_mapping_user_Id_idx ON external_identity_mapping(userId ASC, tenantid ASC);
 CREATE INDEX fk_external_identity_mapping_roleId_idx ON external_identity_mapping(roleId ASC, tenantid ASC);
 CREATE INDEX fk_external_identity_mapping_group_Id_idx ON external_identity_mapping(groupId ASC, tenantid ASC);

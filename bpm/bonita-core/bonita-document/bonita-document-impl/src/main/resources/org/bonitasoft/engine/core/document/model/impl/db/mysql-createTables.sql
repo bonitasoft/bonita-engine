@@ -2,7 +2,7 @@ CREATE TABLE document (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   author BIGINT,
-  creattiondate BIGINT NOT NULL,
+  creationdate BIGINT NOT NULL,
   hascontent BOOLEAN NOT NULL,
   filename VARCHAR(255),
   mimetype VARCHAR(255),
