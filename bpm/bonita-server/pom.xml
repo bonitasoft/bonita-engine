@@ -17,6 +17,12 @@
             <groupId>com.bonitasoft.engine.core</groupId>
             <artifactId>bonita-process-engine</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Builder Factory -->
@@ -230,6 +236,12 @@
             <groupId>org.bonitasoft.engine.core</groupId>
             <artifactId>bonita-expression-resolver-api-impl</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- External Identity Mapping -->
@@ -249,6 +261,10 @@
                     <groupId>org.bonitasoft.engine</groupId>
                     <artifactId>bonita-common</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -262,6 +278,12 @@
             <groupId>org.bonitasoft.engine.incident</groupId>
             <artifactId>bonita-incident-log</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Identity -->
@@ -452,6 +474,12 @@
             <groupId>com.bonitasoft.engine.core.process.instance</groupId>
             <artifactId>bonita-process-instance-impl</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Recorder -->
@@ -915,25 +943,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- <plugin> -->
-            <!-- <artifactId>maven-javadoc-plugin</artifactId> -->
-            <!-- <executions> -->
-            <!-- <execution> -->
-            <!-- <id>javadoc-jar</id> -->
-            <!-- <phase>package</phase> -->
-            <!-- <goals> -->
-            <!-- <goal>jar</goal> -->
-            <!-- </goals> -->
-            <!-- <configuration> -->
-            <!-- <includeDependencySources>true</includeDependencySources> -->
-            <!-- <dependencySourceIncludes> -->
-            <!-- <dependencySourceInclude>org.bonitasoft.engine.*:*</dependencySourceInclude> -->
-            <!-- <dependencySourceInclude>com.bonitasoft.engine.*:*</dependencySourceInclude> -->
-            <!-- </dependencySourceIncludes> -->
-            <!-- </configuration> -->
-            <!-- </execution> -->
-            <!-- </executions> -->
-            <!-- </plugin> -->
         </plugins>
     </build>
 </project>
