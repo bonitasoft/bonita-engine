@@ -93,16 +93,17 @@ public class DocumentServiceImpl implements DocumentService {
             //update mapping
             SDocumentMapping sDocumentMapping = getMappedDocument(processInstanceId, name);
             archive(sDocumentMapping, System.currentTimeMillis());
-            updateMapping(document, sDocumentMapping);
+            updateMapping(document, sDocumentMapping, description);
             return new SMappedDocumentImpl(sDocumentMapping, document);
         } catch (final SBonitaException e) {
             throw new SProcessDocumentCreationException(e.getMessage(), e);
         }
     }
 
-    private void updateMapping(SDocument document, SDocumentMapping sDocumentMapping) throws SRecorderException {
+    private void updateMapping(SDocument document, SDocumentMapping sDocumentMapping, String description) throws SRecorderException {
         Map<String, Object> params = new HashMap<String, Object>(2);
         params.put("documentId", document.getId());
+        params.put("description", description);
         params.put("version", incrementVersion(sDocumentMapping.getVersion()));
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sDocumentMapping,
                 params);
