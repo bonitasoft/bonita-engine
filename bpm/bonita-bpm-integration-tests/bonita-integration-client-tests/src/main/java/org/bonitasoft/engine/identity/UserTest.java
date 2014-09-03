@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.identity;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -746,7 +747,7 @@ public class UserTest extends CommonAPITest {
     }
 
     @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Search", "Users", "Filter", "Order", "Pagination",
-            "Column not unique" }, jira = "ENGINE-1557")
+    "Column not unique" }, jira = "ENGINE-1557")
     @Test
     public void searchUser() throws BonitaException {
         final List<User> users = new ArrayList<User>();
@@ -988,7 +989,7 @@ public class UserTest extends CommonAPITest {
     }
 
     @Cover(classes = { IdentityAPI.class, SearchOptionsBuilder.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Search", "User", "Manager",
-            "Not in team" }, jira = "ENGINE-569")
+    "Not in team" }, jira = "ENGINE-569")
     @Test
     public void searchUsersNotInTeam() throws BonitaException {
         // Manager
@@ -1175,4 +1176,49 @@ public class UserTest extends CommonAPITest {
     public void throwExceptionWhenGettingTechnicalUserWithProContactData() throws BonitaException {
         getIdentityAPI().getUserWithProfessionalDetails(-1l);
     }
+
+    @Cover(classes = { User.class, ContactData.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-8991", keywords = { "user", "255 characters" })
+    @Test
+    public void can_create_user_with_255_char_in_fields() throws Exception {
+        final UserCreator creator = new UserCreator(completeWithZeros("user"), "bpm");
+        creator.setJobTitle(completeWithZeros("Engineer"));
+        creator.setFirstName(completeWithZeros("First"));
+        creator.setLastName(completeWithZeros("Last"));
+
+        final ContactDataCreator contactDataCreator = new ContactDataCreator();
+        contactDataCreator.setAddress(completeWithZeros("32 Rue Gustave Eiffel"));
+        creator.setProfessionalContactData(contactDataCreator);
+
+        //when
+        final User user = getIdentityAPI().createUser(creator);
+
+        //then
+        assertThat(user).isNotNull();
+        assertThat(user.getUserName()).hasSize(255);
+        assertThat(user.getFirstName()).hasSize(255);
+        assertThat(user.getLastName()).hasSize(255);
+        assertThat(user.getJobTitle()).hasSize(255);
+
+        //when
+        final UserWithContactData userWithContactData = getIdentityAPI().getUserWithProfessionalDetails(user.getId());
+
+        //then
+        assertThat(userWithContactData).isNotNull();
+        assertThat(userWithContactData.getContactData().getAddress()).hasSize(255);
+
+        //clean
+        getIdentityAPI().deleteUser(user.getId());
+
+    }
+
+    private String completeWithZeros(final String prefix) {
+
+        final StringBuilder stb = new StringBuilder(prefix);
+        for (int i = 0; i < 255 - prefix.length(); i++) {
+            stb.append("0");
+        }
+
+        return stb.toString();
+    }
+
 }

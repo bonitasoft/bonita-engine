@@ -34,12 +34,12 @@ CREATE TABLE user_ (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   enabled NUMBER(1) NOT NULL,
-  userName VARCHAR2(50) NOT NULL,
+  userName VARCHAR2(255) NOT NULL,
   password VARCHAR2(60),
-  firstName VARCHAR2(50),
-  lastName VARCHAR2(50),
+  firstName VARCHAR2(255),
+  lastName VARCHAR2(255),
   title VARCHAR2(50),
-  jobTitle VARCHAR2(50),
+  jobTitle VARCHAR2(255),
   managerUserId NUMBER(19, 0),
   delegeeUserName VARCHAR2(50),
   iconName VARCHAR2(50),
@@ -63,7 +63,7 @@ CREATE TABLE user_contactinfo (
   fax VARCHAR2(50),
   building VARCHAR2(50),
   room VARCHAR2(50),
-  address VARCHAR2(50),
+  address VARCHAR2(255),
   zipCode VARCHAR2(50),
   city VARCHAR2(50),
   state VARCHAR2(50),
@@ -84,6 +84,8 @@ CREATE TABLE custom_usr_inf_def (
   UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)
 );
+
+CREATE INDEX idx_custom_usr_inf_def_name ON custom_usr_inf_def (tenantid, name);
 
 CREATE TABLE custom_usr_inf_val (
   id NUMBER(19, 0) NOT NULL,
