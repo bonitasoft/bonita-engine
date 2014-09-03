@@ -7,12 +7,13 @@
 		<artifactId>bonita-persistence</artifactId>
 		<version>6.4.0-SNAPSHOT</version>
 	</parent>
+
 	<artifactId>bonita-sequence-api</artifactId>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.bonitasoft.engine.sessionaccessor</groupId>
-			<artifactId>bonita-session-accessor-read</artifactId>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

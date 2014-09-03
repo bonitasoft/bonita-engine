@@ -229,6 +229,11 @@
 			<artifactId>bonita-process-definition-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.api</groupId>
+			<artifactId>bonita-common-api-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
         <!-- Others -->
         <dependency>
             <groupId>commons-io</groupId>
