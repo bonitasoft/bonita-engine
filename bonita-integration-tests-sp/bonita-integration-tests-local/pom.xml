@@ -47,14 +47,22 @@
         </dependency>
 
         <dependency>
-            <groupId>org.bonitasoft.engine.test</groupId>
-            <artifactId>bonita-server-test-utils</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.bonitasoft.engine</groupId>
             <artifactId>bonita-deploy-tcp</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.test</groupId>
+            <artifactId>bonita-server-test-utils</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.bonitasoft.engine.test</groupId>
+            <artifactId>bonita-integration-tests-client-sp</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
     </dependencies>

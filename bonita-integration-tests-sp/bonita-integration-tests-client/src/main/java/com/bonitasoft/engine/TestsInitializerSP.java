@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bonitasoft.engine.BonitaSuiteRunner;
 import org.bonitasoft.engine.TestsInitializer;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -40,7 +43,14 @@ public class TestsInitializerSP extends TestsInitializer {
 
     public static void afterAll() throws Exception {
         TestsInitializerSP.getInstance().after();
+    }
 
+    @Override
+    protected List<String> getSpringConfigLocations() {
+        List<String> springConfigLocations = new ArrayList<String>(super.getSpringConfigLocations());
+        springConfigLocations.add("datasource-sp.xml");
+        springConfigLocations.add("jndi-setup-sp.xml");
+        return springConfigLocations;
     }
 
     @Override
