@@ -562,20 +562,6 @@
 			<groupId>org.bonitasoft.engine</groupId>
 			<artifactId>bonita-common</artifactId>
 			<version>${project.version}</version>
-			<exclusions>
-			    <exclusion>
-			        <groupId>org.bonitasoft.engine.api</groupId>
-			        <artifactId>bonita-common-api</artifactId>
-			    </exclusion>
-			    <exclusion>
-			    	<groupId>org.bonitasoft.engine.api</groupId>
-			        <artifactId>bonita-common-api-impl</artifactId>
-			    </exclusion>
-			    <exclusion>
-			    	<groupId>org.bonitasoft.engine.api</groupId>
-			        <artifactId>bonita-common-api-ejb2</artifactId>
-			    </exclusion>
-			</exclusions>
 		</dependency>
 	</dependencies>
 
