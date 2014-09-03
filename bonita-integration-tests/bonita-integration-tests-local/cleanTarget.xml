@@ -5,15 +5,15 @@
 	<target name="cleanhome">
 		<delete dir="${basedir}/target/home" />
 		<copy todir="${basedir}/target/home">
-			<fileset dir="${basedir}/common" excludes="**/.svn" />
+			<fileset dir="${bonita.home}/common" excludes="**/.svn" />
 		</copy>
 		<copy todir="${basedir}/target/home">
-			<fileset dir="${basedir}/base" excludes="**/.svn" />
+			<fileset dir="${bonita.home}/base" excludes="**/.svn" />
 		</copy>
 		<copy todir="${basedir}/target/home">
-			<fileset dir="${basedir}/hibernate" excludes="**/.svn" />
+			<fileset dir="${bonita.home}/hibernate" excludes="**/.svn" />
 		</copy>
-		<loadfile srcFile="${basedir}/pom.xml" property="project.version">
+		<loadfile srcFile="${bonita.home}/pom.xml" property="project.version">
 			<filterchain>
 				  <linecontains>
 				    <contains value="version>"/>
