@@ -6,7 +6,7 @@ CREATE TABLE document (
   hascontent BIT NOT NULL,
   filename NVARCHAR(255),
   mimetype NVARCHAR(255),
-  url NVARCHAR(255),
+  url NVARCHAR(1024),
   content VARBINARY(MAX) NOT NULL,
   PRIMARY KEY (tenantid, id)
 )

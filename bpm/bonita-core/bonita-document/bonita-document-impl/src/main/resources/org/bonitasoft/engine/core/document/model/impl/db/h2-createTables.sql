@@ -6,7 +6,7 @@ CREATE TABLE document (
   hascontent BOOLEAN NOT NULL,
   filename VARCHAR(255),
   mimetype VARCHAR(255),
-  url VARCHAR(255),
+  url VARCHAR(1024),
   content LONGBLOB NULL,
   PRIMARY KEY (tenantid, id)
 );
