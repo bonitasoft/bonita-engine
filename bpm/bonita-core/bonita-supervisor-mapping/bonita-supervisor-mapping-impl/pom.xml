@@ -11,6 +11,7 @@
 	<artifactId>bonita-supervisor-mapping-impl</artifactId>
 
 	<name>Bonita Supervisor Mapping: Service Implementation</name>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
@@ -35,6 +36,21 @@
         <dependency>
             <groupId>org.bonitasoft.engine.log</groupId>
             <artifactId>bonita-log-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-builder</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.persistence</groupId>
+            <artifactId>bonita-persistence-read</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.events</groupId>
+            <artifactId>bonita-events-model</artifactId>
             <version>${project.version}</version>
         </dependency>
 	</dependencies>
