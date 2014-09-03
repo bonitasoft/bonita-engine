@@ -50,12 +50,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.test</groupId>
-			<artifactId>bonita-test-util</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.codehaus.btm</groupId>
 			<artifactId>btm</artifactId>
 			<scope>test</scope>

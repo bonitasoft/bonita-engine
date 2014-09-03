@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,11 +32,11 @@ public class BonitaClassLoaderTest {
     public void releaseShouldRemoveAllScopeFolderAndItsContent() throws IOException {
         final Map<String, byte[]> resources = new HashMap<String, byte[]>(1);
         resources.put("myJar.jar", "Salut le monde".getBytes());
-        final File tempDir = new File(IOUtil.TMP_DIRECTORY, "BonitaClassLoaderTest");
+        final File tempDir = new File(IOUtil.TMP_DIRECTORY, "BonitaClassLoaderTest_JVM_" + ManagementFactory.getRuntimeMXBean().getName());
         if (tempDir.exists()) {
             FileUtils.deleteDirectory(tempDir);
         }
-        
+
         final BonitaClassLoader bonitaClassLoader = new BonitaClassLoader(resources, "here", 154L, tempDir.toURI(), BonitaClassLoader.class.getClassLoader());
         assertThat(tempDir).as("bonitaClassLoader tempDir:%s should exists after bonitaClassLoader creation", tempDir.getAbsolutePath()).exists();
 

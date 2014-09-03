@@ -224,6 +224,16 @@
 			<artifactId>bonita-data-instance-transient</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
+			<artifactId>bonita-process-definition-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.api</groupId>
+			<artifactId>bonita-common-api-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
         <!-- Others -->
         <dependency>
             <groupId>commons-io</groupId>
@@ -233,7 +243,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
-
         <!-- Tests -->
         <dependency>
             <groupId>junit</groupId>
@@ -286,11 +295,6 @@
         	<artifactId>bonita-identity-impl</artifactId>
         	<version>${project.version}</version>
         	<scope>test</scope>
-        </dependency>
-         <dependency>
-            <groupId>org.bonitasoft.engine.core.process.definition</groupId>
-			<artifactId>bonita-process-definition-impl</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
 			<groupId>org.bonitasoft.engine.core.operation</groupId>

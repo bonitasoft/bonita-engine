@@ -103,12 +103,6 @@
 			<artifactId>mockito-all</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-commons-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
         <dependency>
             <!-- because we need the builderfactory impl and it does not 
                 make sense to mock them -->
@@ -125,6 +119,11 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+        	<groupId>org.assertj</groupId>
+        	<artifactId>assertj-core</artifactId>
+        	<scope>test</scope>
+        </dependency>
 	</dependencies>
 
 	<build>
@@ -133,12 +132,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<properties>
-						<property>
-							<name>listener</name>
-							<value>org.bonitasoft.engine.test.annotation.CustomListener</value>
-						</property>
-					</properties>
 					<systemPropertyVariables>
 						<bonita.home>${project.build.directory}/home</bonita.home>
 					</systemPropertyVariables>

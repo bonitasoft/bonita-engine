@@ -38,7 +38,6 @@
 				<module>bonita-expression-resolver</module>
 				<module>bonita-external</module>
 				<module>bonita-util</module>
-				<module>bonita-bpm-integration-tests</module>
 				<module>bonita-synchro-repository</module>
 			</modules>
 		</profile>
@@ -56,7 +55,6 @@
 				<module>bonita-expression-resolver</module>
 				<module>bonita-external</module>
 				<module>bonita-util</module>
-				<module>bonita-bpm-integration-tests</module>
 				<module>bonita-synchro-repository</module>
 			</modules>
 		</profile>
@@ -77,7 +75,6 @@
 				<module>bonita-expression-resolver</module>
 				<module>bonita-external</module>
 				<module>bonita-util</module>
-				<module>bonita-bpm-integration-tests</module>
 				<module>bonita-synchro-repository</module>
 			</modules>
 		</profile>
@@ -95,7 +92,6 @@
 				<module>bonita-expression-resolver</module>
 				<module>bonita-external</module>
 				<module>bonita-util</module>
-				<module>bonita-bpm-integration-tests</module>
 				<module>bonita-synchro-repository</module>
 			</modules>
 		</profile>
@@ -113,7 +109,6 @@
 				<module>bonita-expression-resolver</module>
 				<module>bonita-external</module>
 				<module>bonita-util</module>
-				<module>bonita-bpm-integration-tests</module>
 				<module>bonita-synchro-repository</module>
 			</modules>
 		</profile>
