@@ -36,7 +36,13 @@
             <version>${project.version}</version>
             <type>test-jar</type>
         </dependency>
-
+        
+        <dependency>
+            <groupId>com.bonitasoft.engine</groupId>
+            <artifactId>bonita-server-sp</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.test</groupId>
             <artifactId>bonita-server-test-utils</artifactId>
