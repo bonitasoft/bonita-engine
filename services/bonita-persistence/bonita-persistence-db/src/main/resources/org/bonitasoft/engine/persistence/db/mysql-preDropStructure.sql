@@ -53,7 +53,7 @@ ALTER TABLE business_app_page DROP FOREIGN KEY fk_page_id;
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------
 ALTER TABLE arch_document_mapping DROP FOREIGN KEY fk_arch_document_mapping_tenantId;
-ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_archdocmap_docid;
+ALTER TABLE arch_document_mapping DROP FOREIGN KEY fk_archdocmap_docid;
 ALTER TABLE arch_flownode_instance DROP FOREIGN KEY fk_arch_flownode_instance_tenantId;
 ALTER TABLE arch_process_comment DROP FOREIGN KEY fk_arch_process_comment_tenantId;
 ALTER TABLE arch_process_instance DROP FOREIGN KEY fk_arch_process_instance_tenantId;
