@@ -13,6 +13,7 @@ ALTER TABLE dependency DROP FOREIGN KEY fk_dependency_tenantId;
 ALTER TABLE dependencymapping DROP FOREIGN KEY fk_dependencymapping_tenantId;
 ALTER TABLE document_content DROP FOREIGN KEY fk_document_content_tenantId;
 ALTER TABLE document_mapping DROP FOREIGN KEY fk_document_mapping_tenantId;
+ALTER TABLE document_mapping DROP FOREIGN KEY fk_docmap_docid;
 ALTER TABLE event_trigger_instance DROP FOREIGN KEY fk_event_trigger_instance_tenantId;
 ALTER TABLE external_identity_mapping DROP FOREIGN KEY fk_external_identity_mapping_tenantId;
 ALTER TABLE flownode_instance DROP FOREIGN KEY fk_flownode_instance_tenantId;
@@ -52,6 +53,7 @@ ALTER TABLE business_app_page DROP FOREIGN KEY fk_page_id;
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------
 ALTER TABLE arch_document_mapping DROP FOREIGN KEY fk_arch_document_mapping_tenantId;
+ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_archdocmap_docid;
 ALTER TABLE arch_flownode_instance DROP FOREIGN KEY fk_arch_flownode_instance_tenantId;
 ALTER TABLE arch_process_comment DROP FOREIGN KEY fk_arch_process_comment_tenantId;
 ALTER TABLE arch_process_instance DROP FOREIGN KEY fk_arch_process_instance_tenantId;

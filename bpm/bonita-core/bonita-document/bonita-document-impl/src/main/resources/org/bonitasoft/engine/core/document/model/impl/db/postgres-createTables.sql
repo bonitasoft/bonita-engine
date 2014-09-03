@@ -20,4 +20,3 @@ CREATE TABLE document_mapping (
   version VARCHAR(10) NOT NULL,
   PRIMARY KEY (tenantid, ID)
 );
-ALTER TABLE document_mapping ADD CONSTRAINT fk_docmap_docid FOREIGN KEY (tenantid, documentid) REFERENCES document(tenantid, id) ON DELETE CASCADE;

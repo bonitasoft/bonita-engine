@@ -204,19 +204,14 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public SMappedDocument getMappedDocument(final long processInstanceId, final String documentName, final long time) throws SDocumentNotFoundException,
             SBonitaReadException {
-        try {
-            final List<SAMappedDocument> docMapping = definitiveArchiveReadPersistenceService.selectList(SelectDescriptorBuilder
-                    .getSAMappedDocumentOfProcessWithName(
-                            processInstanceId,
-                            documentName, time));
-            if (docMapping.isEmpty()) {
-                throw new SDocumentNotFoundException("Can't find the archived document named " + documentName + " on process instance with id "
-                        + processInstanceId + " for the time " + time);
-            }
-            return docMapping.get(0);
-            // FIXME throws a SDocumentMappingReadException when we can't read on the persistence service instead of not found...
-        } catch (final SDocumentNotFoundException e) {
+        final List<SAMappedDocument> docMapping = definitiveArchiveReadPersistenceService.selectList(SelectDescriptorBuilder
+                .getSAMappedDocumentOfProcessWithName(
+                        processInstanceId,
+                        documentName, time));
+        if (docMapping.isEmpty()) {
             return getMappedDocument(processInstanceId, documentName);
+        } else {
+            return docMapping.get(0);
         }
     }
 

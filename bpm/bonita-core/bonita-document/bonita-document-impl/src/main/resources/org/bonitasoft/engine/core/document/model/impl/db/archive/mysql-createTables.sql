@@ -10,5 +10,3 @@ CREATE TABLE arch_document_mapping (
   archiveDate BIGINT NOT NULL,
   PRIMARY KEY (tenantid, ID)
 ) ENGINE = INNODB;
-
-ALTER TABLE arch_document_mapping ADD CONSTRAINT fk_archdocmap_docid FOREIGN KEY (tenantid, documentid) REFERENCES document(tenantid, id) ON DELETE CASCADE;
