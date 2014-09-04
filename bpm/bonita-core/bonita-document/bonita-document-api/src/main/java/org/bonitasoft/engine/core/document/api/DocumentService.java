@@ -49,22 +49,26 @@ public interface DocumentService {
      *        the document to store
      * @param processInstanceId
      *        the process instance id to attach the document to
+     * @param name
+     * @param description
      * @return The document image from database
      * @throws org.bonitasoft.engine.core.document.exception.SProcessDocumentCreationException
      *         when the storage has failed
      */
-    SMappedDocument attachDocumentToProcessInstance(SDocument document, long processInstanceId) throws SProcessDocumentCreationException;
+    SMappedDocument attachDocumentToProcessInstance(SDocument document, long processInstanceId, String name, String description) throws SProcessDocumentCreationException;
 
     /**
      * Modify document information
      *
      * @param document
      *        the document will be updated to
+     * @param name
+     * @param description
      * @return the updated SDocumentMapping object
      * @throws SProcessDocumentCreationException
      *         when the update has failed
      */
-    SMappedDocument updateDocumentOfProcessInstance(SDocument document, long processInstanceId) throws SProcessDocumentCreationException;
+    SMappedDocument updateDocumentOfProcessInstance(SDocument document, long processInstanceId, String name, String description) throws SProcessDocumentCreationException;
 
 
     /**

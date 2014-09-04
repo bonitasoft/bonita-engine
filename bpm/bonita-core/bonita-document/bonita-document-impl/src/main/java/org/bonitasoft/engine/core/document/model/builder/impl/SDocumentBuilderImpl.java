@@ -30,12 +30,6 @@ public class SDocumentBuilderImpl implements SDocumentBuilder {
     }
 
     @Override
-    public SDocumentBuilder setName(String name) {
-        entity.setName(name);
-        return this;
-    }
-
-    @Override
     public SDocumentBuilder setAuthor(long author) {
         entity.setAuthor(author);
         return this;

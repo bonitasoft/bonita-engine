@@ -34,7 +34,6 @@ public class SADocumentMappingImpl extends SDocumentMappingImpl implements SADoc
 
     private long sourceObjectId;
 
-
     public long getArchiveDate() {
         return archiveDate;
     }
@@ -51,12 +50,13 @@ public class SADocumentMappingImpl extends SDocumentMappingImpl implements SADoc
         this.sourceObjectId = sourceObjectId;
     }
 
-
     public SADocumentMappingImpl() {
     }
 
-    public SADocumentMappingImpl(long documentId, long processInstanceId, long archiveDate, long sourceObjectId) {
-        super(documentId, processInstanceId);
+    public SADocumentMappingImpl(long documentId, long processInstanceId, long archiveDate, long sourceObjectId, String name, String description, String version) {
+        super(documentId, processInstanceId, name);
+        setDescription(description);
+        setVersion(version);
         this.archiveDate = archiveDate;
         this.sourceObjectId = sourceObjectId;
     }
@@ -68,14 +68,19 @@ public class SADocumentMappingImpl extends SDocumentMappingImpl implements SADoc
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        if (!super.equals(o))
+            return false;
 
         SADocumentMappingImpl that = (SADocumentMappingImpl) o;
 
-        if (archiveDate != that.archiveDate) return false;
-        if (sourceObjectId != that.sourceObjectId) return false;
+        if (archiveDate != that.archiveDate)
+            return false;
+        if (sourceObjectId != that.sourceObjectId)
+            return false;
 
         return true;
     }

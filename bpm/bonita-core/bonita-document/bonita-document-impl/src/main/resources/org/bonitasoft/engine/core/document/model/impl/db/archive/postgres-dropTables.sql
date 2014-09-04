@@ -1,1 +1,1 @@
-DROP TABLE arch_document_mapping;
+DROP TABLE arch_document_mapping CASCADE;

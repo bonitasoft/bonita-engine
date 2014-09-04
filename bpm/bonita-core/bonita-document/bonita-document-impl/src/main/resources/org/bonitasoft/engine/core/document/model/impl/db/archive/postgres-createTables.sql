@@ -4,6 +4,9 @@ CREATE TABLE arch_document_mapping (
   sourceObjectId INT8,
   processinstanceid INT8 NOT NULL,
   documentid INT8 NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  description TEXT,
+  version VARCHAR(10) NOT NULL,
   archiveDate INT8 NOT NULL,
   PRIMARY KEY (tenantid, ID)
 );

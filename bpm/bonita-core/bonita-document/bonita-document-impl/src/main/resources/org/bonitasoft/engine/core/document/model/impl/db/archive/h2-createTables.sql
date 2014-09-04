@@ -4,7 +4,9 @@ CREATE TABLE arch_document_mapping (
   sourceObjectId BIGINT,
   processinstanceid BIGINT NOT NULL,
   documentid BIGINT NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  description TEXT,
+  version VARCHAR(10) NOT NULL,
   archiveDate BIGINT NOT NULL,
   PRIMARY KEY (tenantid, id)
 );
-ALTER TABLE arch_document_mapping ADD CONSTRAINT fk_archdocmap_docid FOREIGN KEY (tenantid, documentid) REFERENCES document(tenantid, id) ON DELETE CASCADE;

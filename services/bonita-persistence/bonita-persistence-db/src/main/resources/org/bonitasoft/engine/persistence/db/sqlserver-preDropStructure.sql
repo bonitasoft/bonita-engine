@@ -27,6 +27,8 @@ ALTER TABLE document DROP CONSTRAINT fk_document_tenantId
 GO
 ALTER TABLE document_mapping DROP CONSTRAINT fk_document_mapping_tenantId
 GO
+ALTER TABLE document_mapping DROP CONSTRAINT fk_docmap_docid
+GO
 ALTER TABLE event_trigger_instance DROP CONSTRAINT fk_event_trigger_instance_tenantId
 GO
 ALTER TABLE external_identity_mapping DROP CONSTRAINT fk_external_identity_mapping_tenantId
@@ -100,6 +102,8 @@ GO
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------
 ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_arch_document_mapping_tenantId
+GO
+ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_archdocmap_docid
 GO
 ALTER TABLE arch_flownode_instance DROP CONSTRAINT fk_arch_flownode_instance_tenantId
 GO

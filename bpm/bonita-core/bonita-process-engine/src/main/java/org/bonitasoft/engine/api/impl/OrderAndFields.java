@@ -222,46 +222,46 @@ public class OrderAndFields {
      */
     public static OrderAndField getOrderAndFieldForDocument(DocumentCriterion pagingCriterion) {
         final SDocumentBuilderFactory fact = BuilderFactory.get(SDocumentBuilderFactory.class);
-        String field = null;
-        OrderByType order = null;
+        String field;
+        OrderByType order;
         if (pagingCriterion == null) {
             pagingCriterion = DocumentCriterion.DEFAULT;
         }
         switch (pagingCriterion) {
             case DEFAULT:
-                field = fact.getCreationDateKey();
+                field = "document." + fact.getCreationDateKey();
                 order = OrderByType.DESC;
                 break;
             case AUTHOR_ASC:
-                field = fact.getAuthorKey();
+                field = "document." + fact.getAuthorKey();
                 order = OrderByType.ASC;
                 break;
             case AUTHOR_DESC:
-                field = fact.getAuthorKey();
+                field = "document." + fact.getAuthorKey();
                 order = OrderByType.DESC;
                 break;
             case FILENAME_ASC:
-                field = fact.getFileNameKey();
+                field = "document." + fact.getFileNameKey();
                 order = OrderByType.ASC;
                 break;
             case FILENAME_DESC:
-                field = fact.getFileNameKey();
+                field = "document." + fact.getFileNameKey();
                 order = OrderByType.DESC;
                 break;
             case MIMETYPE_ASC:
-                field = fact.getMimeTypeKey();
+                field = "document." + fact.getMimeTypeKey();
                 order = OrderByType.ASC;
                 break;
             case MIMETYPE_DESC:
-                field = fact.getMimeTypeKey();
+                field = "document." + fact.getMimeTypeKey();
                 order = OrderByType.DESC;
                 break;
             case CREATION_DATE_ASC:
-                field = fact.getCreationDateKey();
+                field = "document." + fact.getCreationDateKey();
                 order = OrderByType.ASC;
                 break;
             case CREATION_DATE_DESC:
-                field = fact.getCreationDateKey();
+                field = "document." + fact.getCreationDateKey();
                 order = OrderByType.DESC;
                 break;
             case NAME_ASC:
@@ -273,11 +273,11 @@ public class OrderAndFields {
                 order = OrderByType.DESC;
                 break;
             case URL_ASC:
-                field = fact.getURLKey();
+                field = "document." + fact.getURLKey();
                 order = OrderByType.ASC;
                 break;
             case URL_DESC:
-                field = fact.getURLKey();
+                field = "document." + fact.getURLKey();
                 order = OrderByType.DESC;
                 break;
             default:
