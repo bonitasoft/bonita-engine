@@ -12,8 +12,8 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.bonitasoft.engine.work</groupId>
-			<artifactId>bonita-work-api</artifactId>
+			<groupId>org.bonitasoft.engine.log</groupId>
+			<artifactId>bonita-log-technical-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -30,5 +30,4 @@
 			<artifactId>hazelcast</artifactId>
 		</dependency>
 	</dependencies>
-
 </project>
