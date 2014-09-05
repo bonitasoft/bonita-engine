@@ -19,8 +19,8 @@
       <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>bonita-common-api</artifactId>
                     <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
                 </exclusion>
             </exclusions>
     </dependency>
@@ -231,6 +231,12 @@
       <groupId>org.bonitasoft.engine.core</groupId>
       <artifactId>bonita-expression-resolver-api-impl</artifactId>
       <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
+            </exclusions>
     </dependency>
 
     <!-- External Identity Mapping -->
@@ -250,6 +256,10 @@
           <groupId>org.bonitasoft.engine</groupId>
           <artifactId>bonita-common</artifactId>
         </exclusion>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
       </exclusions>
     </dependency>
 
@@ -263,6 +273,12 @@
       <groupId>org.bonitasoft.engine.incident</groupId>
       <artifactId>bonita-incident-log</artifactId>
       <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+                </exclusion>
+            </exclusions>
     </dependency>
 
     <!-- Identity -->
@@ -334,7 +350,7 @@
       <artifactId>bonita-page-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    
     <!-- Parameter -->
     <dependency>
       <groupId>com.bonitasoft.engine.core.parameter</groupId>
@@ -455,8 +471,8 @@
       <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>bonita-common-api</artifactId>
                     <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
                 </exclusion>
             </exclusions>
     </dependency>
@@ -558,7 +574,7 @@
       <artifactId>bonita-synchro-jms</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    
     <!-- Time Tracker -->
         <dependency>
             <groupId>org.bonitasoft.engine</groupId>
@@ -643,7 +659,7 @@
             <artifactId>bonita-theme-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    
     <!-- Not in shade -->
     <dependency>
       <groupId>com.bonitasoft.engine</groupId>
@@ -719,9 +735,9 @@
                   <!-- Category -->
                   <include>org.bonitasoft.engine.core.category:bonita-category-api</include>
                   <include>org.bonitasoft.engine.core.category:bonita-category-api-impl</include>
-									<include>org.bonitasoft.engine.core.category:bonita-category-model</include>
-									<include>org.bonitasoft.engine.core.category:bonita-category-model-impl</include>
-									<include>org.bonitasoft.engine.core.category:bonita-category-model-impl-hibernate</include>
+                  <include>org.bonitasoft.engine.core.category:bonita-category-model</include>
+                  <include>org.bonitasoft.engine.core.category:bonita-category-model-impl</include>
+                  <include>org.bonitasoft.engine.core.category:bonita-category-model-impl-hibernate</include>
                   <!-- Classloader -->
                   <include>org.bonitasoft.engine.classloader:bonita-classloader-api</include>
                   <include>org.bonitasoft.engine.classloader:bonita-classloader-impl</include>
@@ -923,25 +939,6 @@
           </execution>
         </executions>
       </plugin>
-            <!-- <plugin> -->
-            <!-- <artifactId>maven-javadoc-plugin</artifactId> -->
-            <!-- <executions> -->
-            <!-- <execution> -->
-            <!-- <id>javadoc-jar</id> -->
-            <!-- <phase>package</phase> -->
-            <!-- <goals> -->
-            <!-- <goal>jar</goal> -->
-            <!-- </goals> -->
-            <!-- <configuration> -->
-            <!-- <includeDependencySources>true</includeDependencySources> -->
-            <!-- <dependencySourceIncludes> -->
-            <!-- <dependencySourceInclude>org.bonitasoft.engine.*:*</dependencySourceInclude> -->
-            <!-- <dependencySourceInclude>com.bonitasoft.engine.*:*</dependencySourceInclude> -->
-            <!-- </dependencySourceIncludes> -->
-            <!-- </configuration> -->
-            <!-- </execution> -->
-            <!-- </executions> -->
-            <!-- </plugin> -->
     </plugins>
   </build>
 </project>

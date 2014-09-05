@@ -46,6 +46,11 @@
             <artifactId>bonita-cache-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+       <dependency>
+           <groupId>org.bonitasoft.engine.transaction</groupId>
+           <artifactId>bonita-transaction-api</artifactId>
+           <version>${project.version}</version>
+       </dependency>
     </dependencies>
 
 </project>

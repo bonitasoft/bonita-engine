@@ -420,12 +420,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
-			<artifactId>bonita-process-definition-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
