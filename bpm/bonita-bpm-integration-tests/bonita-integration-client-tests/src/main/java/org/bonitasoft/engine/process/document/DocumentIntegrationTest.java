@@ -1131,12 +1131,11 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
         // Build URL with 256 characters
         final StringBuilder builder = new StringBuilder("http://intranet.bonitasoft.com/private/docStorage/");
-        for (int i = 0; i < 4; i++) {
-            builder.append("aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeee"); // + 50 characters
+        for (int i = 0; i < 975; i++) {
+            builder.append("a"); // + 50 characters
         }
-        builder.append("123456");
         final String url = builder.toString();
-        assertEquals(256, url.length());
+        assertEquals(1025, url.length());
 
         // Build document
         final String docName = "myRtfDocument";
@@ -1154,12 +1153,11 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
         // Build URL with 255 characters
         final StringBuilder builder = new StringBuilder("http://intranet.bonitasoft.com/private/docStorage/");
-        for (int i = 0; i < 4; i++) {
-            builder.append("aaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeee"); // + 50 characters
+        for (int i = 0; i < 974; i++) {
+            builder.append("a"); // + 50 characters
         }
-        builder.append("12345");
         final String url = builder.toString();
-        assertEquals(255, url.length());
+        assertEquals(1024, url.length());
 
         // Build document
         final String docName = "myRtfDocument";

@@ -102,7 +102,7 @@ public class DocumentLeftOperandHandler implements LeftOperandHandler {
                     // Let's check if the document already exists:
                     SMappedDocument mappedDocument = documentService.getMappedDocument(processInstanceId, documentName);
                     // a document exist, update it with the new values
-                        documentService.updateDocumentOfProcessInstance(document, processInstanceId, documentName, mappedDocument.getDescription()); //FIXME description in document value?
+                        documentService.updateDocumentOfProcessInstance(document, processInstanceId, documentName, mappedDocument.getDescription());
                 } catch (final SDocumentNotFoundException e) {
                         documentService.attachDocumentToProcessInstance(document, processInstanceId, documentName, null);
                 }
