@@ -1,4 +1,4 @@
-<project name="bpm-services" default="cleantarget">
+<project name="bonita-integration-tests-servives-bpm" default="cleantarget">
 
 	<property name="target.dir" value="${basedir}/target"/>
 	

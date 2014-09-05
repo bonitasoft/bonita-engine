@@ -1,4 +1,4 @@
-<project name="services" default="cleantarget">
+<project name="bonita-integration-tests-services" default="cleantarget">
 
 	<!-- After running this script, run test using param -Dbonita.services.folder=<project_folder>/target/test-classes/conf -->
 	

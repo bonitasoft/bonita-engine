@@ -1,4 +1,4 @@
-<project name="bonita-engine-home" default="cleanhome">
+<project name="bonita-integration-tests-local" default="cleanhome">
 
 	<property name="bonita.home" value="${basedir}/../../bpm/bonita-home" />
 	
