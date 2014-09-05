@@ -235,12 +235,6 @@
 		<!-- Event -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.events</groupId>
 			<artifactId>bonita-events-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -429,7 +423,7 @@
 
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-impl</artifactId>
+			<artifactId>bonita-process-instance-impl-sp</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -721,7 +715,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-api</artifactId>
+			<artifactId>bonita-process-instance-api-sp</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

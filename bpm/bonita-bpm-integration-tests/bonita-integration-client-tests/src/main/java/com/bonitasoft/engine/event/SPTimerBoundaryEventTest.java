@@ -45,16 +45,16 @@ public class SPTimerBoundaryEventTest extends CommonAPISPTest {
     public void beforeTest() throws BonitaException {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         donaBenta = createUser("donabenta", "bpm");
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith("donabenta", "bpm");
     }
 
     @After
     public void afterTest() throws BonitaException {
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWithDefaultTechnicalUser();
         deleteUser(donaBenta.getId());
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     private ProcessDefinition deployProcessWithBoundaryEvent(final long timerValue, final boolean withData) throws BonitaException,
@@ -112,15 +112,15 @@ public class SPTimerBoundaryEventTest extends CommonAPISPTest {
 
             Thread.sleep(timerDuration); // wait timer trigger
 
-            final WaitForStep waitForExceptionStep = waitForStep("exceptionStep", processInstance, TestStates.getReadyState());
+            final WaitForStep waitForExceptionStep = waitForStep("exceptionStep", processInstance, TestStates.READY);
 
             // ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStep1.getStepId());
-            // assertEquals(TestStates.getAbortedState(), archActivityInst.getState());
+            // assertEquals(TestStates.ABORTED, archActivityInst.getState());
 
-            ArchivedActivityInstance archActivityInst = waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+            ArchivedActivityInstance archActivityInst = waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
             if (manualUserTask != null) {
                 archActivityInst = getProcessAPI().getArchivedActivityInstance(manualUserTask.getId());
-                assertEquals(TestStates.getAbortedState(), archActivityInst.getState());
+                assertEquals(TestStates.ABORTED.getStateName(), archActivityInst.getState());
             }
 
             assignAndExecuteStep(waitForExceptionStep.getResult(), donaBenta.getId());

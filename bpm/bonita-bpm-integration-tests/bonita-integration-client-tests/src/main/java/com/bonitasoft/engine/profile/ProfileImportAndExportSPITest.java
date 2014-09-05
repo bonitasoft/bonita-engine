@@ -224,7 +224,7 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
         try {
             customPage = getPageAPI().getPageByName(pageName);
         } catch (final PageNotFoundException p) {
-            Map<String, byte[]> map = new HashMap<String, byte[]>();
+            final Map<String, byte[]> map = new HashMap<String, byte[]>();
             map.put("index.html", "return \"\";".getBytes());
             map.put("page.properties", ("name=" + pageName + "\ndisplayName=" + pageName + "\ndescription=description of " + pageName).getBytes());
             customPage = getPageAPI().createPage(new PageCreator(pageName, "content.zip").setDescription("description").setDisplayName("display name"),
@@ -632,6 +632,7 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
         // check profile mapping
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, Integer.MAX_VALUE);
         searchOptionsBuilder.filter(ProfileMemberSearchDescriptor.PROFILE_ID, newId1);
+        searchOptionsBuilder.sort(ProfileMemberSearchDescriptor.USER_ID, Order.ASC);
         final SearchResult<ProfileMember> searchpms = getProfileAPI().searchProfileMembers("user", searchOptionsBuilder.done());
         assertEquals(2, searchpms.getCount());
         assertEquals(user1.getId(), searchpms.getResult().get(0).getUserId());
