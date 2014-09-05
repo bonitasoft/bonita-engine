@@ -113,7 +113,7 @@ public class SignalEventTest extends CommonAPITest {
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final ProcessInstance instance = getProcessAPI().startProcess(startSignal.getId());
-        waitForEvent(instance, "OnSignal", TestStates.getWaitingState());
+        waitForEvent(instance, "OnSignal", TestStates.WAITING);
 
         getProcessAPI().startProcess(endSignal.getId());
         waitForUserTask("Task1");
@@ -182,7 +182,7 @@ public class SignalEventTest extends CommonAPITest {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         final ProcessInstance instance = getProcessAPI().startProcess(intermediateSignal.getId());
-        waitForEvent(instance, "OnSignal", TestStates.getWaitingState());
+        waitForEvent(instance, "OnSignal", TestStates.WAITING);
 
         getProcessAPI().sendSignal("GO");
         waitForUserTask("Task1");

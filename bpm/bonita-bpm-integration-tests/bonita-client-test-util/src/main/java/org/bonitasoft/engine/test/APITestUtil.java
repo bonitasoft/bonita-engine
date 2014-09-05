@@ -61,6 +61,7 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
@@ -420,7 +421,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName,
             final List<User> users)
-                    throws BonitaException {
+            throws BonitaException {
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         return deployAndEnableProcessWithActor(businessArchive, actorName, users);
     }
@@ -510,7 +511,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActor(final DesignProcessDefinition designProcessDefinition, final String actorName,
             final Group... groups)
-                    throws BonitaException {
+            throws BonitaException {
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
         for (final Group group : groups) {
@@ -607,7 +608,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ProcessDefinition deployAndEnableProcessWithActorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
             final User user, final List<BarResource> generateFilterDependencies, final List<BarResource> userFilters)
-                    throws BonitaException {
+            throws BonitaException {
         return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource> emptyList(),
                 generateFilterDependencies, userFilters);
     }
@@ -679,9 +680,9 @@ public class APITestUtil extends PlatformTestUtil {
         return session;
     }
 
-    public static boolean containsState(final List<ArchivedProcessInstance> instances, final String state) {
+    public static boolean containsState(final List<ArchivedProcessInstance> instances, final TestStates state) {
         for (final ArchivedProcessInstance pi : instances) {
-            if (state.equals(pi.getState())) {
+            if (state.getStateName().equals(pi.getState())) {
                 return true;
             }
         }
@@ -799,8 +800,8 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     @Deprecated
-    public ArchivedActivityInstance waitForArchivedActivity(final long activityId, final String stateName) throws Exception {
-        final WaitForArchivedActivity waitForArchivedActivity = new WaitForArchivedActivity(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, activityId, stateName,
+    public ArchivedActivityInstance waitForArchivedActivity(final long activityId, final TestStates state) throws Exception {
+        final WaitForArchivedActivity waitForArchivedActivity = new WaitForArchivedActivity(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, activityId, state,
                 getProcessAPI());
         assertTrue(waitForArchivedActivity.waitUntil());
         final ArchivedActivityInstance archivedActivityInstance = waitForArchivedActivity.getArchivedActivityInstance();
@@ -818,7 +819,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     @Deprecated
-    private void waitForProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance, final String state)
+    private void waitForProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance, final TestStates state)
             throws Exception {
         final WaitProcessToFinishAndBeArchived waitProcessToFinishAndBeArchived = new WaitProcessToFinishAndBeArchived(repeatEach, timeout, false,
                 processInstance, getProcessAPI(), state);
@@ -847,7 +848,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     @Deprecated
-    public void waitForProcessToFinish(final ProcessInstance processInstance, final String state) throws Exception {
+    public void waitForProcessToFinish(final ProcessInstance processInstance, final TestStates state) throws Exception {
         waitForProcessToFinishAndBeArchived(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance, state);
     }
 
@@ -866,7 +867,7 @@ public class APITestUtil extends PlatformTestUtil {
         System.err.println("Archived flownodes: ");
         final List<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(
                 new SearchOptionsBuilder(0, 100).filter(ArchivedFlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId())
-                .done()).getResult();
+                        .done()).getResult();
         System.err.println(archivedFlowNodeInstances);
     }
 
@@ -883,20 +884,20 @@ public class APITestUtil extends PlatformTestUtil {
         return waitProcessToFinishAndBeArchived(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance);
     }
 
-    private Long waitForFlowNode(final long processInstanceId, final String state, final String flowNodeName, final boolean useRootProcessInstance,
+    private Long waitForFlowNode(final long processInstanceId, final TestStates state, final String flowNodeName, final boolean useRootProcessInstance,
             final int timeout) throws Exception {
         Map<String, Serializable> params;
         if (useRootProcessInstance) {
-            params = ClientEventUtil.getTaskInState(processInstanceId, state, flowNodeName);
+            params = ClientEventUtil.getTaskInState(processInstanceId, state.getStateName(), flowNodeName);
         } else {
-            params = ClientEventUtil.getTaskInStateWithParentId(processInstanceId, state, flowNodeName);
+            params = ClientEventUtil.getTaskInStateWithParentId(processInstanceId, state.getStateName(), flowNodeName);
         }
         return ClientEventUtil.executeWaitServerCommand(getCommandAPI(), params, timeout);
     }
 
     public FlowNodeInstance waitForFlowNodeInReadyState(final ProcessInstance processInstance, final String flowNodeName, final boolean useRootProcessInstance)
             throws Exception {
-        final Long flowNodeInstanceId = waitForFlowNode(processInstance.getId(), TestStates.getReadyState(), flowNodeName, useRootProcessInstance,
+        final Long flowNodeInstanceId = waitForFlowNode(processInstance.getId(), TestStates.READY, flowNodeName, useRootProcessInstance,
                 DEFAULT_TIMEOUT);
         final FlowNodeInstance flowNodeInstance = getProcessAPI().getFlowNodeInstance(flowNodeInstanceId);
         assertNotNull(flowNodeInstance);
@@ -905,23 +906,23 @@ public class APITestUtil extends PlatformTestUtil {
 
     public FlowNodeInstance waitForFlowNodeInExecutingState(final ProcessInstance processInstance, final String flowNodeName,
             final boolean useRootProcessInstance) throws Exception {
-        final Long activityId = waitForFlowNode(processInstance.getId(), TestStates.getExecutingState(), flowNodeName, useRootProcessInstance, DEFAULT_TIMEOUT);
+        final Long activityId = waitForFlowNode(processInstance.getId(), TestStates.EXECUTING, flowNodeName, useRootProcessInstance, DEFAULT_TIMEOUT);
         return getFlowNodeInstance(activityId);
     }
 
-    public Long waitForFlowNodeInState(final ProcessInstance processInstance, final String flowNodeName, final String state,
+    public Long waitForFlowNodeInState(final ProcessInstance processInstance, final String flowNodeName, final TestStates state,
             final boolean useRootProcessInstance) throws Exception {
         return waitForFlowNode(processInstance.getId(), state, flowNodeName, useRootProcessInstance, DEFAULT_TIMEOUT);
     }
 
-    public ActivityInstance waitForTaskInState(final ProcessInstance processInstance, final String flowNodeName, final String state) throws Exception {
+    public ActivityInstance waitForTaskInState(final ProcessInstance processInstance, final String flowNodeName, final TestStates state) throws Exception {
         final Long activityId = waitForFlowNode(processInstance.getId(), state, flowNodeName, true, DEFAULT_TIMEOUT);
         return getActivityInstance(activityId);
     }
 
     public FlowNodeInstance waitForFlowNodeInInterruptingState(final ProcessInstance processInstance, final String flowNodeName,
             final boolean useRootProcessInstance) throws Exception {
-        final Long flowNodeInstanceId = waitForFlowNode(processInstance.getId(), TestStates.getInterruptingState(), flowNodeName, useRootProcessInstance,
+        final Long flowNodeInstanceId = waitForFlowNode(processInstance.getId(), TestStates.INTERRUPTED, flowNodeName, useRootProcessInstance,
                 DEFAULT_TIMEOUT);
         final FlowNodeInstance flowNodeInstance = getProcessAPI().getFlowNodeInstance(flowNodeInstanceId);
         assertNotNull(flowNodeInstance);
@@ -930,19 +931,19 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ActivityInstance waitForTaskToFail(final ProcessInstance processInstance) throws Exception {
         final Long activityId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
-                ClientEventUtil.getTaskInState(processInstance.getId(), TestStates.getFailedState()), DEFAULT_TIMEOUT);
+                ClientEventUtil.getTaskInState(processInstance.getId(), TestStates.FAILED.getStateName()), DEFAULT_TIMEOUT);
         return getActivityInstance(activityId);
     }
 
     public FlowNodeInstance waitForFlowNodeInFailedState(final ProcessInstance processInstance) throws Exception {
         final Long activityId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
-                ClientEventUtil.getTaskInState(processInstance.getId(), TestStates.getFailedState()), DEFAULT_TIMEOUT);
+                ClientEventUtil.getTaskInState(processInstance.getId(), TestStates.FAILED.getStateName()), DEFAULT_TIMEOUT);
         return getFlowNodeInstance(activityId);
     }
 
     public void waitForFlowNodeInFailedState(final String flowNodeInstanceName) throws Exception {
         final long failedTaskId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
-                ClientEventUtil.getTaskInState(TestStates.getFailedState(), flowNodeInstanceName), DEFAULT_TIMEOUT);
+                ClientEventUtil.getTaskInState(TestStates.FAILED.getStateName(), flowNodeInstanceName), DEFAULT_TIMEOUT);
         assertNotNull(failedTaskId);
     }
 
@@ -965,19 +966,19 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public ActivityInstance waitForUserTaskAndAssigneIt(final String taskName, final long processInstanceId, final long userId) throws Exception,
-    UpdateException {
+            UpdateException {
         final ActivityInstance activityInstance = waitForUserTask(taskName, processInstanceId);
         getProcessAPI().assignUserTask(activityInstance.getId(), userId);
         return activityInstance;
     }
 
     public ActivityInstance waitForUserTaskAndAssigneIt(final String taskName, final ProcessInstance processInstance, final long userId) throws Exception,
-    UpdateException {
+            UpdateException {
         return waitForUserTaskAndAssigneIt(taskName, processInstance.getId(), userId);
     }
 
     public ActivityInstance waitForUserTaskAndAssigneIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception,
-    UpdateException {
+            UpdateException {
         return waitForUserTaskAndAssigneIt(taskName, processInstance.getId(), user.getId());
     }
 
@@ -1007,13 +1008,13 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     @Deprecated
-    public WaitForStep waitForStep(final String taskName, final ProcessInstance processInstance, final String state) throws Exception {
-        return waitForStep(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, taskName, processInstance, state);
+    public WaitForStep waitForStep(final String taskName, final ProcessInstance processInstance, final TestStates states) throws Exception {
+        return waitForStep(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, taskName, processInstance, states);
     }
 
     @Deprecated
-    private WaitForStep waitForStep(final int repeatEach, final int timeout, final String taskName, final ProcessInstance processInstance, final String state)
-            throws Exception {
+    private WaitForStep waitForStep(final int repeatEach, final int timeout, final String taskName, final ProcessInstance processInstance,
+            final TestStates state) throws Exception {
         final WaitForStep waitForStep = new WaitForStep(repeatEach, timeout, taskName, processInstance.getId(), state, getProcessAPI());
         assertTrue("Task " + taskName + " not found", waitForStep.waitUntil());
         return waitForStep;
@@ -1060,26 +1061,26 @@ public class APITestUtil extends PlatformTestUtil {
 
     @Deprecated
     public WaitForEvent waitForEventInWaitingState(final ProcessInstance processInstance, final String eventName) throws Exception {
-        return waitForEvent(processInstance, eventName, TestStates.getWaitingState());
+        return waitForEvent(processInstance, eventName, TestStates.WAITING);
     }
 
     @Deprecated
     public WaitForEvent waitForEventInWaitingState(final long processInstanceId, final String eventName) throws Exception {
-        return waitForEvent(processInstanceId, eventName, TestStates.getWaitingState());
+        return waitForEvent(processInstanceId, eventName, TestStates.WAITING);
     }
 
     @Deprecated
-    public WaitForEvent waitForEvent(final long processInstanceId, final String eventName, final String state) throws Exception {
+    public WaitForEvent waitForEvent(final long processInstanceId, final String eventName, final TestStates state) throws Exception {
         return waitForEvent(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstanceId, eventName, state);
     }
 
     @Deprecated
-    public WaitForEvent waitForEvent(final ProcessInstance processInstance, final String eventName, final String state) throws Exception {
+    public WaitForEvent waitForEvent(final ProcessInstance processInstance, final String eventName, final TestStates state) throws Exception {
         return waitForEvent(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance.getId(), eventName, state);
     }
 
     @Deprecated
-    private WaitForEvent waitForEvent(final int repeatEach, final int timeout, final long processInstanceId, final String eventName, final String state)
+    private WaitForEvent waitForEvent(final int repeatEach, final int timeout, final long processInstanceId, final String eventName, final TestStates state)
             throws Exception {
         final WaitForEvent waitForEvent = new WaitForEvent(repeatEach, timeout, eventName, processInstanceId, state, getProcessAPI());
         assertTrue("Expected 1 activities in " + state + " state", waitForEvent.waitUntil());
@@ -1144,16 +1145,16 @@ public class APITestUtil extends PlatformTestUtil {
 
     @Deprecated
     public CheckNbOfActivities checkNbOfActivitiesInReadyState(final ProcessInstance processInstance, final int nbActivities) throws Exception {
-        return checkNbOfActivitiesInInterruptingState(processInstance, nbActivities, TestStates.getReadyState());
+        return checkNbOfActivitiesInInterruptingState(processInstance, nbActivities, TestStates.READY);
     }
 
     @Deprecated
     public CheckNbOfActivities checkNbOfActivitiesInInterruptingState(final ProcessInstance processInstance, final int nbActivities) throws Exception {
-        return checkNbOfActivitiesInInterruptingState(processInstance, nbActivities, TestStates.getInterruptingState());
+        return checkNbOfActivitiesInInterruptingState(processInstance, nbActivities, TestStates.INTERRUPTED);
     }
 
     @Deprecated
-    public CheckNbOfActivities checkNbOfActivitiesInInterruptingState(final ProcessInstance processInstance, final int nbActivities, final String state)
+    public CheckNbOfActivities checkNbOfActivitiesInInterruptingState(final ProcessInstance processInstance, final int nbActivities, final TestStates state)
             throws Exception {
         final CheckNbOfActivities checkNbOfActivities = new CheckNbOfActivities(getProcessAPI(), DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, false, processInstance,
                 nbActivities, state);
@@ -1179,8 +1180,8 @@ public class APITestUtil extends PlatformTestUtil {
     @Deprecated
     private CheckNbOfHumanTasks checkNbOfHumanTasks(final int repeatEach, final int timeout, final int nbHumanTaks) throws Exception {
         final CheckNbOfHumanTasks checkNbOfHumanTasks = new CheckNbOfHumanTasks(repeatEach, timeout, false, nbHumanTaks, new SearchOptionsBuilder(0, 15)
-        .filter(HumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.READY_STATE).sort(HumanTaskInstanceSearchDescriptor.NAME, Order.DESC)
-        .done(), getProcessAPI());
+                .filter(HumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.READY_STATE).sort(HumanTaskInstanceSearchDescriptor.NAME, Order.DESC)
+                .done(), getProcessAPI());
         final boolean waitUntil = checkNbOfHumanTasks.waitUntil();
         assertTrue("Expected " + nbHumanTaks + " Human tasks in ready state, but found " + checkNbOfHumanTasks.getHumanTaskInstances().getCount(), waitUntil);
         return checkNbOfHumanTasks;
@@ -1206,7 +1207,7 @@ public class APITestUtil extends PlatformTestUtil {
     private void checkNbOfArchivedActivities(final int repeatEach, final int timeout, final ProcessInstance processInstance, final int nbAbortedActivities)
             throws Exception {
         final CheckNbOfArchivedActivities checkNbOfActivities = new CheckNbOfArchivedActivities(getProcessAPI(), repeatEach, timeout, true, processInstance,
-                nbAbortedActivities, TestStates.getAbortedState());
+                nbAbortedActivities, TestStates.ABORTED);
         final boolean waitUntil = checkNbOfActivities.waitUntil();
         assertTrue("Expected " + nbAbortedActivities + " in the aboted state. But was " + checkNbOfActivities.getResult().size(), waitUntil);
     }
@@ -1262,7 +1263,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public void updateActivityInstanceVariablesWithOperations(final String updatedValue, final long activityInstanceId, final String dataName,
             final boolean isTransient)
-                    throws InvalidExpressionException, UpdateException {
+            throws InvalidExpressionException, UpdateException {
         final Operation stringOperation = BuildTestUtil.buildStringOperation(dataName, updatedValue, isTransient);
         final List<Operation> operations = new ArrayList<Operation>();
         operations.add(stringOperation);
@@ -1351,7 +1352,7 @@ public class APITestUtil extends PlatformTestUtil {
             final StringBuilder processBuilder = new StringBuilder("Process Definitions are still active: ");
             for (final ProcessDeploymentInfo processDeploymentInfo : processes) {
                 processBuilder.append(processDeploymentInfo.getId()).append(", ");
-                if (TestStates.getProcessDepInfoEnabledState().equals(processDeploymentInfo.getActivationState())) {
+                if (ActivationState.ENABLED.equals(processDeploymentInfo.getActivationState())) {
                     getProcessAPI().disableProcess(processDeploymentInfo.getProcessId());
                 }
                 getProcessAPI().deleteProcess(processDeploymentInfo.getProcessId());

@@ -5,12 +5,10 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
- * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,6 +20,7 @@ import java.util.List;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.EventCriterion;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
+import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.WaitUntil;
 
 @Deprecated
@@ -46,10 +45,10 @@ public class WaitForEvent extends WaitUntil {
     }
 
     @Deprecated
-    public WaitForEvent(final int repeatEach, final int timeout, final String eventName, final long processInstanceId, final String state,
+    public WaitForEvent(final int repeatEach, final int timeout, final String eventName, final long processInstanceId, final TestStates state,
             final ProcessAPI processAPI) {
         this(repeatEach, timeout, eventName, processInstanceId, processAPI);
-        this.state = state;
+        this.state = state.getStateName();
     }
 
     @Override

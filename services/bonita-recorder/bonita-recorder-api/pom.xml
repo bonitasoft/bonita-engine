@@ -14,18 +14,13 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.bonitasoft.engine.recorder</groupId>
-			<artifactId>bonita-recorder-model</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine.persistence</groupId>
 			<artifactId>bonita-persistence-read</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-model</artifactId>
+			<artifactId>bonita-events-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

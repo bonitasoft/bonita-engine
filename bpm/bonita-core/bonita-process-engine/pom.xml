@@ -263,7 +263,7 @@
 			<!-- because we need the builderfactory impl and it does not make sense 
 				to mock them -->
             <groupId>org.bonitasoft.engine.core.process.instance</groupId>
-            <artifactId>bonita-process-instance-model-impl</artifactId>
+            <artifactId>bonita-process-instance-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

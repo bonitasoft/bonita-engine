@@ -1,6 +1,9 @@
 package org.bonitasoft.engine.scheduler.job;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,9 +15,12 @@ public class IncrementItselfJob extends GroupJob {
 
     private static int value = 0;
 
+    private static List<Date> executionDates = new ArrayList<Date>();
+
     @Override
     public void execute() {
         value++;
+        getExecutionDates().add(new Date(System.currentTimeMillis()));
     }
 
     public static int getValue() {
@@ -23,6 +29,11 @@ public class IncrementItselfJob extends GroupJob {
 
     public static void reset() {
         value = 0;
+        executionDates = new ArrayList<Date>();
+    }
+
+    public static List<Date> getExecutionDates() {
+        return executionDates;
     }
 
     @Override

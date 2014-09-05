@@ -15,8 +15,6 @@
 	<name>Bonita Event</name>
 
 	<modules>
-		<module>bonita-events-model</module>
-		<module>bonita-events-model-impl</module>
 		<module>bonita-events-api</module>
 		<module>bonita-events-api-impl</module>
 	</modules>

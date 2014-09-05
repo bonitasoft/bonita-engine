@@ -13,21 +13,23 @@
  **/
 package org.bonitasoft.engine.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
@@ -48,6 +50,7 @@ import org.junit.Test;
  */
 public class TimerEventSubProcessTest extends CommonAPITest {
 
+    private static final String DATE_FORMAT_WITH_MS = "yyyyy-mm-dd hh:mm:ss SSSSS";
     private User john;
 
     @Before
@@ -127,28 +130,29 @@ public class TimerEventSubProcessTest extends CommonAPITest {
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer" }, jira = "ENGINE-536")
     @Test
     public void testTimerEventSubProcessTriggered() throws Exception {
+        //given
         final int timerDuration = 2000;
         final ProcessDefinition process = deployAndEnableProcessWithTimerEventSubProcess(timerDuration);
-        final long startDate = System.currentTimeMillis();
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
 
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
-        assertNotNull(step1);
-        final FlowNodeInstance eventSubProcessActivity = waitForFlowNodeInExecutingState(processInstance, "eventSubProcess", false);
+        //when
         final ActivityInstance subStep = waitForUserTask("subStep", processInstance);
-        assertNotNull(subStep);
-
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
-        assertTrue("start date=" + subProcInst.getStartDate().getTime() + " should be >= than " + (startDate + timerDuration), subProcInst.getStartDate()
-                .getTime() >= startDate + timerDuration);
 
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+        final Date processStartDate = processInstance.getStartDate();
+        assertThat(subProcInst.getStartDate()).as(
+                String.format("process started at %s should trigger subprocess at %s (+ %d ms) ", formatedDate(processStartDate),
+                        formatedDate(subProcInst.getStartDate()), timerDuration)).isAfter(processStartDate);
+
+        //cleanup
         assignAndExecuteStep(subStep, john.getId());
-        waitForArchivedActivity(eventSubProcessActivity.getId(), TestStates.getNormalFinalState());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.getAbortedState());
-
         disableAndDeleteProcess(process.getId());
+    }
+
+    private String formatedDate(final Date date) {
+        final SimpleDateFormat dt = new SimpleDateFormat(DATE_FORMAT_WITH_MS);
+        return dt.format(date);
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer" }, jira = "ENGINE-536")
@@ -196,7 +200,7 @@ public class TimerEventSubProcessTest extends CommonAPITest {
 
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.getAbortedState());
+        waitForProcessToFinish(processInstance, TestStates.ABORTED);
 
         disableAndDeleteProcess(process.getId());
     }
@@ -226,10 +230,10 @@ public class TimerEventSubProcessTest extends CommonAPITest {
         final ProcessInstance calledProcInst = getProcessAPI().getProcessInstance(step1.getParentProcessInstanceId());
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+        waitForFlowNodeInState(processInstance, "step1", TestStates.ABORTED, true);
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(calledProcInst, TestStates.getAbortedState());
+        waitForProcessToBeInState(calledProcInst, ProcessInstanceState.ABORTED);
 
         waitForUserTaskAndExecuteIt("step2", processInstance, john);
         waitForProcessToFinish(processInstance);

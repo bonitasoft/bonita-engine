@@ -21,6 +21,7 @@ import java.util.Set;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.WaitUntil;
 
 /**
@@ -50,9 +51,9 @@ public final class CheckNbOfActivities extends WaitUntil {
 
     @Deprecated
     public CheckNbOfActivities(final ProcessAPI processAPI, final int repeatEach, final int timeout, final boolean throwExceptions,
-            final ProcessInstance processInstance, final int nbActivities, final String state) {
+            final ProcessInstance processInstance, final int nbActivities, final TestStates state) {
         this(processAPI, repeatEach, timeout, throwExceptions, processInstance, nbActivities);
-        activityState = state;
+        activityState = state.getStateName();
     }
 
     @Override

@@ -25,6 +25,8 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
@@ -39,7 +41,6 @@ import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.scheduler.exception.failedJob.SFailedJobReadException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorDeletionException;
-import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNotFoundException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorReadException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogDeletionException;
@@ -125,9 +126,14 @@ public class JobServiceImplTest {
     @Mock
     private SFailedJob sFailedJob;
 
+    @Mock
+    private TechnicalLoggerService logger;
+
     @Before
     public void before() throws Exception {
         doReturn("message").when(sRecorderException).getLocalizedMessage();
+
+        doReturn(true).when(logger).isLoggable(JobServiceImpl.class, TechnicalLogSeverity.TRACE);
 
         when(sJobDescriptor.getJobName()).thenReturn("jobName");
         when(sJobDescriptor.getDescription()).thenReturn("job description");
@@ -135,7 +141,7 @@ public class JobServiceImplTest {
         when(sJobDescriptor.getJobClassName()).thenReturn(this.getClass().getName());
         when(sJobDescriptor.disallowConcurrentExecution()).thenReturn(true);
 
-        jobService = spy(new JobServiceImpl(eventService, recorder, readPersistenceService));
+        jobService = spy(new JobServiceImpl(eventService, recorder, readPersistenceService, logger));
         doReturn(sEventBuilderFactory).when(jobService).getEventBuilderFactory();
     }
 
@@ -150,21 +156,21 @@ public class JobServiceImplTest {
     }
 
     @Test
-	public void should_delete_all_job_descriptors_for_a_given_tenant() throws Exception {
-    	List<SJobDescriptor> descriptors = asList(sJobDescriptor, sJobDescriptor);
-    	when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class), anyMap())).thenReturn(descriptors);
-    	
-    	jobService.deleteAllJobDescriptors();
-    	
-    	verify(jobService, times(2)).deleteJobDescriptor(sJobDescriptor);
-	}
-    
+    public void should_delete_all_job_descriptors_for_a_given_tenant() throws Exception {
+        final List<SJobDescriptor> descriptors = asList(sJobDescriptor, sJobDescriptor);
+        when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class), anyMap())).thenReturn(descriptors);
+
+        jobService.deleteAllJobDescriptors();
+
+        verify(jobService, times(2)).deleteJobDescriptor(sJobDescriptor);
+    }
+
     @Test(expected = SJobDescriptorDeletionException.class)
-	public void should_throw_exception_if_error_occurs_when_deleting_all_job_descriptors() throws Exception {
-    	when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class), anyMap())).thenThrow(new SBonitaSearchException("error"));
-    	
-    	jobService.deleteAllJobDescriptors();
-	}
+    public void should_throw_exception_if_error_occurs_when_deleting_all_job_descriptors() throws Exception {
+        when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class), anyMap())).thenThrow(new SBonitaSearchException("error"));
+
+        jobService.deleteAllJobDescriptors();
+    }
 
     @Test(expected = IllegalArgumentException.class)
     public void createJobDescriptor_should_check_bad_job_descriptor() throws Exception {
@@ -268,19 +274,19 @@ public class JobServiceImplTest {
 
     }
 
-    @Test(expected = SJobDescriptorNotFoundException.class)
-    public void deleteJobDescriptor_should_throw_not_found_exception() throws Exception {
+    @Test
+    public void deleteJobDescriptor_should_ignore_SJobDescriptorNotFoundException() throws Exception {
         //given
         doThrow(SRecorderException.class).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
 
         //when
         jobService.deleteJobDescriptor(1l);
 
-        //then exception
+        //then no exception
     }
 
     @Test(expected = SJobDescriptorDeletionException.class)
-    public void deleteJobDescriptor_should_throw_not_found_exceptionz() throws Exception {
+    public void deleteJobDescriptor_should_throw_deletion_exception() throws Exception {
         //given
         doReturn(sJobDescriptor).when(jobService).getJobDescriptor(anyLong());
         doThrow(sRecorderException).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));

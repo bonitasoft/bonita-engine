@@ -15,7 +15,6 @@
 	<name>Bonita Recorder</name>
 
 	<modules>
-		<module>bonita-recorder-model</module>
 		<module>bonita-recorder-api</module>
 		<module>bonita-recorder-impl</module>
 	</modules>
