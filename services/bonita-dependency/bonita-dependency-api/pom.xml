@@ -29,5 +29,15 @@
 			<artifactId>bonita-log-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.persistence</groupId>
+			<artifactId>bonita-persistence-read</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-commons</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

@@ -182,6 +182,10 @@
 			        <artifactId>bonita-common</artifactId>
 			        <groupId>org.bonitasoft.engine</groupId>
 			    </exclusion>
+			    <exclusion>
+			        <artifactId>bonita-common-api</artifactId>
+			        <groupId>org.bonitasoft.engine.api</groupId>
+			    </exclusion>
 			</exclusions>
 		</dependency>
 
@@ -204,6 +208,12 @@
 			<groupId>org.bonitasoft.engine.incident</groupId>
 			<artifactId>bonita-incident-log</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+			    <exclusion>
+			        <artifactId>bonita-common-api</artifactId>
+			        <groupId>org.bonitasoft.engine.api</groupId>
+			    </exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Identity -->
