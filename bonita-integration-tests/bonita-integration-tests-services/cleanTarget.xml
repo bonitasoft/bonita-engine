@@ -9,7 +9,7 @@
     		<fileset dir="${basedir}/../bonita-test-utils/bonita-server-test-utils/src/test/resources" />
     	</copy>
     	<copy todir="${basedir}/target/test-classes/conf">
-    	    <fileset dir="${basedir}/src\test\resources\conf" />
+    	    <fileset dir="${basedir}/src/test/resources/conf" />
     	</copy>
     </target>
 
