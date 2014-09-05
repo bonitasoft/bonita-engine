@@ -65,7 +65,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     private static final String DOUBLE_HYPHEN = "--";
 
-    private static final int MAX_CHARACTER_URL = 255;
+    private static final int MAX_CHARACTER_URL = 1024;
 
     private static final int MAX_CHARACTER_FILENAME = 255;
 
@@ -333,10 +333,10 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
             if ((document.getFileName() == null || document.getFileName().isEmpty()) && (document.getUrl() == null || document.getUrl().isEmpty())) {
                 designErrors.add("A document definition must have a file name or an URL: " + document.getName());
             }
-            if (document.getUrl() != null && document.getUrl().length() > 255) {
+            if (document.getUrl() != null && document.getUrl().length() > MAX_CHARACTER_URL) {
                 designErrors.add("An url can't have more than " + MAX_CHARACTER_URL + " characters.");
             }
-            if (document.getFileName() != null && document.getFileName().length() > 255) {
+            if (document.getFileName() != null && document.getFileName().length() > MAX_CHARACTER_FILENAME) {
                 designErrors.add("A file name can't have more than " + MAX_CHARACTER_FILENAME + " characters.");
             }
         }
