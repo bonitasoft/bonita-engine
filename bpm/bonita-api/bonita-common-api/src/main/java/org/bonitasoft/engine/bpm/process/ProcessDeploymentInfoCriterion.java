@@ -13,10 +13,15 @@
  **/
 package org.bonitasoft.engine.bpm.process;
 
+import org.bonitasoft.engine.api.ProcessManagementAPI;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.Sort;
 
 /**
+ * Sort criterion used to specify the sort order of the ProcessDeploymentInfo. Used by {@link ProcessManagementAPI} methods like
+ * {@link ProcessManagementAPI#getProcessDeploymentInfos(int, int, ProcessDeploymentInfoCriterion)} to indicate in what order we should returned the list of
+ * results.
+ * 
  * @author Baptiste Mesta
  * @author Celine Souchet
  */

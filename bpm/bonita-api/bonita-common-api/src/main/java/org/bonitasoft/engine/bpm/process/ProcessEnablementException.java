@@ -16,6 +16,8 @@ package org.bonitasoft.engine.bpm.process;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
+ * Thrown when a process cannot be enabled.
+ * 
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */

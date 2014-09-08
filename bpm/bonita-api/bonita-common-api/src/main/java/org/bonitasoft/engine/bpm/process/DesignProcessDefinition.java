@@ -22,38 +22,110 @@ import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
+ * Represents the Design Definition of a process. It gives access to process attributes.
+ * <ul>
+ * <li>display name</li>
+ * <li>description</li>
+ * <li>parameters</li>
+ * <li>actors</li>
+ * <li>search indexes</li>
+ * </ul>
+ *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
+ * @author Laurent Leseigneur
  */
+@SuppressWarnings("deprecation")
 public interface DesignProcessDefinition extends ProcessDefinition {
 
+    /**
+     * Retrieve the displayed name of the process definition, as set at design-time.
+     *
+     * @return the displayed name of the process definition, as set at design-time.
+     */
     String getDisplayName();
 
+    /**
+     * Retrieve the displayed description of the process definition, as set at design-time.
+     *
+     * @return the displayed description of the process definition, as set at design-time.
+     */
     String getDisplayDescription();
 
+    /**
+     * Retrieve the definition of the FlowElementContainerDefinition of the process container
+     *
+     * @return the {@link FlowElementContainerDefinition} of the process container.<br/>
+     *         return type FlowElementContainerDefinition in this package is deprecated. Instead use
+     *         {@link org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition}
+     */
+    @Deprecated
     FlowElementContainerDefinition getProcessContainer();
 
+    /**
+     * Retrieve a Set of ParameterDefinition objects from a ProcessDefinition
+     *
+     * @return as set of {@link ParameterDefinition} objects
+     */
     Set<ParameterDefinition> getParameters();
 
     /**
-     * @return A set of ActorDefinition
+     * Retrieve a Set of ActorDefinition objects from a ProcessDefinition
+     *
+     * @return A set of {@link ActorDefinition} objects.
+     *         <br/>If no actors have been defined, return an empty Set.
      * @see #getActorsList()
      * @since 6.0
-     * @deprecated As of release 6.1, replaced by {@link #getActorsList()}
+     * @deprecated As of release 6.1, replaced by {@link #getActorsList()} which return the same information as a list
      */
     @Deprecated
     Set<ActorDefinition> getActors();
 
     /**
-     * @return A list of ActorDefinition
+     * Gets the list of all actors defined on this process.
+     *
+     * @return The list of {@link ActorDefinition} objects defined in this process.
+     *         <br/>If no actors have been defined, return an empty List.
      * @since 6.1
      */
     List<ActorDefinition> getActorsList();
 
+    /**
+     * Retrieve the ActorDefinition of process's actor defined as initiator.
+     *
+     * @return the {@link ActorDefinition} of process's actor defined as initiator.
+     * @since 6.1
+     */
     ActorDefinition getActorInitiator();
+   
+
+    /**
+     * Retrieve the label for the ProcessDefinition given search index.
+     * <p>
+     * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
+     * index</a> Bonitasoft documentation page
+     * </p>
+     *
+     * @param index
+     *        the position of search index to retrieve. Valid values are between 1 and 5 (inclusive)
+     * @throws IndexOutOfBoundsException if index is invalid
+     * @return the label the Expression of the search index
+     */
 
     String getStringIndexLabel(int index);
 
+    /**
+     * Retrieve the Expression for the ProcessDefinition given search index.
+     * <p>
+     * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
+     * index</a> Bonitasoft documentation page
+     * </p>
+     *
+     * @param index
+     *        the position of search index to retrieve. Valid values are between 1 and 5 (inclusive)
+     * @throws IndexOutOfBoundsException if index is invalid
+     * @return the {@link Expression} the Expression of the search index
+     */
     Expression getStringIndexValue(int index);
 
 }

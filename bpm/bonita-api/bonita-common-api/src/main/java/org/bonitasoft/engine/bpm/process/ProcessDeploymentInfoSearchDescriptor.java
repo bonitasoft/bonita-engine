@@ -14,6 +14,10 @@
 package org.bonitasoft.engine.bpm.process;
 
 /**
+ * Search descriptors are used to filter / sort results of a generic search.
+ * ProcessDeploymentInfoSearchDescriptor defines the fields that can be used as filters or sort fields on <code>List{@literal <}ProcessDeploymentInfo></code>
+ * returning methods.
+ *
  * @author Zhao Na
  * @author Celine Souchet
  * @author Matthieu Chaffotte
@@ -22,12 +26,24 @@ public class ProcessDeploymentInfoSearchDescriptor {
 
     public static final String ID = "id";
 
+    /**
+     * Name of the process.
+     */
     public static final String NAME = "name";
 
+    /**
+     * The version of the process.
+     */
     public static final String VERSION = "version";
 
+    /**
+     * Date of the deployment of the process.
+     */
     public static final String DEPLOYMENT_DATE = "deploymentDate";
 
+    /**
+     * User who deployed the process.
+     */
     public static final String DEPLOYED_BY = "deployedBy";
 
     /**
@@ -44,6 +60,9 @@ public class ProcessDeploymentInfoSearchDescriptor {
 
     public static final String LAST_UPDATE_DATE = "lastUpdateDate";
 
+    /**
+     * Process category.
+     */
     public static final String CATEGORY_ID = "categoryId";
 
     public static final String LABEL = "label";
