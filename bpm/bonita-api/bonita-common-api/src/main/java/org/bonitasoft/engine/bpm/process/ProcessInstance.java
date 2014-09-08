@@ -154,9 +154,9 @@ public interface ProcessInstance extends NamedElement, BaseElement {
     /**
      * This field is used to extend the meta data of the process instance.
      * It's the value corresponding to the string index label.
-     * Return an empty string, if there is no thirst string index.
+     * Return an empty string, if there is no third string index.
      * 
-     * @return The thirst string index of this process instance.
+     * @return The third string index of this process instance.
      * @see ProcessInstance#getStringIndexLabel(int)
      * @since 6.0.0
      */
