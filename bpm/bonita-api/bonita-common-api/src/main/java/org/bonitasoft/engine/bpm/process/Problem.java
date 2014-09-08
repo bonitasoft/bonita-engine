@@ -15,12 +15,6 @@ package org.bonitasoft.engine.bpm.process;
 
 import java.io.Serializable;
 
-import org.bonitasoft.engine.bpm.data.DataDefinition;
-import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
-import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
-import org.bonitasoft.engine.expression.Expression;
-
 /**
  * A <code>Problem</code> explains the issue in the {@link DesignProcessDefinition} when it is not well designed.
  * It can concern :
@@ -33,6 +27,8 @@ import org.bonitasoft.engine.expression.Expression;
  *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
+ * @version 6.3.5
+ * @since 6.0.0
  */
 public interface Problem extends Serializable {
 

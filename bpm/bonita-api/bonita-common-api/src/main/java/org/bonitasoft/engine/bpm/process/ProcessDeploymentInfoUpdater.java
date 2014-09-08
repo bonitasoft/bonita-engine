@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,18 +18,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Updater object to update <code>ProcessDeploymentInfo</code>s.
+ * Updater object to update {@link ProcessDeploymentInfo}.
  *
  * @author Emmanuel Duchastenier
  * @author Zhang Bole
  * @author Celine Souchet
+ * @version 6.3.5
+ * @since 6.0.0
  */
 public class ProcessDeploymentInfoUpdater implements Serializable {
 
     private static final long serialVersionUID = 8000868488852784706L;
 
     /**
-     * Fields that can be updated on a <code>ProcessDeploymentInfo</code>.
+     * Fields that can be updated on a {@link ProcessDeploymentInfo}.
      * 
      * @author Emmanuel Duchastenier
      */
@@ -52,22 +54,52 @@ public class ProcessDeploymentInfoUpdater implements Serializable {
 
     private final Map<ProcessDeploymentInfoField, Serializable> fields;
 
+    /**
+     * Construct the updater object with no field to update.
+     */
     public ProcessDeploymentInfoUpdater() {
         fields = new HashMap<ProcessDeploymentInfoField, Serializable>(ProcessDeploymentInfoField.values().length);
     }
 
+    /**
+     * Set the new display name of the process definition.
+     * 
+     * @param name
+     *        The new display name of the process definition.
+     * @since 6.3.5
+     */
     public void setDisplayName(final String name) {
         fields.put(ProcessDeploymentInfoField.DISPLAY_NAME, name);
     }
 
+    /**
+     * Set the new display description of the process definition.
+     * 
+     * @param description
+     *        The new display description of the process definition.
+     * @since 6.3.5
+     */
     public void setDisplayDescription(final String description) {
         fields.put(ProcessDeploymentInfoField.DISPLAY_DESCRIPTION, description);
     }
 
+    /**
+     * Set the new icon path of the process definition.
+     * 
+     * @param iconPath
+     *        The new icon path of the process definition.
+     * @since 6.3.5
+     */
     public void setIconPath(final String iconPath) {
         fields.put(ProcessDeploymentInfoField.ICONPATH, iconPath);
     }
 
+    /**
+     * Get the map of the fields to update with their new value.
+     * 
+     * @return The map of the fields to update with their new value.
+     * @since 6.3.5
+     */
     public Map<ProcessDeploymentInfoField, Serializable> getFields() {
         return fields;
     }

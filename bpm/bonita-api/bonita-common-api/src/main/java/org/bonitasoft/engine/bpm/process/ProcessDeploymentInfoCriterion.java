@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,17 +13,19 @@
  **/
 package org.bonitasoft.engine.bpm.process;
 
-import org.bonitasoft.engine.api.ProcessManagementAPI;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.Sort;
 
 /**
- * Sort criterion used to specify the sort order of the ProcessDeploymentInfo. Used by {@link ProcessManagementAPI} methods like
- * {@link ProcessManagementAPI#getProcessDeploymentInfos(int, int, ProcessDeploymentInfoCriterion)} to indicate in what order we should return the list of
- * results.
+ * Sort criterion used to specify the sort order of the {@linkProcessDeploymentInfo}. <br>
+ * Used by {@link org.bonitasoft.engine.api.ProcessManagementAPI} methods like
+ * {@link org.bonitasoft.engine.api.ProcessManagementAPI#getProcessDeploymentInfos(int, int, ProcessDeploymentInfoCriterion)} to
+ * indicate in what order we should return the list of the results.
  *
  * @author Baptiste Mesta
  * @author Celine Souchet
+ * @version 6.3.5
+ * @since 6.0.0
  */
 public enum ProcessDeploymentInfoCriterion {
 
@@ -34,6 +36,8 @@ public enum ProcessDeploymentInfoCriterion {
 
     /**
      * Process label ascending order
+     * 
+     * @deprecated Since 6.3.5. This field doesn't exist in the process definition.
      */
     LABEL_ASC(ProcessDeploymentInfoSearchDescriptor.LABEL, Order.ASC),
 
@@ -59,6 +63,8 @@ public enum ProcessDeploymentInfoCriterion {
 
     /**
      * Process label ascending order
+     * 
+     * @deprecated Since 6.3.5. This field doesn't exist in the process definition.
      */
     LABEL_DESC(ProcessDeploymentInfoSearchDescriptor.LABEL, Order.DESC),
 
@@ -78,7 +84,7 @@ public enum ProcessDeploymentInfoCriterion {
     CONFIGURATION_STATE_DESC(ProcessDeploymentInfoSearchDescriptor.CONFIGURATION_STATE, Order.DESC),
 
     /**
-     * Default criterion
+     * Default criterion : {@link ProcessDeploymentInfoCriterion#NAME_ASC}
      */
     DEFAULT(ProcessDeploymentInfoSearchDescriptor.NAME, Order.ASC);
 
@@ -86,19 +92,37 @@ public enum ProcessDeploymentInfoCriterion {
 
     private final Order order;
 
-    ProcessDeploymentInfoCriterion(final String field, final Order order) {
+    private ProcessDeploymentInfoCriterion(final String field, final Order order) {
         this.field = field;
         this.order = order;
     }
 
+    /**
+     * Get the {@link Order} corresponding to this object.
+     * 
+     * @return The {@link Order} corresponding to this object.
+     * @since 6.3.5
+     */
     public Order getOrder() {
         return order;
     }
 
+    /**
+     * Get the name of the field used to sort the {@link ProcessDeploymentInfo}, corresponding to this object.
+     * 
+     * @return The name of the field corresponding to this object.
+     * @since 6.3.5
+     */
     public String getField() {
         return field;
     }
 
+    /**
+     * Build the {@link Sort} corresponding to this object.
+     * 
+     * @return The {@link Sort} corresponding to this object.
+     * @since 6.3.5
+     */
     public Sort getSort() {
         return new Sort(order, field);
     }

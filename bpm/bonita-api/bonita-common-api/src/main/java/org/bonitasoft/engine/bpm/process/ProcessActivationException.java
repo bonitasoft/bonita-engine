@@ -13,12 +13,11 @@
  **/
 package org.bonitasoft.engine.bpm.process;
 
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
- * Thrown when a process cannot be enabled / disabled, or when a {@link ProcessAPI#startProcess(long)} (and its variants) cannot be performed because the
- * process is not enabled.
+ * Thrown when a process definition cannot be enabled / disabled, or when a {@link org.bonitasoft.engine.api.ProcessAPI#startProcess(long)} (and its variants) cannot be performed
+ * because the process definition is not enabled.
  *
  * @author Baptiste Mesta
  * @author Emmanuel Duchastenier
@@ -29,23 +28,57 @@ import org.bonitasoft.engine.exception.ExecutionException;
  * @see ProcessAPI#startProcess(long, java.util.List, java.util.Map)
  * @see ProcessAPI#startProcess(long, long, java.util.Map)
  * @see ProcessAPI#startProcess(long, long, java.util.List, java.util.Map)
+ * @version 6.3.5
+ * @since 6.0.0
  */
 public class ProcessActivationException extends ExecutionException {
 
     private static final long serialVersionUID = -425713003229819771L;
 
+    /**
+     * Constructs a new exception with the specified detail cause.
+     * 
+     * @param cause
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        cause is nonexistent or unknown.)
+     */
     public ProcessActivationException(final Exception e) {
         super(e);
     }
 
+    /**
+     * Constructs a new exception with the specified detail message and cause.
+     *
+     * @param message
+     *        The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
+     * @param cause
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        cause is nonexistent or unknown.)
+     */
     public ProcessActivationException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Constructs a new exception with the specified detail message.
+     *
+     * @param message
+     *        The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
+     */
     public ProcessActivationException(final String message) {
         super(message);
     }
 
+    /**
+     * Constructs a new exception and the message with the given informations of the process definition with the problem.
+     * 
+     * @param processDefinitionId
+     *        The identifier of the process definition
+     * @param name
+     *        The name of the process definition
+     * @param version
+     *        The version of the process definition
+     */
     public ProcessActivationException(final long processDefinitionId, final String name, final String version) {
         super("The process definition is not enabled !!");
         setProcessDefinitionIdOnContext(processDefinitionId);

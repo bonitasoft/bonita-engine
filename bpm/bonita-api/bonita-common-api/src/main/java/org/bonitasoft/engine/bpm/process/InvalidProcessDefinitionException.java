@@ -18,14 +18,16 @@ import java.util.List;
 import org.bonitasoft.engine.exception.BonitaException;
 
 /**
- * Thrown when the process definition is invalid.
- * The class InvalidProcessDefinitionException is a form of Throwable that indicates conditions that a reasonable application might want to catch.
- * The class InvalidProcessDefinitionException that is not also subclasses of {@link RuntimeException} are checked exceptions.
+ * <p>Thrown when the process definition is invalid.</p>
+ * <p>The class InvalidProcessDefinitionException is a form of Throwable that indicates conditions that a reasonable application might want to catch.<br>
+ * The class InvalidProcessDefinitionException that is not also subclasses of {@link RuntimeException} are checked exceptions.<br>
  * Checked exceptions need to be declared in a method or constructor's {@literal throws} clause if they can be thrown by the execution of the method or
- * constructor and propagate outside the method or constructor boundary.
+ * constructor and propagate outside the method or constructor boundary.</p>
  *
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
+ * @version 6.3.5
+ * @since 6.0.0
  */
 public class InvalidProcessDefinitionException extends BonitaException {
 

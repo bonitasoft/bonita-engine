@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,8 +14,17 @@
 package org.bonitasoft.engine.bpm.process;
 
 /**
+ * Sort criterion used to specify the sort order of the {@link ProcessInstance}. <br>
+ * Used by {@link org.bonitasoft.engine.api.ProcessRuntimeAPI} methods like
+ * {@link org.bonitasoft.engine.api.ProcessRuntimeAPI#getProcessInstances(int, int, ProcessInstanceCriterion)} to indicate in what order we should return the
+ * list of the results.
+ * 
  * @author Emmanuel Duchastenier
  * @author Yanyan Liu
+ * @author Celine Souchet
+ * @version 6.3.5
+ * @since 6.0.0
+ * @see ProcessRuntimeAPI
  */
 public enum ProcessInstanceCriterion {
 
@@ -72,5 +81,5 @@ public enum ProcessInstanceCriterion {
     /**
      * Default sort criterion
      */
-    DEFAULT,
+    DEFAULT;
 }

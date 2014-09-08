@@ -14,24 +14,26 @@
 package org.bonitasoft.engine.bpm.process;
 
 /**
- * <p>Activation state of a process. A <code>ProcessDefinition</code> can be enabled or disabled, which toggles on/off the possibility to start a new instance
- * of
- * the process.</p>
+ * <p>Activation state of a process. <br>
+ * A {@link ProcessDefinition} can be enabled or disabled, which toggles on/off the possibility to start a new instance of the process.</p>
  * <p>Use {@link ProcessDeploymentInfo#getActivationState()} to retrieve the activation state for a process.</p>
  *
  * @see ProcessDeploymentInfo#getActivationState()
+ * @see ProcessDefinition#getActivationState()
  * @author Celine Souchet
  * @author Emmanuel Duchastenier
+ * @version 6.3.5
+ * @since 6.0.0
  */
 public enum ActivationState {
 
     /**
-     * The process is enabled and instances of the process can be started.
+     * The {@link ProcessDeploymentInfo} is enabled and instances of the process can be started.
      */
     ENABLED,
 
     /**
-     * The process is disabled and no instance can be started.
+     * The {@link ProcessDeploymentInfo} is disabled and no instance can be started.
      */
     DISABLED
 
