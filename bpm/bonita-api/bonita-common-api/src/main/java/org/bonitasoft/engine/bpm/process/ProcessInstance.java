@@ -19,12 +19,19 @@ import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.NamedElement;
 
 /**
+ * Represents a running instance of a process.
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
 public interface ProcessInstance extends NamedElement, BaseElement {
 
+    /**
+     * Gets the current state of this <code>ProcessInstance</code>
+     *
+     * @return the current state of this <code>ProcessInstance</code>.
+     */
     String getState();
 
     Date getStartDate();
@@ -60,7 +67,7 @@ public interface ProcessInstance extends NamedElement, BaseElement {
     long getRootProcessInstanceId();
 
     /**
-     * 
+     *
      * @return id of the call activity instance
      */
     long getCallerId();
@@ -77,7 +84,7 @@ public interface ProcessInstance extends NamedElement, BaseElement {
 
     /**
      * get the label of the string index
-     * 
+     *
      * @param index
      * @return label of the string index
      */
