@@ -14,7 +14,11 @@
 package org.bonitasoft.engine.identity;
 
 /**
+ * holds constants about {@link Role} search
+ *
  * @author Matthieu Chaffotte
+ * @see Role
+ * @since 6.0.0
  */
 public class RoleSearchDescriptor {
 

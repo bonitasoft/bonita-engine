@@ -14,8 +14,12 @@
 package org.bonitasoft.engine.identity;
 
 /**
+ * holds constants about {@link User} search
+ *
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
+ * @see User
+ * @since 6.0.0
  */
 public final class UserSearchDescriptor {
 

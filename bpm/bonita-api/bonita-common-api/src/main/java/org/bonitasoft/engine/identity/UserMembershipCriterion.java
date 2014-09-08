@@ -14,9 +14,13 @@
 package org.bonitasoft.engine.identity;
 
 /**
+ * lists the available {@link User} sort orders
+ *
  * @author Bole Zhang
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
+ * @see UserMembership
+ * @since 6.0.0
  */
 public enum UserMembershipCriterion {
     /**
@@ -34,7 +38,13 @@ public enum UserMembershipCriterion {
     /**
      * groupName descending order
      */
-    GROUP_NAME_DESC, 
-    ASSIGNED_DATE_ASC, 
+    GROUP_NAME_DESC,
+    /**
+     * assigned date ascending order
+     */
+    ASSIGNED_DATE_ASC,
+    /**
+     * assigned date descending order
+     */
     ASSIGNED_DATE_DESC
 }

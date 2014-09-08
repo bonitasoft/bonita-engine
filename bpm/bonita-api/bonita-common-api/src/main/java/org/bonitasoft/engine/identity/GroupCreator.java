@@ -18,47 +18,77 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * represent a helper in creating a {@link Group}
+ *
  * @author Matthieu Chaffotte
+ * @see Group
+ * @since 6.0.0
  */
 public class GroupCreator implements Serializable {
 
     private static final long serialVersionUID = -1546623947528297571L;
 
+    /**
+     * represents the available {@link Group} field
+     */
     public enum GroupField {
         NAME, DISPLAY_NAME, DESCRIPTION, ICON_NAME, ICON_PATH, PARENT_PATH;
     }
 
     private final Map<GroupField, Serializable> fields;
 
+    /**
+     * creates a new {@link GroupCreator} with a group name to create
+     *
+     * @param name the name of the group that will be created
+     */
     public GroupCreator(final String name) {
         fields = new HashMap<GroupField, Serializable>(3);
         fields.put(GroupField.NAME, name);
     }
 
+    /**
+     * @param parentPath the group's parent path to create
+     */
     public void setParentPath(final String parentPath) {
         fields.put(GroupField.PARENT_PATH, parentPath);
     }
 
+    /**
+     * @param parentPath the group's display to create
+     */
     public GroupCreator setDisplayName(final String displayName) {
         fields.put(GroupField.DISPLAY_NAME, displayName);
         return this;
     }
 
+    /**
+     * @param parentPath the group's description to create
+     */
     public GroupCreator setDescription(final String description) {
         fields.put(GroupField.DESCRIPTION, description);
         return this;
     }
 
+    /**
+     * @param parentPath the group's icon name to create
+     */
     public GroupCreator setIconName(final String iconName) {
         fields.put(GroupField.ICON_NAME, iconName);
         return this;
     }
 
+    /**
+     * @param parentPath the group's icon file path to create
+     */
     public GroupCreator setIconPath(final String iconPath) {
         fields.put(GroupField.ICON_PATH, iconPath);
         return this;
     }
 
+    /**
+     * @return the information associated to the group to create
+     */
     public Map<GroupField, Serializable> getFields() {
         return fields;
     }

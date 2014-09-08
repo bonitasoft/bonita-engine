@@ -14,7 +14,11 @@
 package org.bonitasoft.engine.identity;
 
 /**
+ * holds constants about {@link Group} search
+ *
  * @author Matthieu Chaffotte
+ * @see Group
+ * @since 6.0.0
  */
 public class GroupSearchDescriptor {
 

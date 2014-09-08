@@ -17,8 +17,10 @@ import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
  * Describes a custom user info definition that will be available for all {@link User}s in the organization.
- * 
+ *
  * @author Vincent Elcrin
+ * @see User
+ * @since 6.3
  */
 public interface CustomUserInfoDefinition extends BonitaObject {
 
