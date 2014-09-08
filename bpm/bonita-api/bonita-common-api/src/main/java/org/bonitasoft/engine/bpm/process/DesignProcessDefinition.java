@@ -22,38 +22,93 @@ import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
+ * Represents the Design Definition of a process. It gives access to process attributes.
+ * <ul>
+ * <li>display name</li>
+ * <li>description</li>
+ * <li>parameters</li>
+ * <li>actors</li>
+ * </ul>
+ *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
+ * @author Laurent Leseigneur
  */
 public interface DesignProcessDefinition extends ProcessDefinition {
 
+    /**
+     * Retrieve the displayed name of the process definition, as set at design-time.
+     *
+     * @return the displayed name of the process definition, as set at design-time.
+     */
     String getDisplayName();
 
+    /**
+     * Retrieve the displayed description of the process definition, as set at design-time.
+     *
+     * @return the displayed description of the process definition, as set at design-time.
+     */
     String getDisplayDescription();
 
+    /**
+     * Retrieve the definition of the FlowElementContainerDefinition of the process container
+     *
+     * @return the {@link FlowElementContainerDefinition} of the process container.<br/>
+     *         return type FlowElementContainerDefinition has been deprecated due to move to a new package:
+     *         {@link org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition}
+     */
     FlowElementContainerDefinition getProcessContainer();
 
+    /**
+     * Retrieve a Set of ParameterDefinition involved in ProcessDefinition
+     *
+     * @return as set of {@link ParameterDefinition}
+     */
     Set<ParameterDefinition> getParameters();
 
     /**
-     * @return A set of ActorDefinition
+     * Retrieve a Set of ActorDefinition involved in ProcessDefinition
+     *
+     * @return A set of {@link ActorDefinition}.
+     *         <br/>If no actors have been defined, return an empty Set.
      * @see #getActorsList()
      * @since 6.0
-     * @deprecated As of release 6.1, replaced by {@link #getActorsList()}
+     * @deprecated As of release 6.1, replaced by {@link #getActorsList()} which return the same information as a list
      */
     @Deprecated
     Set<ActorDefinition> getActors();
 
     /**
-     * @return A list of ActorDefinition
+     * Retrieve a list of involved in ProcessDefinition
+     *
+     * @return A list of {@link ActorDefinition}.
+     *         <br/>If no actors have been defined, return an empty List.
      * @since 6.1
      */
     List<ActorDefinition> getActorsList();
 
+    /**
+     * Retrieve the ActorDefinition of process's actor defined as initiator.
+     *
+     * @return the {@link ActorDefinition} of process's actor defined as initiator.
+     * @since 6.1
+     */
     ActorDefinition getActorInitiator();
 
+    /**
+     * Retrieve the label of the ProcessDefinition for a given index
+     *
+     * @param index the position of the label to retrieve
+     * @return as String description
+     */
     String getStringIndexLabel(int index);
 
+    /**
+     * Retrieve the Expression of the ProcessDefinition for a given index
+     *
+     * @param index the position of the expression to retrieve
+     * @return the {@link Expression} associated to the given index
+     */
     Expression getStringIndexValue(int index);
 
 }
