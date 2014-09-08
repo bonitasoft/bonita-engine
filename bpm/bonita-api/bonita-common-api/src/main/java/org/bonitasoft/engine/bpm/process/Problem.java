@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,27 +15,76 @@ package org.bonitasoft.engine.bpm.process;
 
 import java.io.Serializable;
 
+import org.bonitasoft.engine.bpm.data.DataDefinition;
+import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition;
+import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
+import org.bonitasoft.engine.expression.Expression;
+
 /**
- * When ConfigurationState of a process is {@link ConfigurationState#UNRESOLVED}, a list of <code>Problem</code>s can be retrieved using
- * {@link ProcessAPI#getProcessResolutionProblems(long)} to identify what must be fixed.
- * 
+ * A <code>Problem</code> explains the issue in the {@link DesignProcessDefinition} when it is not well designed.
+ * It can concern :
+ * <ul>
+ * <li>structural problems like a {@link BoundaryEventDefinition} without an exception flow,</li>
+ * <li>naming problems like two {@link FlowNodeDefinition}s with the same name,</li>
+ * <li>type problems like an {@link Expression} which has not the right type,</li>
+ * <li>...</li>
+ * </ul>
+ *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
- * @see ConfigurationState
- * @see ProcessAPI#getProcessResolutionProblems(long)
  */
 public interface Problem extends Serializable {
 
+    /**
+     * Defines a severity level.
+     *
+     * @author Matthieu Chaffotte
+     */
     public enum Level {
-        ERROR, WARNING, INFO
+        /**
+         * The {@link DesignProcessDefinition} cannot be deployed.
+         */
+        ERROR,
+        /**
+         * The {@link DesignProcessDefinition} can be deployed and used but contains something that should be updated.
+         */
+        WARNING,
+        /**
+         * Not currently used.
+         */
+        INFO
     }
 
+    /**
+     * Returns the severity of the problem.
+     *
+     * @return the severity
+     */
     Level getLevel();
 
+    /**
+     * Returns the resource/concept name of the problem.
+     * It can be related to {@link DataDefinition}, {@link FlowNodeDefinition}, ...
+     *
+     * @return the resource name
+     */
     String getResource();
 
+    /**
+     * Returns the resource identifier.
+     * Generally, it is the name of the entity that has the problem in the {@link DesignProcessDefinition}.
+     * For example, the name of the {@link UserTaskDefinition}.
+     *
+     * @return the resource identifier
+     */
     String getResourceId();
 
+    /**
+     * Returns the description/explanation of the problem.
+     *
+     * @return the explanation of the problem
+     */
     String getDescription();
 
 }
