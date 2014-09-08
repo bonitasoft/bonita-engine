@@ -9,9 +9,35 @@
 package com.bonitasoft.engine.bpm.process;
 
 /**
+ * Represent a search index that contains arbitrary String information on a process instance, on which search can be performed.
+ * It is tipically made to allow search on data that are external to Bonita BPM platform, but related to processes, that the process stores for search purposes.
+ *
  * @author Matthieu Chaffotte
  */
 public enum Index {
 
-    FIRST, SECOND, THIRD, FOURTH, FIFTH;
+    /**
+     * First search index
+     */
+    FIRST,
+
+    /**
+     * Second search index
+     */
+    SECOND,
+
+    /**
+     * Third search index
+     */
+    THIRD,
+
+    /**
+     * Fourth search index
+     */
+    FOURTH,
+
+    /**
+     * Fifth search index
+     */
+    FIFTH;
 }
