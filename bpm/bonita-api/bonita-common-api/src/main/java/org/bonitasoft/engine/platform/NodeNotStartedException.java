@@ -14,6 +14,8 @@
 package org.bonitasoft.engine.platform;
 
 /**
+ * Indicates that an operation needing a started node was called in a stopped node.
+ *
  * @author Emmanuel Duchastenier
  */
 public class NodeNotStartedException extends IllegalNodeStateException {

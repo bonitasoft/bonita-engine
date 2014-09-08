@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Describes how a platform command will be updated.
+ *
  * @author Zhang Bole
  */
 public class PlatformCommandUpdater implements Serializable {
@@ -34,10 +36,20 @@ public class PlatformCommandUpdater implements Serializable {
         fields = new HashMap<PlatformCommandField, Serializable>();
     }
 
+    /**
+     * Sets new name content
+     *
+     * @param name a String defining the new command name
+     */
     public void setName(final String name) {
         fields.put(PlatformCommandField.NAME, name);
     }
 
+    /**
+     * Sets the new description content
+     *
+     * @param description a String defining the new description
+     */
     public void setDescription(final String description) {
         fields.put(PlatformCommandField.DESCRIPTION, description);
     }
