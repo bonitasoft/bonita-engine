@@ -16,7 +16,7 @@ package org.bonitasoft.engine.bpm.process;
 import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
- * Thrown when a reference to an inexistant Process Definition is made, generally through its ID.
+ * Thrown when a reference to a nonexistant Process Definition is made, generally through its ID.
  *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte

@@ -47,7 +47,7 @@ public class InvalidProcessDefinitionException extends BonitaException {
      * Constructs a new exception with the specified detail message and cause.
      *
      * @param errors
-     *        The list of errors include in the detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
+     *        The list of errors included in the detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
      */
     public InvalidProcessDefinitionException(final List<String> errors) {
         super(getErrorMessage(errors));

@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.bpm.process;
 
 /**
- * Autoset by Bonita BPM Execution Engine. Determines if a process is resolved / unresolved, that is, if a process can be started or not.
+ * Autoset by Bonita BPM Engine. Determines if a process is resolved / unresolved, that is, if a process can be started or not.
  * Reasons for unresolved processes are:
  * <ul>
  * <li>Not all actors of the process have mappings to users / groups / roles / memberships</li>
@@ -32,7 +32,7 @@ package org.bonitasoft.engine.bpm.process;
 public enum ConfigurationState {
 
     /**
-     * The process is unresolved, for one or more of the caused defined above.
+     * The process is unresolved, for one or more of the causes defined above.
      */
     UNRESOLVED,
 

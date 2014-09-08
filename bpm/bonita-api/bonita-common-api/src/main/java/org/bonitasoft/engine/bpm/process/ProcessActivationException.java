@@ -17,11 +17,18 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
- * Thrown when a process cannot be enabled / disabled, or when a {@link ProcessAPI#startProcess(long)} cannot be performed because the process is not enabled.
+ * Thrown when a process cannot be enabled / disabled, or when a {@link ProcessAPI#startProcess(long)} (and its variants) cannot be performed because the
+ * process is not enabled.
  *
  * @author Baptiste Mesta
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
+ * @see ProcessAPI#startProcess(long)
+ * @see ProcessAPI#startProcess(long, long)
+ * @see ProcessAPI#startProcess(long, java.util.Map)
+ * @see ProcessAPI#startProcess(long, java.util.List, java.util.Map)
+ * @see ProcessAPI#startProcess(long, long, java.util.Map)
+ * @see ProcessAPI#startProcess(long, long, java.util.List, java.util.Map)
  */
 public class ProcessActivationException extends ExecutionException {
 

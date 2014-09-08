@@ -13,11 +13,13 @@
  **/
 package org.bonitasoft.engine.bpm.process;
 
+import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
- * Thrown when a process cannot be enabled.
- * 
+ * Thrown when a process cannot be enabled. This can happen if the process is already enabled, or if an unexpected error occurs on methods like {link
+ * {@link ProcessAPI#enableProcess(long)}.
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
