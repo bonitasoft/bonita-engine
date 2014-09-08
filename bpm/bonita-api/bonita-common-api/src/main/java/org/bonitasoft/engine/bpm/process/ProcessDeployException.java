@@ -39,13 +39,6 @@ public class ProcessDeployException extends ExecutionException {
     }
 
     /**
-     * @param id
-     */
-    public void setProcessDefinitionId(final Long id) {
-        processDefinitionId = id;
-    }
-
-    /**
      * @return the processDefinitionId
      */
     public Long getProcessDefinitionId() {

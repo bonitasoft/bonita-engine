@@ -63,7 +63,7 @@ public interface ProcessDeploymentInfo extends DescriptionElement, BaseElement {
      *
      * @return a String representing the <code>ProcessDefinition</code> display description.
      * @see ProcessDefinition
-     * @see ProcessManagementAPI.#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)
+     * @see ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)
      */
     String getDisplayDescription();
 

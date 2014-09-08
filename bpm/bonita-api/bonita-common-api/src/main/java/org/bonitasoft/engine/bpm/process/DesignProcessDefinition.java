@@ -34,12 +34,14 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Celine Souchet
  * @author Laurent Leseigneur
  */
+@SuppressWarnings("deprecation")
 public interface DesignProcessDefinition extends ProcessDefinition {
 
     /**
      * Retrieve the displayed name of the process definition, as set at design-time.
      *
      * @return the displayed name of the process definition, as set at design-time.
+     *         Gets the display name of the process definition.
      */
     String getDisplayName();
 
@@ -57,6 +59,7 @@ public interface DesignProcessDefinition extends ProcessDefinition {
      *         return type FlowElementContainerDefinition has been deprecated due to move to a new package:
      *         {@link org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition}
      */
+    @Deprecated
     FlowElementContainerDefinition getProcessContainer();
 
     /**
@@ -79,9 +82,9 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     Set<ActorDefinition> getActors();
 
     /**
-     * Retrieve a list of involved in ProcessDefinition
+     * Gets the list of all actors defined on this process.
      *
-     * @return A list of {@link ActorDefinition}.
+     * @return The list of {@link ActorDefinition} defined in this process.
      *         <br/>If no actors have been defined, return an empty List.
      * @since 6.1
      */

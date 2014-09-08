@@ -17,12 +17,27 @@ import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.impl.FlowElementContainerDefinition;
 
 /**
+ * Definition of a sub-process, which is a type of Activity.
+ *
  * @author Matthieu Chaffotte
  */
+@SuppressWarnings("deprecation")
 public interface SubProcessDefinition extends ActivityDefinition {
 
+    /**
+     * Has this definition of sub-process been triggered by a BPM event?
+     *
+     * @return true if this definition of sub-process has been triggered by an event, false otherwise.
+     */
     boolean isTriggeredByEvent();
 
+    /**
+     * Gets the definition of the "container" of this sub-process.
+     *
+     * @return the definition of the "container" of this sub-process.
+     * @deprecated since 6.2.3 In a later version, {@link org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition} will be used instead.
+     */
+    @Deprecated
     FlowElementContainerDefinition getSubProcessContainer();
 
 }

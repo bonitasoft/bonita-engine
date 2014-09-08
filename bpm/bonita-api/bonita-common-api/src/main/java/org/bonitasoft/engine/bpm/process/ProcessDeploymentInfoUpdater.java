@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Updater object to update <code>ProcessDeploymentInfo</code>s.
+ *
  * @author Emmanuel Duchastenier
  * @author Zhang Bole
  * @author Celine Souchet
@@ -26,8 +28,26 @@ public class ProcessDeploymentInfoUpdater implements Serializable {
 
     private static final long serialVersionUID = 8000868488852784706L;
 
+    /**
+     * Fields that can be updated on a <code>ProcessDeploymentInfo</code>.
+     * 
+     * @author Emmanuel Duchastenier
+     */
     public enum ProcessDeploymentInfoField {
-        DISPLAY_NAME, DISPLAY_DESCRIPTION, ICONPATH
+        /**
+         * Display name of the process
+         */
+        DISPLAY_NAME,
+
+        /**
+         * Display description of the process
+         */
+        DISPLAY_DESCRIPTION,
+
+        /**
+         * Path of the icon of the process
+         */
+        ICONPATH
     }
 
     private final Map<ProcessDeploymentInfoField, Serializable> fields;
