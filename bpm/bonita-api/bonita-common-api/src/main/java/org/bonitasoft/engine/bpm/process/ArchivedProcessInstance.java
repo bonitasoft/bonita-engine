@@ -20,7 +20,7 @@ import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.NamedElement;
 
 /**
- * Represents a archived instance of a process.
+ * Represents an archived instance of a process.
  * Gives access to the information of the instance, whereas the state, the definition, the archived date of the process instance...
  * 
  * @author Baptiste Mesta
@@ -51,9 +51,9 @@ public interface ArchivedProcessInstance extends NamedElement, BaseElement, Arch
     int getStateId();
 
     /**
-     * Get the date when this process instance is started.
+     * Get the date when this process instance was started.
      * 
-     * @return The date when this process instance is started.
+     * @return The date when this process instance was started.
      * @since 6.0.0
      */
     Date getStartDate();
@@ -85,18 +85,18 @@ public interface ArchivedProcessInstance extends NamedElement, BaseElement, Arch
     long getStartedByDelegate();
 
     /**
-     * Get the date when this process instance is finished.
+     * Get the date when this process instance was finished.
      * It equals to null, if this process instance is not finished.
      * 
-     * @return The date when this process instance is finished.
+     * @return The date when this process instance was finished.
      * @since 6.0.0
      */
     Date getEndDate();
 
     /**
-     * Get the date of the last update of this process instance, when it was archived.
+     * Get the date of the last update of this process instance, when the process instance was archived.
      * 
-     * @return The date of the last update of this process instance, when it was archived.
+     * @return The date of the last update of this process instance, when the process instance was archived.
      * @since 6.0.0
      */
     Date getLastUpdate();
@@ -111,18 +111,18 @@ public interface ArchivedProcessInstance extends NamedElement, BaseElement, Arch
     long getProcessDefinitionId();
 
     /**
-     * Get the description of this process instance, when it was archived.
+     * Get the description of this process instance, when the process instance was archived.
      * 
-     * @return The description of this process instance, when it was archived.
+     * @return The description of this process instance, when the process instance was archived.
      * @since 6.0.0
      */
     String getDescription();
 
     /**
-     * Get the identifier of the root process instance of this process instance.
-     * It equals to -1, if this process instance doesn't have a root process instance.
+     * Get the identifier of the root {@link ProcessInstance} of this process instance.
+     * Is -1 if this process instance is not a child of another process instance.
      * 
-     * @return The identifier of the root process instance of this process instance.
+     * @return The identifier of the root {@link ProcessInstance} of this process instance.
      * @see ProcessInstance#getId()
      * @see ArchivedProcessInstance#getSourceObjectId()
      * @since 6.0.0
@@ -131,7 +131,7 @@ public interface ArchivedProcessInstance extends NamedElement, BaseElement, Arch
 
     /**
      * Get the identifier of the flow node instance who starts this process instance.
-     * It equals to -1, if this process instance is not a child of an other process instance.
+     * Is -1 if this process instance is not a child of another process instance.
      * 
      * @return The identifier of the flow node instance who starts this process instance.
      * @see org.bonitasoft.engine.bpm.flownode.CallActivityInstance#getId()
