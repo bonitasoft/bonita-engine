@@ -14,10 +14,15 @@
 package org.bonitasoft.engine.command;
 
 /**
+ * Sort criterion used to specify the sort order of the {@link org.bonitasoft.engine.command.CommandDescriptor}. <br>
+ * Used by {@link org.bonitasoft.engine.api.CommandAPI#getAllCommands(int, int, CommandCriterion)} and $
+ * {@link org.bonitasoft.engine.api.CommandAPI#getUserCommands(int, int, CommandCriterion)} indicate in what order we should return the list of the results.
+ *
  * @author Matthieu Chaffotte
+ * @since 6.0.0
  */
 public enum CommandCriterion {
 
-    NAME_ASC, NAME_DESC;
+    NAME_ASC, NAME_DESC
 
 }

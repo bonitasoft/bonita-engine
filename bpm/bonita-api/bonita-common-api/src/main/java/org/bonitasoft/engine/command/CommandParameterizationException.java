@@ -16,7 +16,10 @@ package org.bonitasoft.engine.command;
 import org.bonitasoft.engine.exception.BonitaException;
 
 /**
+ * Happens when an a command is executed with wrong parameters
+ *
  * @author Matthieu Chaffotte
+ * @since 6.0.0
  */
 public class CommandParameterizationException extends BonitaException {
 
