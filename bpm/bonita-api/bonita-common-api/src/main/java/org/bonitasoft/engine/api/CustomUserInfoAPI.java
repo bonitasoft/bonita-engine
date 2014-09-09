@@ -74,7 +74,6 @@ public interface CustomUserInfoAPI {
      *
      * @param id
      *        the identifier of the {@link org.bonitasoft.engine.identity.CustomUserInfoDefinition}
-     * @return
      * @throws DeletionException
      *         if an error occurs during deletion
      * @since 6.3
