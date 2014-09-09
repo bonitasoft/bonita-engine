@@ -35,7 +35,7 @@ import org.bonitasoft.engine.search.SearchResult;
 public interface CustomUserInfoAPI {
 
     /**
-     * Create a new CustomUserInfoDefinition that will be available for all {@link User}s in the organization.
+     * Create a new CustomUserInfoDefinition that will be available for all {@link org.bonitasoft.engine.identity.User}s in the organization.
      *
      * @param creator
      *        describes all information for the new object
@@ -114,7 +114,7 @@ public interface CustomUserInfoAPI {
      * @param definitionId
      *        the {@link CustomUserInfoDefinition} identifier
      * @param userId
-     *        the {@link User} identifier
+     *        the {@link org.bonitasoft.engine.identity.User} identifier
      * @param value
      *        the new custom user info value
      * @return custom user info value

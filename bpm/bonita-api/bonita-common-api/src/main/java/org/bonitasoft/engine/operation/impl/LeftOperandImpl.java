@@ -112,7 +112,7 @@ public class LeftOperandImpl implements LeftOperand {
     }
 
     /**
-     * @deprecated As of 6.0 use {@link Operation#getType()} instead
+     * @deprecated As of 6.0 use {@link org.bonitasoft.engine.operation.Operation#getType()} instead
      */
     @Deprecated
     @Override

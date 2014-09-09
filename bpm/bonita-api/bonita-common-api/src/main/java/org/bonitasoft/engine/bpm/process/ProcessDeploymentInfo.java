@@ -74,7 +74,7 @@ public interface ProcessDeploymentInfo extends DescriptionElement, BaseElement {
     Date getDeploymentDate();
 
     /**
-     * Retrieves the identifier of the Bonita BPM {@link User} who deployed the {@link ProcessDefinition}
+     * Retrieves the identifier of the Bonita BPM {@link org.bonitasoft.engine.identity.User} who deployed the {@link ProcessDefinition}
      *
      * @return a long representing the identifier of the <code>Bonita BPM user</code> who deployed the process.
      * @see User

@@ -17,7 +17,7 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.Sort;
 
 /**
- * Sort criterion used to specify the sort order of the {@linkProcessDeploymentInfo}. <br>
+ * Sort criterion used to specify the sort order of the {@link ProcessDeploymentInfo}. <br>
  * Used by {@link org.bonitasoft.engine.api.ProcessManagementAPI} methods like
  * {@link org.bonitasoft.engine.api.ProcessManagementAPI#getProcessDeploymentInfos(int, int, ProcessDeploymentInfoCriterion)} to
  * indicate in what order we should return the list of the results.
