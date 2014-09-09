@@ -55,13 +55,13 @@ public interface ProcessDeploymentInfo extends DescriptionElement, BaseElement {
 
     /**
      * Retrieves the {@link ProcessDefinition} display description. Unlike <code>description</code> that is static, the <code>display description</code> can be
-     * updated via {@link ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)}.
+     * updated via {@link org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)}.
      * <p>
      * When set, this field is used by the Bonita BPM Portal in the place of <code>description</code>.
      *
-     * @return a String representing the <code>ProcessDefinition</code> display description.
+     * @return a String representing the {@link ProcessDefinition} display description.
      * @see ProcessDefinition
-     * @see ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)
+     * @see org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)
      */
     String getDisplayDescription();
 
@@ -77,20 +77,20 @@ public interface ProcessDeploymentInfo extends DescriptionElement, BaseElement {
      * Retrieves the identifier of the Bonita BPM {@link org.bonitasoft.engine.identity.User} who deployed the {@link ProcessDefinition}
      *
      * @return a long representing the identifier of the <code>Bonita BPM user</code> who deployed the process.
-     * @see User
+     * @see org.bonitasoft.engine.identity.User
      * @see ProcessDefinition
      */
     long getDeployedBy();
 
     /**
      * Retrieves the {@link ProcessDefinition} display name. Unlike <code>name</code> that is static, the <code>display name</code> can be
-     * updated via {@link ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)}.
+     * updated via {@link org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)}.
      * <p>
      * When set this field is used by the Bonita BPM Portal in the place of <code>name</code>.
      *
      * @return a String representing the <code>ProcessDefinition</code> display name.
      * @see ProcessDefinition
-     * @see ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)
+     * @see org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)
      */
     String getDisplayName();
 

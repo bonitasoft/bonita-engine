@@ -19,9 +19,9 @@ import java.io.Serializable;
  * A <code>Problem</code> explains the issue in the {@link DesignProcessDefinition} when it is not well designed.
  * It can concern :
  * <ul>
- * <li>structural problems like a {@link BoundaryEventDefinition} without an exception flow,</li>
- * <li>naming problems like two {@link FlowNodeDefinition}s with the same name,</li>
- * <li>type problems like an {@link Expression} which has not the right type,</li>
+ * <li>structural problems like a {@link org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition} without an exception flow,</li>
+ * <li>naming problems like two {@link org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition}s with the same name,</li>
+ * <li>type problems like an {@link org.bonitasoft.engine.expression.Expression} which has not the right type,</li>
  * <li>...</li>
  * </ul>
  *
@@ -61,7 +61,7 @@ public interface Problem extends Serializable {
 
     /**
      * Returns the resource/concept name of the problem.
-     * It can be related to {@link DataDefinition}, {@link FlowNodeDefinition}, ...
+     * It can be related to {@link org.bonitasoft.engine.bpm.data.DataDefinition}, {@link org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition}, ...
      *
      * @return the resource name
      */
@@ -70,7 +70,7 @@ public interface Problem extends Serializable {
     /**
      * Returns the resource identifier.
      * Generally, it is the name of the entity that has the problem in the {@link DesignProcessDefinition}.
-     * For example, the name of the {@link UserTaskDefinition}.
+     * For example, the name of the {@link org.bonitasoft.engine.bpm.flownode.UserTaskDefinition}.
      *
      * @return the resource identifier
      */

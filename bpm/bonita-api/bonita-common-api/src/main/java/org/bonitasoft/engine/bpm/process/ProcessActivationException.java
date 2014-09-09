@@ -16,18 +16,19 @@ package org.bonitasoft.engine.bpm.process;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
- * Thrown when a process definition cannot be enabled / disabled, or when a {@link org.bonitasoft.engine.api.ProcessAPI#startProcess(long)} (and its variants) cannot be performed
+ * Thrown when a process definition cannot be enabled / disabled, or when a {@link org.bonitasoft.engine.api.ProcessAPI#startProcess(long)} (and its variants)
+ * cannot be performed
  * because the process definition is not enabled.
  *
  * @author Baptiste Mesta
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
- * @see ProcessAPI#startProcess(long)
- * @see ProcessAPI#startProcess(long, long)
- * @see ProcessAPI#startProcess(long, java.util.Map)
- * @see ProcessAPI#startProcess(long, java.util.List, java.util.Map)
- * @see ProcessAPI#startProcess(long, long, java.util.Map)
- * @see ProcessAPI#startProcess(long, long, java.util.List, java.util.Map)
+ * @see org.bonitasoft.engine.api.ProcessAPI#startProcess(long)
+ * @see org.bonitasoft.engine.api.ProcessAPI#startProcess(long, long)
+ * @see org.bonitasoft.engine.api.ProcessAPI#startProcess(long, java.util.Map)
+ * @see org.bonitasoft.engine.api.ProcessAPI#startProcess(long, java.util.List, java.util.Map)
+ * @see org.bonitasoft.engine.api.ProcessAPI#startProcess(long, long, java.util.Map)
+ * @see org.bonitasoft.engine.api.ProcessAPI#startProcess(long, long, java.util.List, java.util.Map)
  * @version 6.3.5
  * @since 6.0.0
  */
@@ -38,7 +39,7 @@ public class ProcessActivationException extends ExecutionException {
     /**
      * Constructs a new exception with the specified detail cause.
      * 
-     * @param cause
+     * @param e
      *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
      *        cause is nonexistent or unknown.)
      */

@@ -19,7 +19,6 @@ package org.bonitasoft.engine.bpm.process;
  * <p>Use {@link ProcessDeploymentInfo#getActivationState()} to retrieve the activation state for a process.</p>
  *
  * @see ProcessDeploymentInfo#getActivationState()
- * @see ProcessDefinition#getActivationState()
  * @author Celine Souchet
  * @author Emmanuel Duchastenier
  * @version 6.3.5

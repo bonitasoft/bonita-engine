@@ -24,7 +24,7 @@ package org.bonitasoft.engine.bpm.process;
  * @author Celine Souchet
  * @version 6.3.5
  * @since 6.0.0
- * @see ProcessRuntimeAPI
+ * @see org.bonitasoft.engine.api.ProcessRuntimeAPI
  */
 public enum ProcessInstanceCriterion {
 
