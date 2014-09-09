@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-log</artifactId>
 		<groupId>org.bonitasoft.engine.log</groupId>
-		<version>6.3.5</version>
+		<version>6.3.5-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-log-technical-slf4j</artifactId>
