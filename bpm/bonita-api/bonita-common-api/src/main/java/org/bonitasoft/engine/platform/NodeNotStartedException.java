@@ -22,9 +22,6 @@ public class NodeNotStartedException extends IllegalNodeStateException {
 
     private static final long serialVersionUID = -1L;
 
-    /**
-     * @param message
-     */
     public NodeNotStartedException() {
         super("The current node has not been started yet. Method PlatformAPI.startNode() must be called previously.");
     }

@@ -20,7 +20,7 @@ import org.bonitasoft.engine.bpm.BonitaObject;
  * 
  * @author Zhang Bole
  * @author Emmanuel Duchastenier
- * @see CommandAPI to use commands
+ * @see org.bonitasoft.engine.api.CommandAPI to use commands
  */
 public interface CommandDescriptor extends BonitaObject {
 
