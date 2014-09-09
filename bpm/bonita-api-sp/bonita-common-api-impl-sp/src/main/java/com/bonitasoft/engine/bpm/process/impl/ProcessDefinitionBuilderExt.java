@@ -14,7 +14,16 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
+ * Bonita BPM Subscription Edition specific builder for process definition.
+ * It gives access to Subscription Edition specific features:
+ * <ul>
+ * <li>Parameters</li>
+ * <li>StringIndexes</li>
+ * <li>BusinessData</li>
+ * </ul>
+ *
  * @author Baptiste Mesta
+ * @author Emmanuel Duchastenier
  */
 public final class ProcessDefinitionBuilderExt extends ProcessDefinitionBuilder {
 
@@ -23,7 +32,7 @@ public final class ProcessDefinitionBuilderExt extends ProcessDefinitionBuilder 
         super.createNewInstance(name, version);
         return this;
     }
-    
+
     /**
      * Adds a parameter on this process.
      * @param parameterName parameter name.
