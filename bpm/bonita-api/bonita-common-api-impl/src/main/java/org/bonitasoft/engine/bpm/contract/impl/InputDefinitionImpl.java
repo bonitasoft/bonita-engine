@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.bpm.contract.impl;
 
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
+import org.bonitasoft.engine.bpm.contract.Type;
 
 /**
  * @author Matthieu Chaffotte
@@ -22,18 +23,20 @@ public class InputDefinitionImpl implements InputDefinition {
 
     private static final long serialVersionUID = 2836592506382887928L;
 
-    private final String type;
+    private final Type type;
+
     private final String description;
+
     private final String name;
 
-    public InputDefinitionImpl(final String name, final String type, final String description) {
+    public InputDefinitionImpl(final String name, final Type type, final String description) {
         this.description = description;
         this.name = name;
         this.type = type;
     }
 
     @Override
-    public String getType() {
+    public Type getType() {
         return type;
     }
 

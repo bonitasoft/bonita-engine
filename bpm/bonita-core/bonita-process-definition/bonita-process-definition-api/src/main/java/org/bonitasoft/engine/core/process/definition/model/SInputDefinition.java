@@ -20,6 +20,6 @@ public interface SInputDefinition extends SNamedElement {
 
     String getDescription();
 
-    String getType();
+    SType getType();
 
 }

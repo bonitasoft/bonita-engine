@@ -577,7 +577,7 @@ public class XMLProcessDefinition {
     private XMLNode createInputNode(final InputDefinition input) {
         final XMLNode inputNode = new XMLNode(CONTRACT_INPUT_NODE);
         inputNode.addAttribute(NAME, input.getName());
-        inputNode.addAttribute(TYPE, input.getType());
+        inputNode.addAttribute(TYPE, input.getType().toString());
         inputNode.addAttribute(DESCRIPTION, input.getDescription());
         return inputNode;
     }

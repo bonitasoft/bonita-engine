@@ -48,6 +48,7 @@ import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceWithFailureInfoImpl;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
+import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.RuleDefinitionImpl;
@@ -1983,7 +1984,7 @@ public class ModelConvertor {
     public static ContractDefinition toContract(final SContractDefinition sContract) {
         final ContractDefinitionImpl contract = new ContractDefinitionImpl();
         for (final SInputDefinition input : sContract.getInputs()) {
-            contract.addInput(new InputDefinitionImpl(input.getName(), input.getType(), input.getDescription()));
+            contract.addInput(new InputDefinitionImpl(input.getName(), Type.valueOf(input.getType().toString()), input.getDescription()));
         }
         for (final SRuleDefinition sRule : sContract.getRules()) {
             final RuleDefinitionImpl rule = new RuleDefinitionImpl(sRule.getName(), sRule.getExpression(), sRule.getExplanation());

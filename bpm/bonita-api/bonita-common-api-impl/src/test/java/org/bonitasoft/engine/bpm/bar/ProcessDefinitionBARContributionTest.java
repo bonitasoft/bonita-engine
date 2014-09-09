@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
@@ -81,8 +82,8 @@ public class ProcessDefinitionBARContributionTest {
         processBuilder.addReceiveTask("ReceiveTask", "messageName");
         processBuilder.addSendTask("SendTask", "messageName", targetProcessNameExpr);
         processBuilder.addTransition("BoundaryEvent", "ManualTask");
-        processBuilder.addUserTask("task", ACTOR_NAME).addContract().addInput("in", Integer.class.getName(), null)
-                .addRule("Mandatory", "in != null", "in must be set", "in");
+        processBuilder.addUserTask("task", ACTOR_NAME).addContract().addInput("in", Type.INTEGER, null)
+        .addRule("Mandatory", "in != null", "in must be set", "in");
         return processBuilder.done();
     }
 

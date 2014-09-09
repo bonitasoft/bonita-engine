@@ -18,6 +18,7 @@ import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.contract.Input;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.RuleDefinition;
+import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
@@ -59,7 +60,7 @@ public class UserTaskContractTest extends CommonAPITest {
     public void createAContractAndGetIt() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
-        builder.addUserTask("task1", ACTOR_NAME).addContract().addInput("numberOfDays", Integer.class.getName(), null)
+        builder.addUserTask("task1", ACTOR_NAME).addContract().addInput("numberOfDays", Type.INTEGER, null)
         .addRule("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
@@ -71,7 +72,7 @@ public class UserTaskContractTest extends CommonAPITest {
         assertThat(contract.getInputs()).hasSize(1);
         final InputDefinition input = contract.getInputs().get(0);
         assertThat(input.getName()).isEqualTo("numberOfDays");
-        assertThat(input.getType()).isEqualTo(Integer.class.getName());
+        assertThat(input.getType()).isEqualTo(Type.INTEGER);
         assertThat(input.getDescription()).isNull();
 
         assertThat(contract.getRules()).hasSize(1);
@@ -97,7 +98,7 @@ public class UserTaskContractTest extends CommonAPITest {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         final String expectedExplanation = "numberOfDays must between one day and one year";
-        builder.addUserTask("task1", ACTOR_NAME).addContract().addInput("numberOfDays", Integer.class.getName(), null)
+        builder.addUserTask("task1", ACTOR_NAME).addContract().addInput("numberOfDays", Type.INTEGER, null)
         .addRule("mandatory", "numberOfDays>1 && numberOfDays<365", expectedExplanation, "numberOfDays");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
@@ -126,7 +127,7 @@ public class UserTaskContractTest extends CommonAPITest {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         final String expectedExplanation = "numberOfDays must between one day and one year";
-        builder.addUserTask("task1", ACTOR_NAME).addContract().addInput("comment", Integer.class.getName(), null)
+        builder.addUserTask("task1", ACTOR_NAME).addContract().addInput("comment", Type.INTEGER, null)
         .addRule("mandatory", "comment.equals(\"<tag>\")", expectedExplanation, "comment");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
@@ -145,7 +146,7 @@ public class UserTaskContractTest extends CommonAPITest {
     public void getExceptionWhenContractIsNotValid() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
-        builder.addUserTask("task1", ACTOR_NAME).addContract().addInput("numberOfDays", Integer.class.getName(), null);
+        builder.addUserTask("task1", ACTOR_NAME).addContract().addInput("numberOfDays", Type.INTEGER, null);
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
@@ -174,7 +175,7 @@ public class UserTaskContractTest extends CommonAPITest {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask("task1", ACTOR_NAME);
-        userTaskBuilder.addContract().addInput("numberOfDays", Integer.class.getName(), null)
+        userTaskBuilder.addContract().addInput("numberOfDays", Type.INTEGER, null)
         .addRule("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
         userTaskBuilder.addIntegerData("result", null);
         userTaskBuilder.addOperation(new OperationBuilder().createSetDataOperation("result",
@@ -200,7 +201,7 @@ public class UserTaskContractTest extends CommonAPITest {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         final UserTaskDefinitionBuilder userTaskBuilder = builder.addAutomaticTask("automaticTask").addUserTask("task1", ACTOR_NAME);
-        userTaskBuilder.addContract().addInput("numberOfDays", Integer.class.getName(), null)
+        userTaskBuilder.addContract().addInput("numberOfDays", Type.INTEGER, null)
         .addRule("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
@@ -222,7 +223,7 @@ public class UserTaskContractTest extends CommonAPITest {
     public void getExceptionWhenContractIsNotValidWithRules() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
-        builder.addUserTask("task1", ACTOR_NAME).addContract().addInput("numberOfDays", Integer.class.getName(), null)
+        builder.addUserTask("task1", ACTOR_NAME).addContract().addInput("numberOfDays", Type.INTEGER, null)
         .addRule("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
@@ -256,7 +257,7 @@ public class UserTaskContractTest extends CommonAPITest {
         userTaskBuilder.addConnector("myConnector", "org.bonitasoft.engine.connectors.TestConnectorWithAPICall", "1.0", ConnectorEvent.ON_FINISH)
         .addInput("processName", processNameExpression).addInput("processVersion", processVersionExpression)
         .addOutput(new OperationBuilder().createSetDataOperation("processId", outputExpression));
-        userTaskBuilder.addContract().addInput("inputVersion", String.class.getName(), null).addInput("processInputId", Long.class.getName(), null);
+        userTaskBuilder.addContract().addInput("inputVersion", Type.TEXT, null).addInput("processInputId", Type.INTEGER, null);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnectorWithAPICall(designProcessDefinition);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());

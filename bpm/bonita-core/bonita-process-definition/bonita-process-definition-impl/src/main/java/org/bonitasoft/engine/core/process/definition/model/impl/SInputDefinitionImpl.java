@@ -15,6 +15,7 @@ package org.bonitasoft.engine.core.process.definition.model.impl;
 
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SType;
 
 /**
  * @author Matthieu Chaffotte
@@ -25,7 +26,7 @@ public class SInputDefinitionImpl extends SNamedElementImpl implements SInputDef
 
     private String description;
 
-    private String type;
+    private SType type;
 
     public SInputDefinitionImpl(final String name) {
         super(name);
@@ -34,7 +35,7 @@ public class SInputDefinitionImpl extends SNamedElementImpl implements SInputDef
     public SInputDefinitionImpl(final InputDefinition input) {
         this(input.getName());
         description = input.getDescription();
-        type = input.getType();
+        type = SType.valueOf(input.getType().toString());
     }
 
     @Override
@@ -47,11 +48,11 @@ public class SInputDefinitionImpl extends SNamedElementImpl implements SInputDef
     }
 
     @Override
-    public String getType() {
+    public SType getType() {
         return type;
     }
 
-    public void setType(final String type) {
+    public void setType(final SType type) {
         this.type = type;
     }
 

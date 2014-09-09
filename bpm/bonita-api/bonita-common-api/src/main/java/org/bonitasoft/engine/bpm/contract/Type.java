@@ -13,13 +13,11 @@
  **/
 package org.bonitasoft.engine.bpm.contract;
 
-import org.bonitasoft.engine.bpm.DescriptionElement;
-
 /**
  * @author Matthieu Chaffotte
  */
-public interface InputDefinition extends DescriptionElement {
+public enum Type {
 
-    Type getType();
+    TEXT, BOOLEAN, DATE, INTEGER, DECIMAL;
 
 }

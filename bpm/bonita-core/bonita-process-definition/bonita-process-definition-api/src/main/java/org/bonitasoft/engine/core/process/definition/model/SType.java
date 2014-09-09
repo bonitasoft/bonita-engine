@@ -11,15 +11,11 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.contract;
-
-import org.bonitasoft.engine.bpm.DescriptionElement;
+package org.bonitasoft.engine.core.process.definition.model;
 
 /**
  * @author Matthieu Chaffotte
  */
-public interface InputDefinition extends DescriptionElement {
-
-    Type getType();
-
+public enum SType {
+    TEXT, BOOLEAN, DATE, INTEGER, DECIMAL;
 }

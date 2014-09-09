@@ -33,6 +33,7 @@ import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.contract.Input;
+import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -456,7 +457,7 @@ public class ProcessAPIImplTest {
         when(processDefinition.getProcessContainer()).thenReturn(container);
         when(container.getFlowNode(userTaskDefinitionId)).thenReturn(definition);
         final SContractDefinitionImpl contractDefinitionImpl = new SContractDefinitionImpl();
-        final InputDefinitionImpl input = new InputDefinitionImpl("name", "aType", "aDescription");
+        final InputDefinitionImpl input = new InputDefinitionImpl("name", Type.TEXT, "aDescription");
         contractDefinitionImpl.addInput(new SInputDefinitionImpl(input));
         when(definition.getContract()).thenReturn(contractDefinitionImpl);
         final ContractDefinitionImpl contractDefinition = new ContractDefinitionImpl();

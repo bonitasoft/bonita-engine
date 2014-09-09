@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
+import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.RuleDefinitionImpl;
@@ -33,7 +34,7 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
         activity.setContract(contract);
     }
 
-    public ContractDefinitionBuilder addInput(final String name, final String type, final String description) {
+    public ContractDefinitionBuilder addInput(final String name, final Type type, final String description) {
         final InputDefinitionImpl input = new InputDefinitionImpl(name, type, description);
         contract.addInput(input);
         return this;

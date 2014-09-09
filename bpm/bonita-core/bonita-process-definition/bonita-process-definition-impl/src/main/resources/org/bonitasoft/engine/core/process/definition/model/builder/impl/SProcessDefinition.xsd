@@ -361,7 +361,17 @@
 	<xs:complexType name="SInputDefinition">
 		<xs:complexContent>
 			<xs:extension base="definition:SNamedElement">
-				<xs:attribute name="type" type="xs:string" />
+				<xs:attribute name="type">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="TEXT" />
+                            <xs:enumeration value="BOOLEAN" />
+                            <xs:enumeration value="DATE" />
+                            <xs:enumeration value="INTEGER" />
+                            <xs:enumeration value="DECIMAL" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

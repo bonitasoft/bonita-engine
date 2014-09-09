@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SRuleDefinitionImpl;
@@ -58,10 +59,10 @@ public class ContractValidatorTest {
 
     private SContractDefinition addInputsToContract(final SContractDefinition contract) {
         final SInputDefinitionImpl input1 = new SInputDefinitionImpl(IS_VALID);
-        input1.setType(Boolean.class.getName());
+        input1.setType(SType.BOOLEAN);
         contract.getInputs().add(input1);
         final SInputDefinitionImpl input2 = new SInputDefinitionImpl(COMMENT);
-        input2.setType(String.class.getName());
+        input2.setType(SType.TEXT);
         contract.getInputs().add(input2);
         return contract;
     }

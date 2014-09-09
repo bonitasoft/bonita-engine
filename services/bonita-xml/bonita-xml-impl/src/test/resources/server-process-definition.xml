@@ -28,16 +28,11 @@
 				<boundaryEvents />
 				<contract>
 					<inputDefinitions>
-						<inputDefinition description="user name" name="userName"
-							type="java.lang.String" />
-						<inputDefinition description="start date" name="startDate"
-							type="java.util.Date" />
-						<inputDefinition description="end date" name="endDate"
-							type="java.util.Date" />
-						<inputDefinition description="request is approved"
-							name="isValid" type="java.lang.Boolean" />
-						<inputDefinition description="comment" name="comment"
-							type="java.lang.Boolean" />
+						<inputDefinition description="user name" name="userName" type="TEXT" />
+						<inputDefinition description="start date" name="startDate" type="DATE" />
+						<inputDefinition description="end date" name="endDate" type="DATE" />
+						<inputDefinition description="request is approved" name="isValid" type="BOOLEAN" />
+						<inputDefinition description="comment" name="comment" type="TEXT" />
 					</inputDefinitions>
 					<ruleDefinitions>
 						<ruleDefinition name="username_rule">

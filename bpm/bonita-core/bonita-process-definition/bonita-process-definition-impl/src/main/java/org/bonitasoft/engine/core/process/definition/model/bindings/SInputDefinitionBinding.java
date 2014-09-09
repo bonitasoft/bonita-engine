@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.process.definition.model.bindings;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinitionImpl;
 import org.bonitasoft.engine.xml.SXMLParseException;
 
@@ -24,12 +25,12 @@ import org.bonitasoft.engine.xml.SXMLParseException;
  */
 public class SInputDefinitionBinding extends SNamedElementBinding {
 
-    private String type;
+    private SType type;
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
-        type = attributes.get(XMLProcessDefinition.TYPE);
+        type = SType.valueOf(attributes.get(XMLProcessDefinition.TYPE));
     }
 
     @Override
