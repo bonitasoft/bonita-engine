@@ -25,7 +25,7 @@ public class CommandUpdater implements Serializable {
     private static final long serialVersionUID = 1326464578602375090L;
 
     public enum CommandField {
-        NAME, DESCRIPTION;
+        NAME, DESCRIPTION
     }
 
     private final Map<CommandField, Serializable> fields;
