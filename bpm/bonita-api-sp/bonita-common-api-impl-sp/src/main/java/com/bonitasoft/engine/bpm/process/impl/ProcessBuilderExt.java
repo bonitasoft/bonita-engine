@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013-2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -16,19 +16,32 @@ import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionIm
  *
  * @author Baptiste Mesta
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
+ * @version 6.3.5
+ * @since 6.0.0
  */
 public class ProcessBuilderExt extends ProcessBuilder {
 
-    ProcessBuilderExt(final DesignProcessDefinitionImpl process, final ProcessDefinitionBuilderExt processDefinitionBuilder) {
-        super(process, processDefinitionBuilder);
+    /**
+     * Default Constructor.
+     * 
+     * @param designProcessDefinitionImpl
+     *        The {@link DesignProcessDefinition}
+     * @param processDefinitionBuilder
+     *        The {@link ProcessDefinitionBuilder} to build the {@link DesignProcessDefinition}
+     */
+    ProcessBuilderExt(final DesignProcessDefinitionImpl designProcessDefinitionImpl, final ProcessDefinitionBuilderExt processDefinitionBuilder) {
+        super(designProcessDefinitionImpl, processDefinitionBuilder);
     }
 
     /**
      * Adds a parameter definition on this process.
      *
-     * @param parameterName the name of the parameter that will be its reference name in the process.
-     * @param type the fully qualified parameter class type (complete class name)
-     * @return a reference to the newly created <code>ParameterDefinitionBuilder</code>
+     * @param parameterName
+     *        The name of the parameter that will be its reference name in the process.
+     * @param type
+     *        The fully qualified parameter class type (complete class name)
+     * @return A reference to the newly created {@link ParameterDefinitionBuilder}
      */
     public ParameterDefinitionBuilder addParameter(final String parameterName, final String type) {
         return new ParameterDefinitionBuilder((ProcessDefinitionBuilderExt) getProcessBuilder(), process, parameterName, type);
