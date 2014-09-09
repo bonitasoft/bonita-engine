@@ -982,7 +982,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         disableAndDeleteProcess(subProcessDefinition);
     }
 
-    @Test
+    //@Test deactivated until it is stable
     public void useMultipleBusinessDataInACallActivityWithOutDataMultiInstance() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee john = new Employee(); john.firstName = 'John' + processInstanceId; john.lastName = 'Doe'; john;",
