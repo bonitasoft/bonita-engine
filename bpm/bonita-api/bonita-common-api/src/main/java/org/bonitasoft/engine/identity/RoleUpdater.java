@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,6 +21,7 @@ import java.util.Map;
  * represent a helper to update a {@link Role}
  *
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  * @see Role
  * @since 6.0.0
  */
@@ -45,8 +46,9 @@ public class RoleUpdater implements Serializable {
     }
 
     /**
-     * @param name the role's name to update
-     * @return the current {@link RoleUpdater} for chaining purpose
+     * @param name
+     *        The role's name to update
+     * @return The current {@link RoleUpdater} for chaining purpose
      */
     public RoleUpdater setName(final String name) {
         fields.put(RoleField.NAME, name);
@@ -54,8 +56,9 @@ public class RoleUpdater implements Serializable {
     }
 
     /**
-     * @param name the role's display name to update
-     * @return the current {@link RoleUpdater} for chaining purpose
+     * @param displayName
+     *        The role's display name to update
+     * @return The current {@link RoleUpdater} for chaining purpose
      */
     public RoleUpdater setDisplayName(final String displayName) {
         fields.put(RoleField.DISPLAY_NAME, displayName);
@@ -63,8 +66,9 @@ public class RoleUpdater implements Serializable {
     }
 
     /**
-     * @param name the role's description to update
-     * @return the current {@link RoleUpdater} for chaining purpose
+     * @param description
+     *        The role's description to update
+     * @return The current {@link RoleUpdater} for chaining purpose
      */
     public RoleUpdater setDescription(final String description) {
         fields.put(RoleField.DESCRIPTION, description);
@@ -72,8 +76,9 @@ public class RoleUpdater implements Serializable {
     }
 
     /**
-     * @param name the role's icon name to update
-     * @return the current {@link RoleUpdater} for chaining purpose
+     * @param iconName
+     *        The role's icon name to update
+     * @return The current {@link RoleUpdater} for chaining purpose
      */
     public RoleUpdater setIconName(final String iconName) {
         fields.put(RoleField.ICON_NAME, iconName);
@@ -81,8 +86,9 @@ public class RoleUpdater implements Serializable {
     }
 
     /**
-     * @param name the role's icon path to update
-     * @return the current {@link RoleUpdater} for chaining purpose
+     * @param iconPath
+     *        The role's icon path to update
+     * @return The current {@link RoleUpdater} for chaining purpose
      */
     public RoleUpdater setIconPath(final String iconPath) {
         fields.put(RoleField.ICON_PATH, iconPath);
@@ -90,7 +96,7 @@ public class RoleUpdater implements Serializable {
     }
 
     /**
-     * @return the role's fields to update
+     * @return The role's fields to update
      */
     public Map<RoleField, Serializable> getFields() {
         return fields;
