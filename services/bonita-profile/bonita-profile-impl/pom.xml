@@ -19,16 +19,16 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.persistence</groupId>
-			<artifactId>bonita-persistence-read</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+            <groupId>org.bonitasoft.engine.persistence</groupId>
+            <artifactId>bonita-persistence-read</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.persistence</groupId>
-			<artifactId>bonita-persistence-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
+            <groupId>org.bonitasoft.engine.persistence</groupId>
+            <artifactId>bonita-persistence-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
 			<groupId>org.bonitasoft.engine.recorder</groupId>
 			<artifactId>bonita-recorder-api</artifactId>
 			<version>${project.version}</version>
@@ -43,12 +43,12 @@
 			<artifactId>bonita-log-technical-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.log</groupId>
+            <artifactId>bonita-log-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
 			<groupId>org.bonitasoft.engine.session</groupId>
 			<artifactId>bonita-session-api</artifactId>
 			<version>${project.version}</version>
@@ -58,26 +58,26 @@
 			<artifactId>bonita-session-accessor-read</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-model</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-commons</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-builder</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.events</groupId>
+            <artifactId>bonita-events-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.events</groupId>
+            <artifactId>bonita-events-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-builder</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 		<dependency>
 			<groupId>junit</groupId>

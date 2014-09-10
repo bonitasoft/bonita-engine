@@ -1,67 +1,56 @@
+/**
+ * Copyright (C) 2009-2014 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.test;
-
-import org.bonitasoft.engine.bpm.process.ActivationState;
-import org.bonitasoft.engine.bpm.process.ConfigurationState;
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
-public class TestStates {
+public enum TestStates {
 
-    public static String getInitialState() {
-        return "initializing";
+    INITIAL("initializing"),
+
+    NORMAL_FINAL("completed"),
+
+    READY("ready"),
+
+    SKIPPED("skipped"),
+
+    WAITING("waiting"),
+
+    FAILED("failed"),
+
+    ABORTED("aborted"),
+
+    EXECUTING("executing"),
+
+    CANCELLED("cancelled"),
+
+    INTERRUPTED("interrupted");
+
+    private final String stateName;
+
+    private TestStates(final String stateName) {
+        this.stateName = stateName;
     }
 
-    public static String getNormalFinalState() {
-        return "completed";
+    public String getStateName() {
+        return stateName;
     }
 
-    public static String getReadyState() {
-        return "ready";
+    @Override
+    public String toString() {
+        return stateName;
     }
-
-    public static String getSkippedState() {
-        return "skipped";
-    }
-
-    public static ConfigurationState getProcessDepInfoUnresolvedState() {
-        return ConfigurationState.UNRESOLVED;
-    }
-
-    public static ConfigurationState getProcessDepInfoResolvedState() {
-        return ConfigurationState.RESOLVED;
-    }
-
-    public static ActivationState getProcessDepInfoEnabledState() {
-        return ActivationState.ENABLED;
-    }
-
-    public static ActivationState getProcessDepInfoDisabledState() {
-        return ActivationState.DISABLED;
-    }
-
-    public static String getWaitingState() {
-        return "waiting";
-    }
-
-    public static String getFailedState() {
-        return "failed";
-    }
-
-    public static String getAbortedState() {
-        return "aborted";
-    }
-
-    public static String getExecutingState() {
-        return "executing";
-    }
-
-    public static String getCancelledState() {
-        return "cancelled";
-    }
-
-    public static String getInterruptingState() {
-        return "interrupted";
-    }
-
 }

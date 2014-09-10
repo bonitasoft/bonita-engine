@@ -30,11 +30,11 @@ public final class WaitProcessToFinishAndBeArchived extends WaitUntil {
 
     private final ProcessAPI processAPI;
 
-    private final String state;
+    private final TestStates state;
 
     @Deprecated
     public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final boolean throwExceptions, final ProcessInstance processInstance,
-            final ProcessAPI processAPI, final String state) {
+            final ProcessAPI processAPI, final TestStates state) {
         super(repeatEach, timeout, throwExceptions);
         this.processInstance = processInstance;
         this.processAPI = processAPI;
@@ -44,7 +44,7 @@ public final class WaitProcessToFinishAndBeArchived extends WaitUntil {
     @Deprecated
     public WaitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final boolean throwExceptions, final ProcessInstance processInstance,
             final ProcessAPI processAPI) {
-        this(repeatEach, timeout, throwExceptions, processInstance, processAPI, TestStates.getNormalFinalState());
+        this(repeatEach, timeout, throwExceptions, processInstance, processAPI, TestStates.NORMAL_FINAL);
     }
 
     @Deprecated

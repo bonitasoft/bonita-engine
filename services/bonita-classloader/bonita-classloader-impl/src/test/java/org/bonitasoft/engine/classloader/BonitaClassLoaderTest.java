@@ -17,6 +17,7 @@ package org.bonitasoft.engine.classloader;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;

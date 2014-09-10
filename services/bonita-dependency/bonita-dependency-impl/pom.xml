@@ -50,7 +50,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-model</artifactId>
+			<artifactId>bonita-events-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

@@ -128,7 +128,7 @@ public class LocalTimerEventTest extends CommonAPILocalTest {
         final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEvent(TimerType.DURATION, timerExpression, "step");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        final Long floNodeInstanceId = waitForFlowNodeInState(processInstance, "intermediateCatchEvent", TestStates.getWaitingState(), false);
+        final Long floNodeInstanceId = waitForFlowNodeInState(processInstance, "intermediateCatchEvent", TestStates.WAITING, false);
         final String jobName = getJobName(floNodeInstanceId);
         assertThat(containsTimerJob(jobName)).isTrue();
 
@@ -136,7 +136,7 @@ public class LocalTimerEventTest extends CommonAPILocalTest {
         getProcessAPI().cancelProcessInstance(processInstance.getId());
 
         //then
-        waitForFlowNodeInState(processInstance, "intermediateCatchEvent", TestStates.getCancelledState(), false);
+        waitForFlowNodeInState(processInstance, "intermediateCatchEvent", TestStates.CANCELLED, false);
         assertThat(containsTimerJob(jobName)).isFalse();
 
         waitForProcessToBeInState(processInstance, ProcessInstanceState.CANCELLED);

@@ -19,6 +19,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
+			<artifactId>bonita-process-instance-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.bonitasoft.engine.core</groupId>
 			<artifactId>bonita-expression-resolver-api</artifactId>
 			<version>${project.version}</version>
