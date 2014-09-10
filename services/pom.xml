@@ -11,6 +11,14 @@
 	<artifactId>services</artifactId>
 	<packaging>pom</packaging>
 
+	<profiles>
+		<profile>
+			<id>package</id>
+            <activation>
+                <property>
+                    <name>!publishArtifacts</name>                                                                   
+                </property>
+            </activation>
 	<modules>
 		<module>bonita-transaction</module>
 		<module>bonita-archive</module>
@@ -31,9 +39,9 @@
 		<module>bonita-builder-sp</module>
 		<module>bonita-page</module>
 		<module>bonita-business-data</module>
+		<module>bonita-business-application</module>
 	</modules>
-
-	<profiles>
+		</profile>
 		<profile>
 			<id>tests</id>
 			<modules>

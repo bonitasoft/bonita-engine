@@ -45,21 +45,22 @@ import com.hazelcast.core.IMap;
 import com.hazelcast.core.Member;
 
 /**
- * 
  * @author Laurent Vaills
- * 
  */
 public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
 
     private final IMap<String, List<SHandler<SEvent>>> eventHandlers;
 
-    // Local copy of the eventHandlers Map keys to speed up performance. It has to be manipulated
-    // only by the distributed tasks.
+    // Local copy of the eventHandlers Map keys to speed up performance. It has to be manipulated only by the distributed tasks.
     private final Set<String> localEventTypes = new HashSet<String>();
 
     private final ReadWriteLock localEventTypesLock = new ReentrantReadWriteLock();
 
     private final HazelcastInstance hazelcastInstance;
+
+    private final String mapName;
+
+    private final String clusteredServicelocalUserContext;
 
     public ClusteredEventServiceImpl(final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger,
             final HazelcastInstance hazelcastInstance) throws HandlerRegistrationException {
@@ -73,24 +74,27 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
 
     ClusteredEventServiceImpl(final String eventServiceHandlerMapNameSuffix,
             final Map<String, SHandler<SEvent>> handlers, final TechnicalLoggerService logger, final HazelcastInstance hazelcastInstance, final Manager manager)
-            throws HandlerRegistrationException {
+                    throws HandlerRegistrationException {
         super(logger);
         if (!manager.isFeatureActive(Features.ENGINE_CLUSTERING)) {
             throw new IllegalStateException("The clustering is not an active feature.");
         }
-        String mapName = "EVENT_SERVICE_HANDLERS-" + eventServiceHandlerMapNameSuffix;
-        // --- Hard coded configuration for Hazelcast
-        Config config = hazelcastInstance.getConfig();
+        mapName = "EVENT_SERVICE_HANDLERS-" + eventServiceHandlerMapNameSuffix;
 
-        NearCacheConfig nearCacheConfig = new NearCacheConfig();
+        logger.log(getClass(), TechnicalLogSeverity.TRACE, "instanciating Clustered event service " + mapName + " on " + this);
+
+        // --- Hard coded configuration for Hazelcast
+        final Config config = hazelcastInstance.getConfig();
+
+        final NearCacheConfig nearCacheConfig = new NearCacheConfig();
         nearCacheConfig.setInMemoryFormat(InMemoryFormat.CACHED);
 
         config.addMapConfig(new MapConfig(mapName));
         // ---
         this.hazelcastInstance = hazelcastInstance;
 
-        // We will need this service in the tasks defined below.
-        hazelcastInstance.getUserContext().put("ClusteredEventService", this);
+        clusteredServicelocalUserContext = "ClusteredEventService" + eventServiceHandlerMapNameSuffix;
+        hazelcastInstance.getUserContext().put(clusteredServicelocalUserContext, this);
 
         eventHandlers = hazelcastInstance.getMap(mapName);
         if (eventHandlers.isEmpty()) {
@@ -115,7 +119,7 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
         Lock readLock = localEventTypesLock.readLock();
         readLock.lock();
         try {
-            return (result = localEventTypes.contains(eventType));
+            return result = localEventTypes.contains(eventType);
         } finally {
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(getClass(), TechnicalLogSeverity.TRACE, "containsHandlerFor : " + eventType + " " + result);
@@ -128,8 +132,8 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
     protected Collection<SHandler<SEvent>> getHandlersFor(final String eventType) {
         List<SHandler<SEvent>> result = eventHandlers.get(eventType);
 
-        if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(getClass(), TechnicalLogSeverity.TRACE, "getHandlersFor : " + eventType + " " + result);
+        if (result == null && logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(getClass(), TechnicalLogSeverity.TRACE, "WARNING, no handler found for type " + eventType);
         }
 
         return result;
@@ -139,12 +143,12 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
     protected void addHandlerFor(final String eventType, final SHandler<SEvent> handler) throws HandlerRegistrationException {
         eventHandlers.lock(eventType);
         try {
-            // check if the given event type is already registered in the Event Service
+            // check if the given event type is already registered in the Event Service:
             if (containsHandlerFor(eventType)) {
-                // if the handler already exists for the same eventType, an Exception is thrown
+                // if the handler already exists for the same eventType, an Exception is thrown:
                 final List<SHandler<SEvent>> handlers = eventHandlers.get(eventType);
 
-                // Check if another handler of the same class is already registered
+                // Check if another handler of the same class is already registered:
                 for (SHandler<SEvent> tmpHandler : handlers) {
                     if (tmpHandler.getIdentifier().equals(handler.getIdentifier())) {
                         throw new HandlerRegistrationException("The handler with identifier " + tmpHandler.getIdentifier()
@@ -155,11 +159,11 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
 
                 eventHandlers.replace(eventType, handlers);
             } else {
-                // if the given type doesn't already exist in the eventFilters list, we create it
-                final List<SHandler<SEvent>> newHandlerList = new ArrayList<SHandler<SEvent>>(3);
+                // if the given type doesn't already exist in the eventFilters list, we create it:
+                final List<SHandler<SEvent>> newHandlerList = new ArrayList<SHandler<SEvent>>(1);
                 newHandlerList.add(handler);
                 eventHandlers.put(eventType, newHandlerList);
-                EventTypeCallable task = new AddEventTypeCallable(eventType);
+                EventTypeCallable task = new AddEventTypeCallable(eventType, clusteredServicelocalUserContext);
                 informAllMembers(task);
             }
         } finally {
@@ -176,9 +180,9 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
         for (Map.Entry<Member, Future<Void>> entry : results.entrySet()) {
             try {
                 entry.getValue().get();
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 throw new SBonitaRuntimeException("There was an error on the member " + entry.getKey() + " for the task " + task.getClass().getName(), e);
-            } catch (ExecutionException e) {
+            } catch (final ExecutionException e) {
                 throw new SBonitaRuntimeException("There was an error on the member " + entry.getKey() + " for the task " + task.getClass().getName(), e);
             }
         }
@@ -191,9 +195,9 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
 
             handlers.remove(handler);
             if (handlers.isEmpty()) {
-                eventHandlers.remove(eventType);
-                EventTypeCallable task = new RemoveEventTypeCallable(eventType);
+                EventTypeCallable task = new RemoveEventTypeCallable(eventType, clusteredServicelocalUserContext);
                 informAllMembers(task);
+                eventHandlers.remove(eventType);
             } else {
                 eventHandlers.replace(eventType, handlers);
             }
@@ -201,9 +205,10 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
     }
 
     // It should be used only for the tests
-    /* package */synchronized void removeAllHandlers() {
+    /* package */
+    synchronized void removeAllHandlers() {
+        informAllMembers(new ClearLocalEventType(clusteredServicelocalUserContext));
         eventHandlers.clear();
-        informAllMembers(new ClearLocalEventType());
     }
 
     private static abstract class LocalClusteredServiceTask implements Serializable, Callable<Void>, HazelcastInstanceAware {
@@ -212,6 +217,12 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
 
         private transient HazelcastInstance hazelcastInstance;
 
+        private final String clusteredServicelocalUserContext;
+
+        protected LocalClusteredServiceTask(final String clusteredServicelocalUserContext) {
+            this.clusteredServicelocalUserContext = clusteredServicelocalUserContext;
+        }
+
         @Override
         public void setHazelcastInstance(final HazelcastInstance hazelcastInstance) {
             this.hazelcastInstance = hazelcastInstance;
@@ -219,8 +230,12 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
 
         @Override
         public Void call() {
-            ClusteredEventServiceImpl clusteredEventService = (ClusteredEventServiceImpl) hazelcastInstance.getUserContext().get("ClusteredEventService");
-            doWithClusteredEventService(clusteredEventService);
+            ClusteredEventServiceImpl clusteredEventService = (ClusteredEventServiceImpl) hazelcastInstance.getUserContext().get(
+                    clusteredServicelocalUserContext);
+            // If Service is not initialized yet on one node, ignore it:
+            if (clusteredEventService != null) {
+                doWithClusteredEventService(clusteredEventService);
+            }
             return null;
         }
 
@@ -234,6 +249,10 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
     private static abstract class WriteLockLocalClusteredServiceTask extends LocalClusteredServiceTask {
 
         private static final long serialVersionUID = 1L;
+
+        WriteLockLocalClusteredServiceTask(final String clusteredServicelocalUserContext) {
+            super(clusteredServicelocalUserContext);
+        }
 
         @Override
         final protected void doWithClusteredEventService(final ClusteredEventServiceImpl clusteredEventService) {
@@ -257,8 +276,15 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
 
         private static final long serialVersionUID = 1L;
 
+        ClearLocalEventType(final String clusteredServicelocalUserContext) {
+            super(clusteredServicelocalUserContext);
+        }
+
         @Override
         protected void doInsideWriteLock(final ClusteredEventServiceImpl clusteredEventService) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Informing all nodes to clear the registered event types.");
+            }
             clusteredEventService.localEventTypes.clear();
         }
 
@@ -270,7 +296,8 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
 
         protected final String eventType;
 
-        public EventTypeCallable(final String eventType) {
+        public EventTypeCallable(final String eventType, final String clusteredServicelocalUserContext) {
+            super(clusteredServicelocalUserContext);
             this.eventType = eventType;
         }
 
@@ -280,12 +307,15 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
 
         private static final long serialVersionUID = 1L;
 
-        public AddEventTypeCallable(final String eventType) {
-            super(eventType);
+        public AddEventTypeCallable(final String eventType, final String clusteredServicelocalUserContext) {
+            super(eventType, clusteredServicelocalUserContext);
         }
 
         @Override
         protected void doInsideWriteLock(final ClusteredEventServiceImpl clusteredEventService) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Informing all nodes to register new event type " + eventType);
+            }
             clusteredEventService.localEventTypes.add(eventType);
         }
 
@@ -295,12 +325,15 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
 
         private static final long serialVersionUID = 1L;
 
-        public RemoveEventTypeCallable(final String eventType) {
-            super(eventType);
+        public RemoveEventTypeCallable(final String eventType, final String clusteredServicelocalUserContext) {
+            super(eventType, clusteredServicelocalUserContext);
         }
 
         @Override
         protected void doInsideWriteLock(final ClusteredEventServiceImpl clusteredEventService) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, "Informing all nodes to UNregister event type " + eventType);
+            }
             clusteredEventService.localEventTypes.remove(eventType);
         }
 
@@ -327,7 +360,7 @@ public class ClusteredEventServiceImpl extends AbstractEventServiceImpl {
             }
             eventHandlers.replace(eventType, handlers);
         } finally {
-            eventHandlers.lock(eventType);
+            eventHandlers.unlock(eventType);
         }
     }
 

@@ -5,8 +5,13 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
+import com.bonitasoft.engine.business.application.SApplication;
+import com.bonitasoft.engine.business.application.SApplicationPage;
+import com.bonitasoft.engine.business.application.impl.SApplicationImpl;
+import com.bonitasoft.engine.business.application.impl.SApplicationPageImpl;
 import com.bonitasoft.engine.page.SPageWithContent;
 import com.bonitasoft.engine.page.impl.SPageWithContentImpl;
+import com.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 
 /**
  * Test Repository
@@ -24,8 +29,14 @@ public class TestRepository {
         return sessionFactory.getCurrentSession();
     }
 
+    protected Session getSessionWithTenantFilter() {
+        final Session session = getSession();
+        session.enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        return session;
+    }
+
     protected Query getNamedQuery(final String queryName) {
-        return getSession().getNamedQuery(queryName);
+        return getSessionWithTenantFilter().getNamedQuery(queryName);
     }
 
     /**
@@ -35,5 +46,21 @@ public class TestRepository {
         getSession().save(sPageWithContentImpl);
         return (SPageWithContentImpl) getSession().get(sPageWithContentImpl.getClass(),
                 new PersistentObjectId(sPageWithContentImpl.getId(), sPageWithContentImpl.getTenantId()));
+    }
+
+    public SApplication add(final SApplicationImpl application) {
+        getSession().save(application);
+        return (SApplication) getSession().get(application.getClass(),
+                new PersistentObjectId(application.getId(), application.getTenantId()));
+    }
+
+    public SApplicationPage add(final SApplicationPageImpl applicationPage) {
+        getSession().save(applicationPage);
+        return (SApplicationPage) getSession().get(applicationPage.getClass(),
+                new PersistentObjectId(applicationPage.getId(), applicationPage.getTenantId()));
+    }
+
+    public void update(final SApplicationImpl application) {
+        getSession().update(application);
     }
 }

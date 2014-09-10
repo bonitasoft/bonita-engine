@@ -11,6 +11,7 @@ package com.bonitasoft.engine;
 import org.bonitasoft.engine.test.APIMethodTest;
 import org.junit.Test;
 
+import com.bonitasoft.engine.api.ApplicationAPI;
 import com.bonitasoft.engine.api.impl.LogAPIExt;
 import com.bonitasoft.engine.api.impl.MonitoringAPIImpl;
 import com.bonitasoft.engine.api.impl.NodeAPIImpl;
@@ -62,6 +63,11 @@ public class APIMethodSPTest extends APIMethodTest {
     @Test
     public void checkAllMethodsOfPageAPIContainsSerializableParameters() {
         checkAllParametersAreSerializable(PageAPIExt.class);
+    }
+
+    @Test
+    public void checkAllMethodsOfApplicationAPIContainsSerializableParameters() {
+        checkAllParametersAreSerializable(ApplicationAPI.class);
     }
 
 }

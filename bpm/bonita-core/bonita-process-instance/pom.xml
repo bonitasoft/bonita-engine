@@ -14,7 +14,7 @@
 	<name>Bonita Process Instance</name>
 
 	<modules>
-		<module>bonita-process-instance-api</module>
-		<module>bonita-process-instance-impl</module>
+        <module>bonita-process-instance-api-sp</module>
+        <module>bonita-process-instance-impl-sp</module>
 	</modules>
 </project>
