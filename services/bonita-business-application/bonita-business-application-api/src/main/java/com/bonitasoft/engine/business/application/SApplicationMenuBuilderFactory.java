@@ -20,7 +20,7 @@ package com.bonitasoft.engine.business.application;
  */
 public interface SApplicationMenuBuilderFactory {
 
-    SApplicationMenuBuilder createNewInstance(String displayName, long applicationPageId, int position);
+    SApplicationMenuBuilder createNewInstance(String displayName, long applicationPageId, int index);
 
     String getDisplayNameKey();
 
@@ -28,6 +28,6 @@ public interface SApplicationMenuBuilderFactory {
 
     String getParentIdKey();
 
-    String getPositionKey();
+    String getIndexKey();
 
 }

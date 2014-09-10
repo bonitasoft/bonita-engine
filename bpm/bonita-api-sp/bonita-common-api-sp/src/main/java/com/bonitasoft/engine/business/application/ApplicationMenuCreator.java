@@ -21,16 +21,16 @@ public class ApplicationMenuCreator implements Serializable {
     private static final long serialVersionUID = 5253969343647340983L;
 
     public enum ApplicationMenuField {
-        DISPLAY_NAME, APPLICATION_ID, PARENT_ID, POSITION;
+        DISPLAY_NAME, APPLICATION_ID, PARENT_ID, INDEX;
     }
 
     private final Map<ApplicationMenuField, Serializable> fields;
 
-    public ApplicationMenuCreator(final String displayName, final long applicationPageId, final String position) {
+    public ApplicationMenuCreator(final String displayName, final long applicationPageId, final String index) {
         fields = new HashMap<ApplicationMenuField, Serializable>(2);
         fields.put(ApplicationMenuField.DISPLAY_NAME, displayName);
         fields.put(ApplicationMenuField.APPLICATION_ID, applicationPageId);
-        fields.put(ApplicationMenuField.POSITION, position);
+        fields.put(ApplicationMenuField.INDEX, index);
     }
 
     public ApplicationMenuCreator setParentId(final long parentId) {

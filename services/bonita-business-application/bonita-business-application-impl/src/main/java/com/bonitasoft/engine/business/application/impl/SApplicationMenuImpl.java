@@ -65,7 +65,7 @@ public class SApplicationMenuImpl extends PersistentObjectId implements SApplica
     }
 
     @Override
-    public int getPosition() {
+    public int getIndex() {
         return position;
     }
 

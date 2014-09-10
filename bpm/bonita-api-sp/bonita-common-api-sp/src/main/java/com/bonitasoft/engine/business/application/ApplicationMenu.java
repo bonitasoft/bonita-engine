@@ -23,6 +23,6 @@ public interface ApplicationMenu extends BaseElement {
 
     long getParentId();
 
-    int getPosition();
+    int getIndex();
 
 }

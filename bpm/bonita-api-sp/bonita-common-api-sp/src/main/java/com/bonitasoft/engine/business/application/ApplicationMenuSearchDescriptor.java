@@ -19,6 +19,6 @@ public class ApplicationMenuSearchDescriptor {
 
     public static final String APPLICATION_PAGE_ID = "applicationPageId";
 
-    public static final String POSITION = "position";
+    public static final String INDEX = "index";
 
 }

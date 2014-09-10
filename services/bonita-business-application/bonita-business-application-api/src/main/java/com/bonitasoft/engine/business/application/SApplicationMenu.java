@@ -28,6 +28,6 @@ public interface SApplicationMenu extends PersistentObject {
 
     long getParentId();
 
-    int getPosition();
+    int getIndex();
 
 }

@@ -24,8 +24,8 @@ import com.bonitasoft.engine.business.application.SApplicationMenuBuilderFactory
 public class SApplicationMenuBuilderFactoryImpl implements SApplicationMenuBuilderFactory {
 
     @Override
-    public SApplicationMenuBuilder createNewInstance(final String displayName, final long applicationPageId, final int position) {
-        return new SApplicationMenuBuilderImpl(new SApplicationMenuImpl(displayName, applicationPageId, position));
+    public SApplicationMenuBuilder createNewInstance(final String displayName, final long applicationPageId, final int index) {
+        return new SApplicationMenuBuilderImpl(new SApplicationMenuImpl(displayName, applicationPageId, index));
     }
 
     @Override
@@ -44,7 +44,7 @@ public class SApplicationMenuBuilderFactoryImpl implements SApplicationMenuBuild
     }
 
     @Override
-    public String getPositionKey() {
+    public String getIndexKey() {
         return "position";
     }
 
