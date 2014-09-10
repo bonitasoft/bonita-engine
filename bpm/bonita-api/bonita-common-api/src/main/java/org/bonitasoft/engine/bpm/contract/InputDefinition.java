@@ -16,10 +16,18 @@ package org.bonitasoft.engine.bpm.contract;
 import org.bonitasoft.engine.bpm.DescriptionElement;
 
 /**
+ * An <code>InputDefinition</code> defines
+ *
  * @author Matthieu Chaffotte
+ * @since 7.0
  */
 public interface InputDefinition extends DescriptionElement {
 
+    /**
+     * Gets the type of the input.
+     *
+     * @return the input type
+     */
     Type getType();
 
 }

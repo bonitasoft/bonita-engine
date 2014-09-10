@@ -16,14 +16,31 @@ package org.bonitasoft.engine.bpm.contract;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.BonitaObject;
+import org.bonitasoft.engine.bpm.flownode.UserTaskDefinition;
+import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 
 /**
+ * A <code>ContractDefinition</code> defines what the {@link UserTaskInstance} needs to be executed.
+ * <p>
+ * A <code>ContractDefinition</code> is part of a {@link UserTaskDefinition}.
+ * 
  * @author Matthieu Chaffotte
+ * @since 7.0
  */
 public interface ContractDefinition extends BonitaObject {
 
+    /**
+     * Lists the inputs of the contract.
+     *
+     * @return the inputs of the contract
+     */
     List<InputDefinition> getInputs();
 
+    /**
+     * Lists the validation rules of the contract.
+     *
+     * @return the validation rules of the contract
+     */
     List<RuleDefinition> getRules();
 
 }

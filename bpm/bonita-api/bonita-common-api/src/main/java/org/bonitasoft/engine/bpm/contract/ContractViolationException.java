@@ -19,7 +19,10 @@ import java.util.List;
 import org.bonitasoft.engine.exception.BonitaException;
 
 /**
+ * Thrown when the {@link ContractDefinition} is not fulfilled.
+ *
  * @author Matthieu Chaffotte
+ * @since 7.0
  */
 public class ContractViolationException extends BonitaException {
 
@@ -27,6 +30,12 @@ public class ContractViolationException extends BonitaException {
 
     private List<String> explanations;
 
+    /**
+     * Constructs an <code>ContractViolationException</code> with the specified detail message and the explanations.
+     *
+     * @param message the specified detail message
+     * @param explanations the explanations
+     */
     public ContractViolationException(final String message, final List<String> explanations) {
         super(message);
         if (explanations == null) {
@@ -35,6 +44,11 @@ public class ContractViolationException extends BonitaException {
         this.explanations = new ArrayList<String>(explanations);
     }
 
+    /**
+     * Returns the explanations of why the contract is not fulfilled.
+     *
+     * @return the explanations
+     */
     public List<String> getExplanations() {
         return explanations;
     }

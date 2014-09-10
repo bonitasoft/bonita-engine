@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.contract;
 
 /**
  * @author Matthieu Chaffotte
+ * @since 7.0
  */
 public enum Type {
 
