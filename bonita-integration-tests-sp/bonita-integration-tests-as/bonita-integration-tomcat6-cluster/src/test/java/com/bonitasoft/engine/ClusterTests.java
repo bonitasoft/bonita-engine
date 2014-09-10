@@ -69,8 +69,8 @@ public class ClusterTests extends CommonAPISPTest {
         logoutOnTenant();
         // init the context here
         changeToNode2();
-        PlatformSession platformSession = loginOnPlatform();
-        PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
+        final PlatformSession platformSession = loginOnPlatform();
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
         platformAPI.startNode();
         changeToNode1();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
@@ -94,7 +94,7 @@ public class ClusterTests extends CommonAPISPTest {
     }
 
     private void setConnectionPort(final String port) {
-        Map<String, String> parameters = new HashMap<String, String>(2);
+        final Map<String, String> parameters = new HashMap<String, String>(2);
         parameters.put("server.url", "http://localhost:" + port);
         parameters.put("application.name", "bonita");
         APITypeManager.setAPITypeAndParams(ApiAccessType.HTTP, parameters);
@@ -114,9 +114,9 @@ public class ClusterTests extends CommonAPISPTest {
 
     @Test
     public void useSameSessionOnBothNodes() throws Exception {
-        User createUser = getIdentityAPI().createUser("john", "bpm", "John", "Doe");
+        final User createUser = getIdentityAPI().createUser("john", "bpm", "John", "Doe");
         changeToNode2();
-        User userByUserName = getIdentityAPI().getUserByUserName("john");
+        final User userByUserName = getIdentityAPI().getUserByUserName("john");
         assertEquals(createUser, userByUserName);
         getIdentityAPI().deleteUser("john");
 
@@ -129,7 +129,7 @@ public class ClusterTests extends CommonAPISPTest {
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
                 "1.0");
         designProcessDefinition.addActor(ACTOR_NAME);
-        UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step0", ACTOR_NAME);
+        final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step0", ACTOR_NAME);
         addUserTask.addShortTextData("text", new ExpressionBuilder().createConstantStringExpression("default"));
         addUserTask
         .addConnector("aConnector", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER)
@@ -149,7 +149,7 @@ public class ClusterTests extends CommonAPISPTest {
         changeToNode2();
         getProcessAPI().startProcess(processDefinition.getId());
 
-        List<HumanTaskInstance> waitForPendingTasks = waitForPendingTasks(user.getId(), 1);
+        final List<HumanTaskInstance> waitForPendingTasks = waitForPendingTasks(user.getId(), 1);
         assertEquals("inputValue", getProcessAPI().getActivityDataInstance("text", waitForPendingTasks.get(0).getId()).getValue());
 
         disableAndDeleteProcess(processDefinition);
@@ -185,17 +185,17 @@ public class ClusterTests extends CommonAPISPTest {
             designProcessDefinition.addTransition("autoStep" + i, "step" + i);
         }
 
-        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
-        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait the all automatic task finish
         waitForPendingTasks(user.getId(), 10);
 
         // check that at least one data is set to "Node1" and at least one to "Node2"
-        List<DataInstance> processDataInstances = getProcessAPI().getProcessDataInstances(processInstance.getId(), 0, 20);
+        final List<DataInstance> processDataInstances = getProcessAPI().getProcessDataInstances(processInstance.getId(), 0, 20);
         boolean node1Ok = false;
         boolean node2Ok = false;
 
-        for (DataInstance dataInstance : processDataInstances) {
+        for (final DataInstance dataInstance : processDataInstances) {
             node1Ok |= "Node1".equals(dataInstance.getValue());
             node2Ok |= "Node2".equals(dataInstance.getValue());
         }
@@ -228,11 +228,11 @@ public class ClusterTests extends CommonAPISPTest {
 
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
-        ProcessDefinitionBuilder pdb = new ProcessDefinitionBuilder().createNewInstance("loop process def", "1.0");
+        final ProcessDefinitionBuilder pdb = new ProcessDefinitionBuilder().createNewInstance("loop process def", "1.0");
         pdb.addAutomaticTask("step1").addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(100));
-        DesignProcessDefinition dpd = pdb.done();
-        ProcessDefinition pd = deployAndEnableProcess(dpd);
-        ProcessInstance pi = getProcessAPI().startProcess(pd.getId());
+        final DesignProcessDefinition dpd = pdb.done();
+        final ProcessDefinition pd = deployAndEnableProcess(dpd);
+        final ProcessInstance pi = getProcessAPI().startProcess(pd.getId());
 
         logoutOnTenant();
         // when: we stop node 1

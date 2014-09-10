@@ -51,6 +51,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
+import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -355,22 +356,21 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
 
         final Map<ManualTaskField, Serializable> fields = creator.getFields();
-        final TaskPriority taskPriority = fields.get(ManualTaskField.PRIORITY) != null ? (TaskPriority) fields.get(ManualTaskField.PRIORITY)
-                : TaskPriority.NORMAL;
-        final long humanTaskId = (Long) fields.get(ManualTaskField.PARENT_TASK_ID);
+
+        final long parentHumanTaskId = (Long) fields.get(ManualTaskField.PARENT_TASK_ID);
         final long loggedUserId = SessionInfos.getUserIdFromSession();
         try {
-            final SActivityInstance activityInstance = getSActivityInstance(humanTaskId);
-            if (!(activityInstance instanceof SHumanTaskInstance)) {
+            final SActivityInstance parentActivityInstance = getSActivityInstance(parentHumanTaskId);
+            if (!(parentActivityInstance instanceof SHumanTaskInstance)) {
                 throw new CreationException("The parent activity is not a Human task");
             }
-            if (((SHumanTaskInstance) activityInstance).getAssigneeId() != loggedUserId) {
+            if (((SHumanTaskInstance) parentActivityInstance).getAssigneeId() != loggedUserId) {
                 throw new CreationException("Unable to create a child task from this task, it's not assigned to you!");
             }
 
-            final SManualTaskInstance createManualUserTask = createManualUserTask(activityInstanceService, fields, taskPriority, humanTaskId);
+            final SManualTaskInstance createManualUserTask = createManualUserTask(tenantAccessor, fields, parentHumanTaskId);
             executeFlowNode(loggedUserId, createManualUserTask.getId(), false /* wrapInTransaction */);// put it in ready
-            addActivityInstanceTokenCount(activityInstanceService, activityInstance);
+            addActivityInstanceTokenCount(activityInstanceService, parentActivityInstance);
 
             return ModelConvertor.toManualTask(createManualUserTask, flowNodeStateManager);
         } catch (final SBonitaException e) {
@@ -385,19 +385,26 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         activityInstanceService.setTokenCount(activityInstance, tokenCount);
     }
 
-    private SManualTaskInstance createManualUserTask(final ActivityInstanceService activityInstanceService, final Map<ManualTaskField, Serializable> fields,
-            final TaskPriority taskPriority, final long humanTaskId) throws SActivityCreationException, SFlowNodeNotFoundException, SFlowNodeReadException {
+    private SManualTaskInstance createManualUserTask(final TenantServiceAccessor tenantAccessor, final Map<ManualTaskField, Serializable> fields,
+            final long parentHumanTaskId) throws SFlowNodeNotFoundException, SFlowNodeReadException, SActivityCreationException {
+        final BPMInstancesCreator bpmInstancesCreator = tenantAccessor.getBPMInstancesCreator();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+
         final Date dueDate = (Date) fields.get(ManualTaskField.DUE_DATE);
         long dueTime = 0L;
         if (dueDate != null) {
             dueTime = dueDate.getTime();
         }
-        final SManualTaskInstance createManualUserTask = activityInstanceService.createManualUserTask(humanTaskId,
+
+        final TaskPriority taskPriority = fields.get(ManualTaskField.PRIORITY) != null ? (TaskPriority) fields.get(ManualTaskField.PRIORITY)
+                : TaskPriority.NORMAL;
+
+        final SManualTaskInstance sManualTaskInstance = bpmInstancesCreator.createManualTaskInstance(parentHumanTaskId,
                 (String) fields.get(ManualTaskField.TASK_NAME), -1L,
                 (String) fields.get(ManualTaskField.DISPLAY_NAME), (Long) fields.get(ManualTaskField.ASSIGN_TO),
-                (String) fields.get(ManualTaskField.DESCRIPTION), dueTime,
-                STaskPriority.valueOf(taskPriority.name()));
-        return createManualUserTask;
+                (String) fields.get(ManualTaskField.DESCRIPTION), dueTime, STaskPriority.valueOf(taskPriority.name()));
+        activityInstanceService.createActivityInstance(sManualTaskInstance);
+        return sManualTaskInstance;
     }
 
     @Override
