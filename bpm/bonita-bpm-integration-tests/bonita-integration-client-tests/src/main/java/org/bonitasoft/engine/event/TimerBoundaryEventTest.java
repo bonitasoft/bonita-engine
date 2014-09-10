@@ -28,16 +28,14 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class TimerBoundaryEventTest extends AbstractTimerBoundaryEventTest {
-    
-    
+
     protected ProcessDefinition deployProcessWithInterruptingAndNonInterruptingTimer(final long interruptTimer, final long nonInterruptingTimer,
-            final String taskWithBoundaryName, final String interruptExceptionTaskName, final String nonInterruptExceptionTaskName, String interruptTimerName, String nonInterruptTimerName) throws BonitaException {
+            final String taskWithBoundaryName, final String interruptExceptionTaskName, final String nonInterruptExceptionTaskName, String interruptTimerName,
+            String nonInterruptTimerName) throws BonitaException {
         String normalFlowTaskName = "normalFlow";
         Expression interruptTimerExpr = new ExpressionBuilder().createConstantLongExpression(interruptTimer);
         Expression nonInterruptTimerExpr = new ExpressionBuilder().createConstantLongExpression(nonInterruptingTimer);
@@ -58,10 +56,10 @@ public class TimerBoundaryEventTest extends AbstractTimerBoundaryEventTest {
 
         return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, donaBenta);
     }
-    
+
     @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
-    "interrupting", "Non-interrupting" }, story = "A non-interrupting timer event is not triggered if an interrupting timer event is triggered before in the same task.", 
-    jira = "ENGINE-1731")
+            "interrupting", "Non-interrupting" }, story = "A non-interrupting timer event is not triggered if an interrupting timer event is triggered before in the same task.",
+            jira = "ENGINE-1731")
     @Test
     public void nonInterruptingNotTrigerAfterInterruptingTriggering() throws Exception {
         //deploy process
@@ -71,24 +69,25 @@ public class TimerBoundaryEventTest extends AbstractTimerBoundaryEventTest {
         String nonInterruptExceptionTaskName = "afterNonInterrupt";
         String interruptTimerName = "interruptTimer";
         String nonInterruptTimerName = "nonInterruptTimer";
-        ProcessDefinition processDefinition = deployProcessWithInterruptingAndNonInterruptingTimer(100, nonInterruptingTimer, taskWithBoundaryName, interruptExceptionTaskName, nonInterruptExceptionTaskName, interruptTimerName, nonInterruptTimerName);
-        
+        ProcessDefinition processDefinition = deployProcessWithInterruptingAndNonInterruptingTimer(100, nonInterruptingTimer, taskWithBoundaryName,
+                interruptExceptionTaskName, nonInterruptExceptionTaskName, interruptTimerName, nonInterruptTimerName);
+
         //start process and wait for task in aborted state
         ProcessInstance processInstance = getProcessAPI().startProcess(donaBenta.getId(), processDefinition.getId());
-        waitForFlowNodeInState(processInstance, taskWithBoundaryName, TestStates.getAbortedState(), false);
-        
+        waitForFlowNodeInState(processInstance, taskWithBoundaryName, TestStates.ABORTED, false);
+
         //verify that non-interrupting timer was aborted
-        waitForFlowNodeInState(processInstance, nonInterruptTimerName, TestStates.getAbortedState(), false);
-        
+        waitForFlowNodeInState(processInstance, nonInterruptTimerName, TestStates.ABORTED, false);
+
         //verify that exception flow was taken
         waitForUserTask(interruptExceptionTaskName);
-        
+
         getProcessAPI().deleteProcessInstance(processInstance.getId());
         disableAndDeleteProcess(processDefinition);
     }
-    
+
     @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
-            "interrupting", "Non-interrupting" }, story = "An interrupting timer event is triggered after that a non-interrupting timer event is triggered in the same task.", 
+            "interrupting", "Non-interrupting" }, story = "An interrupting timer event is triggered after that a non-interrupting timer event is triggered in the same task.",
             jira = "ENGINE-1731")
     @Test
     public void interruptingTrigerAfterNonInterruptingTriggering() throws Exception {
@@ -98,23 +97,23 @@ public class TimerBoundaryEventTest extends AbstractTimerBoundaryEventTest {
         String nonInterruptExceptionTaskName = "afterNonInterrupt";
         String interruptTimerName = "interruptTimer";
         String nonInterruptTimerName = "nonInterruptTimer";
-        ProcessDefinition processDefinition = deployProcessWithInterruptingAndNonInterruptingTimer(1000, 100, taskWithBoundaryName, interruptExceptionTaskName, nonInterruptExceptionTaskName, interruptTimerName, nonInterruptTimerName);
-        
+        ProcessDefinition processDefinition = deployProcessWithInterruptingAndNonInterruptingTimer(1000, 100, taskWithBoundaryName, interruptExceptionTaskName,
+                nonInterruptExceptionTaskName, interruptTimerName, nonInterruptTimerName);
+
         //start process and wait for task in ready state
         ProcessInstance processInstance = getProcessAPI().startProcess(donaBenta.getId(), processDefinition.getId());
         waitForUserTask(taskWithBoundaryName);
-        
+
         //verify that exception flow was taken for non-interrupting event
         waitForUserTask(nonInterruptExceptionTaskName);
 
         //wait for aborted state
-        waitForFlowNodeInState(processInstance, taskWithBoundaryName, TestStates.getAbortedState(), false);
+        waitForFlowNodeInState(processInstance, taskWithBoundaryName, TestStates.ABORTED, false);
         //verify that interrupting  event was triggered
         waitForUserTask(interruptExceptionTaskName);
-        
+
         getProcessAPI().deleteProcessInstance(processInstance.getId());
         disableAndDeleteProcess(processDefinition);
     }
 
-    
 }

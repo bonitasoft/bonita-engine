@@ -80,11 +80,11 @@ import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.*;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
@@ -924,7 +924,7 @@ public class StateBehaviors {
             long userId = ((SHumanTaskInstance) flowNodeInstance).getAssigneeId();
             if (userId > 0) {
                 try {
-                    addAssignmentSystemComment(flowNodeInstance,userId);
+                    addAssignmentSystemComment(flowNodeInstance, userId);
                 } catch (SBonitaException e) {
                     throw new SActivityStateExecutionException("error while updating display name and description", e);
                 }

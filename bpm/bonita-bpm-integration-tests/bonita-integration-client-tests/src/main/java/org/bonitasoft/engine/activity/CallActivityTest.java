@@ -451,7 +451,7 @@ public class CallActivityTest extends CommonAPITest {
             assertEquals(1, processInstances.size());
             final WaitForActivity waitForActivity = waitForActivity("callActivity", callingProcessInstance);
             final ActivityInstance callActivityInstance = waitForActivity.getResult();
-            assertEquals(TestStates.getFailedState(), callActivityInstance.getState());
+            assertEquals(TestStates.FAILED, callActivityInstance.getState());
 
             return;
         }
@@ -472,7 +472,7 @@ public class CallActivityTest extends CommonAPITest {
 
         final WaitForActivity waitForActivity = waitForActivity("callActivity", callingProcessInstance);
         final ActivityInstance callActivityInstance = waitForActivity.getResult();
-        assertEquals(TestStates.getExecutingState(), callActivityInstance.getState());
+        assertEquals(TestStates.EXECUTING.getStateName(), callActivityInstance.getState());
         assertEquals(callingProcessInstance.getId(), targetPI.getRootProcessInstanceId());
         assertEquals(callActivityInstance.getId(), targetPI.getCallerId());
 
@@ -610,7 +610,7 @@ public class CallActivityTest extends CommonAPITest {
         assertEquals(1, processInstances.size());
 
         final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
-        assertEquals(TestStates.getFailedState(), waitForTaskToFail.getState());
+        assertEquals(TestStates.FAILED.getStateName(), waitForTaskToFail.getState());
         disableAndDeleteProcess(processDef);
     }
 
@@ -673,7 +673,7 @@ public class CallActivityTest extends CommonAPITest {
 
         final WaitForActivity waitForActivity = waitForActivity("callActivity", callingProcessInstance);
         final ActivityInstance callActivityInstance = waitForActivity.getResult();
-        assertEquals(TestStates.getExecutingState(), callActivityInstance.getState());
+        assertEquals(TestStates.EXECUTING.getStateName(), callActivityInstance.getState());
 
         waitForStepAndExecuteIt(callingProcessInstance, "tStep1", cebolinha, targetPI); // first loop execution
         waitForProcessToFinish(targetPI);
@@ -805,7 +805,7 @@ public class CallActivityTest extends CommonAPITest {
             assertEquals(targetPI.getProcessDefinitionId(), targetProcessDef.getId());
             assertEquals(PROCESS_VERSION, targetProcessDef.getVersion());
             final ActivityInstance callActivityInstance = waitForActivity("callActivity", callingProcessInstance).getResult();
-            assertEquals(TestStates.getExecutingState(), callActivityInstance.getState());
+            assertEquals(TestStates.EXECUTING.getStateName(), callActivityInstance.getState());
             assertEquals(callingProcessInstance.getId(), targetPI.getRootProcessInstanceId());
             assertEquals(callActivityInstance.getId(), targetPI.getCallerId());
             final HumanTaskInstance tStep1 = waitForUserTask("tStep1", callingProcessInstance);
@@ -856,7 +856,7 @@ public class CallActivityTest extends CommonAPITest {
             assertEquals(2, processInstances.size()); // two instances are expected calling and target process
             final ProcessInstance targetPI = processInstances.get(0);
             final ActivityInstance callActivityInstance = waitForActivity("callActivity", callingProcessInstance).getResult();
-            assertEquals(TestStates.getExecutingState(), callActivityInstance.getState());
+            assertEquals(TestStates.EXECUTING.getStateName(), callActivityInstance.getState());
             assertEquals(callingProcessInstance.getId(), targetPI.getRootProcessInstanceId());
             assertEquals(callActivityInstance.getId(), targetPI.getCallerId());
             assertEquals("callActivityDisplayName", callActivityInstance.getDisplayName());

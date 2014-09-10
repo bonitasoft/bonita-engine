@@ -50,7 +50,6 @@ import org.bonitasoft.engine.core.process.definition.model.SMultiInstanceLoopCha
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SStandardLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SBoundaryEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SIntermediateCatchEventDefinition;
@@ -68,6 +67,8 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
@@ -83,6 +84,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanc
 import org.bonitasoft.engine.core.process.instance.model.builder.SHumanTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SLoopActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SLoopActivityInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SManualTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SManualTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
@@ -159,7 +161,8 @@ public class BPMInstancesCreator {
             final ActorMappingService actorMappingService, final GatewayInstanceService gatewayInstanceService,
             final EventInstanceService eventInstanceService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService,
-            final DataInstanceService dataInstanceService, final TechnicalLoggerService logger, final TransientDataService transientDataService, ArchiveService archiveService) {
+            final DataInstanceService dataInstanceService, final TechnicalLoggerService logger, final TransientDataService transientDataService,
+            ArchiveService archiveService) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.actorMappingService = actorMappingService;
@@ -352,10 +355,50 @@ public class BPMInstancesCreator {
     private SHumanTaskInstanceBuilder createManualTaskInstance(final long processDefinitionId, final long rootContainerId, final long parentContainerId,
             final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId,
             final long parentProcessInstanceId) throws SActorNotFoundException {
-        final SHumanTaskInstanceBuilder builder = createHumanTaskInstance(processDefinitionId, rootContainerId, parentContainerId, sFlowNodeDefinition,
+        final SHumanTaskDefinition humanTaskDefinition = (SHumanTaskDefinition) sFlowNodeDefinition;
+        final String actorName = humanTaskDefinition.getActorName();
+
+        final SActor actor = getActor(processDefinitionId, actorName);
+        final SHumanTaskInstanceBuilder builder = BuilderFactory.get(SManualTaskInstanceBuilderFactory.class).createNewManualTaskInstance(
+                humanTaskDefinition.getName(), humanTaskDefinition.getId(), rootContainerId, parentContainerId, actor.getId(), processDefinitionId,
                 rootProcessInstanceId, parentProcessInstanceId);
+        fillHumanTask(humanTaskDefinition, builder);
         updateActivityInstance(parentContainerId, parentContainerType, sFlowNodeDefinition, builder);
         return builder;
+    }
+
+    public SManualTaskInstance createManualTaskInstance(final long parentUserTaskId, final String name, final long flowNodeDefinitionId,
+            final String displayName, final long userId, final String description, final long dueDate, final STaskPriority priority)
+            throws SFlowNodeNotFoundException, SFlowNodeReadException {
+        final SHumanTaskInstance parentUserTask = (SHumanTaskInstance) activityInstanceService.getFlowNodeInstance(parentUserTaskId);
+        final SManualTaskInstanceBuilderFactory manualTaskInstanceBuilderFact = BuilderFactory.get(SManualTaskInstanceBuilderFactory.class);
+        final long processDefinitionId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilderFact.getProcessDefinitionIndex());
+        final long rootProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilderFact.getRootProcessInstanceIndex());
+        final long parentProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilderFact.getParentProcessInstanceIndex());
+        final SManualTaskInstanceBuilder builder = manualTaskInstanceBuilderFact.createNewManualTaskInstance(name, flowNodeDefinitionId,
+                parentUserTask.getRootContainerId(), parentUserTaskId, parentUserTask.getActorId(), processDefinitionId, rootProcessInstanceId,
+                parentProcessInstanceId);
+        builder.setParentContainerId(parentUserTaskId);
+        builder.setParentActivityInstanceId(parentUserTaskId);
+        builder.setAssigneeId(userId);
+        builder.setExpectedEndDate(dueDate);
+        builder.setDescription(description);
+        builder.setDisplayDescription(description);
+        builder.setDisplayName(displayName);
+        builder.setPriority(priority);
+        builder.setState(firstStateIds.get(builder.getFlowNodeType()), false, false, firstStateNames.get(builder.getFlowNodeType()));
+        return builder.done();
+    }
+
+    private SActor getActor(final long processDefinitionId, final String actorName) throws SActorNotFoundException {
+        final GetActor getSActor = new GetActor(actorMappingService, actorName, processDefinitionId);
+        try {
+            getSActor.execute();
+        } catch (final SBonitaException sbe) {
+            throw new SActorNotFoundException(sbe);
+        }
+        final SActor actor = getSActor.getResult();
+        return actor;
     }
 
     private SIntermediateThrowEventInstanceBuilder createIntermediateThrowEventInstance(final long processDefinitionId, final long rootContainerId,
@@ -481,24 +524,15 @@ public class BPMInstancesCreator {
         final SHumanTaskDefinition humanTaskDefinition = (SHumanTaskDefinition) sFlowNodeDefinition;
         final String actorName = humanTaskDefinition.getActorName();
 
-        final GetActor getSActor = new GetActor(actorMappingService, actorName, processDefinitionId);
-        try {
-            getSActor.execute();
-        } catch (final SBonitaException sbe) {
-            throw new SActorNotFoundException(sbe);
-        }
-        final SActor actor = getSActor.getResult();
-        SHumanTaskInstanceBuilder builder;
-        if (sFlowNodeDefinition instanceof SUserTaskDefinition) {
-            builder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class).createNewUserTaskInstance(humanTaskDefinition.getName(),
-                    humanTaskDefinition.getId(), rootContainerId,
-                    parentContainerId, actor.getId(), processDefinitionId, rootProcessInstanceId, parentProcessInstanceId);
-        } else {
-            // manual task
-            builder = BuilderFactory.get(SManualTaskInstanceBuilderFactory.class).createNewManualTaskInstance(humanTaskDefinition.getName(),
-                    humanTaskDefinition.getId(), rootContainerId,
-                    parentContainerId, actor.getId(), processDefinitionId, rootProcessInstanceId, parentProcessInstanceId);
-        }
+        final SActor actor = getActor(processDefinitionId, actorName);
+        final SHumanTaskInstanceBuilder builder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class).createNewUserTaskInstance(
+                humanTaskDefinition.getName(), humanTaskDefinition.getId(), rootContainerId, parentContainerId, actor.getId(), processDefinitionId,
+                rootProcessInstanceId, parentProcessInstanceId);
+        fillHumanTask(humanTaskDefinition, builder);
+        return builder;
+    }
+
+    private void fillHumanTask(final SHumanTaskDefinition humanTaskDefinition, final SHumanTaskInstanceBuilder builder) {
         // Creation date:
         builder.setReachedStateDate(System.currentTimeMillis());
         final Long expectedDuration = humanTaskDefinition.getExpectedDuration();
@@ -511,7 +545,6 @@ public class BPMInstancesCreator {
             final STaskPriority sPriority = STaskPriority.valueOf(priority);
             builder.setPriority(sPriority);
         }
-        return builder;
     }
 
     public void createConnectorInstances(final PersistentObject container, final List<SConnectorDefinition> connectors, final String containerType)

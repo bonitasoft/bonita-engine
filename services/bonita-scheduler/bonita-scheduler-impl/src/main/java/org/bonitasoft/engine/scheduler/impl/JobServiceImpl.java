@@ -24,6 +24,8 @@ import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -71,10 +73,13 @@ public class JobServiceImpl implements JobService {
 
     private final ReadPersistenceService readPersistenceService;
 
-    public JobServiceImpl(final EventService eventService, final Recorder recorder, final ReadPersistenceService readPersistenceService) {
+    private final TechnicalLoggerService logger;
+
+    public JobServiceImpl(final EventService eventService, final Recorder recorder, final ReadPersistenceService readPersistenceService, final TechnicalLoggerService logger) {
         this.readPersistenceService = readPersistenceService;
         this.eventService = eventService;
         this.recorder = recorder;
+        this.logger = logger;
     }
 
     @Override
@@ -100,8 +105,18 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void deleteJobDescriptor(final long id) throws SJobDescriptorNotFoundException, SJobDescriptorReadException, SJobDescriptorDeletionException {
-        final SJobDescriptor sJobDescriptor = getJobDescriptor(id);
-        deleteJobDescriptor(sJobDescriptor);
+        try {
+            final SJobDescriptor sJobDescriptor = getJobDescriptor(id);
+            deleteJobDescriptor(sJobDescriptor);
+        } catch (final SJobDescriptorNotFoundException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                final StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("jobDescriptor with id");
+                stringBuilder.append(id);
+                stringBuilder.append(" already deleted, ignore it");
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, stringBuilder.toString());
+            }
+        }
     }
 
     @Override
@@ -357,9 +372,9 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-	@Override
-	public void deleteAllJobDescriptors() throws SJobDescriptorDeletionException {
-		final List<FilterOption> filters = new ArrayList<FilterOption>();
+    @Override
+    public void deleteAllJobDescriptors() throws SJobDescriptorDeletionException {
+        final List<FilterOption> filters = new ArrayList<FilterOption>();
         final QueryOptions queryOptions = new QueryOptions(0, 100, null, filters, null);
         try {
             final List<SJobDescriptor> jobDescriptors = searchJobDescriptors(queryOptions);
@@ -369,6 +384,6 @@ public class JobServiceImpl implements JobService {
         } catch (final SBonitaSearchException e) {
             throw new SJobDescriptorDeletionException(e);
         }
-	}
+    }
 
 }

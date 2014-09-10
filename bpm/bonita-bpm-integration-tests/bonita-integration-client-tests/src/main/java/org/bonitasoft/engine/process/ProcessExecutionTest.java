@@ -193,7 +193,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         assertEquals(0, activities.size());
 
         assertTrue("Process instance should be completed",
-                containsState(getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 10), TestStates.getNormalFinalState()));// FIXME
+                containsState(getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 10), TestStates.NORMAL_FINAL));// FIXME
 
         disableAndDeleteProcess(processDefinition);
         deleteUser(user.getId());
@@ -250,7 +250,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         assertTrue("The process instance " + processInstance.getName() + " must start between <" + before + "> and <" + after + ">, but was <"
                 + processStartDate + ">", after >= processStartDate && processStartDate >= before);
         assertEquals(getSession().getUserId(), processInstance.getStartedBy());
-        assertTrue("expected 1 activity", new CheckNbOfActivities(getProcessAPI(), 20, 5000, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
+        assertTrue("expected 1 activity", new CheckNbOfActivities(getProcessAPI(), 20, 5000, true, processInstance, 1, TestStates.READY).waitUntil());
 
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance step1 = activities.get(0);
@@ -280,7 +280,7 @@ public class ProcessExecutionTest extends CommonAPITest {
 
         final List<ArchivedProcessInstance> archs = getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 100);
         assertEquals(1, archs.size());
-        assertEquals(TestStates.getInitialState(), archs.get(0).getState());
+        assertEquals(TestStates.INITIAL.getStateName(), archs.get(0).getState());
 
         assignAndExecuteStep(step1, user.getId());
         waitForProcessToFinish(processInstance);
@@ -330,7 +330,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         assignFirstActorToMe(processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        assertTrue("Expected an activity", new CheckNbOfActivities(getProcessAPI(), 50, 1000, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
+        assertTrue("Expected an activity", new CheckNbOfActivities(getProcessAPI(), 50, 1000, true, processInstance, 1, TestStates.READY).waitUntil());
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance step1 = activities.get(0);
         final long before = new Date().getTime();
@@ -363,7 +363,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals(user.getId(), processInstance.getStartedBy());
-        assertTrue("Expected an activity", new CheckNbOfActivities(getProcessAPI(), 50, 1000, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
+        assertTrue("Expected an activity", new CheckNbOfActivities(getProcessAPI(), 50, 1000, true, processInstance, 1, TestStates.READY).waitUntil());
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance step1 = activities.get(0);
         assignAndExecuteStep(step1, user.getId());
@@ -393,7 +393,7 @@ public class ProcessExecutionTest extends CommonAPITest {
 
         assertEquals(null, archivedActivityInstance.getDisplayDescription());
 
-        final ActivityInstance activityInstance = waitForTaskInState(pi, "task1", TestStates.getReadyState());
+        final ActivityInstance activityInstance = waitForTaskInState(pi, "task1", TestStates.READY);
 
         assertEquals(null, activityInstance.getDisplayDescription());
 
@@ -505,7 +505,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-    "process instance" })
+            "process instance" })
     @Test
     public void getArchivedProcessDataInstance() throws Exception {
         final String dataName = "title";
@@ -527,7 +527,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-    "process instance" })
+            "process instance" })
     @Test
     public void getArchivedProcessDataInstanceFromAnArchivedProcess() throws Exception {
         final String dataName = "title";
@@ -571,7 +571,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Cover(jira = "ENGINE-1820", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-    "process instance" })
+            "process instance" })
     @Test
     public void getUnknownArchivedProcessDataInstance() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
@@ -592,7 +592,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-    "activity instance" })
+            "activity instance" })
     @Test
     public void getArchivedActivityDataInstance() throws Exception {
         final String dataName = "title";
@@ -614,7 +614,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-    "activity instance" })
+            "activity instance" })
     @Test
     public void getArchivedActivityDataInstanceFromAnArchivedProcess() throws Exception {
         final String dataName = "title";
@@ -638,7 +638,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Cover(jira = "ENGINE-1821", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-    "activity instance" })
+            "activity instance" })
     @Test
     public void getUnknownArchivedActivityDataInstance() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
@@ -663,7 +663,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Cover(jira = "ENGINE-1822", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-    "process instance" })
+            "process instance" })
     @Test
     public void getArchivedProcessDataInstances() throws Exception {
         final String dataName = "title";
@@ -732,7 +732,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Cover(jira = "ENGINE-1822", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-    "process instance" })
+            "process instance" })
     @Test
     public void getEmptyArchivedProcessDataInstances() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessToArchive", "1.0");
@@ -752,7 +752,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     }
 
     @Cover(jira = "ENGINE-1822", classes = { ArchivedDataInstance.class, ProcessAPI.class }, concept = BPMNConcept.DATA, keywords = { "last archived data",
-    "activity instance" })
+            "activity instance" })
     @Test
     public void getArchivedActivityDataInstances() throws Exception {
         final String dataName = "title";

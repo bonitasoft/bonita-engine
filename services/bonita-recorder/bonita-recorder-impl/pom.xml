@@ -29,13 +29,13 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-api</artifactId>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.persistence</groupId>
-			<artifactId>bonita-delete-api</artifactId>
+			<groupId>org.bonitasoft.engine.events</groupId>
+			<artifactId>bonita-events-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
         <dependency>

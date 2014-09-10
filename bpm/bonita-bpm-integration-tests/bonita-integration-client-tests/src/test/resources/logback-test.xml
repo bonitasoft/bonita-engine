@@ -7,7 +7,7 @@
 		</encoder>
 	</appender>
 
-	<logger name="org.bonitasoft" level="TRACE" />
+	<logger name="org.bonitasoft" level="INFO" />
 
 	<root level="WARN">
 		<appender-ref ref="STDOUT" />

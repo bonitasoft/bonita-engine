@@ -39,6 +39,14 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+        
+        <!-- Business application -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.application</groupId>
+            <artifactId>bonita-business-application</artifactId>
+            <version>${project.version}</version>
+			<scope>test</scope>
+        </dependency>
 
 		<!-- Cache -->
 		<dependency>
@@ -180,12 +188,6 @@
 		<!-- Event -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.events</groupId>
 			<artifactId>bonita-events-api-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
@@ -251,12 +253,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- Login -->
 		<dependency>
@@ -279,6 +275,14 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+        
+        <!-- Page -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.page</groupId>
+            <artifactId>bonita-page</artifactId>
+            <version>${project.version}</version>
+			<scope>test</scope>
+        </dependency>
 
 		<!-- Platform -->
 		<dependency>
@@ -340,12 +344,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
 			<artifactId>bonita-process-instance-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-model-impl</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -509,15 +507,13 @@
 			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc</artifactId>
 			<version>6</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/ojdbc6.jar</systemPath>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.microsoft.jdbc</groupId>
 			<artifactId>sqlserver</artifactId>
 			<version>4.0.2206.100</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/sqljdbc-4.0.2206.100.jar</systemPath>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>

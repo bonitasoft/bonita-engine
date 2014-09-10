@@ -131,7 +131,7 @@ public class EndEventTest extends CommonAPITest {
         waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
         // should finish even if we don't execute step2
         waitForProcessToFinish(startProcess);
-        waitForArchivedActivity(userTask.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(userTask.getId(), TestStates.ABORTED);
         disableAndDeleteProcess(process);
     }
 
@@ -153,7 +153,7 @@ public class EndEventTest extends CommonAPITest {
         waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
         // should finish even if we don't execute step2
         waitForProcessToFinish(startProcess);
-        waitForArchivedActivity(userTask.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(userTask.getId(), TestStates.ABORTED);
         disableAndDeleteProcess(process);
     }
 

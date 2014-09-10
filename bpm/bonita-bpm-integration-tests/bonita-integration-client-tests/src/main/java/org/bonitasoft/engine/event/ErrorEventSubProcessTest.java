@@ -210,7 +210,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
 
         // throw error
         assignAndExecuteStep(step2, john.getId());
-        waitForArchivedActivity(step2.getId(), TestStates.getNormalFinalState());
+        waitForArchivedActivity(step2.getId(), TestStates.NORMAL_FINAL);
 
         final FlowNodeInstance eventSubProcessActivity = waitForFlowNodeInExecutingState(processInstance, BuildTestUtil.EVENT_SUB_PROCESS_NAME, false);
         final ActivityInstance subStep = waitForUserTask("subStep", processInstance.getId());
@@ -247,7 +247,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
         assignAndExecuteStep(step1, john.getId());
         assignAndExecuteStep(step2, john.getId());
 
-        waitForArchivedActivity(step1.getId(), TestStates.getNormalFinalState());
+        waitForArchivedActivity(step1.getId(), TestStates.NORMAL_FINAL);
         waitForProcessToFinish(processInstance);
 
         // the parent process instance has completed, so no more waiting events are expected
@@ -381,7 +381,7 @@ public class ErrorEventSubProcessTest extends EventsAPITest {
         final ProcessInstance calledProcInst = getProcessAPI().getProcessInstance(step1.getParentProcessInstanceId());
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
         assignAndExecuteStep(subStep, john.getId());
         waitForProcessToFinish(subProcInst);
         waitForProcessToBeInState(calledProcInst, ProcessInstanceState.ABORTED);
