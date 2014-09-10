@@ -7,6 +7,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,11 +30,19 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class ContractValidatorTest {
 
+    private static final String BOOLEAN_INPUT = "booleanInput";
+
+    private static final String NUMBER_INPUT = "numberInput";
+
     private static final String NICE_COMMENT = "no way!";
 
     private static final String COMMENT = "comment";
 
     private static final String IS_VALID = "isValid";
+
+    private static final String DATE_INPUT = "dateInput";
+
+    private static final String DECIMAL_INPUT = "decimalInput";
 
     @Mock
     private TechnicalLoggerService loggerService;
@@ -68,12 +79,11 @@ public class ContractValidatorTest {
     }
 
     private SContractDefinitionImpl buildEmptyContract() {
-        final SContractDefinitionImpl contract = new SContractDefinitionImpl();
-        return contract;
+        return new SContractDefinitionImpl();
     }
 
     @Test
-    public void isValid_should_be_true_an_retrun_an_empty_list() throws Exception {
+    public void isValid_should_be_true_an_return_an_empty_list() throws Exception {
         //given
         final Map<String, Object> variables = new HashMap<String, Object>();
         variables.put(IS_VALID, true);
@@ -89,7 +99,7 @@ public class ContractValidatorTest {
     }
 
     @Test
-    public void isValid_should_be_false_an_retrun_explanations() throws Exception {
+    public void isValid_should_be_false_an_return_explanations() throws Exception {
         //given
         final Map<String, Object> variables = new HashMap<String, Object>();
         variables.put(IS_VALID, false);
@@ -152,7 +162,9 @@ public class ContractValidatorTest {
         variables.put(IS_VALID, false);
         variables.put(COMMENT, null);
         final SContractDefinition contract = new SContractDefinitionImpl();
-        contract.getInputs().add(new SInputDefinitionImpl(IS_VALID));
+        SInputDefinitionImpl sInputDefinition = new SInputDefinitionImpl(IS_VALID);
+        sInputDefinition.setType(SType.BOOLEAN);
+        contract.getInputs().add(sInputDefinition);
 
         //when
         final boolean valid = validator.isValid(contract, variables);
@@ -168,15 +180,19 @@ public class ContractValidatorTest {
         final Map<String, Object> variables = new HashMap<String, Object>();
         variables.put(COMMENT, NICE_COMMENT);
         final SContractDefinition contract = new SContractDefinitionImpl();
-        contract.getInputs().add(new SInputDefinitionImpl(IS_VALID));
-        contract.getInputs().add(new SInputDefinitionImpl(COMMENT));
+        SInputDefinitionImpl sInputDefinition = new SInputDefinitionImpl(IS_VALID);
+        sInputDefinition.setType(SType.BOOLEAN);
+        contract.getInputs().add(sInputDefinition);
+        SInputDefinitionImpl sInputDefinition2 = new SInputDefinitionImpl(COMMENT);
+        sInputDefinition2.setType(SType.TEXT);
+        contract.getInputs().add(sInputDefinition2);
 
         //when
         final boolean valid = validator.isValid(contract, variables);
 
         //then
         assertThat(valid).as("should refuse when inputs are unexpected").isFalse();
-        assertThat(validator.getComments()).hasSize(1).containsExactly(IS_VALID + " is not defined");
+        assertThat(validator.getComments()).isNotEmpty().contains(IS_VALID + " is not defined");
     }
 
     @Test
@@ -204,7 +220,7 @@ public class ContractValidatorTest {
         final boolean valid = validator.isValid(contract, variables);
 
         //then
-        assertThat(valid).as("shoul validate when contract is empty and no inputs are provided").isTrue();
+        assertThat(valid).as("should validate when contract is empty and no inputs are provided").isTrue();
     }
 
     @Test
@@ -219,6 +235,7 @@ public class ContractValidatorTest {
         final boolean valid = validator.isValid(contract, variables);
 
         //then
+        assertThat(validator.getComments()).as("should have no comments").isEmpty();
         assertThat(valid).as("should validate contract").isTrue();
     }
 
@@ -254,4 +271,69 @@ public class ContractValidatorTest {
         assertThat(valid).as("should validate contract without rules").isFalse();
         assertThat(validator.getComments()).hasSize(1).containsExactly(badRule.getExplanation());
     }
+
+    @Test
+    public void isValid_should_check_input_type() throws Exception {
+        //given
+        final SContractDefinition contract = buildEmptyContract();
+        final SInputDefinitionImpl sInputDefinition = new SInputDefinitionImpl(NUMBER_INPUT);
+        sInputDefinition.setType(SType.INTEGER);
+        contract.getInputs().add(sInputDefinition);
+
+        final SInputDefinitionImpl sInputDefinition2 = new SInputDefinitionImpl(BOOLEAN_INPUT);
+        sInputDefinition2.setType(SType.BOOLEAN);
+        contract.getInputs().add(sInputDefinition2);
+
+        final StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(sInputDefinition2.getName());
+        stringBuilder.append(".class.isInstance(");
+        stringBuilder.append(sInputDefinition2.getType());
+        stringBuilder.append(")");
+
+        final Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put(NUMBER_INPUT, "abc");
+        variables.put(BOOLEAN_INPUT, true);
+
+        //when
+        final boolean valid = validator.isValid(contract, variables);
+
+        //then
+        assertThat(valid).as("should validate contract without rules").isFalse();
+        assertThat(validator.getComments()).isNotEmpty().contains("unable to bind input numberInput to type " + BigInteger.class.getName());
+    }
+
+    @Test
+    public void isValid_should_validate_input_type() throws Exception {
+        //given
+        final SContractDefinition contract = buildEmptyContract();
+        final SInputDefinitionImpl sInputDefinition = new SInputDefinitionImpl(NUMBER_INPUT);
+        sInputDefinition.setType(SType.INTEGER);
+        contract.getInputs().add(sInputDefinition);
+
+        final SInputDefinitionImpl sInputDefinition2 = new SInputDefinitionImpl(BOOLEAN_INPUT);
+        sInputDefinition2.setType(SType.BOOLEAN);
+        contract.getInputs().add(sInputDefinition2);
+
+        final SInputDefinitionImpl sInputDefinition3 = new SInputDefinitionImpl(DATE_INPUT);
+        sInputDefinition3.setType(SType.DATE);
+        contract.getInputs().add(sInputDefinition3);
+
+        final SInputDefinitionImpl sInputDefinition4 = new SInputDefinitionImpl(DECIMAL_INPUT);
+        sInputDefinition4.setType(SType.DECIMAL);
+        contract.getInputs().add(sInputDefinition4);
+
+        final Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put(NUMBER_INPUT, BigInteger.valueOf(123));
+        variables.put(BOOLEAN_INPUT, false);
+        variables.put(DATE_INPUT, new Date());
+        variables.put(DECIMAL_INPUT, BigDecimal.valueOf(1.5f));
+
+        //when
+        final boolean valid = validator.isValid(contract, variables);
+
+        //then
+        assertThat(validator.getComments()).isEmpty();
+        assertThat(valid).as("should validate contract without rules").isTrue();
+    }
+
 }

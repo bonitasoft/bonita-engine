@@ -13,9 +13,22 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Date;
+
 /**
  * @author Matthieu Chaffotte
  */
 public enum SType {
-    TEXT, BOOLEAN, DATE, INTEGER, DECIMAL;
+    @STypeConverter(implementationClass = String.class)
+    TEXT,
+    @STypeConverter(implementationClass = Boolean.class)
+    BOOLEAN,
+    @STypeConverter(implementationClass = Date.class)
+    DATE,
+    @STypeConverter(implementationClass = BigInteger.class)
+    INTEGER,
+    @STypeConverter(implementationClass = BigDecimal.class)
+    DECIMAL
 }
