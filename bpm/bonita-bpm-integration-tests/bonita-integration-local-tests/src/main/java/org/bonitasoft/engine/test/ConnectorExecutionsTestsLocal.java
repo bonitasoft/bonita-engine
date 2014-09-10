@@ -405,7 +405,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
         // Run Started state of the human task
         executeFlowNodeUntilEnd(step1Id);
-        waitForArchivedActivity(step1Id, TestStates.getNormalFinalState());
+        waitForArchivedActivity(step1Id, TestStates.NORMAL_FINAL);
 
         // Check that the "input1" variable has value for "valueOfInput1", in Started state of human task
         waitForVariableStorage(TestConnector.INPUT1, valueOfInput1);
@@ -433,7 +433,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
                 new ExpressionBuilder().createConstantLongExpression(3000));
         userTaskDefinitionBuilder.addUserTask("exceptionStep", ACTOR_NAME);
         processBuilder.addEndEvent("end");
-        processBuilder.addAutomaticTask("step2");
+        processBuilder.addUserTask("step2", ACTOR_NAME);
         processBuilder.addTransition("step1", "step2");
         processBuilder.addTransition("timer", "exceptionStep");
 
@@ -453,12 +453,12 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
         // Run Started state of the human task
         getProcessAPI().executeFlowNode(step1.getId());
+        waitForUserTask("step2", processInstance);
 
         // Check that the "input1" variable has value for "valueOfInput1", in Started state of human task
         waitForVariableStorage(TestConnector.INPUT1, valueOfInput1);
 
         // Remove all for the end
-        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 

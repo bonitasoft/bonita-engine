@@ -31,14 +31,14 @@ public class SignalEventTest extends CommonAPITest {
 
     @Before
     public void setUp() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         john = createUser(USERNAME, PASSWORD);
     }
 
     @After
     public void tearDown() throws Exception {
         logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         if (john != null) {
             getIdentityAPI().deleteUser(john.getId());
         }
@@ -113,7 +113,7 @@ public class SignalEventTest extends CommonAPITest {
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
         final ProcessInstance instance = getProcessAPI().startProcess(startSignal.getId());
-        waitForEvent(instance, "OnSignal", TestStates.getWaitingState());
+        waitForEvent(instance, "OnSignal", TestStates.WAITING);
 
         getProcessAPI().startProcess(endSignal.getId());
         waitForUserTask("Task1");
@@ -182,7 +182,7 @@ public class SignalEventTest extends CommonAPITest {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
         final ProcessInstance instance = getProcessAPI().startProcess(intermediateSignal.getId());
-        waitForEvent(instance, "OnSignal", TestStates.getWaitingState());
+        waitForEvent(instance, "OnSignal", TestStates.WAITING);
 
         getProcessAPI().sendSignal("GO");
         waitForUserTask("Task1");

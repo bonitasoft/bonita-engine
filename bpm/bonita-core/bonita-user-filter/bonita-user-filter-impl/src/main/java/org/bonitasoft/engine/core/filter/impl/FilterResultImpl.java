@@ -43,8 +43,5 @@ public class FilterResultImpl implements FilterResult {
         return shouldAutoAssignTaskIfSingleResult;
     }
 
-    public boolean isShouldAutoAssignTaskIfSingleResult() {
-        return shouldAutoAssignTaskIfSingleResult;
-    }
 
 }

@@ -28,8 +28,8 @@ public class SequenceWorkSynchronization extends AbstractWorkSynchronization {
     private final TechnicalLoggerService loggerService;
 
     public SequenceWorkSynchronization(final BonitaExecutorService executorService, final TechnicalLoggerService loggerService,
-            final SessionAccessor sessionAccessor) {
-        super(executorService, sessionAccessor);
+            final SessionAccessor sessionAccessor, final WorkService workService) {
+        super(executorService, sessionAccessor, workService);
         this.loggerService = loggerService;
     }
 

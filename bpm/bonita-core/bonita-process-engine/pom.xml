@@ -220,18 +220,8 @@
             <version>${project.version}</version>
         </dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.incident</groupId>
-			<artifactId>bonita-incident-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine.core.data</groupId>
 			<artifactId>bonita-data-instance-transient</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
-			<artifactId>bonita-process-definition-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
         <!-- Others -->
@@ -243,6 +233,7 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
+
         <!-- Tests -->
         <dependency>
             <groupId>junit</groupId>
@@ -272,7 +263,7 @@
 			<!-- because we need the builderfactory impl and it does not make sense 
 				to mock them -->
             <groupId>org.bonitasoft.engine.core.process.instance</groupId>
-            <artifactId>bonita-process-instance-model-impl</artifactId>
+            <artifactId>bonita-process-instance-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
@@ -280,7 +271,7 @@
 			<!-- because we need the builderfactory impl and it does not make sense 
 				to mock them -->
             <groupId>org.bonitasoft.engine.expression</groupId>
-            <artifactId>bonita-expression-model-impl</artifactId>
+            <artifactId>bonita-expression-api-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
@@ -300,12 +291,6 @@
             <groupId>org.bonitasoft.engine.core.process.definition</groupId>
 			<artifactId>bonita-process-definition-impl</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-			<groupId>org.bonitasoft.engine.core.operation</groupId>
-			<artifactId>bonita-operation-model-impl</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
 			<groupId>org.bonitasoft.engine.core.operation</groupId>

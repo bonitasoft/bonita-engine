@@ -53,9 +53,8 @@ public class StandardLoopCharacteristicsBinding extends ElementBinding {
     public Object getObject() {
         if (loopMax == null) {
             return new StandardLoopCharacteristics(loopCondition, testBefore);
-        } else {
-            return new StandardLoopCharacteristics(loopCondition, testBefore, loopMax);
         }
+        return new StandardLoopCharacteristics(loopCondition, testBefore, loopMax);
     }
 
     @Override

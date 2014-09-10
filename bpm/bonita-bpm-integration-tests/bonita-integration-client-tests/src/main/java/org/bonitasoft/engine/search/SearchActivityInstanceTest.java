@@ -70,7 +70,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         user = createUser(USERNAME, PASSWORD);
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
@@ -98,7 +98,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
 
         // Wait for 2 activities in READY state:
         final CheckNbOfActivities checkNbReadyActivities = new CheckNbOfActivities(getProcessAPI(), 200, 3000, true, processInstance, 2,
-                TestStates.getReadyState());
+                TestStates.READY);
         assertTrue("Expected 2 open activities for process instance " + processInstance.getId(), checkNbReadyActivities.waitUntil());
 
         // Check that no tasks are archived yet:

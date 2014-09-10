@@ -56,7 +56,7 @@ public class ConnectorExecutionTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         johnUser = createUser(USERNAME, PASSWORD);
         johnUserId = johnUser.getId();
         logoutOnTenant();

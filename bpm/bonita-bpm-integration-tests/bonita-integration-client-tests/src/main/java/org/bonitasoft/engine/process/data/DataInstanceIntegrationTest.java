@@ -54,7 +54,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
 
     @Before
     public void before() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         user = createUser("pedro", "secreto");
     }
 
@@ -318,7 +318,7 @@ public class DataInstanceIntegrationTest extends CommonAPITest {
         assertEquals(1, processDataInstances.get(0).getValue());
 
         // Execute pending task
-        assertTrue("expected an activity", new CheckNbOfActivities(getProcessAPI(), 20, 1000, true, processInstance, 1, TestStates.getReadyState()).waitUntil());
+        assertTrue("expected an activity", new CheckNbOfActivities(getProcessAPI(), 20, 1000, true, processInstance, 1, TestStates.READY).waitUntil());
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance activityInstance = activities.get(0);
         assignAndExecuteStep(activityInstance, user.getId());

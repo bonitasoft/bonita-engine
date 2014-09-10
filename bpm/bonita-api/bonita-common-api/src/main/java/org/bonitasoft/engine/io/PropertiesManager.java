@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -26,6 +26,7 @@ import java.util.Properties;
 /**
  * @author Matthieu Chaffotte
  * @author Frederic Bouquet
+ * @author Celine Souchet
  */
 public class PropertiesManager {
 
@@ -44,7 +45,11 @@ public class PropertiesManager {
 
     public static Properties getProperties(final URL url) throws IOException {
         final InputStreamReader reader = new InputStreamReader(url.openStream());
-        return getProperties(reader);
+        try {
+            return getProperties(reader);
+        } finally {
+            reader.close();
+        }
     }
 
     public static Properties getProperties(final String fileName) throws IOException {
@@ -53,17 +58,17 @@ public class PropertiesManager {
 
     public static Properties getProperties(final File file) throws IOException {
         final FileReader reader = new FileReader(file);
-        return getProperties(reader);
+        try {
+            return getProperties(reader);
+        } finally {
+            reader.close();
+        }
     }
 
     private static Properties getProperties(final Reader reader) throws IOException {
         final Properties properties = new Properties();
-        try {
-            properties.load(reader);
-            return properties;
-        } finally {
-            reader.close();
-        }
+        properties.load(reader);
+        return properties;
     }
 
     public static void savePropertiesToXML(final Properties properties, final File file) throws IOException {

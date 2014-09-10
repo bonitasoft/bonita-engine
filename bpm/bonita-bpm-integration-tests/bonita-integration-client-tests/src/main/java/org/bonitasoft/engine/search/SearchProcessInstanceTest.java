@@ -12,16 +12,12 @@ import java.util.List;
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -62,7 +58,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         user = createUser("jane", PASSWORD);
     }
 
@@ -960,13 +956,13 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         final List<ArchivedProcessInstance> processes = searchResult.getResult();
         // canceled
         assertEquals(simpleProcess.getName(), processes.get(0).getName());
-        assertEquals(TestStates.getCancelledState(), processes.get(0).getState());
+        assertEquals(TestStates.CANCELLED.getStateName(), processes.get(0).getState());
         // aborted
         assertEquals(procWithEventSubProcess.getName(), processes.get(1).getName());
-        assertEquals(TestStates.getAbortedState(), processes.get(1).getState());
+        assertEquals(TestStates.ABORTED.getStateName(), processes.get(1).getState());
         // completed
         assertEquals(simpleProcess.getName(), processes.get(2).getName());
-        assertEquals(TestStates.getNormalFinalState(), processes.get(2).getState());
+        assertEquals(TestStates.NORMAL_FINAL.getStateName(), processes.get(2).getState());
 
         // clean up
         disableAndDeleteProcess(simpleProcess.getId());
@@ -1103,7 +1099,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
 
         // execute user task and wait the parent process to finish (state aborted)
         waitForUserTaskAndExecuteIt(subProcTaskName, procInstWithEventSubProc, user);
-        waitForProcessToFinish(procInstWithEventSubProc, TestStates.getAbortedState());
+        waitForProcessToFinish(procInstWithEventSubProc, TestStates.ABORTED);
         return procWithEventSubProcess;
     }
 
@@ -1121,7 +1117,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         final ProcessInstance processInstanceToCancel = getProcessAPI().startProcess(simpleProcess.getId());
         waitForUserTask(userTaskName, processInstanceToCancel);
         getProcessAPI().cancelProcessInstance(processInstanceToCancel.getId());
-        waitForProcessToFinish(processInstanceToCancel, TestStates.getCancelledState());
+        waitForProcessToFinish(processInstanceToCancel, TestStates.CANCELLED);
         return simpleProcess;
     }
 

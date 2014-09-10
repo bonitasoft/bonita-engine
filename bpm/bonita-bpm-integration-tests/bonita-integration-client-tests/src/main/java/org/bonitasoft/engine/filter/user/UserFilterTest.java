@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.filter.user;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -7,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.bpm.comment.Comment;
+import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
@@ -27,6 +30,8 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbAssignedTaskOf;
@@ -64,7 +69,7 @@ public class UserFilterTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         john = createUser(JOHN, "bpm");
         jack = createUser(JACK, "bpm");
         james = createUser(JAMES, "bpm");
@@ -170,17 +175,21 @@ public class UserFilterTest extends CommonAPITest {
         final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step2", ACTOR_NAME);
         addUserTask.addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilterWithAutoAssign", "1.0").addInput("userId",
                 new ExpressionBuilder().createConstantLongExpression(jack.getId()));
+        addUserTask.addDisplayName(new ExpressionBuilder().createConstantStringExpression("A task to test user filter"));
         designProcessDefinition.addTransition("step1", "step2");
 
         final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME, john, "TestFilterWithAutoAssign");
 
-        getProcessAPI().startProcess(processDefinition.getId());
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         assertTrue(new CheckNbAssignedTaskOf(getProcessAPI(), 50, 5000, false, 1, jack).waitUntil());
         List<HumanTaskInstance> tasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
         assertEquals(0, tasks.size());
         tasks = getProcessAPI().getAssignedHumanTaskInstances(jack.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
+        SearchResult<Comment> commentSearchResult = getProcessAPI().searchComments(new SearchOptionsBuilder(0, 10).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId()).done());
+        assertThat(commentSearchResult.getResult()).hasSize(1);
+        assertThat(commentSearchResult.getResult().get(0).getContent()).isEqualTo("The task \"A task to test user filter\" is now assigned to jack");
         disableAndDeleteProcess(processDefinition);
     }
 

@@ -29,7 +29,7 @@ import org.junit.Test;
 public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEventTest {
 
     @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
-    "Interrupting" }, story = "Execute timer boundary event triggerd.", jira = "ENGINE-500")
+            "Interrupting" }, story = "Execute timer boundary event triggerd.", jira = "ENGINE-500")
     @Test
     public void timerBoundaryEventTriggered() throws Exception {
         final int timerDuration = 1000;
@@ -43,7 +43,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         // wait timer trigger
         waitForUserTaskAndExecuteIt("exceptionStep", processInstance, getUser());
         waitForProcessToFinishAndBeArchived(processInstance);
-        waitForArchivedActivity(waitForStep1.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(waitForStep1.getId(), TestStates.ABORTED);
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "step2");
 
@@ -95,7 +95,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         waitForProcessToFinishAndBeArchived(processInstance);
 
         final ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStepCA.getId());
-        assertEquals(TestStates.getAbortedState(), archActivityInst.getState());
+        assertEquals(TestStates.ABORTED.getStateName(), archActivityInst.getState());
 
         checkFlowNodeWasntExecuted(processInstance.getId(), parentUserTaskName);
 
@@ -121,7 +121,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         waitForUserTaskAndExecuteIt("exceptionStep", processInstance, getUser());
         waitForProcessToFinishAndBeArchived(processInstance);
 
-        waitForArchivedActivity(multiInstance.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(multiInstance.getId(), TestStates.ABORTED);
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "step2");
 
@@ -148,7 +148,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         waitForProcessToFinishAndBeArchived(processInstance);
 
         final ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(step1.getId());
-        assertEquals(TestStates.getAbortedState(), archActivityInst.getState());
+        assertEquals(TestStates.ABORTED.getStateName(), archActivityInst.getState());
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "step2");
 
@@ -177,7 +177,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         waitForProcessToFinish(processInstance);
 
         // verify that the normal flow was aborted
-        waitForArchivedActivity(activityInLoop.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(activityInLoop.getId(), TestStates.ABORTED);
 
         checkFlowNodeWasntExecuted(processInstance.getId(), normalFlowStepName);
 
@@ -185,7 +185,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "Timer boundary event", "Data", "Long", "On process", "Human task",
-    "Exception" }, story = "Execute a process with a long data and a human task with a timer boundary event that throw a exception", jira = "ENGINE-1383")
+            "Exception" }, story = "Execute a process with a long data and a human task with a timer boundary event that throw a exception", jira = "ENGINE-1383")
     @Test
     public void timerBoundaryEventTriggeredAndLongData() throws Exception {
         final int timerDuration = 1000;
@@ -201,13 +201,13 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         waitForProcessToFinishAndBeArchived(processInstance);
 
         // Check that step1 is aborted
-        waitForArchivedActivity(step1.getId(), TestStates.getAbortedState());
+        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
 
         disableAndDeleteProcess(processDefinition);
     }
 
     private ProcessDefinition deployProcessWithTimerEventOnHumanTask(final long timerValue, final boolean withData) throws BonitaException,
-    InvalidProcessDefinitionException {
+            InvalidProcessDefinitionException {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("pTimerBoundary", "2.0");
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addStartEvent("start");

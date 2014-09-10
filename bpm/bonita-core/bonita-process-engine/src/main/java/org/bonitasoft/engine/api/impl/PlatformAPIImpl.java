@@ -235,7 +235,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     @AvailableOnStoppedNode
     public void startNode() throws StartNodeException {
 
-
         final PlatformServiceAccessor platformAccessor;
         SessionAccessor sessionAccessor = null;
         try {
@@ -294,8 +293,9 @@ public class PlatformAPIImpl implements PlatformAPI {
      * @param tenants
      * @throws SBonitaException
      */
-    private void afterServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor, final List<STenant> tenants)
-            throws SBonitaException {
+    private void afterServicesStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformAccessor, final SessionAccessor sessionAccessor,
+            final List<STenant> tenants)
+                    throws SBonitaException {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlaformConfiguration();
         final SessionService sessionService = platformAccessor.getSessionService();
         final TechnicalLoggerService technicalLoggerService = platformAccessor.getTechnicalLoggerService();
@@ -308,7 +308,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             // * flow node that are completed and not deleted : call execute to make it create transitions and so on
             // * all element that are in not stable state
             new StarterThread(platformAccessor, sessionService, platformConfiguration, tenants, sessionAccessor, technicalLoggerService)
-                    .start();
+            .start();
 
         }
     }
@@ -405,7 +405,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private void startPlatformServices(final PlatformServiceAccessor platformAccessor) throws  SBonitaException {
+    private void startPlatformServices(final PlatformServiceAccessor platformAccessor) throws SBonitaException {
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
         final TechnicalLoggerService logger = platformAccessor.getTechnicalLoggerService();
         final NodeConfiguration platformConfiguration = platformAccessor.getPlaformConfiguration();
@@ -414,7 +414,7 @@ public class PlatformAPIImpl implements PlatformAPI {
             if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
                 logger.log(getClass(), TechnicalLogSeverity.INFO, "Start service of platform : " + serviceWithLifecycle.getClass().getName());
             }
-            // scheduler my be already running
+            // scheduler might be already running
             // skip service start
             if (!serviceWithLifecycle.getClass().isInstance(schedulerService) || !schedulerService.isStarted()) {
                 serviceWithLifecycle.start();
@@ -695,13 +695,12 @@ public class PlatformAPIImpl implements PlatformAPI {
         } finally {
             inputStream.close();
         }
-        List<ExportedProfile> profilesFromXML = ProfilesImporter.getProfilesFromXML(xmlContent, parser);
+        final List<ExportedProfile> profilesFromXML = ProfilesImporter.getProfilesFromXML(xmlContent, parser);
         importProfiles(profileService, identityService, profilesFromXML, tenantServiceAccessor);
     }
 
     protected void importProfiles(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> profilesFromXML,
-            final TenantServiceAccessor tenantServiceAccessor)
-                    throws ExecutionException {
+            final TenantServiceAccessor tenantServiceAccessor) throws ExecutionException {
         new ProfilesImporter(profileService, identityService, profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES).importProfiles(-1);
     }
 

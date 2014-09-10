@@ -21,7 +21,7 @@ public class ExportedParentProfileEntryTest {
     private ExportedParentProfileEntry entry3;
 
     @Test
-    public void testEqual_sameEntry() throws Exception {
+    public void testEqual_sameEntry() {
         // given
         entry1 = new ExportedParentProfileEntry(NAME);
         entry2 = new ExportedParentProfileEntry(NAME);
@@ -48,7 +48,7 @@ public class ExportedParentProfileEntryTest {
     }
 
     @Test
-    public void testEqual_with_null() throws Exception {
+    public void testEqual_with_null() {
         // given
         entry1 = new ExportedParentProfileEntry(NAME);
 
@@ -60,7 +60,7 @@ public class ExportedParentProfileEntryTest {
     }
 
     @Test
-    public void should_get_one_errors() throws Exception {
+    public void should_get_one_errors() {
         // given
         final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry(null);
 
@@ -74,7 +74,7 @@ public class ExportedParentProfileEntryTest {
     }
 
     @Test
-    public void should_get_child_errors() throws Exception {
+    public void should_get_child_errors() {
         // given
         final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
         final ExportedProfileEntry childEntry = new ExportedProfileEntry("name");
@@ -91,7 +91,7 @@ public class ExportedParentProfileEntryTest {
     }
 
     @Test
-    public void should_get_no_errors_with_valid_children() throws Exception {
+    public void should_get_no_errors_with_valid_children() {
         // given
         final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
         final ExportedProfileEntry childEntry = new ExportedProfileEntry("name");
@@ -107,7 +107,7 @@ public class ExportedParentProfileEntryTest {
     }
 
     @Test
-    public void should_get_no_errors() throws Exception {
+    public void should_get_no_errors() {
         // given
         final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
 
@@ -121,7 +121,7 @@ public class ExportedParentProfileEntryTest {
     }
 
     @Test
-    public void should_hasCustomPage_beTrue() throws Exception {
+    public void should_hasCustomPage_beTrue() {
         // given
         final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
         parentEntry.setCustom(true);
@@ -132,7 +132,7 @@ public class ExportedParentProfileEntryTest {
     }
 
     @Test
-    public void should_hasCustomPage_child_beTrue() throws Exception {
+    public void should_hasCustomPage_child_beTrue() {
         // given
         final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
         parentEntry.setCustom(false);
@@ -147,7 +147,7 @@ public class ExportedParentProfileEntryTest {
     }
 
     @Test
-    public void should_hasCustomPage_beFalse() throws Exception {
+    public void should_hasCustomPage_beFalse() {
         // given
         final ExportedParentProfileEntry parentEntry = new ExportedParentProfileEntry("name");
         parentEntry.setCustom(false);

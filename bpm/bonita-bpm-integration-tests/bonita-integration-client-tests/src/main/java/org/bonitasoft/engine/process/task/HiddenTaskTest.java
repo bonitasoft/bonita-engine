@@ -45,7 +45,7 @@ public class HiddenTaskTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
 
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
                 "ProcessContainingTasksToHide", "1.01beta", Arrays.asList("humanTask_1", "humanTask_2"), Arrays.asList(true, true), "actor", true, true);
@@ -289,7 +289,7 @@ public class HiddenTaskTest extends CommonAPITest {
             checkNbOPendingTasks = new CheckNbPendingTasksForUserUsingSearch(getProcessAPI(), 50, 3000, true, 2, user.getId(),
                     new SearchOptionsBuilder(0, 100).done());
         } else {
-            loginOnDefaultTenantWithDefaultTechnicalLogger();
+            loginOnDefaultTenantWithDefaultTechnicalUser();
             checkNbOPendingTasks = new CheckNbPendingTasksForUserUsingSearch(getProcessAPI(), 50, 3000, true, 2, this.user.getId(), new SearchOptionsBuilder(0,
                     100).done());
         }

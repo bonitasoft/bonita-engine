@@ -17,9 +17,8 @@ public class TestFilterThatThrowException extends AbstractUserFilter {
     public List<Long> filter(final String actorName) throws UserFilterException {
         if (getInputParameter("exception").equals("runtime")) {
             throw new RuntimeException("unexpected");
-        } else {
-            throw new UserFilterException("unexpected");
         }
+        throw new UserFilterException("unexpected");
     }
 
     @Override

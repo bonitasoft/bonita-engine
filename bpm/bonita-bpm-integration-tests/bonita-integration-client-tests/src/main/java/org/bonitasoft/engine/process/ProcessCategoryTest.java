@@ -64,7 +64,7 @@ public class ProcessCategoryTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         categories = new ArrayList<Category>();
         processDefinitions = new ArrayList<ProcessDefinition>();
     }

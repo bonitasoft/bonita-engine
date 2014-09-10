@@ -35,7 +35,7 @@ public class UserPermissionCommandTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         final String userName = "Richard";
         manager = createUser("Jean-Michel", "bpm");
         d1 = createUser(userName, manager.getId());

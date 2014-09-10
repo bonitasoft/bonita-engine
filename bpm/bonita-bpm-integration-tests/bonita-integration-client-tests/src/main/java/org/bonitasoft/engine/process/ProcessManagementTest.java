@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2009-2014 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.process;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -8,7 +21,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,7 +37,6 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import org.bonitasoft.engine.bpm.bar.ExternalResourceContribution;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -38,6 +49,7 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
+import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
@@ -92,7 +104,7 @@ public class ProcessManagementTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @Test
@@ -114,7 +126,7 @@ public class ProcessManagementTest extends CommonAPITest {
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         deleteProcess(processDefinition);
         assertNotNull(processDeploymentInfo);
-        assertEquals(TestStates.getProcessDepInfoResolvedState(), processDeploymentInfo.getConfigurationState());
+        assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
         assertEquals(APITestUtil.PROCESS_NAME, processDeploymentInfo.getName());
         assertEquals(APITestUtil.PROCESS_VERSION, processDeploymentInfo.getVersion());
         assertEquals(getSession().getUserId(), processDeploymentInfo.getDeployedBy());
@@ -138,7 +150,7 @@ public class ProcessManagementTest extends CommonAPITest {
         addUserToFirstActorOfProcess(user.getId(), processDefinition);
 
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
-        assertEquals(TestStates.getProcessDepInfoResolvedState(), processDeploymentInfo.getConfigurationState());
+        assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
 
         try {
             getProcessAPI().startProcess(user.getId(), processDefinition.getId());
@@ -157,10 +169,10 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
-        assertEquals(TestStates.getProcessDepInfoEnabledState(), processDeploymentInfo.getActivationState());
+        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         getProcessAPI().disableProcess(processDefinition.getId());
         processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
-        assertEquals(TestStates.getProcessDepInfoResolvedState(), processDeploymentInfo.getConfigurationState());
+        assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
 
         deleteProcess(processDefinition);
         deleteUser(user);
@@ -194,7 +206,7 @@ public class ProcessManagementTest extends CommonAPITest {
         try {
             getProcessAPI().enableProcess(processDefinition.getId());
             final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
-            assertEquals(TestStates.getProcessDepInfoResolvedState(), processDeploymentInfo.getConfigurationState());
+            assertEquals(ConfigurationState.RESOLVED, processDeploymentInfo.getConfigurationState());
             fail("expected a ProcessEnablementException");
         } catch (final ProcessEnablementException e) {
             // ok
@@ -297,8 +309,7 @@ public class ProcessManagementTest extends CommonAPITest {
         checkNbOfArchivedActivityInstances(processInstance2, 3 * 2);
         assertTrue(waitForProcessToFinishAndBeArchived(processInstance1));
         assertTrue(waitForProcessToFinishAndBeArchived(processInstance2));
-        disableAndDeleteProcess(processDefinition1);
-        disableAndDeleteProcess(processDefinition2);
+        disableAndDeleteProcess(processDefinition1, processDefinition2);
     }
 
     @Ignore("Pb : ReachedStateDate has 0 for value for activities in state executing")
@@ -407,18 +418,17 @@ public class ProcessManagementTest extends CommonAPITest {
                 ActivityInstanceCriterion.DEFAULT);
         for (final ActivityInstance activityInstance : openedActivityInstances) {
             // Check that all TestStates are Open (Ready):
-            assertEquals(activityInstance.getState(), TestStates.getReadyState());
+            assertEquals(activityInstance.getState(), TestStates.READY.getStateName());
         }
 
         checkNbOfOpenActivities(processInstance2, 2);
         openedActivityInstances = getProcessAPI().getOpenActivityInstances(processInstance1.getId(), 0, 200, ActivityInstanceCriterion.DEFAULT);
         for (final ActivityInstance activityInstance : openedActivityInstances) {
             // Check that all TestStates are Open (Ready):
-            assertEquals(activityInstance.getState(), TestStates.getReadyState());
+            assertEquals(activityInstance.getState(), TestStates.READY.getStateName());
         }
 
-        disableAndDeleteProcess(processDefinition1);
-        disableAndDeleteProcess(processDefinition2);
+        disableAndDeleteProcess(processDefinition1, processDefinition2);
     }
 
     @Test
@@ -449,7 +459,6 @@ public class ProcessManagementTest extends CommonAPITest {
 
         List<ActivityInstance> openedActivityInstances;
         openedActivityInstances = getProcessAPI().getOpenActivityInstances(procInstance.getId(), 0, 200, ActivityInstanceCriterion.LAST_UPDATE_ASC);
-
         assertTrue(openedActivityInstances.get(0).getLastUpdateDate().compareTo(openedActivityInstances.get(1).getLastUpdateDate()) <= 0);
         assertTrue(openedActivityInstances.get(1).getLastUpdateDate().compareTo(openedActivityInstances.get(2).getLastUpdateDate()) <= 0);
 
@@ -551,9 +560,8 @@ public class ProcessManagementTest extends CommonAPITest {
     @Test
     public void getProcessResources() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
-                designProcessDefinition);
+                processDefinitionBuilder.done());
 
         // Add a resource to the biz archive:
         final String dummyText = "DUMMY";
@@ -563,17 +571,9 @@ public class ProcessManagementTest extends CommonAPITest {
         businessArchiveBuilder.addExternalResource(new BarResource(dummyFile, dummyText.getBytes()));
         businessArchiveBuilder.addExternalResource(new BarResource(documentFile, documentText.getBytes()));
         businessArchiveBuilder.addExternalResource(new BarResource("folder/image.jpg", "UNUSED".getBytes()));
-        final BusinessArchive businessArchive = businessArchiveBuilder.done();
-        final File tempFile = File.createTempFile("testbar", ".bar");
-        tempFile.deleteOnExit();
-        tempFile.delete();
-        BusinessArchiveFactory.writeBusinessArchiveToFile(businessArchive, tempFile);
 
-        // read from the file
-        final BusinessArchive readBusinessArchive = BusinessArchiveFactory.readBusinessArchive(tempFile);
         // deploy the process to unzip the .bar in BONITA_HOME:
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(readBusinessArchive);
-        tempFile.delete();
+        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchiveBuilder.done());
         final Map<String, byte[]> resources = getProcessAPI().getProcessResources(processDefinition.getId(), ".*/.*\\.txt");
         assertEquals(2, resources.size());
         assertTrue("Searched resource not returned", resources.containsKey(ExternalResourceContribution.EXTERNAL_RESOURCE_FOLDER + "/" + dummyFile));
@@ -1098,7 +1098,7 @@ public class ProcessManagementTest extends CommonAPITest {
         getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
         getProcessAPI().executeFlowNode(humanTaskInstance.getId());
         // look in archive
-        assertEquals(reachedDate, getProcessAPI().getActivityReachedStateDate(humanTaskInstance.getId(), TestStates.getReadyState()));
+        assertEquals(reachedDate, getProcessAPI().getActivityReachedStateDate(humanTaskInstance.getId(), TestStates.READY.getStateName()));
         disableAndDeleteProcess(processDefinition1);
         deleteUser(user);
     }
@@ -1216,7 +1216,7 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessInstance startedProcess = getProcessAPI().startProcess(definition.getId());
         assertTrue("expected 2 activities",
-                new CheckNbOfActivities(getProcessAPI(), 200, 5000, true, startedProcess, 3, TestStates.getReadyState()).waitUntil());
+                new CheckNbOfActivities(getProcessAPI(), 200, 5000, true, startedProcess, 3, TestStates.READY).waitUntil());
         // add lucy to actor
         getProcessAPI().addUserToActor(ACTOR_NAME, definition, lucy.getId());
         // assign first user task to jack, second one to john, leaving the third pending
@@ -1261,7 +1261,7 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessInstance startedProcess = getProcessAPI().startProcess(definition.getId());
         assertTrue("expected 2 activities",
-                new CheckNbOfActivities(getProcessAPI(), 200, 5000, true, startedProcess, 3, TestStates.getReadyState()).waitUntil());
+                new CheckNbOfActivities(getProcessAPI(), 200, 5000, true, startedProcess, 3, TestStates.READY).waitUntil());
         // add lucy to actor
         getProcessAPI().addUserToActor(ACTOR_NAME, definition, lucy.getId());
         // assign first user task to jack, second one to john, leaving the third pending
@@ -1502,18 +1502,15 @@ public class ProcessManagementTest extends CommonAPITest {
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("cantResolveDataInExpressionInDataDefaultValue", "1");
         processBuilder.addActor(ACTOR_NAME).addDescription("Process to test archiving mechanism");
-
         processBuilder.addShortTextData("name", new ExpressionBuilder().createConstantStringExpression("a value"));
-
         final AutomaticTaskDefinitionBuilder automaticTaskDefinitionBuilder = processBuilder.addAutomaticTask("activity");
         automaticTaskDefinitionBuilder.addShortTextData("taskData", aExpression);
         automaticTaskDefinitionBuilder.addShortTextData("taskDataFromString", aScript);
-
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, jack);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(jack.getId(), processDefinition.getId());
         try {
-            waitForProcessToFinish(processInstance, TestStates.getNormalFinalState());
+            waitForProcessToFinish(processInstance, TestStates.NORMAL_FINAL);
         } catch (final Exception e) {
             fail("Process should finish");
         }

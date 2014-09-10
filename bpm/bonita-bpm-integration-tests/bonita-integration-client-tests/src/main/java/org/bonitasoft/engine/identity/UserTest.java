@@ -43,7 +43,7 @@ public class UserTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     /**
@@ -58,13 +58,13 @@ public class UserTest extends CommonAPITest {
         platformAPI.stopNode();
         logoutOnPlatform(session);
         try {
-            loginOnDefaultTenantWithDefaultTechnicalLogger();
+            loginOnDefaultTenantWithDefaultTechnicalUser();
         } finally {
             session = loginOnPlatform();
             platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
             platformAPI.startNode();
             logoutOnPlatform(session);
-            loginOnDefaultTenantWithDefaultTechnicalLogger();
+            loginOnDefaultTenantWithDefaultTechnicalUser();
         }
     }
 

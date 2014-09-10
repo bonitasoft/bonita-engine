@@ -34,7 +34,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testGetASimpleAddressBook() throws Exception {
+    public void getASimpleAddressBook() throws Exception {
         InputStream xsdSchema = null;
         try {
             xsdSchema = this.getClass().getResourceAsStream("/addressBook.xsd");
@@ -60,7 +60,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testValidateASimpleAddressBook() throws Exception {
+    public void validateASimpleAddressBook() throws Exception {
         InputStream xsdSchema = null;
         try {
             xsdSchema = this.getClass().getResourceAsStream("/addressBook.xsd");
@@ -76,7 +76,7 @@ public class ParserTest {
     }
 
     @Test(expected = SValidationException.class)
-    public void testValidateInvalidSimpleAddressBook() throws Exception {
+    public void validateInvalidSimpleAddressBook() throws Exception {
         InputStream xsdSchema = null;
         try {
             xsdSchema = this.getClass().getResourceAsStream("/addressBook.xsd");
@@ -92,7 +92,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testValidateASimpleAddressBookTwice() throws Exception {
+    public void validateASimpleAddressBookTwice() throws Exception {
         InputStream xsdSchema = null;
         try {
             xsdSchema = this.getClass().getResourceAsStream("/addressBook.xsd");
@@ -109,7 +109,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testGetASimpleAddressBook1() throws Exception {
+    public void getASimpleAddressBook1() throws Exception {
         final URL urlFile = this.getClass().getResource("/MyAddressBook.xml");
         final File xmlFile = new File(urlFile.toURI());
         final AddressBook addressbook = (AddressBook) parser.getObjectFromXML(xmlFile.getAbsolutePath());

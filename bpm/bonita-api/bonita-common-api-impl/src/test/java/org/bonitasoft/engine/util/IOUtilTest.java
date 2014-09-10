@@ -165,11 +165,10 @@ public class IOUtilTest {
         inputStream.close();
 
         assertEquals(content, read);
-
     }
 
     @Test
-    public void testReadFile() throws Exception {
+    public void readFile() throws Exception {
         final File file = File.createTempFile("test", "test");
         final String content = "theContent" + lineSeparator + "VeryGreatContent";
         IOUtil.writeContentToFile(content, file);
@@ -180,14 +179,14 @@ public class IOUtilTest {
     }
 
     @Test
-    public void testUnzipToFolder() throws Exception {
+    public void unzipToFolder() throws Exception {
         final HashMap<String, byte[]> hashMap = new HashMap<String, byte[]>(2);
         hashMap.put("file1.txt", "content1".getBytes());
         hashMap.put("file2.txt", "content2\ncontent2".getBytes());
         final byte[] zip = IOUtil.zip(hashMap);
         final File folder = File.createTempFile("folder", "tmp");
         folder.delete();
-        folder.mkdir();
+        folder.mkdirs();
 
         IOUtil.unzipToFolder(new ByteArrayInputStream(zip), folder);
 
@@ -198,5 +197,4 @@ public class IOUtilTest {
 
         IOUtil.deleteDir(folder);
     }
-
 }

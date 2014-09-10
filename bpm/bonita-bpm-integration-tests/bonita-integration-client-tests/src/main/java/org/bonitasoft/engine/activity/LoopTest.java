@@ -47,7 +47,7 @@ public class LoopTest extends CommonAPITest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         john = createUser(USERNAME, PASSWORD);
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
@@ -198,14 +198,14 @@ public class LoopTest extends CommonAPITest {
         final int loopMax = 3;
         builder.addData("myData", Integer.class.getName(), new ExpressionBuilder().createConstantIntegerExpression(0));
         builder.addUserTask("step1", delivery)
-        .addLoop(false, condition)
-        .addOperation(
-                new LeftOperandBuilder().createNewInstance("myData").done(),
-                OperatorType.ASSIGNMENT,
-                "=",
-                null,
-                new ExpressionBuilder().createGroovyScriptExpression("executeAStandardLoopWithConditionUsingData1", "myData + 1",
-                        Integer.class.getName(), Arrays.asList(new ExpressionBuilder().createDataExpression("myData", Integer.class.getName()))));
+                .addLoop(false, condition)
+                .addOperation(
+                        new LeftOperandBuilder().createNewInstance("myData").done(),
+                        OperatorType.ASSIGNMENT,
+                        "=",
+                        null,
+                        new ExpressionBuilder().createGroovyScriptExpression("executeAStandardLoopWithConditionUsingData1", "myData + 1",
+                                Integer.class.getName(), Arrays.asList(new ExpressionBuilder().createDataExpression("myData", Integer.class.getName()))));
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), delivery, john);
         getProcessAPI().startProcess(processDefinition.getId());
@@ -237,7 +237,7 @@ public class LoopTest extends CommonAPITest {
 
         // then
         // executing the user task will terminate the process: the loop activity must be aborted
-        waitForFlowNodeInState(processInstance, loopName, TestStates.getAbortedState(), true);
+        waitForFlowNodeInState(processInstance, loopName, TestStates.ABORTED, true);
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
@@ -259,7 +259,7 @@ public class LoopTest extends CommonAPITest {
         builder.addTransition(loopName, "terminate");
         builder.addTransition(parallelTaskName, "terminate");
 
-        return  deployAndEnableProcessWithActor(builder.done(), delivery, john);
+        return deployAndEnableProcessWithActor(builder.done(), delivery, john);
     }
 
 }

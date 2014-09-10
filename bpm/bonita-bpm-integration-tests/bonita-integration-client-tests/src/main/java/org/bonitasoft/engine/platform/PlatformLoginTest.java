@@ -2,6 +2,7 @@ package org.bonitasoft.engine.platform;
 
 import static org.junit.Assert.fail;
 
+import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
@@ -21,7 +22,7 @@ import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PlatformLoginTest {
+public class PlatformLoginTest extends CommonAPITest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlatformLoginTest.class);
 

@@ -40,7 +40,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         john = createUser(USERNAME, "bpm");
     }
 
@@ -272,7 +272,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         final ActivityInstance userTask = waitForUserTask("step1", p1);
         assignAndExecuteStep(userTask, john.getId());
         waitForProcessToFinish(p1);
-        waitForArchivedActivity(userTask.getId(), TestStates.getNormalFinalState());
+        waitForArchivedActivity(userTask.getId(), TestStates.NORMAL_FINAL);
         final ArchivedActivityInstance archivedUserTask = getProcessAPI().getArchivedActivityInstance(userTask.getId());
         assertEquals("My Description", archivedUserTask.getDescription());
         assertEquals("My Display Description", archivedUserTask.getDisplayDescription());

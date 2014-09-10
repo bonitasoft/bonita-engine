@@ -83,7 +83,7 @@ public class ReceiveTasksTest extends CommonAPITest {
 
     @Before
     public void setUp() throws Exception {
-         loginOnDefaultTenantWithDefaultTechnicalLogger();
+         loginOnDefaultTenantWithDefaultTechnicalUser();
         user = getIdentityAPI().createUser("john", "bpm");
     }
 
@@ -223,11 +223,11 @@ public class ReceiveTasksTest extends CommonAPITest {
             receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
                     "delivery", user, "m4", null, null, null);
             final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-            waitForTaskInState(receiveMessageProcessInstance, "waitForMessage", "waiting");
+            waitForTaskInState(receiveMessageProcessInstance, "waitForMessage", TestStates.WAITING);
             forceMatchingOfEvents();
             waitForUserTask("userTask1", receiveMessageProcessInstance);
             final ProcessInstance receiveMessageProcessInstance2 = getProcessAPI().startProcess(receiveMessageProcess.getId());
-            waitForTaskInState(receiveMessageProcessInstance2, "waitForMessage", "waiting");
+            waitForTaskInState(receiveMessageProcessInstance2, "waitForMessage", TestStates.WAITING);
             forceMatchingOfEvents();
             waitForUserTask("userTask1", receiveMessageProcessInstance2);
         } finally {
@@ -304,7 +304,7 @@ public class ReceiveTasksTest extends CommonAPITest {
         assertEquals(1, searchResult.getCount());
 
         getProcessAPI().cancelProcessInstance(receiveMessageProcessInstance.getId());
-        waitForProcessToFinish(receiveMessageProcessInstance, TestStates.getCancelledState());
+        waitForProcessToFinish(receiveMessageProcessInstance, TestStates.CANCELLED);
 
         searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(ArchivedActivityInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId());
@@ -312,7 +312,7 @@ public class ReceiveTasksTest extends CommonAPITest {
         final SearchResult<ArchivedActivityInstance> archivedActivityInstancesSearch = getProcessAPI().searchArchivedActivities(searchOptionsBuilder.done());
         assertEquals(1, archivedActivityInstancesSearch.getCount());
         assertTrue(archivedActivityInstancesSearch.getResult().get(0) instanceof ArchivedReceiveTaskInstance);
-        assertEquals(TestStates.getCancelledState(), archivedActivityInstancesSearch.getResult().get(0).getState());
+        assertEquals(TestStates.CANCELLED.getStateName(), archivedActivityInstancesSearch.getResult().get(0).getState());
 
         searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
         assertEquals(0, searchResult.getCount());

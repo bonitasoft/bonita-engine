@@ -29,7 +29,7 @@ public class ProfileImportStategyTest {
     }
 
     @Test
-    public void FailOnDuplicate_stategy_allows_to_create_defaults_profile() throws Exception {
+    public void FailOnDuplicate_stategy_allows_to_create_defaults_profile() {
         // given
         final FailOnDuplicateImportStrategy strategy = new FailOnDuplicateImportStrategy(profileService);
 
@@ -38,7 +38,7 @@ public class ProfileImportStategyTest {
     }
 
     @Test
-    public void FailOnDuplicate_stategy_allows_to_create_custom_profile() throws Exception {
+    public void FailOnDuplicate_stategy_allows_to_create_custom_profile() {
         // given
         final FailOnDuplicateImportStrategy strategy = new FailOnDuplicateImportStrategy(profileService);
 
@@ -47,7 +47,7 @@ public class ProfileImportStategyTest {
     }
 
     @Test
-    public void IgnoreDuplicate_stategy_allows_to_create_defaults_profile() throws Exception {
+    public void IgnoreDuplicate_stategy_allows_to_create_defaults_profile() {
         // given
         final IgnoreDuplicateImportStrategy strategy = new IgnoreDuplicateImportStrategy(profileService);
 
@@ -56,7 +56,7 @@ public class ProfileImportStategyTest {
     }
 
     @Test
-    public void IgnoreDuplicate_stategy_allows_to_create_custom_profile() throws Exception {
+    public void IgnoreDuplicate_stategy_allows_to_create_custom_profile() {
         // given
         final IgnoreDuplicateImportStrategy strategy = new IgnoreDuplicateImportStrategy(profileService);
 
@@ -65,7 +65,7 @@ public class ProfileImportStategyTest {
     }
 
     @Test
-    public void DeleteExisting_stategy_allows_to_create_defaults_profile() throws Exception {
+    public void DeleteExisting_stategy_allows_to_create_defaults_profile() {
         // given
         final DeleteExistingImportStrategy strategy = new DeleteExistingImportStrategy(profileService);
 
@@ -74,7 +74,7 @@ public class ProfileImportStategyTest {
     }
 
     @Test
-    public void DeleteExisting_stategy_allows_to_create_custom_profile() throws Exception {
+    public void DeleteExisting_stategy_allows_to_create_custom_profile() {
         // given
         final DeleteExistingImportStrategy strategy = new DeleteExistingImportStrategy(profileService);
 
@@ -83,7 +83,7 @@ public class ProfileImportStategyTest {
     }
 
     @Test
-    public void ReplaceDuplicate_stategy_refuse_to_create_defaults_profile() throws Exception {
+    public void ReplaceDuplicate_stategy_refuse_to_create_defaults_profile() {
         // given
         final ReplaceDuplicateImportStrategy strategy = new ReplaceDuplicateImportStrategy(profileService);
 
@@ -92,7 +92,7 @@ public class ProfileImportStategyTest {
     }
 
     @Test
-    public void ReplaceDuplicate_stategy_allows_to_create_custom_profile() throws Exception {
+    public void ReplaceDuplicate_stategy_allows_to_create_custom_profile() {
         // given
         final ReplaceDuplicateImportStrategy strategy = new ReplaceDuplicateImportStrategy(profileService);
 

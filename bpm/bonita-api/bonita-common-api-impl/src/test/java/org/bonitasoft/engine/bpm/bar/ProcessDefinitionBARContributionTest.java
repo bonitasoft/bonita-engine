@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2011, 2013-2014 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.bpm.bar;
 
 import static org.junit.Assert.assertEquals;
@@ -69,9 +82,9 @@ public class ProcessDefinitionBARContributionTest {
         processBuilder.addActor("actor2").addDescription(DESCRIPTION);
         processBuilder.addDescription(DESCRIPTION);
         processBuilder.addAutomaticTask("AutomaticTask").addCallActivity("CallActivity", targetProcessNameExpr, targetProcessVersionExpr)
-        .addManualTask("ManualTask", ACTOR_NAME).addBoundaryEvent("BoundaryEvent").addSignalEventTrigger("signalName");
+                .addManualTask("ManualTask", ACTOR_NAME).addBoundaryEvent("BoundaryEvent").addSignalEventTrigger("signalName");
         processBuilder.addUserTask("UserTask", ACTOR_NAME).addUserFilter("test", "org.bonitasoft.engine.filter.user.testFilter", "1.0")
-        .addInput("userId", new ExpressionBuilder().createConstantLongExpression(3));
+                .addInput("userId", new ExpressionBuilder().createConstantLongExpression(3));
         processBuilder.addConnector("testConnectorThatThrowException", "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER);
         processBuilder.addDocumentDefinition("Doc").addUrl("plop");
         processBuilder.addGateway("Gateway", GatewayType.PARALLEL).addDescription(DESCRIPTION);
@@ -89,9 +102,10 @@ public class ProcessDefinitionBARContributionTest {
         exception.expect(InvalidBusinessArchiveFormatException.class);
         exception.expectMessage("Wrong version");
         final String allContentFrom = IOUtil.read(getClass().getResourceAsStream("/old-process.xml"));
-        final File createTempFile = File.createTempFile("old", "process.xml");
-        IOUtil.writeContentToFile(allContentFrom, createTempFile);
+        final File createTempFile = IOUtil.createTempFileInDefaultTempDirectory("old", "process.xml");
+
         try {
+        IOUtil.writeContentToFile(allContentFrom, createTempFile);
             new ProcessDefinitionBARContribution().deserializeProcessDefinition(createTempFile);
         } finally {
             createTempFile.delete();
@@ -101,11 +115,9 @@ public class ProcessDefinitionBARContributionTest {
     @Test
     public void should_checkVersion_with_old_content_thrown_exception() throws Exception {
         exception.expect(InvalidBusinessArchiveFormatException.class);
-        exception
-        .expectMessage("6.0 namespace is not compatible with your current version");
+        exception.expectMessage("6.0 namespace is not compatible with your current version");
 
         new ProcessDefinitionBARContribution().checkVersion(IOUtil.read(getClass().getResourceAsStream("/old-process.xml")));
-
     }
 
     @Test
@@ -114,7 +126,6 @@ public class ProcessDefinitionBARContributionTest {
         exception.expectMessage("There is no bonitasoft process namespace declaration");
 
         new ProcessDefinitionBARContribution().checkVersion("invalid");
-
     }
 
 }
