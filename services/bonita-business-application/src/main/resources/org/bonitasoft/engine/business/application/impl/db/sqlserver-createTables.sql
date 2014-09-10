@@ -43,4 +43,22 @@ GO
 CREATE INDEX idx_app_page_pageId ON business_app_page (pageId, tenantid)
 GO
 
+CREATE TABLE business_app_menu (
+  tenantId NUMERIC(19, 0) NOT NULL,
+  id NUMERIC(19, 0) NOT NULL,
+  displayName NVARCHAR(255) NOT NULL,
+  applicationPageId NUMERIC(19, 0),
+  parentId NUMERIC(19, 0),
+  index_ NUMERIC(19, 0)
+)
+GO
+
+ALTER TABLE business_app_menu ADD CONSTRAINT pk_business_app_menu PRIMARY KEY (tenantid, id)
+GO
+
+CREATE INDEX idx_app_menu_page ON business_app_menu (applicationPageId, tenantid)
+GO
+CREATE INDEX idx_app_menu_parent ON business_app_menu (parentId, tenantid)
+GO
+
 -- forein keys are create in bonita-persistence-db/postCreateStructure.sql

@@ -34,4 +34,18 @@ ALTER TABLE business_app_page ADD CONSTRAINT uk_app_page_appId_name UNIQUE (tena
 CREATE INDEX idx_app_page_name ON business_app_page (applicationId, name, tenantid);
 CREATE INDEX idx_app_page_pageId ON business_app_page (pageId, tenantid);
 
+CREATE TABLE business_app_menu (
+  tenantId BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  displayName VARCHAR(255) NOT NULL,
+  applicationPageId BIGINT,
+  parentId BIGINT,
+  index_ BIGINT
+) ENGINE = INNODB;
+
+ALTER TABLE business_app_menu ADD CONSTRAINT pk_business_app_menu PRIMARY KEY (tenantid, id);
+
+CREATE INDEX idx_app_menu_page ON business_app_menu (applicationPageId, tenantid);
+CREATE INDEX idx_app_menu_parent ON business_app_menu (parentId, tenantid);
+
 -- forein keys are create in bonita-persistence-db/postCreateStructure.sql
