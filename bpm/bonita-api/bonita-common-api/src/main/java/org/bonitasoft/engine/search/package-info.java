@@ -1,7 +1,7 @@
 /**
  * 
  *     <p>
- * 
+ *      Contains classes to use when invoking search methods
  *     </p>
  * 
  */
