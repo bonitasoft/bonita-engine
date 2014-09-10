@@ -58,7 +58,7 @@ public interface ApplicationService {
 
     List<SApplicationPage> searchApplicationPages(final QueryOptions options) throws SBonitaSearchException;
 
-    SApplicationMenu createApplicationMenu(SApplicationMenu applicationMenu) throws SObjectCreationException, SObjectAlreadyExistsException;
+    SApplicationMenu createApplicationMenu(SApplicationMenu applicationMenu) throws SObjectCreationException;
 
     SApplicationMenu getApplicationMenu(long applicationMenuId) throws SBonitaReadException, SObjectNotFoundException;
 

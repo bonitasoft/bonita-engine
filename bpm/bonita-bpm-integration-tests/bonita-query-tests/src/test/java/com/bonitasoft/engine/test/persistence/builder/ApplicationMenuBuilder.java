@@ -28,25 +28,25 @@ public class ApplicationMenuBuilder extends PersistentObjectBuilder<SApplication
 
     private String displayName;
     private long applicationPageId;
-    private int position;
+    private int index;
 
     @Override
     SApplicationMenuImpl _build() {
-        return new SApplicationMenuImpl(displayName, applicationPageId, position);
+        return new SApplicationMenuImpl(displayName, applicationPageId, index);
     }
 
-    ApplicationMenuBuilder withDisplayName(final String displayName) {
+    public ApplicationMenuBuilder withDisplayName(final String displayName) {
         this.displayName = displayName;
         return this;
     }
 
-    ApplicationMenuBuilder withApplicationPageId(final long applicationPageId) {
+    public ApplicationMenuBuilder withApplicationPageId(final long applicationPageId) {
         this.applicationPageId = applicationPageId;
         return this;
     }
 
-    ApplicationMenuBuilder withPosition(final int position) {
-        this.position = position;
+    public ApplicationMenuBuilder withIndex(final int index) {
+        this.index = index;
         return this;
     }
 }

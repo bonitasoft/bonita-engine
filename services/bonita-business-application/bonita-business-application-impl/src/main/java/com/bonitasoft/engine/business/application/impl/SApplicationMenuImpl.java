@@ -28,16 +28,16 @@ public class SApplicationMenuImpl extends PersistentObjectId implements SApplica
     private String displayName;
     private long applicationPageId;
     private long parentId;
-    private int position;
+    private int index;
 
     //used by Hibernate
     public SApplicationMenuImpl() {
     }
 
-    public SApplicationMenuImpl(final String displayName, final long applicationPageId, final int position) {
+    public SApplicationMenuImpl(final String displayName, final long applicationPageId, final int index) {
         this.displayName = displayName;
         this.applicationPageId = applicationPageId;
-        this.position = position;
+        this.index = index;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class SApplicationMenuImpl extends PersistentObjectId implements SApplica
 
     @Override
     public int getIndex() {
-        return position;
+        return index;
     }
 
 }

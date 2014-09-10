@@ -62,5 +62,11 @@
         SELECT applicationPage
         FROM com.bonitasoft.engine.business.application.impl.SApplicationPageImpl as applicationPage
     </query>
+    
+    <query name="getApplicationMenuById">
+        SELECT applicationMenu
+        FROM com.bonitasoft.engine.business.application.impl.SApplicationMenuImpl as applicationMenu
+        WHERE id = :id
+    </query>
 
 </hibernate-mapping>

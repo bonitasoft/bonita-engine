@@ -45,7 +45,7 @@ public class SApplicationMenuBuilderFactoryImpl implements SApplicationMenuBuild
 
     @Override
     public String getIndexKey() {
-        return "position";
+        return "index_";
     }
 
 }

@@ -119,6 +119,7 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstanceVisibilityMapping" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" />
 				<entry key="com.bonitasoft.engine.business.application.SApplication" value="com.bonitasoft.engine.business.application.impl.SApplicationImpl" />
                 <entry key="com.bonitasoft.engine.business.application.SApplicationPage" value="com.bonitasoft.engine.business.application.impl.SApplicationPageImpl" />
+                <entry key="com.bonitasoft.engine.business.application.SApplicationMenu" value="com.bonitasoft.engine.business.application.impl.SApplicationMenuImpl" />
 
 				<!-- bpm -->
 				<entry key="org.bonitasoft.engine.actor.mapping.model.SActor" value="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" />

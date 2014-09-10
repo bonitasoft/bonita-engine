@@ -14,6 +14,7 @@
 package com.bonitasoft.engine.application;
 
 import static com.bonitasoft.engine.test.persistence.builder.ApplicationBuilder.anApplication;
+import static com.bonitasoft.engine.test.persistence.builder.ApplicationMenuBuilder.anApplicationMenu;
 import static com.bonitasoft.engine.test.persistence.builder.ApplicationPageBuilder.anApplicationPage;
 import static com.bonitasoft.engine.test.persistence.builder.PageBuilder.aPage;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,6 +28,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bonitasoft.engine.business.application.SApplication;
+import com.bonitasoft.engine.business.application.SApplicationMenu;
 import com.bonitasoft.engine.business.application.SApplicationPage;
 import com.bonitasoft.engine.business.application.impl.SApplicationImpl;
 import com.bonitasoft.engine.page.SPage;
@@ -142,7 +144,7 @@ public class ApplicationQueriesTest {
     }
 
     @Test
-    public void getApplicationHomePage_should_return_the_applicationPage_with_set_as_home_page_for_the_given_application() throws Exception {
+    public void getApplicationHomePage_should_return_the_applicationPage_set_as_home_page_for_the_given_application() throws Exception {
         //given
         final SApplication application = repository.add(anApplication().withName("app1").withDispalyName("my app1").withDispalyName("my app")
                 .withVersion("1.0").withPath("/app1")
@@ -161,6 +163,25 @@ public class ApplicationQueriesTest {
 
         //then
         assertThat(retrievedAppPage).isEqualTo(firstPage);
+    }
+
+    @Test
+    public void getApplicationMenu_by_id_should_return_the_application_menu_identified_by_the_given_id() throws Exception {
+        //given
+        final SApplication application = repository.add(anApplication().withName("app1").withDispalyName("my app1").withDispalyName("my app")
+                .withVersion("1.0").withPath("/app1")
+                .build());
+        final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
+        final SApplicationPage appPage = repository.add(anApplicationPage().withName("FirstPage").withApplicationId(application.getId())
+                .withPageId(page.getId()).build());
+        final SApplicationMenu menu = repository.add(anApplicationMenu().withApplicationPageId(appPage.getId()).withDisplayName("menu app1").withIndex(1)
+                .build());
+
+        //when
+        final SApplicationMenu retrievedMenu = repository.getApplicationMenu(menu.getId());
+
+        //then
+        assertThat(retrievedMenu).isEqualTo(retrievedMenu);
     }
 
 }

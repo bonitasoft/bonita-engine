@@ -37,4 +37,16 @@
 		<filter name="tenantFilter" />
 	</class>
 
+	<class name="SApplicationMenuImpl" table="business_app_menu">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantId" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="displayName" column="displayName" />
+		<property name="applicationPageId" column="applicationPageId" />
+		<property name="parentId" column="parentId" />
+		<property name="index" column="index_" />
+		<filter name="tenantFilter" />
+	</class>
+
 </hibernate-mapping>

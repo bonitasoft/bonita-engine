@@ -12,6 +12,7 @@
             <map>
                 <entry key="com.bonitasoft.engine.business.application.SApplication" value="application" />
                 <entry key="com.bonitasoft.engine.business.application.SApplicationPage" value="applicationPage" />
+                <entry key="com.bonitasoft.engine.business.application.SApplicationMenu" value="applicationMenu" />
             </map>
         </property>
     </bean>

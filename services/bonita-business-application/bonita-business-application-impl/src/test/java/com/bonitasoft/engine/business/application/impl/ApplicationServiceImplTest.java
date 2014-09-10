@@ -680,8 +680,8 @@ public class ApplicationServiceImplTest {
         assertThat(insertEventCaptor.getValue().getType()).isEqualTo(ApplicationService.APPLICATION_MENU + CREATED_SUFFIX);
     }
 
-    private SApplicationMenu buildApplicationMenu(final String displayName, final long applicationPageId, final int position) {
-        final SApplicationMenuBuilder builder = new SApplicationMenuBuilderFactoryImpl().createNewInstance(displayName, applicationPageId, position);
+    private SApplicationMenu buildApplicationMenu(final String displayName, final long applicationPageId, final int index) {
+        final SApplicationMenuBuilder builder = new SApplicationMenuBuilderFactoryImpl().createNewInstance(displayName, applicationPageId, index);
         return builder.done();
     }
 
@@ -691,7 +691,7 @@ public class ApplicationServiceImplTest {
         doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
 
         //when
-        applicationServiceActive.createApplicationMenu(buildApplicationMenu("main²", 4, 1));
+        applicationServiceActive.createApplicationMenu(buildApplicationMenu("main", 4, 1));
 
         //then exception
     }
@@ -705,7 +705,7 @@ public class ApplicationServiceImplTest {
     }
 
     @Test
-    public void getApplication_by_id_should_return_result_of_persitence_service() throws Exception {
+    public void getApplicationMenu_by_id_should_return_result_of_persitence_service() throws Exception {
         //given
         final SApplicationMenu applicationMenu = buildApplicationMenu("main", 2, 1);
         final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById",
@@ -720,7 +720,7 @@ public class ApplicationServiceImplTest {
     }
 
     @Test(expected = SObjectNotFoundException.class)
-    public void getApplication_by_id_should_throw_SObjectNotFoundException_when_persitence_service_returns_null() throws Exception {
+    public void getApplicationMenu_by_id_should_throw_SObjectNotFoundException_when_persitence_service_returns_null() throws Exception {
         //given
         final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById",
                 SApplicationMenu.class, 3);
