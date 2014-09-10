@@ -8,9 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -148,12 +145,6 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     public void deleteApplicationMenu(final long applicationMenuId) throws DeletionException {
         // TODO Auto-generated method stub
 
-    }
-
-    @Override
-    public List<ApplicationMenu> getApplicationMenus(final long applicationId) {
-        // TODO Auto-generated method stub
-        return Collections.emptyList();
     }
 
     @Override

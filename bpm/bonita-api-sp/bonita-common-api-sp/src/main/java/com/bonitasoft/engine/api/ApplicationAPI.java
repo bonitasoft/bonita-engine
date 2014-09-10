@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
-import java.util.List;
-
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -166,14 +164,6 @@ public interface ApplicationAPI {
      * @throws DeletionException if an error occurs during the deletion
      */
     void deleteApplicationMenu(long applicationMenuId) throws DeletionException;
-
-    /**
-     * Retrieves the list of menus for the given application.
-     *
-     * @param applicationId the application identifier
-     * @return the list of menus for the given application.
-     */
-    List<ApplicationMenu> getApplicationMenus(long applicationId);
 
     /**
      * Searches for application menus with specific search criteria.
