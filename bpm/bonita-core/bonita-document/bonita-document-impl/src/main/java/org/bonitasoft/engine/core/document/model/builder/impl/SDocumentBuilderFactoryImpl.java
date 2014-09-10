@@ -41,6 +41,8 @@ public class SDocumentBuilderFactoryImpl  implements SDocumentBuilderFactory {
 
     static final String URL = "url";
 
+    static final String DESCRIPTION = "description";
+
 
     @Override
     public String getIdKey() {
@@ -89,5 +91,10 @@ public class SDocumentBuilderFactoryImpl  implements SDocumentBuilderFactory {
     @Override
     public SDocumentBuilder createNewInstance(SDocument documentMapping) {
         return null;
+    }
+
+    @Override
+    public String getDescriptionKey() {
+        return DESCRIPTION;
     }
 }

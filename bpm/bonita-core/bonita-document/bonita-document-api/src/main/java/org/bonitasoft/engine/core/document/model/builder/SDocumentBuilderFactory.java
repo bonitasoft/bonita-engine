@@ -42,4 +42,5 @@ public interface SDocumentBuilderFactory {
 
     SDocumentBuilder createNewInstance(SDocument documentMapping);
 
+    String getDescriptionKey();
 }

@@ -22,6 +22,8 @@ public final class DocumentsSearchDescriptor {
 
     public static final String DOCUMENT_NAME = "documentName";
 
+    public static final String DOCUMENT_DESCRIPTION = "documentDescription";
+
     public static final String DOCUMENT_AUTHOR = "documentAuthor";
 
     public static final String DOCUMENT_CREATIONDATE = "documentCreationDate";
