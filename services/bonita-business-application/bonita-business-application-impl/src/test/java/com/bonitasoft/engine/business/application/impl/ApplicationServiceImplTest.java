@@ -50,12 +50,16 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.SApplication;
-import com.bonitasoft.engine.business.application.SApplicationMenu;
-import com.bonitasoft.engine.business.application.SApplicationMenuBuilder;
-import com.bonitasoft.engine.business.application.SApplicationPage;
-import com.bonitasoft.engine.business.application.SApplicationUpdateBuilder;
 import com.bonitasoft.engine.business.application.SInvalidNameException;
+import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplicationMenu;
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilder;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationBuilderFactoryImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuBuilderFactoryImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationPageBuilderFactoryImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationUpdateBuilderFactoryImpl;
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 

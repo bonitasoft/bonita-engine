@@ -20,12 +20,12 @@ import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationCreator.ApplicationField;
 import com.bonitasoft.engine.business.application.ApplicationPage;
-import com.bonitasoft.engine.business.application.SApplication;
-import com.bonitasoft.engine.business.application.SApplicationBuilder;
-import com.bonitasoft.engine.business.application.SApplicationBuilderFactory;
-import com.bonitasoft.engine.business.application.SApplicationPage;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
+import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationBuilder;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationBuilderFactory;
 
 
 /**

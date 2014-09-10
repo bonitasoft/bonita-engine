@@ -13,7 +13,7 @@
  **/
 package com.bonitasoft.engine.test.persistence.builder;
 
-import com.bonitasoft.engine.business.application.impl.SApplicationMenuImpl;
+import com.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl;
 
 /**
  * @author Elias Ricken de Medeiros

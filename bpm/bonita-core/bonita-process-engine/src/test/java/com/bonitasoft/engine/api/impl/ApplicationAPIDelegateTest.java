@@ -36,13 +36,13 @@ import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.SApplicationState;
 import com.bonitasoft.engine.business.application.SInvalidNameException;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
 import com.bonitasoft.engine.business.application.impl.SApplicationFields;
-import com.bonitasoft.engine.business.application.impl.SApplicationImpl;
-import com.bonitasoft.engine.business.application.impl.SApplicationPageImpl;
+import com.bonitasoft.engine.business.application.model.SApplicationState;
+import com.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
+import com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
 import com.bonitasoft.engine.exception.InvalidNameException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 

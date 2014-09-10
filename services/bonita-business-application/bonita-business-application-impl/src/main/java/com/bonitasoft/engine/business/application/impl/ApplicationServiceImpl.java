@@ -45,13 +45,16 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.SApplication;
-import com.bonitasoft.engine.business.application.SApplicationLogBuilder;
-import com.bonitasoft.engine.business.application.SApplicationMenu;
-import com.bonitasoft.engine.business.application.SApplicationMenuLogBuilder;
-import com.bonitasoft.engine.business.application.SApplicationPage;
-import com.bonitasoft.engine.business.application.SApplicationPageLogBuilder;
 import com.bonitasoft.engine.business.application.SInvalidNameException;
+import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplicationMenu;
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationLogBuilder;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuLogBuilder;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationPageLogBuilder;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationLogBuilderImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuLogBuilderImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationPageLogBuilderImpl;
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 

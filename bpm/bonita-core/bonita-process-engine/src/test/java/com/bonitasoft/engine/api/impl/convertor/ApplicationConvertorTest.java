@@ -13,13 +13,13 @@ import org.junit.Test;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationPage;
-import com.bonitasoft.engine.business.application.SApplication;
-import com.bonitasoft.engine.business.application.SApplicationPage;
-import com.bonitasoft.engine.business.application.SApplicationState;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
-import com.bonitasoft.engine.business.application.impl.SApplicationImpl;
-import com.bonitasoft.engine.business.application.impl.SApplicationPageImpl;
+import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
+import com.bonitasoft.engine.business.application.model.SApplicationState;
+import com.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
+import com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
 
 
 public class ApplicationConvertorTest {

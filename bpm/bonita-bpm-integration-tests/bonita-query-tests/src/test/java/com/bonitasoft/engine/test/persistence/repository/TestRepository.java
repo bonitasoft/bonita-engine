@@ -5,12 +5,12 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import com.bonitasoft.engine.business.application.SApplication;
-import com.bonitasoft.engine.business.application.SApplicationMenu;
-import com.bonitasoft.engine.business.application.SApplicationPage;
-import com.bonitasoft.engine.business.application.impl.SApplicationImpl;
-import com.bonitasoft.engine.business.application.impl.SApplicationMenuImpl;
-import com.bonitasoft.engine.business.application.impl.SApplicationPageImpl;
+import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplicationMenu;
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
+import com.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
+import com.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl;
+import com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
 import com.bonitasoft.engine.page.SPageWithContent;
 import com.bonitasoft.engine.page.impl.SPageWithContentImpl;
 import com.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
