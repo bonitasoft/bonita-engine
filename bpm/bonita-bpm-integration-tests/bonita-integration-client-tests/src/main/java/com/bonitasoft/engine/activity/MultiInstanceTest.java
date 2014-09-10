@@ -40,9 +40,9 @@ public class MultiInstanceTest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         john = createUser(JOHN, "bpm");
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith(JOHN, "bpm");
     }
 
@@ -50,7 +50,7 @@ public class MultiInstanceTest extends CommonAPISPTest {
     public void afterTest() throws BonitaException {
         deleteUser(JOHN);
         VariableStorage.clearAll();
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     @Test
@@ -101,7 +101,7 @@ public class MultiInstanceTest extends CommonAPISPTest {
         // tasks + 2 children for completed one
 
         final CheckNbOfArchivedActivities checkNbOfActivities = new CheckNbOfArchivedActivities(getProcessAPI(), 100, 5000, true, processInstance,
-                nbAbortedActivities, TestStates.getAbortedState());
+                nbAbortedActivities, TestStates.ABORTED);
         final boolean waitUntilAborted = checkNbOfActivities.waitUntil();
         assertTrue("Expected " + nbAbortedActivities + " in the aboterd state. But was " + checkNbOfActivities.getResult().size(), waitUntilAborted);
     }

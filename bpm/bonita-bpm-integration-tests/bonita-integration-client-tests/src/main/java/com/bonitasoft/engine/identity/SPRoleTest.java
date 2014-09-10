@@ -28,7 +28,7 @@ public class SPRoleTest extends CommonAPISPTest {
 
     @Before
     public void before() throws BonitaException {
-        session = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalLogger();
+        session = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @After
@@ -44,7 +44,7 @@ public class SPRoleTest extends CommonAPISPTest {
         final IdentityAPI identityAPI1 = TenantAPIAccessor.getIdentityAPI(session1);
         final Role role1 = identityAPI1.createRole(role);
 
-        final APISession session2 = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalLogger();
+        final APISession session2 = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
         final IdentityAPI identityAPI2 = TenantAPIAccessor.getIdentityAPI(session2);
         final Role role2 = identityAPI2.createRole(role);
 

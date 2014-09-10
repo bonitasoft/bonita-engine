@@ -13,12 +13,12 @@
   <dependencies>
         <dependency>
             <groupId>org.bonitasoft.engine.log</groupId>
-            <artifactId>bonita-log-model</artifactId>
+            <artifactId>bonita-log-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bonitasoft.engine.recorder</groupId>
-            <artifactId>bonita-recorder-model</artifactId>
+            <artifactId>bonita-recorder-api</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

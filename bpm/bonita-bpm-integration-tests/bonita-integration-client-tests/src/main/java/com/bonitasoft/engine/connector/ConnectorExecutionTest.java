@@ -65,7 +65,7 @@ public abstract class ConnectorExecutionTest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         user = createUser(JOHN, "bpm");
         johnUserId = user.getId();
        logoutOnTenant();

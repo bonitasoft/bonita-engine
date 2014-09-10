@@ -743,19 +743,19 @@ public class ProfileEntrySPITest extends AbstractProfileSPTest {
 
     @Test
     public void createProfileEntryMultiThreaded() throws Throwable {
-        List<FailableThread> threads = new ArrayList<FailableThread>();
+        final List<FailableThread> threads = new ArrayList<FailableThread>();
 
         for (int i = 0; i < 10; i++) {
             threads.add(createThreadThatAddProfileEntry(i));
         }
-        for (Thread thread : threads) {
+        for (final Thread thread : threads) {
             thread.start();
         }
-        for (Thread thread : threads) {
+        for (final Thread thread : threads) {
             thread.join(1000);
         }
 
-        for (FailableThread thread : threads) {
+        for (final FailableThread thread : threads) {
             if (thread.getException() != null) {
                 throw thread.getException();
             }
@@ -764,18 +764,16 @@ public class ProfileEntrySPITest extends AbstractProfileSPTest {
     }
 
     private FailableThread createThreadThatAddProfileEntry(final int i) {
-        final FailableThread t1 = new FailableThread("faiblablethread"+i,new FailableRunnable() {
+        final FailableThread t1 = new FailableThread("faiblablethread" + i, new FailableRunnable() {
 
             @Override
             public void run() {
                 try {
-                    System.out.println("t1 start");
                     final ProfileEntryCreator profileEntryCreator = new ProfileEntryCreator("ProfileEntry" + i, adminProfileId)
                     .setDescription("Description profileEntry" + i)
                     .setIndex(i * 2).setType("folder").setParentId(1L).setPage("MyPage");
                     getProfileAPI().createProfileEntry(profileEntryCreator);
-                    System.out.println("t1 done");
-                } catch (Throwable e) {
+                } catch (final Throwable e) {
                     setException(e);
                 }
             }

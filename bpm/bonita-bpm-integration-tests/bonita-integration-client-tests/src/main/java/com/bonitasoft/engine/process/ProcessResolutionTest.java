@@ -24,6 +24,7 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
+import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.Problem;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -32,7 +33,6 @@ import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.connectors.TestConnectorWithModifiedOutput;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -47,12 +47,12 @@ public class ProcessResolutionTest extends CommonAPISPTest {
 
     @After
     public void afterTest() throws BonitaException {
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @Cover(classes = { Problem.class, ProcessDefinition.class, ParameterDefinition.class }, concept = BPMNConcept.PROCESS, jira = "ENGINE-531", keywords = { "process resolution" })
@@ -64,7 +64,7 @@ public class ProcessResolutionTest extends CommonAPISPTest {
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive);
         final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
-        Assert.assertEquals(TestStates.getProcessDepInfoUnresolvedState(), deploymentInfo.getConfigurationState());
+        Assert.assertEquals(ConfigurationState.UNRESOLVED, deploymentInfo.getConfigurationState());
 
         final List<Problem> problems = getProcessAPI().getProcessResolutionProblems(definition.getId());
         Assert.assertEquals(1, problems.size());
@@ -88,7 +88,7 @@ public class ProcessResolutionTest extends CommonAPISPTest {
         getProcessAPI().addUserToActor(initiator.getId(), getSession().getUserId());
 
         ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
-        Assert.assertEquals(TestStates.getProcessDepInfoUnresolvedState(), deploymentInfo.getConfigurationState());
+        Assert.assertEquals(ConfigurationState.UNRESOLVED, deploymentInfo.getConfigurationState());
 
         getProcessAPI().importParameters(definition.getId(), "param1=toto".getBytes());
 
@@ -96,7 +96,7 @@ public class ProcessResolutionTest extends CommonAPISPTest {
         deploymentInfo = getProcessAPI().getProcessDeploymentInfo(getProcessAPI().getProcessDefinition(definition.getId()).getId());
         // deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
 
-        Assert.assertEquals(TestStates.getProcessDepInfoResolvedState(), deploymentInfo.getConfigurationState());
+        Assert.assertEquals(ConfigurationState.RESOLVED, deploymentInfo.getConfigurationState());
 
         deleteProcess(definition.getId());
     }
@@ -110,7 +110,7 @@ public class ProcessResolutionTest extends CommonAPISPTest {
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive);
         final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
-        Assert.assertEquals(TestStates.getProcessDepInfoUnresolvedState(), deploymentInfo.getConfigurationState());
+        Assert.assertEquals(ConfigurationState.UNRESOLVED, deploymentInfo.getConfigurationState());
 
         getProcessAPI().updateParameterInstanceValue(definition.getId(), "param1", "value");
         final ActorInstance initiator = getProcessAPI().getActorInitiator(definition.getId());
@@ -131,7 +131,7 @@ public class ProcessResolutionTest extends CommonAPISPTest {
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();
         final ProcessDefinition definition = getProcessAPI().deploy(businessArchive);
         final ProcessDeploymentInfo deploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
-        Assert.assertEquals(TestStates.getProcessDepInfoUnresolvedState(), deploymentInfo.getConfigurationState());
+        Assert.assertEquals(ConfigurationState.UNRESOLVED, deploymentInfo.getConfigurationState());
 
         final String implSourchFile = "/org/bonitasoft/engine/connectors/TestConnectorWithModifiedOutput.impl";
         final Class<TestConnectorWithModifiedOutput> implClass = TestConnectorWithModifiedOutput.class;

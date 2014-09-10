@@ -12,6 +12,16 @@
         		<bean class="org.bonitasoft.engine.execution.work.BPMEventWorksHandler" />
         	</list>
         </property>
+        <property name="lifecycleServices">
+            <list>
+                <ref bean="classLoaderService" />
+                <ref bean="normalClassLoader" />
+                <ref bean="platformCacheService" />
+                <ref bean="cacheService" />
+                <ref bean="distributedCacheService" />
+                <ref bean="localCacheService" />
+            </list>
+        </property>
 	</bean>
 
 </beans>

@@ -32,7 +32,7 @@ public class MonitoringAPITest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @Cover(classes = MonitoringAPI.class, concept = BPMNConcept.NONE, keywords = { "Monitoring", "User" }, story = "Get number of users.", jira = "")
@@ -91,13 +91,6 @@ public class MonitoringAPITest extends CommonAPISPTest {
     public void getNumberOfExecutingProcesses() throws BonitaException {
         final long numberOfActiveTransactions = getMonitoringAPI().getNumberOfExecutingProcesses();
         assertEquals(0, numberOfActiveTransactions);
-    }
-
-    @Cover(classes = MonitoringAPITest.class, concept = BPMNConcept.NONE, keywords = { "Monitoring", "Active transaction" }, story = "Get number of active transaction.", jira = "")
-    @Test
-    public void getNumberOfActiveTransaction() throws BonitaException {
-        final long numberOfActiveTransactions = getMonitoringAPI().getNumberOfActiveTransactions();
-        assertEquals(0L, numberOfActiveTransactions);
     }
 
 }

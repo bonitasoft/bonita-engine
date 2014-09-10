@@ -71,7 +71,7 @@ public abstract class ExecutionInSession {
             if (tenantId > 0) {
                 session = BPMTestSPUtil.loginOnTenantWithDefaultTechnicalLogger(tenantId);
             } else {
-                session = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalLogger();
+                session = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
             }
         }
         setSession(session);

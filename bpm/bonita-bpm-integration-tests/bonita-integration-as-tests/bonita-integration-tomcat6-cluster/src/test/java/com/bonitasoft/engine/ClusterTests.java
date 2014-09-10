@@ -8,14 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,26 +26,20 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connectors.TestConnectorWithOutput;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.expression.ExpressionEvaluationException;
-import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.OperationBuilder;
-import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.After;
@@ -59,14 +51,10 @@ import org.slf4j.LoggerFactory;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.api.TenantStatusException;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
-import com.bonitasoft.engine.platform.TenantCreator;
 
 /**
- * 
  * @author Baptiste Mesta
- * 
  */
 public class ClusterTests extends CommonAPISPTest {
 
@@ -76,13 +64,13 @@ public class ClusterTests extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         user = createUser(USERNAME, PASSWORD);
         logoutOnTenant();
         // init the context here
         changeToNode2();
-        PlatformSession platformSession = loginOnPlatform();
-        PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
+        final PlatformSession platformSession = loginOnPlatform();
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
         platformAPI.startNode();
         changeToNode1();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
@@ -106,7 +94,7 @@ public class ClusterTests extends CommonAPISPTest {
     }
 
     private void setConnectionPort(final String port) {
-        Map<String, String> parameters = new HashMap<String, String>(2);
+        final Map<String, String> parameters = new HashMap<String, String>(2);
         parameters.put("server.url", "http://localhost:" + port);
         parameters.put("application.name", "bonita");
         APITypeManager.setAPITypeAndParams(ApiAccessType.HTTP, parameters);
@@ -126,9 +114,9 @@ public class ClusterTests extends CommonAPISPTest {
 
     @Test
     public void useSameSessionOnBothNodes() throws Exception {
-        User createUser = getIdentityAPI().createUser("john", "bpm", "John", "Doe");
+        final User createUser = getIdentityAPI().createUser("john", "bpm", "John", "Doe");
         changeToNode2();
-        User userByUserName = getIdentityAPI().getUserByUserName("john");
+        final User userByUserName = getIdentityAPI().getUserByUserName("john");
         assertEquals(createUser, userByUserName);
         getIdentityAPI().deleteUser("john");
 
@@ -141,7 +129,7 @@ public class ClusterTests extends CommonAPISPTest {
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
                 "1.0");
         designProcessDefinition.addActor(ACTOR_NAME);
-        UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step0", ACTOR_NAME);
+        final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step0", ACTOR_NAME);
         addUserTask.addShortTextData("text", new ExpressionBuilder().createConstantStringExpression("default"));
         addUserTask
         .addConnector("aConnector", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER)
@@ -153,8 +141,7 @@ public class ClusterTests extends CommonAPISPTest {
                 designProcessDefinition.done());
 
         addConnectorImplemWithDependency(businessArchiveBuilder, "/org/bonitasoft/engine/connectors/TestConnectorWithOutput.impl",
-                "TestConnectorWithOutput.impl",
-                TestConnectorWithOutput.class, "TestConnectorWithOutput.jar");
+                "TestConnectorWithOutput.impl", TestConnectorWithOutput.class, "TestConnectorWithOutput.jar");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, user);
 
@@ -162,7 +149,7 @@ public class ClusterTests extends CommonAPISPTest {
         changeToNode2();
         getProcessAPI().startProcess(processDefinition.getId());
 
-        List<HumanTaskInstance> waitForPendingTasks = waitForPendingTasks(user.getId(), 1);
+        final List<HumanTaskInstance> waitForPendingTasks = waitForPendingTasks(user.getId(), 1);
         assertEquals("inputValue", getProcessAPI().getActivityDataInstance("text", waitForPendingTasks.get(0).getId()).getValue());
 
         disableAndDeleteProcess(processDefinition);
@@ -198,17 +185,17 @@ public class ClusterTests extends CommonAPISPTest {
             designProcessDefinition.addTransition("autoStep" + i, "step" + i);
         }
 
-        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
-        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait the all automatic task finish
         waitForPendingTasks(user.getId(), 10);
 
         // check that at least one data is set to "Node1" and at least one to "Node2"
-        List<DataInstance> processDataInstances = getProcessAPI().getProcessDataInstances(processInstance.getId(), 0, 20);
+        final List<DataInstance> processDataInstances = getProcessAPI().getProcessDataInstances(processInstance.getId(), 0, 20);
         boolean node1Ok = false;
         boolean node2Ok = false;
 
-        for (DataInstance dataInstance : processDataInstances) {
+        for (final DataInstance dataInstance : processDataInstances) {
             node1Ok |= "Node1".equals(dataInstance.getValue());
             node2Ok |= "Node2".equals(dataInstance.getValue());
         }
@@ -218,175 +205,51 @@ public class ClusterTests extends CommonAPISPTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    /*
-     * Check that:
-     * when pause a tenant on one node:
-     * * normal user is logged out on both nodes
-     * * technical user can't access API not accessible in pause
-     * * processes with timers are not executed in both nodes
-     * When resume
-     * * processes are executed
-     */
     @Test
-    public void should_pause_tenant_have_effect_on_all_nodes() throws Exception {
-        final String systemProperty = "bonita.process.executed";
-
-        // create an other tenant for later
+    public void pause_tenant_should_be_effective_on_all_nodes() throws Exception {
+        changeToNode1();
         logoutOnTenant();
-        PlatformSession loginPlatform = loginOnPlatform();
-        PlatformAPI platformAPI = (PlatformAPI) getPlatformAPI(loginPlatform);
-        long otherTenantId = platformAPI.createTenant(new TenantCreator("tenantToCheckSysProp", "tenantToCheckSysProp", "testIconName",
-                "testIconPath", "install", "install"));
-        platformAPI.activateTenant(otherTenantId);
-        logoutOnPlatform(loginPlatform);
-        loginOnDefaultTenantWith(USERNAME, PASSWORD);
+        loginOnDefaultTenantWithDefaultTechnicalUser();
 
-        ProcessDefinition processDefinition = deployProcessThatSetASystemPropertyOnTheNode(systemProperty);
-        // start an instance on both node
-        System.out.println("[test] start process on node 1");
-        getProcessAPI().startProcess(processDefinition.getId());
-        changeToNode2();
-        System.out.println("[test] start process on node 2");
-        getProcessAPI().startProcess(processDefinition.getId());
-        System.out.println("[test] pause on node 2");
         getTenantManagementAPI().pause();
-        try {
-            System.out.println("[test] try to call getNumberOfProcess on node 2");
-            getProcessAPI().getNumberOfProcessInstances();
-            fail("should not be logged with a normal user anymore");
-        } catch (InvalidSessionException e) {
-            // ok
-        }
-        changeToNode1();
-        try {
-            System.out.println("[test] try to call getNumberOfProcess on node 1");
-            getProcessAPI().getNumberOfProcessInstances();
-            fail("should not be logged with a normal user anymore");
-        } catch (InvalidSessionException e) {
-            // ok
-        }
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
-        // should work on both nodes
-        try {
-            System.out.println("[test] try to call getNumberOfProcess with tech user on node 1");
-            getProcessAPI().getNumberOfProcessInstances();
-            fail("should not be able to acces this method in pause");
-        } catch (TenantStatusException e) {
-            // ok
-        }
+
+        assertThat(getTenantManagementAPI().isPaused()).isTrue();
+
         changeToNode2();
-        // should work on both nodes
-        try {
-            System.out.println("[test] try to call getNumberOfProcess with tech user on node 2");
-            getProcessAPI().getNumberOfProcessInstances();
-            fail("should not be able to acces this method in pause");
-        } catch (TenantStatusException e) {
-            // ok
-        }
-        logoutOnTenant();
 
-        Thread.sleep(6000);// wait 6 secondes (more than 5 ) then change using an other tenant that the system property did not change
+        assertThat(getTenantManagementAPI().isPaused()).isTrue();
 
-        loginOnTenantWith("install", "install", otherTenantId);
-        System.out.println("[test] deploy process on an other tenant");
-        final ProcessDefinition processDefinitionOnTheOtherTenant = deployProcessThatSetASystemPropertyOnTheNode(systemProperty);
-        // check not executed on node 1
-        System.out.println("[test] check if executed on node 1");
-        assertFalse(isExecuted(systemProperty, processDefinitionOnTheOtherTenant));
-        changeToNode2();
-        // check not executed on node 2
-        System.out.println("[test] check if executed on node 2");
-        assertFalse(isExecuted(systemProperty, processDefinitionOnTheOtherTenant));
-
-        logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
-        System.out.println("[test] resume on node 2");
         getTenantManagementAPI().resume();
-        // wait that quartz launch its jobs
-        Thread.sleep(20000);
-        logoutOnTenant();
-        loginOnTenantWith("install", "install", otherTenantId);
-
-        // check executed on node 2 and/or 1 (because matching of events result in non deterministic target node)
-        System.out.println("[test] check if executed on node 1 or node 2");
-        boolean executedOnNode2 = isExecuted(systemProperty, processDefinitionOnTheOtherTenant);
-
-        changeToNode1();
-        boolean executedOnNode1 = isExecuted(systemProperty, processDefinitionOnTheOtherTenant);
-        assertTrue(executedOnNode1 || executedOnNode2);
-
-        logoutOnTenant();
-        loginPlatform = loginOnPlatform();
-        platformAPI = (PlatformAPI) getPlatformAPI(loginPlatform);
-        platformAPI.deactiveTenant(otherTenantId);
-        platformAPI.deleteTenant(otherTenantId);
-        logoutOnPlatform(loginPlatform);
-        loginOnDefaultTenantWith(USERNAME, PASSWORD);
-
-        disableAndDeleteProcess(processDefinition);
-    }
-
-    private boolean isExecuted(final String systemProperty, final ProcessDefinition processDefinitionOnTheOtherTenant) throws ExpressionEvaluationException,
-    InvalidExpressionException {
-        String evaluateExpressionOnProcessDefinition = (String) getProcessAPI().evaluateExpressionOnProcessDefinition(
-                new ExpressionBuilder().createGroovyScriptExpression("getSystemProp", "return System.getProperty(\"" + systemProperty + "\")",
-                        String.class.getName()), Collections.<String, Serializable> emptyMap(), processDefinitionOnTheOtherTenant.getId());
-        return Boolean.valueOf(evaluateExpressionOnProcessDefinition);
-    }
-
-    private ProcessDefinition deployProcessThatSetASystemPropertyOnTheNode(final String systemProperty) throws InvalidExpressionException, BonitaException,
-    InvalidProcessDefinitionException {
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance("executeConnectorOnActivityInstance",
-                "1.0");
-        designProcessDefinition.addActor(ACTOR_NAME);
-        designProcessDefinition.addStartEvent("start");
-        designProcessDefinition.addShortTextData("data", new ExpressionBuilder().createConstantStringExpression("none"));
-        designProcessDefinition.addIntermediateCatchEvent("timer1").addTimerEventTriggerDefinition(TimerType.DURATION,
-                new ExpressionBuilder().createConstantLongExpression(2500));
-        designProcessDefinition.addIntermediateCatchEvent("timer2").addTimerEventTriggerDefinition(TimerType.DURATION,
-                new ExpressionBuilder().createConstantLongExpression(2500));
-        designProcessDefinition.addAutomaticTask("autoStep").addOperation(
-                new OperationBuilder().createSetDataOperation(
-                        "data",
-                        new ExpressionBuilder().createGroovyScriptExpression("getNodeName",
-                                "System.setProperty('" + systemProperty + "','true');return System.getProperty(\"node.name\");",
-                                String.class.getName())));
-        designProcessDefinition.addUserTask("step", ACTOR_NAME);
-        designProcessDefinition.addTransition("start", "timer1");
-        designProcessDefinition.addTransition("timer1", "timer2");
-        designProcessDefinition.addTransition("timer2", "autoStep");
-        designProcessDefinition.addTransition("autoStep", "step");
-
-        return deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
     }
 
     @Test
     public void should_pause_tenant_then_stop_start_node_dont_restart_elements() throws Exception {
         // given: 2 node with 1 node having running processes
-        final long tenantId = createAndActivateTenant("MyTenant_");
 
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
 
-        ProcessDefinitionBuilder pdb = new ProcessDefinitionBuilder().createNewInstance("loop process def", "1.0");
+        final ProcessDefinitionBuilder pdb = new ProcessDefinitionBuilder().createNewInstance("loop process def", "1.0");
         pdb.addAutomaticTask("step1").addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(100));
-        DesignProcessDefinition dpd = pdb.done();
-        ProcessDefinition pd = deployAndEnableProcess(dpd);
-        ProcessInstance pi = getProcessAPI().startProcess(pd.getId());
+        final DesignProcessDefinition dpd = pdb.done();
+        final ProcessDefinition pd = deployAndEnableProcess(dpd);
+        final ProcessInstance pi = getProcessAPI().startProcess(pd.getId());
 
         logoutOnTenant();
         // when: we stop node 1
         stopPlatform();
         changeToNode2();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
-        // then: node2 should finish the work
-        waitForProcessToFinishAndBeArchived(pi);
-
-        // cleanup
-        disableAndDeleteProcess(pd);
-        logoutOnTenant();
-        changeToNode1();
-        startPlatform();
-        loginOnDefaultTenantWith(USERNAME, PASSWORD);
+        try {
+            // then: node2 should finish the work
+            waitForProcessToFinishAndBeArchived(pi);
+        } finally {
+            // cleanup
+            disableAndDeleteProcess(pd);
+            logoutOnTenant();
+            changeToNode1();
+            startPlatform();
+            loginOnDefaultTenantWith(USERNAME, PASSWORD);
+        }
     }
 
 }

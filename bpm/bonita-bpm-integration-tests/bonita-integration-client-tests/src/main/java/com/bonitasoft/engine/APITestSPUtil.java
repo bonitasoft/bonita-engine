@@ -183,8 +183,8 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     @Override
-    public void loginOnDefaultTenantWithDefaultTechnicalLogger() throws BonitaException {
-        setSession(BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalLogger());
+    public void loginOnDefaultTenantWithDefaultTechnicalUser() throws BonitaException {
+        setSession(BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser());
         setAPIs();
     }
 

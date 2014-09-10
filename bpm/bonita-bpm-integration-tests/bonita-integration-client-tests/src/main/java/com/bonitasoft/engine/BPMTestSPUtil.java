@@ -45,9 +45,9 @@ import com.bonitasoft.engine.platform.TenantDeactivationException;
  */
 public class BPMTestSPUtil {
 
-    private static final String DEFAULT_TECHNICAL_LOGGER_USERNAME = "install";
+    private static final String DEFAULT_TECHNICAL_USER_USERNAME = "install";
 
-    private static final String DEFAULT_TECHNICAL_LOGGER_PASSWORD = "install";
+    private static final String DEFAULT_TECHNICAL_USER_PASSWORD = "install";
 
     private static final String DEFAULT_TENANT_DESCRIPTION = "the default tenant";
 
@@ -68,7 +68,7 @@ public class BPMTestSPUtil {
         platformAPI.startNode();
         defaultTenantId = platformAPI.getDefaultTenant().getId();
         logoutOnPlatform(session);
-        final APISession loginDefaultTenant = loginOnDefaultTenantWithDefaultTechnicalLogger();
+        final APISession loginDefaultTenant = loginOnDefaultTenantWithDefaultTechnicalUser();
         ClientEventUtil.deployCommand(loginDefaultTenant);
         logoutOnTenant(loginDefaultTenant);
     }
@@ -78,7 +78,7 @@ public class BPMTestSPUtil {
     }
 
     public static void destroyPlatformAndTenants() throws BonitaException {
-        final APISession loginDefaultTenant = loginOnDefaultTenantWithDefaultTechnicalLogger();
+        final APISession loginDefaultTenant = loginOnDefaultTenantWithDefaultTechnicalUser();
         ClientEventUtil.undeployCommand(loginDefaultTenant);
         logoutOnTenant(loginDefaultTenant);
         final PlatformSession session = loginOnPlatform();
@@ -138,8 +138,8 @@ public class BPMTestSPUtil {
         final PlatformSession session = loginOnPlatform();
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         final TenantCreator tenantCreator = new TenantCreator(tenantName);
-        tenantCreator.setUsername(DEFAULT_TECHNICAL_LOGGER_USERNAME);
-        tenantCreator.setPassword(DEFAULT_TECHNICAL_LOGGER_PASSWORD);
+        tenantCreator.setUsername(DEFAULT_TECHNICAL_USER_USERNAME);
+        tenantCreator.setPassword(DEFAULT_TECHNICAL_USER_PASSWORD);
         final long tenantId = platformAPI.createTenant(tenantCreator);
         platformAPI.activateTenant(tenantId);
         logoutOnPlatform(session);
@@ -233,11 +233,11 @@ public class BPMTestSPUtil {
     }
 
     public static APISession loginOnTenantWithDefaultTechnicalLogger(final long tenantId) throws BonitaException {
-        return loginOnTenant(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD, tenantId);
+        return loginOnTenant(DEFAULT_TECHNICAL_USER_USERNAME, DEFAULT_TECHNICAL_USER_PASSWORD, tenantId);
     }
 
-    public static APISession loginOnDefaultTenantWithDefaultTechnicalLogger() throws BonitaException {
-        return loginOnDefaultTenant(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD);
+    public static APISession loginOnDefaultTenantWithDefaultTechnicalUser() throws BonitaException {
+        return loginOnDefaultTenant(DEFAULT_TECHNICAL_USER_USERNAME, DEFAULT_TECHNICAL_USER_PASSWORD);
     }
 
     public static APISession loginOnDefaultTenant(final String userName, final String password) throws BonitaException {
@@ -246,7 +246,7 @@ public class BPMTestSPUtil {
     }
 
     public static User createUserOnDefaultTenant(final String userName, final String password) throws BonitaException {
-        final APISession session = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalLogger();
+        final APISession session = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
         final User user = identityAPI.createUser(userName, password);
         assertNull(user.getLastConnection());
@@ -255,7 +255,7 @@ public class BPMTestSPUtil {
     }
 
     public static void deleteUserOnDefaultTenant(final User user) throws BonitaException {
-        final APISession session = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalLogger();
+        final APISession session = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
         identityAPI.deleteUser(user.getId());
         BPMTestSPUtil.logoutOnTenant(session);
@@ -272,7 +272,7 @@ public class BPMTestSPUtil {
     }
 
     public static User createUserOnTenantWithDefaultTechnicalLogger(final String userName, final String password, final long tenantId) throws BonitaException {
-        final APISession session = BPMTestSPUtil.loginOnTenant(DEFAULT_TECHNICAL_LOGGER_USERNAME, DEFAULT_TECHNICAL_LOGGER_PASSWORD, tenantId);
+        final APISession session = BPMTestSPUtil.loginOnTenant(DEFAULT_TECHNICAL_USER_USERNAME, DEFAULT_TECHNICAL_USER_PASSWORD, tenantId);
         final IdentityAPI identityAPI = TenantAPIAccessor.getIdentityAPI(session);
         final User user = identityAPI.createUser(userName, password);
         assertNull(user.getLastConnection());

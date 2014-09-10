@@ -40,7 +40,7 @@ public class ManualTasksTest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         createUser(JOHN, "bpm");
        logoutOnTenant();
         loginOnDefaultTenantWith(JOHN, "bpm");
@@ -60,7 +60,7 @@ public class ManualTasksTest extends CommonAPISPTest {
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance task = waitForUserTask("Request", startProcess.getId());
         final long taskId = task.getId();
-        loginOnDefaultTenantWithDefaultTechnicalLogger();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         loginOnDefaultTenantWith("login1", "password");
         getProcessAPI().assignUserTask(taskId, user.getId());
 

@@ -99,12 +99,12 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         getProcessAPI().executeFlowNode(waitForGatewayToBeAborted.getId());
 
         // the target process instances that exceed the max loop must be in aborted state
-        waitForProcessToFinish(targetProcInstToBeAborted, TestStates.getAbortedState());
+        waitForProcessToFinish(targetProcInstToBeAborted, TestStates.ABORTED);
 
         // the gateway not executed must be in aborted state
         final SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, 10);
         searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.ORIGINAL_FLOW_NODE_ID, waitForGatewayToBeAborted.getId());
-        searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, TestStates.getAbortedState());
+        searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, TestStates.ABORTED.getStateName());
         final SearchResult<ArchivedFlowNodeInstance> searchActivities = getProcessAPI().searchArchivedFlowNodeInstances(searchBuilder.done());
         assertEquals(1, searchActivities.getCount());
 
@@ -160,12 +160,12 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         getProcessAPI().executeFlowNode(waitForFlowNodeToBeAborted.getId());
 
         // the target process instances that exceed the max loop must be in aborted state
-        waitForProcessToFinish(targetProcInstToBeAborted, TestStates.getAbortedState());
+        waitForProcessToFinish(targetProcInstToBeAborted, TestStates.ABORTED);
 
         // the task not executed must be in aborted state
         final SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, 10);
         searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.ORIGINAL_FLOW_NODE_ID, waitForFlowNodeToBeAborted.getId());
-        searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, TestStates.getAbortedState());
+        searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, TestStates.ABORTED.getStateName());
         final SearchResult<ArchivedFlowNodeInstance> searchActivities = getProcessAPI().searchArchivedFlowNodeInstances(searchBuilder.done());
         assertEquals(1, searchActivities.getCount());
 
@@ -225,13 +225,13 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         getProcessAPI().executeFlowNode(waitForFlowNodeToBeAborted.getId());
 
         // the target process instances that exceed the max loop must be in aborted state
-        waitForProcessToFinish(targetProcInstToBeAborted, TestStates.getAbortedState());
+        waitForProcessToFinish(targetProcInstToBeAborted, TestStates.ABORTED);
 
         // the start event not executed must be in aborted state
         // FIXME: uncomment the code below when archive mechanism deals with events
         // final SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, 10);
         // searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.ORIGINAL_FLOW_NODE_ID, waitForFlowNodeToBeAborted.getResult().getId());
-        // searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, TestStates.getAbortedState());
+        // searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, TestStates.ABORTED);
         // final SearchResult<ArchivedFlowNodeInstance> searchActivities = getProcessAPI().searchArchivedFlowNodeInstances(searchBuilder.done());
         // assertEquals(1, searchActivities.getCount());
 
@@ -285,13 +285,13 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         getProcessAPI().executeFlowNode(waitForFlowNodeToBeAborted.getId());
 
         // the target process instances that exceed the max loop must be in aborted state
-        waitForProcessToFinish(targetProcInstToBeAborted, TestStates.getAbortedState());
+        waitForProcessToFinish(targetProcInstToBeAborted, TestStates.ABORTED);
 
         // the event not executed must be in aborted state
         // FIXME: uncomment final the code below final when archive mechanism final deals with events
         // final SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, 10);
         // searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.ORIGINAL_FLOW_NODE_ID, waitForFlowNodeToBeAborted.getResult().getId());
-        // searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, TestStates.getAbortedState());
+        // searchBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, TestStates.ABORTED);
         // final SearchResult<ArchivedFlowNodeInstance> searchActivities = getProcessAPI().searchArchivedFlowNodeInstances(searchBuilder.done());
         // assertEquals(1, searchActivities.getCount());
 
