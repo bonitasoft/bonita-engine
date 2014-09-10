@@ -18,13 +18,13 @@
 		<server.port>8384</server.port>
 		<server.ajp.port>8313</server.ajp.port>
 		<provider.port>8184</provider.port>
-		<tomcat.version>7.0.50</tomcat.version>
+		<tomcat.version>7.0.55</tomcat.version>
 		<tomcat.name>apache-tomcat-${tomcat.version}</tomcat.name>
 		<tomcat.home>${project.build.directory}/${tomcat.name}</tomcat.home>
 		<tomcat.conf.dir>${tomcat.home}/conf</tomcat.conf.dir>
 		<tomcat.deploy.dir>${tomcat.home}/webapps</tomcat.deploy.dir>
 		<tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-7/v${tomcat.version}/bin/${tomcat.name}.zip</tomcat.url>
-		<tomcat.zip.folder>${user.home}</tomcat.zip.folder>
+		<tomcat.zip.folder>${java.io.tmpdir}</tomcat.zip.folder>
 		<bonita.home>${tomcat.home}/bonita</bonita.home>
 		<if.task>net.sf.antcontrib.logic.IfTask</if.task>
 		<db.vendor>h2</db.vendor>
@@ -120,11 +120,6 @@
                                         <artifactItem>
                                             <groupId>com.h2database</groupId>
                                             <artifactId>h2</artifactId>
-                                            <outputDirectory>${project.build.directory}/driver</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>mysql</groupId>
-                                            <artifactId>mysql-connector-java</artifactId>
                                             <outputDirectory>${project.build.directory}/driver</outputDirectory>
                                         </artifactItem>
                                         <artifactItem>
@@ -225,15 +220,18 @@
                                         <replace file="${tomcat.conf.dir}/Catalina/localhost/bonita.xml"
                                                  token="#db.password#" value="${db.password}"/>
 
-
 										<!-- Replace server.xml by specific file for H2 -->
 										<if>
-                                            <equals arg1="${db.vendor}" arg2="h2"/>
+											<equals arg1="${db.vendor}" arg2="h2" />
 											<then>
-												<copy todir="${tomcat.conf.dir}">
-                                                    <fileset file="tomcat/${db.vendor}/server.xml"/>
+												<copy todir="${tomcat.conf.dir}" overwrite="true">
+													<fileset dir="tomcat/${db.vendor}">
+														<include name="server.xml" />
+													</fileset>
 												</copy>
+												<replace file="${tomcat.conf.dir}/server.xml" token="#db.server.port#" value="${db.server.port}" />
 											</then>
+
 										</if>
 										
                                         <replace file="${tomcat.conf.dir}/server.xml"
