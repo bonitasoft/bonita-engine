@@ -19,7 +19,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,11 +44,17 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
+import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
+import org.bonitasoft.engine.platform.exception.STenantException;
+import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
+import org.bonitasoft.engine.platform.exception.STenantUpdateException;
 import org.bonitasoft.engine.platform.impl.PlatformServiceImpl;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
+import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilder;
+import org.bonitasoft.engine.platform.model.builder.impl.STenantUpdateBuilderImpl;
 import org.bonitasoft.engine.platform.model.impl.SPlatformImpl;
 import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -308,28 +313,6 @@ public class PlatformServiceImplTest {
     }
 
     @Test
-    public final void isTenantActivated() {
-        final STenant tenant = buildTenant("ACTIVATED");
-
-        assertTrue(platformServiceImpl.isTenantActivated(tenant));
-    }
-
-    @Test
-    public final void isNotTenantActivated() {
-        final STenant tenant = buildTenant("DEACTIVATED");
-
-        assertFalse(platformServiceImpl.isTenantActivated(tenant));
-    }
-
-    @Test
-    public final void should_isTenantActivated_return_true_when_tenant_is_paused() {
-        final STenant tenant = mock(STenant.class);
-        when(tenant.getStatus()).thenReturn("PAUSED");
-
-        assertTrue(platformServiceImpl.isTenantActivated(tenant));
-    }
-
-    @Test
     public final void searchTenants() throws SBonitaException {
         final List<STenant> sTenants = new ArrayList<STenant>();
         sTenants.add(buildTenant(87, "tenant"));
@@ -351,15 +334,16 @@ public class PlatformServiceImplTest {
     public void updateTheTenantUsingTheSameName() throws SBonitaException {
         // Given
         final STenant tenant = buildTenant(15, "tenantName");
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField("name", "tenant1");
+        final STenantUpdateBuilder updateDescriptor = new STenantUpdateBuilderImpl(new EntityUpdateDescriptor());
+        updateDescriptor.setName("tenant1");
+        final EntityUpdateDescriptor descriptor = updateDescriptor.done();
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(tenant, descriptor);
 
         final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), "name");
         when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class))).thenReturn(tenant);
 
         // When
-        platformServiceImpl.updateTenant(tenant, descriptor);
+        platformServiceImpl.updateTenant(tenant, updateDescriptor.done());
 
         // Then
         verify(recorder).recordUpdate(eq(updateRecord), any(SUpdateEvent.class));
@@ -373,18 +357,14 @@ public class PlatformServiceImplTest {
         final Map<String, Object> parameters = CollectionUtil.buildSimpleMap(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), "name");
         when(persistenceService.selectOne(new SelectOneDescriptor<STenant>("getTenantByName", parameters, STenant.class))).thenReturn(actual);
 
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        descriptor.addField("name", tenantName);
+        final STenantUpdateBuilder updateDescriptor = new STenantUpdateBuilderImpl(new EntityUpdateDescriptor());
+        updateDescriptor.setName(tenantName);
 
-        platformServiceImpl.updateTenant(tenant, descriptor);
+        platformServiceImpl.updateTenant(tenant, updateDescriptor.done());
     }
 
     private STenant buildTenant(final long id, final String name) {
         return buildTenant(id, name, "me", 468786l, "ACTIVATED", true);
-    }
-
-    private STenant buildTenant(final String status) {
-        return buildTenant(45, "tenant", "me", 1567l, status, false);
     }
 
     private STenant buildTenant(final long id, final String name, final String createdBy, final long created, final String status, final boolean defaultTenant) {

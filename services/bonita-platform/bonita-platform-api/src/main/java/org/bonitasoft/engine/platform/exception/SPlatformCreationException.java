@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.platform;
+package org.bonitasoft.engine.platform.exception;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
@@ -20,19 +20,19 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
  * 
  * @author Charles Souillard
  */
-public class SPlatformUpdateException extends SBonitaException {
+public class SPlatformCreationException extends SBonitaException {
 
     private static final long serialVersionUID = 7615655279956204016L;
 
-    public SPlatformUpdateException(final String message) {
+    public SPlatformCreationException(final String message) {
         super(message);
     }
 
-    public SPlatformUpdateException(final Throwable e) {
+    public SPlatformCreationException(final Throwable e) {
         super(e);
     }
 
-    public SPlatformUpdateException(final String message, final Throwable e) {
+    public SPlatformCreationException(final String message, final Throwable e) {
         super(message, e);
     }
 

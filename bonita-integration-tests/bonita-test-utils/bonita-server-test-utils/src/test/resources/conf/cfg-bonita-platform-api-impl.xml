@@ -13,5 +13,5 @@
 		<constructor-arg ref="platformProperties" />
 		<constructor-arg name="recorder" ref="platformRecorderSync" />
 	</bean>
-
+	
 </beans>
