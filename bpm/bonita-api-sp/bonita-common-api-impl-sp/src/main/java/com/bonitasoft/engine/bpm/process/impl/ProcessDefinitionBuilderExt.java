@@ -42,7 +42,7 @@ public final class ProcessDefinitionBuilderExt extends ProcessDefinitionBuilder 
      * @param parameterName
      *        The name of the new {@link ParameterDefinition}
      * @param type
-     *        The type of the new {@link ParameterDefinition}(complete class name)
+     *        The type of the new {@link ParameterDefinition} (complete class name)
      * @return The {@link ParameterDefinitionBuilder} containing the new {@link ParameterDefinition}
      */
     public ParameterDefinitionBuilder addParameter(final String parameterName, final String type) {
