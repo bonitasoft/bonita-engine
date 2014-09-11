@@ -96,6 +96,12 @@ ALTER TABLE business_app_page DROP CONSTRAINT fk_bus_app_id
 GO
 ALTER TABLE business_app_page DROP CONSTRAINT fk_page_id
 GO
+ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_tenantId
+GO
+ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_pageId
+GO
+ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_parentId
+GO
 
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------

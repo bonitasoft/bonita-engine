@@ -13,6 +13,9 @@ ALTER TABLE business_app DROP CONSTRAINT fk_app_tenantId;
 ALTER TABLE business_app_page DROP CONSTRAINT fk_app_page_tenantId;
 ALTER TABLE business_app_page DROP CONSTRAINT fk_bus_app_id;
 ALTER TABLE business_app_page DROP CONSTRAINT fk_page_id;
+ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_tenantId;
+ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_pageId;
+ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_parentId;
 
 ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_ADocMap_tenId;
 ALTER TABLE arch_flownode_instance DROP CONSTRAINT fk_AFln_tenId;

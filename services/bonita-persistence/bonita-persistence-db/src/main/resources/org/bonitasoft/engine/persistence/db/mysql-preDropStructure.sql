@@ -49,6 +49,9 @@ ALTER TABLE business_app DROP FOREIGN KEY  fk_app_tenantId;
 ALTER TABLE business_app_page DROP FOREIGN KEY fk_app_page_tenantId;
 ALTER TABLE business_app_page DROP FOREIGN KEY fk_bus_app_id;
 ALTER TABLE business_app_page DROP FOREIGN KEY fk_page_id;
+ALTER TABLE business_app_menu DROP FOREIGN KEY fk_app_menu_tenantId;
+ALTER TABLE business_app_menu DROP FOREIGN KEY fk_app_menu_pageId;
+ALTER TABLE business_app_menu DROP FOREIGN KEY fk_app_menu_parentId;
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------
 ALTER TABLE arch_document_mapping DROP FOREIGN KEY fk_arch_document_mapping_tenantId;
