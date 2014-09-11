@@ -63,9 +63,7 @@ import com.bonitasoft.engine.service.TaskResult;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
- * 
  * @author Celine Souchet
- * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class TenantManagementAPIExtTest {
@@ -265,7 +263,7 @@ public class TenantManagementAPIExtTest {
     }
 
     @Test
-    public void pageApi_should_be_available_in_maintenance_mode() throws Exception {
+    public void pageApi_should_be_available_in_maintenance_mode() {
         // given:
         final Class<PageAPIExt> classPageApiExt = PageAPIExt.class;
 
@@ -375,7 +373,7 @@ public class TenantManagementAPIExtTest {
     }
 
     @Test
-    public void tenantManagementAPI_should_have_class_annotation() throws Exception {
+    public void tenantManagementAPI_should_have_class_annotation() {
         // then:
         assertThat(TenantManagementAPIExt.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as(
                 "Annotation @AvailableWhenTenantIsPaused should be present on API class TenantManagementAPIExt").isTrue();

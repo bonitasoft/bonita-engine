@@ -160,7 +160,6 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
             setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId, new ResumeServiceStrategy());
 
             afterServiceStartOfRestartHandlersOfTenant(platformServiceAccessor, tenantId);
-
         } catch (final RestartException e) {
             throw new UpdateException("Unable to resume all elements of the work service.", e);
         } catch (final SSchedulerException e) {
@@ -168,7 +167,8 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         }
     }
 
-    private void beforeServiceStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformServiceAccessor, final long tenantId) throws RestartException {
+    private void beforeServiceStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformServiceAccessor, final long tenantId)
+            throws RestartException {
         final NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlaformConfiguration();
         final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
         final List<TenantRestartHandler> tenantRestartHandlers = nodeConfiguration.getTenantRestartHandlers();
