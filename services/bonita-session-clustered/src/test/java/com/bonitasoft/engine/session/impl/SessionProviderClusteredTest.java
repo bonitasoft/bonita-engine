@@ -8,9 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.session.impl;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,9 +50,9 @@ public class SessionProviderClusteredTest {
     }
 
     private HazelcastInstance buildHazelcastInstance() {
-        Config config = new Config();
+        final Config config = new Config();
         // disable all networking
-        JoinConfig joinConfig = config.getNetworkConfig().getJoin();
+        final JoinConfig joinConfig = config.getNetworkConfig().getJoin();
         joinConfig.getMulticastConfig().setEnabled(false);
         joinConfig.getTcpIpConfig().setEnabled(false);
         joinConfig.getAwsConfig().setEnabled(false);
@@ -63,14 +62,14 @@ public class SessionProviderClusteredTest {
 
     @Test
     public void testAddSession() throws Exception {
-        SSession session = new SSessionImpl(123l, 1, "john", "BPM", 12);
+        final SSession session = new SSessionImpl(123l, 1, "john", "BPM", 12);
         sessionProviderClustered.addSession(session);
-        assertThat(sessionProviderClustered.getSession(123l), is(session));
+        assertThat(sessionProviderClustered.getSession(123l)).isEqualTo(session);
     }
 
     @Test(expected = SSessionNotFoundException.class)
     public void testRemoveSession() throws Exception {
-        SSession session = new SSessionImpl(123l, 1, "john", "BPM", 12);
+        final SSession session = new SSessionImpl(123l, 1, "john", "BPM", 12);
         sessionProviderClustered.addSession(session);
         sessionProviderClustered.removeSession(123l);
 
@@ -90,21 +89,21 @@ public class SessionProviderClusteredTest {
 
     @Test
     public void testUpdateSession() throws Exception {
-        SSessionImpl session = new SSessionImpl(123l, 1, "john", "BPM", 12);
+        final SSessionImpl session = new SSessionImpl(123l, 1, "john", "BPM", 12);
         session.setLastRenewDate(new Date(System.currentTimeMillis() - 100));
         sessionProviderClustered.addSession(session);
 
-        SSessionImpl sessionUpdated = new SSessionImpl(123l, 1, "john", "BPM", 12);
-        Date lastRenewDate = new Date(System.currentTimeMillis());
+        final SSessionImpl sessionUpdated = new SSessionImpl(123l, 1, "john", "BPM", 12);
+        final Date lastRenewDate = new Date(System.currentTimeMillis());
         sessionUpdated.setLastRenewDate(lastRenewDate);
 
         sessionProviderClustered.updateSession(sessionUpdated);
-        assertThat(sessionProviderClustered.getSession(123l).getLastRenewDate(), is(lastRenewDate));
+        assertThat(sessionProviderClustered.getSession(123l).getLastRenewDate()).isEqualTo(lastRenewDate);
     }
 
     @Test(expected = SSessionNotFoundException.class)
     public void testUpdateNoExistingSessionSession() throws Exception {
-        SSessionImpl sessionUpdated = new SSessionImpl(123l, 1, "john", "BPM", 12);
+        final SSessionImpl sessionUpdated = new SSessionImpl(123l, 1, "john", "BPM", 12);
         sessionProviderClustered.updateSession(sessionUpdated);
     }
 
@@ -117,7 +116,7 @@ public class SessionProviderClusteredTest {
 
     @Test(expected = SSessionNotFoundException.class)
     public void testRemoveSessions() throws Exception {
-        SSession session = new SSessionImpl(123l, 1, "john", "BPM", 12);
+        final SSession session = new SSessionImpl(123l, 1, "john", "BPM", 12);
         sessionProviderClustered.addSession(session);
 
         sessionProviderClustered.removeSessions();
@@ -130,7 +129,7 @@ public class SessionProviderClusteredTest {
     public void testDeleteSessionsOfTenantKeepTechnical() throws Exception {
         sessionProviderClustered.removeSessions();
         sessionProviderClustered.addSession(new SSessionImpl(54, 3, "john", "TEST", 12));
-        SSessionImpl technicalSession = new SSessionImpl(55, 3, "technicalUser", "TEST", 13);
+        final SSessionImpl technicalSession = new SSessionImpl(55, 3, "technicalUser", "TEST", 13);
         technicalSession.setTechnicalUser(true);
         sessionProviderClustered.addSession(technicalSession);
         sessionProviderClustered.addSession(new SSessionImpl(56, 4, "john", "TEST", 14));
@@ -140,7 +139,7 @@ public class SessionProviderClusteredTest {
         try {
             sessionProviderClustered.getSession(54);
             fail("session 54 should be deleted because it is on tenant 3");
-        } catch (SSessionNotFoundException e) {
+        } catch (final SSessionNotFoundException e) {
 
         }
     }
@@ -149,7 +148,7 @@ public class SessionProviderClusteredTest {
     public void testDeleteSessionsOfTenant() throws Exception {
         sessionProviderClustered.removeSessions();
         sessionProviderClustered.addSession(new SSessionImpl(54, 3, "john", "TEST", 12));
-        SSessionImpl technicalSession = new SSessionImpl(55, 3, "technicalUser", "TEST", 13);
+        final SSessionImpl technicalSession = new SSessionImpl(55, 3, "technicalUser", "TEST", 13);
         technicalSession.setTechnicalUser(true);
         sessionProviderClustered.addSession(technicalSession);
         sessionProviderClustered.addSession(new SSessionImpl(56, 4, "john", "TEST", 14));
@@ -158,13 +157,13 @@ public class SessionProviderClusteredTest {
         try {
             sessionProviderClustered.getSession(55);
             fail("session 55 should be deleted because it is on tenant 3");
-        } catch (SSessionNotFoundException e) {
+        } catch (final SSessionNotFoundException e) {
 
         }
         try {
             sessionProviderClustered.getSession(54);
             fail("session 54 should be deleted because it is on tenant 3");
-        } catch (SSessionNotFoundException e) {
+        } catch (final SSessionNotFoundException e) {
 
         }
     }

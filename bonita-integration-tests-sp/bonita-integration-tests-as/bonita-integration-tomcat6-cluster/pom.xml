@@ -1,0 +1,472 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.bonitasoft.engine.test</groupId>
+		<artifactId>bonita-integration-tests-as-sp</artifactId>
+		<version>6.4.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>bonita-integration-tomcat6-cluster</artifactId>
+	<packaging>jar</packaging>
+
+
+	<properties>
+		<cluster.group>mycluster</cluster.group>
+		<bonita.home.classifier>performance-cluster</bonita.home.classifier>
+		<tomcat.version>6.0.37</tomcat.version>
+		<tomcat.name>apache-tomcat-${tomcat.version}</tomcat.name>
+        <tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/${tomcat.name}.zip
+        </tomcat.url>
+		<tomcat.zip.folder>${user.home}</tomcat.zip.folder>
+
+		<server1.port>8386</server1.port>
+		<provider1.port>8186</provider1.port>
+		<tomcat1.home>${project.build.directory}/node1</tomcat1.home>
+		<tomcat1.conf.dir>${tomcat1.home}/conf</tomcat1.conf.dir>
+		<tomcat1.deploy.dir>${tomcat1.home}/webapps</tomcat1.deploy.dir>
+
+		<server2.port>8387</server2.port>
+		<provider2.port>8187</provider2.port>
+		<tomcat2.home>${project.build.directory}/node2</tomcat2.home>
+		<tomcat2.conf.dir>${tomcat2.home}/conf</tomcat2.conf.dir>
+
+		<if.task>net.sf.antcontrib.logic.IfTask</if.task>
+		<test.class>com.bonitasoft.engine.ClusteredTestSuite</test.class>
+	</properties>
+
+	<profiles>
+		<profile>
+			<id>tests</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+                                <id>unpack</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>com.bonitasoft.engine</groupId>
+                                            <artifactId>bonita-home-sp</artifactId>
+                                            <version>${project.version}</version>
+                                            <classifier>${bonita.home.classifier}</classifier>
+                                            <type>zip</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${distrib.dir}/resources</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy</id>
+                                <phase>prepare-package</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+                                            <groupId>com.bonitasoft.engine.test</groupId>
+                                            <artifactId>bonita-deploy-war-sp</artifactId>
+                                            <version>${project.version}</version>
+                                            <type>war</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${distrib.dir}/war</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>com.h2database</groupId>
+                                            <artifactId>h2</artifactId>
+                                            <outputDirectory>${project.build.directory}/driver</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+											<groupId>org.bonitasoft.tomcat</groupId>
+											<artifactId>bonita-tomcat-h2-listener</artifactId>
+											<outputDirectory>${project.build.directory}/driver</outputDirectory>
+										</artifactItem>
+										<!-- http://docs.codehaus.org/display/BTM/Tomcat2x#Tomcat2x-Step1CopytheBTMjars -->
+										<artifactItem>
+											<groupId>org.codehaus.btm</groupId>
+											<artifactId>btm</artifactId>
+											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>javax.transaction</groupId>
+											<artifactId>jta</artifactId>
+											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.slf4j</groupId>
+											<artifactId>slf4j-api</artifactId>
+											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>ch.qos.logback</groupId>
+											<artifactId>logback-core</artifactId>
+											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>ch.qos.logback</groupId>
+											<artifactId>logback-classic</artifactId>
+											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.codehaus.btm</groupId>
+											<artifactId>btm-tomcat55-lifecycle</artifactId>
+											<outputDirectory>${project.build.directory}/tx-manager</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<!-- ================================= Create 2 tomcats: node1 + node2 
+								====================================== -->
+							<execution>
+								<id>Tomcat installation</id>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<phase>pre-integration-test</phase>
+								<inherited>false</inherited>
+								<configuration>
+									<target>
+										<taskdef name="if" classname="${if.task}"
+                                                 classpathref="maven.runtime.classpath"/>
+										<available property="tomcat.present"
+                                                   file="${tomcat.zip.folder}/${tomcat.name}.zip"/>
+										<if>
+											<not>
+                                                <isset property="tomcat.present"/>
+											</not>
+											<then>
+                                                <get src="${tomcat.url}"
+                                                     dest="${tomcat.zip.folder}/${tomcat.name}.zip"/>
+											</then>
+										</if>
+                                        <unzip dest="${project.build.directory}"
+                                               src="${tomcat.zip.folder}/${tomcat.name}.zip"/>
+										<!-- move to folder node1 -->
+										<move todir="${tomcat1.home}">
+                                            <fileset dir="${project.build.directory}/${tomcat.name}"/>
+										</move>
+										<!-- override global context XML file in order to declare the datasources 
+											and the Transaction Manager -->
+										<copy todir="${tomcat1.conf.dir}">
+                                            <fileset dir="tomcat/conf"/>
+										</copy>
+										<copy todir="${tomcat1.home}/lib">
+											<fileset dir="target/driver">
+                                                <include name="*jar"/>
+											</fileset>
+											<fileset dir="target/tx-manager">
+                                                <include name="*jar"/>
+											</fileset>
+										</copy>
+										<copy tofile="${tomcat1.deploy.dir}/bonita.war"
+                                              file="${distrib.dir}/war/bonita-deploy-war-sp-${project.version}.war"/>
+
+										<!-- duplicate to node2 -->
+										<copy todir="${tomcat2.home}">
+                                            <fileset dir="${tomcat1.home}"/>
+										</copy>
+
+										<!-- change ports for both nodes -->
+                                        <replace file="${tomcat1.conf.dir}/server.xml"
+                                                 token="&lt;Connector port=&quot;8080&quot;"
+                                                 value="&lt;Connector port=&quot;${provider1.port}&quot;"/>
+                                        <replace file="${tomcat1.conf.dir}/server.xml"
+                                                 token="&lt;Server port=&quot;8005&quot;"
+                                                 value="&lt;Server port=&quot;${server1.port}&quot;"/>
+                                        <replace file="${tomcat1.conf.dir}/server.xml"
+                                                 token="redirectPort=&quot;8443&quot;"
+                                                 value="redirectPort=&quot;8443&quot; maxPostSize=&quot;-1&quot;"/>
+
+                                        <replace file="${tomcat2.conf.dir}/server.xml"
+                                                 token="&lt;Connector port=&quot;8080&quot;"
+                                                 value="&lt;Connector port=&quot;${provider2.port}&quot;"/>
+                                        <replace file="${tomcat2.conf.dir}/server.xml"
+                                                 token="&lt;Server port=&quot;8005&quot;"
+                                                 value="&lt;Server port=&quot;${server2.port}&quot;"/>
+                                        <replace file="${tomcat2.conf.dir}/server.xml"
+                                                 token="redirectPort=&quot;8443&quot;"
+                                                 value="redirectPort=&quot;8443&quot; maxPostSize=&quot;-1&quot;"/>
+										<replaceregexp file="${tomcat2.conf.dir}/server.xml"
+                                                       byline="true" replace="" match=".*H2Listener.*"/>
+
+										<!-- Create default bonita.home folder -->
+										<copy todir="${bonita.home}" verbose="true">
+                                            <fileset dir="${distrib.dir}/resources/home/"/>
+										</copy>
+
+										<copy todir="${bonita.home}/server/licenses" failonerror="true">
+                                            <fileset dir="${user.home}/lic" includes="*.lic"/>
+										</copy>
+
+										<copy file="${basedir}/client/bonita-client.properties"
+                                              todir="${bonita.home}/client/conf" overwrite="true"/>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.cargo</groupId>
+						<artifactId>cargo-maven2-plugin</artifactId>
+						<executions>
+
+							<!-- ================================= Node1 ====================================== -->
+							<execution>
+								<id>start-container1</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<container>
+										<containerId>tomcat6x</containerId>
+										<home>${tomcat1.home}</home>
+										<systemProperties>
+											<!-- in order to identify on which node we are -->
+											<node.name>Node1</node.name>
+											<bonita.home>${bonita.home}</bonita.home>
+											<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
+											<db.vendor>h2</db.vendor>
+                                            <logback.configurationFile>${tomcat1.conf.dir}/logback.xml
+                                            </logback.configurationFile>
+											<file.encoding>${project.build.sourceEncoding}</file.encoding>
+                                            <javax.xml.parsers.DocumentBuilderFactory>
+                                                com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl
+                                            </javax.xml.parsers.DocumentBuilderFactory>
+
+											<!-- Bitronix properties -->
+											<btm.root>${tomcat1.home}</btm.root>
+                                            <bitronix.tm.configuration>${tomcat1.home}/conf/btm-config.properties
+                                            </bitronix.tm.configuration>
+										</systemProperties>
+									</container>
+									<configuration>
+										<type>existing</type>
+										<home>${tomcat1.home}</home>
+										<properties>
+											<cargo.servlet.port>${provider1.port}</cargo.servlet.port>
+											<cargo.jvmargs>
+												-Dbonita.cluster.group.name=${cluster.group}
+											<!---Xdebug
+												-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8001
+												-Xnoagent
+												-Djava.compiler=NONE-->
+											</cargo.jvmargs>
+										</properties>
+									</configuration>
+								</configuration>
+							</execution>
+							<execution>
+								<id>stop-container1</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>stop</goal>
+								</goals>
+								<configuration>
+									<container>
+										<containerId>tomcat6x</containerId>
+										<home>${tomcat1.home}</home>
+										<systemProperties>
+											<!-- in order to identify on which node we are -->
+											<bonita.home>${bonita.home}</bonita.home>
+											<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
+											<db.vendor>h2</db.vendor>
+											<file.encoding>${project.build.sourceEncoding}</file.encoding>
+                                            <javax.xml.parsers.DocumentBuilderFactory>
+                                                com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl
+                                            </javax.xml.parsers.DocumentBuilderFactory>
+
+											<!-- Bitronix properties -->
+											<btm.root>${tomcat1.home}</btm.root>
+                                            <bitronix.tm.configuration>${tomcat1.home}/conf/btm-config.properties
+                                            </bitronix.tm.configuration>
+										</systemProperties>
+									</container>
+									<configuration>
+										<type>existing</type>
+										<home>${tomcat1.home}</home>
+										<properties>
+											<cargo.servlet.port>${provider1.port}</cargo.servlet.port>
+										</properties>
+									</configuration>
+								</configuration>
+							</execution>
+
+							<!-- ================================= Node2 ====================================== -->
+							<execution>
+								<id>start-container2</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>start</goal>
+								</goals>
+								<configuration>
+									<container>
+										<containerId>tomcat6x</containerId>
+										<home>${tomcat2.home}</home>
+										<systemProperties>
+											<bonita.home>${bonita.home}</bonita.home>
+											<node.name>Node2</node.name>
+											<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
+											<db.vendor>h2</db.vendor>
+                                            <logback.configurationFile>${tomcat2.conf.dir}/logback.xml
+                                            </logback.configurationFile>
+											<file.encoding>${project.build.sourceEncoding}</file.encoding>
+                                            <javax.xml.parsers.DocumentBuilderFactory>
+                                                com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl
+                                            </javax.xml.parsers.DocumentBuilderFactory>
+
+											Bitronix properties
+											<btm.root>${tomcat2.home}</btm.root>
+                                            <bitronix.tm.configuration>${tomcat2.home}/conf/btm-config.properties
+                                            </bitronix.tm.configuration>
+											<hazelcast.jmx>true</hazelcast.jmx>
+										</systemProperties>
+									</container>
+									<configuration>
+										<type>existing</type>
+										<home>${tomcat2.home}</home>
+										<properties>
+											<cargo.servlet.port>${provider2.port}</cargo.servlet.port>
+											<cargo.jvmargs>
+												-Dbonita.cluster.group.name=${cluster.group}
+												<!-- -Xdebug
+												-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000
+												-Xnoagent
+												-Djava.compiler=NONE -->
+											</cargo.jvmargs>
+										</properties>
+									</configuration>
+								</configuration>
+							</execution>
+							<execution>
+								<id>stop-container2</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>stop</goal>
+								</goals>
+								<configuration>
+									<container>
+										<containerId>tomcat6x</containerId>
+										<home>${tomcat2.home}</home>
+										<systemProperties>
+											<bonita.home>${bonita.home}</bonita.home>
+											<sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
+											<db.vendor>h2</db.vendor>
+											<file.encoding>${project.build.sourceEncoding}</file.encoding>
+                                            <javax.xml.parsers.DocumentBuilderFactory>
+                                                com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl
+                                            </javax.xml.parsers.DocumentBuilderFactory>
+
+											<!-- Bitronix properties -->
+											<btm.root>${tomcat2.home}</btm.root>
+                                            <bitronix.tm.configuration>${tomcat2.home}/conf/btm-config.properties
+                                            </bitronix.tm.configuration>
+										</systemProperties>
+									</container>
+									<configuration>
+										<type>existing</type>
+										<home>${tomcat2.home}</home>
+										<properties>
+											<cargo.servlet.port>${provider2.port}</cargo.servlet.port>
+										</properties>
+									</configuration>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>integration-test</goal>
+									<goal>verify</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<systemProperties>
+								<property>
+									<name>bonita.home</name>
+									<value>${bonita.home}</value>
+								</property>
+							</systemProperties>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<!-- the profile package-all is declared here only to deactivate the profile 
+			tests (active by default) -->
+		<profile>
+			<id>package-all</id>
+		</profile>
+	</profiles>
+
+	<dependencies>
+		<dependency>
+			<groupId>ant-contrib</groupId>
+			<artifactId>ant-contrib</artifactId>
+			<version>1.0b3</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>ant</artifactId>
+					<groupId>ant</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- Transaction manager dependencies -->
+		<dependency>
+			<groupId>org.codehaus.btm</groupId>
+			<artifactId>btm</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>jta</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.btm</groupId>
+			<artifactId>btm-tomcat55-lifecycle</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.tomcat</groupId>
+			<artifactId>bonita-tomcat-h2-listener</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.0.11</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>
