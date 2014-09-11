@@ -40,21 +40,21 @@ import org.bonitasoft.engine.expression.Expression;
 public interface DesignProcessDefinition extends ProcessDefinition {
 
     /**
-     * Retrieve the displayed name of the process definition, as set at design-time.
+     * Retrieves the displayed name of the process definition, as set at design-time.
      *
      * @return The displayed name of the process definition, as set at design-time.
      */
     String getDisplayName();
 
     /**
-     * Retrieve the displayed description of the process definition, as set at design-time.
+     * Retrieves the displayed description of the process definition, as set at design-time.
      *
      * @return The displayed description of the process definition, as set at design-time.
      */
     String getDisplayDescription();
 
     /**
-     * Retrieve the definition of the FlowElementContainerDefinition of the process container
+     * Retrieves the definition of the FlowElementContainerDefinition of the process container
      *
      * @return The {@link FlowElementContainerDefinition} of the process container.<br/>
      *         return type FlowElementContainerDefinition in this package is deprecated. Instead use
@@ -64,14 +64,14 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     FlowElementContainerDefinition getProcessContainer();
 
     /**
-     * Retrieve a Set of ParameterDefinition objects from a ProcessDefinition
+     * Retrieves a Set of ParameterDefinition objects from a ProcessDefinition
      *
      * @return A set of {@link ParameterDefinition} objects
      */
     Set<ParameterDefinition> getParameters();
 
     /**
-     * Retrieve a Set of ActorDefinition objects from a ProcessDefinition
+     * Retrieves a Set of ActorDefinition objects from a ProcessDefinition
      *
      * @return A set of {@link ActorDefinition} objects.
      *         <br/>If no actors have been defined, return an empty Set.
@@ -92,16 +92,16 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     List<ActorDefinition> getActorsList();
 
     /**
-     * Retrieve the ActorDefinition of process's actor defined as initiator.
+     * Retrieves the ActorDefinition of process's actor defined as initiator.
      *
      * @return The {@link ActorDefinition} of process's actor defined as initiator.
      * @since 6.1
      */
     ActorDefinition getActorInitiator();
-   
+
 
     /**
-     * Retrieve the label for the ProcessDefinition given search index.
+     * Retrieves the label for the ProcessDefinition given search index.
      * <p>
      * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
      * index</a> Bonitasoft documentation page
@@ -116,7 +116,7 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     String getStringIndexLabel(int index);
 
     /**
-     * Retrieve the Expression for the ProcessDefinition given search index.
+     * Retrieves the Expression for the ProcessDefinition given search index.
      * <p>
      * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
      * index</a> Bonitasoft documentation page
