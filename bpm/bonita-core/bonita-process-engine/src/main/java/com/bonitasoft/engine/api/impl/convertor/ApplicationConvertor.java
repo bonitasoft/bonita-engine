@@ -19,13 +19,20 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationCreator.ApplicationField;
+import com.bonitasoft.engine.business.application.ApplicationMenu;
+import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
+import com.bonitasoft.engine.business.application.ApplicationMenuCreator.ApplicationMenuField;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
+import com.bonitasoft.engine.business.application.impl.ApplicationMenuImpl;
 import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
 import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationBuilderFactory;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilder;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilderFactory;
 
 
 /**
@@ -84,6 +91,29 @@ public class ApplicationConvertor {
             appPages.add(toApplicationPage(sApplicationPage));
         }
         return appPages;
+    }
+
+    public SApplicationMenu buildSApplicationMenu(final ApplicationMenuCreator creator) {
+        final Map<ApplicationMenuField, Serializable> fields = creator.getFields();
+        final String displayName = (String) fields.get(ApplicationMenuField.DISPLAY_NAME);
+        final long applicationPageId = (Long) fields.get(ApplicationMenuField.APPLICATION_PAGE_ID);
+        final int index = (Integer) fields.get(ApplicationMenuField.INDEX);
+        final Long parentId = (Long) fields.get(ApplicationMenuField.PARENT_ID);
+
+        final SApplicationMenuBuilder builder = BuilderFactory.get(SApplicationMenuBuilderFactory.class).createNewInstance(displayName, applicationPageId,
+                index);
+        if (parentId != null) {
+            builder.setParentId(parentId);
+        }
+        return builder.done();
+    }
+
+    public ApplicationMenu toApplicationMenu(final SApplicationMenu sApplicationMenu) {
+        final ApplicationMenuImpl menu = new ApplicationMenuImpl(sApplicationMenu.getDisplayName(), sApplicationMenu.getApplicationPageId(),
+                sApplicationMenu.getIndex());
+        menu.setId(sApplicationMenu.getId());
+        menu.setParentId(sApplicationMenu.getParentId());
+        return menu;
     }
 
 }

@@ -26,7 +26,7 @@ public interface SApplicationMenu extends PersistentObject {
 
     long getApplicationPageId();
 
-    long getParentId();
+    Long getParentId();
 
     int getIndex();
 

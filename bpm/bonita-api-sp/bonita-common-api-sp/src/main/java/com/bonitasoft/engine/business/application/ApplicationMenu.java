@@ -21,7 +21,12 @@ public interface ApplicationMenu extends BaseElement {
 
     long getApplicationPageId();
 
-    long getParentId();
+    /**
+     * Retrieves the identifier of the parent menu. If the menu does not have a parent menu, this method will return null.
+     *
+     * @return the identifier of the parent menu or null if the menu has no parent.
+     */
+    Long getParentId();
 
     int getIndex();
 

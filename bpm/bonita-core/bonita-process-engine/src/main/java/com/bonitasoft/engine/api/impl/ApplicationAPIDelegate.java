@@ -29,12 +29,16 @@ import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationP
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
+import com.bonitasoft.engine.business.application.ApplicationMenu;
+import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
+import com.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.SInvalidNameException;
 import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilderFactory;
@@ -180,6 +184,34 @@ public class ApplicationAPIDelegate {
             return searchApplicationPages.getResult();
         } catch (final SBonitaException e) {
             throw new SearchException(e);
+        }
+    }
+
+    public ApplicationMenu createApplicationMenu(final ApplicationMenuCreator applicationMenuCreator) throws CreationException {
+        try {
+            final SApplicationMenu sApplicationMenu = applicationService.createApplicationMenu(convertor.buildSApplicationMenu(applicationMenuCreator));
+            return convertor.toApplicationMenu(sApplicationMenu);
+        } catch (final SObjectCreationException e) {
+            throw new CreationException(e);
+        }
+    }
+
+    public ApplicationMenu getApplicationMenu(final long applicationMenuId) throws ApplicationMenuNotFoundException {
+        try {
+            final SApplicationMenu sApplicationMenu = applicationService.getApplicationMenu(applicationMenuId);
+            return convertor.toApplicationMenu(sApplicationMenu);
+        } catch (final SBonitaReadException e) {
+            throw new RetrieveException(e);
+        } catch (final SObjectNotFoundException e) {
+            throw new ApplicationMenuNotFoundException(e.getMessage());
+        }
+    }
+
+    public void deleteApplicationMenu(final long applicationMenuId) throws DeletionException {
+        try {
+            applicationService.deleteApplicationMenu(applicationMenuId);
+        } catch (final SBonitaException e) {
+            throw new DeletionException(e);
         }
     }
 

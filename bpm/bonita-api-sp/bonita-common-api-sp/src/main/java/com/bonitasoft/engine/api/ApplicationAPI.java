@@ -143,10 +143,9 @@ public interface ApplicationAPI {
      *
      * @param applicationMenuCreator creator describing characteristics of application menu to be created
      * @return the created {@link ApplicationMenu}
-     * @throws AlreadyExistsException if an application menu already exists with the same display name and parent
      * @throws CreationException if an error occurs during the creation
      */
-    ApplicationMenu createApplicationMenu(ApplicationMenuCreator applicationMenuCreator) throws AlreadyExistsException, CreationException;
+    ApplicationMenu createApplicationMenu(ApplicationMenuCreator applicationMenuCreator) throws CreationException;
 
     /**
      * Retrieves the {@link ApplicationMenu} from its identifier

@@ -12,13 +12,17 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
+import com.bonitasoft.engine.business.application.ApplicationMenu;
+import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
 import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.SApplicationState;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
+import com.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
 
 
@@ -152,6 +156,55 @@ public class ApplicationConvertorTest {
 
         //then
         assertThat(applicationPages).containsExactly(appPage1, appPage2);
+    }
+
+    @Test
+    public void buildSApplicationMenu_should_map_all_creator_fields() throws Exception {
+        //given
+        final ApplicationMenuCreator creator = new ApplicationMenuCreator("main", 20, 1);
+        creator.setParentId(11);
+
+        //when
+        final SApplicationMenu menu = convertor.buildSApplicationMenu(creator);
+
+        //then
+        assertThat(menu).isNotNull();
+        assertThat(menu.getDisplayName()).isEqualTo("main");
+        assertThat(menu.getApplicationPageId()).isEqualTo(20);
+        assertThat(menu.getIndex()).isEqualTo(1);
+        assertThat(menu.getParentId()).isEqualTo(11);
+    }
+
+    @Test
+    public void buildSApplicationMenu_should_have_null_parentId_when_not_set_on_creator() throws Exception {
+        //given
+        final ApplicationMenuCreator creator = new ApplicationMenuCreator("main", 20, 1);
+
+        //when
+        final SApplicationMenu menu = convertor.buildSApplicationMenu(creator);
+
+        //then
+        assertThat(menu).isNotNull();
+        assertThat(menu.getParentId()).isNull();
+    }
+
+    @Test
+    public void toApplicationMenu_should_map_all_server_object_fields() throws Exception {
+        //given
+        final SApplicationMenuImpl sMenu = new SApplicationMenuImpl("main", 15, 1);
+        sMenu.setId(3);
+        sMenu.setParentId(21L);
+
+        //when
+        final ApplicationMenu menu = convertor.toApplicationMenu(sMenu);
+
+        //then
+        assertThat(menu).isNotNull();
+        assertThat(menu.getId()).isEqualTo(3);
+        assertThat(menu.getDisplayName()).isEqualTo("main");
+        assertThat(menu.getApplicationPageId()).isEqualTo(15);
+        assertThat(menu.getIndex()).isEqualTo(1);
+        assertThat(menu.getParentId()).isEqualTo(21);
     }
 
 }

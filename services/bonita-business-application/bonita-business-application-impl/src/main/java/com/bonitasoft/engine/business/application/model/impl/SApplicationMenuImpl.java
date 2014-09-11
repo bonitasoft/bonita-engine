@@ -27,7 +27,7 @@ public class SApplicationMenuImpl extends PersistentObjectId implements SApplica
     private static final long serialVersionUID = 5080525289831930498L;
     private String displayName;
     private long applicationPageId;
-    private long parentId;
+    private Long parentId;
     private int index;
 
     //used by Hibernate
@@ -56,11 +56,11 @@ public class SApplicationMenuImpl extends PersistentObjectId implements SApplica
     }
 
     @Override
-    public long getParentId() {
+    public Long getParentId() {
         return parentId;
     }
 
-    public void setParentId(final long parentId) {
+    public void setParentId(final Long parentId) {
         this.parentId = parentId;
     }
 

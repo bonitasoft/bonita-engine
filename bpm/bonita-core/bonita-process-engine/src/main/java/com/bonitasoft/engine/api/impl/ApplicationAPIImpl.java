@@ -130,21 +130,18 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public ApplicationMenu createApplicationMenu(final ApplicationMenuCreator applicationMenuCreator) throws AlreadyExistsException, CreationException {
-        // TODO Auto-generated method stub
-        return null;
+    public ApplicationMenu createApplicationMenu(final ApplicationMenuCreator applicationMenuCreator) throws CreationException {
+        return getDelegate().createApplicationMenu(applicationMenuCreator);
     }
 
     @Override
     public ApplicationMenu getApplicationMenu(final long applicationMenuId) throws ApplicationMenuNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
+        return getDelegate().getApplicationMenu(applicationMenuId);
     }
 
     @Override
     public void deleteApplicationMenu(final long applicationMenuId) throws DeletionException {
-        // TODO Auto-generated method stub
-
+        getDelegate().deleteApplicationMenu(applicationMenuId);
     }
 
     @Override

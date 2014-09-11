@@ -27,7 +27,8 @@ import com.bonitasoft.engine.TestsInitializerSP;
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
     ApplicationAPIApplicationIT.class,
-    ApplicationAPIApplicationPageIT.class
+    ApplicationAPIApplicationPageIT.class,
+    ApplicationAPIApplicationMenuIT.class
 })
 @Initializer(TestsInitializerSP.class)
 public class ApplicationAPIITs {
