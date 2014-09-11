@@ -17,11 +17,11 @@ import java.io.Serializable;
 
 /**
  * A <code>Problem</code> explains the issue in the {@link DesignProcessDefinition} when it is not well designed.
- * It can concern :
+ * It relates to :
  * <ul>
- * <li>structural problems like a {@link org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition} without an exception flow,</li>
- * <li>naming problems like two {@link org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition}s with the same name,</li>
- * <li>type problems like an {@link org.bonitasoft.engine.expression.Expression} which has not the right type,</li>
+ * <li>structural problems such as a {@link org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition} without an exception flow,</li>
+ * <li>naming problems such as two {@link org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition}s with the same name,</li>
+ * <li>type problems such as an {@link org.bonitasoft.engine.expression.Expression} which has not the right type,</li>
  * <li>...</li>
  * </ul>
  *
