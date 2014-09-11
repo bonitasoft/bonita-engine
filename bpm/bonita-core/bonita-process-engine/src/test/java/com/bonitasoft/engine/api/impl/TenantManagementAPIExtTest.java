@@ -36,9 +36,10 @@ import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.STenantNotFoundException;
+import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
+import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
 import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -95,6 +96,7 @@ public class TenantManagementAPIExtTest {
 
     @Mock
     private DependencyResolver dependencyResolver;
+
     @Mock
     private TechnicalLoggerService technicalLoggerService;
 
@@ -114,7 +116,6 @@ public class TenantManagementAPIExtTest {
         when(platformServiceAccessor.getPlaformConfiguration()).thenReturn(nodeConfiguration);
         when(platformServiceAccessor.getSessionService()).thenReturn(sessionService);
         when(platformServiceAccessor.getTechnicalLoggerService()).thenReturn(technicalLoggerService);
-        when(platformServiceAccessor.getSessionService()).thenReturn(sessionService);
         when(platformServiceAccessor.getTenantServiceAccessor(tenantId)).thenReturn(tenantServiceAccessor);
 
         when(tenantServiceAccessor.getDependencyResolver()).thenReturn(dependencyResolver);
@@ -359,7 +360,7 @@ public class TenantManagementAPIExtTest {
     public void pause_should_update_tenant_state_on_activated_tenant() throws Exception {
         // Given
         sTenant.setStatus(STenant.ACTIVATED);
-        doNothing().when(tenantManagementAPI).updateTenant(eq(platformService), any(EntityUpdateDescriptor.class), any(STenant.class));
+        doNothing().when(platformService).updateTenant(any(STenant.class), any(EntityUpdateDescriptor.class));
         doNothing().when(tenantManagementAPI).pauseServicesForTenant(eq(platformServiceAccessor), eq(tenantId));
 
         // When
@@ -367,9 +368,8 @@ public class TenantManagementAPIExtTest {
 
         // Then
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-        final String statusKey = BuilderFactory.get(STenantBuilderFactory.class).getStatusKey();
-        entityUpdateDescriptor.addField(statusKey, STenant.PAUSED);
-        verify(tenantManagementAPI).updateTenant(platformService, entityUpdateDescriptor, sTenant);
+        entityUpdateDescriptor.addField(STenantUpdateBuilderFactory.STATUS, STenant.PAUSED);
+        verify(platformService).updateTenant(sTenant, entityUpdateDescriptor);
     }
 
     @Test

@@ -57,7 +57,7 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
 
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionDependencyMissingException, SExpressionEvaluationException {
+            final ContainerState containerState) throws SExpressionEvaluationException {
         final String businessDataName = expression.getContent();
         if (context.containsKey(businessDataName)) {
             return context.get(businessDataName);
