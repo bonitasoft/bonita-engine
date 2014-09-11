@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011, 2014 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -222,11 +222,15 @@ import org.bonitasoft.engine.identity.UserCreator;
 import org.bonitasoft.engine.identity.UserCreator.UserField;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.identity.impl.ContactDataImpl;
+import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
+import org.bonitasoft.engine.identity.impl.CustomUserInfoValueImpl;
 import org.bonitasoft.engine.identity.impl.GroupImpl;
 import org.bonitasoft.engine.identity.impl.RoleImpl;
 import org.bonitasoft.engine.identity.impl.UserImpl;
 import org.bonitasoft.engine.identity.impl.UserMembershipImpl;
 import org.bonitasoft.engine.identity.model.SContactInfo;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -1970,6 +1974,25 @@ public class ModelConvertor {
         final ThemeType type = ThemeType.valueOf(sTheme.getType().name());
         final Date lastUpdateDate = new Date(sTheme.getLastUpdateDate());
         return new ThemeImpl(sTheme.getContent(), sTheme.getCssContent(), sTheme.isDefault(), type, lastUpdateDate);
+    }
+
+    public static CustomUserInfoDefinitionImpl convert(SCustomUserInfoDefinition sDefinition) {
+        CustomUserInfoDefinitionImpl definition = new CustomUserInfoDefinitionImpl();
+        definition.setId(sDefinition.getId());
+        definition.setName(sDefinition.getName());
+        definition.setDescription(sDefinition.getDescription());
+        return definition;
+    }
+
+    public static CustomUserInfoValueImpl convert(SCustomUserInfoValue sValue) {
+        if (sValue == null) {
+            return null;
+        }
+        CustomUserInfoValueImpl value = new CustomUserInfoValueImpl();
+        value.setDefinitionId(sValue.getDefinitionId());
+        value.setUserId(sValue.getUserId());
+        value.setValue(sValue.getValue());
+        return value;
     }
 
 }
