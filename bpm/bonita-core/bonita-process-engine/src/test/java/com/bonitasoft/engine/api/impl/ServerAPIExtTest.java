@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
 import java.util.Date;
@@ -156,7 +164,7 @@ public class ServerAPIExtTest {
     }
 
     @Test
-    public void isInAValidModeForAnActiveTenantWithAnnotationInOnlyIsInvalid() throws Exception {
+    public void isInAValidModeForAnActiveTenantWithAnnotationInOnlyIsInvalid() {
         when(annotation.only()).thenReturn(true);
 
         final boolean valid = serverAPIExt.isMethodAvailableOnRunningTenant(true, annotation);
@@ -165,7 +173,7 @@ public class ServerAPIExtTest {
     }
 
     @Test
-    public void isInAValidModeForAnActiveTenantWithAnnotationInNotOnlyIsValid() throws Exception {
+    public void isInAValidModeForAnActiveTenantWithAnnotationInNotOnlyIsValid() {
         when(annotation.only()).thenReturn(false);
 
         final boolean valid = serverAPIExt.isMethodAvailableOnRunningTenant(true, annotation);
@@ -174,14 +182,14 @@ public class ServerAPIExtTest {
     }
 
     @Test
-    public void isInAValidModeForAnActiveTenantWithoutAnnotationIsValid() throws Exception {
+    public void isInAValidModeForAnActiveTenantWithoutAnnotationIsValid() {
         final boolean valid = serverAPIExt.isMethodAvailableOnRunningTenant(true, null);
 
         assertThat(valid).isTrue();
     }
 
     @Test
-    public void isInAValidModeForAPausedTenantWithAnnotationInOnlyIsValid() throws Exception {
+    public void isInAValidModeForAPausedTenantWithAnnotationInOnlyIsValid() {
         when(annotation.only()).thenReturn(true);
 
         final boolean valid = serverAPIExt.isMethodAvailableOnPausedTenant(false, annotation);
@@ -190,7 +198,7 @@ public class ServerAPIExtTest {
     }
 
     @Test
-    public void isInAValidModeForAPausedTenantWithAnnotationInNotOnlyIsValid() throws Exception {
+    public void isInAValidModeForAPausedTenantWithAnnotationInNotOnlyIsValid() {
         when(annotation.only()).thenReturn(false);
 
         final boolean valid = serverAPIExt.isMethodAvailableOnPausedTenant(false, annotation);
@@ -199,7 +207,7 @@ public class ServerAPIExtTest {
     }
 
     @Test
-    public void isInAValidModeForAPausedTenantWithoutAnnotationIsInvalid() throws Exception {
+    public void isInAValidModeForAPausedTenantWithoutAnnotationIsInvalid() {
         final boolean valid = serverAPIExt.isMethodAvailableOnPausedTenant(false, null);
 
         assertThat(valid).isFalse();

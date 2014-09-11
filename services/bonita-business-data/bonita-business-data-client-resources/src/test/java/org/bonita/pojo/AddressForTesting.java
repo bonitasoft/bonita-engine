@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package org.bonita.pojo;
 
 import javax.persistence.Column;
@@ -14,14 +22,14 @@ import javax.persistence.Version;
 @javax.persistence.Entity(name = "Address")
 @Table(name = "ADDRESS")
 @NamedQueries({
-    @NamedQuery(name = "Address.findByStreet", query = "SELECT a\nFROM Address a\nWHERE a.street= :street\nORDER BY a.persistenceId"),
-    @NamedQuery(name = "Address.findByCity", query = "SELECT a\nFROM Address a\nWHERE a.city= :city\nORDER BY a.persistenceId"),
-    @NamedQuery(name = "Address.find", query = "SELECT a\nFROM Address a\nORDER BY a.persistenceId"),
-    @NamedQuery(name = "Address.findAddressesByEmployeePersistenceId", query = "SELECT e.addresses\nFROM Employee e\nWHERE e.persistenceId= :persistenceId")
+        @NamedQuery(name = "Address.findByStreet", query = "SELECT a\nFROM Address a\nWHERE a.street= :street\nORDER BY a.persistenceId"),
+        @NamedQuery(name = "Address.findByCity", query = "SELECT a\nFROM Address a\nWHERE a.city= :city\nORDER BY a.persistenceId"),
+        @NamedQuery(name = "Address.find", query = "SELECT a\nFROM Address a\nORDER BY a.persistenceId"),
+        @NamedQuery(name = "Address.findAddressesByEmployeePersistenceId", query = "SELECT e.addresses\nFROM Employee e\nWHERE e.persistenceId= :persistenceId")
 })
-public class AddressForTesting
-implements com.bonitasoft.engine.bdm.Entity
-{
+public class AddressForTesting implements com.bonitasoft.engine.bdm.Entity {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue
@@ -37,7 +45,7 @@ implements com.bonitasoft.engine.bdm.Entity
     }
 
     public void setPersistenceId(Long persistenceId) {
-        persistenceId = persistenceId;
+        this.persistenceId = persistenceId;
     }
 
     @Override
@@ -46,7 +54,7 @@ implements com.bonitasoft.engine.bdm.Entity
     }
 
     public void setPersistenceVersion(Long persistenceVersion) {
-        persistenceVersion = persistenceVersion;
+        this.persistenceVersion = persistenceVersion;
     }
 
     @Override
@@ -55,7 +63,7 @@ implements com.bonitasoft.engine.bdm.Entity
     }
 
     public void setStreet(String street) {
-        street = street;
+        this.street = street;
     }
 
     public String getStreet() {
@@ -63,7 +71,7 @@ implements com.bonitasoft.engine.bdm.Entity
     }
 
     public void setCity(String city) {
-        city = city;
+        this.city = city;
     }
 
     public String getCity() {

@@ -92,9 +92,8 @@ public class RelationField extends Field {
                 builder = builder.append(reference.getQualifiedName(), other.reference.getQualifiedName());
             }
             return builder.isEquals();
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Override

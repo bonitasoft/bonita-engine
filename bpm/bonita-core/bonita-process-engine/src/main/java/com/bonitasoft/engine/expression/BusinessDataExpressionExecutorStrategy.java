@@ -17,7 +17,6 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
-import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -76,10 +75,9 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
             if (refBusinessDataInstance instanceof SSimpleRefBusinessDataInstance) {
                 final SSimpleRefBusinessDataInstance reference = (SSimpleRefBusinessDataInstance) refBusinessDataInstance;
                 return businessDataRepository.findById(bizClass, reference.getDataId());
-            } else {
-                final SMultiRefBusinessDataInstance reference = (SMultiRefBusinessDataInstance) refBusinessDataInstance;
-                return businessDataRepository.findByIds(bizClass, reference.getDataIds());
             }
+            final SMultiRefBusinessDataInstance reference = (SMultiRefBusinessDataInstance) refBusinessDataInstance;
+            return businessDataRepository.findByIds(bizClass, reference.getDataIds());
         } catch (final SBonitaReadException e) {
             throw new SExpressionEvaluationException("Unable to retrieve business data instance with name " + businessDataName, expression.getName());
         } catch (final SBonitaException e) {
@@ -108,7 +106,7 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
 
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionDependencyMissingException, SExpressionEvaluationException {
+            final ContainerState containerState) throws SExpressionEvaluationException {
         final List<Object> bizDatas = new ArrayList<Object>(expressions.size());
         final List<String> alreadyEvaluatedExpressionContent = new ArrayList<String>();
         for (final SExpression expression : expressions) {
