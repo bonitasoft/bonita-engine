@@ -11,46 +11,29 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.platform.model;
+package org.bonitasoft.engine.platform.exception;
 
-import org.bonitasoft.engine.persistence.PersistentObject;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
+ * Exception related to the platform module
+ * 
  * @author Charles Souillard
  */
-public interface STenant extends PersistentObject {
+public class STenantUpdateException extends SBonitaException {
 
-    String PAUSED = "PAUSED";
+    private static final long serialVersionUID = 7615655279956204016L;
 
-    String DEACTIVATED = "DEACTIVATED";
+    public STenantUpdateException(final String message) {
+        super(message);
+    }
 
-    String ACTIVATED = "ACTIVATED";
+    public STenantUpdateException(final Throwable e) {
+        super(e);
+    }
 
-    /**
-     * Return true if the tenant is activated else return false.
-     * 
-     * @param sTenant
-     * @return true if the tenant is activated
-     * @since 6.0
-     */
-    boolean isActivated();
-
-    String getName();
-
-    String getDescription();
-
-    String getIconName();
-
-    String getIconPath();
-
-    long getCreated();
-
-    String getCreatedBy();
-
-    String getStatus();
-
-    boolean isDefaultTenant();
-
-    boolean isPaused();
+    public STenantUpdateException(final String message, final Throwable e) {
+        super(message, e);
+    }
 
 }

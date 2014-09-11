@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2014 BonitaSoft S.A.
+ * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -11,29 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.platform;
+package org.bonitasoft.engine.platform.model.builder;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
- * Exception related to the platform module
- * 
- * @author Charles Souillard
+ * @author Celine Souchet
  */
-public class SPlatformCreationException extends SBonitaException {
+public interface STenantUpdateBuilder {
 
-    private static final long serialVersionUID = 7615655279956204016L;
+    EntityUpdateDescriptor done();
 
-    public SPlatformCreationException(final String message) {
-        super(message);
-    }
+    STenantUpdateBuilder setName(String name);
 
-    public SPlatformCreationException(final Throwable e) {
-        super(e);
-    }
+    STenantUpdateBuilder setDescription(String description);
 
-    public SPlatformCreationException(final String message, final Throwable e) {
-        super(message, e);
-    }
+    STenantUpdateBuilder setIconPath(String iconPath);
+
+    STenantUpdateBuilder setIconName(String iconName);
+
+    STenantUpdateBuilder setStatus(String status);
+
+    STenantUpdateBuilder setSecurityActivated(boolean securityActivated);
 
 }

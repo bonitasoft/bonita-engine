@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.sessionaccessor;
 
-
 /**
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
@@ -21,7 +20,8 @@ package org.bonitasoft.engine.sessionaccessor;
 public class ThreadLocalSessionAccessor implements SessionAccessor {
 
     private final ThreadLocal<Long> sessionData = new ThreadLocal<Long>();
-    private final ThreadLocal <Long> tenantData = new ThreadLocal<Long>();
+
+    private final ThreadLocal<Long> tenantData = new ThreadLocal<Long>();
 
     @Override
     public long getSessionId() throws SessionIdNotSetException {

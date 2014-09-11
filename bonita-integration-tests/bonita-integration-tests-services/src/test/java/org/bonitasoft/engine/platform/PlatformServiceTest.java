@@ -6,6 +6,9 @@ import static org.junit.Assert.fail;
 
 import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.platform.exception.SPlatformAlreadyExistException;
+import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
+import org.bonitasoft.engine.platform.exception.SPlatformUpdateException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
 import org.bonitasoft.engine.platform.model.builder.SPlatformBuilderFactory;
