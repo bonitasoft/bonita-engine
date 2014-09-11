@@ -20,5 +20,9 @@
 		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/core/process/document/mapping/model/impl/db/archive/${db.vendor}-deleteTenantObjects.sql" />
 		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="14"/>
 	</bean>
+	
+	<bean name="documentURLProvider" class="org.bonitasoft.engine.core.process.document.api.impl.SDocumentDownloadURLProviderImpl" >
+		<constructor-arg name="servletUrl" value="${document.servlet.url}"/>
+	</bean>
 
 </beans>
