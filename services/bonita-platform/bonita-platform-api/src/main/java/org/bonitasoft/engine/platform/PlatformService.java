@@ -38,6 +38,8 @@ public interface PlatformService {
     // 1 - multi tenancy based on a discriminator column (same DB, same schema, same tables)
     // 2 - multi tenancy done using different schemas
 
+    String TENANT = "TENANT";
+
     /**
      * Retrieve the platform from the cache
      * No need to be in a transaction

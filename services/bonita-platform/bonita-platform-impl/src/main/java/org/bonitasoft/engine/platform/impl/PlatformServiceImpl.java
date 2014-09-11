@@ -25,6 +25,9 @@ import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
+import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
+import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -52,7 +55,11 @@ import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
+import org.bonitasoft.engine.recorder.Recorder;
+import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
 import org.bonitasoft.engine.services.TenantPersistenceService;
@@ -122,13 +129,17 @@ public class PlatformServiceImpl implements PlatformService {
 
     private final SPlatformProperties sPlatformProperties;
 
-    public PlatformServiceImpl(final PersistenceService platformPersistenceService, final List<TenantPersistenceService> tenantPersistenceServices,
-            final TechnicalLoggerService logger, final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties) {
+    private final Recorder recorder;
+
+    public PlatformServiceImpl(final PersistenceService platformPersistenceService, final Recorder recorder,
+            final List<TenantPersistenceService> tenantPersistenceServices, final TechnicalLoggerService logger,
+            final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties) {
         this.platformPersistenceService = platformPersistenceService;
         this.tenantPersistenceServices = tenantPersistenceServices;
         this.logger = logger;
         this.platformCacheService = platformCacheService;
         this.sPlatformProperties = sPlatformProperties;
+        this.recorder = recorder;
         trace = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
     }
 
@@ -182,33 +193,42 @@ public class PlatformServiceImpl implements PlatformService {
         if (trace) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_CREATE_TENANT));
         }
-        // check if the tenant already exists. If yes, throws
-        // TenantAlreadyExistException
-        STenant existingTenant = null;
-        final String tenantName = tenant.getName();
-        try {
-            existingTenant = getTenantByName(tenantName);
-        } catch (final STenantNotFoundException e) {
-            if (trace) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_TENANT, e));
-            }
-            // OK
-        }
-        if (existingTenant != null) {
-            throw new STenantAlreadyExistException("Unable to create the tenant " + tenantName + " : it already exists.");
-        }
+        // check if the tenant already exists. If yes, throws TenantAlreadyExistException
+        checkIfTenantAlreadyExists(tenant);
 
         // create the tenant
+        final InsertRecord insertRecord = new InsertRecord(tenant);
+        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(TENANT)
+                .setObject(tenant).done();
         try {
-            platformPersistenceService.insert(tenant);
-        } catch (final SPersistenceException e) {
+            recorder.recordInsert(insertRecord, insertEvent);
+        } catch (final SRecorderException e) {
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_TENANT, e));
             }
             throw new STenantCreationException("Unable to insert the tenant row : " + e.getMessage(), e);
         }
 
-        // initialize tenant
+        initializeTenant(tenant);
+        return tenant.getId();
+    }
+
+    private void checkIfTenantAlreadyExists(final STenant tenant) throws STenantAlreadyExistException {
+        try {
+            final String tenantName = tenant.getName();
+            final STenant existingTenant = getTenantByName(tenantName);
+            if (existingTenant != null) {
+                throw new STenantAlreadyExistException("Unable to create the tenant " + tenantName + " : it already exists.");
+            }
+        } catch (final STenantNotFoundException e) {
+            if (trace) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_TENANT, e));
+            }
+            // OK
+        }
+    }
+
+    private void initializeTenant(final STenant tenant) throws STenantCreationException {
         try {
             final Map<String, String> replacements = new HashMap<String, String>();
             replacements.put("tenantid", Long.toString(tenant.getId()));
@@ -218,7 +238,6 @@ public class PlatformServiceImpl implements PlatformService {
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_CREATE_TENANT));
             }
-            return tenant.getId();
         } catch (final SPersistenceException e) {
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_TENANT, e));
@@ -591,14 +610,28 @@ public class PlatformServiceImpl implements PlatformService {
                 // Ok
             }
         }
-        final UpdateDescriptor desc = new UpdateDescriptor(tenant);
-        desc.addFields(descriptor.getFields());
+        // final UpdateDescriptor desc = new UpdateDescriptor(tenant);
+        // desc.addFields(descriptor.getFields());
+        // try {
+        // platformPersistenceService.update(desc);
+        // if (trace) {
+        // logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_UPDATE_TENANT));
+        // }
+        // } catch (final SPersistenceException e) {
+        // if (trace) {
+        // logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_UPDATE_TENANT, e));
+        // }
+        // throw new STenantUpdateException("Problem while updating tenant: " + tenant, e);
+        // }
+
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(tenant, descriptor);
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(TENANT).setObject(tenant).done();
         try {
-            platformPersistenceService.update(desc);
+            recorder.recordUpdate(updateRecord, updateEvent);
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_UPDATE_TENANT));
             }
-        } catch (final SPersistenceException e) {
+        } catch (final SRecorderException e) {
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_UPDATE_TENANT, e));
             }

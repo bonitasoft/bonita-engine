@@ -77,7 +77,7 @@ public class RecorderTest extends CommonServiceTest {
 
     static {
         persitenceService = getServicesBuilder().buildTenantPersistenceService();
-        recorder = getServicesBuilder().buildRecorder();
+        recorder = getServicesBuilder().buildTenantRecorder();
         scheduler = getServicesBuilder().buildSchedulerService();
         eventService = getServicesBuilder().buildEventService();
         loggerService = getServicesBuilder().buildQueriableLogger();
@@ -176,7 +176,8 @@ public class RecorderTest extends CommonServiceTest {
                 try {
                     txService.begin();
                     final Human human = buildHuman(firstName, "Vaills", 20);
-                    final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(HUMAN).setObject(human).done();
+                    final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(HUMAN).setObject(human)
+                            .done();
                     recorder.recordInsert(new InsertRecord(human), insertEvent);
                     foo.insertCompleted = true;
 

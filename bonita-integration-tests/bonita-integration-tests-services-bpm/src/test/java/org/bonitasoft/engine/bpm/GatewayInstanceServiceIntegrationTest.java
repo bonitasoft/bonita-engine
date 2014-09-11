@@ -32,7 +32,7 @@ public class GatewayInstanceServiceIntegrationTest extends CommonBPMServicesTest
     protected void deleteGatewayInstance(final SGatewayInstance gatewayInstance) throws SBonitaException {
         transactionService.begin();
         try {
-            getServicesBuilder().getRecorder().recordDelete(new DeleteRecord(gatewayInstanceService().getGatewayInstance(gatewayInstance.getId())), null);
+            getServicesBuilder().getTenantRecorder().recordDelete(new DeleteRecord(gatewayInstanceService().getGatewayInstance(gatewayInstance.getId())), null);
         } catch (final SBonitaException e) {
             throw new SFlowNodeDeletionException(e);
         } finally {
