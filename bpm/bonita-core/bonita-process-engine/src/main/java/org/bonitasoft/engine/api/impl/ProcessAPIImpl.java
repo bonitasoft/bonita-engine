@@ -259,7 +259,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDep
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoBuilderFactory;
-import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowMessageEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowMessageEventTriggerDefinitionBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowSignalEventTriggerDefinitionBuilderFactory;
@@ -326,6 +325,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.execution.SUnreleasableTaskException;
+import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
@@ -811,6 +811,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 return baos.toByteArray();
             } finally {
                 zos.close();
+                baos.close();
             }
         } catch (final IOException e) {
             throw new ProcessExportException(e);
@@ -2227,8 +2228,8 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SCommentService scommentService = tenantAccessor.getCommentService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
-            final AssignOrUnassignUserTask assignUserTask = new AssignOrUnassignUserTask(userId, userTaskId, activityInstanceService, scommentService,
-                    identityService);
+            final AssignOrUnassignUserTask assignUserTask = new AssignOrUnassignUserTask(userId, userTaskId, activityInstanceService, tenantAccessor
+                    .getFlowNodeStateManager().getStateBehaviors());
             assignUserTask.execute();
         } catch (final SUserNotFoundException sunfe) {
             throw new UpdateException(sunfe);
@@ -2947,18 +2948,24 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final OperationService operationService = tenantAccessor.getOperationService();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final int processDefinitionIndex = BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class).getProcessDefinitionIndex();
         final List<String> dataNames = new ArrayList<String>(operations.size());
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         for (final Operation operation : operations) {
             dataNames.add(operation.getLeftOperand().getName());
         }
         try {
+
             final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
             final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(activityInstance.getProcessDefinitionId());
             final SActivityDefinition activityDefinition = (SActivityDefinition) processDefinition.getProcessContainer().getFlowNode(
                     activityInstance.getFlowNodeDefinitionId());
+            final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(),
+                    activityInstance.getLogicalGroup(processDefinitionIndex));
+            Thread.currentThread().setContextClassLoader(processClassLoader);
             final List<SDataDefinition> sDataDefinitions = activityDefinition.getSDataDefinitions();
             final ArrayList<String> transientDataNames = new ArrayList<String>();
             // separate transient data and normal data
@@ -2974,7 +2981,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             for (final Operation operation : operations) {
                 final String name = operation.getLeftOperand().getName();
                 if (transientDataNames.contains(name)) {
-                    final SOperation sOperation = ServerModelConvertor.convertOperation(operation);
+                    final SOperation sOperation = convertOperation(operation);
                     final SExpressionContext sExpressionContext = new SExpressionContext(activityInstanceId,
                             DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
                             activityInstance.getLogicalGroup(processDefinitionIndex));
@@ -2983,7 +2990,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 } else {
                     // same order between dataInstances and dataNames
                     final SDataInstance dataInstance = dataInstances.get(dataNames.indexOf(name));
-                    final SOperation sOperation = ServerModelConvertor.convertOperation(operation);
+                    final SOperation sOperation = convertOperation(operation);
                     final SExpressionContext sExpressionContext = new SExpressionContext(activityInstanceId,
                             DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
                             activityInstance.getLogicalGroup(processDefinitionIndex));
@@ -2995,7 +3002,13 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new UpdateException(e);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
+    }
+
+    protected SOperation convertOperation(final Operation operation) {
+        return ModelConvertor.convertOperation(operation);
     }
 
     @Override
@@ -3076,7 +3089,8 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
-            final AssignOrUnassignUserTask assignUserTask = new AssignOrUnassignUserTask(0, userTaskId, activityInstanceService, null, null);
+            final AssignOrUnassignUserTask assignUserTask = new AssignOrUnassignUserTask(0, userTaskId, activityInstanceService, tenantAccessor
+                    .getFlowNodeStateManager().getStateBehaviors());
             assignUserTask.execute();
         } catch (final SUnreleasableTaskException e) {
             throw new UpdateException(e);
@@ -3378,7 +3392,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final Map<String, Serializable> externalDataValue = new HashMap<String, Serializable>(operations.size());
             for (final Operation operation : operations) {
                 // convert the client operation to server operation
-                final SOperation sOperation = ServerModelConvertor.convertOperation(operation);
+                final SOperation sOperation = convertOperation(operation);
                 // set input values of expression with connector result + provided input for this operation
                 final HashMap<String, Object> inputValues = new HashMap<String, Object>(operationInputValues);
                 inputValues.putAll(connectorResult.getResult());
@@ -3493,8 +3507,19 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void setActivityStateById(final long activityInstanceId, final int stateId) throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final FlowNodeExecutor flowNodeExecutor = tenantAccessor.getFlowNodeExecutor();
+        final StateBehaviors stateBehaviors = new StateBehaviors(tenantAccessor.getBPMInstancesCreator(), tenantAccessor.getEventsHandler(),
+                tenantAccessor.getActivityInstanceService(), tenantAccessor.getUserFilterService(), tenantAccessor.getClassLoaderService(),
+                tenantAccessor.getActorMappingService(), tenantAccessor.getConnectorInstanceService(), tenantAccessor.getExpressionResolverService(),
+                tenantAccessor.getProcessDefinitionService(), tenantAccessor.getDataInstanceService(), tenantAccessor.getOperationService(),
+                tenantAccessor.getWorkService(), tenantAccessor.getContainerRegistry(), tenantAccessor.getEventInstanceService(),
+                tenantAccessor.getSchedulerService(), tenantAccessor.getCommentService(), tenantAccessor.getIdentityService(),
+                tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getTokenService(), tenantAccessor.getCacheService());
         try {
             final SActivityInstance sActivityInstance = getSActivityInstance(activityInstanceId);
+            if (sActivityInstance instanceof SHumanTaskInstance) {
+                stateBehaviors.interruptSubActivities(sActivityInstance.getId(), SStateCategory.ABORTING);
+            }
+
             // set state
             flowNodeExecutor.setStateByStateId(sActivityInstance.getLogicalGroup(0), sActivityInstance.getId(), stateId);
         } catch (final SBonitaException e) {
@@ -4206,7 +4231,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     /**
      * @param orAssignedToUser
-     *        do we also want to retrieve tasks directly assigned to this user ?
+     *            do we also want to retrieve tasks directly assigned to this user ?
      * @throws SearchException
      */
     private SearchResult<HumanTaskInstance> searchTasksForUser(final long userId, final SearchOptions searchOptions, final boolean orAssignedToUser)
@@ -5082,7 +5107,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ExpressionResolverService expressionResolverService = tenantAccessor.getExpressionResolverService();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final SExpression sExpression = ServerModelConvertor.convertExpression(expression);
+        final SExpression sExpression = ModelConvertor.constructSExpression(expression);
         final SExpressionContext expcontext = new SExpressionContext();
         expcontext.setProcessDefinitionId(processDefinitionId);
         SProcessDefinition processDef;
@@ -5181,10 +5206,10 @@ public class ProcessAPIImpl implements ProcessAPI {
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         final ExpressionResolverService expressionResolverService = tenantAccessor.getExpressionResolverService();
 
-        final SExpression targetProcessNameExp = ServerModelConvertor.convertExpression(targetProcess);
+        final SExpression targetProcessNameExp = ModelConvertor.constructSExpression(targetProcess);
         SExpression targetFlowNodeNameExp = null;
         if (targetFlowNode != null) {
-            targetFlowNodeNameExp = ServerModelConvertor.convertExpression(targetFlowNode);
+            targetFlowNodeNameExp = ModelConvertor.constructSExpression(targetFlowNode);
         }
         final SThrowMessageEventTriggerDefinitionBuilder builder = BuilderFactory.get(SThrowMessageEventTriggerDefinitionBuilderFactory.class)
                 .createNewInstance(messageName, targetProcessNameExp, targetFlowNodeNameExp);
@@ -5206,10 +5231,10 @@ public class ProcessAPIImpl implements ProcessAPI {
     private void addMessageContent(final SThrowMessageEventTriggerDefinitionBuilder messageEventTriggerDefinitionBuilder,
             final ExpressionResolverService expressionResolverService, final Map<Expression, Expression> messageContent) throws SBonitaException {
         for (final Entry<Expression, Expression> entry : messageContent.entrySet()) {
-            expressionResolverService.evaluate(ServerModelConvertor.convertExpression(entry.getKey()));
+            expressionResolverService.evaluate(ModelConvertor.constructSExpression(entry.getKey()));
             final SDataDefinitionBuilder dataDefinitionBuilder = BuilderFactory.get(SDataDefinitionBuilderFactory.class).createNewInstance(
                     entry.getKey().getContent(), entry.getValue().getReturnType());
-            dataDefinitionBuilder.setDefaultValue(ServerModelConvertor.convertExpression(entry.getValue()));
+            dataDefinitionBuilder.setDefaultValue(ModelConvertor.constructSExpression(entry.getValue()));
             messageEventTriggerDefinitionBuilder.addData(dataDefinitionBuilder.done());
         }
 
@@ -5218,8 +5243,8 @@ public class ProcessAPIImpl implements ProcessAPI {
     private void addMessageCorrelations(final SThrowMessageEventTriggerDefinitionBuilder messageEventTriggerDefinitionBuilder,
             final Map<Expression, Expression> messageCorrelations) {
         for (final Entry<Expression, Expression> entry : messageCorrelations.entrySet()) {
-            messageEventTriggerDefinitionBuilder.addCorrelation(ServerModelConvertor.convertExpression(entry.getKey()),
-                    ServerModelConvertor.convertExpression(entry.getValue()));
+            messageEventTriggerDefinitionBuilder.addCorrelation(ModelConvertor.constructSExpression(entry.getKey()),
+                    ModelConvertor.constructSExpression(entry.getValue()));
         }
     }
 

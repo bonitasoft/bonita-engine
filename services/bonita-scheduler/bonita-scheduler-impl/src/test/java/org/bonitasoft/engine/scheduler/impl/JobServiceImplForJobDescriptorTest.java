@@ -30,6 +30,8 @@ import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -73,6 +75,9 @@ public class JobServiceImplForJobDescriptorTest {
     @Mock
     private Recorder recorder;
 
+    @Mock
+    private TechnicalLoggerService logger;
+
     @InjectMocks
     private JobServiceImpl jobServiceImpl;
 
@@ -80,6 +85,9 @@ public class JobServiceImplForJobDescriptorTest {
     public final void createJobDescriptorByTenant() throws SJobDescriptorCreationException, SRecorderException {
         final long tenantId = 2;
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
+
+        doReturn(true).when(logger).isLoggable(JobServiceImpl.class, TechnicalLogSeverity.TRACE);
+
         doReturn("plop").when(sJobDescriptor).getJobName();
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
@@ -109,7 +117,7 @@ public class JobServiceImplForJobDescriptorTest {
 
     @Test
     public final void deleteJobDescriptorById() throws SBonitaReadException, SRecorderException, SJobDescriptorNotFoundException, SJobDescriptorReadException,
-            SJobDescriptorDeletionException {
+    SJobDescriptorDeletionException {
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
         doReturn(3L).when(sJobDescriptor).getId();
 
@@ -121,9 +129,9 @@ public class JobServiceImplForJobDescriptorTest {
         jobServiceImpl.deleteJobDescriptor(3);
     }
 
-    @Test(expected = SJobDescriptorNotFoundException.class)
+    @Test
     public final void deleteNotExistingJobDescriptorById() throws SBonitaReadException, SJobDescriptorDeletionException, SJobDescriptorNotFoundException,
-            SJobDescriptorReadException {
+    SJobDescriptorReadException {
         when(readPersistenceService.selectById(Matchers.<SelectByIdDescriptor<SJobDescriptor>> any())).thenReturn(null);
 
         jobServiceImpl.deleteJobDescriptor(1);

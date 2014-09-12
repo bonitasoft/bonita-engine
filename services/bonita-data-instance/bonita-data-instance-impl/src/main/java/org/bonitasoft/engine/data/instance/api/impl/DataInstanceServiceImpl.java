@@ -269,12 +269,12 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public void addChildContainer(final long parentContainerId, final String parentContainerType, final long containerId, final String containerType)
+    public void addChildContainer(final long parentContainerId, final String parentContainerType, final long containerId, final String containerType, boolean shouldArchiveMapping)
             throws SDataInstanceException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "addChildContainer");
         try {
             // insert mappings from parent element
-            final List<SDataInstanceVisibilityMapping> mappings = insertMappingForLocalElement(containerId, containerType);
+            final List<SDataInstanceVisibilityMapping> mappings = insertMappingForLocalElement(containerId, containerType, shouldArchiveMapping);
             final ArrayList<String> localData = new ArrayList<String>(mappings.size());
             for (final SDataInstanceVisibilityMapping sDataInstanceVisibilityMapping : mappings) {
                 localData.add(sDataInstanceVisibilityMapping.getDataName());
@@ -286,7 +286,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             while (parentVisibleDataInstances.size() > 0) {
                 for (final SDataInstance parentData : parentVisibleDataInstances) {
                     if (!localData.contains(parentData.getName())) {
-                        insertDataInstanceVisibilityMapping(containerId, containerType, parentData.getName(), parentData.getId(), archivedDate);
+                        insertDataInstanceVisibilityMapping(containerId, containerType, parentData.getName(), parentData.getId(), archivedDate, shouldArchiveMapping);
                     }
                 }
                 currentIndex += batchSize;
@@ -333,10 +333,10 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public List<SDataInstanceVisibilityMapping> createDataContainer(final long containerId, final String containerType) throws SDataInstanceException {
+    public List<SDataInstanceVisibilityMapping> createDataContainer(final long containerId, final String containerType, boolean shouldArchiveMapping) throws SDataInstanceException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "createDataContainer");
         try {
-            final List<SDataInstanceVisibilityMapping> listSDataInstanceVisibilityMapping = insertMappingForLocalElement(containerId, containerType);
+            final List<SDataInstanceVisibilityMapping> listSDataInstanceVisibilityMapping = insertMappingForLocalElement(containerId, containerType, shouldArchiveMapping);
             logAfterMethod(TechnicalLogSeverity.TRACE, "createDataContainer");
             return listSDataInstanceVisibilityMapping;
         } catch (final SRecorderException e) {
@@ -348,7 +348,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         }
     }
 
-    protected List<SDataInstanceVisibilityMapping> insertMappingForLocalElement(final long containerId, final String containerType) throws SRecorderException,
+    protected List<SDataInstanceVisibilityMapping> insertMappingForLocalElement(final long containerId, final String containerType, boolean shouldArchiveMapping) throws SRecorderException,
             SDataInstanceException, SDefinitiveArchiveNotFound {
         final int batchSize = 50;
         int currentIndex = 0;
@@ -357,7 +357,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         final List<SDataInstanceVisibilityMapping> mappings = new ArrayList<SDataInstanceVisibilityMapping>(localDataInstances.size());
         while (localDataInstances != null && localDataInstances.size() > 0) {
             for (final SDataInstance sDataInstance : localDataInstances) {
-                mappings.add(insertDataInstanceVisibilityMapping(containerId, containerType, sDataInstance.getName(), sDataInstance.getId(), archiveDate));
+                mappings.add(insertDataInstanceVisibilityMapping(containerId, containerType, sDataInstance.getName(), sDataInstance.getId(), archiveDate, shouldArchiveMapping));
             }
             currentIndex += batchSize;
             localDataInstances = getLocalDataInstances(containerId, containerType, currentIndex, batchSize);
@@ -374,11 +374,13 @@ public class DataInstanceServiceImpl implements DataInstanceService {
      * @param dataName
      * @param dataInstanceId
      * @param archiveDate
+     * @param shouldArchive
+     *          true if we create an archived version of the mapping
      * @throws SRecorderException
      * @throws SDefinitiveArchiveNotFound
      */
     protected SDataInstanceVisibilityMapping insertDataInstanceVisibilityMapping(final long containerId, final String containerType, final String dataName,
-            final long dataInstanceId, final long archiveDate) throws SRecorderException, SDefinitiveArchiveNotFound {
+            final long dataInstanceId, final long archiveDate, final boolean shouldArchive) throws SRecorderException, SDefinitiveArchiveNotFound {
         final SDataInstanceVisibilityMapping mapping = createDataInstanceVisibilityMapping(containerId, containerType, dataName, dataInstanceId);
         final InsertRecord record = new InsertRecord(mapping);
         final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DATA_VISIBILITY_MAPPING).done();
@@ -386,7 +388,9 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         // add archived mapping also because when the data change the archive mapping will be used to retrieve old value
         final SADataInstanceVisibilityMapping archivedMapping = BuilderFactory.get(SADataInstanceVisibilityMappingBuilderFactory.class)
                 .createNewInstance(containerId, containerType, dataName, dataInstanceId, mapping.getId()).done();
-        archiveService.recordInsert(archiveDate, new ArchiveInsertRecord(archivedMapping));
+        if(shouldArchive){
+            archiveService.recordInsert(archiveDate, new ArchiveInsertRecord(archivedMapping));
+        }
         return mapping;
     }
 
@@ -519,7 +523,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             throws SDataInstanceException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getDataInstances");
         NullCheckingUtil.checkArgsNotNull(dataNames, containerType);
-        // FIXME: update the service interface to take data source information as parameters instead of look for data in both datasources
         if (dataNames.isEmpty()) {
             return Collections.emptyList();
         }

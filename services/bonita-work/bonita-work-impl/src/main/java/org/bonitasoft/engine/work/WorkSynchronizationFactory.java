@@ -24,6 +24,6 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 public interface WorkSynchronizationFactory {
 
     AbstractWorkSynchronization getWorkSynchronization(BonitaExecutorService executorService, TechnicalLoggerService loggerService,
-            SessionAccessor sessionAccessor);
+            SessionAccessor sessionAccessor, final WorkService workService);
 
 }

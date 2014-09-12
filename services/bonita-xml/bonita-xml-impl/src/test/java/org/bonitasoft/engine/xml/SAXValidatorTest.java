@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 
-import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
 import org.junit.Before;
@@ -37,10 +36,10 @@ public class SAXValidatorTest {
         //given
         final InputStream xslStream = this.getClass().getResourceAsStream(xmlResource);
         final InputStream xsdStream = this.getClass().getResourceAsStream(xsdResource);
-        final Source source = new StreamSource(xsdStream);
+        final StreamSource source = new StreamSource(xsdStream);
 
         //when
-        validator.setSchemaSource(source);
+        validator.setSchema(source);
         validator.validate(xslStream);
 
         //then no SValidationException

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2014 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -63,7 +63,6 @@ import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.TransitionState;
-import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.document.api.SProcessDocumentCreationException;
@@ -984,7 +983,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final ConnectorResult result = connectorService.executeMutipleEvaluation(processDefinition.getId(), connectorId, version, connectorsExps,
                     contextInputValues, Thread.currentThread().getContextClassLoader(), expcontext);
             final List<Operation> outputs = connectorDefinition.getOutputs();
-            connectorService.executeOutputOperation(ServerModelConvertor.convertOperations(outputs), expcontext, result);
+            connectorService.executeOutputOperation(ModelConvertor.convertOperations(outputs), expcontext, result);
         }
     }
 

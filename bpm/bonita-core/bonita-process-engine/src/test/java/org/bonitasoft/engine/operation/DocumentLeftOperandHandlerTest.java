@@ -44,7 +44,7 @@ public class DocumentLeftOperandHandlerTest {
     }
 
     @Test
-    public void handlerSupportsBatchUpdate() throws Exception {
+    public void handlerSupportsBatchUpdate() {
         assertThat(handler.supportBatchUpdate()).isTrue();
     }
 

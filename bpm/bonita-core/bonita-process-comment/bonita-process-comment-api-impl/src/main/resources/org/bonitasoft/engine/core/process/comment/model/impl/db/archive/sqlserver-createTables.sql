@@ -10,3 +10,8 @@ CREATE TABLE arch_process_comment(
   PRIMARY KEY (tenantid, id)
 )
 GO
+
+CREATE INDEX idx1_arch_process_comment on arch_process_comment (tenantid, sourceobjectid)
+GO
+CREATE INDEX idx2_arch_process_comment on arch_process_comment (tenantid, processinstanceid, archivedate)
+GO

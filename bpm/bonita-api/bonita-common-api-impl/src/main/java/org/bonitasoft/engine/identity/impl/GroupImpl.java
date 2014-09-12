@@ -138,9 +138,8 @@ public class GroupImpl implements Group {
     public String getPath() {
         if (parentPath == null) {
             return "/" + getName();
-        } else {
-            return parentPath + "/" + getName();
         }
+        return parentPath + "/" + getName();
     }
 
     @Override

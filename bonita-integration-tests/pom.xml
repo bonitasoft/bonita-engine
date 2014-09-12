@@ -1,0 +1,119 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.bonitasoft.engine</groupId>
+		<artifactId>bonita-engine</artifactId>
+		<version>6.4.0-SNAPSHOT</version>
+	</parent>
+
+	<groupId>org.bonitasoft.engine.test</groupId>
+	<artifactId>bonita-integration-tests</artifactId>
+
+	<packaging>pom</packaging>
+	<name>bonita engine integrations tests</name>
+
+	<modules>
+		<module>bonita-test-utils</module>
+		<module>bonita-query-tests</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>5.1.26</version>
+			</dependency>
+			<dependency>
+				<groupId>org.postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>9.2-1003-jdbc4</version>
+			</dependency>
+			<dependency>
+				<groupId>com.oracle</groupId>
+				<artifactId>ojdbc</artifactId>
+				<version>6</version>
+			</dependency>
+			<dependency>
+				<groupId>com.microsoft.jdbc</groupId>
+				<artifactId>sqlserver</artifactId>
+				<version>4.0.2206.100</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<!-- don't execute tests in test phase -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>package-all</id>
+			<modules>
+				<module>bonita-integration-tests-services</module>
+				<module>bonita-integration-tests-services-bpm</module>
+				<module>bonita-integration-tests-client</module>
+				<module>bonita-integration-tests-local</module>
+				<module>bonita-integration-tests-as</module>
+			</modules>
+		</profile>
+
+		<profile>
+			<id>tests</id>
+			<modules>
+				<module>bonita-integration-tests-services</module>
+				<module>bonita-integration-tests-services-bpm</module>
+				<module>bonita-integration-tests-client</module>
+				<module>bonita-integration-tests-local</module>
+			</modules>
+		</profile>
+
+		<profile>
+			<id>sonar</id>
+			<modules>
+				<module>bonita-integration-tests-services</module>
+			</modules>
+		</profile>
+
+		<profile>
+			<id>as-tests</id>
+			<modules>
+				<module>bonita-integration-tests-client</module>
+				<module>bonita-integration-tests-local</module>
+				<module>bonita-integration-tests-as</module>
+			</modules>
+		</profile>
+
+		<profile>
+			<id>all</id>
+			<modules>
+				<module>bonita-integration-tests-services</module>
+				<module>bonita-integration-tests-services-bpm</module>
+				<module>bonita-integration-tests-client</module>
+				<module>bonita-integration-tests-local</module>
+			</modules>
+		</profile>
+
+		<profile>
+			<id>package</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<modules>
+				<module>bonita-query-tests</module>
+			</modules>
+		</profile>
+
+	</profiles>
+</project>

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -24,16 +24,17 @@ import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverServi
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.service.ModelConvertor;
 
 /**
  * @author Zhao Na
+ * @author Matthieu Chaffotte
  */
 public class EvaluateExpressionsDefinitionLevel extends AbstractEvaluateExpressionsInstance implements TransactionContentWithResult<Map<String, Serializable>> {
 
@@ -72,7 +73,7 @@ public class EvaluateExpressionsDefinitionLevel extends AbstractEvaluateExpressi
                     inputValues.put(SExpressionContext.PROCESS_DEFINITION_KEY, processDefinition);
                     context.setProcessDefinitionId(processDefinitionId);
                     context.setSerializableInputValues(inputValues);
-                    final SExpression sexp = ServerModelConvertor.convertExpression(exp);
+                    final SExpression sexp = ModelConvertor.constructSExpression(exp);
                     final Serializable res = evaluateExpression(context, sexp, processDefinition);
                     results.put(buildName(exp), res);
                 }

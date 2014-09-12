@@ -45,9 +45,12 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
+import org.bonitasoft.engine.core.operation.OperationService;
+import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
+import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
@@ -58,6 +61,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInsta
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
@@ -71,8 +75,15 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
+import org.bonitasoft.engine.expression.Expression;
+import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
+import org.bonitasoft.engine.operation.LeftOperand;
+import org.bonitasoft.engine.operation.LeftOperandBuilder;
+import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.operation.OperationBuilder;
+import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -103,7 +114,16 @@ public class ProcessAPIImplTest {
     private TransientDataService transientDataService;
 
     @Mock
+    private OperationService operationService;
+
+    @Mock
     private ActivityInstanceService activityInstanceService;
+
+    @Mock
+    private DataInstanceService dataInstanceService;
+
+    @Mock
+    private ProcessDefinitionService processDefinitionService;
 
     @Mock
     private ClassLoaderService classLoaderService;
@@ -127,6 +147,9 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getTransientDataService()).thenReturn(transientDataService);
         when(tenantAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
         when(tenantAccessor.getClassLoaderService()).thenReturn(classLoaderService);
+        when(tenantAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
+        when(tenantAccessor.getDataInstanceService()).thenReturn(dataInstanceService);
+        when(tenantAccessor.getOperationService()).thenReturn(operationService);
     }
 
     @Test
@@ -438,6 +461,40 @@ public class ProcessAPIImplTest {
     }
 
     @Test
+    public void updateActivityInstanceVariables_should_load_processDef_classes() throws Exception {
+        final String dataInstanceName = "acase";
+
+        final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(dataInstanceName)
+                .setType(LeftOperand.TYPE_DATA).done();
+        final String customDataTypeName = "com.bonitasoft.support.Case";
+        final Expression expression = new ExpressionBuilder().createGroovyScriptExpression("updateDataCaseTest",
+                "new com.bonitasoft.support.Case(\"title\", \"description\")",
+                customDataTypeName);
+        final Operation operation = new OperationBuilder().createNewInstance().setOperator("=").setLeftOperand(leftOperand).setType(OperatorType.ASSIGNMENT)
+                .setRightOperand(expression).done();
+        final ClassLoader contextClassLoader = mock(ClassLoader.class);
+        when(classLoaderService.getLocalClassLoader(anyString(), anyLong())).thenReturn(contextClassLoader);
+        final SProcessDefinition processDef = mock(SProcessDefinition.class);
+        when(processDefinitionService.getProcessDefinition(anyLong())).thenReturn(processDef);
+        final SActivityInstance activityInstance = mock(SActivityInstance.class);
+        when(activityInstanceService.getActivityInstance(anyLong())).thenReturn(activityInstance);
+        final SFlowElementContainerDefinition flowElementContainerDefinition = mock(SFlowElementContainerDefinition.class);
+        when(processDef.getProcessContainer()).thenReturn(flowElementContainerDefinition);
+        when(flowElementContainerDefinition.getFlowNode(anyLong())).thenReturn(mock(SActivityDefinition.class));
+
+        final SDataInstance dataInstance = mock(SDataInstance.class);
+        when(dataInstanceService.getDataInstances(any(List.class), anyLong(),
+                eq(DataInstanceContainer.ACTIVITY_INSTANCE.toString()))).thenReturn(Arrays.asList(dataInstance));
+
+        doReturn(mock(SOperation.class)).when(processAPI).convertOperation(operation);
+
+        final List<Operation> operations = new ArrayList<Operation>();
+        operations.add(operation);
+        processAPI.updateActivityInstanceVariables(operations, 2, null);
+
+        verify(classLoaderService).getLocalClassLoader(anyString(), anyLong());
+    }
+
     public void getUserTaskContract_should_return_contract_associated_to_a_given_task() throws Exception {
         final long userTaskInstanceId = 786454L;
         final long processDefinitionId = 464684354L;

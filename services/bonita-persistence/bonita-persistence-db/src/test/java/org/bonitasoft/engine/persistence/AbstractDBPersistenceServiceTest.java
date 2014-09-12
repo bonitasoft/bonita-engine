@@ -1,7 +1,6 @@
 package org.bonitasoft.engine.persistence;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
@@ -23,9 +22,9 @@ public class AbstractDBPersistenceServiceTest {
 
     /**
      * Dummy implementation for testing purpose : we are not interested in the data manipulation behaviour.
-     * 
+     *
      * @author Laurent Vaills
-     * 
+     *
      */
     class DummyDBPersistenceService extends AbstractDBPersistenceService {
 
@@ -195,9 +194,9 @@ public class AbstractDBPersistenceServiceTest {
 
     @Test
     public void should_word_search_returns_false_when_entity_class_is_null() throws Exception {
-        boolean enableWordSearch = true;
-        Set<String> wordSearchExclusionMappings = Collections.<String> emptySet();
-        Class<? extends PersistentObject> entityClass = null;
+        final boolean enableWordSearch = true;
+        final Set<String> wordSearchExclusionMappings = Collections.<String> emptySet();
+        final Class<? extends PersistentObject> entityClass = null;
         final boolean expectedResult = false;
 
         executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
@@ -205,9 +204,9 @@ public class AbstractDBPersistenceServiceTest {
 
     @Test
     public void should_word_search_returns_true_when_feature_is_enabled_and_exclusion_is_empty() throws Exception {
-        boolean enableWordSearch = true;
-        Set<String> wordSearchExclusionMappings = Collections.<String> emptySet();
-        Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
+        final boolean enableWordSearch = true;
+        final Set<String> wordSearchExclusionMappings = Collections.<String> emptySet();
+        final Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
         final boolean expectedResult = true;
 
         executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
@@ -215,9 +214,9 @@ public class AbstractDBPersistenceServiceTest {
 
     @Test
     public void should_word_search_returns_false_when_feature_is_disabled_and_exclusion_is_empty() throws Exception {
-        boolean enableWordSearch = false;
-        Set<String> wordSearchExclusionMappings = Collections.<String> emptySet();
-        Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
+        final boolean enableWordSearch = false;
+        final Set<String> wordSearchExclusionMappings = Collections.<String> emptySet();
+        final Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
         final boolean expectedResult = false;
 
         executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
@@ -225,9 +224,9 @@ public class AbstractDBPersistenceServiceTest {
 
     @Test
     public void should_word_search_returns_false_when_feature_is_enabled_and_entity_class_is_excluded() throws Exception {
-        boolean enableWordSearch = true;
-        Set<String> wordSearchExclusionMappings = Collections.singleton(ParentDummyPersistentObject.class.getName());
-        Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
+        final boolean enableWordSearch = true;
+        final Set<String> wordSearchExclusionMappings = Collections.singleton(ParentDummyPersistentObject.class.getName());
+        final Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
         final boolean expectedResult = false;
 
         executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
@@ -235,9 +234,9 @@ public class AbstractDBPersistenceServiceTest {
 
     @Test
     public void should_word_search_returns_true_when_feature_is_enabled_and_entity_class_is_not_excluded() throws Exception {
-        boolean enableWordSearch = true;
-        Set<String> wordSearchExclusionMappings = Collections.singleton(DummyPersistentObject2.class.getName());
-        Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
+        final boolean enableWordSearch = true;
+        final Set<String> wordSearchExclusionMappings = Collections.singleton(DummyPersistentObject2.class.getName());
+        final Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
         final boolean expectedResult = true;
 
         executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
@@ -245,9 +244,9 @@ public class AbstractDBPersistenceServiceTest {
 
     @Test
     public void should_word_search_returns_false_when_feature_is_enabled_and_parent_entity_class_is_excluded() throws Exception {
-        boolean enableWordSearch = true;
-        Set<String> wordSearchExclusionMappings = Collections.singleton(ParentDummyPersistentObject.class.getName());
-        Class<? extends PersistentObject> entityClass = Child1DummyPersistentObject.class;
+        final boolean enableWordSearch = true;
+        final Set<String> wordSearchExclusionMappings = Collections.singleton(ParentDummyPersistentObject.class.getName());
+        final Class<? extends PersistentObject> entityClass = Child1DummyPersistentObject.class;
         final boolean expectedResult = false;
 
         executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
@@ -255,9 +254,9 @@ public class AbstractDBPersistenceServiceTest {
 
     @Test
     public void should_word_search_returns_true_when_feature_is_enabled_and_child_entity_class_is_excluded() throws Exception {
-        boolean enableWordSearch = true;
-        Set<String> wordSearchExclusionMappings = Collections.singleton(Child1DummyPersistentObject.class.getName());
-        Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
+        final boolean enableWordSearch = true;
+        final Set<String> wordSearchExclusionMappings = Collections.singleton(Child1DummyPersistentObject.class.getName());
+        final Class<? extends PersistentObject> entityClass = ParentDummyPersistentObject.class;
         final boolean expectedResult = true;
 
         executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
@@ -265,9 +264,9 @@ public class AbstractDBPersistenceServiceTest {
 
     @Test
     public void should_word_search_returns_true_when_feature_is_enabled_and_brother_entity_class_is_excluded() throws Exception {
-        boolean enableWordSearch = true;
-        Set<String> wordSearchExclusionMappings = Collections.singleton(Child1DummyPersistentObject.class.getName());
-        Class<? extends PersistentObject> entityClass = Child2DummyPersistentObject.class;
+        final boolean enableWordSearch = true;
+        final Set<String> wordSearchExclusionMappings = Collections.singleton(Child1DummyPersistentObject.class.getName());
+        final Class<? extends PersistentObject> entityClass = Child2DummyPersistentObject.class;
         final boolean expectedResult = true;
 
         executeIsWordSearchEnabled(enableWordSearch, wordSearchExclusionMappings, entityClass, expectedResult);
@@ -276,13 +275,14 @@ public class AbstractDBPersistenceServiceTest {
     private void executeIsWordSearchEnabled(final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings,
             final Class<? extends PersistentObject> entityClass, final boolean expectedResult)
                     throws ClassNotFoundException {
-        DBConfigurationsProvider dbConfigurationsProvider = mock(DBConfigurationsProvider.class);
-        SequenceManager sequenceManager = mock(SequenceManager.class);
-        DataSource datasource = mock(DataSource.class);
-        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
-        AbstractDBPersistenceService persistenceService = new DummyDBPersistenceService("name", dbConfigurationsProvider, ";", "#", sequenceManager,
+        final DBConfigurationsProvider dbConfigurationsProvider = mock(DBConfigurationsProvider.class);
+        final SequenceManager sequenceManager = mock(SequenceManager.class);
+        final DataSource datasource = mock(DataSource.class);
+        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        final AbstractDBPersistenceService persistenceService = new DummyDBPersistenceService("name", dbConfigurationsProvider, ";", "#", sequenceManager,
                 datasource, enableWordSearch, wordSearchExclusionMappings, logger);
 
-        assertThat(persistenceService.isWordSearchEnabled(entityClass), is(expectedResult));
+        assertThat(persistenceService.isWordSearchEnabled(entityClass)).isEqualTo(expectedResult);
     }
+
 }
