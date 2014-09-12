@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-category</artifactId>
 		<groupId>org.bonitasoft.engine.core.category</groupId>
-		<version>6.3.5-SNAPSHOT</version>
+		<version>6.3.6-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-category-api-impl</artifactId>
