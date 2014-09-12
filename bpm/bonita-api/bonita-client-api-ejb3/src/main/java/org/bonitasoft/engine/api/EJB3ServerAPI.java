@@ -38,7 +38,8 @@ public class EJB3ServerAPI implements ServerAPI {
 
     public EJB3ServerAPI(final Map<String, String> parameters) throws ServerAPIException {
         try {
-            remoteServAPI = lookup("serverAPI", new Hashtable<String, String>(parameters));
+            remoteServAPI = lookup("ejb:bonita-ear/bonita-ejb/serverAPIBean!org.bonitasoft.engine.api.internal.ServerAPI", new Hashtable<String, String>(
+                    parameters));
         } catch (final NamingException e) {
             throw new ServerAPIException(e);
         }
@@ -56,8 +57,8 @@ public class EJB3ServerAPI implements ServerAPI {
 
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
-    	final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
-    	return remoteServAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
+            final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
+        return remoteServAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
     }
 
 }
