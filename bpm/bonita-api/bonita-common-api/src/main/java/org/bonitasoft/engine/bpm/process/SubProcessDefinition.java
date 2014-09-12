@@ -27,7 +27,7 @@ public interface SubProcessDefinition extends ActivityDefinition {
     /**
      * Has this definition of sub-process been triggered by a BPM event?
      *
-     * @return true if this definition of sub-process has been triggered by an event, false otherwise.
+     * @return true if this definition of a sub-process has been triggered by an event, false otherwise.
      */
     boolean isTriggeredByEvent();
 
