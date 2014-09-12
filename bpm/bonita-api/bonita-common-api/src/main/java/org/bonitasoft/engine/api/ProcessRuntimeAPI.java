@@ -2344,7 +2344,7 @@ public interface ProcessRuntimeAPI {
      *         If an execution exception occurs
      * @since 7.0
      */
-    void executeUserTask(long userTaskInstanceId, List<Input> inputs) throws UserTaskNotFoundException, ContractViolationException, FlowNodeExecutionException;
+    void executeUserTask(long userTaskInstanceId, Map<String, Object> inputs) throws UserTaskNotFoundException, ContractViolationException, FlowNodeExecutionException;
 
     /**
      * Executes a user task that is in a stable state on behalf of a given user
@@ -2366,6 +2366,6 @@ public interface ProcessRuntimeAPI {
      *         If an execution exception occurs
      * @since 7.0
      */
-    void executeUserTask(long userId, long userTaskInstanceId, List<Input> inputs) throws UserTaskNotFoundException, ContractViolationException, FlowNodeExecutionException;
+    void executeUserTask(long userId, long userTaskInstanceId, Map<String, Object> inputs) throws UserTaskNotFoundException, ContractViolationException, FlowNodeExecutionException;
 
 }

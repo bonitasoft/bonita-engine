@@ -1,14 +1,11 @@
 package org.bonitasoft.engine.activity;
 
-import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +14,6 @@ import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
-import org.bonitasoft.engine.bpm.contract.Input;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.RuleDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
@@ -111,7 +107,7 @@ public class UserTaskContractTest extends CommonAPITest {
         final Map<String, Object> inputs = new HashMap<String, Object>();
         inputs.put("numberOfDays", BigInteger.valueOf(inputValue));
         try {
-            getProcessAPI().executeUserTask(task.getId(), asList(new Input("numberOfDays", BigInteger.valueOf(inputValue))));
+            getProcessAPI().executeUserTask(task.getId(), inputs);
             fail("should throw ContractViolationException");
         } catch (final ContractViolationException e) {
             //then
@@ -140,7 +136,9 @@ public class UserTaskContractTest extends CommonAPITest {
         getProcessAPI().assignUserTask(task.getId(), matti.getId());
 
         //then no exceptions
-        getProcessAPI().executeUserTask(task.getId(), Arrays.asList(new Input("comment", "<tag>")));
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("comment", "<tag>");
+        getProcessAPI().executeUserTask(task.getId(), map);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -163,7 +161,7 @@ public class UserTaskContractTest extends CommonAPITest {
             assertThat(state).isEqualTo("ready");
         }
         try {
-            getProcessAPI().executeUserTask(userTask.getId(), new ArrayList<Input>());
+            getProcessAPI().executeUserTask(userTask.getId(), new HashMap<String, Object>());
             fail("The contract is not enforced");
         } catch (final ContractViolationException e) {
             final String state = getProcessAPI().getActivityInstanceState(userTask.getId());
@@ -191,7 +189,10 @@ public class UserTaskContractTest extends CommonAPITest {
 
         long expectedValue = 8l;
         try {
-            getProcessAPI().executeUserTask(userTask.getId(), asList(new Input("numberOfDays", BigInteger.valueOf(expectedValue))));
+            final Map<String, Object> inputs = new HashMap<String, Object>();
+            inputs.put("numberOfDays", BigInteger.valueOf(expectedValue));
+
+            getProcessAPI().executeUserTask(userTask.getId(), inputs);
         } catch (ContractViolationException e) {
             System.err.println(e.getExplanations());
         }
@@ -216,8 +217,11 @@ public class UserTaskContractTest extends CommonAPITest {
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
 
         try {
+            final Map<String, Object> inputs = new HashMap<String, Object>();
+            inputs.put("numberOfDays", 8);
+
             //when
-            getProcessAPI().executeUserTask(-1l, asList(new Input("numberOfDays", 8)));
+            getProcessAPI().executeUserTask(-1l, inputs);
             fail("should have a UserTaskNotFoundException ");
         } catch (final UserTaskNotFoundException e) {
             //then
@@ -239,7 +243,10 @@ public class UserTaskContractTest extends CommonAPITest {
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
 
         try {
-            getProcessAPI().executeUserTask(userTask.getId(), asList(new Input("numberOfDays", null)));
+            final Map<String, Object> inputs = new HashMap<String, Object>();
+            inputs.put("numberOfDays", null);
+
+            getProcessAPI().executeUserTask(userTask.getId(), inputs);
             fail("The contract is not enforced");
         } catch (final ContractViolationException e) {
             final String state = getProcessAPI().getActivityInstanceState(userTask.getId());
@@ -271,8 +278,11 @@ public class UserTaskContractTest extends CommonAPITest {
 
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
         try {
-            getProcessAPI().executeUserTask(userTask.getId(),
-                    Arrays.asList(new Input("inputVersion", PROCESS_VERSION), new Input("processInputId", BigInteger.valueOf(45l))));
+            final Map<String, Object> inputs = new HashMap<String, Object>();
+            inputs.put("inputVersion", PROCESS_VERSION);
+            inputs.put("processInputId", BigInteger.valueOf(45L));
+
+            getProcessAPI().executeUserTask(userTask.getId(), inputs);
         } catch (ContractViolationException e) {
             System.err.println(e.getExplanations());
         }

@@ -900,7 +900,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void executeFlowNode(final long userId, final long flownodeInstanceId) throws FlowNodeExecutionException {
         try {
-            executeFlowNode(userId, flownodeInstanceId, true, new ArrayList<Input>());
+            executeFlowNode(userId, flownodeInstanceId, true, new HashMap<String, Object>());
         } catch (final Exception e) {
             throw new FlowNodeExecutionException(e);
         }
@@ -908,13 +908,13 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @CustomTransactions
     @Override
-    public void executeUserTask(final long flownodeInstanceId, final List<Input> inputs) throws FlowNodeExecutionException, ContractViolationException, UserTaskNotFoundException {
+    public void executeUserTask(final long flownodeInstanceId, final Map<String, Object> inputs) throws FlowNodeExecutionException, ContractViolationException, UserTaskNotFoundException {
         executeUserTask(0, flownodeInstanceId, inputs);
     }
 
     @CustomTransactions
     @Override
-    public void executeUserTask(final long userId, final long flownodeInstanceId, final List<Input> inputs) throws FlowNodeExecutionException, ContractViolationException, UserTaskNotFoundException {
+    public void executeUserTask(final long userId, final long flownodeInstanceId, final Map<String, Object> inputs) throws FlowNodeExecutionException, ContractViolationException, UserTaskNotFoundException {
         try {
             executeFlowNode(userId, flownodeInstanceId, true, inputs);
         } catch (final SFlowNodeNotFoundException e) {
@@ -924,21 +924,20 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction, final List<Input> inputs)
+    protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction, final Map<String, Object> inputs)
             throws ContractViolationException, SBonitaException, SFlowNodeNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(tenantAccessor.getActivityInstanceService(), flownodeInstanceId);
         executeTransactionContent(tenantAccessor, getFlowNodeInstance, wrapInTransaction);
         final SFlowNodeInstance flowNodeInstance = getFlowNodeInstance.getResult();
-        final Map<String, Object> variables = buildMap(inputs);
         if (flowNodeInstance instanceof SUserTaskInstance) {
             final GetContractOfUserTaskInstance contractOfUserTaskInstance = new GetContractOfUserTaskInstance(tenantAccessor.getProcessDefinitionService(),
                     (SUserTaskInstance) flowNodeInstance);
             executeTransactionContent(tenantAccessor, contractOfUserTaskInstance, wrapInTransaction);
             final SContractDefinition contractDefinition = contractOfUserTaskInstance.getResult();
             final ContractValidator validator = new ContractValidator(tenantAccessor.getTechnicalLoggerService());
-            if (!validator.isValid(contractDefinition, variables)) {
+            if (!validator.isValid(contractDefinition, inputs)) {
                 throw new ContractViolationException("Contract is not valid: ", validator.getComments());
             }
         }
@@ -947,19 +946,11 @@ public class ProcessAPIImpl implements ProcessAPI {
         final BonitaLock lock = lockService.lock(flowNodeInstance.getParentProcessInstanceId(), SFlowElementsContainerType.PROCESS.name(),
                 tenantAccessor.getTenantId());
         try {
-            final ExecuteFlowNode executeFlowNode = new ExecuteFlowNode(tenantAccessor, userId, flowNodeInstance, variables);
+            final ExecuteFlowNode executeFlowNode = new ExecuteFlowNode(tenantAccessor, userId, flowNodeInstance, inputs);
             executeTransactionContent(tenantAccessor, executeFlowNode, wrapInTransaction);
         } finally {
             lockService.unlock(lock, tenantAccessor.getTenantId());
         }
-    }
-
-    private Map<String, Object> buildMap(final List<Input> inputs) {
-        final Map<String, Object> map = new HashMap<String, Object>();
-        for (final Input input : inputs) {
-            map.put(input.getName(), input.getValue());
-        }
-        return map;
     }
 
     private void executeTransactionContent(final TenantServiceAccessor tenantAccessor, final TransactionContent transactionContent,

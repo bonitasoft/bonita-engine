@@ -591,7 +591,7 @@ public class ProcessAPIImplTest {
     public void executeUserTask_should_throw_FlowNodeExecutionException() throws Exception {
         final long userId = 1l;
         final long flownodeInstanceId = 2l;
-        final List<Input> inputs = new ArrayList<Input>();
+        final HashMap inputs = new HashMap<String, Object>();
         final SBonitaException sBonitaException = new SBonitaException() {
 
             @Override
@@ -612,7 +612,7 @@ public class ProcessAPIImplTest {
     public void executeUserTask_should_throw_ContractViolationException() throws Exception {
         final long userId = 1l;
         final long flownodeInstanceId = 2l;
-        final List<Input> inputs = new ArrayList<Input>();
+        final HashMap inputs = new HashMap<String, Object>();
         final SBonitaException sBonitaException = new SBonitaException() {
 
             @Override
@@ -633,7 +633,7 @@ public class ProcessAPIImplTest {
     public void executeUserTask_should_throw_UserTaskNotFoundException() throws Exception {
         final long userId = 1l;
         final long flownodeInstanceId = 2l;
-        final List<Input> inputs = new ArrayList<Input>();
+        final HashMap inputs = new HashMap<String, Object>();
         final SFlowNodeNotFoundException sFlowNodeNotFoundException = new SFlowNodeNotFoundException(flownodeInstanceId);
 
         //given
