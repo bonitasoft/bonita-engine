@@ -204,6 +204,29 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu",
+            "search", "filter on application id" })
+    @Test
+    public void searchApplicationMenus_can_filter_on_applicationId() throws Exception {
+        //given
+        final Application application2 = getApplicationAPI().createApplication(new ApplicationCreator("app2", "My second app", "1.0", "/app"));
+        final ApplicationPage appPage2 = getApplicationAPI().createApplicationPage(application2.getId(), getPage().getId(), "mySecondPage");
+
+        final ApplicationMenu menu1 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("first", appPage2.getId(), 1));
+        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("second", appPage.getId(), 2));
+        final ApplicationMenu menu3 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("third", appPage2.getId(), 3));
+
+        //when
+        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, application2.getId());
+        final SearchResult<ApplicationMenu> searchResult = getApplicationAPI().searchApplicationMenus(builder.done());
+
+        //then
+        assertThat(searchResult).isNotNull();
+        assertThat(searchResult.getCount()).isEqualTo(2);
+        assertThat(searchResult.getResult()).containsExactly(menu1, menu3);
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu",
             "search", "search term" })
     @Test
     public void searchApplicationMenus_can_use_searchTerm() throws Exception {
