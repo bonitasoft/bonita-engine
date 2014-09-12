@@ -20,7 +20,7 @@ import org.bonitasoft.engine.bpm.DescriptionElement;
 
 /**
  * Gives access to the {@link ProcessDefinition} deployment information.<br/>
- * A <code>ProcessDeploymentInfo</code> has a {@link ConfigurationState}, which says if the process is <code>resolved</code> (all his basic configuration has a
+ * A <code>ProcessDeploymentInfo</code> has a {@link ConfigurationState}, which says if the process is <code>resolved</code> (all its basic configuration has a
  * proper value), or <code>unresolved</code> (some configuration has to be done before the process can be activated).
  * <p>
  * A <code>ProcessDeploymentInfo</code> has an {@link ActivationState}, which says if the process was set to <code>enabled</code> (logged users can start
@@ -74,9 +74,9 @@ public interface ProcessDeploymentInfo extends DescriptionElement, BaseElement {
     Date getDeploymentDate();
 
     /**
-     * Retrieves the identifier of the Bonita BPM {@link org.bonitasoft.engine.identity.User} who deployed the {@link ProcessDefinition}
+     * Retrieves the identifier of the Bonita BPM {@link org.bonitasoft.engine.identity.User} which deployed the {@link ProcessDefinition}
      *
-     * @return a long representing the identifier of the <code>Bonita BPM user</code> who deployed the process.
+     * @return a long representing the identifier of the <code>Bonita BPM user</code> which deployed the process.
      * @see org.bonitasoft.engine.identity.User
      * @see ProcessDefinition
      */
