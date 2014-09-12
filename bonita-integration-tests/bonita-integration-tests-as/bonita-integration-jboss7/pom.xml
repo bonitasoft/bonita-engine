@@ -34,9 +34,9 @@
 
         <db.vendor>h2</db.vendor>
 
-        <cargo.jvmargs>-Xms1024m -Xmx1024m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError</cargo.jvmargs>
+        <cargo.jvmargs>-Xms1024m -Xmx1024m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError </cargo.jvmargs>
         <invoker.port>4422</invoker.port>
-        <!-- -Xdebug -->
+        <!-- -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8787 -Xnoagent -Djava.compiler=NONE -->
         <!-- -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8787 -Xnoagent -Djava.compiler=NONE -->
     </properties>
 
@@ -103,15 +103,8 @@
 									<goal>copy</goal>
 								</goals>
 								<configuration>
-									<artifactItems>
-										<artifactItem>
-                                            <groupId>org.bonitasoft.engine.test</groupId>
-                                            <artifactId>bonita-deploy-ear3</artifactId>
-                                            <version>${project.version}</version>
-                                            <type>ear</type>
-                                            <overWrite>false</overWrite>
-                                            <outputDirectory>${distrib.dir}/ear/ejb3</outputDirectory>
-                                        </artifactItem>
+									<stripVersion>true</stripVersion>
+                                    <artifactItems>
                                         <artifactItem>
                                             <groupId>com.h2database</groupId>
                                             <artifactId>h2</artifactId>
@@ -128,9 +121,9 @@
                                             <outputDirectory>${project.build.directory}/driver</outputDirectory>
                                         </artifactItem>
                                         <artifactItem>
-											<groupId>org.bonitasoft.jboss</groupId>
-            								<artifactId>bonita-jboss-h2-mbean</artifactId>
-											<outputDirectory>${project.build.directory}/driver</outputDirectory>
+                                            <groupId>org.bonitasoft.jboss</groupId>
+                                            <artifactId>bonita-jboss-h2-mbean</artifactId>
+                                            <outputDirectory>${project.build.directory}/driver</outputDirectory>
 										</artifactItem>
 									</artifactItems>
 								</configuration>
@@ -171,7 +164,13 @@
                                             <then>
                                                 <copydir dest="${jboss.deploy.dir}/h2.sar"
                                                     src="jboss/${db.vendor}/h2.sar"/>
+                                                <replace file="${jboss.deploy.dir}/h2.sar/META-INF/jboss-service.xml"
+                                                 token="#bonita.home#" value="${bonita.home}"/>
                                                 <touch file="${jboss.deploy.dir}/h2.sar.dodeploy"/>
+                                                <copy file="${project.build.directory}/driver/h2.jar"
+                                                    todir="${jboss.deploy.dir}/h2.sar"/>
+                                                <copy file="${project.build.directory}/driver/bonita-jboss-h2-mbean.jar"
+                                                    todir="${jboss.deploy.dir}/h2.sar"/>
                                             </then>
                                         </if>
 										<!-- Update database configuration -->
@@ -316,10 +315,18 @@
 										<copy file="${basedir}/client/bonita-client.properties" todir="${bonita.home}/client/conf" overwrite="true" />
 										<replace file="${bonita.home}/client/conf/bonita-client.properties" token="#provider.port#" value="${provider.port}"/>
 
-										<!--waitfor maxwait="1" maxwaitunit="minute">
+                                        <mkdir dir="${project.build.directory}/test-classes"/>
+                                        <copy file="${basedir}/client/jboss-ejb-client.properties" todir="${project.build.directory}/test-classes" overwrite="true" />
+
+                                        <!-- 
+                                            in jboss 7, all port are available even when everything is not deployed...
+                                            Thus, we have to force a sleep task and not only wait for a port to be ready
+                                        -->
+										<!-- <waitfor maxwait="1" maxwaitunit="minute">
 											<socket server="localhost" port="${provider.port}" />
-										</waitfor-->
-                                        <sleep seconds="10"/>
+										</waitfor> -->
+
+                                        <sleep seconds="3"/>
 
 										<mkdir dir="${report.xml}" />
 										<junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="256m">
@@ -328,8 +335,8 @@
 											<sysproperty key="bonita.home" value="${bonita.home}" />
 											<formatter type="xml" />
 											<test todir="${report.xml}" name="${test.class}" />
-                                            <jvmarg value="-Xdebug"/> 
-                                            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"/>
+                                           <!--  <jvmarg value="-Xdebug"/> 
+                                            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"/> -->
 										</junit>
 										<junitreport todir="${report.xml}">
 											<fileset dir="${report.xml}" includes="TEST-*.xml" />
@@ -355,7 +362,7 @@
 									<goal>start</goal>
 								</goals>
 							</execution>
-							<execution>
+                        	<execution>
 								<id>stop-container</id>
 								<phase>post-integration-test</phase>
 								<goals>
@@ -399,7 +406,7 @@
                                     <groupId>org.bonitasoft.engine.test</groupId>
                                     <artifactId>bonita-deploy-ear3</artifactId>
                                     <type>ear</type>
-                                    <pingURL>http://localhost:7080/</pingURL>
+                                    <pingURL>http://localhost:${jboss.web.port}/</pingURL>
                                     <pingTimeout>30000</pingTimeout>
                                 </deployable>
                             </deployables>
