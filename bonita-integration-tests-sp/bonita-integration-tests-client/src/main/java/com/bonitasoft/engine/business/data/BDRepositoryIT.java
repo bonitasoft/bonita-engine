@@ -76,7 +76,9 @@ import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.businessdata.BusinessDataReference;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
+import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
 
 public class BDRepositoryIT extends CommonAPISPTest {
 
@@ -1055,6 +1057,20 @@ public class BDRepositoryIT extends CommonAPISPTest {
         assertThat(dataInstance.getValue().toString()).isEqualTo("[Doe, Doe]");
 
         disableAndDeleteProcess(processDefinition);
+    }
+
+    public void getProcessBusinessDataReferencesShoulReturnTheListOfReferences() throws Exception {
+        final String taskName = "step";
+        final ProcessDefinition definition = buildProcessThatUpdateBizDataInsideConnector(taskName);
+        final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
+        waitForUserTask(taskName, instance.getId());
+
+        final List<BusinessDataReference> references = getProcessAPI().getProcessBusinessDataReferences(instance.getId(), 0, 10);
+
+        assertThat(references).hasSize(1);
+        assertThat(((SimpleBusinessDataReference) references.get(0)).getStorageId()).isNotNull();
+
+        disableAndDeleteProcess(definition);
     }
 
 }

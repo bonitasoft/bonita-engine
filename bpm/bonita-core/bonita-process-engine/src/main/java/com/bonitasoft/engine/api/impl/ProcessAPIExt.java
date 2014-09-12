@@ -1219,7 +1219,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public BusinessDataReference getProcessBusinessData(final String businessDataName, final long processInstanceId) throws DataNotFoundException {
+    public BusinessDataReference getProcessBusinessDataReference(final String businessDataName, final long processInstanceId) throws DataNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final RefBusinessDataService refBusinessDataService = tenantAccessor.getRefBusinessDataService();
@@ -1233,7 +1233,27 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         } catch (final SRefBusinessDataInstanceNotFoundException srbdnfe) {
             throw new DataNotFoundException(srbdnfe);
         } catch (final SBonitaReadException sbre) {
-            throw new BonitaRuntimeException(sbre);
+            throw new RetrieveException(sbre);
+        }
+    }
+
+    @Override
+    public List<BusinessDataReference> getProcessBusinessDataReferences(final long processInstanceId, final int startIndex, final int maxResults) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        try {
+            final RefBusinessDataService refBusinessDataService = tenantAccessor.getRefBusinessDataService();
+            final List<SRefBusinessDataInstance> sReferences = refBusinessDataService.getRefBusinessDataInstances(processInstanceId, startIndex, maxResults);
+            final List<BusinessDataReference> references = new ArrayList<BusinessDataReference>();
+            for (final SRefBusinessDataInstance sReference : sReferences) {
+                if (sReference instanceof SSimpleRefBusinessDataInstance) {
+                    references.add(SPModelConvertor.toSimpleBusinessDataReference((SSimpleRefBusinessDataInstance) sReference));
+                } else {
+                    references.add(SPModelConvertor.toMultipleBusinessDataReference((SMultiRefBusinessDataInstance) sReference));
+                }
+            }
+            return references;
+        } catch (final SBonitaReadException sbre) {
+            throw new RetrieveException(sbre);
         }
     }
 
