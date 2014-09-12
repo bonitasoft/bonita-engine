@@ -12,7 +12,7 @@ import org.bonitasoft.engine.api.CommandAPI;
 
 /**
  * Gives access to Subscription edition specific APIs.
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  * @author Emmanuel Duchastenier
@@ -57,14 +57,14 @@ public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
 
     /**
      * Gives access to ReportingAPI.
-     * 
+     *
      * @return the ReportingAPI, giving access to all reporting methods.
      */
     ReportingAPI getReportingAPI();
 
     /**
      * Gives access to ThemeAPI.
-     * 
+     *
      * @return The ThemeAPI, giving access to all theme methods.
      * @since 6.2
      */
@@ -73,10 +73,18 @@ public interface APIAccessor extends org.bonitasoft.engine.api.APIAccessor {
 
     /**
      * Gives access to Page API
-     * 
+     *
      * @return
      * @since 6.3
      */
     PageAPI getPageAPI();
+
+    /**
+     * Gives access to {@link ApplicationAPI}
+     * 
+     * @return
+     * @since 6.4
+     */
+    ApplicationAPI getApplicationAPI();
 
 }

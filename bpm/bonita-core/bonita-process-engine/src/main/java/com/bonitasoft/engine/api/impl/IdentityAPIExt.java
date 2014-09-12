@@ -42,18 +42,4 @@ public class IdentityAPIExt extends IdentityAPIImpl implements IdentityAPI {
         }
     }
 
-    @Override
-    public String exportOrganization() throws OrganizationExportException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.WEB_ORGANIZATION_EXCHANGE);
-
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        int maxResults = 100;
-        final ExportOrganization exportOrganization = new ExportOrganization(tenantAccessor.getXMLWriter(), tenantAccessor.getIdentityService(), maxResults);
-        try {
-            exportOrganization.execute();
-            return exportOrganization.getResult();
-        } catch (final SBonitaException e) {
-            throw new OrganizationExportException(e);
-        }
-    }
 }

@@ -322,11 +322,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.bonitasoft.engine.api.impl.PlatformAPIImpl#importProfiles(org.bonitasoft.engine.profile.ProfileService,
-     * org.bonitasoft.engine.identity.IdentityService, java.util.List, org.bonitasoft.engine.service.TenantServiceAccessor)
-     */
     @Override
     protected void importProfiles(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> profilesFromXML,
             final org.bonitasoft.engine.service.TenantServiceAccessor tenantServiceAccessor) throws ExecutionException {
