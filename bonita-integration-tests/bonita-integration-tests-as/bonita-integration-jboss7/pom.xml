@@ -14,7 +14,6 @@
     <name>Bonita - Integration Tests on JBoss AS 7</name>
 
     <properties>
-        <jboss7.version>jboss-7.1.1.Final</jboss7.version>
         <jboss.name>jboss-as-7.1.1.Final</jboss.name>
         <jboss.web.port>7080</jboss.web.port>
         <jboss.ajp.port>8011</jboss.ajp.port>
@@ -111,11 +110,6 @@
                                             <outputDirectory>${project.build.directory}/driver</outputDirectory>
                                         </artifactItem>
                                         <artifactItem>
-                                            <groupId>mysql</groupId>
-                                            <artifactId>mysql-connector-java</artifactId>
-                                            <outputDirectory>${project.build.directory}/driver</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
                                             <groupId>org.postgresql</groupId>
                                             <artifactId>postgresql</artifactId>
                                             <outputDirectory>${project.build.directory}/driver</outputDirectory>
@@ -162,65 +156,15 @@
                                         <if>
                                             <equals arg1="${db.vendor}" arg2="h2" />
                                             <then>
-                                                <copydir dest="${jboss.deploy.dir}/h2.sar"
-                                                    src="jboss/${db.vendor}/h2.sar"/>
-                                                <replace file="${jboss.deploy.dir}/h2.sar/META-INF/jboss-service.xml"
-                                                 token="#bonita.home#" value="${bonita.home}"/>
+                                                <copydir dest="${jboss.deploy.dir}/h2.sar" src="jboss/${db.vendor}/h2.sar"/>
+                                                <replace file="${jboss.deploy.dir}/h2.sar/META-INF/jboss-service.xml" token="#bonita.home#" value="${bonita.home}"/>
                                                 <touch file="${jboss.deploy.dir}/h2.sar.dodeploy"/>
-                                                <copy file="${project.build.directory}/driver/h2.jar"
-                                                    todir="${jboss.deploy.dir}/h2.sar"/>
-                                                <copy file="${project.build.directory}/driver/bonita-jboss-h2-mbean.jar"
-                                                    todir="${jboss.deploy.dir}/h2.sar"/>
+                                                <copy file="${project.build.directory}/driver/h2.jar" todir="${jboss.deploy.dir}/h2.sar"/>
+                                                <copy file="${project.build.directory}/driver/bonita-jboss-h2-mbean.jar" todir="${jboss.deploy.dir}/h2.sar"/>
                                             </then>
                                         </if>
 										<!-- Update database configuration -->
                                         <property file="jboss/${db.vendor}/database.properties"/>
-
-                                        <!--property name="bindings.xml"
-                                                  location="${jboss.conf.dir}/bindingservice.beans/META-INF/bindings-jboss-beans.xml"/-->
-                                        <!--replace file="${bindings.xml}"
-                                                 token="&lt;property name=&quot;port&quot;&gt;1099&lt;/property&gt;"
-                                                 value="&lt;property name=&quot;port&quot;&gt;${provider.port}&lt;/property&gt;"/>
-                                        <replace file="${bindings.xml}"
-                                                 token="&lt;property name=&quot;port&quot;&gt;4444&lt;/property&gt;"
-                                                 value="&lt;property name=&quot;port&quot;&gt;0&lt;/property&gt;"/>
-                                        <replace file="${bindings.xml}"
-                                                 token="&lt;property name=&quot;port&quot;&gt;1098&lt;/property&gt;"
-                                                 value="&lt;property name=&quot;port&quot;&gt;0&lt;/property&gt;"/>
-                                        <replace file="${bindings.xml}"
-                                                 token="&lt;property name=&quot;port&quot;&gt;4445&lt;/property&gt;"
-                                                 value="&lt;property name=&quot;port&quot;&gt;0&lt;/property&gt;"/>
-                                        <replace file="${bindings.xml}"
-                                                 token="&lt;property name=&quot;port&quot;&gt;4446&lt;/property&gt;"
-                                                 value="&lt;property name=&quot;port&quot;&gt;0&lt;/property&gt;"/>
-                                        <replace file="${bindings.xml}"
-                                                 token="&lt;property name=&quot;port&quot;&gt;8083&lt;/property&gt;"
-                                                 value="&lt;property name=&quot;port&quot;&gt;0&lt;/property&gt;"/>
-
-                                        <replace file="${jboss.conf.dir}/jboss-service.xml"
-                                                 token="&lt;attribute name=&quot;DefaultCacheTimeout&quot;&gt;1800&lt;/attribute&gt;"
-                                                 value="&lt;attribute name=&quot;DefaultCacheTimeout&quot;&gt;0&lt;/attribute&gt;"/>
-                                        <replace file="${jboss.conf.dir}/jboss-service.xml"
-                                                 token="&lt;attribute name=&quot;DefaultCacheResolution&quot;&gt;60&lt;/attribute&gt;"
-                                                 value="&lt;attribute name=&quot;DefaultCacheResolution&quot;&gt;0&lt;/attribute&gt;"/>
-                                        <replace file="${jboss.conf.dir}/jboss-service.xml"
-                                                 token="&lt;attribute name=&quot;CallByValue&quot;&gt;false&lt;/attribute&gt;"
-                                                 value="&lt;attribute name=&quot;CallByValue&quot;&gt;true&lt;/attribute&gt;"/-->
-										<!-- Workaround JBoss bug: https://issues.jboss.org/browse/JBAS-6981 -->
-										<!--replace file="${jboss.conf.dir}/bootstrap/profile.xml"
-										token="&lt;constructor&gt;&lt;parameter&gt;&lt;inject bean=&quot;BootstrapProfileFactory&quot; property=&quot;attachmentStoreRoot&quot; /&gt;&lt;/parameter&gt;&lt;/constructor&gt;"
-                                                 value="&lt;constructor&gt;&lt;parameter class=&quot;java.io.File&quot;&gt;&lt;inject bean=&quot;BootstrapProfileFactory&quot; property=&quot;attachmentStoreRoot&quot; /&gt;&lt;/parameter&gt;&lt;/constructor&gt;"/>
-
-                                        <replace file="${jboss.deploy.dir}ers/ear-deployer-jboss-beans.xml"
-                                                 token="&lt;property name=&quot;isolated&quot;&gt;false&lt;/property&gt;"
-                                                 value="&lt;property name=&quot;isolated&quot;&gt;true&lt;/property&gt;"/>
-                                        <replace file="${jboss.deploy.dir}ers/ear-deployer-jboss-beans.xml"
-                                                 token="&lt;property name=&quot;callByValue&quot;&gt;false&lt;/property&gt;"
-                                                 value="&lt;property name=&quot;callByValue&quot;&gt;true&lt;/property&gt;"/-->
-
-                                        <!--replace file="${jboss.deploy.dir}/ejb3-connectors-jboss-beans.xml"
-                                                 token="&lt;parameter&gt;3873&lt;/parameter&gt;"
-                                                 value="&lt;parameter&gt;${invokerLocatorPort}&lt;/parameter&gt;"/-->
 
                                         <replace file="${jboss.conf.dir}/standalone.xml"
                                                  token="port=&quot;8080&quot;"
@@ -231,9 +175,6 @@
 
                                         <replace file="${jboss.home}/bin/standalone.conf" token="-XX:MaxPermSize=256m"
                                                  value="-XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError"/>
-
-                                        <!--copy todir="${jboss.deploy.dir}"
-                                              file="${distrib.dir}/ear/ejb3/bonita-deploy-ear3-${project.version}.ear"/-->
 
                                         <!-- set the bonita client to use ejb3 -->
                                         <copy file="${basedir}/client/bonita-client.properties"
@@ -274,12 +215,6 @@
                                                  value="${database.driver.xml}"/>
                                             </then>
                                         </if>
-                                        
-										<!--copy todir="${jboss.lib.dir}">
-											<fileset dir="target/driver">
-                                                <include name="*jar"/>
-											</fileset>
-										</copy-->
 									</target>
 								</configuration>
 							</execution>

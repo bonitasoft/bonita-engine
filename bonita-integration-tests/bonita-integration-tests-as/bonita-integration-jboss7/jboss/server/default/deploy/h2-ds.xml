@@ -7,14 +7,7 @@
 <!-- ====================================================================== -->
 
 <datasources>
-    <datasource jta="false" jndi-name="java:jboss/datasources/bonitaSequenceManagerDS" pool-name="bonitaSequenceManagerDS" enabled="true" use-ccm="false">
-        <connection-url>jdbc:h2:tcp:localhost:9091/bonita_journal.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE</connection-url>
-        <driver>h2</driver>
-        <security>
-            <user-name>sa</user-name>
-            <password>sa</password>
-        </security>
-    </datasource>
+
     <xa-datasource jndi-name="java:jboss/datasources/bonitaDS" pool-name="bonitaDS" enabled="true" use-ccm="false">
         <xa-datasource-property name="URL">jdbc:h2:tcp:localhost:9091/bonita_journal.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE</xa-datasource-property>
         <driver>h2</driver>
@@ -28,4 +21,21 @@
             <password>sa</password>
         </security>
     </xa-datasource>
+    
+    <datasource jta="false" jndi-name="java:jboss/datasources/bonitaSequenceManagerDS" pool-name="bonitaSequenceManagerDS" enabled="true" use-ccm="false">
+        <connection-url>jdbc:h2:tcp:localhost:9091/bonita_journal.db;MVCC=TRUE;DB_CLOSE_ON_EXIT=TRUE;IGNORECASE=TRUE</connection-url>
+        <driver>h2</driver>
+        <security>
+            <user-name>sa</user-name>
+            <password>sa</password>
+        </security>
+    </datasource>
+    
+    <drivers>
+		<driver name="h2" module="com.h2database.h2">
+			<xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
+			<datasource-class>org.h2.Driver</datasource-class>
+		</driver>
+	</drivers>
+    
 </datasources>

@@ -8,29 +8,54 @@
 
 <datasources>
 	<!-- PostgreSQL Example -->
-	<xa-datasource>
-		<jndi-name>bonitaDS</jndi-name>
-		<use-java-context>false</use-java-context>
-		<xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>
-		<xa-datasource-property name="ServerName">#database.ip#</xa-datasource-property>
+	<xa-datasource jndi-name="java:jboss/datasources/bonitaDS" pool-name="bonitaDS" enabled="true" use-ccm="false">
+        <use-java-context>false</use-java-context>
+        <driver>postgresql</driver>
+        <xa-datasource-property name="ServerName">#database.ip#</xa-datasource-property>
 		<xa-datasource-property name="portNumber">#database.port#</xa-datasource-property>
 		<xa-datasource-property name="DatabaseName">#database.name#</xa-datasource-property>
-		<xa-datasource-property name="User">#database.user#</xa-datasource-property>
-		<xa-datasource-property name="Password">#database.password#</xa-datasource-property>
-		<check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
-		<background-validation-millis>30000</background-validation-millis>
-		<track-connection-by-tx/>
-	</xa-datasource>
-
-	<no-tx-datasource>
-		<jndi-name>bonitaSequenceManagerDS</jndi-name>
-		<connection-url>jdbc:postgresql://#database.ip#:#database.port#/#database.name#</connection-url>
-		<driver-class>org.postgresql.Driver</driver-class>
-		<use-java-context>false</use-java-context>
-		<user-name>#database.user#</user-name>
-		<password>#database.password#</password>
-		<check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
-		<background-validation-millis>30000</background-validation-millis>
-		<idle-timeout-minutes>0</idle-timeout-minutes>
-	</no-tx-datasource>
+        <xa-pool>
+            <min-pool-size>1</min-pool-size>
+            <max-pool-size>50</max-pool-size>
+            <prefill>true</prefill>
+        </xa-pool>
+        <security>
+            <user-name>#database.user#</user-name>
+            <password>#database.password#</password>
+        </security>
+        <validation>
+        	<background-validation-millis>30000</background-validation-millis>
+        	<check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
+        </validation>
+        <statement>
+			<share-prepared-statements>false</share-prepared-statements>
+		</statement> 
+    </xa-datasource>
+    
+    <datasource jta="false" jndi-name="java:jboss/datasources/bonitaSequenceManagerDS" pool-name="bonitaSequenceManagerDS" enabled="true" use-ccm="false">
+        <use-java-context>false</use-java-context>
+        <driver>postgres</driver>
+        <connection-url>jdbc:postgresql://#database.ip#:#database.port#/#database.name#</connection-url>
+        <security>
+            <user-name>#database.user#</user-name>
+            <password>#database.password#</password>
+        </security>
+        <validation>
+        	<background-validation-millis>30000</background-validation-millis>
+        	<check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
+        </validation>
+        <timeout>
+        	<idle-timeout-minutes>0</idle-timeout-minutes>
+        </timeout>
+        <statement>
+			<share-prepared-statements>false</share-prepared-statements>
+		</statement>
+    </datasource>
+    
+	<drivers>
+		<driver name="postgres" module="org.postgresql">
+			<xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>
+			<datasource-class>org.postgresql.Driver</datasource-class>
+		</driver>
+	</drivers>
 </datasources>
