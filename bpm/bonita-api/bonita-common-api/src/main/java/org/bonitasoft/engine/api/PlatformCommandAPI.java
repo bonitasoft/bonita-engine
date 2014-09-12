@@ -31,9 +31,10 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
- * Manipulates platform command. It can be registered, unregistered and executed with parameters.<br/>
- * These commands are executed in a platform scope, see {@link CommandAPI} for more explanations on how to deploy, execute, ... a command. The only
- * difference with {@link CommandAPI} is that commands must extends {@link org.bonitasoft.engine.command.PlatformCommand}.
+ * Manipulates a platform command. A command can be registered, unregistered and executed with parameters.<br/>
+ * These commands are executed in a platform scope, see {@link CommandAPI} for an explanation of how to deploy, execute, ... a command. The only
+ * difference between the {@link CommandAPI} and the {@link PlatformCommandAPI} is that a platform command must extend
+ * {@link org.bonitasoft.engine.command.PlatformCommand}.
  *
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
@@ -51,7 +52,7 @@ public interface PlatformCommandAPI {
      * @throws InvalidSessionException
      *         occurs when the session is not valid
      * @throws AlreadyExistsException
-     *         occurs when the dependency name was already taken by another dependency
+     *         occurs when the dependency name is already used for another dependency
      * @throws CreationException
      *         if a problem occurs when creating the dependency
      */
@@ -65,7 +66,7 @@ public interface PlatformCommandAPI {
      * @throws InvalidSessionException
      *         if the current platform session is not valid
      * @throws DependencyNotFoundException
-     *         if no dependency can be found with the provided name
+     *         if no dependency can be found with the specified name
      * @throws DeletionException
      *         if a problem occurs when deleting the dependency
      */
@@ -79,12 +80,12 @@ public interface PlatformCommandAPI {
      * @param description
      *        the command description
      * @param implementation
-     *        the implementation class which will be uses when executing the command
+     *        the implementation class which will be used when executing the command
      * @return the descriptor of the command
      * @throws InvalidSessionException
      *         occurs when the session is not valid
      * @throws AlreadyExistsException
-     *         occurs when the command name was already taken by another command
+     *         occurs when the command name is already used for another command
      * @throws CreationException
      *         if a problem occurs when registering the command
      */
