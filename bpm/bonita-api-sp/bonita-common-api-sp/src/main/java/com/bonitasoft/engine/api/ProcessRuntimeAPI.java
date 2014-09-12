@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -16,6 +16,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
+import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
@@ -36,6 +37,7 @@ import org.bonitasoft.engine.session.InvalidSessionException;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.Index;
 import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
+import com.bonitasoft.engine.businessdata.BusinessDataReference;
 
 /**
  * {@link ProcessRuntimeAPI} extends {@link org.bonitasoft.engine.api.ProcessRuntimeAPI} and adds capabilities on Manual tasks, connector execution (directly
@@ -451,5 +453,22 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * @since 6.3
      */
     SearchResult<FlowNodeInstance> searchFlowNodeInstancesSupervisedBy(long supervisorId, SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Returns the {@link BusinessDataReference} of the named business data of the process instance.
+     * The value is returned in a DataInstance object.
+     *
+     * @param businessDataName
+     *        The name of the business data
+     * @param processInstanceId
+     *        The identifier of the process instance
+     * @return the reference of the business data
+     * @throws InvalidSessionException
+     *         If the session is invalid, e.g. the session has expired.
+     * @throws DataNotFoundException
+     *         If the specified business data value cannot be found.
+     * @since 6.4
+     */
+    BusinessDataReference getProcessBusinessData(String businessDataName, long processInstanceId) throws DataNotFoundException;
 
 }
