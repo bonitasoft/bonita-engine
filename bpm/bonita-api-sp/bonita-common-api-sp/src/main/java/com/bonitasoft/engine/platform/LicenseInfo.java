@@ -41,9 +41,9 @@ public interface LicenseInfo extends Serializable {
     String getEdition();
 
     /**
-     * Retrieves a list containing the name of all features available for this license
+     * Retrieves a list containing the names of all features available for this license
      *
-     * @return a list containing the name of all features available for this license
+     * @return a list containing the names of all features available for this license
      */
     List<String> getFeatures();
 
