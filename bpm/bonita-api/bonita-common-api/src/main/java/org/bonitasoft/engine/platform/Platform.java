@@ -23,7 +23,7 @@ import org.bonitasoft.engine.api.PlatformAPI;
  * The <code>platform</code> is the base on which runs the <code>Bonita BPM Engine</code>. There is only one platform for a running <code>Bonita BPM
  * Engine</code>.
  * <p>
- * In oder to perform actions on the platform, please, refer to the {@link PlatformAPI}
+ * In order to perform actions on the platform, please, refer to the {@link PlatformAPI}
  *
  * @author Matthieu Chaffotte
  * @see PlatformAPI
@@ -68,9 +68,9 @@ public interface Platform extends Serializable {
     String getInitialVersion();
 
     /**
-     * Retrieves the time stamp in which the platform was created
+     * Retrieves the timestamp at which the platform was created
      *
-     * @return a long representing the time stamp in which the platform was created
+     * @return a long representing the timestamp at which the platform was created
      */
     long getCreated();
 
