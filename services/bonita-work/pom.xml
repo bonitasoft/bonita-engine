@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>services</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.3.6-SNAPSHOT</version>
+		<version>6.3.6</version>
 	</parent>
 
 	<groupId>com.bonitasoft.engine.work</groupId>
