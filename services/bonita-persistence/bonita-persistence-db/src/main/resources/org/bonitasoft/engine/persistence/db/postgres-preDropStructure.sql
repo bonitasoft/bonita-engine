@@ -45,13 +45,13 @@ ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_profileId;
 ALTER TABLE profileentry DROP CONSTRAINT fk_profileentry_profileId;
 
 -- business application
-ALTER TABLE business_app DROP CONSTRAINT fk_app_tenantId;
-ALTER TABLE business_app_page DROP CONSTRAINT fk_app_page_tenantId;
-ALTER TABLE business_app_page DROP CONSTRAINT fk_bus_app_id;
-ALTER TABLE business_app_page DROP CONSTRAINT fk_page_id;
 ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_tenantId;
 ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_pageId;
 ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_parentId;
+ALTER TABLE business_app_page DROP CONSTRAINT fk_app_page_tenantId;
+ALTER TABLE business_app_page DROP CONSTRAINT fk_bus_app_id;
+ALTER TABLE business_app_page DROP CONSTRAINT fk_page_id;
+ALTER TABLE business_app DROP CONSTRAINT fk_app_tenantId;
 
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------
