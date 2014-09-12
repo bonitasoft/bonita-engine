@@ -67,7 +67,7 @@ public class ApplicationMenuImpl extends BaseElementImpl implements ApplicationM
         result = prime * result + (int) (applicationPageId ^ applicationPageId >>> 32);
         result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + index;
-        result = prime * result + (int) (parentId ^ parentId >>> 32);
+        result = prime * result + (parentId == null ? 0 : parentId.hashCode());
         return result;
     }
 
@@ -96,10 +96,15 @@ public class ApplicationMenuImpl extends BaseElementImpl implements ApplicationM
         if (index != other.index) {
             return false;
         }
-        if (parentId != other.parentId) {
+        if (parentId == null) {
+            if (other.parentId != null) {
+                return false;
+            }
+        } else if (!parentId.equals(other.parentId)) {
             return false;
         }
         return true;
     }
+
 
 }

@@ -6,7 +6,7 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.api.impl;
+package com.bonitasoft.engine.api.impl.application;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -26,19 +26,10 @@ import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
-import com.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
-import com.bonitasoft.engine.business.application.Application;
-import com.bonitasoft.engine.business.application.ApplicationCreator;
-import com.bonitasoft.engine.business.application.ApplicationMenu;
-import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
-import com.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
-import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.SInvalidNameException;
-import com.bonitasoft.engine.business.application.model.SApplication;
-import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilderFactory;
@@ -51,53 +42,17 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
  * @author Elias Ricken de Medeiros
  *
  */
-public class ApplicationAPIDelegate {
+public class ApplicationPageAPIDelegate {
 
     private final ApplicationConvertor convertor;
-    private final long loggedUserId;
-    private final SearchApplications searchApplications;
     private final ApplicationService applicationService;
     private final SearchApplicationPages searchApplicationPages;
 
-    public ApplicationAPIDelegate(final TenantServiceAccessor accessor, final ApplicationConvertor convertor, final long loggedUserId,
-            final SearchApplications searchApplications, final SearchApplicationPages searchApplicationPages) {
+    public ApplicationPageAPIDelegate(final TenantServiceAccessor accessor, final ApplicationConvertor convertor,
+            final SearchApplicationPages searchApplicationPages) {
         this.searchApplicationPages = searchApplicationPages;
         applicationService = accessor.getApplicationService();
         this.convertor = convertor;
-        this.loggedUserId = loggedUserId;
-        this.searchApplications = searchApplications;
-    }
-
-    public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException, InvalidNameException {
-        try {
-            final SApplication sApplication = applicationService.createApplication(convertor.buildSApplication(applicationCreator, loggedUserId));
-            return convertor.toApplication(sApplication);
-        } catch (final SObjectCreationException e) {
-            throw new CreationException(e);
-        } catch (final SObjectAlreadyExistsException e) {
-            throw new AlreadyExistsException(e.getMessage());
-        } catch (final SInvalidNameException e) {
-            throw new InvalidNameException(e.getMessage());
-        }
-    }
-
-    public Application getApplication(final long applicationId) throws ApplicationNotFoundException {
-        try {
-            final SApplication sApplication = applicationService.getApplication(applicationId);
-            return convertor.toApplication(sApplication);
-        } catch (final SBonitaReadException e) {
-            throw new RetrieveException(e);
-        } catch (final SObjectNotFoundException e) {
-            throw new ApplicationNotFoundException(applicationId);
-        }
-    }
-
-    public void deleteApplication(final long applicationId) throws DeletionException {
-        try {
-            applicationService.deleteApplication(applicationId);
-        } catch (final SBonitaException e) {
-            throw new DeletionException(e);
-        }
     }
 
     public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException {
@@ -107,15 +62,6 @@ public class ApplicationAPIDelegate {
             applicationService.updateApplication(applicationId, updateBuilder.done());
         } catch (final SObjectModificationException e) {
             throw new UpdateException(e);
-        }
-    }
-
-    public SearchResult<Application> searchApplications() throws SearchException {
-        try {
-            searchApplications.execute();
-            return searchApplications.getResult();
-        } catch (final SBonitaException e) {
-            throw new SearchException(e);
         }
     }
 
@@ -184,34 +130,6 @@ public class ApplicationAPIDelegate {
             return searchApplicationPages.getResult();
         } catch (final SBonitaException e) {
             throw new SearchException(e);
-        }
-    }
-
-    public ApplicationMenu createApplicationMenu(final ApplicationMenuCreator applicationMenuCreator) throws CreationException {
-        try {
-            final SApplicationMenu sApplicationMenu = applicationService.createApplicationMenu(convertor.buildSApplicationMenu(applicationMenuCreator));
-            return convertor.toApplicationMenu(sApplicationMenu);
-        } catch (final SObjectCreationException e) {
-            throw new CreationException(e);
-        }
-    }
-
-    public ApplicationMenu getApplicationMenu(final long applicationMenuId) throws ApplicationMenuNotFoundException {
-        try {
-            final SApplicationMenu sApplicationMenu = applicationService.getApplicationMenu(applicationMenuId);
-            return convertor.toApplicationMenu(sApplicationMenu);
-        } catch (final SBonitaReadException e) {
-            throw new RetrieveException(e);
-        } catch (final SObjectNotFoundException e) {
-            throw new ApplicationMenuNotFoundException(e.getMessage());
-        }
-    }
-
-    public void deleteApplicationMenu(final long applicationMenuId) throws DeletionException {
-        try {
-            applicationService.deleteApplicationMenu(applicationMenuId);
-        } catch (final SBonitaException e) {
-            throw new DeletionException(e);
         }
     }
 

@@ -69,4 +69,50 @@ public class SApplicationMenuImpl extends PersistentObjectId implements SApplica
         return index;
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + (int) (applicationPageId ^ applicationPageId >>> 32);
+        result = prime * result + (displayName == null ? 0 : displayName.hashCode());
+        result = prime * result + index;
+        result = prime * result + (parentId == null ? 0 : parentId.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SApplicationMenuImpl other = (SApplicationMenuImpl) obj;
+        if (applicationPageId != other.applicationPageId) {
+            return false;
+        }
+        if (displayName == null) {
+            if (other.displayName != null) {
+                return false;
+            }
+        } else if (!displayName.equals(other.displayName)) {
+            return false;
+        }
+        if (index != other.index) {
+            return false;
+        }
+        if (parentId == null) {
+            if (other.parentId != null) {
+                return false;
+            }
+        } else if (!parentId.equals(other.parentId)) {
+            return false;
+        }
+        return true;
+    }
+
 }

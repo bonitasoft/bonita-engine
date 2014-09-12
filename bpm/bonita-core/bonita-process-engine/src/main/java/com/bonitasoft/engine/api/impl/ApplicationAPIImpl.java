@@ -20,7 +20,11 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.ApplicationAPI;
+import com.bonitasoft.engine.api.impl.application.ApplicationAPIDelegate;
+import com.bonitasoft.engine.api.impl.application.ApplicationMenuAPIDelegate;
+import com.bonitasoft.engine.api.impl.application.ApplicationPageAPIDelegate;
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
+import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
 import com.bonitasoft.engine.business.application.Application;
@@ -34,6 +38,7 @@ import com.bonitasoft.engine.business.application.ApplicationPageNotFoundExcepti
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.exception.InvalidNameException;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
+import com.bonitasoft.engine.search.descriptor.SearchApplicationMenuDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationPageDescriptor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -48,37 +53,64 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException, InvalidNameException {
-        return getDelegate().createApplication(applicationCreator);
+        return getApplicationAPIDelegate().createApplication(applicationCreator);
     }
 
-    private ApplicationAPIDelegate getDelegate() {
-        return getDelegate(null);
+    private ApplicationAPIDelegate getApplicationAPIDelegate() {
+        return getApplicationAPIDelegate(null);
     }
-    private ApplicationAPIDelegate getDelegate(final SearchOptions searchOptions) {
+
+    private ApplicationAPIDelegate getApplicationAPIDelegate(final SearchOptions searchOptions) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SearchApplicationDescriptor appSearchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationDescriptor();
-        final SearchApplicationPageDescriptor appPageSearchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationPageDescriptor();
         final ApplicationConvertor convertor = new ApplicationConvertor();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
         final SearchApplications searchApplications = new SearchApplications(applicationService, appSearchDescriptor, searchOptions, convertor);
+        final ApplicationAPIDelegate delegate = new ApplicationAPIDelegate(tenantAccessor, convertor,
+                SessionInfos.getUserIdFromSession(), searchApplications);
+        return delegate;
+    }
+
+    private ApplicationPageAPIDelegate getApplicationPageAPIDelegate() {
+        return getApplicationPageAPIDelegate(null);
+    }
+
+    private ApplicationPageAPIDelegate getApplicationPageAPIDelegate(final SearchOptions searchOptions) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final SearchApplicationPageDescriptor appPageSearchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationPageDescriptor();
+        final ApplicationConvertor convertor = new ApplicationConvertor();
+        final ApplicationService applicationService = tenantAccessor.getApplicationService();
         final SearchApplicationPages searchApplicationPages = new SearchApplicationPages(applicationService, convertor, appPageSearchDescriptor,
                 searchOptions);
-        final ApplicationAPIDelegate delegate = new ApplicationAPIDelegate(tenantAccessor, convertor,
-                SessionInfos.getUserIdFromSession(), searchApplications, searchApplicationPages);
+        final ApplicationPageAPIDelegate delegate = new ApplicationPageAPIDelegate(tenantAccessor, convertor, searchApplicationPages);
+        return delegate;
+    }
+
+    private ApplicationMenuAPIDelegate getApplicationMenuAPIDelegate() {
+        return getApplicationMenuAPIDelegate(null);
+    }
+
+    private ApplicationMenuAPIDelegate getApplicationMenuAPIDelegate(final SearchOptions searchOptions) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ApplicationConvertor convertor = new ApplicationConvertor();
+        final SearchApplicationMenuDescriptor searchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationMenuDescriptor();
+        final ApplicationService applicationService = tenantAccessor.getApplicationService();
+        final SearchApplicationMenus searchApplicationMenus = new SearchApplicationMenus(applicationService, convertor, searchDescriptor, searchOptions);
+        final ApplicationMenuAPIDelegate delegate = new ApplicationMenuAPIDelegate(tenantAccessor, convertor, searchApplicationMenus);
         return delegate;
     }
 
     @Override
     public Application getApplication(final long applicationId) throws ApplicationNotFoundException {
-        return getDelegate().getApplication(applicationId);
+        return getApplicationAPIDelegate().getApplication(applicationId);
     }
 
     @Override
     public void deleteApplication(final long applicationId) throws DeletionException {
-        getDelegate().deleteApplication(applicationId);
+        getApplicationAPIDelegate().deleteApplication(applicationId);
     }
 
-    protected TenantServiceAccessor getTenantAccessor() {
+    private TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
@@ -90,64 +122,63 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException {
-        return getDelegate(searchOptions).searchApplications();
+        return getApplicationAPIDelegate(searchOptions).searchApplications();
     }
 
     @Override
     public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String name) throws AlreadyExistsException,
     CreationException, InvalidNameException {
-        return getDelegate().createApplicationPage(applicationId, pagedId, name);
+        return getApplicationPageAPIDelegate().createApplicationPage(applicationId, pagedId, name);
     }
 
     @Override
     public ApplicationPage getApplicationPage(final String applicationName, final String applicationPageName) throws ApplicationPageNotFoundException {
-        return getDelegate().getApplicationPage(applicationName, applicationPageName);
+        return getApplicationPageAPIDelegate().getApplicationPage(applicationName, applicationPageName);
     }
 
     @Override
     public SearchResult<ApplicationPage> searchApplicationPages(final SearchOptions searchOptions) throws SearchException {
-        return getDelegate(searchOptions).searchApplicationPages();
+        return getApplicationPageAPIDelegate(searchOptions).searchApplicationPages();
     }
 
     @Override
     public ApplicationPage getApplicationPage(final long applicationPageId) throws ApplicationPageNotFoundException {
-        return getDelegate().getApplicationPage(applicationPageId);
+        return getApplicationPageAPIDelegate().getApplicationPage(applicationPageId);
     }
 
     @Override
     public void deleteApplicationPage(final long applicationpPageId) throws DeletionException {
-        getDelegate().deleteApplicationPage(applicationpPageId);
+        getApplicationPageAPIDelegate().deleteApplicationPage(applicationpPageId);
     }
 
     @Override
     public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException {
-        getDelegate().setApplicationHomePage(applicationId, applicationPageId);
+        getApplicationPageAPIDelegate().setApplicationHomePage(applicationId, applicationPageId);
     }
 
     @Override
     public ApplicationPage getApplicationHomePage(final long applicationId) throws ApplicationPageNotFoundException {
-        return getDelegate().getApplicationHomePage(applicationId);
+        return getApplicationPageAPIDelegate().getApplicationHomePage(applicationId);
     }
 
     @Override
     public ApplicationMenu createApplicationMenu(final ApplicationMenuCreator applicationMenuCreator) throws CreationException {
-        return getDelegate().createApplicationMenu(applicationMenuCreator);
+        return getApplicationMenuAPIDelegate().createApplicationMenu(applicationMenuCreator);
     }
 
     @Override
     public ApplicationMenu getApplicationMenu(final long applicationMenuId) throws ApplicationMenuNotFoundException {
-        return getDelegate().getApplicationMenu(applicationMenuId);
+        return getApplicationMenuAPIDelegate().getApplicationMenu(applicationMenuId);
     }
 
     @Override
     public void deleteApplicationMenu(final long applicationMenuId) throws DeletionException {
-        getDelegate().deleteApplicationMenu(applicationMenuId);
+        getApplicationMenuAPIDelegate().deleteApplicationMenu(applicationMenuId);
     }
 
     @Override
     public SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions) throws SearchException {
-        // TODO Auto-generated method stub
-        return null;
+        return getApplicationMenuAPIDelegate(searchOptions).searchApplicationMenus();
     }
 
 }

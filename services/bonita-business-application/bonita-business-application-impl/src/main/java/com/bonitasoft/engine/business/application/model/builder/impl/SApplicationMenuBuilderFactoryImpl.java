@@ -30,6 +30,11 @@ public class SApplicationMenuBuilderFactoryImpl implements SApplicationMenuBuild
     }
 
     @Override
+    public String getIdKey() {
+        return "id";
+    }
+
+    @Override
     public String getDisplayNameKey() {
         return "displayName";
     }
@@ -46,7 +51,8 @@ public class SApplicationMenuBuilderFactoryImpl implements SApplicationMenuBuild
 
     @Override
     public String getIndexKey() {
-        return "index_";
+        return "index";
     }
+
 
 }

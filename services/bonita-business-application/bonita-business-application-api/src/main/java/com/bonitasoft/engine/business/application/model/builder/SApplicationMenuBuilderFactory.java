@@ -22,6 +22,8 @@ public interface SApplicationMenuBuilderFactory {
 
     SApplicationMenuBuilder createNewInstance(String displayName, long applicationPageId, int index);
 
+    String getIdKey();
+
     String getDisplayNameKey();
 
     String getApplicationPageIdKey();

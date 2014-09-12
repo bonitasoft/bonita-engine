@@ -116,4 +116,12 @@ public class ApplicationConvertor {
         return menu;
     }
 
+    public List<ApplicationMenu> toApplicationMenu(final List<SApplicationMenu> sApplicationMenus) {
+        final List<ApplicationMenu> menus = new ArrayList<ApplicationMenu>(sApplicationMenus.size());
+        for (final SApplicationMenu sMenu : sApplicationMenus) {
+            menus.add(toApplicationMenu(sMenu));
+        }
+        return menus;
+    }
+
 }

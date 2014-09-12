@@ -15,6 +15,10 @@ package com.bonitasoft.engine.business.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.bonitasoft.engine.search.Order;
+import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -114,6 +118,121 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
 
         //then
         getApplicationAPI().getApplicationMenu(createdAppMenu.getId()); //throws exception
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu",
+            "search", "all" })
+    @Test
+    public void searchApplicationMenus_without_filters_without_search_term_should_return_all_applicationMenues_pagged() throws Exception {
+        //given
+        final ApplicationMenu menu1 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("first", appPage.getId(), 1));
+        final ApplicationMenu menu2 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("second", appPage.getId(), 2));
+        final ApplicationMenu menu3 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("third", appPage.getId(), 3));
+
+        //when
+        final SearchResult<ApplicationMenu> firstPage = getApplicationAPI().searchApplicationMenus(buildSearchOptions(0, 2));
+        final SearchResult<ApplicationMenu> secondPage = getApplicationAPI().searchApplicationMenus(buildSearchOptions(2, 2));
+
+        //then
+        assertThat(firstPage).isNotNull();
+        assertThat(firstPage.getCount()).isEqualTo(3);
+        assertThat(firstPage.getResult()).containsExactly(menu1, menu2);
+        assertThat(secondPage).isNotNull();
+        assertThat(secondPage.getCount()).isEqualTo(3);
+        assertThat(secondPage.getResult()).containsExactly(menu3);
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu",
+            "search", "filter on display name" })
+    @Test
+    public void searchApplicationMenus_can_filter_on_displayname() throws Exception {
+        //given
+        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("first", appPage.getId(), 1));
+        final ApplicationMenu menu2 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("second", appPage.getId(), 2));
+        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("third", appPage.getId(), 3));
+
+        //when
+        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationMenuSearchDescriptor.DISPLAY_NAME, "second");
+        final SearchResult<ApplicationMenu> searchResult = getApplicationAPI().searchApplicationMenus(builder.done());
+
+        //then
+        assertThat(searchResult).isNotNull();
+        assertThat(searchResult.getCount()).isEqualTo(1);
+        assertThat(searchResult.getResult()).containsExactly(menu2);
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu",
+            "search", "filter on index" })
+    @Test
+    public void searchApplicationMenus_can_filter_on_index() throws Exception {
+        //given
+        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("first", appPage.getId(), 1));
+        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("second", appPage.getId(), 2));
+        final ApplicationMenu menu3 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("third", appPage.getId(), 3));
+
+        //when
+        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationMenuSearchDescriptor.INDEX, 3);
+        final SearchResult<ApplicationMenu> searchResult = getApplicationAPI().searchApplicationMenus(builder.done());
+
+        //then
+        assertThat(searchResult).isNotNull();
+        assertThat(searchResult.getCount()).isEqualTo(1);
+        assertThat(searchResult.getResult()).containsExactly(menu3);
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu",
+            "search", "filter on application page id" })
+    @Test
+    public void searchApplicationMenus_can_filter_on_applicationPageId() throws Exception {
+        //given
+        final ApplicationPage appPage2 = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "mySecondPage");
+        final ApplicationMenu menu1 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("first", appPage.getId(), 1));
+        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("second", appPage2.getId(), 2));
+        final ApplicationMenu menu3 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("third", appPage.getId(), 3));
+
+        //when
+        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_PAGE_ID, appPage.getId());
+        final SearchResult<ApplicationMenu> searchResult = getApplicationAPI().searchApplicationMenus(builder.done());
+
+        //then
+        assertThat(searchResult).isNotNull();
+        assertThat(searchResult.getCount()).isEqualTo(2);
+        assertThat(searchResult.getResult()).containsExactly(menu1, menu3);
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu",
+            "search", "search term" })
+    @Test
+    public void searchApplicationMenus_can_use_searchTerm() throws Exception {
+        //given
+        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("first", appPage.getId(), 1));
+        final ApplicationMenu menu2 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("second", appPage.getId(), 2));
+        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("third", appPage.getId(), 3));
+
+        //when
+        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.searchTerm("second");
+        final SearchResult<ApplicationMenu> searchResult = getApplicationAPI().searchApplicationMenus(builder.done());
+
+        //then
+        assertThat(searchResult).isNotNull();
+        assertThat(searchResult.getCount()).isEqualTo(1);
+        assertThat(searchResult.getResult()).containsExactly(menu2);
+    }
+
+    private SearchOptions buildSearchOptions(final int startIndex, final int maxResults) {
+        final SearchOptionsBuilder builder = getDefaultBuilder(startIndex, maxResults);
+        final SearchOptions options = builder.done();
+        return options;
+    }
+
+    private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
+        builder.sort(ApplicationMenuSearchDescriptor.INDEX, Order.ASC);
+        return builder;
     }
 
 }

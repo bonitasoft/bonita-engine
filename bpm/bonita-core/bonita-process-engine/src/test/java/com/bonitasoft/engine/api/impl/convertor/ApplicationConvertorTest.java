@@ -1,7 +1,16 @@
+/*******************************************************************************
+ * Copyright (C) 2014 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.api.impl.convertor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 import java.util.Arrays;
@@ -205,6 +214,24 @@ public class ApplicationConvertorTest {
         assertThat(menu.getApplicationPageId()).isEqualTo(15);
         assertThat(menu.getIndex()).isEqualTo(1);
         assertThat(menu.getParentId()).isEqualTo(21);
+    }
+
+    @Test
+    public void toApplicationMenu_list_should_call_toApplitionMenu_for_each_element_in_the_list_and_return_the_list_of_converted_values() throws Exception {
+        //given
+        final SApplicationMenu sMenu1 = mock(SApplicationMenu.class);
+        final SApplicationMenu sMenu2 = mock(SApplicationMenu.class);
+        final ApplicationMenu menu1 = mock(ApplicationMenu.class);
+        final ApplicationMenu menu2 = mock(ApplicationMenu.class);
+        final ApplicationConvertor convertorMock = spy(convertor);
+        doReturn(menu1).when(convertorMock).toApplicationMenu(sMenu1);
+        doReturn(menu2).when(convertorMock).toApplicationMenu(sMenu2);
+
+        //when
+        final List<ApplicationMenu> applicationMenus = convertorMock.toApplicationMenu(Arrays.<SApplicationMenu> asList(sMenu1, sMenu2));
+
+        //then
+        assertThat(applicationMenus).containsExactly(menu1, menu2);
     }
 
 }

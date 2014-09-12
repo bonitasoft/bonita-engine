@@ -68,5 +68,15 @@
         FROM com.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl as applicationMenu
         WHERE id = :id
     </query>
+    
+    <query name="getNumberOfSApplicationMenu">
+        SELECT count(applicationMenu)
+        FROM com.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl as applicationMenu
+    </query>
+
+    <query name="searchSApplicationMenu">
+        SELECT applicationMenu
+        FROM com.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl as applicationMenu
+    </query>
 
 </hibernate-mapping>
