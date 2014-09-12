@@ -16,6 +16,7 @@ package org.bonitasoft.engine.bpm.contract.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.RuleDefinition;
@@ -43,6 +44,10 @@ public class ContractDefinitionImpl implements ContractDefinition {
 
     public void addInput(final InputDefinition input) {
         inputs.add(input);
+    }
+
+    public void addComplexInput(final ComplexInputDefinition complexInput) {
+        inputs.add(complexInput);
     }
 
     @Override

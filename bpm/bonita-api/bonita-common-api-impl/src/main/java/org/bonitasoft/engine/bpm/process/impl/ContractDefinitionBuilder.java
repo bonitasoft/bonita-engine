@@ -13,7 +13,11 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
+import java.util.List;
+
+import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
+import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.RuleDefinitionImpl;
@@ -22,6 +26,7 @@ import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Laurent Leseigneur
  */
 public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
 
@@ -36,6 +41,11 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
 
     public ContractDefinitionBuilder addInput(final String name, final Type type, final String description) {
         final InputDefinitionImpl input = new InputDefinitionImpl(name, type, description);
+        contract.addInput(input);
+        return this;
+    }
+    public ContractDefinitionBuilder addComplexInput(final String name, final String description, final List<InputDefinition> inputs) {
+        final ComplexInputDefinitionImpl input = new ComplexInputDefinitionImpl(name, description, inputs);
         contract.addInput(input);
         return this;
     }

@@ -14,10 +14,10 @@
 package org.bonitasoft.engine.bpm.contract;
 
 /**
- * @author Matthieu Chaffotte
+ * An <code>ComplexInputDefinition</code> defines
+ *
+ * @author Laurent Leseigneur
  * @since 7.0
  */
-public enum Type {
-    TEXT, BOOLEAN, DATE, INTEGER, DECIMAL, COMPLEX
-
+public interface ComplexInputDefinition extends InputDefinition {
 }
