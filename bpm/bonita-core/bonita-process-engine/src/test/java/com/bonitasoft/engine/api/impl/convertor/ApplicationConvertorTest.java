@@ -38,12 +38,13 @@ import com.bonitasoft.engine.business.application.model.impl.SApplicationPageImp
 public class ApplicationConvertorTest {
 
     private static final String ICON_PATH = "/icon.jpg";
-    private static final int TENANT_ID = 1;
-    private static final int ID = 11;
-    private static final int CREATOR_ID = 16;
-    private static final int APPLICATION_ID = 20;
-    private static final int PAGE_ID = 30;
-    private static final int HOME_PAGE_ID = 130;
+    private static final long TENANT_ID = 1;
+    private static final long ID = 11;
+    private static final long CREATOR_ID = 16;
+    private static final long APPLICATION_ID = 20;
+    private static final long PAGE_ID = 30;
+    private static final long HOME_PAGE_ID = 130;
+    private static final long PROFILE_ID = 40;
     private static final String APP_DESC = "app desc";
     private static final String APP_PATH = "/app";
     private static final String APP_VERSION = "1.0";
@@ -58,6 +59,7 @@ public class ApplicationConvertorTest {
         final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, APP_PATH);
         creator.setDescription(APP_DESC);
         creator.setIconPath(ICON_PATH);
+        creator.setProfileId(PROFILE_ID);
         final long userId = 10;
         final long before = System.currentTimeMillis();
 
@@ -77,6 +79,7 @@ public class ApplicationConvertorTest {
         assertThat(application.getUpdatedBy()).isEqualTo(userId);
         assertThat(application.getLastUpdateDate()).isEqualTo(application.getCreationDate());
         assertThat(application.getState()).isEqualTo(SApplicationState.DEACTIVATED.name());
+        assertThat(application.getProfileId()).isEqualTo(PROFILE_ID);
     }
 
     @Test
@@ -91,6 +94,7 @@ public class ApplicationConvertorTest {
         sApp.setTenantId(TENANT_ID);
         sApp.setIconPath(ICON_PATH);
         sApp.setHomePageId(HOME_PAGE_ID);
+        sApp.setProfileId(PROFILE_ID);
 
         //when
         final Application application = convertor.toApplication(sApp);
@@ -110,6 +114,7 @@ public class ApplicationConvertorTest {
         assertThat(application.getLastUpdateDate()).isEqualTo(new Date(currentDate));
         assertThat(application.getState()).isEqualTo(state);
         assertThat(application.getHomePageId()).isEqualTo(HOME_PAGE_ID);
+        assertThat(application.getProfileId()).isEqualTo(PROFILE_ID);
     }
 
     @Test

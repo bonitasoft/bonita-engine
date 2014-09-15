@@ -23,4 +23,6 @@ public interface SApplicationBuilder {
 
     SApplicationBuilder setIconPath(String iconPath);
 
+    SApplicationBuilder setProfileId(Long profileId);
+
 }

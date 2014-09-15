@@ -22,12 +22,12 @@ public class ApplicationCreator implements Serializable {
     private static final long serialVersionUID = -916041825489100271L;
 
     public enum ApplicationField {
-        NAME, DISPLAY_NAME, VERSION, PATH, DESCRIPTION, ICON_PATH;
+        NAME, DISPLAY_NAME, VERSION, PATH, DESCRIPTION, ICON_PATH, PROFILE_ID;
     }
 
     private final Map<ApplicationField, Serializable> fields;
 
-    public ApplicationCreator(final String name, String displayName, final String version, final String path) {
+    public ApplicationCreator(final String name, final String displayName, final String version, final String path) {
         fields = new HashMap<ApplicationField, Serializable>(2);
         fields.put(ApplicationField.NAME, name);
         fields.put(ApplicationField.VERSION, version);
@@ -46,6 +46,11 @@ public class ApplicationCreator implements Serializable {
 
     public ApplicationCreator setIconPath(final String iconPath) {
         fields.put(ApplicationField.ICON_PATH, iconPath);
+        return this;
+    }
+
+    public ApplicationCreator setProfileId(final Long profileId) {
+        fields.put(ApplicationField.PROFILE_ID, profileId);
         return this;
     }
 

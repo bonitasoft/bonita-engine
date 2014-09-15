@@ -39,4 +39,6 @@ public interface SApplication extends PersistentObject {
 
     long getHomePageId();
 
+    Long getProfileId();
+
 }

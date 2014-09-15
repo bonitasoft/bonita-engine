@@ -45,6 +45,8 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
 
     private String displayName;
 
+    private Long profileId;
+
     public SApplicationImpl() {
         super();
     }
@@ -140,6 +142,15 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
     }
 
     @Override
+    public Long getProfileId() {
+        return profileId;
+    }
+
+    public void setProfileId(final Long profileId) {
+        this.profileId = profileId;
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
@@ -152,6 +163,7 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         result = prime * result + (int) (lastUpdateDate ^ lastUpdateDate >>> 32);
         result = prime * result + (name == null ? 0 : name.hashCode());
         result = prime * result + (path == null ? 0 : path.hashCode());
+        result = prime * result + (profileId == null ? 0 : profileId.hashCode());
         result = prime * result + (state == null ? 0 : state.hashCode());
         result = prime * result + (int) (updatedBy ^ updatedBy >>> 32);
         result = prime * result + (version == null ? 0 : version.hashCode());
@@ -217,6 +229,13 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         } else if (!path.equals(other.path)) {
             return false;
         }
+        if (profileId == null) {
+            if (other.profileId != null) {
+                return false;
+            }
+        } else if (!profileId.equals(other.profileId)) {
+            return false;
+        }
         if (state == null) {
             if (other.state != null) {
                 return false;
@@ -241,7 +260,8 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
     public String toString() {
         return "SApplicationImpl [name=" + name + ", description=" + description + ", version=" + version + ", path=" + path + ", iconPath=" + iconPath
                 + ", creationDate=" + creationDate + ", createdBy=" + createdBy + ", lastUpdateDate=" + lastUpdateDate + ", updatedBy=" + updatedBy
-                + ", state=" + state + ", homePageId=" + homePageId + ", getId()=" + getId() + ", getTenantId()=" + getTenantId() + "]";
+                + ", state=" + state + ", homePageId=" + homePageId + ", displayName=" + displayName + ", profileId=" + profileId + ", getId()=" + getId()
+                + ", getTenantId()=" + getTenantId() + "]";
     }
 
 }

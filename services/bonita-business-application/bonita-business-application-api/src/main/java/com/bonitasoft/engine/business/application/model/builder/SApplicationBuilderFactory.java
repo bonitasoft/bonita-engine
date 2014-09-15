@@ -41,4 +41,6 @@ public interface SApplicationBuilderFactory {
 
     String getStateKey();
 
+    String getProfileIdKey();
+
 }

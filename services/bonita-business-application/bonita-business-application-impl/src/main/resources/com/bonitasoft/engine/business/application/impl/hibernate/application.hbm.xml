@@ -23,6 +23,7 @@
 		<property name="updatedBy" column="updatedBy" />
 		<property name="state" column="state" />  
 		<property name="homePageId" column="homePageId" />
+		<property name="profileId" column="profileId" />
 		<filter name="tenantFilter" />
 	</class>
 

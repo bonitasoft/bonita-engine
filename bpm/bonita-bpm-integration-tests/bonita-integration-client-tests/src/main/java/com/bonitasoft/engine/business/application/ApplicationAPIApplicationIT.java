@@ -21,6 +21,7 @@ import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -73,9 +74,11 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
     @Test
     public void createApplication_returns_application_based_on_ApplicationCreator_information() throws Exception {
         //given
+        final Profile profile = getProfileAPI().createProfile("ProfileForApp", "Profile used by the application");
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0", "/myApplication");
         creator.setDescription("This is my application");
         creator.setIconPath("/icon.jpg");
+        creator.setProfileId(profile.getId());
 
         //when
         final Application application = applicationAPI.createApplication(creator);
@@ -92,6 +95,24 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         assertThat(application.getCreatedBy()).isEqualTo(user.getId());
         assertThat(application.getUpdatedBy()).isEqualTo(user.getId());
         assertThat(application.getHomePageId()).isEqualTo(0);
+        assertThat(application.getProfileId()).isEqualTo(profile.getId());
+
+        applicationAPI.deleteApplication(application.getId());
+        getProfileAPI().deleteProfile(profile.getId());
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "create" })
+    @Test
+    public void createApplication_without_profile_should_hav_null_profileId() throws Exception {
+        //given
+        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0", "/myApplication");
+
+        //when
+        final Application application = applicationAPI.createApplication(creator);
+
+        //then
+        assertThat(application).isNotNull();
+        assertThat(application.getProfileId()).isNull();
 
         applicationAPI.deleteApplication(application.getId());
     }

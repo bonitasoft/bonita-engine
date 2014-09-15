@@ -42,4 +42,10 @@ public class SApplicationBuilderImpl implements SApplicationBuilder {
         return this;
     }
 
+    @Override
+    public SApplicationBuilder setProfileId(final Long profileId) {
+        application.setProfileId(profileId);
+        return this;
+    }
+
 }

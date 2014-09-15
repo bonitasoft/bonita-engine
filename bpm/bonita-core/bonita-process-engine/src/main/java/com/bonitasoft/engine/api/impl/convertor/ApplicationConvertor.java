@@ -49,9 +49,11 @@ public class ApplicationConvertor {
         final String description = (String) fields.get(ApplicationField.DESCRIPTION);
         final String path = (String) fields.get(ApplicationField.PATH);
         final String iconPath = (String) fields.get(ApplicationField.ICON_PATH);
+        final Long profileId = (Long) fields.get(ApplicationField.PROFILE_ID);
         final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(name, displayName, version, path, creatorUserId);
         builder.setDescription(description);
         builder.setIconPath(iconPath);
+        builder.setProfileId(profileId);
         return builder.done();
     }
 
@@ -67,6 +69,7 @@ public class ApplicationConvertor {
         application.setState(sApplication.getState());
         application.setIconPath(sApplication.getIconPath());
         application.setHomePageId(sApplication.getHomePageId());
+        application.setProfileId(sApplication.getProfileId());
         return application;
     }
 
