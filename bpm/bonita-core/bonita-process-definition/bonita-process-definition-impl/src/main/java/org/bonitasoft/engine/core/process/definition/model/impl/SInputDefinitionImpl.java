@@ -31,6 +31,12 @@ public class SInputDefinitionImpl extends SNamedElementImpl implements SInputDef
     public SInputDefinitionImpl(final String name) {
         super(name);
     }
+    
+    public SInputDefinitionImpl(String name, SType type, String description) {
+        super(name);
+        this.description = description;
+        this.type = type;
+    }
 
     public SInputDefinitionImpl(final InputDefinition input) {
         this(input.getName());

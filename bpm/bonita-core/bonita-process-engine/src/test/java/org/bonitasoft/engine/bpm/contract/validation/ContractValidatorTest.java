@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.bpm.contract;
+package org.bonitasoft.engine.bpm.contract.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.contract.ContractValidator;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
@@ -22,9 +21,9 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinition
 import org.bonitasoft.engine.core.process.definition.model.impl.SRuleDefinitionImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -47,10 +46,15 @@ public class ContractValidatorTest {
 
     @Mock
     private TechnicalLoggerService loggerService;
-
-    @InjectMocks
+    
     private ContractValidator validator;
 
+    @Before
+    public void setUp() {
+        ContractStructureValidator contractStructureValidator2 = new ContractStructureValidator(new ContractTypeValidator(), loggerService);
+        validator = new ContractValidator(contractStructureValidator2, loggerService);
+    }
+    
     private SContractDefinition buildContractWithInputsAndRules() {
         final SContractDefinitionImpl contract = buildEmptyContract();
         addInputsToContract(contract);
@@ -157,33 +161,16 @@ public class ContractValidatorTest {
     }
 
     @Test
-    public void isValid_should_be_false_when_inputs_are_unexpected() throws Exception {
-        //given
-        final Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put(IS_VALID, false);
-        variables.put(COMMENT, null);
-        final SContractDefinition contract = new SContractDefinitionImpl();
-        SInputDefinitionImpl sInputDefinition = new SInputDefinitionImpl(IS_VALID);
-        sInputDefinition.setType(SType.BOOLEAN);
-        contract.getInputs().add(sInputDefinition);
-
-        //when
-        final boolean valid = validator.isValid(contract, variables);
-
-        //then
-        assertThat(valid).as("should refuse when inputs are unexpected").isFalse();
-        assertThat(validator.getComments()).hasSize(1).containsExactly("variable " + COMMENT + " is not expected");
-    }
-
-    @Test
     public void isValid_should_be_false_when_inputs_are_missing() throws Exception {
         //given
         final Map<String, Object> variables = new HashMap<String, Object>();
         variables.put(COMMENT, NICE_COMMENT);
+        
         final SContractDefinition contract = new SContractDefinitionImpl();
         SInputDefinitionImpl sInputDefinition = new SInputDefinitionImpl(IS_VALID);
         sInputDefinition.setType(SType.BOOLEAN);
         contract.getInputs().add(sInputDefinition);
+        
         SInputDefinitionImpl sInputDefinition2 = new SInputDefinitionImpl(COMMENT);
         sInputDefinition2.setType(SType.TEXT);
         contract.getInputs().add(sInputDefinition2);
@@ -193,22 +180,7 @@ public class ContractValidatorTest {
 
         //then
         assertThat(valid).as("should refuse when inputs are unexpected").isFalse();
-        assertThat(validator.getComments()).isNotEmpty().contains(IS_VALID + " is not defined");
-    }
-
-    @Test
-    public void isValid_should_be_false_when_inputs_are_missing_and_contract_has_no_rules() throws Exception {
-        //given
-        final Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put(IS_VALID, false);
-        final SContractDefinition contract = addInputsToContract(buildEmptyContract());
-
-        //when
-        final boolean valid = validator.isValid(contract, variables);
-
-        //then
-        assertThat(valid).as("should refuse when inputs are unexpected").isFalse();
-        assertThat(validator.getComments()).hasSize(1).containsExactly(COMMENT + " is not defined");
+        assertThat(validator.getComments()).isNotEmpty().contains("Contract need field [" + IS_VALID + "] but it has not been provided");
     }
 
     @Test
@@ -300,7 +272,7 @@ public class ContractValidatorTest {
 
         //then
         assertThat(valid).as("should validate contract without rules").isFalse();
-        assertThat(validator.getComments()).isNotEmpty().contains("unable to bind input numberInput to type " + BigInteger.class.getName());
+        assertThat(validator.getComments()).isNotEmpty().contains("abc cannot be assigned to INTEGER");
     }
 
     @Test
