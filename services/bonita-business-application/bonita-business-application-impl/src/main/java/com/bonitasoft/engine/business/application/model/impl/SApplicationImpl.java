@@ -150,6 +150,34 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         this.profileId = profileId;
     }
 
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public void setVersion(final String version) {
+        this.version = version;
+    }
+
+    public void setPath(final String path) {
+        this.path = path;
+    }
+
+    public void setLastUpdateDate(final long lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
+    }
+
+    public void setUpdatedBy(final long updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public void setState(final String state) {
+        this.state = state;
+    }
+
+    public void setDisplayName(final String displayName) {
+        this.displayName = displayName;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;

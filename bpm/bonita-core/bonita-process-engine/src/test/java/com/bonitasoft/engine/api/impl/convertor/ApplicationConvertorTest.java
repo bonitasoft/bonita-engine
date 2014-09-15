@@ -16,7 +16,9 @@ import static org.mockito.Mockito.spy;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
 
 import com.bonitasoft.engine.business.application.Application;
@@ -24,8 +26,11 @@ import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import com.bonitasoft.engine.business.application.ApplicationPage;
+import com.bonitasoft.engine.business.application.ApplicationState;
+import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
+import com.bonitasoft.engine.business.application.impl.SApplicationFields;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
@@ -135,6 +140,50 @@ public class ApplicationConvertorTest {
 
         //then
         assertThat(applications).containsExactly(app1, app2);
+    }
+
+    @Test
+    public void toApplicationUpdateDescriptor_should_map_all_fields() throws Exception {
+        //given
+        final ApplicationUpdater updater = new ApplicationUpdater();
+        updater.setName("My-updated-app");
+        updater.setDisplayName("Updated display name");
+        updater.setVersion("1.1");
+        updater.setPath("/myUpdatedApp");
+        updater.setDescription("Up description");
+        updater.setIconPath("/newIcon.jpg");
+        updater.setProfileId(10L);
+        updater.setState(ApplicationState.ACTIVATED.name());
+
+        //when
+        final EntityUpdateDescriptor updateDescriptor = convertor.toApplicationUpdateDescriptor(updater);
+
+        //then
+        assertThat(updateDescriptor).isNotNull();
+        final Map<String, Object> fields = updateDescriptor.getFields();
+        assertThat(fields).hasSize(8);
+        assertThat(fields.get(SApplicationFields.NAME)).isEqualTo("My-updated-app");
+        assertThat(fields.get(SApplicationFields.DISPLAY_NAME)).isEqualTo("Updated display name");
+        assertThat(fields.get(SApplicationFields.VERSION)).isEqualTo("1.1");
+        assertThat(fields.get(SApplicationFields.PATH)).isEqualTo("/myUpdatedApp");
+        assertThat(fields.get(SApplicationFields.DESCRIPTION)).isEqualTo("Up description");
+        assertThat(fields.get(SApplicationFields.ICON_PATH)).isEqualTo("/newIcon.jpg");
+        assertThat(fields.get(SApplicationFields.PROFILE_ID)).isEqualTo(10L);
+        assertThat(fields.get(SApplicationFields.STATE)).isEqualTo(ApplicationState.ACTIVATED.name());
+    }
+
+    @Test
+    public void toApplicationUpdateDescriptor_should_return_empty_map_if_no_field_is_updated() throws Exception {
+        //given
+        final ApplicationUpdater updater = new ApplicationUpdater();
+
+        //when
+        final EntityUpdateDescriptor updateDescriptor = convertor.toApplicationUpdateDescriptor(updater);
+
+        //then
+        assertThat(updateDescriptor).isNotNull();
+        final Map<String, Object> fields = updateDescriptor.getFields();
+        assertThat(fields).isEmpty();
     }
 
     @Test

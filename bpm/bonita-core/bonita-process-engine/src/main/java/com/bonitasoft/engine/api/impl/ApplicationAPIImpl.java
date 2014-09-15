@@ -113,8 +113,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException {
-        // TODO Auto-generated method stub
-        return null;
+        return getApplicationAPIDelegate().updateApplication(applicationId, updater);
     }
 
     private TenantServiceAccessor getTenantAccessor() {

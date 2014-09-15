@@ -13,8 +13,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
@@ -23,6 +25,7 @@ import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator.ApplicationMenuField;
 import com.bonitasoft.engine.business.application.ApplicationPage;
+import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import com.bonitasoft.engine.business.application.impl.ApplicationMenuImpl;
 import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
@@ -33,6 +36,8 @@ import com.bonitasoft.engine.business.application.model.builder.SApplicationBuil
 import com.bonitasoft.engine.business.application.model.builder.SApplicationBuilderFactory;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilderFactory;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
 
 
 /**
@@ -79,6 +84,48 @@ public class ApplicationConvertor {
             applications.add(toApplication(sApplication));
         }
         return applications;
+    }
+
+    public EntityUpdateDescriptor toApplicationUpdateDescriptor(final ApplicationUpdater updater) {
+        final SApplicationUpdateBuilder builder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance();
+        for (final Entry<ApplicationField, Serializable> entry : updater.getFields().entrySet()) {
+            switch (entry.getKey()) {
+                case NAME:
+                    builder.updateName((String) entry.getValue());
+                    break;
+
+                case DESCRIPTION:
+                    builder.updateDescription((String) entry.getValue());
+                    break;
+
+                case DISPLAY_NAME:
+                    builder.updateDisplayName((String) entry.getValue());
+                    break;
+
+                case ICON_PATH:
+                    builder.updateIconPath((String) entry.getValue());
+                    break;
+
+                case PATH:
+                    builder.updatePath((String) entry.getValue());
+                    break;
+
+                case PROFILE_ID:
+                    builder.updateProfileId((Long) entry.getValue());
+                    break;
+
+                case STATE:
+                    builder.updateState((String) entry.getValue());
+                    break;
+
+                case VERSION:
+                    builder.updateVersion((String) entry.getValue());
+                    break;
+                default:
+                    break;
+            }
+        }
+        return builder.done();
     }
 
     public ApplicationPage toApplicationPage(final SApplicationPage sApplicationPage) {

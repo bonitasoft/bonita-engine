@@ -69,7 +69,7 @@ public class ApplicationUpdater implements Serializable {
     }
 
     /**
-     * Has this updater at least one field to update (directly or in its personal / professional contact data)?
+     * Has this updater at least one field to update
      *
      * @return true if there is at least one field to update
      */

@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.application.model.builder;
 
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 
 /**
@@ -17,5 +16,5 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public interface SApplicationUpdateBuilderFactory {
 
-    SApplicationUpdateBuilder createNewInstance(EntityUpdateDescriptor descriptor);
+    SApplicationUpdateBuilder createNewInstance();
 }

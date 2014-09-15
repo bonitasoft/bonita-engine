@@ -522,7 +522,7 @@ public class ApplicationServiceImplTest {
     @Test
     public void updateApplicationPage_should_call_recorder_recordUpdate_and_return_updated_object() throws Exception {
         //given
-        final SApplicationUpdateBuilder updateBuilder = new SApplicationUpdateBuilderFactoryImpl().createNewInstance(new EntityUpdateDescriptor());
+        final SApplicationUpdateBuilder updateBuilder = new SApplicationUpdateBuilderFactoryImpl().createNewInstance();
         updateBuilder.updateHomePageId(150L);
         final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
 

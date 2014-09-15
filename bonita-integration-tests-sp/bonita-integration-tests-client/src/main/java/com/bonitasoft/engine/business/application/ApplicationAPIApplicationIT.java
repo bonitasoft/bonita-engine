@@ -1,16 +1,11 @@
-/**
+/*******************************************************************************
  * Copyright (C) 2014 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.business.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -101,9 +96,9 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         getProfileAPI().deleteProfile(profile.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "create" })
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "create", "no profile" })
     @Test
-    public void createApplication_without_profile_should_hav_null_profileId() throws Exception {
+    public void createApplication_without_profile_should_have_null_profileId() throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0", "/myApplication");
 
@@ -115,6 +110,43 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         assertThat(application.getProfileId()).isNull();
 
         applicationAPI.deleteApplication(application.getId());
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application", "update" })
+    @Test
+    public void updateApplication_should_return_application_up_to_date() throws Exception {
+        //given
+        final Profile profile = getProfileAPI().createProfile("ProfileForApp", "Profile used by the application");
+        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0", "/myApplication");
+        final Application application = applicationAPI.createApplication(creator);
+
+        final ApplicationUpdater updater = new ApplicationUpdater();
+        updater.setName("My-updated-app");
+        updater.setDisplayName("Updated display name");
+        updater.setVersion("1.1");
+        updater.setPath("/myUpdatedApp");
+        updater.setDescription("Up description");
+        updater.setIconPath("/newIcon.jpg");
+        updater.setProfileId(profile.getId());
+        updater.setState(ApplicationState.ACTIVATED.name());
+
+        //when
+        final Application updatedApplication = applicationAPI.updateApplication(application.getId(), updater);
+
+        //then
+        assertThat(updatedApplication).isNotNull();
+        assertThat(updatedApplication.getName()).isEqualTo("My-updated-app");
+        assertThat(updatedApplication.getDisplayName()).isEqualTo("Updated display name");
+        assertThat(updatedApplication.getVersion()).isEqualTo("1.1");
+        assertThat(updatedApplication.getPath()).isEqualTo("/myUpdatedApp");
+        assertThat(updatedApplication.getDescription()).isEqualTo("Up description");
+        assertThat(updatedApplication.getIconPath()).isEqualTo("/newIcon.jpg");
+        assertThat(updatedApplication.getProfileId()).isEqualTo(profile.getId());
+        assertThat(updatedApplication.getState()).isEqualTo(ApplicationState.ACTIVATED.name());
+        assertThat(updatedApplication).isEqualTo(applicationAPI.getApplication(application.getId()));
+
+        applicationAPI.deleteApplication(application.getId());
+        getProfileAPI().deleteProfile(profile.getId());
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "get" })

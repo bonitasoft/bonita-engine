@@ -26,7 +26,8 @@ import com.bonitasoft.engine.business.application.model.builder.SApplicationUpda
 public class SApplicationUpdateBuilderFactoryImpl implements SApplicationUpdateBuilderFactory {
 
     @Override
-    public SApplicationUpdateBuilder createNewInstance(final EntityUpdateDescriptor descriptor) {
+    public SApplicationUpdateBuilder createNewInstance() {
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         return new SApplicationUpdateBuilderImpl(descriptor);
     }
 

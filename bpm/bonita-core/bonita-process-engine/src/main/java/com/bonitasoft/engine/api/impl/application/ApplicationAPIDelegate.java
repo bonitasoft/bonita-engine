@@ -11,12 +11,14 @@ package com.bonitasoft.engine.api.impl.application;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchResult;
 
@@ -26,6 +28,7 @@ import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.business.application.SInvalidNameException;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.exception.InvalidNameException;
@@ -88,6 +91,15 @@ public class ApplicationAPIDelegate {
             return searchApplications.getResult();
         } catch (final SBonitaException e) {
             throw new SearchException(e);
+        }
+    }
+
+    public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException {
+        try {
+            final SApplication sApplication = applicationService.updateApplication(applicationId, convertor.toApplicationUpdateDescriptor(updater));
+            return convertor.toApplication(sApplication);
+        } catch (final SObjectModificationException e) {
+            throw new UpdateException(e);
         }
     }
 

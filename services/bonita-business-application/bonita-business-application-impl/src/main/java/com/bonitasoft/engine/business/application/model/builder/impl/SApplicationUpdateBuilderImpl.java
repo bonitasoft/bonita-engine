@@ -42,4 +42,52 @@ public class SApplicationUpdateBuilderImpl implements SApplicationUpdateBuilder 
         return this;
     }
 
+    @Override
+    public SApplicationUpdateBuilder updateName(final String name) {
+        descriptor.addField(SApplicationFields.NAME, name);
+        return this;
+    }
+
+    @Override
+    public SApplicationUpdateBuilder updateDisplayName(final String displayName) {
+        descriptor.addField(SApplicationFields.DISPLAY_NAME, displayName);
+        return this;
+    }
+
+    @Override
+    public SApplicationUpdateBuilder updateVersion(final String version) {
+        descriptor.addField(SApplicationFields.VERSION, version);
+        return this;
+    }
+
+    @Override
+    public SApplicationUpdateBuilder updatePath(final String path) {
+        descriptor.addField(SApplicationFields.PATH, path);
+        return this;
+    }
+
+    @Override
+    public SApplicationUpdateBuilder updateDescription(final String description) {
+        descriptor.addField(SApplicationFields.DESCRIPTION, description);
+        return this;
+    }
+
+    @Override
+    public SApplicationUpdateBuilder updateIconPath(final String iconPath) {
+        descriptor.addField(SApplicationFields.ICON_PATH, iconPath);
+        return this;
+    }
+
+    @Override
+    public SApplicationUpdateBuilder updateState(final String state) {
+        descriptor.addField(SApplicationFields.STATE, state);
+        return this;
+    }
+
+    @Override
+    public SApplicationUpdateBuilder updateProfileId(final Long profileId) {
+        descriptor.addField(SApplicationFields.PROFILE_ID, profileId);
+        return this;
+    }
+
 }

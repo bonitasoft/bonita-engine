@@ -21,7 +21,6 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
@@ -56,7 +55,7 @@ public class ApplicationPageAPIDelegate {
     }
 
     public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException {
-        final SApplicationUpdateBuilder updateBuilder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(new EntityUpdateDescriptor());
+        final SApplicationUpdateBuilder updateBuilder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance();
         updateBuilder.updateHomePageId(applicationPageId);
         try {
             applicationService.updateApplication(applicationId, updateBuilder.done());

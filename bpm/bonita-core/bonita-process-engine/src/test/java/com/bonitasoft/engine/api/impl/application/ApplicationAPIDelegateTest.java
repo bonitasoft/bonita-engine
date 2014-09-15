@@ -3,6 +3,7 @@ package com.bonitasoft.engine.api.impl.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -15,7 +16,9 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchResult;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,8 +32,10 @@ import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.business.application.SInvalidNameException;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
+import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationState;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
 import com.bonitasoft.engine.exception.InvalidNameException;
@@ -205,6 +210,43 @@ public class ApplicationAPIDelegateTest {
 
         //when
         delegate.getApplication(APPLICATION_ID);
+
+        //then exception
+    }
+
+    @Test
+    public void updateApplication_should_return_result_of_applicationservice_updadateApplication() throws Exception {
+        //given
+        final SApplication sApplication = mock(SApplication.class);
+        final Application application = mock(Application.class);
+        final ApplicationUpdater updater = new ApplicationUpdater();
+        updater.setName("new name");
+        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
+        given(convertor.toApplicationUpdateDescriptor(updater)).willReturn(updateDescriptor);
+        given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willReturn(sApplication);
+        given(convertor.toApplication(sApplication)).willReturn(application);
+
+        //when
+        final Application updatedApplication = delegate.updateApplication(APPLICATION_ID, updater);
+
+        //then
+        assertThat(updatedApplication).isEqualTo(application);
+    }
+
+    @Test(expected = UpdateException.class)
+    public void updateApplication_should_throw_UpdadateException_when_applicationservice_throws_SObjectModificationException() throws Exception {
+        //given
+        final SApplication sApplication = mock(SApplication.class);
+        final Application application = mock(Application.class);
+        final ApplicationUpdater updater = new ApplicationUpdater();
+        updater.setName("new name");
+        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
+        given(convertor.toApplicationUpdateDescriptor(updater)).willReturn(updateDescriptor);
+        given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectModificationException());
+        given(convertor.toApplication(sApplication)).willReturn(application);
+
+        //when
+        delegate.updateApplication(APPLICATION_ID, updater);
 
         //then exception
     }
