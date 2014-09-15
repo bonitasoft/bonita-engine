@@ -18,7 +18,7 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
-import com.bonitasoft.engine.business.application.ApplicationCreator.ApplicationField;
+import com.bonitasoft.engine.business.application.ApplicationField;
 import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator.ApplicationMenuField;
