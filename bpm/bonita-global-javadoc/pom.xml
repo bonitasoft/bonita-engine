@@ -7,12 +7,8 @@
         <groupId>com.bonitasoft.engine</groupId>
         <version>6.3.6-SNAPSHOT</version>
     </parent>
-
-	<parent>
-		<artifactId>bpm</artifactId>
-		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.3.6-SNAPSHOT</version>
-	</parent>
+    
+    <artifactId>bonita-global-javadoc</artifactId>
 
     <name>Bonita Global Javadoc</name>
 
