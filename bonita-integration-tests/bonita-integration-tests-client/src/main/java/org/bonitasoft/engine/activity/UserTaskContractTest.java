@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
@@ -17,6 +18,7 @@ import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.RuleDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
+import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
@@ -34,6 +36,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class UserTaskContractTest extends CommonAPITest {
@@ -79,6 +82,36 @@ public class UserTaskContractTest extends CommonAPITest {
         assertThat(rule.getExpression()).isEqualTo("numberOfDays != null");
         assertThat(rule.getExplanation()).isEqualTo("numberOfDays must be set");
         assertThat(rule.getInputNames()).containsExactly("numberOfDays");
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    @Ignore
+    public void createAContractWithAComplexInput() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
+        builder.addActor(ACTOR_NAME);
+        InputDefinition expenseType = new InputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
+        InputDefinition expenseAmount = new InputDefinitionImpl("amount", Type.DECIMAL, "expense amount");
+        InputDefinition expenseDate = new InputDefinitionImpl("date", Type.DATE, "expense date");
+        List<InputDefinition> inputs = Arrays.asList(expenseType, expenseDate, expenseAmount);
+
+        //given
+        builder.addUserTask("task1", ACTOR_NAME).addContract().addComplexInput("expenseLine", "expense report line", inputs);
+
+        //when
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance userTask = waitForUserTask("task1");
+
+        //then
+        final ContractDefinition contract = getProcessAPI().getUserTaskContract(userTask.getId());
+
+        assertThat(contract.getInputs()).hasSize(1);
+        final InputDefinition input = contract.getInputs().get(0);
+        assertThat(input.getName()).isEqualTo("expenseLine");
+        assertThat(input.getType()).isEqualTo(Type.COMPLEX);
+        assertThat(input.getDescription()).isEqualTo("expense report line");
 
         disableAndDeleteProcess(processDefinition);
     }

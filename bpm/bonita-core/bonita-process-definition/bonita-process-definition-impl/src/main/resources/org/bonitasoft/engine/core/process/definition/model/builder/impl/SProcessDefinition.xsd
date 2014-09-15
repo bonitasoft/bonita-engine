@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:definition="http://www.bonitasoft.org/ns/process/server/6.3" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.bonitasoft.org/ns/process/server/6.3"
+<xs:schema xmlns:definition="http://www.bonitasoft.org/ns/process/server/6.3"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.bonitasoft.org/ns/process/server/6.3"
 	elementFormDefault="qualified">
 
 	<xs:element name="processDefinition" type="definition:SProcessDefinition" />
@@ -14,7 +15,8 @@
 					<xs:element name="stringIndexes">
 						<xs:complexType>
 							<xs:sequence>
-								<xs:element type="definition:SStringIndex" name="stringIndex" minOccurs="0" maxOccurs="unbounded" />
+								<xs:element type="definition:SStringIndex" name="stringIndex"
+									minOccurs="0" maxOccurs="unbounded" />
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
@@ -31,21 +33,24 @@
 								<xs:element name="parameters">
 									<xs:complexType>
 										<xs:sequence>
-											<xs:element type="definition:SParameterDefinition" name="parameter" minOccurs="0" maxOccurs="unbounded" />
+											<xs:element type="definition:SParameterDefinition"
+												name="parameter" minOccurs="0" maxOccurs="unbounded" />
 										</xs:sequence>
 									</xs:complexType>
 								</xs:element>
 								<xs:element name="actors">
 									<xs:complexType>
 										<xs:sequence>
-											<xs:element type="definition:SActorDefinition" name="actor" minOccurs="0" maxOccurs="unbounded" />
+											<xs:element type="definition:SActorDefinition"
+												name="actor" minOccurs="0" maxOccurs="unbounded" />
 										</xs:sequence>
 									</xs:complexType>
 								</xs:element>
 							</xs:all>
 						</xs:complexType>
 					</xs:element>
-					<xs:element name="actorInitiator" minOccurs="0" maxOccurs="1">
+					<xs:element name="actorInitiator" minOccurs="0"
+						maxOccurs="1">
 						<xs:complexType>
 							<xs:complexContent>
 								<xs:extension base="definition:SActorDefinition" />
@@ -68,7 +73,8 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SNamedElement">
 				<xs:sequence>
-					<xs:element name="description" type="xs:string" minOccurs="0" />
+					<xs:element name="description" type="xs:string"
+						minOccurs="0" />
 				</xs:sequence>
 				<xs:attribute name="type" type="xs:string" />
 			</xs:extension>
@@ -77,7 +83,8 @@
 
 	<xs:complexType name="SStringIndex">
 		<xs:sequence>
-			<xs:element name="expression" type="definition:SExpression" minOccurs="0" maxOccurs="1" />
+			<xs:element name="expression" type="definition:SExpression"
+				minOccurs="0" maxOccurs="1" />
 		</xs:sequence>
 		<xs:attribute name="index" type="xs:int" />
 		<xs:attribute name="label" type="xs:string" />
@@ -87,7 +94,8 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SNamedElement">
 				<xs:all>
-					<xs:element name="description" type="xs:string" minOccurs="0" />
+					<xs:element name="description" type="xs:string"
+						minOccurs="0" />
 				</xs:all>
 			</xs:extension>
 		</xs:complexContent>
@@ -99,18 +107,30 @@
 				<xs:complexType>
 					<xs:sequence>
 						<xs:choice minOccurs="0" maxOccurs="unbounded">
-							<xs:element type="definition:SUserTaskDefinition" name="userTask" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:SManualTaskDefinition" name="manualTask" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:SReceiveTaskDefinition" name="receiveTask" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:SSendTaskDefinition" name="sendTask" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:SAutomaticTaskDefinition" name="automaticTask" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:SCallActivityDefinition" name="callActivity" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:SGatewayDefinition" name="gateway" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:SStartEventDefinition" name="startEvent" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:SIntermediateCatchEventDefinition" name="intermediateCatchEvent" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:SIntermediateThrowEventDefinition" name="intermediateThrowEvent" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:SEndEventDefinition" name="endEvent" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:SSubProcessDefinition" name="subProcess" minOccurs="0" maxOccurs="unbounded" />
+							<xs:element type="definition:SUserTaskDefinition"
+								name="userTask" minOccurs="0" maxOccurs="unbounded" />
+							<xs:element type="definition:SManualTaskDefinition"
+								name="manualTask" minOccurs="0" maxOccurs="unbounded" />
+							<xs:element type="definition:SReceiveTaskDefinition"
+								name="receiveTask" minOccurs="0" maxOccurs="unbounded" />
+							<xs:element type="definition:SSendTaskDefinition"
+								name="sendTask" minOccurs="0" maxOccurs="unbounded" />
+							<xs:element type="definition:SAutomaticTaskDefinition"
+								name="automaticTask" minOccurs="0" maxOccurs="unbounded" />
+							<xs:element type="definition:SCallActivityDefinition"
+								name="callActivity" minOccurs="0" maxOccurs="unbounded" />
+							<xs:element type="definition:SGatewayDefinition" name="gateway"
+								minOccurs="0" maxOccurs="unbounded" />
+							<xs:element type="definition:SStartEventDefinition"
+								name="startEvent" minOccurs="0" maxOccurs="unbounded" />
+							<xs:element type="definition:SIntermediateCatchEventDefinition"
+								name="intermediateCatchEvent" minOccurs="0" maxOccurs="unbounded" />
+							<xs:element type="definition:SIntermediateThrowEventDefinition"
+								name="intermediateThrowEvent" minOccurs="0" maxOccurs="unbounded" />
+							<xs:element type="definition:SEndEventDefinition"
+								name="endEvent" minOccurs="0" maxOccurs="unbounded" />
+							<xs:element type="definition:SSubProcessDefinition"
+								name="subProcess" minOccurs="0" maxOccurs="unbounded" />
 						</xs:choice>
 					</xs:sequence>
 				</xs:complexType>
@@ -118,21 +138,25 @@
 			<xs:element name="transitions">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element type="definition:STransitionDefinition" name="transition" minOccurs="0" maxOccurs="unbounded" />
+						<xs:element type="definition:STransitionDefinition"
+							name="transition" minOccurs="0" maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="connectors" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element type="definition:SConnectorDefinition" name="connector" minOccurs="0" maxOccurs="unbounded" />
+						<xs:element type="definition:SConnectorDefinition"
+							name="connector" minOccurs="0" maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="businessDataDefinitions" minOccurs="0" maxOccurs="1">
+			<xs:element name="businessDataDefinitions" minOccurs="0"
+				maxOccurs="1">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element type="definition:SBusinessDataDefinition" name="businessDataDefinition" minOccurs="0" maxOccurs="unbounded" />
+						<xs:element type="definition:SBusinessDataDefinition"
+							name="businessDataDefinition" minOccurs="0" maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -141,7 +165,8 @@
 					<xs:sequence>
 						<xs:choice minOccurs="0" maxOccurs="unbounded">
 							<xs:element type="definition:SDataDefinition" name="dataDefinition" />
-							<xs:element type="definition:STextDataDefinition" name="textDataDefinition" />
+							<xs:element type="definition:STextDataDefinition"
+								name="textDataDefinition" />
 							<xs:element type="definition:SXMLDataDefinition" name="xmlDataDefinition" />
 						</xs:choice>
 					</xs:sequence>
@@ -150,7 +175,8 @@
 			<xs:element name="documentDefinitions">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element type="definition:SDocumentDefinition" name="documentDefinition" minOccurs="0" maxOccurs="unbounded" />
+						<xs:element type="definition:SDocumentDefinition" name="documentDefinition"
+							minOccurs="0" maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -161,13 +187,20 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SNamedElement">
 				<xs:sequence>
-					<xs:element name="displayName" type="definition:SExpression" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element name="displayDescription" type="definition:SExpression" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element name="displayDescriptionAfterCompletion" type="definition:SExpression" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element name="incomingTransition" type="definition:STransitionDefinitionRef" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element name="outgoingTransition" type="definition:STransitionDefinitionRef" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element name="defaultTransition" type="definition:STransitionDefinitionRef" minOccurs="0" maxOccurs="1" />
-					<xs:element name="connector" type="definition:SConnectorDefinition" minOccurs="0" maxOccurs="unbounded" />
+					<xs:element name="displayName" type="definition:SExpression"
+						minOccurs="0" maxOccurs="unbounded" />
+					<xs:element name="displayDescription" type="definition:SExpression"
+						minOccurs="0" maxOccurs="unbounded" />
+					<xs:element name="displayDescriptionAfterCompletion"
+						type="definition:SExpression" minOccurs="0" maxOccurs="unbounded" />
+					<xs:element name="incomingTransition" type="definition:STransitionDefinitionRef"
+						minOccurs="0" maxOccurs="unbounded" />
+					<xs:element name="outgoingTransition" type="definition:STransitionDefinitionRef"
+						minOccurs="0" maxOccurs="unbounded" />
+					<xs:element name="defaultTransition" type="definition:STransitionDefinitionRef"
+						minOccurs="0" maxOccurs="1" />
+					<xs:element name="connector" type="definition:SConnectorDefinition"
+						minOccurs="0" maxOccurs="unbounded" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
@@ -182,34 +215,42 @@
 							<xs:sequence>
 								<xs:choice minOccurs="0" maxOccurs="unbounded">
 									<xs:element type="definition:SDataDefinition" name="dataDefinition" />
-									<xs:element type="definition:STextDataDefinition" name="textDataDefinition" />
-									<xs:element type="definition:SXMLDataDefinition" name="xmlDataDefinition" />
+									<xs:element type="definition:STextDataDefinition"
+										name="textDataDefinition" />
+									<xs:element type="definition:SXMLDataDefinition"
+										name="xmlDataDefinition" />
 								</xs:choice>
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
-                    <xs:element name="businessDataDefinitions" minOccurs="0" maxOccurs="1">
-                        <xs:complexType>
-                            <xs:sequence>
-                                    <xs:element name="businessDataDefinition" minOccurs="0" maxOccurs="2" type="definition:SBusinessDataDefinition" />
-                             </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
+					<xs:element name="businessDataDefinitions" minOccurs="0"
+						maxOccurs="1">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="businessDataDefinition" minOccurs="0"
+									maxOccurs="2" type="definition:SBusinessDataDefinition" />
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
 					<xs:element name="operations" maxOccurs="1">
 						<xs:complexType>
 							<xs:sequence>
-								<xs:element name="operation" type="definition:SOperation" minOccurs="0" maxOccurs="unbounded" />
+								<xs:element name="operation" type="definition:SOperation"
+									minOccurs="0" maxOccurs="unbounded" />
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
 					<xs:choice minOccurs="0">
-						<xs:element name="standardLoopCharacteristics" type="definition:SStandardLoopCharacteristics" minOccurs="0" />
-						<xs:element name="multiInstanceLoopCharacteristics" type="definition:SMultiInstanceLoopCharacteristics" minOccurs="0" />
+						<xs:element name="standardLoopCharacteristics"
+							type="definition:SStandardLoopCharacteristics" minOccurs="0" />
+						<xs:element name="multiInstanceLoopCharacteristics"
+							type="definition:SMultiInstanceLoopCharacteristics" minOccurs="0" />
 					</xs:choice>
 					<xs:element name="boundaryEvents" maxOccurs="1">
 						<xs:complexType>
 							<xs:sequence>
-								<xs:element type="definition:SBoundaryEventDefinition" name="boundaryEvent" minOccurs="0" maxOccurs="unbounded" />
+								<xs:element type="definition:SBoundaryEventDefinition"
+									name="boundaryEvent" minOccurs="0" maxOccurs="unbounded" />
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
@@ -245,8 +286,10 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SActivityDefinition">
 				<xs:sequence>
-					<xs:element name="userFilter" type="definition:SUserFilterDefinition" minOccurs="0" maxOccurs="1" />
-					<xs:element name="contract" type="definition:SContractDefinition" minOccurs="0" />
+					<xs:element name="userFilter" type="definition:SUserFilterDefinition"
+						minOccurs="0" maxOccurs="1" />
+					<xs:element name="contract" type="definition:SContractDefinition"
+						minOccurs="0" />
 				</xs:sequence>
 				<xs:attribute name="actorName" type="xs:string" />
 				<xs:attribute name="priority" type="xs:string" />
@@ -271,7 +314,9 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SActivityDefinition">
 				<xs:sequence>
-					<xs:element name="catchMessageEventTrigger" type="definition:SCatchMessageEventTriggerDefinition" minOccurs="1" maxOccurs="1" />
+					<xs:element name="catchMessageEventTrigger"
+						type="definition:SCatchMessageEventTriggerDefinition" minOccurs="1"
+						maxOccurs="1" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
@@ -281,7 +326,9 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SActivityDefinition">
 				<xs:sequence>
-					<xs:element name="throwMessageEventTrigger" type="definition:SThrowMessageEventTriggerDefinition" minOccurs="1" maxOccurs="1" />
+					<xs:element name="throwMessageEventTrigger"
+						type="definition:SThrowMessageEventTriggerDefinition" minOccurs="1"
+						maxOccurs="1" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
@@ -291,10 +338,14 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SActivityDefinition">
 				<xs:sequence>
-					<xs:element type="definition:SExpression" name="callableElement" minOccurs="1" maxOccurs="1" />
-					<xs:element type="definition:SExpression" name="callableElementVersion" minOccurs="0" maxOccurs="1" />
-					<xs:element type="definition:SOperation" name="dataInputOperation" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element type="definition:SOperation" name="dataOutputOperation" minOccurs="0" maxOccurs="unbounded" />
+					<xs:element type="definition:SExpression" name="callableElement"
+						minOccurs="1" maxOccurs="1" />
+					<xs:element type="definition:SExpression" name="callableElementVersion"
+						minOccurs="0" maxOccurs="1" />
+					<xs:element type="definition:SOperation" name="dataInputOperation"
+						minOccurs="0" maxOccurs="unbounded" />
+					<xs:element type="definition:SOperation" name="dataOutputOperation"
+						minOccurs="0" maxOccurs="unbounded" />
 				</xs:sequence>
 				<xs:attribute name="callableElementType">
 					<xs:simpleType>
@@ -311,7 +362,8 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SNamedElement">
 				<xs:sequence>
-					<xs:element name="condition" type="definition:SExpression" minOccurs="0" />
+					<xs:element name="condition" type="definition:SExpression"
+						minOccurs="0" />
 				</xs:sequence>
 				<xs:attribute name="source" type="xs:long" />
 				<xs:attribute name="target" type="xs:long" />
@@ -341,20 +393,26 @@
 
 	<xs:complexType name="SContractDefinition">
 		<xs:sequence>
-			<xs:element name="inputDefinitions" minOccurs="0" maxOccurs="1">
+			<xs:element name="inputDefinitions" minOccurs="0"
+				maxOccurs="1">
 				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="inputDefinition" type="definition:SInputDefinition" minOccurs="0" maxOccurs="unbounded" />
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:choice>
+							<xs:element name="inputDefinition" type="definition:SInputDefinition" />
+							<xs:element name="complexInputDefinition" type="definition:SComplexInputDefinition" />
+						</xs:choice>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="ruleDefinitions" minOccurs="0" maxOccurs="1">
-            	<xs:complexType>
-            		<xs:sequence>
-            			<xs:element name="ruleDefinition" type="definition:SRuleDefinition" minOccurs="0" maxOccurs="unbounded"/>
-            		</xs:sequence>
-            	</xs:complexType>
-            </xs:element>
+			<xs:element name="ruleDefinitions" minOccurs="0"
+				maxOccurs="1">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ruleDefinition" type="definition:SRuleDefinition"
+							minOccurs="0" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 
@@ -362,19 +420,39 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SNamedElement">
 				<xs:attribute name="type">
-                    <xs:simpleType>
-                        <xs:restriction base="xs:string">
-                            <xs:enumeration value="TEXT" />
-                            <xs:enumeration value="BOOLEAN" />
-                            <xs:enumeration value="DATE" />
-                            <xs:enumeration value="INTEGER" />
-                            <xs:enumeration value="DECIMAL" />
-                        </xs:restriction>
-                    </xs:simpleType>
-                </xs:attribute>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="TEXT" />
+							<xs:enumeration value="BOOLEAN" />
+							<xs:enumeration value="DATE" />
+							<xs:enumeration value="INTEGER" />
+							<xs:enumeration value="DECIMAL" />
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
+	<xs:complexType name="SComplexInputDefinition">
+		<xs:complexContent>
+			<xs:extension base="definition:SNamedElement">
+				<xs:sequence minOccurs="1" maxOccurs="unbounded">
+					<xs:choice>
+						<xs:element name="inputDefinition" type="definition:SInputDefinition" />
+						<xs:element name="complexInputDefinition" type="definition:SComplexInputDefinition" />
+					</xs:choice>
+				</xs:sequence>
+				<xs:attribute name="type">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="COMPLEX" />
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
 
 	<xs:complexType name="SRuleDefinition">
 		<xs:complexContent>
@@ -382,7 +460,8 @@
 				<xs:sequence>
 					<xs:element name="conditionalExpression" type="xs:string" />
 					<xs:element name="explanation" type="xs:string" />
-					<xs:element name="inputDefinitionNames" minOccurs="0" maxOccurs="1">
+					<xs:element name="inputDefinitionNames" minOccurs="0"
+						maxOccurs="1">
 						<xs:complexType>
 							<xs:sequence minOccurs="1" maxOccurs="unbounded">
 								<xs:element name="inputDefinitionName" type="xs:string" />
@@ -452,13 +531,15 @@
 
 	<xs:complexType name="SInputs">
 		<xs:sequence>
-			<xs:element name="input" minOccurs="0" maxOccurs="unbounded" type="definition:SIOExpression" />
+			<xs:element name="input" minOccurs="0" maxOccurs="unbounded"
+				type="definition:SIOExpression" />
 		</xs:sequence>
 	</xs:complexType>
 
 	<xs:complexType name="SOutputs">
 		<xs:sequence>
-			<xs:element name="operation" minOccurs="0" maxOccurs="unbounded" type="definition:SOperation" />
+			<xs:element name="operation" minOccurs="0" maxOccurs="unbounded"
+				type="definition:SOperation" />
 		</xs:sequence>
 	</xs:complexType>
 
@@ -466,11 +547,14 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SNamedElement">
 				<xs:all>
-					<xs:element name="description" type="xs:string" minOccurs="0" />
-					<xs:element name="defaultValue" type="definition:SExpression" minOccurs="0" />
+					<xs:element name="description" type="xs:string"
+						minOccurs="0" />
+					<xs:element name="defaultValue" type="definition:SExpression"
+						minOccurs="0" />
 				</xs:all>
- 				<xs:attribute name="className" type="xs:string" />
- 				<xs:attribute name="multiple" type="xs:boolean" default="false" />
+				<xs:attribute name="className" type="xs:string" />
+				<xs:attribute name="multiple" type="xs:boolean"
+					default="false" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -479,8 +563,10 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SNamedElement">
 				<xs:all>
-					<xs:element name="description" type="xs:string" minOccurs="0" />
-					<xs:element name="defaultValue" type="definition:SExpression" minOccurs="0" />
+					<xs:element name="description" type="xs:string"
+						minOccurs="0" />
+					<xs:element name="defaultValue" type="definition:SExpression"
+						minOccurs="0" />
 				</xs:all>
 				<xs:attribute name="transient" type="xs:boolean" />
 				<xs:attribute name="className" type="xs:string" />
@@ -492,8 +578,10 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SNamedElement">
 				<xs:all>
-					<xs:element name="description" type="xs:string" minOccurs="0" />
-					<xs:element name="defaultValue" type="definition:SExpression" minOccurs="0" />
+					<xs:element name="description" type="xs:string"
+						minOccurs="0" />
+					<xs:element name="defaultValue" type="definition:SExpression"
+						minOccurs="0" />
 				</xs:all>
 				<xs:attribute name="transient" type="xs:boolean" />
 				<xs:attribute name="className" type="xs:string" />
@@ -506,8 +594,10 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SNamedElement">
 				<xs:all>
-					<xs:element name="description" type="xs:string" minOccurs="0" />
-					<xs:element name="defaultValue" type="definition:SExpression" minOccurs="0" />
+					<xs:element name="description" type="xs:string"
+						minOccurs="0" />
+					<xs:element name="defaultValue" type="definition:SExpression"
+						minOccurs="0" />
 					<xs:element name="namespace" type="xs:string" minOccurs="0" />
 					<xs:element name="element" type="xs:string" minOccurs="0" />
 				</xs:all>
@@ -521,7 +611,8 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SNamedElement">
 				<xs:all>
-					<xs:element name="description" type="xs:string" minOccurs="0" />
+					<xs:element name="description" type="xs:string"
+						minOccurs="0" />
 					<xs:element name="url" type="xs:string" minOccurs="0" />
 					<xs:element name="file" type="xs:string" minOccurs="0" />
 					<xs:element name="fileName" type="xs:string" minOccurs="0" />
@@ -538,7 +629,8 @@
 			<xs:extension base="definition:SLoopCharacteristics">
 				<xs:sequence>
 					<xs:element name="loopCondition" type="definition:SExpression" />
-					<xs:element name="loopMax" type="definition:SExpression" minOccurs="0" />
+					<xs:element name="loopMax" type="definition:SExpression"
+						minOccurs="0" />
 				</xs:sequence>
 				<xs:attribute name="testBefore" type="xs:boolean" />
 			</xs:extension>
@@ -547,8 +639,10 @@
 
 	<xs:complexType name="SMultiInstanceLoopCharacteristics">
 		<xs:sequence>
-			<xs:element name="loopCardinality" type="definition:SExpression" minOccurs="0" />
-			<xs:element name="completionCondition" type="definition:SExpression" minOccurs="0" />
+			<xs:element name="loopCardinality" type="definition:SExpression"
+				minOccurs="0" />
+			<xs:element name="completionCondition" type="definition:SExpression"
+				minOccurs="0" />
 		</xs:sequence>
 		<xs:attribute name="isSequential" type="xs:boolean" />
 		<xs:attribute name="loopDataInputRef" type="xs:string" />
@@ -561,7 +655,8 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SFlowNodeDefinition">
 				<xs:sequence>
-					<xs:element name="eventTrigger" type="definition:SEventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
+					<xs:element name="eventTrigger" type="definition:SEventTriggerDefinition"
+						minOccurs="0" maxOccurs="unbounded" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
@@ -571,9 +666,15 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SEventDefinition">
 				<xs:sequence>
-					<xs:element name="timerEventTrigger" type="definition:STimerEventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element name="catchMessageEventTrigger" type="definition:SCatchMessageEventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element name="catchSignalEventTrigger" type="definition:SCatchSignalEventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
+					<xs:element name="timerEventTrigger"
+						type="definition:STimerEventTriggerDefinition" minOccurs="0"
+						maxOccurs="unbounded" />
+					<xs:element name="catchMessageEventTrigger"
+						type="definition:SCatchMessageEventTriggerDefinition" minOccurs="0"
+						maxOccurs="unbounded" />
+					<xs:element name="catchSignalEventTrigger"
+						type="definition:SCatchSignalEventTriggerDefinition" minOccurs="0"
+						maxOccurs="unbounded" />
 				</xs:sequence>
 				<xs:attribute name="interrupting">
 					<xs:simpleType>
@@ -588,7 +689,9 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SCatchEventDefinition">
 				<xs:sequence>
-					<xs:element name="catchErrorEventTrigger" type="definition:SCatchErrorEventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
+					<xs:element name="catchErrorEventTrigger"
+						type="definition:SCatchErrorEventTriggerDefinition" minOccurs="0"
+						maxOccurs="unbounded" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
@@ -598,8 +701,12 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SEventDefinition">
 				<xs:sequence>
-					<xs:element name="throwMessageEventTrigger" type="definition:SThrowMessageEventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element name="throwSignalEventTrigger" type="definition:SThrowSignalEventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
+					<xs:element name="throwMessageEventTrigger"
+						type="definition:SThrowMessageEventTriggerDefinition" minOccurs="0"
+						maxOccurs="unbounded" />
+					<xs:element name="throwSignalEventTrigger"
+						type="definition:SThrowSignalEventTriggerDefinition" minOccurs="0"
+						maxOccurs="unbounded" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
@@ -611,7 +718,8 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SEventTriggerDefinition">
 				<xs:sequence>
-					<xs:element name="expression" type="definition:SExpression" minOccurs="1" maxOccurs="1" />
+					<xs:element name="expression" type="definition:SExpression"
+						minOccurs="1" maxOccurs="1" />
 				</xs:sequence>
 				<xs:attribute name="type">
 					<xs:simpleType>
@@ -646,8 +754,10 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SEventTriggerDefinition">
 				<xs:sequence>
-					<xs:element name="correlation" type="definition:SCorrelationDefinition" minOccurs="0" maxOccurs="5" />
-					<xs:element name="operation" type="definition:SOperation" minOccurs="0" maxOccurs="unbounded" />
+					<xs:element name="correlation" type="definition:SCorrelationDefinition"
+						minOccurs="0" maxOccurs="5" />
+					<xs:element name="operation" type="definition:SOperation"
+						minOccurs="0" maxOccurs="unbounded" />
 				</xs:sequence>
 				<xs:attribute name="name" type="xs:string" />
 			</xs:extension>
@@ -658,10 +768,14 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SEventTriggerDefinition">
 				<xs:sequence>
-					<xs:element name="targetProcess" type="definition:SExpression" minOccurs="1" maxOccurs="1" />
-					<xs:element name="targetFlowNode" type="definition:SExpression" minOccurs="0" maxOccurs="1" />
-					<xs:element name="dataDefinition" type="definition:SDataDefinition" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element name="correlation" type="definition:SCorrelationDefinition" minOccurs="0" maxOccurs="5" />
+					<xs:element name="targetProcess" type="definition:SExpression"
+						minOccurs="1" maxOccurs="1" />
+					<xs:element name="targetFlowNode" type="definition:SExpression"
+						minOccurs="0" maxOccurs="1" />
+					<xs:element name="dataDefinition" type="definition:SDataDefinition"
+						minOccurs="0" maxOccurs="unbounded" />
+					<xs:element name="correlation" type="definition:SCorrelationDefinition"
+						minOccurs="0" maxOccurs="5" />
 				</xs:sequence>
 				<xs:attribute name="name" type="xs:string" />
 			</xs:extension>
@@ -670,8 +784,10 @@
 
 	<xs:complexType name="SCorrelationDefinition">
 		<xs:sequence>
-			<xs:element name="key" type="definition:SExpression" minOccurs="1" maxOccurs="1" />
-			<xs:element name="value" type="definition:SExpression" minOccurs="1" maxOccurs="1" />
+			<xs:element name="key" type="definition:SExpression"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="value" type="definition:SExpression"
+				minOccurs="1" maxOccurs="1" />
 		</xs:sequence>
 	</xs:complexType>
 
@@ -701,7 +817,9 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SCatchEventDefinition">
 				<xs:sequence>
-					<xs:element name="catchErrorEventTrigger" type="definition:SCatchErrorEventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
+					<xs:element name="catchErrorEventTrigger"
+						type="definition:SCatchErrorEventTriggerDefinition" minOccurs="0"
+						maxOccurs="unbounded" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
@@ -717,8 +835,12 @@
 		<xs:complexContent>
 			<xs:extension base="definition:SThrowEventDefinition">
 				<xs:sequence>
-					<xs:element name="terminateEventTrigger" type="definition:STerminateEventTriggerDefinition" minOccurs="0" maxOccurs="1" />
-					<xs:element name="throwErrorEventTrigger" type="definition:SThrowErrorEventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
+					<xs:element name="terminateEventTrigger"
+						type="definition:STerminateEventTriggerDefinition" minOccurs="0"
+						maxOccurs="1" />
+					<xs:element name="throwErrorEventTrigger"
+						type="definition:SThrowErrorEventTriggerDefinition" minOccurs="0"
+						maxOccurs="unbounded" />
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
@@ -733,7 +855,8 @@
 	<xs:complexType name="SExpression">
 		<xs:sequence>
 			<xs:element name="content" type="xs:string" minOccurs="1" />
-			<xs:element name="expression" type="definition:SExpression" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="expression" type="definition:SExpression"
+				minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" />
 		<xs:attribute name="expressionType" />
@@ -743,8 +866,10 @@
 
 	<xs:complexType name="SOperation">
 		<xs:all>
-			<xs:element name="rightOperand" type="definition:SExpression" minOccurs="0" />
-			<xs:element name="leftOperand" type="definition:SLeftOperand" minOccurs="1" />
+			<xs:element name="rightOperand" type="definition:SExpression"
+				minOccurs="0" />
+			<xs:element name="leftOperand" type="definition:SLeftOperand"
+				minOccurs="1" />
 		</xs:all>
 		<xs:attribute name="operator" />
 		<xs:attribute name="operatorType" />

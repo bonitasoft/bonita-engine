@@ -9,6 +9,9 @@ import javax.xml.transform.stream.StreamSource;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * @author Laurent Leseigneur
+ */
 public class SAXValidatorTest {
 
     private static final String SERVEUR_PROCESS_SCHEMA = "/org/bonitasoft/engine/core/process/definition/model/builder/impl/SProcessDefinition.xsd";

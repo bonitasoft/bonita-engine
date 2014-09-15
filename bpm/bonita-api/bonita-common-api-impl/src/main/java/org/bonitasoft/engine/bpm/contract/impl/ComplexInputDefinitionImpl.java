@@ -20,7 +20,7 @@ import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Laurent Leseigneur
  */
 public class ComplexInputDefinitionImpl extends InputDefinitionImpl implements ComplexInputDefinition {
 
@@ -30,7 +30,6 @@ public class ComplexInputDefinitionImpl extends InputDefinitionImpl implements C
     public ComplexInputDefinitionImpl(final String name, final String description, final List<InputDefinition> inputDefinitions) {
         super(name, Type.COMPLEX, description);
         this.inputDefinitions = inputDefinitions;
-
     }
 
     public List<InputDefinition> getInputDefinitions() {

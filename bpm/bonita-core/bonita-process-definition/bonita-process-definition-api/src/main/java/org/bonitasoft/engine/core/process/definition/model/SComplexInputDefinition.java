@@ -13,24 +13,12 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Date;
+import java.util.List;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Laurent Leseigneur
  */
-public enum SType {
-    @STypeConverter(implementationClass = String.class)
-    TEXT,
-    @STypeConverter(implementationClass = Boolean.class)
-    BOOLEAN,
-    @STypeConverter(implementationClass = Date.class)
-    DATE,
-    @STypeConverter(implementationClass = BigInteger.class)
-    INTEGER,
-    @STypeConverter(implementationClass = BigDecimal.class)
-    DECIMAL,
-    @STypeConverter(implementationClass = Object.class/*FIXME*/)
-    COMPLEX
+public interface SComplexInputDefinition extends SInputDefinition {
+
+    List<SInputDefinition> getInputDefinitions();
 }

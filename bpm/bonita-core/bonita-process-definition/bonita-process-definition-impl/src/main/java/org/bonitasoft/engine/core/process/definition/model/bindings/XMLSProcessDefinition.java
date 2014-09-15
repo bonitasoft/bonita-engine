@@ -45,6 +45,7 @@ import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSendTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SBoundaryEventDefinition;
@@ -346,6 +347,8 @@ public class XMLSProcessDefinition {
 
     public static final String CONTRACT_INPUT_NODE = "inputDefinition";
 
+    public static final String CONTRACT_COMPLEX_INPUT_NODE = "complexInputDefinition";
+
     public static final String TYPE = "type";
 
     public static final String CONTRACT_RULES_NODE = "ruleDefinitions";
@@ -571,8 +574,8 @@ public class XMLSProcessDefinition {
         if (!inputs.isEmpty()) {
             final XMLNode inputsNode = new XMLNode(CONTRACT_INPUTS_NODE);
             contractNode.addChild(inputsNode);
-
             for (final SInputDefinition input : inputs) {
+               if (!input.getType().equals(SType.COMPLEX))
                 inputsNode.addChild(createInputNode(input));
             }
         }
@@ -602,7 +605,8 @@ public class XMLSProcessDefinition {
     }
 
     private XMLNode createInputNode(final SInputDefinition input) {
-        final XMLNode inputNode = new XMLNode(CONTRACT_INPUT_NODE);
+        String nodeName = CONTRACT_INPUT_NODE;
+        final XMLNode inputNode = new XMLNode(nodeName);
         inputNode.addAttribute(NAME, input.getName());
         inputNode.addAttribute(TYPE, input.getType().toString());
         inputNode.addAttribute(DESCRIPTION, input.getDescription());

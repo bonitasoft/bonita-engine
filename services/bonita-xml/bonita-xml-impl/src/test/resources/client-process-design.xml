@@ -27,16 +27,21 @@
 				<boundaryEvents />
 				<contract>
 					<inputDefinitions>
-						<inputDefinition description="user name" name="userName"
-							type="TEXT" />
-						<inputDefinition description="start date" name="startDate"
-							type="DATE" />
-						<inputDefinition description="end date" name="endDate"
-							type="DATE" />
-						<inputDefinition description="request is approved"
-							name="isValid" type="BOOLEAN" />
-						<inputDefinition description="comment" name="comment"
-							type="TEXT" />
+						<inputDefinition description="user name" name="userName" type="TEXT" />
+						<inputDefinition description="start date" name="startDate" type="DATE" />
+						<inputDefinition description="end date" name="endDate" type="DATE" />
+						<inputDefinition description="request is approved" name="isValid" type="BOOLEAN" />
+						<inputDefinition description="comment" name="comment" type="TEXT" />
+						<complexInputDefinition description="expense line" name="expense" type="COMPLEX">
+							<inputDefinition description="expense type" name="type" type="TEXT" />
+							<inputDefinition description="expense comment" name="comment" type="TEXT" />
+							<inputDefinition description="expense comment" name="comment" type="DATE" />
+							<complexInputDefinition description="expense line" name="expense" type="COMPLEX">
+								<inputDefinition description="complex in complex" name="comment" type="TEXT" />
+							</complexInputDefinition>
+							<inputDefinition description="expense comment" name="comment" type="DECIMAL" />
+						</complexInputDefinition>
+						<inputDefinition description="comment" name="comment" type="TEXT" />
 					</inputDefinitions>
 					<ruleDefinitions>
 						<ruleDefinition name="username_rule">

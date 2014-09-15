@@ -11,18 +11,31 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.contract;
+package org.bonitasoft.engine.core.process.definition.model.impl;
 
 import java.util.List;
 
+import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SType;
+
 /**
- * An <code>ComplexInputDefinition</code> defines
- *
  * @author Laurent Leseigneur
- * @since 7.0
  */
-public interface ComplexInputDefinition extends InputDefinition {
+public class SComplexInputDefinitionImpl extends SInputDefinitionImpl implements SComplexInputDefinition {
 
-    List<InputDefinition> getInputDefinitions();
 
+    private List<SInputDefinition> inputDefinitions;
+
+    public SComplexInputDefinitionImpl(String name, String description, List<SInputDefinition> inputDefinitions) {
+        super(name);
+        this.inputDefinitions = inputDefinitions;
+        setType(SType.COMPLEX);
+        setDescription(description);
+    }
+
+    @Override
+    public List<SInputDefinition> getInputDefinitions() {
+        return inputDefinitions;
+    }
 }

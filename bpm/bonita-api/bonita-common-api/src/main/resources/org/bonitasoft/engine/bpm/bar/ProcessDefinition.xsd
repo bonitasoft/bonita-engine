@@ -393,9 +393,11 @@
 			<xs:element name="inputDefinitions" minOccurs="0"
 				maxOccurs="1">
 				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="inputDefinition" type="definition:InputDefinition"
-							minOccurs="0" maxOccurs="unbounded" />
+					<xs:sequence minOccurs="0" maxOccurs="unbounded">
+						<xs:choice>
+							<xs:element name="inputDefinition" type="definition:InputDefinition" />
+							<xs:element name="complexInputDefinition" type="definition:ComplexInputDefinition" />
+						</xs:choice>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -414,17 +416,38 @@
 	<xs:complexType name="InputDefinition">
 		<xs:complexContent>
 			<xs:extension base="definition:NamedElement">
-                <xs:attribute name="type">
-                    <xs:simpleType>
-                        <xs:restriction base="xs:string">
-                            <xs:enumeration value="TEXT" />
-                            <xs:enumeration value="BOOLEAN" />
-                            <xs:enumeration value="DATE" />
-                            <xs:enumeration value="INTEGER" />
-                            <xs:enumeration value="DECIMAL" />
-                        </xs:restriction>
-                    </xs:simpleType>
-                </xs:attribute>
+				<xs:attribute name="type">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="TEXT" />
+							<xs:enumeration value="BOOLEAN" />
+							<xs:enumeration value="DATE" />
+							<xs:enumeration value="INTEGER" />
+							<xs:enumeration value="DECIMAL" />
+							<xs:enumeration value="COMPLEX" />
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="ComplexInputDefinition">
+		<xs:complexContent>
+			<xs:extension base="definition:NamedElement">
+				<xs:sequence minOccurs="1" maxOccurs="unbounded">
+					<xs:choice>
+					<xs:element name="inputDefinition" type="definition:InputDefinition"/>
+					<xs:element name="complexInputDefinition" type="definition:ComplexInputDefinition"/>
+					</xs:choice>
+				</xs:sequence>
+				<xs:attribute name="type">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="COMPLEX" />
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
