@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -21,8 +20,12 @@
 			<version>${project.version}</version>
 			<exclusions>
 			    <exclusion>
-			        <artifactId>bonita-common-api</artifactId>
 			        <groupId>org.bonitasoft.engine.api</groupId>
+			        <artifactId>bonita-common-api</artifactId>
+			    </exclusion>
+			    <exclusion>
+			        <groupId>org.bonitasoft.engine.api</groupId>
+			        <artifactId>bonita-common-api-impl</artifactId>
 			    </exclusion>
 			</exclusions>
 		</dependency>
@@ -46,6 +49,12 @@
 			<groupId>org.bonitasoft.engine.api</groupId>
 			<artifactId>bonita-server-api-http</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bonitasoft.engine.api</groupId>
+            		<artifactId>bonita-common-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Archive -->
@@ -109,6 +118,12 @@
 			<artifactId>bonita-connector-service-api-impl</artifactId>
 			<groupId>org.bonitasoft.engine.core.connector</groupId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bonitasoft.engine.api</groupId>
+            		<artifactId>bonita-common-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Data Definition -->
@@ -179,10 +194,6 @@
 			<version>${project.version}</version>
 			<exclusions>
 			    <exclusion>
-			        <artifactId>bonita-common</artifactId>
-			        <groupId>org.bonitasoft.engine</groupId>
-			    </exclusion>
-			    <exclusion>
 			        <artifactId>bonita-common-api</artifactId>
 			        <groupId>org.bonitasoft.engine.api</groupId>
 			    </exclusion>
@@ -235,6 +246,12 @@
 			<groupId>org.bonitasoft.engine.core.login</groupId>
 			<artifactId>bonita-login-api-impl</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bonitasoft.engine.api</groupId>
+            		<artifactId>bonita-common-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Logs -->
@@ -249,6 +266,12 @@
 			<groupId>org.bonitasoft.engine.core.operation</groupId>
 			<artifactId>bonita-operation-api-impl</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bonitasoft.engine.api</groupId>
+            		<artifactId>bonita-common-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.operation</groupId>
@@ -263,7 +286,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		
-
 		<!-- Persistence -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.persistence</groupId>
@@ -331,8 +353,12 @@
 			<version>${project.version}</version>
 			<exclusions>
 			    <exclusion>
-			        <groupId>org.bonitasoft.engine</groupId>
-			        <artifactId>bonita-common</artifactId>
+			        <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api</artifactId>
+			    </exclusion>
+			    <exclusion>
+			        <groupId>org.bonitasoft.engine.api</groupId>
+                    <artifactId>bonita-common-api-impl</artifactId>
 			    </exclusion>
 			</exclusions>
 		</dependency>
@@ -472,6 +498,12 @@
 			<groupId>org.bonitasoft.engine.core.filter</groupId>
 			<artifactId>bonita-user-filter-impl</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bonitasoft.engine.api</groupId>
+            		<artifactId>bonita-common-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Work -->
@@ -760,5 +792,4 @@
 			</build>
 		</profile>
 	</profiles>
-
 </project>
