@@ -12,6 +12,7 @@ CREATE TABLE business_app (
   updatedBy BIGINT NOT NULL,
   state VARCHAR(30) NOT NULL,
   homePageId BIGINT,
+  profileId BIGINT,
   displayName VARCHAR(255) NOT NULL
 ) ENGINE = INNODB;
 

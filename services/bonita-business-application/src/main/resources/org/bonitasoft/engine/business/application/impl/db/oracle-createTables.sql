@@ -12,6 +12,7 @@ CREATE TABLE business_app (
   updatedBy NUMBER(19, 0) NOT NULL,
   state VARCHAR2(30) NOT NULL,
   homePageId NUMBER(19, 0),
+  profileId NUMBER(19, 0),
   displayName VARCHAR2(255) NOT NULL
 );
 
