@@ -1,0 +1,7 @@
+<project name="bonita-integration-tests-services-sp" default="cleantarget">
+
+    <target name="cleantarget">
+        <delete dir="${basedir}/target" includes="**/*.db"/>
+    </target>
+
+</project>

@@ -1,43 +1,38 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"                                                                                                                                       
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <artifactId>bonita-transaction-sp</artifactId>
-        <groupId>com.bonitasoft.engine.transaction</groupId>
-        <version>6.4.0-SNAPSHOT</version>
-    </parent>
+	<parent>
+		<artifactId>bonita-transaction-sp</artifactId>
+		<groupId>com.bonitasoft.engine.transaction</groupId>
+		<version>6.4.0-SNAPSHOT</version>
+	</parent>
 
-    <artifactId>bonita-transaction-impl-sp</artifactId>
+	<artifactId>bonita-transaction-impl-sp</artifactId>
 
-    <name>Bonita Transaction: SP Service Implementation</name>
+	<name>Bonita Transaction: SP Service Implementation</name>
 
-    <dependencies>
-        <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>jta</artifactId>
-            <version>1.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.transaction</groupId>
-            <artifactId>bonita-transaction-impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <!-- For the SRetryAbleException -->
-        <dependency>
-            <groupId>org.bonitasoft.engine.persistence</groupId>
-            <artifactId>bonita-persistence-read</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-    </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>jta</artifactId>
+			<version>1.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.transaction</groupId>
+			<artifactId>bonita-transaction-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.log</groupId>
+			<artifactId>bonita-log-technical-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- For the SRetryAbleException -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.persistence</groupId>
+			<artifactId>bonita-persistence-read</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 </project>
