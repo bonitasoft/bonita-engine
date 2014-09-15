@@ -50,7 +50,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         super();
     }
 
-    public void generateBom(BusinessObjectModel bom, final File destDir) throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException, ClassNotFoundException {
+    public void generateBom(final BusinessObjectModel bom, final File destDir) throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException, ClassNotFoundException {
         final BusinessObjectModelValidator validator = new BusinessObjectModelValidator();
         final ValidationStatus validationStatus = validator.validate(bom);
         if (!validationStatus.isOk()) {
@@ -60,7 +60,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         super.generate(destDir);
     }
 
-    private void buildJavaModelFromBom(BusinessObjectModel bom) throws JClassAlreadyExistsException, ClassNotFoundException {
+    private void buildJavaModelFromBom(final BusinessObjectModel bom) throws JClassAlreadyExistsException, ClassNotFoundException {
         if (bom == null) {
             throw new IllegalArgumentException("bom is null");
         }
@@ -93,7 +93,23 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
 
     private JMethod getSetterForParam(final JVar param, final JDefinedClass entity) {
         final String setterName = getSetterName(param);
-        return entity.getMethod(setterName, new JType[] { param.type() });
+        return findMethodWithSignature(param, entity, setterName);
+    }
+
+    private JMethod findMethodWithSignature(final JVar param, final JDefinedClass entity, final String name) {
+        for (final JMethod m : entity.methods()) {
+            if (!m.name().equals(name)) {
+                continue;
+            }
+
+            if (m.params().size() == 1) {
+                final JVar jVar = m.params().get(0);
+                if (jVar.type().equals(param.type()) || jVar.type().fullName().equals(param.type().fullName())) {
+                    return m;
+                }
+            }
+        }
+        return null;
     }
 
     private void addNotNullParamCheck(final JBlock methodBody, final JVar param) {
