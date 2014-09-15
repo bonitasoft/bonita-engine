@@ -36,6 +36,7 @@ import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.exception.InvalidNameException;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationMenuDescriptor;
@@ -108,6 +109,12 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public void deleteApplication(final long applicationId) throws DeletionException {
         getApplicationAPIDelegate().deleteApplication(applicationId);
+    }
+
+    @Override
+    public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     private TenantServiceAccessor getTenantAccessor() {

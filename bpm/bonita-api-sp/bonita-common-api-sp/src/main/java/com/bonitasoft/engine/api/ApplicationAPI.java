@@ -24,6 +24,7 @@ import com.bonitasoft.engine.business.application.ApplicationMenuNotFoundExcepti
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
+import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.exception.InvalidNameException;
 import com.bonitasoft.engine.page.Page;
 
@@ -62,6 +63,19 @@ public interface ApplicationAPI {
      * @throws DeletionException if an error occurs during the deletion
      */
     void deleteApplication(long applicationId) throws DeletionException;
+
+    /**
+     * Updates an {@link Application} based on the information supplied by the {@link ApplicationUpdater}
+     *
+     * @param applicationId a long representing the application identifier
+     * @param updater an <code>ApplicationUpdater</code> describing the fields to be updated.
+     * @return the <code>Application</code> as it is after the update.
+     * @throws ApplicationNotFoundException if no <code>Applicaton</code> is found with the given id
+     * @throws UpdateException if an error occurs during the update
+     * @see Application
+     * @see ApplicationUpdater
+     */
+    Application updateApplication(long applicationId, ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException;
 
     /**
      * Searches for applications with specific search criteria.

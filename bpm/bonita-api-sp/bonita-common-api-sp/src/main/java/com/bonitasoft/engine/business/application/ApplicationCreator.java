@@ -21,10 +21,6 @@ public class ApplicationCreator implements Serializable {
 
     private static final long serialVersionUID = -916041825489100271L;
 
-    public enum ApplicationField {
-        NAME, DISPLAY_NAME, VERSION, PATH, DESCRIPTION, ICON_PATH, PROFILE_ID;
-    }
-
     private final Map<ApplicationField, Serializable> fields;
 
     public ApplicationCreator(final String name, final String displayName, final String version, final String path) {
