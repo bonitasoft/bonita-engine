@@ -244,7 +244,7 @@ public interface ProcessRuntimeAPI {
      *        The identifier of the process instance.
      * @return The number of open activity instances.
      *         #throws ProcessInstanceNotFoundException
-     *         if the specified process instacne id does not refer to a process instance.
+     *         if the specified process instance id does not refer to a process instance.
      * @throws ProcessInstanceNotFoundException
      *         If no matching process definition is found for parameter processInstanceId
      * @since 6.0
