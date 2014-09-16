@@ -130,7 +130,7 @@ public class BusinessDataExpressionExecutorStrategyTest {
     }
 
     @Test
-    public void should_be_a_business_data_expression_kind_strategy() throws Exception {
+    public void should_be_a_business_data_expression_kind_strategy() {
         assertThat(businessDataExpressionExecutorStrategy.getExpressionKind()).isEqualTo(ExpressionExecutorStrategy.KIND_BUSINESS_DATA);
     }
 
@@ -260,7 +260,7 @@ public class BusinessDataExpressionExecutorStrategyTest {
     }
 
     @Test
-    public void evaluation_result_should_be_pushed_in_context() throws Exception {
+    public void evaluation_result_should_be_pushed_in_context() {
         assertThat(businessDataExpressionExecutorStrategy.mustPutEvaluatedExpressionInContext()).isEqualTo(true);
     }
 

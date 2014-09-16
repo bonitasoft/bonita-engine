@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
 import static org.bonitasoft.engine.commons.Pair.pair;
@@ -90,8 +98,7 @@ public class PageAPIExtTest {
     public ExpectedException exception = ExpectedException.none();
 
     @Before
-    public void before() throws Exception {
-
+    public void before() {
         pageAPIExt = spy(new PageAPIExt());
 
         doReturn(tenantServiceAccessor).when(pageAPIExt).getTenantAccessor();
@@ -105,7 +112,6 @@ public class PageAPIExtTest {
         doReturn(2l).when(sPage).getInstalledBy();
         doReturn(3l).when(sPage).getInstallationDate();
         doReturn(4l).when(sPage).getLastModificationDate();
-
     }
 
     @Test

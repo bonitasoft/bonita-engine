@@ -262,8 +262,7 @@ public class PageServiceImpl implements PageService {
     private SPage createPage(final String name, final String displayName, final String description, final String contentName, final long creatorUserId,
             final boolean provided) {
         final SPageBuilder newSPageBuilder = BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
-                System.currentTimeMillis(), creatorUserId,
-                provided, contentName, null);
+                System.currentTimeMillis(), creatorUserId, provided, contentName);
         return newSPageBuilder.done();
     }
 
@@ -402,25 +401,22 @@ public class PageServiceImpl implements PageService {
     private SInsertEvent getInsertEvent(final Object object, final String type) {
         if (eventService.hasHandlers(type, EventActionType.CREATED)) {
             return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(type).setObject(object).done();
-        } else {
-            return null;
         }
+        return null;
     }
 
     private SDeleteEvent getDeleteEvent(final Object object, final String type) {
         if (eventService.hasHandlers(type, EventActionType.DELETED)) {
             return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(type).setObject(object).done();
-        } else {
-            return null;
         }
+        return null;
     }
 
     private SUpdateEvent getUpdateEvent(final Object object, final String type) {
         if (eventService.hasHandlers(type, EventActionType.UPDATED)) {
             return (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(type).setObject(object).done();
-        } else {
-            return null;
         }
+        return null;
     }
 
     void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String methodName) {
@@ -615,17 +611,17 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public void stop() throws SBonitaException {
+    public void stop() {
         // nothing to do
     }
 
     @Override
-    public void pause() throws SBonitaException {
+    public void pause() {
         // nothing to do
     }
 
     @Override
-    public void resume() throws SBonitaException {
+    public void resume() {
         // nothing to do
     }
 

@@ -48,7 +48,7 @@ import com.sun.codemodel.JMethod;
 public class EntityCodeGenerator {
 
     private final CodeGenerator codeGenerator;
-	private BusinessObjectModel bom;
+    private final BusinessObjectModel bom;
 
     public EntityCodeGenerator(final CodeGenerator codeGenerator, BusinessObjectModel bom) {
         this.codeGenerator = codeGenerator;
@@ -80,7 +80,7 @@ public class EntityCodeGenerator {
         return entityClass;
     }
 
-    private void addFieldsAndMethods(final BusinessObject bo, final JDefinedClass entityClass) throws JClassAlreadyExistsException {
+    private void addFieldsAndMethods(final BusinessObject bo, final JDefinedClass entityClass) {
         addPersistenceIdFieldAndAccessors(entityClass);
         addPersistenceVersionFieldAndAccessors(entityClass);
 
@@ -99,10 +99,10 @@ public class EntityCodeGenerator {
         for (final Query providedQuery : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
             addNamedQuery(entityClass, valueArray, providedQuery.getName(), providedQuery.getContent());
         }
-        
+
         // Add method for lazy fields
         for (final Query query : BDMQueryUtil.createProvidedQueriesForLazyField(bom, bo)) {
-        	addNamedQuery(entityClass, valueArray, query.getName(), query.getContent());
+            addNamedQuery(entityClass, valueArray, query.getName(), query.getContent());
         }
 
         // Add custom queries
@@ -165,20 +165,20 @@ public class EntityCodeGenerator {
         }
     }
 
-    public void addPersistenceIdFieldAndAccessors(final JDefinedClass entityClass) throws JClassAlreadyExistsException {
+    public void addPersistenceIdFieldAndAccessors(final JDefinedClass entityClass) {
         final JFieldVar idFieldVar = codeGenerator.addField(entityClass, Field.PERSISTENCE_ID, codeGenerator.toJavaClass(FieldType.LONG));
         codeGenerator.addAnnotation(idFieldVar, Id.class);
         codeGenerator.addAnnotation(idFieldVar, GeneratedValue.class);
         addAccessors(entityClass, idFieldVar);
     }
 
-    public void addPersistenceVersionFieldAndAccessors(final JDefinedClass entityClass) throws JClassAlreadyExistsException {
+    public void addPersistenceVersionFieldAndAccessors(final JDefinedClass entityClass) {
         final JFieldVar versionField = codeGenerator.addField(entityClass, Field.PERSISTENCE_VERSION, codeGenerator.toJavaClass(FieldType.LONG));
         codeGenerator.addAnnotation(versionField, Version.class);
         addAccessors(entityClass, versionField);
     }
 
-    public JFieldVar addField(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {
+    public JFieldVar addField(final JDefinedClass entityClass, final Field field) {
         JFieldVar fieldVar = null;
         if (field.isCollection()) {
             fieldVar = codeGenerator.addListField(entityClass, field);
@@ -221,11 +221,11 @@ public class EntityCodeGenerator {
         }
     }
 
-    public void addAccessors(final JDefinedClass entityClass, final JFieldVar fieldVar) throws JClassAlreadyExistsException {
+    public void addAccessors(final JDefinedClass entityClass, final JFieldVar fieldVar) {
         addAccessors(entityClass, fieldVar, null);
     }
 
-    public void addAccessors(final JDefinedClass entityClass, final JFieldVar fieldVar, final Field field) throws JClassAlreadyExistsException {
+    public void addAccessors(final JDefinedClass entityClass, final JFieldVar fieldVar, final Field field) {
         codeGenerator.addSetter(entityClass, fieldVar);
         final JMethod getter = codeGenerator.addGetter(entityClass, fieldVar);
         if (field instanceof RelationField && ((RelationField) field).isLazy()) {
@@ -233,7 +233,7 @@ public class EntityCodeGenerator {
         }
     }
 
-    protected void addModifiers(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {
+    protected void addModifiers(final JDefinedClass entityClass, final Field field) {
         final Boolean collection = field.isCollection();
         if (collection != null && collection) {
             codeGenerator.addAddMethod(entityClass, field);

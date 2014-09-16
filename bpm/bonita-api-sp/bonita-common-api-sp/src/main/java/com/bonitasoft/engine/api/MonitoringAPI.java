@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
-import org.bonitasoft.engine.session.InvalidSessionException;
-
 import com.bonitasoft.engine.monitoring.MonitoringException;
 
 /**

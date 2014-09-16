@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2013-2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -18,7 +18,6 @@ import org.bonitasoft.engine.authentication.AuthenticationConstants;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.platform.LoginException;
-import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.session.APISession;
 
@@ -71,21 +70,24 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
     }
 
     @Override
+    @CustomTransactions
+    @AvailableWhenTenantIsPaused
     public APISession login(final long tenantId, final Map<String, Serializable> credentials) throws LoginException, TenantStatusException {
         if (!LicenseChecker.getInstance().checkLicence()) {
             throw new LoginException("The node is not started !!");
         }
-        checkCredentials(credentials);
-        if (credentials != null) {
-            credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
-        }
+        checkCredentialsAreNotNullOrEmpty(credentials);
+
         try {
+            credentials.put(AuthenticationConstants.BASIC_TENANT_ID, tenantId);
             return loginInternal(tenantId, credentials);
         } catch (final LoginException e) {
             throw e;
         } catch (final TenantStatusException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (final RuntimeException e) {
+            throw e;
+        } catch (final Exception e) {
             throw new LoginException(e);
         }
     }
@@ -96,8 +98,8 @@ public class LoginAPIExt extends LoginAPIImpl implements LoginAPI {
     }
 
     @Override
-    protected void checkThatWeCanLogin(final String userName, final PlatformService platformService, final STenant sTenant) throws LoginException {
-        super.checkThatWeCanLogin(userName, platformService, sTenant);
+    protected void checkThatWeCanLogin(final String userName, final STenant sTenant) throws LoginException {
+        super.checkThatWeCanLogin(userName, sTenant);
         try {
             if (sTenant.isPaused()) {
                 final String technicalUserName = BonitaHomeServer.getInstance().getTenantProperties(sTenant.getId()).getProperty("userName");

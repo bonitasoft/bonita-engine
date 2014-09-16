@@ -15,7 +15,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
-import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -41,7 +40,7 @@ public class BusinessObjectDAOExpressionStrategy extends NonEmptyContentExpressi
 
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionDependencyMissingException, SExpressionEvaluationException {
+            final ContainerState containerState) throws SExpressionEvaluationException {
         final String daoName = expression.getContent();
         if (context.containsKey(daoName)) {
             return context.get(daoName);
@@ -60,9 +59,8 @@ public class BusinessObjectDAOExpressionStrategy extends NonEmptyContentExpressi
         if (daoImplClass != null) {
             Constructor constructor = daoImplClass.getConstructor(BusinessDataRepository.class);
             return constructor.newInstance(businessDataRepository);
-        } else {
-            throw new SBusinessDataRepositoryException("Cannot load class " + daoClassName);
         }
+        throw new SBusinessDataRepositoryException("Cannot load class " + daoClassName);
     }
 
     protected String getDAOServerImplementationFromInterface(final String daoClassName) {
@@ -72,7 +70,7 @@ public class BusinessObjectDAOExpressionStrategy extends NonEmptyContentExpressi
 
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionDependencyMissingException, SExpressionEvaluationException {
+            final ContainerState containerState) throws SExpressionEvaluationException {
         List<Object> daos = new ArrayList<Object>(expressions.size());
         for (SExpression expression : expressions) {
             daos.add(evaluate(expression, context, resolvedExpressions, containerState));
