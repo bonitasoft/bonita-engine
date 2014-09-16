@@ -29,7 +29,7 @@ import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 public class ContractValidator {
 
     private final ContractStructureValidator structureValidator;
-    private ContractRulesValidator rulesValidator;
+    private final ContractRulesValidator rulesValidator;
 
     private final List<String> comments;
 
@@ -42,7 +42,7 @@ public class ContractValidator {
     public boolean isValid(final SContractDefinition contract, final Map<String, Object> variables) {
         try {
             structureValidator.validate(contract, variables);
-            rulesValidator.validate(variables, contract.getRules());
+            rulesValidator.validate(contract.getRules(), variables);
         } catch (ContractViolationException e) {
             comments.addAll(e.getExplanations());
             return false;

@@ -31,7 +31,7 @@ public class ContractRulesValidator {
         this.logger = logger;
     }
 
-    public void validate(final Map<String, Object> variables, final List<SRuleDefinition> rules) throws ContractViolationException {
+    public void validate(final List<SRuleDefinition> rules, final Map<String, Object> variables) throws ContractViolationException {
         List<String> comments = new ArrayList<String>();
         for (final SRuleDefinition rule : rules) {
             log(TechnicalLogSeverity.DEBUG, "Evaluating rule [" + rule.getName() + "] on input(s) " + rule.getInputNames());
@@ -53,8 +53,8 @@ public class ContractRulesValidator {
     }
 
     private void log(final TechnicalLogSeverity severity, final String message) {
-        if (logger.isLoggable(ContractValidator.class, severity)) {
-            logger.log(ContractValidator.class, severity, message);
+        if (logger.isLoggable(ContractRulesValidator.class, severity)) {
+            logger.log(ContractRulesValidator.class, severity, message);
         }
     }
 }
