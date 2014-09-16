@@ -571,15 +571,15 @@ public class XMLSProcessDefinition {
     private XMLNode createContractNode(final SContractDefinition contract) {
         final XMLNode contractNode = new XMLNode(CONTRACT_NODE);
         final XMLNode inputsNode = new XMLNode(CONTRACT_INPUTS_NODE);
-
         for (final SSimpleInputDefinition input : contract.getSimpleInputs()) {
             inputsNode.addChild(createSimpleInputNode(input));
         }
-
         for (final SComplexInputDefinition input : contract.getComplexInputs()) {
             inputsNode.addChild(createComplexInputNode(input));
         }
-
+        if (!inputsNode.getChildNodes().isEmpty()) {
+            contractNode.addChild(inputsNode);
+        }
         final List<SRuleDefinition> rules = contract.getRules();
         if (!rules.isEmpty()) {
             final XMLNode rulesNode = new XMLNode(CONTRACT_RULES_NODE);

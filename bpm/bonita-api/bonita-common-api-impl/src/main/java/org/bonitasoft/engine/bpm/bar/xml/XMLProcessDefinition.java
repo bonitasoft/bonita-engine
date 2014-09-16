@@ -543,19 +543,19 @@ public class XMLProcessDefinition {
 
     private XMLNode createContractNode(final ContractDefinition contract) {
         final XMLNode contractNode = new XMLNode(CONTRACT_NODE);
+        final XMLNode inputsNode = new XMLNode(CONTRACT_INPUTS_NODE);
         if (!contract.getSimpleInputs().isEmpty()) {
-            final XMLNode inputsNode = new XMLNode(CONTRACT_INPUTS_NODE);
-            contractNode.addChild(inputsNode);
             for (final SimpleInputDefinition input : contract.getSimpleInputs()) {
                 inputsNode.addChild(createSimpleInputNode(input));
             }
         }
         if (!contract.getComplexInputs().isEmpty()) {
-            final XMLNode inputsNode = new XMLNode(CONTRACT_INPUTS_NODE);
-            contractNode.addChild(inputsNode);
             for (final ComplexInputDefinition input : contract.getComplexInputs()) {
                 inputsNode.addChild(createComplexInputNode(input));
             }
+        }
+        if (!inputsNode.getChildNodes().isEmpty()) {
+            contractNode.addChild(inputsNode);
         }
         final List<RuleDefinition> rules = contract.getRules();
         if (!rules.isEmpty()) {
