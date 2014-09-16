@@ -32,6 +32,13 @@ public class SSimpleInputDefinitionImpl extends SNamedElementImpl implements SSi
         super(name);
     }
 
+    public SSimpleInputDefinitionImpl(String name, SType type, String description) {
+        super(name);
+        this.description = description;
+        this.type = type;
+    }
+
+
     public SSimpleInputDefinitionImpl(final SimpleInputDefinition input) {
         this(input.getName());
         description = input.getDescription();

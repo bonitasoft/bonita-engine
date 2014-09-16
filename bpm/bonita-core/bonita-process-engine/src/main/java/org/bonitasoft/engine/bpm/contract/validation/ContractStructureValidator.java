@@ -22,6 +22,7 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -51,7 +52,7 @@ public class ContractStructureValidator {
 
     private List<String> findEventualProblems(SContractDefinition contract, Map<String, Object> inputs) {
         List<String> problems = new ArrayList<String>();
-        for (SInputDefinition definition : contract.getInputs()) {
+        for (SSimpleInputDefinition definition : contract.getSimpleInputs()) {
             String inputName = definition.getName();
             if (!inputs.containsKey(inputName)) {
                 problems.add("Contract need field [" + inputName + "] but it has not been provided");
@@ -75,7 +76,7 @@ public class ContractStructureValidator {
 
     private List<String> getInputsWhichAreNotInContract(SContractDefinition contract, Map<String, Object> inputs) {
         List<String> keySet = new ArrayList<String>(inputs.keySet());
-        for (SInputDefinition def : contract.getInputs()) {
+        for (SInputDefinition def : contract.getSimpleInputs()) {
             keySet.remove(def.getName());
         }
         return keySet;

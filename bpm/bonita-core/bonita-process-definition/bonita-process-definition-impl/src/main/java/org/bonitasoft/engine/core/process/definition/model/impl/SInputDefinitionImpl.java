@@ -27,10 +27,9 @@ public class SInputDefinitionImpl extends SNamedElementImpl implements SInputDef
         super(name);
     }
     
-    public SInputDefinitionImpl(String name, SType type, String description) {
+    public SInputDefinitionImpl(String name, String description) {
         super(name);
         this.description = description;
-        this.type = type;
     }
 
     @Override
