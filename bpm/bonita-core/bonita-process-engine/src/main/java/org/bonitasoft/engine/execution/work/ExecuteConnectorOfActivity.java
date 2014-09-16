@@ -63,21 +63,19 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
     private final long flowNodeDefinitionId;
 
-    private final Map<String, Object> inputs;
 
     ExecuteConnectorOfActivity(final long processDefinitionId, final long flowNodeDefinitionId, final long flowNodeInstanceId, final long connectorInstanceId,
-            final String connectorDefinitionName, final Map<String, Object> inputs) {
+            final String connectorDefinitionName) {
         super(processDefinitionId, connectorInstanceId, connectorDefinitionName, new SExpressionContext(flowNodeInstanceId,
-                DataInstanceContainer.ACTIVITY_INSTANCE.name(), processDefinitionId), inputs);
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(), processDefinitionId));
         this.flowNodeDefinitionId = flowNodeDefinitionId;
         this.flowNodeInstanceId = flowNodeInstanceId;
-        this.inputs = inputs;
     }
 
     @Override
     protected void evaluateOutput(final Map<String, Object> context, final ConnectorResult result, final SConnectorDefinition sConnectorDefinition)
             throws STransactionException, SBonitaException {
-        evaluateOutput(context, result, sConnectorDefinition, flowNodeInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), inputs);
+        evaluateOutput(context, result, sConnectorDefinition, flowNodeInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name());
     }
 
     @Override

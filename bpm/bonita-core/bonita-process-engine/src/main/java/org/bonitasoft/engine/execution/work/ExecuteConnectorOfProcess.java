@@ -78,7 +78,7 @@ public class ExecuteConnectorOfProcess extends ExecuteConnectorWork {
     @Override
     protected void evaluateOutput(final Map<String, Object> context, final ConnectorResult result, final SConnectorDefinition sConnectorDefinition)
             throws SBonitaException {
-        evaluateOutput(context, result, sConnectorDefinition, processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name(), null);
+        evaluateOutput(context, result, sConnectorDefinition, processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name());
     }
 
     @Override

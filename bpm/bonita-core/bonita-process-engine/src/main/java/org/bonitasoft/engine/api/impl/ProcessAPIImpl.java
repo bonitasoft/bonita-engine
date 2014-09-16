@@ -152,7 +152,6 @@ import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
-import org.bonitasoft.engine.bpm.contract.Input;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
@@ -3504,7 +3503,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 tenantAccessor.getProcessDefinitionService(), tenantAccessor.getDataInstanceService(), tenantAccessor.getOperationService(),
                 tenantAccessor.getWorkService(), tenantAccessor.getContainerRegistry(), tenantAccessor.getEventInstanceService(),
                 tenantAccessor.getSchedulerService(), tenantAccessor.getCommentService(), tenantAccessor.getIdentityService(),
-                tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getTokenService(), tenantAccessor.getCacheService());
+                tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getTokenService());
         try {
             final SActivityInstance sActivityInstance = getSActivityInstance(activityInstanceId);
             if (sActivityInstance instanceof SHumanTaskInstance) {

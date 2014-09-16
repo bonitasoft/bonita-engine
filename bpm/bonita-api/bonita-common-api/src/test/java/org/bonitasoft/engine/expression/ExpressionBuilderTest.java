@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.expression;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -100,4 +102,16 @@ public class ExpressionBuilderTest {
     public void setReturnTypeShouldAllowNonPrimitiveBooleanType() throws Exception {
         new ExpressionBuilder().createNewInstance("someName").setReturnType(Boolean.class.getName());
     }
+
+    @Test
+    public void createContractInputExpressionShouldConstructARightExpression() throws Exception {
+        final Expression expression = new ExpressionBuilder().createContractInputExpression("comment", String.class.getName());
+        assertThat(expression.getName()).isEqualTo("comment");
+        assertThat(expression.getContent()).isEqualTo("comment");
+        assertThat(expression.getReturnType()).isEqualTo(String.class.getName());
+        assertThat(expression.getDependencies()).isEmpty();
+        assertThat(expression.getExpressionType()).isEqualTo(ExpressionType.TYPE_CONTRACT_INPUT.toString());
+        assertThat(expression.getInterpreter()).isNull();
+    }
+
 }

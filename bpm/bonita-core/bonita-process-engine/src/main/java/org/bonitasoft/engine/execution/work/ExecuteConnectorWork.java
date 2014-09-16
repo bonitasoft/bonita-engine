@@ -100,13 +100,12 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
     }
 
     protected void evaluateOutput(final Map<String, Object> context, final ConnectorResult result, final SConnectorDefinition sConnectorDefinition,
-            final Long id, final String containerType, final Map<String, Object> inputs) throws SBonitaException {
+            final Long id, final String containerType) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final List<SOperation> outputs = sConnectorDefinition.getOutputs();
         final SExpressionContext sExpressionContext = new SExpressionContext(id, containerType, processDefinitionId);
-        sExpressionContext.setInputValues(inputs);
         connectorService.executeOutputOperation(outputs, sExpressionContext, result);
         connectorInstanceService.setState(connectorInstanceService.getConnectorInstance(connectorInstanceId), ConnectorService.DONE);
     }

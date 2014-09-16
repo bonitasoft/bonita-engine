@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.execution.work;
 
 import java.util.List;
-import java.util.Map;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -43,9 +42,9 @@ public class WorkFactory {
     }
 
     public static BonitaWork createExecuteConnectorOfActivity(final long processDefinitionId, final long processInstanceId, final long flowNodeDefinitionId,
-            final long flowNodeInstanceId, final long connectorInstanceId, final String connectorDefinitionName, final Map<String, Object> inputs) {
+            final long flowNodeInstanceId, final long connectorInstanceId, final String connectorDefinitionName) {
         BonitaWork wrappedWork = new ExecuteConnectorOfActivity(processDefinitionId, flowNodeDefinitionId, flowNodeInstanceId,
-                connectorInstanceId, connectorDefinitionName, inputs);
+                connectorInstanceId, connectorDefinitionName);
         wrappedWork = new ConnectorDefinitionAndInstanceContextWork(wrappedWork, connectorDefinitionName, connectorInstanceId);
         wrappedWork = buildFlowNodeDefinitionAndInstanceContextWork(processDefinitionId, processInstanceId, flowNodeInstanceId, wrappedWork);
         return new FailureHandlingBonitaWork(wrappedWork);

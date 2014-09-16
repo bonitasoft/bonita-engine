@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
@@ -27,8 +26,6 @@ import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.cache.CacheService;
-import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -84,21 +81,11 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
-import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
-import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
@@ -203,16 +190,13 @@ public class StateBehaviors {
 
     private final TokenService tokenService;
 
-    private final CacheService cacheService;
-
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
             final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
             final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
             final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
             final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceSevice, final SchedulerService schedulerService,
-            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final TokenService tokenService,
-            final CacheService cacheService) {
+            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final TokenService tokenService) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -233,7 +217,6 @@ public class StateBehaviors {
         this.identityService = identityService;
         this.logger = logger;
         this.tokenService = tokenService;
-        this.cacheService = cacheService;
     }
 
     public void setProcessExecutor(final ProcessExecutor processExecutor) {
@@ -276,26 +259,26 @@ public class StateBehaviors {
     @SuppressWarnings("unchecked")
     public void mapDataOutputOfMultiInstance(final SFlowNodeInstance flowNodeInstance, final SMultiInstanceLoopCharacteristics miLoop)
             throws SActivityExecutionException, SBonitaException {
-                        final SDataInstance outputData = dataInstanceService.getDataInstance(miLoop.getDataOutputItemRef(), flowNodeInstance.getId(),
-                                DataInstanceContainer.ACTIVITY_INSTANCE.name());
-                        final SDataInstance loopData = dataInstanceService.getDataInstance(miLoop.getLoopDataOutputRef(), flowNodeInstance.getId(),
-                                DataInstanceContainer.ACTIVITY_INSTANCE.name());
-                        if (outputData != null && loopData != null) {
-                            final Serializable value = loopData.getValue();
-                            final int index = flowNodeInstance.getLoopCounter();
-                            if (value instanceof List<?>) {
-                                final List<Serializable> list = (List<Serializable>) value;
-                                list.set(index, outputData.getValue());
-                            } else {
-                                throw new SActivityExecutionException("unable to map the ouput of the multi instanciated activity "
-                                        + flowNodeInstance.getName() + " the output loop data named " + loopData.getName() + " is not a list but "
-                                        + loopData.getClassName());
-                            }
-                            final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-                            entityUpdateDescriptor.addField("value", value);
-                            dataInstanceService.updateDataInstance(loopData, entityUpdateDescriptor);
-                        }
-                    }
+        final SDataInstance outputData = dataInstanceService.getDataInstance(miLoop.getDataOutputItemRef(), flowNodeInstance.getId(),
+                DataInstanceContainer.ACTIVITY_INSTANCE.name());
+        final SDataInstance loopData = dataInstanceService.getDataInstance(miLoop.getLoopDataOutputRef(), flowNodeInstance.getId(),
+                DataInstanceContainer.ACTIVITY_INSTANCE.name());
+        if (outputData != null && loopData != null) {
+            final Serializable value = loopData.getValue();
+            final int index = flowNodeInstance.getLoopCounter();
+            if (value instanceof List<?>) {
+                final List<Serializable> list = (List<Serializable>) value;
+                list.set(index, outputData.getValue());
+            } else {
+                throw new SActivityExecutionException("unable to map the ouput of the multi instanciated activity "
+                        + flowNodeInstance.getName() + " the output loop data named " + loopData.getName() + " is not a list but "
+                        + loopData.getClassName());
+            }
+            final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+            entityUpdateDescriptor.addField("value", value);
+            dataInstanceService.updateDataInstance(loopData, entityUpdateDescriptor);
+        }
+    }
 
     public void mapActors(final SFlowNodeInstance flowNodeInstance, final SFlowElementContainerDefinition processContainer)
             throws SActivityStateExecutionException {
@@ -399,7 +382,7 @@ public class StateBehaviors {
 
     /**
      * Return the phases and connectors to execute, as a couple of (phase, couple of (connector instance, connector definition))
-     * 
+     *
      * @param processDefinition
      *        the process where the connectors are defined.
      * @param flowNodeInstance
@@ -413,7 +396,7 @@ public class StateBehaviors {
      */
     public BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> getConnectorToExecuteAndFlag(final SProcessDefinition processDefinition,
             final SFlowNodeInstance flowNodeInstance, final boolean executeConnectorsOnEnter, final boolean executeConnectorsOnFinish)
-            throws SActivityStateExecutionException {
+                    throws SActivityStateExecutionException {
         try {
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SFlowNodeDefinition flowNodeDefinition = processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
@@ -495,7 +478,7 @@ public class StateBehaviors {
 
     private BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> getConnectorWithFlagIfIsNextToExecute(final SFlowNodeInstance flowNodeInstance,
             final List<SConnectorDefinition> sConnectorDefinitions, final SConnectorInstance nextConnectorInstanceToExecute, final int flag)
-            throws SActivityStateExecutionException {
+                    throws SActivityStateExecutionException {
         for (final SConnectorDefinition sConnectorDefinition : sConnectorDefinitions) {
             if (sConnectorDefinition.getName().equals(nextConnectorInstanceToExecute.getName())) {
                 return getConnectorWithFlag(nextConnectorInstanceToExecute, sConnectorDefinition, flag);
@@ -580,7 +563,7 @@ public class StateBehaviors {
     }
 
     private long getTargetProcessDefinitionId(final String callableElement, final String callableElementVersion) throws SProcessDefinitionReadException,
-            SProcessDefinitionNotFoundException {
+    SProcessDefinitionNotFoundException {
         if (callableElementVersion != null) {
             return processDefinitionService.getProcessDefinitionId(callableElement, callableElementVersion);
         }
@@ -677,16 +660,10 @@ public class StateBehaviors {
                 final List<SOperation> sOperations = activityDefinition.getSOperations();
                 final SExpressionContext sExpressionContext = new SExpressionContext(activityInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                         processDefinition.getId());
-                if (activityInstance instanceof SUserTaskInstance) {
-                    final Map<String, Object> inputs = (Map<String, Object>) cacheService.get("USER_TASK_CONTRACT", activityInstance.getId());
-                    sExpressionContext.setInputValues(inputs);
-                }
                 operationService.execute(sOperations, sExpressionContext);
             }
         } catch (final SOperationExecutionException e) {
             throw new SActivityStateExecutionException(e);
-        } catch (final SCacheException sce) {
-            throw new SActivityStateExecutionException(sce);
         }
     }
 
@@ -756,20 +733,14 @@ public class StateBehaviors {
 
     public void executeConnectorInWork(final Long processDefinitionId, final long processInstanceId, final long flowNodeDefinitionId,
             final long flowNodeInstanceId, final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition)
-            throws SActivityStateExecutionException {
+                    throws SActivityStateExecutionException {
         final long connectorInstanceId = connector.getId();
         // final Long connectorDefinitionId = sConnectorDefinition.getId();// FIXME: Uncomment when generate id
         final String connectorDefinitionName = sConnectorDefinition.getName();
         try {
             connectorInstanceService.setState(connector, ConnectorState.EXECUTING.name());
-            Map<String, Object> inputs = null;
-            try {
-                inputs = (Map<String, Object>) cacheService.get("USER_TASK_CONTRACT", flowNodeInstanceId);
-            } catch (final SCacheException sce) {
-                throw new SActivityStateExecutionException(sce);
-            }
             workService.registerWork(WorkFactory.createExecuteConnectorOfActivity(processDefinitionId, processInstanceId, flowNodeDefinitionId,
-                    flowNodeInstanceId, connectorInstanceId, connectorDefinitionName, inputs));
+                    flowNodeInstanceId, connectorInstanceId, connectorDefinitionName));
         } catch (final SConnectorInstanceModificationException e) {
             throw new SActivityStateExecutionException("Unable to set ConnectorState to EXECUTING", e);
         } catch (final SWorkRegisterException e) {
@@ -939,13 +910,13 @@ public class StateBehaviors {
         }
     }
 
-    public void addAssignmentSystemCommentIfTaskWasAutoAssign(SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+    public void addAssignmentSystemCommentIfTaskWasAutoAssign(final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
         if (SFlowNodeType.USER_TASK.equals(flowNodeInstance.getType()) || SFlowNodeType.MANUAL_TASK.equals(flowNodeInstance.getType())) {
-            long userId = ((SHumanTaskInstance) flowNodeInstance).getAssigneeId();
+            final long userId = ((SHumanTaskInstance) flowNodeInstance).getAssigneeId();
             if (userId > 0) {
                 try {
                     addAssignmentSystemComment(flowNodeInstance, userId);
-                } catch (SBonitaException e) {
+                } catch (final SBonitaException e) {
                     throw new SActivityStateExecutionException("error while updating display name and description", e);
                 }
             }
@@ -953,7 +924,7 @@ public class StateBehaviors {
 
     }
 
-    public void addAssignmentSystemComment(SFlowNodeInstance flowNodeInstance, long userId) throws SUserNotFoundException, SCommentAddException {
+    public void addAssignmentSystemComment(final SFlowNodeInstance flowNodeInstance, final long userId) throws SUserNotFoundException, SCommentAddException {
         final SUser user = identityService.getUser(userId);
         if (commentService.isCommentEnabled(SystemCommentType.STATE_CHANGE)) {
             commentService.addSystemComment(flowNodeInstance.getRootContainerId(), "The task \"" + flowNodeInstance.getDisplayName() + "\" is now assigned to "

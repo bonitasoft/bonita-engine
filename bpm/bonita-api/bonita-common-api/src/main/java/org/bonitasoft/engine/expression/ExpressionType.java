@@ -16,7 +16,7 @@ package org.bonitasoft.engine.expression;
 /**
  * Default expression type supported in the engine
  * Other type of expression can be added by adding a new expression executor strategy having an unique kind
- * 
+ *
  * @author Zhao na
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
@@ -61,6 +61,8 @@ public enum ExpressionType {
      */
     TYPE_BUSINESS_OBJECT_DAO,
 
-    TYPE_QUERY_BUSINESS_DATA
+    TYPE_QUERY_BUSINESS_DATA,
+
+    TYPE_CONTRACT_INPUT;
 
 }

@@ -23,6 +23,7 @@
 				<ref bean="conditionExpressionExecutorStrategy" />
 				<ref bean="javaMethodCallExpressionExecutorStrategy" />
 				<ref bean="xPathReadExpressionExecutorStrategy" />
+                <ref bean="contractInputExpressionExecutorStrategy" />
 			</list>
 		</property>
 	</bean>
@@ -53,5 +54,9 @@
 	<bean id="conditionExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.ConditionExpressionExecutorStrategy" />
 
 	<bean id="javaMethodCallExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.impl.JavaMethodCallExpressionExecutorStrategy" />
+
+    <bean id="contractInputExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.ContractInputExpressionExecutorStrategy" >
+        <constructor-arg name="cacheService" ref="cacheService" />
+    </bean>
 
 </beans>

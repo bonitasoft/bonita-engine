@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -147,7 +147,7 @@ public class ExpressionBuilder {
 
     /**
      * Builds an <code>Expression</code> that evaluates to a Business Object Server DAO.
-     * 
+     *
      * @param businessObjectDAOName
      *            name of the DAO to evaluate.
      * @param daoInterfaceClassName
@@ -325,7 +325,7 @@ public class ExpressionBuilder {
 
     public Expression createConstantDoubleExpression(final double d) throws InvalidExpressionException {
         createNewInstance(Double.toString(d)).setContent(String.valueOf(d)).setExpressionType(ExpressionType.TYPE_CONSTANT)
-                .setReturnType(Double.class.getName());
+        .setReturnType(Double.class.getName());
         return done();
     }
 
@@ -392,28 +392,28 @@ public class ExpressionBuilder {
 
     public Expression createGroovyScriptExpression(final String name, final String script, final String returnType) throws InvalidExpressionException {
         createNewInstance(name).setContent(script).setExpressionType(ExpressionType.TYPE_READ_ONLY_SCRIPT).setInterpreter(ExpressionInterpreter.GROOVY.name())
-                .setReturnType(returnType);
+        .setReturnType(returnType);
         return done();
     }
 
     public Expression createGroovyScriptExpression(final String name, final String script, final String returnType, final List<Expression> dependencies)
             throws InvalidExpressionException {
         createNewInstance(name).setContent(script).setExpressionType(ExpressionType.TYPE_READ_ONLY_SCRIPT).setInterpreter(ExpressionInterpreter.GROOVY.name())
-                .setReturnType(returnType).setDependencies(dependencies);
+        .setReturnType(returnType).setDependencies(dependencies);
         return done();
     }
 
     public Expression createGroovyScriptExpression(final String name, final String script, final String returnType, final Expression... dependencies)
             throws InvalidExpressionException {
         createNewInstance(name).setContent(script).setExpressionType(ExpressionType.TYPE_READ_ONLY_SCRIPT).setInterpreter(ExpressionInterpreter.GROOVY.name())
-                .setReturnType(returnType).setDependencies(Arrays.asList(dependencies));
+        .setReturnType(returnType).setDependencies(Arrays.asList(dependencies));
         return done();
     }
 
     public Expression createPatternExpression(final String name, final String messagePattern, final Expression... dependencies)
             throws InvalidExpressionException {
         createNewInstance(name).setName(messagePattern).setContent(messagePattern).setExpressionType(ExpressionType.TYPE_PATTERN).setInterpreter("NONE")
-                .setReturnType(String.class.getName()).setDependencies(Arrays.asList(dependencies));
+        .setReturnType(String.class.getName()).setDependencies(Arrays.asList(dependencies));
         return done();
     }
 
@@ -421,6 +421,10 @@ public class ExpressionBuilder {
             throws InvalidExpressionException {
         createNewInstance(expressionName).setExpressionType(ExpressionType.TYPE_PARAMETER).setReturnType(returnType).setContent(parameterName);
         return done();
+    }
+
+    public Expression createContractInputExpression(final String inputName, final String returnType) throws InvalidExpressionException {
+        return createNewInstance(inputName).setContent(inputName).setExpressionType(ExpressionType.TYPE_CONTRACT_INPUT).setReturnType(returnType).done();
     }
 
     public Expression createComparisonExpression(final String name, final Expression leftOperand, final ComparisonOperator operator,
