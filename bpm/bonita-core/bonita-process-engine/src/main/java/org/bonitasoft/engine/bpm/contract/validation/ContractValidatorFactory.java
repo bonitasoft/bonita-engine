@@ -24,6 +24,7 @@ public class ContractValidatorFactory {
 
     public ContractValidator createContractValidator(TechnicalLoggerService loggerService) {
         ContractStructureValidator contractStructureValidator = new ContractStructureValidator(new ContractTypeValidator(), loggerService);
-        return new ContractValidator(contractStructureValidator, loggerService);
+        ContractRulesValidator contractRulesValidator = new ContractRulesValidator(loggerService);
+        return new ContractValidator(contractStructureValidator, contractRulesValidator);
     }
 }

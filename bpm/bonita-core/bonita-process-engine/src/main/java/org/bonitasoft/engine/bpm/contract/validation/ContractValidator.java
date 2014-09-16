@@ -19,10 +19,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
-import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.mvel2.MVEL;
 
 /**
  * Validate tasks inputs according to given contract
@@ -32,52 +28,26 @@ import org.mvel2.MVEL;
  */
 public class ContractValidator {
 
-    private final TechnicalLoggerService logger;
-    private final ContractStructureValidator contractStructureValidator;
+    private final ContractStructureValidator structureValidator;
+    private ContractRulesValidator rulesValidator;
 
     private final List<String> comments;
 
-    public ContractValidator(final ContractStructureValidator contractStructureValidator, final TechnicalLoggerService loggerService) {
+    public ContractValidator(final ContractStructureValidator contractStructureValidator, final ContractRulesValidator contractRulesValidator) {
+        this.rulesValidator = contractRulesValidator;
+        this.structureValidator = contractStructureValidator;
         comments = new ArrayList<String>();
-        this.contractStructureValidator = contractStructureValidator;
-        this.logger = loggerService;
     }
 
     public boolean isValid(final SContractDefinition contract, final Map<String, Object> variables) {
-        comments.clear();
-
         try {
-            contractStructureValidator.validate(contract, variables);
+            structureValidator.validate(contract, variables);
+            rulesValidator.validate(variables, contract.getRules());
         } catch (ContractViolationException e) {
             comments.addAll(e.getExplanations());
+            return false;
         }
-        final List<SRuleDefinition> rules = contract.getRules();
-        if (comments.isEmpty()) {
-            validateRules(variables, rules);
-        }
-        return comments.isEmpty();
-    }
-
-    private void validateRules(final Map<String, Object> variables, final List<SRuleDefinition> rules) {
-        for (final SRuleDefinition rule : rules) {
-            log(TechnicalLogSeverity.DEBUG, "Evaluating rule [" + rule.getName() + "] on input(s) " + rule.getInputNames());
-            Boolean valid;
-            try {
-                valid = MVEL.evalToBoolean(rule.getExpression(), variables);
-            } catch (final Exception e) {
-                valid = Boolean.FALSE;
-            }
-            if (!valid) {
-                log(TechnicalLogSeverity.WARNING, "Rule [" + rule.getName() + "] on input(s) " + rule.getInputNames() + " is not valid");
-                comments.add(rule.getExplanation());
-            }
-        }
-    }
-
-    private void log(final TechnicalLogSeverity severity, final String message) {
-        if (logger.isLoggable(ContractValidator.class, severity)) {
-            logger.log(ContractValidator.class, severity, message);
-        }
+        return true;
     }
 
     public List<String> getComments() {

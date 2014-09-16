@@ -52,7 +52,8 @@ public class ContractValidatorTest {
     @Before
     public void setUp() {
         ContractStructureValidator contractStructureValidator2 = new ContractStructureValidator(new ContractTypeValidator(), loggerService);
-        validator = new ContractValidator(contractStructureValidator2, loggerService);
+        ContractRulesValidator contractRulesValidator = new ContractRulesValidator(loggerService);
+        validator = new ContractValidator(contractStructureValidator2, contractRulesValidator);
     }
     
     private SContractDefinition buildContractWithInputsAndRules() {

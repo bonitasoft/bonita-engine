@@ -44,15 +44,15 @@ public class ContractStructureValidator {
 
     public void validate(SContractDefinition contract, Map<String, Object> inputs) throws ContractViolationException {
         logInputsWhichAreNotInContract(DEBUG, contract, inputs);
-        List<String> problems = findEventualProblems(contract, inputs);
+        List<String> problems = findEventualProblems(contract.getSimpleInputs(), inputs);
         if (!problems.isEmpty()) {
             throw new ContractViolationException("Error in task inputs structure", problems);
         }
     }
 
-    private List<String> findEventualProblems(SContractDefinition contract, Map<String, Object> inputs) {
+    protected List<String> findEventualProblems(List<SSimpleInputDefinition> simpleInputs, Map<String, Object> inputs) {
         List<String> problems = new ArrayList<String>();
-        for (SSimpleInputDefinition definition : contract.getSimpleInputs()) {
+        for (SSimpleInputDefinition definition : simpleInputs) {
             String inputName = definition.getName();
             if (!inputs.containsKey(inputName)) {
                 problems.add("Contract need field [" + inputName + "] but it has not been provided");
