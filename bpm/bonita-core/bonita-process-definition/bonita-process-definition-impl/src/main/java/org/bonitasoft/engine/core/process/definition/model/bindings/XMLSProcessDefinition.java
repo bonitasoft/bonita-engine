@@ -345,7 +345,7 @@ public class XMLSProcessDefinition {
 
     public static final String CONTRACT_INPUTS_NODE = "inputDefinitions";
 
-    public static final String CONTRACT_INPUT_NODE = "inputDefinition";
+    public static final String CONTRACT_SIMPLE_INPUT_NODE = "inputDefinition";
 
     public static final String CONTRACT_COMPLEX_INPUT_NODE = "complexInputDefinition";
 
@@ -606,7 +606,7 @@ public class XMLSProcessDefinition {
     }
 
     private XMLNode createSimpleInputNode(final SSimpleInputDefinition input) {
-        final XMLNode inputNode = new XMLNode(CONTRACT_INPUT_NODE);
+        final XMLNode inputNode = new XMLNode(CONTRACT_SIMPLE_INPUT_NODE);
         inputNode.addAttribute(NAME, input.getName());
         inputNode.addAttribute(TYPE, input.getType().toString());
         inputNode.addAttribute(DESCRIPTION, input.getDescription());

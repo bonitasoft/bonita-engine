@@ -8,17 +8,18 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.contract.RuleDefinition;
 import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
+import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
@@ -37,7 +38,6 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class UserTaskContractTest extends CommonAPITest {
@@ -88,17 +88,16 @@ public class UserTaskContractTest extends CommonAPITest {
     }
 
     @Test
-    @Ignore
     public void createAContractWithAComplexInput() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
-        SimpleInputDefinition expenseType = new SimpleInputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
-        SimpleInputDefinition expenseAmount = new SimpleInputDefinitionImpl("amount", Type.DECIMAL, "expense amount");
-        SimpleInputDefinition expenseDate = new SimpleInputDefinitionImpl("date", Type.DATE, "expense date");
-        List<SimpleInputDefinition> inputs = Arrays.asList(expenseType, expenseDate, expenseAmount);
-
+        final SimpleInputDefinition expenseType = new SimpleInputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
+        final SimpleInputDefinition expenseAmount = new SimpleInputDefinitionImpl("amount", Type.DECIMAL, "expense amount");
+        final SimpleInputDefinition expenseDate = new SimpleInputDefinitionImpl("date", Type.DATE, "expense date");
+        final ComplexInputDefinition complexSubIput = new ComplexInputDefinitionImpl("date", "expense date", Arrays.asList(expenseType), null);
         //given
-        builder.addUserTask("task1", ACTOR_NAME).addContract().addComplexInput("expenseLine", "expense report line", inputs,null);
+        builder.addUserTask("task1", ACTOR_NAME).addContract()
+        .addComplexInput("expenseLine", "expense report line", Arrays.asList(expenseDate, expenseAmount), Arrays.asList(complexSubIput));
 
         //when
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
@@ -107,13 +106,14 @@ public class UserTaskContractTest extends CommonAPITest {
 
         //then
         final ContractDefinition contract = getProcessAPI().getUserTaskContract(userTask.getId());
+        assertThat(contract.getComplexInputs()).hasSize(1);
+        final ComplexInputDefinition complexInput = contract.getComplexInputs().get(0);
+        assertThat(complexInput.getName()).isEqualTo("expenseLine");
+        assertThat(complexInput.getDescription()).isEqualTo("expense report line");
+        assertThat(complexInput.getSimpleInputDefinitions()).as("should have 2 simples inputs").hasSize(2);
+        assertThat(complexInput.getComplexInputDefinitions()).as("should have 1 complex input").hasSize(1);
 
-        assertThat(contract.getSimpleInputs()).hasSize(1);
-        final SimpleInputDefinition input = contract.getSimpleInputs().get(0);
-        assertThat(input.getName()).isEqualTo("expenseLine");
-        assertThat(input.getType()).isEqualTo(Type.COMPLEX);
-        assertThat(input.getDescription()).isEqualTo("expense report line");
-
+        //clean up
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -224,7 +224,7 @@ public class UserTaskContractTest extends CommonAPITest {
         final long expectedValue = 8l;
         try {
             final Map<String, Object> inputs = new HashMap<String, Object>();
-            inputs.put("numberOfDays",expectedValue);
+            inputs.put("numberOfDays", expectedValue);
 
             getProcessAPI().executeUserTask(userTask.getId(), inputs);
         } catch (final ContractViolationException e) {

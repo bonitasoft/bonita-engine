@@ -13,28 +13,31 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.bindings;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
-import org.bonitasoft.engine.xml.ElementBinding;
+import org.bonitasoft.engine.core.process.definition.model.impl.SComplexInputDefinitionImpl;
 import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Laurent Leseigneur
  */
-public class SContractDefinitionBinding extends ElementBinding {
+public class SComplexInputDefinitionBinding extends SNamedElementBinding {
 
-    private final SContractDefinitionImpl contract;
-
-    public SContractDefinitionBinding() {
-        contract = new SContractDefinitionImpl();
-    }
+    List<SSimpleInputDefinition> simpleInputDefinitions = new ArrayList<SSimpleInputDefinition>();
+    List<SComplexInputDefinition> complexInputDefinitions = new ArrayList<SComplexInputDefinition>();
 
     @Override
-    public void setAttributes(final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+        if (XMLSProcessDefinition.CONTRACT_SIMPLE_INPUT_NODE.equals(name)) {
+            simpleInputDefinitions.add((SSimpleInputDefinition) value);
+        }
+        else if (XMLSProcessDefinition.CONTRACT_COMPLEX_INPUT_NODE.equals(name)) {
+            complexInputDefinitions.add((SComplexInputDefinition) value);
+        }
     }
 
     @Override
@@ -42,26 +45,18 @@ public class SContractDefinitionBinding extends ElementBinding {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
-        if (XMLSProcessDefinition.CONTRACT_SIMPLE_INPUT_NODE.equals(name)) {
-            contract.addSimpleInput((SSimpleInputDefinition) value);
-        }
-        else if (XMLSProcessDefinition.CONTRACT_COMPLEX_INPUT_NODE.equals(name)) {
-            contract.addComplexInput((SComplexInputDefinition) value);
-        }
-        else if (XMLSProcessDefinition.CONTRACT_RULE_NODE.equals(name)) {
-            contract.addRule((SRuleDefinition) value);
-        }
-    }
-
-    @Override
     public Object getObject() {
-        return contract;
+        final SComplexInputDefinitionImpl input = new SComplexInputDefinitionImpl(name);
+        input.setDescription(description);
+        input.getSimpleInputDefinitions().addAll(simpleInputDefinitions);
+        input.getComplexInputDefinitions().addAll(complexInputDefinitions);
+        return input;
     }
 
     @Override
     public String getElementTag() {
-        return XMLSProcessDefinition.CONTRACT_NODE;
+        return XMLSProcessDefinition.CONTRACT_COMPLEX_INPUT_NODE;
     }
+
 
 }
