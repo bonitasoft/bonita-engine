@@ -179,6 +179,8 @@
                                         <unzip dest="${project.build.directory}"
                                                src="${jboss.zip.folder}/${jboss.name}.zip"/>
 
+                                        <!-- Update database configuration -->
+                                        <property file="jboss/${db.vendor}/database.properties"/>
                                         <if>
                                             <equals arg1="${db.vendor}" arg2="h2" />
                                             <then>
@@ -191,10 +193,10 @@
                                                     todir="${jboss.deploy.dir}/h2.sar"/>
                                                 <copy file="${project.build.directory}/driver/bonita-jboss-h2-mbean.jar"
                                                     todir="${jboss.deploy.dir}/h2.sar"/>
+                                                <replace file="${jboss.deploy.dir}/h2.sar/META-INF/jboss-service.xml" token="#database.port#"
+                                                         value="${database.port}"/>
                                             </then>
                                         </if>
-                                        <!-- Update database configuration -->
-                                        <property file="jboss/${db.vendor}/database.properties"/>
 
                                         <replace file="${jboss.conf.dir}/standalone.xml"
                                                  token="port=&quot;4447&quot;"
@@ -222,9 +224,12 @@
                                         <if>
                                             <not><equals arg1="${db.vendor}" arg2="h2" /></not>
                                             <then>
+                                                <mkdir dir="${jboss.home}/modules/org/postgresql/main/"/>
+                                                <copy todir="${jboss.home}/modules/org/postgresql/main/" file="${basedir}/jboss/${db.vendor}/module.xml"/>
+                                                <copy todir="${jboss.home}/modules/org/postgresql/main/" file="${project.build.directory}/driver/postgresql.jar"/>
                                                 <replace file="${jboss.conf.dir}/standalone.xml"
                                                  token="&lt;/drivers&gt;"
-                                                 value="${database.driver.xml}"/>
+                                                 value="&lt;driver name=&quot;postgresql&quot; module=&quot;org.postgresql&quot;&gt;&lt;xa-datasource-class&gt;org.postgresql.xa.PGXADataSource&lt;/xa-datasource-class&gt;&lt;/driver&gt;&lt;/drivers&gt;"/>
                                             </then>
                                             <else>
         										<copy todir="${jboss.home}/modules/com/h2database/h2/main/">
@@ -243,10 +248,8 @@
                                             <fileset dir="${distrib.dir}/resources/home/"/>
 										</copy>
 
-                                        <copy file="${basedir}/client/bonita-client.properties"
-                                              todir="${bonita.home}/client/conf" overwrite="true"/>
-                                        <replace file="${bonita.home}/client/conf/bonita-client.properties"
-                                                 token="#provider.port#" value="${provider.port}"/>
+                                        <copy file="${basedir}/client/bonita-client.properties" todir="${bonita.home}/client/conf" overwrite="true"/>
+                                        <replace file="${bonita.home}/client/conf/bonita-client.properties" token="#provider.port#" value="${provider.port}"/>
 
                                         <!-- set the bonita client to use ejb3 -->
                                         <copy file="${basedir}/client/jboss-ejb-client.properties" todir="${project.build.directory}/test-classes" overwrite="true" />
