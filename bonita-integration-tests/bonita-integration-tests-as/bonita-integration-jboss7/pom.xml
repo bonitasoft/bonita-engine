@@ -210,7 +210,6 @@
                                         <replace file="${jboss.home}/bin/standalone.conf" token="-XX:MaxPermSize=256m"
                                                  value="-XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError"/>
 
-                                        
                                         <copy todir="${jboss.deploy.dir}">
                                             <fileset dir="jboss/server/default/deploy">
                                                 <include name="${db.vendor}-ds.xml"/>
@@ -253,16 +252,13 @@
                                         </copy>
 
                                         <copy file="${basedir}/client/bonita-client.properties" todir="${bonita.home}/client/conf" overwrite="true" />
-                                        <copy file="${basedir}/client/logback.xml" todir="${bonita.home}/client/conf" overwrite="true" />
                                         <replace file="${bonita.home}/client/conf/bonita-client.properties" token="#provider.port#" value="${provider.port}"/>
-                                        <!-- set the bonita client to use ejb3 -->
-                                        <copy file="${basedir}/client/bonita-client.properties"
-                                              todir="${bonita.home}/client/conf" overwrite="true"/>
-                                        <replace file="${bonita.home}/client/conf/bonita-client.properties"
-                                                 token="#provider.port#" value="${provider.port}"/>
 
-                                        <mkdir dir="${project.build.directory}/test-classes"/>
+                                        <!-- set the bonita client to use ejb3 -->
                                         <copy file="${basedir}/client/jboss-ejb-client.properties" todir="${project.build.directory}/test-classes" overwrite="true" />
+                                        <copy file="${basedir}/client/logback.xml" todir="${bonita.home}/client/conf" overwrite="true" />
+                                        
+                                        <mkdir dir="${project.build.directory}/test-classes"/>
                                         <copy file="${basedir}/client/logback.xml" todir="${project.build.directory}/test-classes" overwrite="true" />
 
 									</target>
