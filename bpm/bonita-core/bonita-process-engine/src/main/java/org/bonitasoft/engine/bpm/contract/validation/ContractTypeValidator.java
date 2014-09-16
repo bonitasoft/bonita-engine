@@ -20,6 +20,11 @@ import org.bonitasoft.engine.bpm.contract.validation.type.IntegerValidator;
 import org.bonitasoft.engine.bpm.contract.validation.type.TextValidator;
 import org.bonitasoft.engine.core.process.definition.model.SType;
 
+/**
+ * Validate that a value is assignable to a given contract type
+ * 
+ * @author Colin Puy
+ */
 public class ContractTypeValidator {
 
     public boolean isValid(SType type, Object object) {

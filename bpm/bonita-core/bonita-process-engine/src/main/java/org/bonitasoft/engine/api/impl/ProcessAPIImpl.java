@@ -152,9 +152,8 @@ import org.bonitasoft.engine.bpm.connector.ConnectorInstance;
 import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
-import org.bonitasoft.engine.bpm.contract.validation.ContractStructureValidator;
-import org.bonitasoft.engine.bpm.contract.validation.ContractTypeValidator;
 import org.bonitasoft.engine.bpm.contract.validation.ContractValidator;
+import org.bonitasoft.engine.bpm.contract.validation.ContractValidatorFactory;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
@@ -938,9 +937,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     (SUserTaskInstance) flowNodeInstance);
             executeTransactionContent(tenantAccessor, contractOfUserTaskInstance, wrapInTransaction);
             final SContractDefinition contractDefinition = contractOfUserTaskInstance.getResult();
-            
-            ContractStructureValidator contractStructureValidator = new ContractStructureValidator(new ContractTypeValidator(), tenantAccessor.getTechnicalLoggerService());
-            final ContractValidator validator = new ContractValidator(contractStructureValidator, tenantAccessor.getTechnicalLoggerService());
+            ContractValidator validator = new ContractValidatorFactory().createContractValidator(tenantAccessor.getTechnicalLoggerService());
             if (!validator.isValid(contractDefinition, inputs)) {
                 throw new ContractViolationException("Contract is not valid: ", validator.getComments());
             }

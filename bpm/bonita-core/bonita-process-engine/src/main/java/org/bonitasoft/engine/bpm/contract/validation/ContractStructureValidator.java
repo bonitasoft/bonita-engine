@@ -25,6 +25,12 @@ import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
+/**
+ * Validate that task inputs fit with contract structure and types
+ * 
+ * @author Colin Puy
+ *
+ */
 public class ContractStructureValidator {
 
     private TechnicalLoggerService logger;

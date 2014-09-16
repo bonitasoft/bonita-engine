@@ -25,7 +25,10 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.mvel2.MVEL;
 
 /**
+ * Validate tasks inputs according to given contract
+ * 
  * @author Matthieu Chaffotte
+ * @author Colin Puy
  */
 public class ContractValidator {
 
