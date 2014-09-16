@@ -11,6 +11,7 @@
 		<constructor-arg ref="platformTechnicalLoggerService" />
 		<constructor-arg ref="platformCacheService" />
 		<constructor-arg ref="platformProperties" />
+		<constructor-arg name="recorder" ref="platformRecorderSync" />
 	</bean>
-
+	
 </beans>
