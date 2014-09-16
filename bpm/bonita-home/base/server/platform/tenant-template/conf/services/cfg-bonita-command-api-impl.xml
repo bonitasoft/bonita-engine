@@ -4,7 +4,7 @@
 	<bean id="commandService" class="org.bonitasoft.engine.command.api.impl.CommandServiceImpl">
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="recorder" ref="recorderSync" />
+		<constructor-arg name="recorder" ref="tenantRecorderSync" />
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 		<constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
 	</bean>

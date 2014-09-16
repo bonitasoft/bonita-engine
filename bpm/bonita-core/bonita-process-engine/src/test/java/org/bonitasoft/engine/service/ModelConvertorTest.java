@@ -8,9 +8,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.bonitasoft.engine.api.impl.DummySCustomUserInfoDefinition;
+import org.bonitasoft.engine.api.impl.DummySCustomUserInfoValue;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
+import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.junit.Test;
 
@@ -56,4 +61,30 @@ public class ModelConvertorTest {
         verify(sUser, never()).getPassword();
     }
 
+    @Test
+    public void should_convert_server_definition_into_client_definition() {
+        CustomUserInfoDefinitionImpl definition = ModelConvertor.convert(
+                new DummySCustomUserInfoDefinition(1L, "name", "description"));
+
+        assertThat(definition.getId()).isEqualTo(1L);
+        assertThat(definition.getName()).isEqualTo("name");
+        assertThat(definition.getDescription()).isEqualTo("description");
+    }
+
+    @Test
+    public void should_convert_server_value_into_client_value() {
+        CustomUserInfoValue value = ModelConvertor.convert(
+                new DummySCustomUserInfoValue(2L, 2L, 1L, "value"));
+
+        assertThat(value.getDefinitionId()).isEqualTo(2L);
+        assertThat(value.getValue()).isEqualTo("value");
+        assertThat(value.getUserId()).isEqualTo(1L);
+    }
+
+    @Test
+    public void should_return_null_when_trying_to_convert_a_null_value() {
+        CustomUserInfoValue value = ModelConvertor.convert((SCustomUserInfoValue) null);
+
+        assertThat(value).isNull();
+    }
 }

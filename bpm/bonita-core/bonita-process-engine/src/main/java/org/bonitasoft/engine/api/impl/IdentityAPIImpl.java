@@ -177,7 +177,7 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     @Override
     public User createUser(final String userName, final String password, final String firstName, final String lastName) throws AlreadyExistsException,
-    CreationException {
+            CreationException {
         final UserCreator creator = new UserCreator(userName, password);
         creator.setFirstName(firstName).setLastName(lastName);
         creator.setEnabled(true);
@@ -630,7 +630,7 @@ public class IdentityAPIImpl implements IdentityAPI {
             throw new RetrieveException(sbe);
         }
     }
-    
+
     @Override
     public List<Long> getUserIdsWithCustomUserInfo(String infoName, String infoValue, boolean usePartialMatch, int startIndex, int maxResults) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -1330,12 +1330,12 @@ public class IdentityAPIImpl implements IdentityAPI {
                 case GROUP_NAME_DESC:
                     orderByOption = new OrderByOption(SGroup.class, BuilderFactory.get(SGroupBuilderFactory.class).getNameKey(), OrderByType.DESC);
                     break;
-                    // case ASSIGNED_BY_ASC:
-                    // orderByOption = new OrderByOption(SUserMembership.class, modelBuilder.getUserMembershipBuilder().getAssignedByKey(), OrderByType.ASC);
-                    // break;
-                    // case ASSIGNED_BY_DESC:
-                    // orderByOption = new OrderByOption(SUserMembership.class, modelBuilder.getUserMembershipBuilder().getAssignedByKey(), OrderByType.DESC);
-                    // break;
+                // case ASSIGNED_BY_ASC:
+                // orderByOption = new OrderByOption(SUserMembership.class, modelBuilder.getUserMembershipBuilder().getAssignedByKey(), OrderByType.ASC);
+                // break;
+                // case ASSIGNED_BY_DESC:
+                // orderByOption = new OrderByOption(SUserMembership.class, modelBuilder.getUserMembershipBuilder().getAssignedByKey(), OrderByType.DESC);
+                // break;
                 case ASSIGNED_DATE_ASC:
                     orderByOption = new OrderByOption(SUserMembership.class, BuilderFactory.get(SUserMembershipBuilderFactory.class).getAssignedDateKey(),
                             OrderByType.ASC);
@@ -1442,7 +1442,7 @@ public class IdentityAPIImpl implements IdentityAPI {
 
     @Override
     public CustomUserInfoDefinition createCustomUserInfoDefinition(final CustomUserInfoDefinitionCreator creator) throws CreationException,
-    AlreadyExistsException {
+            AlreadyExistsException {
         return createCustomUserInfoDefinitionAPI().create(BuilderFactory.get(SCustomUserInfoDefinitionBuilderFactory.class), creator);
     }
 
@@ -1482,7 +1482,7 @@ public class IdentityAPIImpl implements IdentityAPI {
     @Override
     public CustomUserInfoValue setCustomUserInfoValue(final long definitionId, final long userId, final String value) throws UpdateException {
         try {
-            return new CustomUserInfoConverter().convert(createCustomUserInfoValueAPI().set(definitionId, userId, value));
+            return ModelConvertor.convert(createCustomUserInfoValueAPI().set(definitionId, userId, value));
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         }

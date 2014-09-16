@@ -11,6 +11,9 @@
 		<constructor-arg ref="platformTechnicalLoggerService" />
 		<constructor-arg ref="platformCacheService" />
 		<constructor-arg ref="platformProperties" />
+		<constructor-arg name="recorder" ref="platformRecorderSync" />
 	</bean>
+	
+	<bean id="platformProperties" class="org.bonitasoft.engine.platform.model.impl.SPlatformPropertiesImpl" />
 
 </beans>

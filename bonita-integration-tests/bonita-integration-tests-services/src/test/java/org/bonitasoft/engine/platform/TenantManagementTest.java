@@ -12,10 +12,14 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.platform.exception.STenantAlreadyExistException;
+import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
+import org.bonitasoft.engine.platform.exception.STenantUpdateException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilder;
+import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
 import org.bonitasoft.engine.test.util.PlatformUtil;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.After;
@@ -116,20 +120,15 @@ public class TenantManagementTest extends CommonServiceTest {
         getTransactionService().begin();
         getPlatformService().createTenant(tenant);
 
-        final String newCreatedBy = "newCreatedBy";
-        final long newCreated = System.currentTimeMillis();
         final String newDescription = "newDescription";
         final String newName = "newName";
 
-        final STenantBuilderFactory sTenantBuilderFact = BuilderFactory.get(STenantBuilderFactory.class);
+        final STenantUpdateBuilderFactory updateBuilderFactory = BuilderFactory.get(STenantUpdateBuilderFactory.class);
+        final STenantUpdateBuilder updateDescriptor = updateBuilderFactory.createNewInstance();
+        updateDescriptor.setDescription(newDescription);
+        updateDescriptor.setName(newName);
 
-        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        updateDescriptor.addField(sTenantBuilderFact.getCreatedByKey(), newCreatedBy);
-        updateDescriptor.addField(sTenantBuilderFact.getCreatedKey(), newCreated);
-        updateDescriptor.addField(sTenantBuilderFact.getDescriptionKey(), newDescription);
-        updateDescriptor.addField(sTenantBuilderFact.getNameKey(), newName);
-
-        getPlatformService().updateTenant(tenant, updateDescriptor);
+        getPlatformService().updateTenant(tenant, updateDescriptor.done());
         getTransactionService().complete();
 
         getTransactionService().begin();
@@ -137,8 +136,6 @@ public class TenantManagementTest extends CommonServiceTest {
         getTransactionService().complete();
 
         assertThat(readTenant.getName()).isEqualTo(newName);
-        assertThat(readTenant.getCreatedBy()).isEqualTo(newCreatedBy);
-        assertThat(readTenant.getCreated()).isEqualTo(newCreated);
         assertThat(readTenant.getDescription()).isEqualTo(newDescription);
 
         deleteTenant(tenant.getId());
@@ -156,10 +153,10 @@ public class TenantManagementTest extends CommonServiceTest {
         long createdTenant = getPlatformService().createTenant(tenant);
         getPlatformService().deleteTenant(createdTenant);
 
-        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-
+        final STenantUpdateBuilderFactory updateBuilderFactory = BuilderFactory.get(STenantUpdateBuilderFactory.class);
+        final STenantUpdateBuilder updateDescriptor = updateBuilderFactory.createNewInstance();
         try {
-            getPlatformService().updateTenant(tenant, updateDescriptor);
+            getPlatformService().updateTenant(tenant, updateDescriptor.done());
             fail("Tenant update should not work on inexistant tenant");
         } finally {
             getTransactionService().complete();
@@ -183,11 +180,12 @@ public class TenantManagementTest extends CommonServiceTest {
         long tenantId1 = getPlatformService().createTenant(tenant1);
         long tenantId2 = getPlatformService().createTenant(tenant2);
 
-        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        updateDescriptor.addField(BuilderFactory.get(STenantBuilderFactory.class).getNameKey(), tenant1Name);
+        final STenantUpdateBuilderFactory updateBuilderFactory = BuilderFactory.get(STenantUpdateBuilderFactory.class);
+        final STenantUpdateBuilder updateDescriptor = updateBuilderFactory.createNewInstance();
+        updateDescriptor.setName(tenant1Name);
 
         try {
-            getPlatformService().updateTenant(tenant2, updateDescriptor);
+            getPlatformService().updateTenant(tenant2, updateDescriptor.done());
             fail("should not ne able to update the tenant with a name that already exists");
         } finally {
             getTransactionService().complete();
