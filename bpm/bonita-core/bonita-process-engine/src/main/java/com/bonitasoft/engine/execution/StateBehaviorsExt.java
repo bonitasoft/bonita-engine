@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
-import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -68,10 +67,10 @@ public class StateBehaviorsExt extends StateBehaviors {
             final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
             final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceSevice, final SchedulerService schedulerService,
             final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final TokenService tokenService,
-            final RefBusinessDataService refBusinessDataService, final CacheService cacheService) {
+            final RefBusinessDataService refBusinessDataService) {
         super(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService,
                 connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService,
-                containerRegistry, eventInstanceSevice, schedulerService, commentService, identityService, logger, tokenService, cacheService);
+                containerRegistry, eventInstanceSevice, schedulerService, commentService, identityService, logger, tokenService);
         this.refBusinessDataService = refBusinessDataService;
     }
 

@@ -122,7 +122,6 @@
 		<constructor-arg name="breakpointService" ref="breakpointService" />
 		<constructor-arg name="identityService" ref="identityService"/>
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
-		<constructor-arg name="cacheService" ref="cacheService"/>
 	</bean>
 
 	<bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">
