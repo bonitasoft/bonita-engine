@@ -36,8 +36,7 @@
 
 		<cargo.jvmargs>-Xms1024m -Xmx1024m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError</cargo.jvmargs>
 		<invoker.port>4422</invoker.port>
-		<!-- -Xdebug -->
-		<!-- -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8787 -Xnoagent -Djava.compiler=NONE -->
+		<!-- -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8787 -Xnoagent -Djava.compiler=NONE -->
 	</properties>
 
 	<dependencies>
@@ -197,52 +196,6 @@
                                         <!-- Update database configuration -->
                                         <property file="jboss/${db.vendor}/database.properties"/>
 
-                                        <!--property name="bindings.xml"
-                                                  location="${jboss.conf.dir}/bindingservice.beans/META-INF/bindings-jboss-beans.xml"/>
-                                        <replace file="${bindings.xml}"
-                                                 token="&lt;property name=&quot;port&quot;&gt;1099&lt;/property&gt;"
-                                                 value="&lt;property name=&quot;port&quot;&gt;${provider.port}&lt;/property&gt;"/>
-                                        <replace file="${bindings.xml}"
-                                                 token="&lt;property name=&quot;port&quot;&gt;4444&lt;/property&gt;"
-                                                 value="&lt;property name=&quot;port&quot;&gt;0&lt;/property&gt;"/>
-                                        <replace file="${bindings.xml}"
-                                                 token="&lt;property name=&quot;port&quot;&gt;1098&lt;/property&gt;"
-                                                 value="&lt;property name=&quot;port&quot;&gt;0&lt;/property&gt;"/>
-                                        <replace file="${bindings.xml}"
-                                                 token="&lt;property name=&quot;port&quot;&gt;4445&lt;/property&gt;"
-                                                 value="&lt;property name=&quot;port&quot;&gt;0&lt;/property&gt;"/>
-                                        <replace file="${bindings.xml}"
-                                                 token="&lt;property name=&quot;port&quot;&gt;4446&lt;/property&gt;"
-                                                 value="&lt;property name=&quot;port&quot;&gt;0&lt;/property&gt;"/>
-                                        <replace file="${bindings.xml}"
-                                                 token="&lt;property name=&quot;port&quot;&gt;8083&lt;/property&gt;"
-                                                 value="&lt;property name=&quot;port&quot;&gt;0&lt;/property&gt;"/>
-
-                                        <replace file="${jboss.conf.dir}/jboss-service.xml"
-                                                 token="&lt;attribute name=&quot;DefaultCacheTimeout&quot;&gt;1800&lt;/attribute&gt;"
-                                                 value="&lt;attribute name=&quot;DefaultCacheTimeout&quot;&gt;0&lt;/attribute&gt;"/>
-                                        <replace file="${jboss.conf.dir}/jboss-service.xml"
-                                                 token="&lt;attribute name=&quot;DefaultCacheResolution&quot;&gt;60&lt;/attribute&gt;"
-                                                 value="&lt;attribute name=&quot;DefaultCacheResolution&quot;&gt;0&lt;/attribute&gt;"/>
-                                        <replace file="${jboss.conf.dir}/jboss-service.xml"
-                                                 token="&lt;attribute name=&quot;CallByValue&quot;&gt;false&lt;/attribute&gt;"
-                                                 value="&lt;attribute name=&quot;CallByValue&quot;&gt;true&lt;/attribute&gt;"/-->
-										<!-- Workaround JBoss bug: https://issues.jboss.org/browse/JBAS-6981 -->
-										<!--replace file="${jboss.conf.dir}/bootstrap/profile.xml"
-											token="&lt;constructor&gt;&lt;parameter&gt;&lt;inject bean=&quot;BootstrapProfileFactory&quot; property=&quot;attachmentStoreRoot&quot; /&gt;&lt;/parameter&gt;&lt;/constructor&gt;"
-                                                 value="&lt;constructor&gt;&lt;parameter class=&quot;java.io.File&quot;&gt;&lt;inject bean=&quot;BootstrapProfileFactory&quot; property=&quot;attachmentStoreRoot&quot; /&gt;&lt;/parameter&gt;&lt;/constructor&gt;"/>
-
-                                        <replace file="${jboss.deploy.dir}ers/ear-deployer-jboss-beans.xml"
-                                                 token="&lt;property name=&quot;isolated&quot;&gt;false&lt;/property&gt;"
-                                                 value="&lt;property name=&quot;isolated&quot;&gt;true&lt;/property&gt;"/>
-                                        <replace file="${jboss.deploy.dir}ers/ear-deployer-jboss-beans.xml"
-                                                 token="&lt;property name=&quot;callByValue&quot;&gt;false&lt;/property&gt;"
-                                                 value="&lt;property name=&quot;callByValue&quot;&gt;true&lt;/property&gt;"/>
-
-                                        <replace file="${jboss.deploy.dir}/ejb3-connectors-jboss-beans.xml"
-                                                 token="&lt;parameter&gt;3873&lt;/parameter&gt;"
-                                                 value="&lt;parameter&gt;${invokerLocatorPort}&lt;/parameter&gt;"/-->
-
                                         <replace file="${jboss.conf.dir}/standalone.xml"
                                                  token="port=&quot;4447&quot;"
                                                  value="port=&quot;${provider.port}&quot;"/>
@@ -256,10 +209,7 @@
                                         <replace file="${jboss.home}/bin/standalone.conf" token="-XX:MaxPermSize=256m"
                                                  value="-XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError"/>
 
-                                        <!--copy todir="${jboss.deploy.dir}"
-                                              file="${distrib.dir}/ear/ejb3/bonita-deploy-ear3-sp-${project.version}.ear"/-->
-
-										<copy todir="${jboss.deploy.dir}">
+                                      <copy todir="${jboss.deploy.dir}">
 											<fileset dir="jboss/server/default/deploy">
                                                 <include name="${db.vendor}-ds.xml"/>
                                             </fileset>
@@ -276,15 +226,17 @@
                                                  token="&lt;/drivers&gt;"
                                                  value="${database.driver.xml}"/>
                                             </then>
+                                            <else>
+        										<copy todir="${jboss.home}/modules/com/h2database/h2/main/">
+        											<fileset dir="target/driver">
+                                                        <include name="${db.vendor}.jar"/>
+        											</fileset>
+        										</copy>
+                                                <replace file="${jboss.home}/modules/com/h2database/h2/main/module.xml"
+                                                 token="h2-1.3.161"
+                                                 value="h2"/>
+                                            </else>
                                         </if>
-										<copy todir="${jboss.home}/modules/com/h2database/h2/main/">
-											<fileset dir="target/driver">
-                                                <include name="${db.vendor}.jar"/>
-											</fileset>
-										</copy>
-                                        <replace file="${jboss.home}/modules/com/h2database/h2/main/module.xml"
-                                         token="h2-1.3.161"
-                                         value="h2"/>
 
 										<!-- Create default bonita.home folder -->
 										<copy todir="${bonita.home}" verbose="true">
@@ -296,11 +248,11 @@
                                         <replace file="${bonita.home}/client/conf/bonita-client.properties"
                                                  token="#provider.port#" value="${provider.port}"/>
 
-                                        <mkdir dir="${project.build.directory}/test-classes"/>
+                                        <!-- set the bonita client to use ejb3 -->
                                         <copy file="${basedir}/client/jboss-ejb-client.properties" todir="${project.build.directory}/test-classes" overwrite="true" />
                                         <copy file="${basedir}/client/logback.xml" todir="${project.build.directory}/test-classes" overwrite="true" />
 
-										<!-- Change Dialect of BDR -->
+                                        <!-- Change Dialect of BDR -->
                                          <if>
                                             <not><equals arg1="${db.vendor}" arg2="h2" /></not>
                                             <then><replaceregexp
@@ -311,6 +263,7 @@
                                             </then>
                                         </if>
                                         
+                                        <mkdir dir="${project.build.directory}/test-classes"/>
                                         <copy todir="${bonita.home}/server/licenses" failonerror="true">
                                             <fileset dir="${user.home}/lic" includes="*.lic"/>
 										</copy>
