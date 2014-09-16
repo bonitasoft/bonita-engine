@@ -33,7 +33,7 @@ public class CyclicCompositionValidationRuleTest {
     }
 
     @Test
-    public void should_validate_that_a_composite_object_cannot_have_one_of_its_ancestor_as_a_child() throws Exception {
+    public void should_validate_that_a_composite_object_cannot_have_one_of_its_ancestor_as_a_child() {
         final BusinessObject daughter = aBO("daughter").build();
         final BusinessObject mother = aBO("mother").withField(aCompositionField("daughter", daughter)).build();
         final BusinessObject grandMother = aBO("grandMother").withField(aCompositionField("mother", mother)).build();
@@ -47,7 +47,7 @@ public class CyclicCompositionValidationRuleTest {
     }
 
     @Test
-    public void should_validate_that_a_bo_cannot_compose_itself() throws Exception {
+    public void should_validate_that_a_bo_cannot_compose_itself() {
         final BusinessObject daughter = aBO("daughter").build();
         daughter.addField(aCompositionField("toto", daughter));
         final BusinessObjectModel bom = aBOM().withBOs(daughter).build();

@@ -16,7 +16,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
-import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -39,7 +38,7 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
 
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+            final ContainerState containerState) throws SExpressionEvaluationException {
         final String queryName = expression.getContent();
         final String returnType = expression.getReturnType();
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
@@ -103,7 +102,7 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
 
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+            final ContainerState containerState) throws SExpressionEvaluationException {
         final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
             list.add(evaluate(expression, context, resolvedExpressions, containerState));

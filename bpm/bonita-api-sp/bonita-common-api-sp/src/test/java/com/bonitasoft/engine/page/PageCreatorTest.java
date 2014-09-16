@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.page;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,7 +28,7 @@ public class PageCreatorTest {
     private static final String DESCRIPTION = "page description";
 
     @Test
-    public void pageCreatorWithName() throws Exception {
+    public void pageCreatorWithName() {
         // given
         final PageCreator pageCreator = new PageCreator(NAME, CONTENT_ZIP);
 
@@ -35,7 +43,7 @@ public class PageCreatorTest {
     }
 
     @Test
-    public void pageCreatorWithDescrition() throws Exception {
+    public void pageCreatorWithDescrition() {
         // given
         final PageCreator pageCreator = new PageCreator(NAME, CONTENT_ZIP);
         pageCreator.setDescription(DESCRIPTION);
@@ -52,7 +60,7 @@ public class PageCreatorTest {
     }
 
     @Test
-    public void pageCreatorWithDisplayName() throws Exception {
+    public void pageCreatorWithDisplayName() {
         // given
         final PageCreator pageCreator = new PageCreator(NAME, CONTENT_ZIP);
         pageCreator.setDisplayName(DISPLAY_NAME);

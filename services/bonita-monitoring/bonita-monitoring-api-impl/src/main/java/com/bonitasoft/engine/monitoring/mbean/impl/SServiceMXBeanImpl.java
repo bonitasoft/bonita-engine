@@ -99,7 +99,7 @@ public class SServiceMXBeanImpl implements SServiceMXBean {
     }
 
     @Override
-    public long getNumberOfActiveTransactions() throws SMonitoringException {
+    public long getNumberOfActiveTransactions() {
         return transactionSvc.getNumberOfActiveTransactions();
     }
 

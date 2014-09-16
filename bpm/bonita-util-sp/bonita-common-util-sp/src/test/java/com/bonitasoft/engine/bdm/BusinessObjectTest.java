@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bdm;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +42,7 @@ public class BusinessObjectTest {
     }
 
     @Test
-    public void addUniqueConstraintShouldWorkIfTheFieldExists() throws Exception {
+    public void addUniqueConstraintShouldWorkIfTheFieldExists() {
         final SimpleField field = new SimpleField();
         field.setName("field");
         field.setType(FieldType.STRING);
@@ -45,14 +53,14 @@ public class BusinessObjectTest {
     }
 
     @Test
-    public void should_addQuery() throws Exception {
+    public void should_addQuery() {
         final BusinessObject businessObject = new BusinessObject();
         final Query query = businessObject.addQuery("userByName", "SELECT u FROM User u WHERE u.name='romain'", List.class.getName());
         assertThat(businessObject.getQueries()).containsExactly(query);
     }
 
     @Test
-    public void addIndexShouldWorkIfTheFieldExists() throws Exception {
+    public void addIndexShouldWorkIfTheFieldExists() {
         final SimpleField field = new SimpleField();
         field.setName("field");
         field.setType(FieldType.STRING);
@@ -69,13 +77,13 @@ public class BusinessObjectTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void addIndexShouldThrowAnExceptionIfNoFieldIsSet() throws Exception {
+    public void addIndexShouldThrowAnExceptionIfNoFieldIsSet() {
         final BusinessObject object = new BusinessObject();
         object.addIndex("unique", (String[]) null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void addIndexShouldThrowAnExceptionIfTheListOfFieldsIsEmpty() throws Exception {
+    public void addIndexShouldThrowAnExceptionIfTheListOfFieldsIsEmpty() {
         final BusinessObject object = new BusinessObject();
         object.addIndex("unique");
     }

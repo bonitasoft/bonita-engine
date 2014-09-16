@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.command;
 
 import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
@@ -68,7 +76,6 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
 
     private static final String QUERY_NAME = "queryName";
 
-
     protected User businessUser;
 
     private ClassLoader contextClassLoader;
@@ -83,15 +90,15 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
                 withField(aRelationField().withName("addresses").ofType(Type.COMPOSITION).referencing(addressBO).multiple().lazy().build()).
                 withQuery(
                         aQuery().withName("getNoEmployees")
-                        .withContent("SELECT e FROM BonitaEmployee e WHERE e.firstName = 'INEXISTANT'")
-                        .withReturnType(List.class.getName()).build()).
-                        withQuery(
-                                aQuery().withName("getEmployeeByFirstNameAndLastName")
+                                .withContent("SELECT e FROM BonitaEmployee e WHERE e.firstName = 'INEXISTANT'")
+                                .withReturnType(List.class.getName()).build()).
+                withQuery(
+                        aQuery().withName("getEmployeeByFirstNameAndLastName")
                                 .withContent("SELECT e FROM BonitaEmployee e WHERE e.firstName=:firstName AND e.lastName=:lastName")
                                 .withReturnType(EMPLOYEE_QUALIF_CLASSNAME)
                                 .withQueryParameter("firstName", String.class.getName())
                                 .withQueryParameter("lastName", String.class.getName()).build())
-                                .build();
+                .build();
         final BusinessObjectModel model = aBOM().withBOs(addressBO, employee).build();
         return model;
     }
@@ -103,13 +110,12 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
     }
 
     @AfterClass
-    public static void cleanTestClass() throws IOException {
-        try{
+    public static void cleanTestClass() {
+        try {
             FileUtils.deleteDirectory(clientFolder);
         } catch (final Exception e) {
             clientFolder.deleteOnExit();
         }
-
     }
 
     @Before
@@ -274,7 +280,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         sb.append("BonitaEmployee e = new BonitaEmployee();");
         sb.append("\n");
         sb.append("e.firstName =");
-        sb.append( "'" + firstName + "'");
+        sb.append("'" + firstName + "'");
         sb.append("\n");
         sb.append("e.lastName =");
         sb.append("'" + lastName + "'");

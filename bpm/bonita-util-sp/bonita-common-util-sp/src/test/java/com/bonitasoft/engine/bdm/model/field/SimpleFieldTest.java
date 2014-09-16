@@ -20,7 +20,7 @@ public class SimpleFieldTest {
 
     @Test
     @Ignore
-    public void should_not_be_marshallizable_without_name() throws Exception {
+    public void should_not_be_marshallizable_without_name() {
         final SimpleField field = new SimpleField();
         field.setType(FieldType.BOOLEAN);
 
@@ -28,7 +28,7 @@ public class SimpleFieldTest {
     }
 
     @Test
-    public void should_not_be_marshallizable_without_type() throws Exception {
+    public void should_not_be_marshallizable_without_type() {
         final SimpleField field = new SimpleField();
         field.setName("aName");
 
@@ -36,7 +36,7 @@ public class SimpleFieldTest {
     }
 
     @Test
-    public void should_be_marshallizable_with_name_and_type() throws Exception {
+    public void should_be_marshallizable_with_name_and_type() {
         final SimpleField field = new SimpleField();
         field.setName("aName");
         field.setType(FieldType.BOOLEAN);
@@ -45,7 +45,7 @@ public class SimpleFieldTest {
     }
 
     @Test
-    public void should_have_other_optionnal_attributes() throws Exception {
+    public void should_have_other_optionnal_attributes() {
         final SimpleField field = new SimpleField();
         field.setName("aName");
         field.setType(FieldType.BOOLEAN);

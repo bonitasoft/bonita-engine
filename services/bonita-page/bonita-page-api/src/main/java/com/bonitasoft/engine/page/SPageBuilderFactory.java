@@ -14,8 +14,7 @@ package com.bonitasoft.engine.page;
 public interface SPageBuilderFactory {
 
     SPageBuilder createNewInstance(String name, String description, String displayName, long installationDate, long installedBy, boolean provided,
-            String contentName,
-            byte[] content);
+            String contentName);
 
     SPageBuilder createNewInstance(String name, long installationDate, int installedBy, boolean provided, String contentName);
 

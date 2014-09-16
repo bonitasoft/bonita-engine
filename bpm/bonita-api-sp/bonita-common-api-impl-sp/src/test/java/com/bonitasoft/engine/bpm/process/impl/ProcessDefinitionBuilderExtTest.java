@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bpm.process.impl;
 
 import java.util.List;
@@ -9,7 +17,6 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.junit.Test;
-
 
 public class ProcessDefinitionBuilderExtTest {
 
@@ -30,7 +37,7 @@ public class ProcessDefinitionBuilderExtTest {
         builder.addBusinessData("myEmployees", EMPLOYEE_QUALIF_CLASSNAME, employeeExpression).setMultiple(true);
         builder.addActor(ACTOR_NAME);
         builder.addUserTask("step1", ACTOR_NAME)
-        .addOperation(new OperationBuilder().createBusinessDataSetAttributeOperation("myEmployees", "add", Object.class.getName(), jackExpression));
+                .addOperation(new OperationBuilder().createBusinessDataSetAttributeOperation("myEmployees", "add", Object.class.getName(), jackExpression));
         builder.addUserTask("step2", ACTOR_NAME);
         builder.addTransition("step1", "step2");
         builder.done();
@@ -38,7 +45,7 @@ public class ProcessDefinitionBuilderExtTest {
 
     @Test(expected = InvalidProcessDefinitionException.class)
     public void invalidProcessDueToAMismatchConfigurationBetweenMultiBusinessDataAndInitExpression() throws InvalidExpressionException,
-    InvalidProcessDefinitionException {
+            InvalidProcessDefinitionException {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("create", "jane", String.class.getName());
 
         final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("test", "0.0.1");
@@ -49,8 +56,7 @@ public class ProcessDefinitionBuilderExtTest {
     }
 
     @Test
-    public void validMultiBusinessDataUsedWithoutADefaultExpression() throws InvalidExpressionException,
-    InvalidProcessDefinitionException {
+    public void validMultiBusinessDataUsedWithoutADefaultExpression() throws InvalidProcessDefinitionException {
         final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("test", "0.0.1");
         builder.addBusinessData("myEmployees", EMPLOYEE_QUALIF_CLASSNAME, null).setMultiple(true);
         builder.addActor(ACTOR_NAME);

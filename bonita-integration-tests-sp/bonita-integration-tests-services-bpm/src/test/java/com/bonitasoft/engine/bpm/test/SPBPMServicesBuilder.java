@@ -95,9 +95,8 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
     public TenantMonitoringService getTenantMonitoringService(final boolean useCache) {
         if (useCache) {
             return getInstanceOf("monitoringServiceWithCache", TenantMonitoringService.class);
-        } else {
-            return getInstanceOf("monitoringService", TenantMonitoringService.class);
         }
+        return getInstanceOf("monitoringService", TenantMonitoringService.class);
     }
 
     @Override
