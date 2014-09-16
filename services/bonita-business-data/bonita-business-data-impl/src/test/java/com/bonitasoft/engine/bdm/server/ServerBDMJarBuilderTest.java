@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -40,7 +40,7 @@ public class ServerBDMJarBuilderTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         directory.delete();
     }
 

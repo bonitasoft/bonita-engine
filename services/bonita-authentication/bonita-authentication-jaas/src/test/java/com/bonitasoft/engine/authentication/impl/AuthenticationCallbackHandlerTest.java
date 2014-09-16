@@ -1,9 +1,21 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.authentication.impl;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -30,12 +42,12 @@ public class AuthenticationCallbackHandlerTest {
     CASCallbackHandlerDelegate casCallbackHandlerDelegate;
 
     @Test(expected = IllegalArgumentException.class)
-    public void testAuthenticationCallbackHandler() throws Exception {
+    public void testAuthenticationCallbackHandler() {
         new AuthenticationCallbackHandler(null);
     }
 
     @Test
-    public void testHandlePassword() throws Exception {
+    public void testHandlePassword() {
         String password = "password";
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
@@ -49,7 +61,7 @@ public class AuthenticationCallbackHandlerTest {
     }
 
     @Test
-    public void testHandleUsername() throws Exception {
+    public void testHandleUsername() {
         String username = "username";
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         credentials.put(AuthenticationConstants.BASIC_USERNAME, username);
@@ -63,7 +75,7 @@ public class AuthenticationCallbackHandlerTest {
     }
 
     @Test
-    public void testHandleUsernameEmpty() throws Exception {
+    public void testHandleUsernameEmpty() {
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         authenticationCallbackHandler = new AuthenticationCallbackHandler(credentials);
         authenticationCallbackHandler.casCallbackHandlerDelegate = casCallbackHandlerDelegate;
@@ -75,7 +87,7 @@ public class AuthenticationCallbackHandlerTest {
     }
 
     @Test
-    public void testHandleTicketShouldReturnTicket() throws Exception {
+    public void testHandleTicketShouldReturnTicket() {
         String ticket = "service";
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         credentials.put(AuthenticationConstants.CAS_TICKET, ticket);
@@ -91,7 +103,7 @@ public class AuthenticationCallbackHandlerTest {
     }
 
     @Test
-    public void testHandleTicketEmptyShouldReturnNoTicket() throws Exception {
+    public void testHandleTicketEmptyShouldReturnNoTicket() {
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         authenticationCallbackHandler = new AuthenticationCallbackHandler(credentials);
         authenticationCallbackHandler.casCallbackHandlerDelegate = casCallbackHandlerDelegate;
@@ -103,7 +115,7 @@ public class AuthenticationCallbackHandlerTest {
     }
 
     @Test
-    public void testHandleServiceShouldReturnService() throws Exception {
+    public void testHandleServiceShouldReturnService() {
         String service = "service";
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         credentials.put(AuthenticationConstants.CAS_SERVICE, service);
@@ -118,7 +130,7 @@ public class AuthenticationCallbackHandlerTest {
     }
 
     @Test
-    public void testHandleServiceEmptyShouldReturnNoService() throws Exception {
+    public void testHandleServiceEmptyShouldReturnNoService() {
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         authenticationCallbackHandler = new AuthenticationCallbackHandler(credentials);
         authenticationCallbackHandler.casCallbackHandlerDelegate = casCallbackHandlerDelegate;
@@ -130,7 +142,7 @@ public class AuthenticationCallbackHandlerTest {
     }
 
     @Test
-    public void testHandleServiceShouldThrowLicenseException() throws Exception {
+    public void testHandleServiceShouldThrowLicenseException() {
         String service = "service";
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         credentials.put(AuthenticationConstants.CAS_SERVICE, service);
@@ -152,7 +164,7 @@ public class AuthenticationCallbackHandlerTest {
     }
 
     @Test
-    public void testHandleTicketShouldThrowLicenseException() throws Exception {
+    public void testHandleTicketShouldThrowLicenseException() {
         String ticket = "ticket";
         Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         credentials.put(AuthenticationConstants.CAS_SERVICE, ticket);

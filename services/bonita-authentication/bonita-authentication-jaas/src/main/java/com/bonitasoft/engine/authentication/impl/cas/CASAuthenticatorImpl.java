@@ -1,19 +1,11 @@
-/**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2.0 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+/*******************************************************************************
+ * Copyright (C) 2013 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.authentication.impl.cas;
 
 import java.io.ByteArrayInputStream;
@@ -67,7 +59,6 @@ import com.bonitasoft.engine.authentication.impl.AuthenticatorDelegate;
  * delegate the CAS authentication to a CAS Server
  * 
  * @author Julien Reboul
- * 
  */
 public class CASAuthenticatorImpl implements AuthenticatorDelegate {
 
@@ -173,10 +164,10 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * retrieve password from credentials assuming it is stored under the {@link AuthenticationConstants.BASIC_PASSWORD} key
      * 
      * @param credentials
-     *            the credentials to check
+     *        the credentials to check
      * @return the password
      * @throws SLoginException
-     *             if password is absent or if credentials is null
+     *         if password is absent or if credentials is null
      */
     protected String retrievePasswordFromCredentials(final Map<String, Serializable> credentials) throws LoginException {
         String password;
@@ -192,10 +183,10 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * retrieve username from credentials assuming it is stored under the {@link AuthenticationConstants.BASIC_USERNAME} key
      * 
      * @param credentials
-     *            the credentials to check
+     *        the credentials to check
      * @return the username
      * @throws SLoginException
-     *             if username is absent, blank or if credentials is null
+     *         if username is absent, blank or if credentials is null
      */
     protected String retrieveUsernameFromCredentials(final Map<String, Serializable> credentials) throws LoginException {
         String userName;
@@ -211,9 +202,9 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * extract the ticket from the given response which should be a Http 302 status code
      * 
      * @param response
-     *            the http response
+     *        the http response
      * @throws LoginException
-     *             if ticket cannot be retrieved
+     *         if ticket cannot be retrieved
      */
     protected String retrieveTicketFromRedirect(final HttpResponse response) throws LoginException {
         final Header h = response.getFirstHeader("Location");
@@ -233,9 +224,9 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * takes the Ticket Granting Cookie as input parameter as well as the CAS server url
      * 
      * @param action
-     *            the cas server URL
+     *        the cas server URL
      * @param headers
-     *            the cookies to set on the request
+     *        the cookies to set on the request
      * @return the http request
      */
     protected HttpGet createHttpRequestForTicketRetrieval(final String action, Header[] headers) {
@@ -252,11 +243,10 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
 
     /**
      * call the given post Request and retrieve the Set-Cookie headers of the http response the server gave us
-     * 
      * these are useful to manage the Ticket Granting Cookie of CAS protocol
      * 
      * @param postRequest
-     *            the request to send
+     *        the request to send
      * @return the Set-Cookie headers
      */
     protected Header[] authenticateOnCASAndRetrieveCookies(final HttpClient hc, final HttpPost postRequest) throws IOException, ClientProtocolException {
@@ -271,7 +261,7 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * @return the lt security parameter value
      * @throws XPathExpressionException
      * @throws LoginException
-     *             if no LT parameter has been found
+     *         if no LT parameter has been found
      */
     protected String extractLtInputFromDOMDocument(final Document document) throws XPathExpressionException, LoginException {
         javax.xml.xpath.XPathFactory xpathFactory = javax.xml.xpath.XPathFactory.newInstance();
@@ -289,7 +279,7 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * 
      * @return the action to submit the for to
      * @throws LoginException
-     *             if No Action attribute has been found
+     *         if No Action attribute has been found
      */
     protected String extractFormActionFromDOMDocument(final Document document) throws XPathExpressionException, LoginException {
         javax.xml.xpath.XPathFactory xpathFactory = javax.xml.xpath.XPathFactory.newInstance();
@@ -307,9 +297,9 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * create CAS authentication request for login form submit
      * 
      * @param lt
-     *            a security parameter contained in the login form
+     *        a security parameter contained in the login form
      * @param action
-     *            the form action to submit to
+     *        the form action to submit to
      * @return the request to send to an HttpClient
      */
     protected HttpPost createCasAuthenticationHttpRequest(final String lt, final String action, final String login, final String password)
@@ -325,11 +315,11 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * creates the list of http parameter to authenticate to CAS Server
      * 
      * @param lt
-     *            the lt securty token
+     *        the lt securty token
      * @param login
-     *            the CAS login
+     *        the CAS login
      * @param password
-     *            the CAS password associated to the login
+     *        the CAS password associated to the login
      * @return the list of http parameter as name/value pair
      */
     protected List<NameValuePair> createEntityContent(final String lt, final String login, final String password) {
@@ -347,7 +337,7 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
      * create a DOM document from a String that should be at least an HTML page
      * 
      * @param content
-     *            the page to transform
+     *        the page to transform
      * @return a DOM document object for further process
      */
     protected Document createDOMDocumentFromResponse(final String content) throws UnsupportedEncodingException, ParserConfigurationException, SAXException,
@@ -393,7 +383,7 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
 
     /**
      * @param casURLPRefix
-     *            the casURLPRefix to set
+     *        the casURLPRefix to set
      */
     public void setCasServerUrlPrefix(String casURLPRefix) {
         this.casServerUrlPrefix = casURLPRefix;
@@ -415,7 +405,7 @@ public class CASAuthenticatorImpl implements AuthenticatorDelegate {
 
     /**
      * @param casService
-     *            the casService to set
+     *        the casService to set
      */
     public void setCasService(String casService) {
         this.casService = casService;

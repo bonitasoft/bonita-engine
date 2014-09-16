@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.profile;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,7 +66,7 @@ public class ProfilesImporterExtTest {
     }
 
     @Test
-    public void should_checkChildProfileEntryForError_return_null_if_default_page() throws Exception {
+    public void should_checkChildProfileEntryForError_return_null_if_default_page() {
         final ExportedProfileEntry childProfileEntry = createChild("defaultPage", false);
 
         final ImportError error = profilesImporterExt.checkProfileEntryForCustomPageError(childProfileEntry);
@@ -67,7 +75,7 @@ public class ProfilesImporterExtTest {
     }
 
     @Test
-    public void should_checkChildProfileEntryForError_return_error_if_custom_page_do_not_exists() throws Exception {
+    public void should_checkChildProfileEntryForError_return_error_if_custom_page_do_not_exists() {
         final ExportedProfileEntry childProfileEntry = createChild("customPage", true);
 
         final ImportError error = profilesImporterExt.checkProfileEntryForCustomPageError(childProfileEntry);
@@ -86,7 +94,7 @@ public class ProfilesImporterExtTest {
     }
 
     @Test
-    public void should_checkParentProfileEntryForError_return_erro_if_custom_page_do_not_exists() throws Exception {
+    public void should_checkParentProfileEntryForError_return_erro_if_custom_page_do_not_exists() {
         final ExportedParentProfileEntry parentProfileEntry = createParent("customPage", true);
 
         final List<ImportError> error = profilesImporterExt.checkParentProfileEntryForCustomPageErrors(parentProfileEntry);
@@ -133,7 +141,7 @@ public class ProfilesImporterExtTest {
     }
 
     @Test
-    public void should_checkParentProfileEntryForError_return_errors_if_children_all_are_error() throws Exception {
+    public void should_checkParentProfileEntryForError_return_errors_if_children_all_are_error() {
         final ExportedParentProfileEntry parentProfileEntry = new ExportedParentProfileEntry("Mine");
         parentProfileEntry.setChildProfileEntries(Arrays.asList(createChild("p1", true), createChild("p2", true)));
 

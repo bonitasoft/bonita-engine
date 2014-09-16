@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.monitoring.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,10 +22,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.monitoring.mbean.SJvmMXBean;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class PlatformMonitoringServiceImplTest {
-    
+
     @Mock
     private SJvmMXBean jvmMBean;
 
@@ -26,28 +33,27 @@ public class PlatformMonitoringServiceImplTest {
 
     @Mock
     private TransactionService transactionService;
-    
+
     @Mock
     private TechnicalLoggerService loggerService;
-    
+
     private PlatformMonitoringServiceImpl platformMonitoringService;
-    
+
     @Before
     public void setUp() throws Exception {
         platformMonitoringService = new PlatformMonitoringServiceImpl(true, jvmMBean, transactionService, schedulerService, loggerService);
     }
 
-
     @Test
-    public void getNumberOfActiveTransactions_return_nb_of_active_transactions_from_transaction_service() throws Exception {
+    public void getNumberOfActiveTransactions_return_nb_of_active_transactions_from_transaction_service() {
         //given
         doReturn(11L).when(transactionService).getNumberOfActiveTransactions();
-        
+
         //when
         long activeTransactions = platformMonitoringService.getNumberOfActiveTransactions();
 
         //then
         assertThat(activeTransactions).isEqualTo(11);
     }
-    
+
 }

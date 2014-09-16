@@ -3,7 +3,7 @@
 
 	<bean id="themeService" class="org.bonitasoft.engine.theme.impl.ThemeServiceImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="recorder" ref="recorderSync" />
+		<constructor-arg name="recorder" ref="tenantRecorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />

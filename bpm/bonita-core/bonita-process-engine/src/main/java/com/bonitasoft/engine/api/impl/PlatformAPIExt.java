@@ -55,17 +55,18 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.SDeletingActivatedTenantException;
-import org.bonitasoft.engine.platform.STenantCreationException;
-import org.bonitasoft.engine.platform.STenantNotFoundException;
 import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
+import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
+import org.bonitasoft.engine.platform.exception.STenantCreationException;
+import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
+import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilder;
+import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
 import org.bonitasoft.engine.profile.ImportPolicy;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
@@ -662,8 +663,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                 modifyTechnicalUser(tenantId, username, password);
             }
             // update tenant in database
-            final EntityUpdateDescriptor changeDescriptor = getTenantUpdateDescriptor(udpater);
-            platformService.updateTenant(tenant, changeDescriptor);
+            final STenantUpdateBuilder tenantUpdateBuilder = getTenantUpdateDescriptor(udpater);
+            platformService.updateTenant(tenant, tenantUpdateBuilder.done());
             return SPModelConvertor.toTenant(tenant);
         } catch (final BonitaHomeNotSetException e) {
             throw new UpdateException(e);
@@ -676,33 +677,33 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private EntityUpdateDescriptor getTenantUpdateDescriptor(final TenantUpdater udpateDescriptor) {
-        final STenantBuilderFactory tenantBuilderFact = BuilderFactory.get(STenantBuilderFactory.class);
+    private STenantUpdateBuilder getTenantUpdateDescriptor(final TenantUpdater tenantUpdater) {
+        final STenantUpdateBuilderFactory updateBuilderFactory = BuilderFactory.get(STenantUpdateBuilderFactory.class);
+        final STenantUpdateBuilder updateDescriptor = updateBuilderFactory.createNewInstance();
 
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        final Map<TenantField, Serializable> fields = udpateDescriptor.getFields();
+        final Map<TenantField, Serializable> fields = tenantUpdater.getFields();
         for (final Entry<TenantField, Serializable> field : fields.entrySet()) {
             switch (field.getKey()) {
                 case NAME:
-                    descriptor.addField(tenantBuilderFact.getNameKey(), field.getValue());
+                    updateDescriptor.setName((String) field.getValue());
                     break;
                 case DESCRIPTION:
-                    descriptor.addField(tenantBuilderFact.getDescriptionKey(), field.getValue());
+                    updateDescriptor.setDescription((String) field.getValue());
                     break;
                 case ICON_NAME:
-                    descriptor.addField(tenantBuilderFact.getIconNameKey(), field.getValue());
+                    updateDescriptor.setIconName((String) field.getValue());
                     break;
                 case ICON_PATH:
-                    descriptor.addField(tenantBuilderFact.getIconPathKey(), field.getValue());
+                    updateDescriptor.setIconPath((String) field.getValue());
                     break;
                 case STATUS:
-                    descriptor.addField(tenantBuilderFact.getStatusKey(), field.getValue());
+                    updateDescriptor.setStatus((String) field.getValue());
                     break;
                 default:
                     break;
             }
         }
-        return descriptor;
+        return updateDescriptor;
     }
 
     @Override
