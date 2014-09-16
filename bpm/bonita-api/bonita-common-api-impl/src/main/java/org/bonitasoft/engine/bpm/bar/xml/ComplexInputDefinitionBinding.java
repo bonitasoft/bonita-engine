@@ -16,13 +16,13 @@ package org.bonitasoft.engine.bpm.bar.xml;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.Type;
-import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
 import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class InputDefinitionBinding extends NamedElementBinding {
+public class ComplexInputDefinitionBinding extends NamedElementBinding {
 
     private Type type;
 
@@ -42,12 +42,12 @@ public class InputDefinitionBinding extends NamedElementBinding {
 
     @Override
     public Object getObject() {
-        return new InputDefinitionImpl(name, type, description);
+        return new ComplexInputDefinitionImpl(name, description);
     }
 
     @Override
     public String getElementTag() {
-        return XMLProcessDefinition.CONTRACT_INPUT_NODE;
+        return XMLProcessDefinition.CONTRACT_COMPLEX_INPUT_NODE;
     }
 
 }

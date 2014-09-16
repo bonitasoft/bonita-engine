@@ -25,9 +25,8 @@ import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.FailAction;
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.RuleDefinition;
-import org.bonitasoft.engine.bpm.contract.Type;
+import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.data.XMLDataDefinition;
@@ -348,7 +347,7 @@ public class XMLProcessDefinition {
 
     private static final String CONTRACT_INPUTS_NODE = "inputDefinitions";
 
-    public static final String CONTRACT_INPUT_NODE = "inputDefinition";
+    public static final String CONTRACT_SIMPLE_INPUT_NODE = "inputDefinition";
 
     public static final String CONTRACT_COMPLEX_INPUT_NODE = "complexInputDefinition";
 
@@ -544,11 +543,18 @@ public class XMLProcessDefinition {
 
     private XMLNode createContractNode(final ContractDefinition contract) {
         final XMLNode contractNode = new XMLNode(CONTRACT_NODE);
-        if (!contract.getInputs().isEmpty()) {
+        if (!contract.getSimpleInputs().isEmpty()) {
             final XMLNode inputsNode = new XMLNode(CONTRACT_INPUTS_NODE);
             contractNode.addChild(inputsNode);
-            for (final InputDefinition input : contract.getInputs()) {
-                inputsNode.addChild(createInputNode(input));
+            for (final SimpleInputDefinition input : contract.getSimpleInputs()) {
+                inputsNode.addChild(createSimpleInputNode(input));
+            }
+        }
+        if (!contract.getComplexInputs().isEmpty()) {
+            final XMLNode inputsNode = new XMLNode(CONTRACT_INPUTS_NODE);
+            contractNode.addChild(inputsNode);
+            for (final ComplexInputDefinition input : contract.getComplexInputs()) {
+                inputsNode.addChild(createComplexInputNode(input));
             }
         }
         final List<RuleDefinition> rules = contract.getRules();
@@ -575,20 +581,24 @@ public class XMLProcessDefinition {
         return ruleNode;
     }
 
-    private XMLNode createInputNode(final InputDefinition input) {
-        String nodeName = CONTRACT_INPUT_NODE;
-        if (input.getType().equals(Type.COMPLEX)) {
-            nodeName = CONTRACT_COMPLEX_INPUT_NODE;
+    private XMLNode createComplexInputNode(final ComplexInputDefinition input) {
+        final XMLNode inputNode = new XMLNode(CONTRACT_COMPLEX_INPUT_NODE);
+        inputNode.addAttribute(NAME, input.getName());
+        inputNode.addAttribute(DESCRIPTION, input.getDescription());
+        for (final SimpleInputDefinition inputDefinition : input.getSimpleInputDefinitions()) {
+            inputNode.addChild(createSimpleInputNode(inputDefinition));
         }
-        final XMLNode inputNode = new XMLNode(nodeName);
+        for (final ComplexInputDefinition inputDefinition : input.getComplexInputDefinitions()) {
+            inputNode.addChild(createComplexInputNode(inputDefinition));
+        }
+        return inputNode;
+    }
+
+    private XMLNode createSimpleInputNode(final SimpleInputDefinition input) {
+        final XMLNode inputNode = new XMLNode(CONTRACT_SIMPLE_INPUT_NODE);
         inputNode.addAttribute(NAME, input.getName());
         inputNode.addAttribute(TYPE, input.getType().toString());
         inputNode.addAttribute(DESCRIPTION, input.getDescription());
-        if (input.getType().equals(Type.COMPLEX)) {
-            for (InputDefinition inputDefinition : ((ComplexInputDefinition) input).getInputDefinitions()) {
-                inputNode.addChild(createInputNode(inputDefinition));
-            }
-        }
         return inputNode;
     }
 

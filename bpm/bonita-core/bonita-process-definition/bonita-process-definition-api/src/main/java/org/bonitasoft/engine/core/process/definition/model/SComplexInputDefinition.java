@@ -16,9 +16,12 @@ package org.bonitasoft.engine.core.process.definition.model;
 import java.util.List;
 
 /**
- * @author Laurent Leseigneur
+ * @author Matthieu Chaffotte
  */
 public interface SComplexInputDefinition extends SInputDefinition {
 
-    List<SInputDefinition> getInputDefinitions();
+    List<SSimpleInputDefinition> getSimpleInputDefinitions();
+
+    List<SComplexInputDefinition> getComplexInputDefinitions();
+
 }

@@ -47,11 +47,14 @@ import org.bonitasoft.engine.bpm.connector.impl.ArchivedConnectorInstanceImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceWithFailureInfoImpl;
+import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
+import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
+import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.RuleDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -159,12 +162,13 @@ import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
+import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -1982,8 +1986,11 @@ public class ModelConvertor {
 
     public static ContractDefinition toContract(final SContractDefinition sContract) {
         final ContractDefinitionImpl contract = new ContractDefinitionImpl();
-        for (final SInputDefinition input : sContract.getInputs()) {
-            contract.addInput(new InputDefinitionImpl(input.getName(), Type.valueOf(input.getType().toString()), input.getDescription()));
+        for (final SSimpleInputDefinition input : sContract.getSimpleInputs()) {
+            contract.addSimpleInput(toSimpleInput(input));
+        }
+        for (final SComplexInputDefinition input : sContract.getComplexInputs()) {
+            contract.addComplexInput(toComplexInput(input));
         }
         for (final SRuleDefinition sRule : sContract.getRules()) {
             final RuleDefinitionImpl rule = new RuleDefinitionImpl(sRule.getName(), sRule.getExpression(), sRule.getExplanation());
@@ -1995,4 +2002,20 @@ public class ModelConvertor {
         return contract;
     }
 
+    private static SimpleInputDefinition toSimpleInput(final SSimpleInputDefinition input) {
+        return new SimpleInputDefinitionImpl(input.getName(), Type.valueOf(input.getType().toString()), input.getDescription());
+    }
+
+    private static ComplexInputDefinition toComplexInput(final SComplexInputDefinition input) {
+        final List<SimpleInputDefinition> simpleInputDefinitions = new ArrayList<SimpleInputDefinition>();
+        final List<ComplexInputDefinition> complexInputDefinitions = new ArrayList<ComplexInputDefinition>();
+        for (final SSimpleInputDefinition sSimpleInputDefinition : input.getSimpleInputDefinitions()) {
+            simpleInputDefinitions.add(toSimpleInput(sSimpleInputDefinition));
+        }
+        for (final SComplexInputDefinition sComplexInputDefinition : input.getComplexInputDefinitions()) {
+            complexInputDefinitions.add(toComplexInput(sComplexInputDefinition));
+        }
+        return new ComplexInputDefinitionImpl(input.getName(), input.getDescription(), simpleInputDefinitions, complexInputDefinitions);
+
+    }
 }

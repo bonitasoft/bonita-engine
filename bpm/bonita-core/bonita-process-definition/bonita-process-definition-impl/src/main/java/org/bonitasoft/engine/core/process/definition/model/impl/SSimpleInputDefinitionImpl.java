@@ -11,21 +11,57 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.contract.impl;
+package org.bonitasoft.engine.core.process.definition.model.impl;
 
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
+import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SType;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class InputDefinitionImpl implements InputDefinition {
+public class SSimpleInputDefinitionImpl extends SNamedElementImpl implements SSimpleInputDefinition {
+
+    private static final long serialVersionUID = -4947430801791009535L;
+
+    private String description;
+
+    private SType type;
+
+    public SSimpleInputDefinitionImpl(final String name) {
+        super(name);
+    }
+
+    public SSimpleInputDefinitionImpl(final SimpleInputDefinition input) {
+        this(input.getName());
+        description = input.getDescription();
+        type = SType.valueOf(input.getType().toString());
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
+    }
+
+    @Override
+    public SType getType() {
+        return type;
+    }
+
+    public void setType(final SType type) {
+        this.type = type;
+    }
 
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = 1;
+        int result = super.hashCode();
         result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + (type == null ? 0 : type.hashCode());
         return result;
     }
 
@@ -34,13 +70,13 @@ public class InputDefinitionImpl implements InputDefinition {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if (!super.equals(obj)) {
             return false;
         }
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final InputDefinitionImpl other = (InputDefinitionImpl) obj;
+        final SSimpleInputDefinitionImpl other = (SSimpleInputDefinitionImpl) obj;
         if (description == null) {
             if (other.description != null) {
                 return false;
@@ -48,35 +84,15 @@ public class InputDefinitionImpl implements InputDefinition {
         } else if (!description.equals(other.description)) {
             return false;
         }
-        if (name == null) {
-            if (other.name != null) {
+        if (type == null) {
+            if (other.type != null) {
                 return false;
             }
-        } else if (!name.equals(other.name)) {
+        } else if (!type.equals(other.type)) {
             return false;
         }
         return true;
     }
 
-    private static final long serialVersionUID = 2836592506382887928L;
-
-    private final String description;
-
-    private final String name;
-
-    protected InputDefinitionImpl(final String name, final String description) {
-        this.description = description;
-        this.name = name;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
 
 }

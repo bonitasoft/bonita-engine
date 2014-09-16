@@ -18,36 +18,35 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.RuleDefinition;
+import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Laurent Leseigneur
  */
 public class ContractDefinitionImpl implements ContractDefinition {
 
     private static final long serialVersionUID = 786706819903231008L;
 
-    private final List<InputDefinition> inputs;
-
     private final List<RuleDefinition> rules;
 
+    private final List<ComplexInputDefinition> complexInputs;
+
+    private final List<SimpleInputDefinition> simpleInputs;
+
     public ContractDefinitionImpl() {
-        inputs = new ArrayList<InputDefinition>();
+        simpleInputs = new ArrayList<SimpleInputDefinition>();
+        complexInputs = new ArrayList<ComplexInputDefinition>();
         rules = new ArrayList<RuleDefinition>();
     }
 
-    @Override
-    public List<InputDefinition> getInputs() {
-        return inputs;
-    }
-
-    public void addInput(final InputDefinition input) {
-        inputs.add(input);
+    public void addSimpleInput(final SimpleInputDefinition input) {
+        simpleInputs.add(input);
     }
 
     public void addComplexInput(final ComplexInputDefinition complexInput) {
-        inputs.add(complexInput);
+        complexInputs.add(complexInput);
     }
 
     @Override
@@ -60,45 +59,13 @@ public class ContractDefinitionImpl implements ContractDefinition {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (inputs == null ? 0 : inputs.hashCode());
-        result = prime * result + (rules == null ? 0 : rules.hashCode());
-        return result;
+    public List<SimpleInputDefinition> getSimpleInputs() {
+        return simpleInputs;
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ContractDefinitionImpl other = (ContractDefinitionImpl) obj;
-        if (inputs == null) {
-            if (other.inputs != null) {
-                return false;
-            }
-        } else if (!inputs.equals(other.inputs)) {
-            return false;
-        }
-        if (rules == null) {
-            if (other.rules != null) {
-                return false;
-            }
-        } else if (!rules.equals(other.rules)) {
-            return false;
-        }
-        return true;
+    public List<ComplexInputDefinition> getComplexInputs() {
+        return complexInputs;
     }
 
-    @Override
-    public String toString() {
-        return "ContractDefinitionImpl [inputs=" + inputs + ", rules=" + rules + "]";
-    }
 }

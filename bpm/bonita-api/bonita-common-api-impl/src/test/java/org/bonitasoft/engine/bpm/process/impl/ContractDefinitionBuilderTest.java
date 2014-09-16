@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
+import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
@@ -40,7 +40,7 @@ public class ContractDefinitionBuilderTest {
     @Mock
     private FlowElementContainerDefinitionImpl container;
 
-    private List<InputDefinition> inputs;
+    private List<SimpleInputDefinition> inputs;
 
     private UserTaskDefinitionImpl activity;
 
@@ -56,19 +56,19 @@ public class ContractDefinitionBuilderTest {
     @Test
     public void addInputTest() throws Exception {
         //when
-        contractDefinitionBuilder.addInput(name, type, description);
+        contractDefinitionBuilder.addSimpleInput(name, type, description);
 
         //then
-        assertThat(activity.getContract().getInputs()).hasSize(1);
+        assertThat(activity.getContract().getSimpleInputs()).hasSize(1);
     }
 
     @Test
     public void addComplexInputTest() throws Exception {
         //when
-        contractDefinitionBuilder.addComplexInput(name, description, new ArrayList<InputDefinition>());
+        contractDefinitionBuilder.addComplexInput(name, description, new ArrayList<SimpleInputDefinition>(), null);
 
         //then
-        assertThat(activity.getContract().getInputs()).hasSize(1);
+        assertThat(activity.getContract().getComplexInputs()).hasSize(1);
     }
 
     @Test

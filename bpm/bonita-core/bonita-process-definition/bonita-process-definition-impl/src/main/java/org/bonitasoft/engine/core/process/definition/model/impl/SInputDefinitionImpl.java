@@ -13,20 +13,15 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SType;
 
 /**
  * @author Matthieu Chaffotte
  */
 public class SInputDefinitionImpl extends SNamedElementImpl implements SInputDefinition {
 
-    private static final long serialVersionUID = -4947430801791009535L;
-
+    private static final long serialVersionUID = -5021740296501498639L;
     private String description;
-
-    private SType type;
 
     public SInputDefinitionImpl(final String name) {
         super(name);
@@ -38,12 +33,6 @@ public class SInputDefinitionImpl extends SNamedElementImpl implements SInputDef
         this.type = type;
     }
 
-    public SInputDefinitionImpl(final InputDefinition input) {
-        this(input.getName());
-        description = input.getDescription();
-        type = SType.valueOf(input.getType().toString());
-    }
-
     @Override
     public String getDescription() {
         return description;
@@ -51,53 +40,6 @@ public class SInputDefinitionImpl extends SNamedElementImpl implements SInputDef
 
     public void setDescription(final String description) {
         this.description = description;
-    }
-
-    @Override
-    public SType getType() {
-        return type;
-    }
-
-    public void setType(final SType type) {
-        this.type = type;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (type == null ? 0 : type.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SInputDefinitionImpl other = (SInputDefinitionImpl) obj;
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (type == null) {
-            if (other.type != null) {
-                return false;
-            }
-        } else if (!type.equals(other.type)) {
-            return false;
-        }
-        return true;
     }
 
 }

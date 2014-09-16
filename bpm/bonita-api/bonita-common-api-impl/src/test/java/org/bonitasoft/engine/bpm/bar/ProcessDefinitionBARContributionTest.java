@@ -95,7 +95,7 @@ public class ProcessDefinitionBARContributionTest {
         processBuilder.addReceiveTask("ReceiveTask", "messageName");
         processBuilder.addSendTask("SendTask", "messageName", targetProcessNameExpr);
         processBuilder.addTransition("BoundaryEvent", "ManualTask");
-        processBuilder.addUserTask("task", ACTOR_NAME).addContract().addInput("in", Type.INTEGER, null)
+        processBuilder.addUserTask("task", ACTOR_NAME).addContract().addSimpleInput("in", Type.INTEGER, null)
         .addRule("Mandatory", "in != null", "in must be set", "in");
         return processBuilder.done();
     }

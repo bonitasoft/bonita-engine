@@ -23,7 +23,7 @@ import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
  * A <code>ContractDefinition</code> defines what the {@link UserTaskInstance} needs to be executed.
  * <p>
  * A <code>ContractDefinition</code> is part of a {@link UserTaskDefinition}.
- * 
+ *
  * @author Matthieu Chaffotte
  * @since 7.0
  */
@@ -34,7 +34,14 @@ public interface ContractDefinition extends BonitaObject {
      *
      * @return the inputs of the contract
      */
-    List<InputDefinition> getInputs();
+    List<SimpleInputDefinition> getSimpleInputs();
+
+    /**
+     * Lists the inputs of the contract.
+     *
+     * @return the inputs of the contract
+     */
+    List<ComplexInputDefinition> getComplexInputs();
 
     /**
      * Lists the validation rules of the contract.

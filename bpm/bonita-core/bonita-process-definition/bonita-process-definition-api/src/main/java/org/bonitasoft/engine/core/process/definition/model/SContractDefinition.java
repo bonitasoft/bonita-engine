@@ -20,7 +20,9 @@ import java.util.List;
  */
 public interface SContractDefinition extends SBaseElement {
 
-    List<SInputDefinition> getInputs();
+    List<SSimpleInputDefinition> getSimpleInputs();
+
+    List<SComplexInputDefinition> getComplexInputs();
 
     List<SRuleDefinition> getRules();
 

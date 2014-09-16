@@ -23,6 +23,8 @@ import java.util.List;
  */
 public interface ComplexInputDefinition extends InputDefinition {
 
-    List<InputDefinition> getInputDefinitions();
+    List<SimpleInputDefinition> getSimpleInputDefinitions();
+
+    List<ComplexInputDefinition> getComplexInputDefinitions();
 
 }

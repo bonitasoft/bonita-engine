@@ -23,11 +23,5 @@ import org.bonitasoft.engine.bpm.DescriptionElement;
  */
 public interface InputDefinition extends DescriptionElement {
 
-    /**
-     * Gets the type of the input.
-     *
-     * @return the input {@link Type}
-     */
-    Type getType();
 
 }

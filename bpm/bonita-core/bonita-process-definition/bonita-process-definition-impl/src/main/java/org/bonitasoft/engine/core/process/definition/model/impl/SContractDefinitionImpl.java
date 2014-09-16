@@ -16,12 +16,14 @@ package org.bonitasoft.engine.core.process.definition.model.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
 import org.bonitasoft.engine.bpm.contract.RuleDefinition;
+import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 
 /**
  * @author Matthieu Chaffotte
@@ -30,20 +32,26 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
 
     private static final long serialVersionUID = -5281686322739618159L;
 
-    private final List<SInputDefinition> inputs;
+    private final List<SSimpleInputDefinition> simpleInputs;
+
+    private final List<SComplexInputDefinition> complexInputs;
 
     private final List<SRuleDefinition> rules;
 
     public SContractDefinitionImpl() {
         super();
-        inputs = new ArrayList<SInputDefinition>();
+        simpleInputs = new ArrayList<SSimpleInputDefinition>();
+        complexInputs = new ArrayList<SComplexInputDefinition>();
         rules = new ArrayList<SRuleDefinition>();
     }
 
     public SContractDefinitionImpl(final ContractDefinition contract) {
         this();
-        for (final InputDefinition input : contract.getInputs()) {
-            inputs.add(new SInputDefinitionImpl(input));
+        for (final SimpleInputDefinition input : contract.getSimpleInputs()) {
+            simpleInputs.add(new SSimpleInputDefinitionImpl(input));
+        }
+        for (final ComplexInputDefinition input : contract.getComplexInputs()) {
+            complexInputs.add(new SComplexInputDefinitionImpl(input));
         }
         for (final RuleDefinition rule : contract.getRules()) {
             rules.add(new SRuleDefinitionImpl(rule));
@@ -51,12 +59,16 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
     }
 
     @Override
-    public List<SInputDefinition> getInputs() {
-        return inputs;
+    public List<SSimpleInputDefinition> getSimpleInputs() {
+        return simpleInputs;
     }
 
-    public void addInput(final SInputDefinition input) {
-        inputs.add(input);
+    public void addSimpleInput(final SSimpleInputDefinition input) {
+        simpleInputs.add(input);
+    }
+
+    public void addComplexInput(final SComplexInputDefinition input) {
+        complexInputs.add(input);
     }
 
     @Override
@@ -68,12 +80,20 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
         rules.add(rule);
     }
 
+
+
+    @Override
+    public List<SComplexInputDefinition> getComplexInputs() {
+        return complexInputs;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + (inputs == null ? 0 : inputs.hashCode());
+        result = prime * result + (complexInputs == null ? 0 : complexInputs.hashCode());
         result = prime * result + (rules == null ? 0 : rules.hashCode());
+        result = prime * result + (simpleInputs == null ? 0 : simpleInputs.hashCode());
         return result;
     }
 
@@ -89,11 +109,11 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
             return false;
         }
         final SContractDefinitionImpl other = (SContractDefinitionImpl) obj;
-        if (inputs == null) {
-            if (other.inputs != null) {
+        if (complexInputs == null) {
+            if (other.complexInputs != null) {
                 return false;
             }
-        } else if (!inputs.equals(other.inputs)) {
+        } else if (!complexInputs.equals(other.complexInputs)) {
             return false;
         }
         if (rules == null) {
@@ -101,6 +121,13 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
                 return false;
             }
         } else if (!rules.equals(other.rules)) {
+            return false;
+        }
+        if (simpleInputs == null) {
+            if (other.simpleInputs != null) {
+                return false;
+            }
+        } else if (!simpleInputs.equals(other.simpleInputs)) {
             return false;
         }
         return true;

@@ -32,11 +32,11 @@
 						<inputDefinition description="end date" name="endDate" type="DATE" />
 						<inputDefinition description="request is approved" name="isValid" type="BOOLEAN" />
 						<inputDefinition description="comment" name="comment" type="TEXT" />
-						<complexInputDefinition description="expense line" name="expense" type="COMPLEX">
+						<complexInputDefinition description="expense line" name="expense">
 							<inputDefinition description="expense type" name="type" type="TEXT" />
 							<inputDefinition description="expense comment" name="comment" type="TEXT" />
 							<inputDefinition description="expense comment" name="comment" type="DATE" />
-							<complexInputDefinition description="expense line" name="expense" type="COMPLEX">
+							<complexInputDefinition description="expense line" name="expense">
 								<inputDefinition description="complex in complex" name="comment" type="TEXT" />
 							</complexInputDefinition>
 							<inputDefinition description="expense comment" name="comment" type="DECIMAL" />

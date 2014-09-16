@@ -32,11 +32,10 @@ import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
-import org.bonitasoft.engine.bpm.contract.Input;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.validation.ContractValidator;
+import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.impl.IntegerDataInstanceImpl;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
@@ -56,7 +55,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SSimpleInputDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
@@ -515,11 +514,11 @@ public class ProcessAPIImplTest {
         when(processDefinition.getProcessContainer()).thenReturn(container);
         when(container.getFlowNode(userTaskDefinitionId)).thenReturn(definition);
         final SContractDefinitionImpl contractDefinitionImpl = new SContractDefinitionImpl();
-        final InputDefinitionImpl input = new InputDefinitionImpl("name", Type.TEXT, "aDescription");
-        contractDefinitionImpl.addInput(new SInputDefinitionImpl(input));
+        final SimpleInputDefinitionImpl input = new SimpleInputDefinitionImpl("name", Type.TEXT, "aDescription");
+        contractDefinitionImpl.addSimpleInput(new SSimpleInputDefinitionImpl(input));
         when(definition.getContract()).thenReturn(contractDefinitionImpl);
         final ContractDefinitionImpl contractDefinition = new ContractDefinitionImpl();
-        contractDefinition.addInput(input);
+        contractDefinition.addSimpleInput(input);
 
         final ContractDefinition contract = processAPI.getUserTaskContract(userTaskInstanceId);
 

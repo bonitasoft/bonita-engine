@@ -11,47 +11,43 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.process.definition.model.bindings;
+package org.bonitasoft.engine.bpm.bar.xml;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SType;
-import org.bonitasoft.engine.core.process.definition.model.impl.SSimpleInputDefinitionImpl;
-import org.bonitasoft.engine.xml.SXMLParseException;
+import org.bonitasoft.engine.bpm.contract.Type;
+import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
+import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class SInputDefinitionBinding extends SNamedElementBinding {
+public class SimpleInputDefinitionBinding extends NamedElementBinding {
 
-    private SType type;
+    private Type type;
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
-        type = SType.valueOf(attributes.get(XMLProcessDefinition.TYPE));
+        type = Type.valueOf(attributes.get(XMLProcessDefinition.TYPE));
     }
 
     @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
+    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
     }
 
     @Override
-    public void setChildObject(final String name, final Object value) throws SXMLParseException {
+    public void setChildObject(final String name, final Object value) throws XMLParseException {
     }
 
     @Override
     public Object getObject() {
-        final SSimpleInputDefinitionImpl input = new SSimpleInputDefinitionImpl(name);
-        input.setType(type);
-        input.setDescription(description);
-        return input;
+        return new SimpleInputDefinitionImpl(name, type, description);
     }
 
     @Override
     public String getElementTag() {
-        return XMLSProcessDefinition.CONTRACT_INPUT_NODE;
+        return XMLProcessDefinition.CONTRACT_SIMPLE_INPUT_NODE;
     }
 
 }

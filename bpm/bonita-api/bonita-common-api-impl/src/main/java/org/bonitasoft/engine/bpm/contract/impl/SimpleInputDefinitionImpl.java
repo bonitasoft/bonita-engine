@@ -13,19 +13,35 @@
  **/
 package org.bonitasoft.engine.bpm.contract.impl;
 
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
+import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.bpm.contract.Type;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Laurent Leseigneur
  */
-public class InputDefinitionImpl implements InputDefinition {
+public class SimpleInputDefinitionImpl extends InputDefinitionImpl implements SimpleInputDefinition {
+
+    private static final long serialVersionUID = 7373361824507460819L;
+
+
+    private final Type type;
+
+    public SimpleInputDefinitionImpl(final String name, final Type type, final String description) {
+        super(name, description);
+        this.type = type;
+
+    }
+
+    @Override
+    public Type getType() {
+        return type;
+    }
 
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = 1;
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (name == null ? 0 : name.hashCode());
+        int result = super.hashCode();
+        result = prime * result + (type == null ? 0 : type.hashCode());
         return result;
     }
 
@@ -34,49 +50,22 @@ public class InputDefinitionImpl implements InputDefinition {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
+        if (!super.equals(obj)) {
             return false;
         }
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final InputDefinitionImpl other = (InputDefinitionImpl) obj;
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
+        final SimpleInputDefinitionImpl other = (SimpleInputDefinitionImpl) obj;
+        if (type != other.type) {
             return false;
         }
         return true;
     }
 
-    private static final long serialVersionUID = 2836592506382887928L;
-
-    private final String description;
-
-    private final String name;
-
-    protected InputDefinitionImpl(final String name, final String description) {
-        this.description = description;
-        this.name = name;
-    }
-
     @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public String getName() {
-        return name;
+    public String toString() {
+        return "SimpleInputDefinitionImpl [type=" + type + ", getDescription()=" + getDescription() + ", getName()=" + getName() + "]";
     }
 
 }

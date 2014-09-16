@@ -15,12 +15,13 @@ package org.bonitasoft.engine.bpm.process.impl;
 
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
+import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
+import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.InputDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.RuleDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
 
@@ -39,14 +40,16 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
         activity.setContract(contract);
     }
 
-    public ContractDefinitionBuilder addInput(final String name, final Type type, final String description) {
-        final InputDefinitionImpl input = new InputDefinitionImpl(name, type, description);
-        contract.addInput(input);
+    public ContractDefinitionBuilder addSimpleInput(final String name, final Type type, final String description) {
+        final SimpleInputDefinition input = new SimpleInputDefinitionImpl(name, type, description);
+        contract.addSimpleInput(input);
         return this;
     }
-    public ContractDefinitionBuilder addComplexInput(final String name, final String description, final List<InputDefinition> inputs) {
-        final ComplexInputDefinitionImpl input = new ComplexInputDefinitionImpl(name, description, inputs);
-        contract.addInput(input);
+
+    public ContractDefinitionBuilder addComplexInput(final String name, final String description, final List<SimpleInputDefinition> simpleInputs,
+            final List<ComplexInputDefinition> complexInputs) {
+        final ComplexInputDefinitionImpl input = new ComplexInputDefinitionImpl(name, description, simpleInputs, complexInputs);
+        contract.addComplexInput(input);
         return this;
     }
 

@@ -13,11 +13,11 @@
  **/
 package org.bonitasoft.engine.bpm.contract.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
-import org.bonitasoft.engine.bpm.contract.Type;
+import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 
 /**
  * @author Laurent Leseigneur
@@ -25,21 +25,38 @@ import org.bonitasoft.engine.bpm.contract.Type;
 public class ComplexInputDefinitionImpl extends InputDefinitionImpl implements ComplexInputDefinition {
 
     private static final long serialVersionUID = 2836592506382887928L;
-    private final List<InputDefinition> inputDefinitions;
+    private final List<SimpleInputDefinition> simpleInputDefinitions;
+    private final List<ComplexInputDefinition> complexInputDefinitions;
 
-    public ComplexInputDefinitionImpl(final String name, final String description, final List<InputDefinition> inputDefinitions) {
-        super(name, Type.COMPLEX, description);
-        this.inputDefinitions = inputDefinitions;
+    public ComplexInputDefinitionImpl(final String name, final String description) {
+        super(name, description);
+        simpleInputDefinitions = new ArrayList<SimpleInputDefinition>();
+        complexInputDefinitions = new ArrayList<ComplexInputDefinition>();
     }
 
-    public List<InputDefinition> getInputDefinitions() {
-        return inputDefinitions;
+    public ComplexInputDefinitionImpl(final String name, final String description, final List<SimpleInputDefinition> simpleInputDefinitions,
+            final List<ComplexInputDefinition> complexInputDefinitions) {
+        this(name, description);
+        if (simpleInputDefinitions != null) {
+            for (final SimpleInputDefinition simpleInputDefinition : simpleInputDefinitions) {
+                this.simpleInputDefinitions.add(simpleInputDefinition);
+            }
+        }
+        if (complexInputDefinitions != null) {
+            for (final ComplexInputDefinition complexInputDefinition : complexInputDefinitions) {
+                this.complexInputDefinitions.add(complexInputDefinition);
+            }
+        }
     }
 
     @Override
-    public String toString() {
-        return "ComplexInputDefinitionImpl [inputDefinitions=" + inputDefinitions + ", getType()=" + getType() + ", getDescription()=" + getDescription()
-                + ", getName()=" + getName() + ", toString()=" + super.toString() + ", getClass()=" + getClass() + "]";
+    public List<SimpleInputDefinition> getSimpleInputDefinitions() {
+        return simpleInputDefinitions;
+    }
+
+    @Override
+    public List<ComplexInputDefinition> getComplexInputDefinitions() {
+        return complexInputDefinitions;
     }
 
 }

@@ -17,7 +17,7 @@ import java.util.Map;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SInputDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SSimpleInputDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SRuleDefinitionImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -74,12 +74,12 @@ public class ContractValidatorTest {
     }
 
     private SContractDefinition addInputsToContract(final SContractDefinition contract) {
-        final SInputDefinitionImpl input1 = new SInputDefinitionImpl(IS_VALID);
+        final SSimpleInputDefinitionImpl input1 = new SSimpleInputDefinitionImpl(IS_VALID);
         input1.setType(SType.BOOLEAN);
-        contract.getInputs().add(input1);
-        final SInputDefinitionImpl input2 = new SInputDefinitionImpl(COMMENT);
+        contract.getSimpleInputs().add(input1);
+        final SSimpleInputDefinitionImpl input2 = new SSimpleInputDefinitionImpl(COMMENT);
         input2.setType(SType.TEXT);
-        contract.getInputs().add(input2);
+        contract.getSimpleInputs().add(input2);
         return contract;
     }
 
@@ -167,13 +167,12 @@ public class ContractValidatorTest {
         variables.put(COMMENT, NICE_COMMENT);
         
         final SContractDefinition contract = new SContractDefinitionImpl();
-        SInputDefinitionImpl sInputDefinition = new SInputDefinitionImpl(IS_VALID);
+        SSimpleInputDefinitionImpl sInputDefinition = new SSimpleInputDefinitionImpl(IS_VALID);
         sInputDefinition.setType(SType.BOOLEAN);
-        contract.getInputs().add(sInputDefinition);
-        
-        SInputDefinitionImpl sInputDefinition2 = new SInputDefinitionImpl(COMMENT);
+        contract.getSimpleInputs().add(sInputDefinition);
+        SSimpleInputDefinitionImpl sInputDefinition2 = new SSimpleInputDefinitionImpl(COMMENT);
         sInputDefinition2.setType(SType.TEXT);
-        contract.getInputs().add(sInputDefinition2);
+        contract.getSimpleInputs().add(sInputDefinition2);
 
         //when
         final boolean valid = validator.isValid(contract, variables);
@@ -249,13 +248,13 @@ public class ContractValidatorTest {
     public void isValid_should_check_input_type() throws Exception {
         //given
         final SContractDefinition contract = buildEmptyContract();
-        final SInputDefinitionImpl sInputDefinition = new SInputDefinitionImpl(NUMBER_INPUT);
+        final SSimpleInputDefinitionImpl sInputDefinition = new SSimpleInputDefinitionImpl(NUMBER_INPUT);
         sInputDefinition.setType(SType.INTEGER);
-        contract.getInputs().add(sInputDefinition);
+        contract.getSimpleInputs().add(sInputDefinition);
 
-        final SInputDefinitionImpl sInputDefinition2 = new SInputDefinitionImpl(BOOLEAN_INPUT);
+        final SSimpleInputDefinitionImpl sInputDefinition2 = new SSimpleInputDefinitionImpl(BOOLEAN_INPUT);
         sInputDefinition2.setType(SType.BOOLEAN);
-        contract.getInputs().add(sInputDefinition2);
+        contract.getSimpleInputs().add(sInputDefinition2);
 
         final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(sInputDefinition2.getName());
@@ -279,21 +278,21 @@ public class ContractValidatorTest {
     public void isValid_should_validate_input_type() throws Exception {
         //given
         final SContractDefinition contract = buildEmptyContract();
-        final SInputDefinitionImpl sInputDefinition = new SInputDefinitionImpl(NUMBER_INPUT);
+        final SSimpleInputDefinitionImpl sInputDefinition = new SSimpleInputDefinitionImpl(NUMBER_INPUT);
         sInputDefinition.setType(SType.INTEGER);
-        contract.getInputs().add(sInputDefinition);
+        contract.getSimpleInputs().add(sInputDefinition);
 
-        final SInputDefinitionImpl sInputDefinition2 = new SInputDefinitionImpl(BOOLEAN_INPUT);
+        final SSimpleInputDefinitionImpl sInputDefinition2 = new SSimpleInputDefinitionImpl(BOOLEAN_INPUT);
         sInputDefinition2.setType(SType.BOOLEAN);
-        contract.getInputs().add(sInputDefinition2);
+        contract.getSimpleInputs().add(sInputDefinition2);
 
-        final SInputDefinitionImpl sInputDefinition3 = new SInputDefinitionImpl(DATE_INPUT);
+        final SSimpleInputDefinitionImpl sInputDefinition3 = new SSimpleInputDefinitionImpl(DATE_INPUT);
         sInputDefinition3.setType(SType.DATE);
-        contract.getInputs().add(sInputDefinition3);
+        contract.getSimpleInputs().add(sInputDefinition3);
 
-        final SInputDefinitionImpl sInputDefinition4 = new SInputDefinitionImpl(DECIMAL_INPUT);
+        final SSimpleInputDefinitionImpl sInputDefinition4 = new SSimpleInputDefinitionImpl(DECIMAL_INPUT);
         sInputDefinition4.setType(SType.DECIMAL);
-        contract.getInputs().add(sInputDefinition4);
+        contract.getSimpleInputs().add(sInputDefinition4);
 
         final Map<String, Object> variables = new HashMap<String, Object>();
         variables.put(NUMBER_INPUT, BigInteger.valueOf(123));

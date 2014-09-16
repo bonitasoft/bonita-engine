@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
-import org.bonitasoft.engine.bpm.contract.InputDefinition;
+import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,31 +14,31 @@ import org.junit.Test;
 public class ContractDefinitionImplTest {
 
     private ContractDefinitionImpl contractDefinitionImpl;
-    private InputDefinition expenseType;
-    private InputDefinition expenseAmount;
-    private InputDefinition expenseDate;
+    private SimpleInputDefinition expenseType;
+    private SimpleInputDefinition expenseAmount;
+    private SimpleInputDefinition expenseDate;
     private ComplexInputDefinition complexInput;
 
     @Before
     public void Before() {
         contractDefinitionImpl = new ContractDefinitionImpl();
-        expenseType = new InputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
-        expenseAmount = new InputDefinitionImpl("amount", Type.DECIMAL, "expense amount");
-        expenseDate = new InputDefinitionImpl("date", Type.DATE, "expense date");
-        complexInput = new ComplexInputDefinitionImpl("expense item", "description", Arrays.asList(expenseType, expenseAmount,
-                expenseDate));
+        expenseType = new SimpleInputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
+        expenseAmount = new SimpleInputDefinitionImpl("amount", Type.DECIMAL, "expense amount");
+        expenseDate = new SimpleInputDefinitionImpl("date", Type.DATE, "expense date");
+
+        complexInput = new ComplexInputDefinitionImpl("expense item", "description", Arrays.asList(expenseType, expenseDate, expenseAmount), null);
 
     }
 
     @Test
     public void addInputTest() throws Exception {
         //when
-        contractDefinitionImpl.addInput(expenseType);
-        contractDefinitionImpl.addInput(expenseAmount);
-        contractDefinitionImpl.addInput(expenseDate);
+        contractDefinitionImpl.addSimpleInput(expenseType);
+        contractDefinitionImpl.addSimpleInput(expenseAmount);
+        contractDefinitionImpl.addSimpleInput(expenseDate);
 
         //then
-        final List<InputDefinition> inputs = contractDefinitionImpl.getInputs();
+        final List<SimpleInputDefinition> inputs = contractDefinitionImpl.getSimpleInputs();
         assertThat(inputs).as("should contains 3 inputs").hasSize(3);
     }
 
@@ -48,7 +48,7 @@ public class ContractDefinitionImplTest {
         contractDefinitionImpl.addComplexInput(complexInput);
 
         //then
-        final List<InputDefinition> inputs = contractDefinitionImpl.getInputs();
+        final List<ComplexInputDefinition> inputs = contractDefinitionImpl.getComplexInputs();
         assertThat(inputs).as("should contains 1 complex type").hasSize(1);
     }
 }

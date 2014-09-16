@@ -15,8 +15,9 @@ package org.bonitasoft.engine.core.process.definition.model.bindings;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
 import org.bonitasoft.engine.xml.ElementBinding;
 import org.bonitasoft.engine.xml.SXMLParseException;
@@ -43,8 +44,12 @@ public class SContractDefinitionBinding extends ElementBinding {
     @Override
     public void setChildObject(final String name, final Object value) throws SXMLParseException {
         if (XMLSProcessDefinition.CONTRACT_INPUT_NODE.equals(name)) {
-            contract.addInput((SInputDefinition) value);
-        } else if (XMLSProcessDefinition.CONTRACT_RULE_NODE.equals(name)) {
+            contract.addSimpleInput((SSimpleInputDefinition) value);
+        }
+        else if (XMLSProcessDefinition.CONTRACT_INPUT_NODE.equals(name)) {
+            contract.addComplexInput((SComplexInputDefinition) value);
+        }
+        else if (XMLSProcessDefinition.CONTRACT_RULE_NODE.equals(name)) {
             contract.addRule((SRuleDefinition) value);
         }
     }

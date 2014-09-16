@@ -11,24 +11,22 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.process.definition.model;
+package org.bonitasoft.engine.bpm.contract;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Date;
 
 /**
- * @author Matthieu Chaffotte
+ * An <code>ComplexInputDefinition</code> defines
+ *
+ * @author Laurent Leseigneur
+ * @since 7.0
  */
-public enum SType {
-    @STypeConverter(implementationClass = String.class)
-    TEXT,
-    @STypeConverter(implementationClass = Boolean.class)
-    BOOLEAN,
-    @STypeConverter(implementationClass = Date.class)
-    DATE,
-    @STypeConverter(implementationClass = BigInteger.class)
-    INTEGER,
-    @STypeConverter(implementationClass = BigDecimal.class)
-    DECIMAL
+public interface SimpleInputDefinition extends InputDefinition {
+
+    /**
+     * Gets the type of the input.
+     *
+     * @return the input {@link Type}
+     */
+    Type getType();
+
 }
