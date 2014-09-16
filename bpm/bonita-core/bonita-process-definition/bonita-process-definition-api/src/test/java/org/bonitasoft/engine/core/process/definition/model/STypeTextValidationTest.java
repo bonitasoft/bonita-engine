@@ -11,26 +11,19 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.contract.validation.type;
+package org.bonitasoft.engine.core.process.definition.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Before;
 import org.junit.Test;
 
-public class TextValidatorTest {
+public class STypeTextValidationTest {
 
-    private TextValidator validator;
-
-    @Before
-    public void setUp() {
-        validator = new TextValidator();
-    }
 
     @Test
     public void string_are_valid() throws Exception {
 
-        boolean validation = validator.validate("this is a String");
+        boolean validation = SType.TEXT.validate("this is a String");
 
         assertThat(validation).isTrue();
     }
@@ -38,7 +31,7 @@ public class TextValidatorTest {
     @Test
     public void character_are_valid() throws Exception {
 
-        boolean validation = validator.validate('a');
+        boolean validation = SType.TEXT.validate('a');
 
         assertThat(validation).isTrue();
     }
@@ -46,7 +39,7 @@ public class TextValidatorTest {
     @Test
     public void null_is_valid() throws Exception {
 
-        boolean validation = validator.validate(null);
+        boolean validation = SType.TEXT.validate(null);
 
         assertThat(validation).isTrue();
     }
@@ -54,13 +47,13 @@ public class TextValidatorTest {
     @Test
     public void other_types_are_not_valid() throws Exception {
 
-        boolean intValidation = validator.validate(54);
+        boolean intValidation = SType.TEXT.validate(54);
         assertThat(intValidation).isFalse();
 
-        boolean doubleValidation = validator.validate(53.2d);
+        boolean doubleValidation = SType.TEXT.validate(53.2d);
         assertThat(doubleValidation).isFalse();
 
-        boolean booleanValidation = validator.validate(true);
+        boolean booleanValidation = SType.TEXT.validate(true);
         assertThat(booleanValidation).isFalse();
     }
 }

@@ -11,115 +11,107 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.contract.validation.type;
+package org.bonitasoft.engine.core.process.definition.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigInteger;
 
-import org.junit.Before;
 import org.junit.Test;
 
-public class IntegerValidatorTest {
-    
-    private IntegerValidator validator;
+public class STypeIntegerValidationTest {
 
-    @Before
-    public void setUp() {
-        validator = new IntegerValidator();
-    }
-    
     @Test
     public void integer_are_valid() throws Exception {
-        
-        boolean validation = validator.validate(12);
-        
+
+        boolean validation = SType.INTEGER.validate(12);
+
         assertThat(validation).isTrue();
     }
-    
+
     @Test
     public void Integer_are_valid() throws Exception {
-        
-        boolean validation = validator.validate(Integer.valueOf(12));
-        
+
+        boolean validation = SType.INTEGER.validate(Integer.valueOf(12));
+
         assertThat(validation).isTrue();
     }
-    
+
     @Test
     public void long_are_valid() throws Exception {
-        
-        boolean validation = validator.validate(12l);
-        
+
+        boolean validation = SType.INTEGER.validate(12l);
+
         assertThat(validation).isTrue();
     }
-    
+
     @Test
     public void Long_are_valid() throws Exception {
-        
-        boolean validation = validator.validate(Long.valueOf(12));
-        
+
+        boolean validation = SType.INTEGER.validate(Long.valueOf(12));
+
         assertThat(validation).isTrue();
     }
-    
+
     @Test
     public void BigInteger_are_valid() throws Exception {
-        
-        boolean validation = validator.validate(BigInteger.valueOf(45));
-        
+
+        boolean validation = SType.INTEGER.validate(BigInteger.valueOf(45));
+
         assertThat(validation).isTrue();
     }
-    
+
     @Test
     public void short_are_valid() throws Exception {
-        
-        boolean validation = validator.validate((short) 65);
-        
+
+        boolean validation = SType.INTEGER.validate((short) 65);
+
         assertThat(validation).isTrue();
     }
-    
+
     @Test
     public void Short_are_valid() throws Exception {
-        
-        boolean validation = validator.validate(Short.valueOf((short) 87));
-        
+
+        boolean validation = SType.INTEGER.validate(Short.valueOf((short) 87));
+
         assertThat(validation).isTrue();
     }
-    
+
     @Test
     public void byte_are_valid() throws Exception {
-        
-        boolean validation = validator.validate((byte) 8);
-        
+
+        boolean validation = SType.INTEGER.validate((byte) 8);
+
         assertThat(validation).isTrue();
     }
-    
+
     @Test
     public void Byte_are_valid() throws Exception {
-        
-        boolean validation = validator.validate(Byte.valueOf((byte) 2));
-        
+
+        boolean validation = SType.INTEGER.validate(Byte.valueOf((byte) 2));
+
         assertThat(validation).isTrue();
     }
-    
+
     @Test
     public void null_is_valid() throws Exception {
-        
-        boolean validation = validator.validate(null);
-        
+
+        boolean validation = SType.INTEGER.validate(null);
+
         assertThat(validation).isTrue();
     }
-    
+
     @Test
     public void other_types_are_not_valid() throws Exception {
-        
-        boolean stringValidation = validator.validate("54");
+
+        boolean stringValidation = SType.INTEGER.validate("54");
         assertThat(stringValidation).isFalse();
-        
-        boolean doubleValidation = validator.validate(53.2d);
+
+        boolean doubleValidation = SType.INTEGER.validate(53.2d);
         assertThat(doubleValidation).isFalse();
-        
-        boolean booleanValidation = validator.validate(true);
+
+        boolean booleanValidation = SType.INTEGER.validate(true);
         assertThat(booleanValidation).isFalse();
     }
-    
+
 }

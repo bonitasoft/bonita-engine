@@ -11,28 +11,20 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.contract.validation.type;
+package org.bonitasoft.engine.core.process.definition.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 
-import org.junit.Before;
 import org.junit.Test;
 
-public class DateValidatorTest {
-    
-    private DateValidator validator;
-
-    @Before
-    public void setUp() {
-        validator = new DateValidator();
-    }
+public class STypeDateValidationTest {
     
     @Test
     public void date_are_valid() throws Exception {
         
-        boolean validation = validator.validate(new Date());
+        boolean validation = SType.DATE.validate(new Date());
         
         assertThat(validation).isTrue();
     }
@@ -40,7 +32,7 @@ public class DateValidatorTest {
     @Test
     public void null_is_valid() throws Exception {
         
-        boolean validation = validator.validate(null);
+        boolean validation = SType.DATE.validate(null);
         
         assertThat(validation).isTrue();
     }
@@ -48,10 +40,10 @@ public class DateValidatorTest {
     @Test
     public void other_type_are_not_valid() throws Exception {
         
-        boolean stringValidation = validator.validate("2014/08/09");
+        boolean stringValidation = SType.DATE.validate("2014/08/09");
         assertThat(stringValidation).isFalse();
         
-        boolean longValidation = validator.validate(1410862853708L);
+        boolean longValidation = SType.DATE.validate(1410862853708L);
         assertThat(longValidation).isFalse();
     }
 }

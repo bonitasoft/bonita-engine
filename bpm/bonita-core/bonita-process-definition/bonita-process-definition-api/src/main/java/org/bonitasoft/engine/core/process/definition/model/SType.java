@@ -15,20 +15,34 @@ package org.bonitasoft.engine.core.process.definition.model;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Matthieu Chaffotte
  */
 public enum SType {
-    @STypeConverter(implementationClass = String.class)
-    TEXT,
-    @STypeConverter(implementationClass = Boolean.class)
-    BOOLEAN,
-    @STypeConverter(implementationClass = Date.class)
-    DATE,
-    @STypeConverter(implementationClass = BigInteger.class)
-    INTEGER,
-    @STypeConverter(implementationClass = BigDecimal.class)
-    DECIMAL
+    TEXT(String.class, Character.class),
+    BOOLEAN(Boolean.class),
+    DATE(Date.class),
+    INTEGER(Integer.class, Long.class, BigInteger.class, Short.class, Byte.class),
+    DECIMAL(Float.class, Double.class, BigDecimal.class);
+
+    private List<Class<?>> assignableTypes;
+
+    SType(Class<?>... assignableTypes) {
+        this.assignableTypes = Arrays.asList(assignableTypes);
+    }
+
+    public boolean validate(Object object) {
+        if (object == null)
+            return true;
+        for (Class<?> clazz : assignableTypes) {
+            if (object.getClass().isAssignableFrom(clazz)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -13,11 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
-import org.bonitasoft.engine.bpm.contract.validation.type.BooleanValidator;
-import org.bonitasoft.engine.bpm.contract.validation.type.DateValidator;
-import org.bonitasoft.engine.bpm.contract.validation.type.DecimalValidator;
-import org.bonitasoft.engine.bpm.contract.validation.type.IntegerValidator;
-import org.bonitasoft.engine.bpm.contract.validation.type.TextValidator;
 import org.bonitasoft.engine.core.process.definition.model.SType;
 
 /**
@@ -28,20 +23,6 @@ import org.bonitasoft.engine.core.process.definition.model.SType;
 public class ContractTypeValidator {
 
     public boolean isValid(SType type, Object object) {
-        switch (type) {
-            case BOOLEAN:
-                return new BooleanValidator().validate(object);
-            case DATE:
-                return new DateValidator().validate(object);
-            case DECIMAL:
-                return new DecimalValidator().validate(object);
-            case INTEGER:
-                return new IntegerValidator().validate(object);
-            case TEXT: 
-                return new TextValidator().validate(object);
-            default:
-                return false;
-        }
-
+        return type.validate(object);
     }
 }

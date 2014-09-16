@@ -11,28 +11,20 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.contract.validation.type;
+package org.bonitasoft.engine.core.process.definition.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 
-import org.junit.Before;
 import org.junit.Test;
 
-public class DecimalValidatorTest {
-
-    private DecimalValidator validator;
-
-    @Before
-    public void setUp() {
-        validator = new DecimalValidator();
-    }
+public class STypeDecimalValidationTest {
 
     @Test
     public void float_are_valid() throws Exception {
 
-        boolean validation = validator.validate(45.2f);
+        boolean validation = SType.DECIMAL.validate(45.2f);
 
         assertThat(validation).isTrue();
     }
@@ -40,7 +32,7 @@ public class DecimalValidatorTest {
     @Test
     public void Float_are_valid() throws Exception {
 
-        boolean validation = validator.validate(Float.valueOf(47.65f));
+        boolean validation = SType.DECIMAL.validate(Float.valueOf(47.65f));
 
         assertThat(validation).isTrue();
     }
@@ -48,7 +40,7 @@ public class DecimalValidatorTest {
     @Test
     public void double_are_valid() throws Exception {
 
-        boolean validation = validator.validate(5684.23d);
+        boolean validation = SType.DECIMAL.validate(5684.23d);
 
         assertThat(validation).isTrue();
     }
@@ -56,7 +48,7 @@ public class DecimalValidatorTest {
     @Test
     public void Double_are_valid() throws Exception {
 
-        boolean validation = validator.validate(Double.valueOf(6548.236d));
+        boolean validation = SType.DECIMAL.validate(Double.valueOf(6548.236d));
 
         assertThat(validation).isTrue();
     }
@@ -64,7 +56,7 @@ public class DecimalValidatorTest {
     @Test
     public void null_is_valid() throws Exception {
 
-        boolean validation = validator.validate(null);
+        boolean validation = SType.DECIMAL.validate(null);
 
         assertThat(validation).isTrue();
     }
@@ -72,7 +64,7 @@ public class DecimalValidatorTest {
     @Test
     public void BigDecimal_are_valid() throws Exception {
 
-        boolean validation = validator.validate(BigDecimal.valueOf(1235.321d));
+        boolean validation = SType.DECIMAL.validate(BigDecimal.valueOf(1235.321d));
 
         assertThat(validation).isTrue();
     }
@@ -80,13 +72,13 @@ public class DecimalValidatorTest {
     @Test
     public void other_types_are_not_valid() throws Exception {
 
-        boolean stringValidation = validator.validate("54");
+        boolean stringValidation = SType.DECIMAL.validate("54");
         assertThat(stringValidation).isFalse();
 
-        boolean intValidation = validator.validate(53);
+        boolean intValidation = SType.DECIMAL.validate(53);
         assertThat(intValidation).isFalse();
 
-        boolean booleanValidation = validator.validate(true);
+        boolean booleanValidation = SType.DECIMAL.validate(true);
         assertThat(booleanValidation).isFalse();
     }
 }

@@ -11,26 +11,18 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.contract.validation.type;
+package org.bonitasoft.engine.core.process.definition.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Before;
 import org.junit.Test;
 
-public class BooleanValidatorTest {
-
-    private BooleanValidator validator;
-
-    @Before
-    public void setUp() {
-        validator = new BooleanValidator();
-    }
+public class STypeBooleanValidationTest {
 
     @Test
     public void boolean_are_valid() throws Exception {
 
-        boolean validation = validator.validate(true);
+        boolean validation = SType.BOOLEAN.validate(true);
 
         assertThat(validation).isTrue();
     }
@@ -38,26 +30,26 @@ public class BooleanValidatorTest {
     @Test
     public void Boolean_are_valid() throws Exception {
 
-        boolean validation = validator.validate(Boolean.FALSE);
+        boolean validation = SType.BOOLEAN.validate(Boolean.FALSE);
 
         assertThat(validation).isTrue();
     }
-    
+
     @Test
     public void null_is_valid() throws Exception {
 
-        boolean validation = validator.validate(null);
+        boolean validation = SType.BOOLEAN.validate(null);
 
         assertThat(validation).isTrue();
     }
-    
+
     @Test
     public void other_type_are_not_valid() throws Exception {
 
-        boolean integerValidation = validator.validate(12);
+        boolean integerValidation = SType.BOOLEAN.validate(12);
         assertThat(integerValidation).isFalse();
-        
-        boolean stringValidation = validator.validate("false");
+
+        boolean stringValidation = SType.BOOLEAN.validate("false");
         assertThat(stringValidation).isFalse();
     }
 }
