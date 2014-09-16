@@ -139,7 +139,7 @@ public class UserTaskContractTest extends CommonAPITest {
         //when
         final HumanTaskInstance task = waitForUserTask("task1");
         final Map<String, Object> inputs = new HashMap<String, Object>();
-        inputs.put("numberOfDays", BigInteger.valueOf(inputValue));
+        inputs.put("numberOfDays", inputValue);
         try {
             getProcessAPI().executeUserTask(task.getId(), inputs);
             fail("should throw ContractViolationException");
@@ -213,7 +213,7 @@ public class UserTaskContractTest extends CommonAPITest {
         .addRule("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
         userTaskBuilder.addData("result", BigDecimal.class.getName(), null);
         userTaskBuilder.addOperation(new OperationBuilder().createSetDataOperation("result",
-                new ExpressionBuilder().createContractInputExpression("numberOfDays", BigInteger.class.getName())));
+                new ExpressionBuilder().createContractInputExpression("numberOfDays", Long.class.getName())));
         builder.addUserTask("task2", ACTOR_NAME).addTransition("task1", "task2");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
@@ -224,7 +224,7 @@ public class UserTaskContractTest extends CommonAPITest {
         final long expectedValue = 8l;
         try {
             final Map<String, Object> inputs = new HashMap<String, Object>();
-            inputs.put("numberOfDays", BigInteger.valueOf(expectedValue));
+            inputs.put("numberOfDays",expectedValue);
 
             getProcessAPI().executeUserTask(userTask.getId(), inputs);
         } catch (final ContractViolationException e) {
@@ -233,7 +233,7 @@ public class UserTaskContractTest extends CommonAPITest {
         waitForUserTask("task2");
 
         final ArchivedDataInstance archivedResult = getProcessAPI().getArchivedActivityDataInstance("result", userTask.getId());
-        assertThat(archivedResult.getValue()).isEqualTo(BigInteger.valueOf(expectedValue));
+        assertThat(archivedResult.getValue()).isEqualTo(expectedValue);
 
         disableAndDeleteProcess(processDefinition);
     }
