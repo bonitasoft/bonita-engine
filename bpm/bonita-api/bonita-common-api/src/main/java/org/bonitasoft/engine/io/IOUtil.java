@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.UUID;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
@@ -207,9 +208,8 @@ public class IOUtil {
     }
 
     public static File createTempDirectoryInDefaultTempDirectory(final String directoryName) {
-        final File tmpDir = new File(TMP_DIRECTORY, directoryName + "_" + String.valueOf(System.currentTimeMillis()));
-        createTempDirectory(tmpDir);
-        return tmpDir;
+        createTempDirectory(new File(TMP_DIRECTORY, directoryName +"_"+ UUID.randomUUID().toString()));
+        return new File(TMP_DIRECTORY, directoryName +"_"+ UUID.randomUUID().toString());
     }
 
     public static File createTempDirectory(final URI directoryPath) {
@@ -360,7 +360,6 @@ public class IOUtil {
      * @param dir2zip
      * @param zos
      * @param root
-     * @param filenameFilter
      * @throws IOException
      */
     public static void zipDir(final String dir2zip, final ZipOutputStream zos, final String root) throws IOException {
