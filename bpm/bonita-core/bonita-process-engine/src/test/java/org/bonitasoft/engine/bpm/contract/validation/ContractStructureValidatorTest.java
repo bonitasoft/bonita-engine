@@ -2,6 +2,7 @@ package org.bonitasoft.engine.bpm.contract.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.bonitasoft.engine.bpm.contract.validation.MapBuilder.aMap;
 import static org.bonitasoft.engine.bpm.contract.validation.SContractDefinitionBuilder.aContract;
 import static org.bonitasoft.engine.bpm.contract.validation.SInputDefinitionBuilder.anInput;
 import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
@@ -25,9 +26,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
-
 @RunWith(MockitoJUnitRunner.class)
 public class ContractStructureValidatorTest {
 
@@ -39,10 +37,6 @@ public class ContractStructureValidatorTest {
 
     @InjectMocks
     private ContractStructureValidator validator;
-
-    private Builder<String, Object> aMap() {
-        return ImmutableMap.<String, Object> builder();
-    }
 
     @Test
     public void should_pass_when_inputs_are_provided_and_valid() throws Exception {

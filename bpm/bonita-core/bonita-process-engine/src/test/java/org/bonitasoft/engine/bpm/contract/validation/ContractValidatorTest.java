@@ -1,21 +1,36 @@
+/**
+ * Copyright (C) 2014 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.bpm.contract.validation.MapBuilder.aMap;
+import static org.bonitasoft.engine.bpm.contract.validation.SContractDefinitionBuilder.aContract;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SType;
-import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SRuleDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SSimpleInputDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -24,20 +39,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ContractValidatorTest {
-
-    private static final String BOOLEAN_INPUT = "booleanInput";
-
-    private static final String NUMBER_INPUT = "numberInput";
-
-    private static final String NICE_COMMENT = "no way!";
-
-    private static final String COMMENT = "comment";
-
-    private static final String IS_VALID = "isValid";
-
-    private static final String DATE_INPUT = "dateInput";
-
-    private static final String DECIMAL_INPUT = "decimalInput";
 
     @Mock
     private ContractStructureValidator structureValidator;
@@ -48,155 +49,82 @@ public class ContractValidatorTest {
     @InjectMocks
     private ContractValidator validator;
 
-    private SContractDefinition buildContractWithInputsAndRules() {
-        final SContractDefinitionImpl contract = buildEmptyContract();
-        addInputsToContract(contract);
-        addRulesToContractWithInputs(contract);
-        return contract;
+    private List<SRuleDefinition> anyRules() {
+        return anyListOf(SRuleDefinition.class);
     }
 
-    private void addRulesToContractWithInputs(final SContractDefinition contract) {
-        final SRuleDefinitionImpl rule1 = new SRuleDefinitionImpl("Mandatory", "isValid != null", "isValid must be set");
-        rule1.addInputName(IS_VALID);
-        contract.getRules().add(rule1);
-        final SRuleDefinitionImpl rule2 = new SRuleDefinitionImpl("Comment_Needed_If_Not_Valid", "isValid || !isValid && comment != null",
-                "A comment is required when no validation");
-        rule2.addInputName(IS_VALID);
-        rule2.addInputName(COMMENT);
-        contract.getRules().add(rule2);
-    }
-
-    private SContractDefinition addInputsToContract(final SContractDefinition contract) {
-        final SSimpleInputDefinitionImpl input1 = new SSimpleInputDefinitionImpl(IS_VALID);
-        input1.setType(SType.BOOLEAN);
-        contract.getSimpleInputs().add(input1);
-        final SSimpleInputDefinitionImpl input2 = new SSimpleInputDefinitionImpl(COMMENT);
-        input2.setType(SType.TEXT);
-        contract.getSimpleInputs().add(input2);
-        return contract;
-    }
-
-    private SContractDefinitionImpl buildEmptyContract() {
-        return new SContractDefinitionImpl();
+    private Map<String, Object> anyInputs() {
+        return anyMapOf(String.class, Object.class);
     }
 
     @Test
-    public void isValid_should_be_true_an_return_an_empty_list() throws Exception {
-        //given
-        final Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put(IS_VALID, true);
-        variables.put(COMMENT, null);
-        final SContractDefinition contract = buildContractWithInputsAndRules();
+    public void should_have_an_empty_comments_list_if_validation_is_true() throws Exception {
 
-        //when
-        final boolean valid = validator.isValid(contract, variables);
+        boolean valid = validator.isValid(aContract().build(), aMap().build());
 
-        //then
         assertThat(valid).isTrue();
         assertThat(validator.getComments()).isEmpty();
     }
 
     @Test
-    public void isValid_should_be_false_when_inputs_are_missing() throws Exception {
-        //given
-        final Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put(COMMENT, NICE_COMMENT);
+    public void should_not_validate_rules_if_structure_validation_fail() throws Exception {
+        SContractDefinition contract = aContract().build();
+        Map<String, Object> inputs = aMap().build();
+        doThrow(new ContractViolationException("bad structure", new ArrayList<String>()))
+                .when(structureValidator).validate(contract, inputs);
 
-        final SContractDefinition contract = new SContractDefinitionImpl();
-        SSimpleInputDefinitionImpl sInputDefinition = new SSimpleInputDefinitionImpl(IS_VALID);
-        sInputDefinition.setType(SType.BOOLEAN);
-        contract.getSimpleInputs().add(sInputDefinition);
-        SSimpleInputDefinitionImpl sInputDefinition2 = new SSimpleInputDefinitionImpl(COMMENT);
-        sInputDefinition2.setType(SType.TEXT);
-        contract.getSimpleInputs().add(sInputDefinition2);
+        validator.isValid(contract, inputs);
 
-        doThrow(new ContractViolationException("bad structure", Arrays.asList("field toto is missing")))
-                .when(structureValidator).validate(contract, variables);
-
-        //when
-        final boolean valid = validator.isValid(contract, variables);
-
-        //then
-        assertThat(valid).as("should refuse when inputs are unexpected").isFalse();
-        assertThat(validator.getComments()).isNotEmpty().contains("field toto is missing");
+        verify(rulesValidator, never()).validate(anyRules(), anyInputs());
     }
 
     @Test
-    public void isValid_should_be_true_when_no_contract_and_no_inputs() throws Exception {
-        //given
-        final Map<String, Object> variables = new HashMap<String, Object>();
-        final SContractDefinition contract = buildEmptyContract();
+    public void should_return_false_if_structure_validation_fail() throws Exception {
+        SContractDefinition contract = aContract().build();
+        Map<String, Object> inputs = aMap().build();
+        doThrow(new ContractViolationException("bad structure", new ArrayList<String>()))
+                .when(structureValidator).validate(contract, inputs);
 
-        //when
-        final boolean valid = validator.isValid(contract, variables);
+        boolean valid = validator.isValid(contract, inputs);
 
-        //then
-        assertThat(valid).as("should validate when contract is empty and no inputs are provided").isTrue();
+        assertThat(valid).isFalse();
     }
 
     @Test
-    public void isValid_should_be_true_when_inputs_meets_contract() throws Exception {
-        //given
-        final Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put(IS_VALID, false);
-        variables.put(COMMENT, NICE_COMMENT);
-        final SContractDefinition contract = buildContractWithInputsAndRules();
+    public void should_populate_comments_with_validation_problems_when_structure_validation_fail() throws Exception {
+        SContractDefinition contract = aContract().build();
+        Map<String, Object> inputs = aMap().build();
+        List<String> problems = Arrays.asList("There is problems with structure", "Might have issue with types too");
+        doThrow(new ContractViolationException("bad structure", problems))
+                .when(structureValidator).validate(contract, inputs);
 
-        //when
-        final boolean valid = validator.isValid(contract, variables);
+        validator.isValid(contract, inputs);
 
-        //then
-        assertThat(validator.getComments()).as("should have no comments").isEmpty();
-        assertThat(valid).as("should validate contract").isTrue();
+        assertThat(validator.getComments()).isEqualTo(problems);
     }
 
     @Test
-    public void isValid_should_be_true_when_inputs_meets_contract_without_rules() throws Exception {
-        //given
-        final Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put(IS_VALID, false);
-        variables.put(COMMENT, NICE_COMMENT);
-        final SContractDefinition contract = addInputsToContract(buildEmptyContract());
+    public void should_return_false_if_rule_validation_fail() throws Exception {
+        SContractDefinition contract = aContract().build();
+        Map<String, Object> inputs = aMap().build();
+        doThrow(new ContractViolationException("rule failure", new ArrayList<String>()))
+                .when(rulesValidator).validate(contract.getRules(), inputs);
 
-        //when
-        final boolean valid = validator.isValid(contract, variables);
+        boolean valid = validator.isValid(contract, inputs);
 
-        //then
-        assertThat(valid).as("should validate contract without rules").isTrue();
+        assertThat(valid).isFalse();
     }
 
     @Test
-    public void isValid_should_validate_input_type() throws Exception {
-        //given
-        final SContractDefinition contract = buildEmptyContract();
-        final SSimpleInputDefinitionImpl sInputDefinition = new SSimpleInputDefinitionImpl(NUMBER_INPUT);
-        sInputDefinition.setType(SType.INTEGER);
-        contract.getSimpleInputs().add(sInputDefinition);
+    public void should_populate_comments_with_validation_problems_when_rule_validation_fail() throws Exception {
+        SContractDefinition contract = aContract().build();
+        Map<String, Object> inputs = aMap().build();
+        List<String> problems = asList("There is problems with a rule", "Might have issue with other rule too");
+        doThrow(new ContractViolationException("rule failure", problems))
+                .when(rulesValidator).validate(contract.getRules(), inputs);
 
-        final SSimpleInputDefinitionImpl sInputDefinition2 = new SSimpleInputDefinitionImpl(BOOLEAN_INPUT);
-        sInputDefinition2.setType(SType.BOOLEAN);
-        contract.getSimpleInputs().add(sInputDefinition2);
+        validator.isValid(contract, inputs);
 
-        final SSimpleInputDefinitionImpl sInputDefinition3 = new SSimpleInputDefinitionImpl(DATE_INPUT);
-        sInputDefinition3.setType(SType.DATE);
-        contract.getSimpleInputs().add(sInputDefinition3);
-
-        final SSimpleInputDefinitionImpl sInputDefinition4 = new SSimpleInputDefinitionImpl(DECIMAL_INPUT);
-        sInputDefinition4.setType(SType.DECIMAL);
-        contract.getSimpleInputs().add(sInputDefinition4);
-
-        final Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put(NUMBER_INPUT, BigInteger.valueOf(123));
-        variables.put(BOOLEAN_INPUT, false);
-        variables.put(DATE_INPUT, new Date());
-        variables.put(DECIMAL_INPUT, BigDecimal.valueOf(1.5f));
-
-        //when
-        final boolean valid = validator.isValid(contract, variables);
-
-        //then
-        assertThat(validator.getComments()).isEmpty();
-        assertThat(valid).as("should validate contract without rules").isTrue();
+        assertThat(validator.getComments()).isEqualTo(problems);
     }
-
 }
