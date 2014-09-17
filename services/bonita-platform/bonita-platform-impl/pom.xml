@@ -29,16 +29,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.log</groupId>
-			<artifactId>bonita-log-technical-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.cache</groupId>
-			<artifactId>bonita-cache-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine.persistence</groupId>
 			<artifactId>bonita-persistence-read</artifactId>
 			<version>${project.version}</version>
@@ -46,6 +36,16 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.recorder</groupId>
 			<artifactId>bonita-recorder-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.log</groupId>
+			<artifactId>bonita-log-technical-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.cache</groupId>
+			<artifactId>bonita-cache-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -62,6 +62,13 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 		</dependency>
+		<dependency>
+            <!-- because we need the builderfactory impl and it does not make sense to mock them -->
+            <groupId>org.bonitasoft.engine.events</groupId>
+            <artifactId>bonita-events-api-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 
 	<build>

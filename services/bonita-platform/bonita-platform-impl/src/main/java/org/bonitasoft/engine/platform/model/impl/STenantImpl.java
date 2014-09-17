@@ -64,6 +64,12 @@ public class STenantImpl implements STenant {
     }
 
     @Override
+    public boolean isActivated() {
+        // the tenant is activated as soon as it is not deactivated (but it can be paused)
+        return !STenant.DEACTIVATED.equals(getStatus());
+    }
+
+    @Override
     public long getCreated() {
         return created;
     }

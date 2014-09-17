@@ -28,6 +28,7 @@ import org.bonitasoft.engine.identity.SIdentityException;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilder;
 import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoDefinitionBuilderFactory;
+import org.bonitasoft.engine.service.ModelConvertor;
 
 /**
  * @author Vincent Elcrin
@@ -37,22 +38,21 @@ public class CustomUserInfoDefinitionAPIDelegate {
 
     private static final int MAX_NAME_LENGHT = 75;
 
-    private IdentityService service;
+    private final IdentityService service;
 
-    private final CustomUserInfoConverter converter = new CustomUserInfoConverter();
-
-    public CustomUserInfoDefinitionAPIDelegate(IdentityService service) {
+    public CustomUserInfoDefinitionAPIDelegate(final IdentityService service) {
         this.service = service;
     }
 
-    public CustomUserInfoDefinition create(SCustomUserInfoDefinitionBuilderFactory factory, CustomUserInfoDefinitionCreator creator) throws CreationException {
+    public CustomUserInfoDefinition create(final SCustomUserInfoDefinitionBuilderFactory factory, final CustomUserInfoDefinitionCreator creator)
+            throws CreationException {
         checkParameter(creator);
 
         final SCustomUserInfoDefinitionBuilder builder = factory.createNewInstance();
         builder.setName(creator.getName());
         builder.setDescription(creator.getDescription());
         try {
-            return converter.convert(service.createCustomUserInfoDefinition(builder.done()));
+            return ModelConvertor.convert(service.createCustomUserInfoDefinition(builder.done()));
         } catch (SCustomUserInfoDefinitionAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
         } catch (SIdentityException e) {
@@ -60,7 +60,7 @@ public class CustomUserInfoDefinitionAPIDelegate {
         }
     }
 
-    private void checkParameter(CustomUserInfoDefinitionCreator creator) throws CreationException {
+    private void checkParameter(final CustomUserInfoDefinitionCreator creator) throws CreationException {
         if (creator == null) {
             throw new CreationException("Can not create null custom user details.");
         }
@@ -73,7 +73,7 @@ public class CustomUserInfoDefinitionAPIDelegate {
 
     }
 
-    public void delete(long id) throws DeletionException {
+    public void delete(final long id) throws DeletionException {
         try {
             service.deleteCustomUserInfoDefinition(id);
         } catch (SIdentityException e) {
@@ -81,11 +81,11 @@ public class CustomUserInfoDefinitionAPIDelegate {
         }
     }
 
-    public List<CustomUserInfoDefinition> list(int startIndex, int maxResult) {
+    public List<CustomUserInfoDefinition> list(final int startIndex, final int maxResult) {
         try {
             List<CustomUserInfoDefinition> definitions = new ArrayList<CustomUserInfoDefinition>();
             for (SCustomUserInfoDefinition sDefinition : service.getCustomUserInfoDefinitions(startIndex, maxResult)) {
-                definitions.add(converter.convert(sDefinition));
+                definitions.add(ModelConvertor.convert(sDefinition));
             }
             return definitions;
         } catch (SIdentityException e) {
