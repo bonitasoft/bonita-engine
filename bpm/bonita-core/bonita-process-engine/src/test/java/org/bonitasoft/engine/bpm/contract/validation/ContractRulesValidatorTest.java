@@ -1,5 +1,7 @@
 package org.bonitasoft.engine.bpm.contract.validation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -9,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
@@ -113,4 +116,25 @@ public class ContractRulesValidatorTest {
         verify(loggerService).log(ContractRulesValidator.class, TechnicalLogSeverity.WARNING,
                 "Rule [Comment_Needed_If_Not_Valid] on input(s) [isValid, comment] is not valid");
     }
+    
+    @Test
+    public void isValid_should_be_false_when_rule_fails_to_evaluate() throws Exception {
+        //given
+        final Map<String, Object> variables = new HashMap<String, Object>();
+        variables.put(IS_VALID, false);
+        variables.put(COMMENT, NICE_COMMENT);
+        final SContractDefinition contract = buildContractWithInputsAndRules();
+        final SRuleDefinitionImpl badRule = new SRuleDefinitionImpl("bad rule", "a == b", "failing rule");
+        contract.getRules().add(badRule);
+
+        //when
+        try {
+            validator.validate(contract.getRules(), variables);
+            fail("validation should fail");
+        } catch (ContractViolationException e) {
+            assertThat(e.getExplanations()).hasSize(1).containsExactly(badRule.getExplanation());
+        }
+
+    }
+
 }

@@ -1,14 +1,16 @@
 package org.bonitasoft.engine.bpm.contract.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doThrow;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
@@ -39,10 +41,10 @@ public class ContractValidatorTest {
 
     @Mock
     private ContractStructureValidator structureValidator;
-    
+
     @Mock
     private ContractRulesValidator rulesValidator;
-    
+
     @InjectMocks
     private ContractValidator validator;
 
@@ -95,31 +97,11 @@ public class ContractValidatorTest {
     }
 
     @Test
-    public void isValid_should_be_false_an_return_explanations() throws Exception {
-        //given
-        final Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put(IS_VALID, false);
-        variables.put(COMMENT, null);
-        final SContractDefinition contract = buildContractWithInputsAndRules();
-
-        //when
-        final boolean valid = validator.isValid(contract, variables);
-
-        //then
-        assertThat(valid).isFalse();
-        final List<String> explanations = validator.getComments();
-        assertThat(explanations).hasSize(1);
-        assertThat(explanations.get(0)).isEqualTo("A comment is required when no validation");
-    }
-
-    
-
-    @Test
     public void isValid_should_be_false_when_inputs_are_missing() throws Exception {
         //given
         final Map<String, Object> variables = new HashMap<String, Object>();
         variables.put(COMMENT, NICE_COMMENT);
-        
+
         final SContractDefinition contract = new SContractDefinitionImpl();
         SSimpleInputDefinitionImpl sInputDefinition = new SSimpleInputDefinitionImpl(IS_VALID);
         sInputDefinition.setType(SType.BOOLEAN);
@@ -128,12 +110,15 @@ public class ContractValidatorTest {
         sInputDefinition2.setType(SType.TEXT);
         contract.getSimpleInputs().add(sInputDefinition2);
 
+        doThrow(new ContractViolationException("bad structure", Arrays.asList("field toto is missing")))
+                .when(structureValidator).validate(contract, variables);
+
         //when
         final boolean valid = validator.isValid(contract, variables);
 
         //then
         assertThat(valid).as("should refuse when inputs are unexpected").isFalse();
-        assertThat(validator.getComments()).isNotEmpty().contains("Contract need field [" + IS_VALID + "] but it has not been provided");
+        assertThat(validator.getComments()).isNotEmpty().contains("field toto is missing");
     }
 
     @Test
@@ -178,54 +163,6 @@ public class ContractValidatorTest {
 
         //then
         assertThat(valid).as("should validate contract without rules").isTrue();
-    }
-
-    @Test
-    public void isValid_should_be_false_when_rule_fails_to_evaluate() throws Exception {
-        //given
-        final Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put(IS_VALID, false);
-        variables.put(COMMENT, NICE_COMMENT);
-        final SContractDefinition contract = buildContractWithInputsAndRules();
-        final SRuleDefinitionImpl badRule = new SRuleDefinitionImpl("bad rule", "a == b", "failing rule");
-        contract.getRules().add(badRule);
-
-        //when
-        final boolean valid = validator.isValid(contract, variables);
-
-        //then
-        assertThat(valid).as("should validate contract without rules").isFalse();
-        assertThat(validator.getComments()).hasSize(1).containsExactly(badRule.getExplanation());
-    }
-
-    @Test
-    public void isValid_should_check_input_type() throws Exception {
-        //given
-        final SContractDefinition contract = buildEmptyContract();
-        final SSimpleInputDefinitionImpl sInputDefinition = new SSimpleInputDefinitionImpl(NUMBER_INPUT);
-        sInputDefinition.setType(SType.INTEGER);
-        contract.getSimpleInputs().add(sInputDefinition);
-
-        final SSimpleInputDefinitionImpl sInputDefinition2 = new SSimpleInputDefinitionImpl(BOOLEAN_INPUT);
-        sInputDefinition2.setType(SType.BOOLEAN);
-        contract.getSimpleInputs().add(sInputDefinition2);
-
-        final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(sInputDefinition2.getName());
-        stringBuilder.append(".class.isInstance(");
-        stringBuilder.append(sInputDefinition2.getType());
-        stringBuilder.append(")");
-
-        final Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put(NUMBER_INPUT, "abc");
-        variables.put(BOOLEAN_INPUT, true);
-
-        //when
-        final boolean valid = validator.isValid(contract, variables);
-
-        //then
-        assertThat(valid).as("should validate contract without rules").isFalse();
-        assertThat(validator.getComments()).isNotEmpty().contains("abc cannot be assigned to INTEGER");
     }
 
     @Test
