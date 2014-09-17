@@ -70,7 +70,7 @@
             <id>jboss</id>
             <modules>
                 <module>bonita-deploy-ear3</module>
-                <module>bonita-integration-jboss5</module>
+                <module>bonita-integration-jboss7</module>
             </modules>
         </profile>
         <profile>

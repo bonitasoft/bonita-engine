@@ -5,6 +5,7 @@
        <system>
         <paths>
          <path name="javax/annotation/processing"/>
+         <path name="com/sun/management"/>
         </paths>
        </system>
       </dependencies>
