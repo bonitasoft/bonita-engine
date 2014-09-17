@@ -2,6 +2,11 @@ package org.bonitasoft.engine.bpm.contract.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.bonitasoft.engine.bpm.contract.validation.MapBuilder.aMap;
+import static org.bonitasoft.engine.bpm.contract.validation.SContractDefinitionBuilder.aContract;
+import static org.bonitasoft.engine.bpm.contract.validation.SInputDefinitionBuilder.anInput;
+import static org.bonitasoft.engine.bpm.contract.validation.SRuleDefinitionBuilder.aRuleFor;
+import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -13,10 +18,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SType;
-import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SRuleDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SSimpleInputDefinitionImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
@@ -25,9 +27,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ContractRulesValidatorTest {
@@ -49,46 +48,20 @@ public class ContractRulesValidatorTest {
     }
 
     private SContractDefinition buildContractWithInputsAndRules() {
-        final SContractDefinitionImpl contract = buildEmptyContract();
-        addInputsToContract(contract);
-        addRulesToContractWithInputs(contract);
-        return contract;
-    }
-
-    private SContractDefinitionImpl buildEmptyContract() {
-        return new SContractDefinitionImpl();
-    }
-
-    private void addRulesToContractWithInputs(final SContractDefinition contract) {
-        final SRuleDefinitionImpl rule1 = new SRuleDefinitionImpl("Mandatory", "isValid != null", "isValid must be set");
-        rule1.addInputName(IS_VALID);
-        contract.getRules().add(rule1);
-        final SRuleDefinitionImpl rule2 = new SRuleDefinitionImpl("Comment_Needed_If_Not_Valid", "isValid || !isValid && comment != null",
-                "A comment is required when no validation");
-        rule2.addInputName(IS_VALID);
-        rule2.addInputName(COMMENT);
-        contract.getRules().add(rule2);
-    }
-
-    private SContractDefinition addInputsToContract(final SContractDefinition contract) {
-        final SSimpleInputDefinitionImpl input1 = new SSimpleInputDefinitionImpl(IS_VALID);
-        input1.setType(SType.BOOLEAN);
-        contract.getSimpleInputs().add(input1);
-        final SSimpleInputDefinitionImpl input2 = new SSimpleInputDefinitionImpl(COMMENT);
-        input2.setType(SType.TEXT);
-        contract.getSimpleInputs().add(input2);
-        return contract;
-    }
-
-    private Builder<String, Object> aMap() {
-        return ImmutableMap.<String, Object> builder();
+        return aContract()
+                .withInput(anInput(BOOLEAN).withName(IS_VALID).build())
+                .withInput(anInput(BOOLEAN).withName(IS_VALID).build())
+                .withRule(aRuleFor(IS_VALID).name("Mandatory").expression("isValid != null").explanation("isValid must be set").build())
+                .withRule(aRuleFor(IS_VALID, COMMENT).name("Comment_Needed_If_Not_Valid").expression("isValid || !isValid && comment != null")
+                        .explanation("A comment is required when no validation").build())
+                .build();
     }
 
     @Test
     public void should_log_all_rules_in_debug_mode() throws Exception {
         final SContractDefinition contract = buildContractWithInputsAndRules();
         Map<String, Object> variables = aMap().put(IS_VALID, false).put(COMMENT, NICE_COMMENT).build();
-        
+
         validator.validate(contract.getRules(), variables);
 
         //then
@@ -100,23 +73,20 @@ public class ContractRulesValidatorTest {
 
     @Test
     public void isValid_should_log_invalid_rules_in_warning_mode() throws Exception {
-        //given
         final Map<String, Object> variables = new HashMap<String, Object>();
         variables.put(IS_VALID, false);
         variables.put(COMMENT, null);
         final SContractDefinition contract = buildContractWithInputsAndRules();
 
-        //when
         try {
             validator.validate(contract.getRules(), variables);
+            fail("validation should fail");
         } catch (Exception e) {
+            verify(loggerService).log(ContractRulesValidator.class, TechnicalLogSeverity.WARNING,
+                    "Rule [Comment_Needed_If_Not_Valid] on input(s) [isValid, comment] is not valid");
         }
-
-        //then
-        verify(loggerService).log(ContractRulesValidator.class, TechnicalLogSeverity.WARNING,
-                "Rule [Comment_Needed_If_Not_Valid] on input(s) [isValid, comment] is not valid");
     }
-    
+
     @Test
     public void isValid_should_be_false_when_rule_fails_to_evaluate() throws Exception {
         //given
