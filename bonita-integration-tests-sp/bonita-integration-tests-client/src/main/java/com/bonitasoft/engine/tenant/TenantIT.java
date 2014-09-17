@@ -8,6 +8,12 @@
  *******************************************************************************/
 package com.bonitasoft.engine.tenant;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
@@ -56,14 +62,11 @@ import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.TenantStatusException;
 import com.bonitasoft.engine.bpm.flownode.ArchivedProcessInstancesSearchDescriptor;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantActivationException;
 import com.bonitasoft.engine.platform.TenantCreator;
 import com.bonitasoft.engine.platform.TenantDeactivationException;
 import com.bonitasoft.engine.platform.TenantNotFoundException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 /**
  * @author Yanyan Liu
@@ -224,7 +227,7 @@ public class TenantIT {
     }
 
     @Test
-    public void testTimerNotDeletedWhenTenantIsDeactivated() throws Exception {
+    public void timerNotDeletedWhenTenantIsDeactivated() throws Exception {
         final LoginAPI loginAPI = TenantAPIAccessor.getLoginAPI();
         APISession apiSession = loginAPI.login(tenantId, userName, password);
         ProcessAPI processAPI = TenantAPIAccessor.getProcessAPI(apiSession);

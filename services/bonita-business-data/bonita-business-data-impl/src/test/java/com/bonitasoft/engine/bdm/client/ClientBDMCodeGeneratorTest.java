@@ -1,5 +1,12 @@
+/*******************************************************************************
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bdm.client;
-
 
 import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
 import static com.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder.aBOM;
@@ -66,42 +73,42 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     }
 
     @Test
-    public void shouldToJavaClass_ReturnIntegerClass() throws Exception {
+    public void shouldToJavaClass_ReturnIntegerClass() {
         assertThat(bdmCodeGenerator.toJavaClass(FieldType.INTEGER).name()).isEqualTo(Integer.class.getSimpleName());
     }
 
     @Test
-    public void shouldToJavaClass_ReturnStringClass() throws Exception {
+    public void shouldToJavaClass_ReturnStringClass() {
         assertThat(bdmCodeGenerator.toJavaClass(FieldType.STRING).name()).isEqualTo(String.class.getSimpleName());
     }
 
     @Test
-    public void shouldToJavaClass_ReturnLongClass() throws Exception {
+    public void shouldToJavaClass_ReturnLongClass() {
         assertThat(bdmCodeGenerator.toJavaClass(FieldType.LONG).name()).isEqualTo(Long.class.getSimpleName());
     }
 
     @Test
-    public void shouldToJavaClass_ReturnDoubleClass() throws Exception {
+    public void shouldToJavaClass_ReturnDoubleClass() {
         assertThat(bdmCodeGenerator.toJavaClass(FieldType.DOUBLE).name()).isEqualTo(Double.class.getSimpleName());
     }
 
     @Test
-    public void shouldToJavaClass_ReturnFloatClass() throws Exception {
+    public void shouldToJavaClass_ReturnFloatClass() {
         assertThat(bdmCodeGenerator.toJavaClass(FieldType.FLOAT).name()).isEqualTo(Float.class.getSimpleName());
     }
 
     @Test
-    public void shouldToJavaClass_ReturnBooleanClass() throws Exception {
+    public void shouldToJavaClass_ReturnBooleanClass() {
         assertThat(bdmCodeGenerator.toJavaClass(FieldType.BOOLEAN).name()).isEqualTo(Boolean.class.getSimpleName());
     }
 
     @Test
-    public void shouldToJavaClass_ReturnDateClass() throws Exception {
+    public void shouldToJavaClass_ReturnDateClass() {
         assertThat(bdmCodeGenerator.toJavaClass(FieldType.DATE).name()).isEqualTo(Date.class.getSimpleName());
     }
 
     @Test
-    public void shouldToJavaClass_ReturnStringTextClass() throws Exception {
+    public void shouldToJavaClass_ReturnStringTextClass() {
         assertThat(bdmCodeGenerator.toJavaClass(FieldType.TEXT).name()).isEqualTo(String.class.getSimpleName());
     }
 
@@ -164,11 +171,12 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         return signature;
     }
 
-    protected String appendCommaIfNotFirstParam(String signature, final boolean first) {
+    protected String appendCommaIfNotFirstParam(final String signature, final boolean first) {
+        String newSignature = signature;
         if (!first) {
-            signature += ", ";
+            newSignature += ", ";
         }
-        return signature;
+        return newSignature;
     }
 
     private String getSimpleClassName(final String qualifedClassName) {

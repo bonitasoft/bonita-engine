@@ -12,7 +12,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.bonitasoft.engine.authentication.AuthenticationConstants;
-import org.bonitasoft.engine.authentication.AuthenticationException;
 import org.bonitasoft.engine.authentication.GenericAuthenticationService;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.identity.IdentityService;
@@ -36,7 +35,7 @@ public class NoAuthenticationServiceImpl implements GenericAuthenticationService
     }
 
     @Override
-    public String checkUserCredentials(Map<String, Serializable> credentials) throws AuthenticationException {
+    public String checkUserCredentials(Map<String, Serializable> credentials) {
         try {
             String userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME));
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {

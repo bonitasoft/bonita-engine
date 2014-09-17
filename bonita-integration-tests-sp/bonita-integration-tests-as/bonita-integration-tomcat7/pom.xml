@@ -18,14 +18,13 @@
 		<server.port>8385</server.port>
 		<server.ajp.port>8314</server.ajp.port>
 		<provider.port>8185</provider.port>
-		<tomcat.version>7.0.50</tomcat.version>
+		<tomcat.version>7.0.55</tomcat.version>
 		<tomcat.name>apache-tomcat-${tomcat.version}</tomcat.name>
 		<tomcat.home>${project.build.directory}/${tomcat.name}</tomcat.home>
 		<tomcat.conf.dir>${tomcat.home}/conf</tomcat.conf.dir>
 		<tomcat.deploy.dir>${tomcat.home}/webapps</tomcat.deploy.dir>
-        <tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-7/v${tomcat.version}/bin/${tomcat.name}.zip
-        </tomcat.url>
-		<tomcat.zip.folder>${user.home}</tomcat.zip.folder>
+        <tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-7/v${tomcat.version}/bin/${tomcat.name}.zip</tomcat.url>
+		<tomcat.zip.folder>${java.io.tmpdir}</tomcat.zip.folder>
 		<bonita.home>${tomcat.home}/bonita</bonita.home>
 		<if.task>net.sf.antcontrib.logic.IfTask</if.task>
 		<db.vendor>h2</db.vendor>
@@ -130,27 +129,10 @@
                                             <outputDirectory>${project.build.directory}/driver</outputDirectory>
                                         </artifactItem>
                                         <artifactItem>
-                                            <groupId>mysql</groupId>
-                                            <artifactId>mysql-connector-java</artifactId>
-                                            <outputDirectory>${project.build.directory}/driver</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
                                             <groupId>org.postgresql</groupId>
                                             <artifactId>postgresql</artifactId>
                                             <outputDirectory>${project.build.directory}/driver</outputDirectory>
                                         </artifactItem>
-                                         <artifactItem>
-											<groupId>com.oracle</groupId>
-											<artifactId>ojdbc</artifactId>
-											<version>6</version>
-											<outputDirectory>${project.build.directory}/driver</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.microsoft.jdbc</groupId>
-											<artifactId>sqlserver</artifactId>
-											<version>4.0.2206.100</version>
-											<outputDirectory>${project.build.directory}/driver</outputDirectory>
-										</artifactItem>
                                         <artifactItem>
 											<groupId>org.bonitasoft.tomcat</groupId>
 											<artifactId>bonita-tomcat-h2-listener</artifactId>
@@ -259,10 +241,8 @@
                                                         <include name="server.xml"/>
 													</fileset>
 												</copy>
-                                                <replace file="${tomcat.conf.dir}/server.xml" token="#db.server.port#"
-                                                         value="${db.server.port}"/>
+                                                <replace file="${tomcat.conf.dir}/server.xml" token="#db.server.port#" value="${db.server.port}"/>
 											</then>
-
 										</if>
 
                                         <replace file="${tomcat.conf.dir}/server.xml"
@@ -331,20 +311,19 @@
 										</waitfor>
 
                                         <mkdir dir="${report.xml}"/>
-                                        <junit printsummary="yes" fork="yes" forkmode="once" showoutput="true"
-                                               maxmemory="1024m">
+                                        <junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="1024m">
 											<!-- <jvmarg line="-Xdebug -Xmx512m -Xms128m -XX:MaxPermSize=256m -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8500"/> -->
                                             <jvmarg line="-Xmx512m -Xms128m -XX:MaxPermSize=256m"/>
                                             <classpath refid="test.path"/>
                                             <sysproperty key="bonita.home" value="${bonita.home}"/>
-                                            <formatter type="xml"/>
+                                            
+											<formatter type="xml"/>
                                             <test todir="${report.xml}" name="${test.class}"/>
 										</junit>
 										<junitreport todir="${report.xml}">
                                             <fileset dir="${report.xml}" includes="TEST-*.xml"/>
                                             <report todir="${report.results}"/>
 										</junitreport>
-
 										<copy todir="${surefire.reports}">
                                             <fileset dir="${report.xml}"/>
 										</copy>

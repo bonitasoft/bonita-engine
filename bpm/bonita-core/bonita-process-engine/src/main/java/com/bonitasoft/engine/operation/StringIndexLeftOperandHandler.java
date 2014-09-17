@@ -21,7 +21,6 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilderFactory;
@@ -101,7 +100,7 @@ public class StringIndexLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Map<String, Object> retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) throws SBonitaReadException {
+    public Map<String, Object> retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) {
         // don't retrieve it, not useful
         return null;
     }

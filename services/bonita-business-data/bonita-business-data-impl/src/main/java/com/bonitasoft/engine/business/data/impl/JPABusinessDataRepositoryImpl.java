@@ -25,7 +25,6 @@ import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.persistence.metamodel.EntityType;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
 
@@ -62,7 +61,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     @Override
-    public void start() throws SBonitaException {
+    public void start() {
         if (businessDataModelRepository.isDBMDeployed()) {
             entityManagerFactory = Persistence.createEntityManagerFactory(BDR_PERSISTENCE_UNIT, configuration);
         }
@@ -77,12 +76,12 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     @Override
-    public void pause() throws SBonitaException {
+    public void pause() {
         stop();
     }
 
     @Override
-    public void resume() throws SBonitaException {
+    public void resume() {
         start();
     }
 

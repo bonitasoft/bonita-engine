@@ -100,7 +100,7 @@ public class BusinessObject {
     public void addUniqueConstraint(UniqueConstraint uniqueConstraint) {
         uniqueConstraints.add(uniqueConstraint);
     }
-    
+
     public UniqueConstraint addUniqueConstraint(final String name, final String... fieldNames) {
         if (fieldNames == null || fieldNames.length == 0) {
             throw new IllegalArgumentException("fieldNames cannot be null or empty");
@@ -108,7 +108,7 @@ public class BusinessObject {
         final UniqueConstraint uniqueConstraint = new UniqueConstraint();
         uniqueConstraint.setName(name);
         uniqueConstraint.setFieldNames(Arrays.asList(fieldNames));
-        
+
         addUniqueConstraint(uniqueConstraint);
         return uniqueConstraint;
     }
@@ -134,7 +134,7 @@ public class BusinessObject {
     public void setQueries(final List<Query> queries) {
         this.queries = queries;
     }
-    
+
     public void addIndex(Index index) {
         indexes.add(index);
     }
@@ -172,7 +172,7 @@ public class BusinessObject {
     private boolean isACompositionField(Field field) {
         return field instanceof RelationField && Type.COMPOSITION == ((RelationField) field).getType();
     }
-    
+
     public String getSimpleName() {
         String simpleName = qualifiedName;
         if (simpleName != null && simpleName.indexOf(".") != -1) {
@@ -181,7 +181,7 @@ public class BusinessObject {
         }
         return simpleName;
     }
-    
+
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37).append(description).append(fields).append(indexes).append(qualifiedName).append(queries).append(uniqueConstraints)
@@ -194,9 +194,8 @@ public class BusinessObject {
             final BusinessObject other = (BusinessObject) obj;
             return new EqualsBuilder().append(description, other.description).append(fields, other.fields).append(indexes, other.indexes)
                     .append(qualifiedName, other.qualifiedName).append(queries, other.queries).append(uniqueConstraints, other.uniqueConstraints).isEquals();
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Override

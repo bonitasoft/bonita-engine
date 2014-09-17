@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.api.impl.resolver;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,7 +70,7 @@ public class BusinessDataProcessDependencyResolverTest {
     }
 
     @Test
-    public void checkResolution_returns_no_problem_with_no_business_data() throws Exception {
+    public void checkResolution_returns_no_problem_with_no_business_data() {
         final SProcessDefinition processDefinition = buildProcessDefinition();
 
         final List<Problem> problems = resolver.checkResolution(tenantAccessor, processDefinition);
@@ -71,7 +79,7 @@ public class BusinessDataProcessDependencyResolverTest {
     }
 
     @Test
-    public void checkResolution_returns_no_problem_with_a_valid_business_data() throws Exception {
+    public void checkResolution_returns_no_problem_with_a_valid_business_data() {
         final SProcessDefinition processDefinition = buildProcessDefinition(buildBusinessDataDefinition("bizData", "com.bonitasoft.Employee"));
 
         final List<Problem> problems = resolver.checkResolution(tenantAccessor, processDefinition);
@@ -80,7 +88,7 @@ public class BusinessDataProcessDependencyResolverTest {
     }
 
     @Test
-    public void checkResolution_returns_a_problem_with_invalid_business_data() throws Exception {
+    public void checkResolution_returns_a_problem_with_invalid_business_data() {
         final SProcessDefinition processDefinition = buildProcessDefinition(buildBusinessDataDefinition("bizData1", "com.bonitasoft.Address"),
                 buildBusinessDataDefinition("bizData2", Long.class.getName()));
 
