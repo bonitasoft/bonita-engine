@@ -53,7 +53,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-ear-plugin</artifactId>
-				<version>2.9.1</version>
 				<configuration>
 					<modules>
 						<ejbModule>

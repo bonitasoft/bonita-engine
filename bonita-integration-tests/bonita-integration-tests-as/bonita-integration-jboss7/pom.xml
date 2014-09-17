@@ -60,7 +60,7 @@
 		<dependency>
             <groupId>org.bonitasoft.jboss</groupId>
             <artifactId>bonita-jboss-h2-mbean</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -163,10 +163,8 @@
 								<inherited>false</inherited>
 								<configuration>
 									<target>
-                                        <taskdef name="if" classname="${if.task}"
-                                                 classpathref="maven.runtime.classpath"/>
-                                        <available property="jboss.present"
-                                                   file="${jboss.zip.folder}/${jboss.name}.zip"/>
+                                        <taskdef name="if" classname="${if.task}" classpathref="maven.runtime.classpath"/>
+                                        <available property="jboss.present" file="${jboss.zip.folder}/${jboss.name}.zip"/>
 										<if>
 											<not>
                                                 <isset property="jboss.present"/>
