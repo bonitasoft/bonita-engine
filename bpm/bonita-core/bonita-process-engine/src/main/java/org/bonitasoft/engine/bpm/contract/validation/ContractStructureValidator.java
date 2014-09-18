@@ -57,7 +57,7 @@ public class ContractStructureValidator {
                 problems.add("Contract need field [" + inputName + "] but it has not been provided");
             } else {
                 Object value = inputs.get(inputName);
-                if (!typeValidator.isValid(definition.getType(), value)) {
+                if (!typeValidator.isValid(definition, value)) {
                     problems.add(value + " cannot be assigned to " + definition.getType());
                 }
             }

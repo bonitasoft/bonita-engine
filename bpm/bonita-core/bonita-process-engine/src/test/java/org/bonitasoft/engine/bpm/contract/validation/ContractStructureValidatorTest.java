@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SType;
+import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +40,7 @@ public class ContractStructureValidatorTest {
 
     @Test
     public void should_pass_when_inputs_are_provided_and_valid() throws Exception {
-        when(typeValidator.isValid(any(SType.class), any())).thenReturn(true);
+        when(typeValidator.isValid(any(SInputDefinition.class), any())).thenReturn(true);
         SContractDefinition contract = aContract()
                 .withInput(anInput(TEXT).withName("aText").build())
                 .withInput(anInput(BOOLEAN).withName("aBoolean").build()).build();
@@ -53,7 +53,7 @@ public class ContractStructureValidatorTest {
     
     @Test
     public void should_pass_when_complex_inputs_are_provided_and_valid() throws Exception {
-        when(typeValidator.isValid(any(SType.class), any())).thenReturn(true);
+        when(typeValidator.isValid(any(SInputDefinition.class), any())).thenReturn(true);
         SContractDefinition contract = aContract()
                 .withInput(anInput(TEXT).withName("aText").build())
                 .withInput(anInput(BOOLEAN).withName("aBoolean").build()).build();
@@ -66,7 +66,7 @@ public class ContractStructureValidatorTest {
 
     @Test
     public void should_log_inputs_provided_but_not_in_defined_in_contract() throws Exception {
-        when(typeValidator.isValid(any(SType.class), any())).thenReturn(true);
+        when(typeValidator.isValid(any(SInputDefinition.class), any())).thenReturn(true);
         SContractDefinition contract = aContract().withInput(anInput(TEXT).withName("aText").build()).build();
         Map<String, Object> taskInputs = aMap()
                 .put("aText", "should be provided")
@@ -102,7 +102,7 @@ public class ContractStructureValidatorTest {
         SContractDefinition contract = aContract()
                 .withInput(anInput(INTEGER).withName("anInteger").build())
                 .withInput(anInput(BOOLEAN).withName("aBoolean").build()).build();
-        when(typeValidator.isValid(any(SType.class), any(Object.class))).thenReturn(false);
+        when(typeValidator.isValid(any(SInputDefinition.class), any(Object.class))).thenReturn(false);
         Map<String, Object> taskInputs = aMap().put("anInteger", "thisIsNotAnInteger").put("aBoolean", "thisIsNotABoolean").build();
 
         try {

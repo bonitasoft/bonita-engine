@@ -17,19 +17,19 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.contract.validation.MapBuilder.aMap;
 import static org.bonitasoft.engine.bpm.contract.validation.SInputDefinitionBuilder.anInput;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.eq;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SComplexInputDefinitionImpl;
@@ -39,17 +39,15 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.verification.VerificationMode;
-import org.mvel2.optimizers.impl.refl.nodes.ArrayLength;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ComplexContractStructureValidatorTest {
 
     @Mock
     private ContractStructureValidator simpleInputValidator;
+    
+    @Mock
+    private ContractTypeValidator typeValidator;
     
     @InjectMocks
     private ComplexContractStructureValidator validator;
@@ -70,6 +68,7 @@ public class ComplexContractStructureValidatorTest {
         List<SSimpleInputDefinition> asList = asList(anInput(SType.BOOLEAN).withName("aSimple").build());
         SComplexInputDefinitionImpl complex = new SComplexInputDefinitionImpl("complex", "acomplexInput", asList, new ArrayList<SComplexInputDefinition>());
         contract.addComplexInput(complex);
+        when(typeValidator.isValid(any(SInputDefinition.class), any(Object.class))).thenReturn(true);
         
         Map<String,Object> simple = aMap().put("aSimple", true).build();
         Map<String,Object> put = aMap().put("complex", simple).build();

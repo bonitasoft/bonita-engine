@@ -13,7 +13,11 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
-import org.bonitasoft.engine.core.process.definition.model.SType;
+import java.util.Map;
+
+import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 
 /**
  * Validate that a value is assignable to a given contract type
@@ -22,7 +26,26 @@ import org.bonitasoft.engine.core.process.definition.model.SType;
  */
 public class ContractTypeValidator {
 
-    public boolean isValid(SType type, Object object) {
-        return type.validate(object);
+    public boolean isValid(SInputDefinition definition, Object object) {
+        if (definition instanceof SSimpleInputDefinition) {
+            return isValidForSimpleType(definition, object);
+        } else if (definition instanceof SComplexInputDefinition) {
+            return isValidForComplexType(object);
+        }
+        return false;
+    }
+
+    private boolean isValidForSimpleType(SInputDefinition definition, Object object) {
+        return ((SSimpleInputDefinition) definition).getType().validate(object);
+    }
+
+    private boolean isValidForComplexType(Object object) {
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = (Map<String, Object>) object;
+            return map != null;
+        } catch (ClassCastException e) {
+            return false;
+        }
     }
 }

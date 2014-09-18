@@ -25,9 +25,11 @@ import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinitio
 public class ComplexContractStructureValidator {
 
     private ContractStructureValidator validator;
+    private ContractTypeValidator typeValidator;
 
-    public ComplexContractStructureValidator(ContractStructureValidator validator) {
+    public ComplexContractStructureValidator(ContractStructureValidator validator, ContractTypeValidator typeValidator) {
         this.validator = validator;
+        this.typeValidator = typeValidator;
     }
 
     public void validate(SContractDefinition contract, Map<String, Object> inputs) throws ContractViolationException {
@@ -56,7 +58,7 @@ public class ComplexContractStructureValidator {
             } else {
                 
                 Object value = inputs.get(def.getName());
-                if (!isTypeValide(value)) {
+                if (!typeValidator.isValid(def, value)) {
                     message.add(value + " cannot be assigned to COMPLEX type");
                 } else {
                     message.addAll(recursive(def.getSimpleInputDefinitions(), def.getComplexInputDefinitions(), (Map<String, Object>) value));
@@ -64,14 +66,5 @@ public class ComplexContractStructureValidator {
             }
         }
         return message;
-    }
-    
-    private boolean isTypeValide(Object o) {
-        try {
-            Map<String, Object> map = (Map<String, Object>) o;
-            return map != null;
-        } catch (ClassCastException e) {
-            return false;
-        }
     }
 }
