@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
 	<bean class="org.bonitasoft.engine.document.impl.DocumentServiceImpl" id="documentService">
-		<constructor-arg name="recorder" ref="recorderSync" />
+		<constructor-arg name="recorder" ref="tenantRecorderSync"/>
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 	</bean>
 	

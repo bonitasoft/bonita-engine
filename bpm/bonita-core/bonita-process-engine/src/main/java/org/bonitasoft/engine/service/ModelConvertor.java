@@ -47,14 +47,6 @@ import org.bonitasoft.engine.bpm.connector.impl.ArchivedConnectorInstanceImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceWithFailureInfoImpl;
-import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
-import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
-import org.bonitasoft.engine.bpm.contract.Type;
-import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.RuleDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -162,13 +154,9 @@ import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
-import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -234,11 +222,15 @@ import org.bonitasoft.engine.identity.UserCreator;
 import org.bonitasoft.engine.identity.UserCreator.UserField;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.identity.impl.ContactDataImpl;
+import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
+import org.bonitasoft.engine.identity.impl.CustomUserInfoValueImpl;
 import org.bonitasoft.engine.identity.impl.GroupImpl;
 import org.bonitasoft.engine.identity.impl.RoleImpl;
 import org.bonitasoft.engine.identity.impl.UserImpl;
 import org.bonitasoft.engine.identity.impl.UserMembershipImpl;
 import org.bonitasoft.engine.identity.model.SContactInfo;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -1982,6 +1974,25 @@ public class ModelConvertor {
         final ThemeType type = ThemeType.valueOf(sTheme.getType().name());
         final Date lastUpdateDate = new Date(sTheme.getLastUpdateDate());
         return new ThemeImpl(sTheme.getContent(), sTheme.getCssContent(), sTheme.isDefault(), type, lastUpdateDate);
+    }
+
+    public static CustomUserInfoDefinitionImpl convert(SCustomUserInfoDefinition sDefinition) {
+        CustomUserInfoDefinitionImpl definition = new CustomUserInfoDefinitionImpl();
+        definition.setId(sDefinition.getId());
+        definition.setName(sDefinition.getName());
+        definition.setDescription(sDefinition.getDescription());
+        return definition;
+    }
+
+    public static CustomUserInfoValueImpl convert(SCustomUserInfoValue sValue) {
+        if (sValue == null) {
+            return null;
+        }
+        CustomUserInfoValueImpl value = new CustomUserInfoValueImpl();
+        value.setDefinitionId(sValue.getDefinitionId());
+        value.setUserId(sValue.getUserId());
+        value.setValue(sValue.getValue());
+        return value;
     }
 
     public static ContractDefinition toContract(final SContractDefinition sContract) {

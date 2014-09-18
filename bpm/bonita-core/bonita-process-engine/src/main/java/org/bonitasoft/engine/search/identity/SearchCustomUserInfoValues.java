@@ -16,7 +16,6 @@ package org.bonitasoft.engine.search.identity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.api.impl.CustomUserInfoConverter;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
@@ -25,15 +24,14 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
+import org.bonitasoft.engine.service.ModelConvertor;
 
 /**
  * @author Vincent Elcrin
  */
 public class SearchCustomUserInfoValues extends AbstractSearchEntity<CustomUserInfoValue, SCustomUserInfoValue> {
 
-    private final CustomUserInfoConverter converter = new CustomUserInfoConverter();
-
-    private IdentityService service;
+    private final IdentityService service;
 
     public SearchCustomUserInfoValues(IdentityService service, SearchEntityDescriptor searchDescriptor, SearchOptions options) {
         super(searchDescriptor, options);
@@ -54,7 +52,7 @@ public class SearchCustomUserInfoValues extends AbstractSearchEntity<CustomUserI
     public List<CustomUserInfoValue> convertToClientObjects(List<SCustomUserInfoValue> sValues) {
         List<CustomUserInfoValue> values = new ArrayList<CustomUserInfoValue>(sValues.size());
         for (SCustomUserInfoValue value : sValues) {
-            values.add(converter.convert(value));
+            values.add(ModelConvertor.convert(value));
         }
         return values;
     }

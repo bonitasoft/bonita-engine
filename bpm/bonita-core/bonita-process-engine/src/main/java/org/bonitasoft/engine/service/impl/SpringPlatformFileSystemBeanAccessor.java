@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -20,12 +20,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class SpringPlatformFileSystemBeanAccessor {
 
@@ -36,39 +38,45 @@ public class SpringPlatformFileSystemBeanAccessor {
         try {
             final String platformFolder = homeServer.getPlatformConfFolder();
             final File serviceFolder = new File(platformFolder + File.separatorChar + "services");
-            if (!serviceFolder.isDirectory()) {
-                throw new RuntimeException("Folder 'services' not found");
-            }
-            final FileFilter filter = new FileFilter() {
-
-                @Override
-                public boolean accept(final File pathname) {
-                    return pathname.isFile() && pathname.getName().endsWith(".xml");
-                }
-            };
-            /*
-             * sort this to have always the same order
-             */
-            File[] listFiles = serviceFolder.listFiles(filter);
-            List<File> listFilesCollection = Arrays.asList(listFiles);
-            Collections.sort(listFilesCollection);
-            listFiles = listFilesCollection.toArray(new File[listFilesCollection.size()]);
-            if (listFiles.length == 0) {
-                throw new RuntimeException("No file found");
-            }
-            final String[] resources = new String[listFiles.length];
-            for (int i = 0; i < listFiles.length; i++) {
-                try {
-                    resources[i] = listFiles[i].getCanonicalPath();
-                } catch (final IOException e) {
-                    // TODO Auto-generated catch block
-                    throw new RuntimeException(e);
-                }
-            }
+            final File modelFolder = new File(platformFolder + File.separatorChar + "model");
+            final String[] resources = ArrayUtils.addAll(getResourcesOfFolder(serviceFolder), getResourcesOfFolder(modelFolder));
             return resources;
         } catch (final BonitaHomeNotSetException e) {
             throw new RuntimeException("Bonita home not set");
         }
+    }
+
+    private static String[] getResourcesOfFolder(final File serviceFolder) {
+        if (!serviceFolder.isDirectory()) {
+            throw new RuntimeException("Folder '" + serviceFolder.getName() + "' not found");
+        }
+        final FileFilter filter = new FileFilter() {
+
+            @Override
+            public boolean accept(final File pathname) {
+                return pathname.isFile() && pathname.getName().endsWith(".xml");
+            }
+        };
+        /*
+         * sort this to have always the same order
+         */
+        File[] listFiles = serviceFolder.listFiles(filter);
+        List<File> listFilesCollection = Arrays.asList(listFiles);
+        Collections.sort(listFilesCollection);
+        listFiles = listFilesCollection.toArray(new File[listFilesCollection.size()]);
+        if (listFiles.length == 0) {
+            throw new RuntimeException("No file found");
+        }
+        final String[] resources = new String[listFiles.length];
+        for (int i = 0; i < listFiles.length; i++) {
+            try {
+                resources[i] = listFiles[i].getCanonicalPath();
+            } catch (final IOException e) {
+                // TODO Auto-generated catch block
+                throw new RuntimeException(e);
+            }
+        }
+        return resources;
     }
 
     public static <T> T getService(final Class<T> serviceClass) {

@@ -3,7 +3,7 @@
 
 	<bean id="categoryService" class="org.bonitasoft.engine.core.category.impl.CategoryServiceImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="recorder" ref="recorderSync" />
+		<constructor-arg name="recorder" ref="tenantRecorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="sessionService" ref="sessionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />

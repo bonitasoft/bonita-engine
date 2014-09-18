@@ -13,7 +13,7 @@ import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.platform.STenantNotFoundException;
+import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;

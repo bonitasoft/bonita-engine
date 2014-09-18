@@ -26,10 +26,16 @@
 		<constructor-arg name="technicalLoggerService" ref="platformTechnicalLoggerService" />
 	</bean>
 
-	<bean id="recorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
-		<constructor-arg name="persistenceService" ref="persistenceService" />
+	<bean id="platformRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
+		<constructor-arg name="persistenceService" ref="platformPersistenceService" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+	</bean>
+	
+	<bean id="tenantRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
+		<constructor-arg name="persistenceService" ref="persistenceService" />
+		<constructor-arg name="eventService" ref="eventService" />
+		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 	</bean>
 
 	<bean id="parserFactory" class="org.bonitasoft.engine.xml.parse.SAXParserFactory">

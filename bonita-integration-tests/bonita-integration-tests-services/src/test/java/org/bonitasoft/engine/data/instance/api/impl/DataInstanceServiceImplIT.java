@@ -47,7 +47,7 @@ public class DataInstanceServiceImplIT extends DataInstanceServiceTest {
 
     @BeforeClass
     public static void setupImplementation() {
-        final Recorder recorder = getServicesBuilder().buildRecorder();
+        final Recorder recorder = getServicesBuilder().buildTenantRecorder();
         final TenantHibernatePersistenceService persistenceService = getServicesBuilder().buildTenantPersistenceService();
         final TechnicalLoggerService technicalLoggerService = getServicesBuilder().buildTechnicalLoggerService();
         final ArchiveService archiveService = getServicesBuilder().buildArchiveService();
