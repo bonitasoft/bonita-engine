@@ -21,7 +21,6 @@ import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
 
 public class ComplexContractStructureValidator {
 
@@ -39,20 +38,40 @@ public class ComplexContractStructureValidator {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private List<String> recursive(List<SSimpleInputDefinition> simpleInputs, List<SComplexInputDefinition> complexInputs, Map<String, Object> inputs) {
         List<String> message = new ArrayList<String>();
 
-        try {
-            validator.validate(simpleInputs, inputs);
-        } catch (ContractViolationException e) {
-            message.addAll(e.getExplanations());
+        if (!simpleInputs.isEmpty()) {
+            try {
+                validator.validate(simpleInputs, inputs);
+            } catch (ContractViolationException e) {
+                message.addAll(e.getExplanations());
+            }
         }
 
         for (SComplexInputDefinition def : complexInputs) {
-            Map<String, Object> map = (Map<String, Object>) inputs.get(def.getName());
-            // TODO ClassCastException
-            message.addAll(recursive(def.getSimpleInputDefinitions(), def.getComplexInputDefinitions(), map));
+            if (!inputs.containsKey(def.getName())) {
+                message.add("Contract need field [" + def.getName() + "] but it has not been provided");
+            } else {
+                
+                Object value = inputs.get(def.getName());
+                if (!isTypeValide(value)) {
+                    message.add(value + " cannot be assigned to COMPLEX type");
+                } else {
+                    message.addAll(recursive(def.getSimpleInputDefinitions(), def.getComplexInputDefinitions(), (Map<String, Object>) value));
+                }
+            }
         }
         return message;
+    }
+    
+    private boolean isTypeValide(Object o) {
+        try {
+            Map<String, Object> map = (Map<String, Object>) o;
+            return map != null;
+        } catch (ClassCastException e) {
+            return false;
+        }
     }
 }
