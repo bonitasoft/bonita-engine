@@ -47,38 +47,32 @@ public class ContractStructureValidator {
 
     @SuppressWarnings("unchecked")
     private List<String> recursive(List<SSimpleInputDefinition> simpleInputs, List<SComplexInputDefinition> complexInputs, Map<String, Object> inputs) {
+
+        logInputsWhichAreNotInContract(DEBUG, simpleInputs, inputs);
+        
         List<String> message = new ArrayList<String>();
-
-        if (!simpleInputs.isEmpty()) {
-            logInputsWhichAreNotInContract(DEBUG, simpleInputs, inputs);
-            List<String> problems = findEventualProblems(simpleInputs, inputs);
-            message.addAll(problems);
-        }
-
-        for (SComplexInputDefinition def : complexInputs) {
+        for (SInputDefinition def : union(simpleInputs, complexInputs)) {
             try {
                 validateInput(def, inputs);
-                message.addAll(recursive(def.getSimpleInputDefinitions(), def.getComplexInputDefinitions(), (Map<String, Object>) inputs.get(def.getName())));
+                if (def instanceof SComplexInputDefinition) {
+                    SComplexInputDefinition complex = (SComplexInputDefinition) def;
+                    message.addAll(recursive(complex.getSimpleInputDefinitions(), complex.getComplexInputDefinitions(), (Map<String, Object>) inputs.get(def.getName())));
+                }
             } catch (InputValidationException e) {
                 message.add(e.getMessage());
             }
         }
         return message;
     }
-    
-    protected List<String> findEventualProblems(List<SSimpleInputDefinition> simpleInputs, Map<String, Object> inputs) {
-        List<String> problems = new ArrayList<String>();
-        for (SSimpleInputDefinition definition : simpleInputs) {
-            try {
-                validateInput(definition, inputs);
-            } catch (InputValidationException e) {
-                problems.add(e.getMessage());
-            }
-        }
-        return problems;
+
+    private List<SInputDefinition> union(List<SSimpleInputDefinition> simpleInputs, List<SComplexInputDefinition> complexInputs) {
+        List<SInputDefinition> all = new ArrayList<SInputDefinition>();
+        all.addAll(simpleInputs);
+        all.addAll(complexInputs);
+        return all;
     }
-    
-    protected void validateInput(SInputDefinition definition, Map<String, Object> inputs) throws InputValidationException {
+
+    private void validateInput(SInputDefinition definition, Map<String, Object> inputs) throws InputValidationException {
         String inputName = definition.getName();
         if (!inputs.containsKey(inputName)) {
             throw new InputValidationException("Contract need field [" + inputName + "] but it has not been provided");
@@ -86,7 +80,7 @@ public class ContractStructureValidator {
             typeValidator.validate(definition, inputs.get(inputName));
         }
     }
-    
+
     private void logInputsWhichAreNotInContract(TechnicalLogSeverity severity, List<SSimpleInputDefinition> simpleInputs, Map<String, Object> inputs) {
         if (logger.isLoggable(ContractStructureValidator.class, severity)) {
             for (String input : getInputsWhichAreNotInContract(simpleInputs, inputs)) {
