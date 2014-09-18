@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.contract.validation.SInputDefinitionBuilder.anInput;
 import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
 
@@ -33,69 +32,33 @@ public class ContractTypeValidatorTest {
         contractTypeValidator = new ContractTypeValidator();
     }
     
-    @Test
+    @Test(expected = InputValidationException.class)
     public void should_delegate_simple_type_validation_to_associated_enum() throws Exception {
         SInputDefinition definition = anInput(BOOLEAN).build();
         
-        boolean validation = contractTypeValidator.isValid(definition, true);
-        assertThat(validation).isTrue();
-        
-        validation = contractTypeValidator.isValid(definition, "not a boolean");
-        assertThat(validation).isFalse();
+        contractTypeValidator.validate(definition, "not a boolean");
     }
     
-    @Test
+    @Test(expected = InputValidationException.class)
     public void should_not_validate_null_for_a_complex_type() throws Exception {
         SComplexInputDefinitionImpl definition = new SComplexInputDefinitionImpl("a complex definition");
         
-        boolean validation = contractTypeValidator.isValid(definition, null);
-        
-        assertThat(validation).isFalse();
+        contractTypeValidator.validate(definition, null);
     }
     
-    @Test
+    @Test(expected = InputValidationException.class)
     public void should_not_validate_non_map_object_for_complex_type() throws Exception {
         SComplexInputDefinitionImpl definition = new SComplexInputDefinitionImpl("a complex definition");
         
-        boolean validation = contractTypeValidator.isValid(definition, "this is not a map");
-        
-        assertThat(validation).isFalse();
+        contractTypeValidator.validate(definition, "this is not a map");
     }
     
     @Test
     public void should_validate__map_object_for_complex_type() throws Exception {
         SComplexInputDefinitionImpl definition = new SComplexInputDefinitionImpl("a complex definition");
         
-        boolean validation = contractTypeValidator.isValid(definition, new HashMap<String, Object>());
+        contractTypeValidator.validate(definition, new HashMap<String, Object>());
         
-        assertThat(validation).isTrue();
-    }
-    
-    @Test
-    public void should_not_validate_unknown_SInputDefinition_subclass() throws Exception {
-        
-        boolean validation = contractTypeValidator.isValid(new UnknownDefintion(), "a value");
-        
-        assertThat(validation).isFalse();
-    }
-    
-    @SuppressWarnings("serial")
-    private class UnknownDefintion implements SInputDefinition {
-
-        @Override
-        public String getName() {
-            return null;
-        }
-
-        @Override
-        public Long getId() {
-            return null;
-        }
-
-        @Override
-        public String getDescription() {
-            return null;
-        }
-        
+        // expected no exception
     }
 }

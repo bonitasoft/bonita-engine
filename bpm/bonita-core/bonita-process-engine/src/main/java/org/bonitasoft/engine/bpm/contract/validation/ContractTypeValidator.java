@@ -26,17 +26,21 @@ import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinitio
  */
 public class ContractTypeValidator {
 
-    public boolean isValid(SInputDefinition definition, Object object) {
+    public void validate(SInputDefinition definition, Object object) throws InputValidationException {
         if (definition instanceof SSimpleInputDefinition) {
-            return isValidForSimpleType(definition, object);
+            SSimpleInputDefinition simpleDefinition = (SSimpleInputDefinition) definition;
+            if (!isValidForSimpleType(simpleDefinition, object)) {
+                throw new InputValidationException(object + " cannot be assigned to " + simpleDefinition.getType());
+            }
         } else if (definition instanceof SComplexInputDefinition) {
-            return isValidForComplexType(object);
-        }
-        return false;
+            if (!isValidForComplexType(object)) {
+                throw new InputValidationException(object + " cannot be assigned to COMPLEX type");
+            }
+        } 
     }
 
-    private boolean isValidForSimpleType(SInputDefinition definition, Object object) {
-        return ((SSimpleInputDefinition) definition).getType().validate(object);
+    private boolean isValidForSimpleType(SSimpleInputDefinition definition, Object object) {
+        return definition.getType().validate(object);
     }
 
     private boolean isValidForComplexType(Object object) {

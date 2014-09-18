@@ -10,6 +10,7 @@ import static org.bonitasoft.engine.core.process.definition.model.SType.INTEGER;
 import static org.bonitasoft.engine.core.process.definition.model.SType.TEXT;
 import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.DEBUG;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +41,6 @@ public class ContractStructureValidatorTest {
 
     @Test
     public void should_pass_when_inputs_are_provided_and_valid() throws Exception {
-        when(typeValidator.isValid(any(SInputDefinition.class), any())).thenReturn(true);
         SContractDefinition contract = aContract()
                 .withInput(anInput(TEXT).withName("aText").build())
                 .withInput(anInput(BOOLEAN).withName("aBoolean").build()).build();
@@ -50,10 +50,9 @@ public class ContractStructureValidatorTest {
 
         validator.validate(contract.getSimpleInputs(), taskInputs);
     }
-    
+
     @Test
     public void should_pass_when_complex_inputs_are_provided_and_valid() throws Exception {
-        when(typeValidator.isValid(any(SInputDefinition.class), any())).thenReturn(true);
         SContractDefinition contract = aContract()
                 .withInput(anInput(TEXT).withName("aText").build())
                 .withInput(anInput(BOOLEAN).withName("aBoolean").build()).build();
@@ -66,16 +65,15 @@ public class ContractStructureValidatorTest {
 
     @Test
     public void should_log_inputs_provided_but_not_in_defined_in_contract() throws Exception {
-        when(typeValidator.isValid(any(SInputDefinition.class), any())).thenReturn(true);
         SContractDefinition contract = aContract().withInput(anInput(TEXT).withName("aText").build()).build();
         Map<String, Object> taskInputs = aMap()
                 .put("aText", "should be provided")
                 .put("someFieldNotDefinedInContract", true)
                 .put("someOtherFieldNotDefinedInContract", "42").build();
         when(logger.isLoggable(ContractStructureValidator.class, DEBUG)).thenReturn(true);
-    
+
         validator.validate(contract.getSimpleInputs(), taskInputs);
-    
+
         verify(logger).log(ContractStructureValidator.class, DEBUG,
                 "Field [someFieldNotDefinedInContract] has been provided but is not expected in task contract");
         verify(logger).log(ContractStructureValidator.class, DEBUG,
@@ -102,7 +100,8 @@ public class ContractStructureValidatorTest {
         SContractDefinition contract = aContract()
                 .withInput(anInput(INTEGER).withName("anInteger").build())
                 .withInput(anInput(BOOLEAN).withName("aBoolean").build()).build();
-        when(typeValidator.isValid(any(SInputDefinition.class), any(Object.class))).thenReturn(false);
+        doThrow(new InputValidationException("type error explanation"))
+                .when(typeValidator).validate(any(SInputDefinition.class), any(Object.class));
         Map<String, Object> taskInputs = aMap().put("anInteger", "thisIsNotAnInteger").put("aBoolean", "thisIsNotABoolean").build();
 
         try {
@@ -110,7 +109,7 @@ public class ContractStructureValidatorTest {
             fail("expected exception has not been thrown");
         } catch (ContractViolationException e) {
             assertThat(e.getExplanations())
-                    .containsOnly("thisIsNotAnInteger cannot be assigned to INTEGER", "thisIsNotABoolean cannot be assigned to BOOLEAN");
+                    .containsOnly("type error explanation", "type error explanation");
         }
     }
 }

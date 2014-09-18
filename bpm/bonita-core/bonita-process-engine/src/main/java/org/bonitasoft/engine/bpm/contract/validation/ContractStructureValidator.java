@@ -52,17 +52,27 @@ public class ContractStructureValidator {
     protected List<String> findEventualProblems(List<SSimpleInputDefinition> simpleInputs, Map<String, Object> inputs) {
         List<String> problems = new ArrayList<String>();
         for (SSimpleInputDefinition definition : simpleInputs) {
-            String inputName = definition.getName();
-            if (!inputs.containsKey(inputName)) {
-                problems.add("Contract need field [" + inputName + "] but it has not been provided");
-            } else {
-                Object value = inputs.get(inputName);
-                if (!typeValidator.isValid(definition, value)) {
-                    problems.add(value + " cannot be assigned to " + definition.getType());
-                }
+            String problem = getInputProblem(definition, inputs);
+            if (problem != null) {
+                problems.add(problem);
             }
         }
         return problems;
+    }
+
+    private String getInputProblem(SSimpleInputDefinition definition, Map<String, Object> inputs) {
+        String inputName = definition.getName();
+        if (!inputs.containsKey(inputName)) {
+            return "Contract need field [" + inputName + "] but it has not been provided";
+        } else {
+            Object value = inputs.get(inputName);
+            try {
+                typeValidator.validate(definition, value);
+            } catch (InputValidationException e) {
+                return e.getMessage();
+            }
+        }
+        return null;
     }
 
     private void logInputsWhichAreNotInContract(TechnicalLogSeverity severity, List<SSimpleInputDefinition> simpleInputs, Map<String, Object> inputs) {

@@ -58,10 +58,11 @@ public class ComplexContractStructureValidator {
             } else {
                 
                 Object value = inputs.get(def.getName());
-                if (!typeValidator.isValid(def, value)) {
-                    message.add(value + " cannot be assigned to COMPLEX type");
-                } else {
+                try {
+                    typeValidator.validate(def, value);
                     message.addAll(recursive(def.getSimpleInputDefinitions(), def.getComplexInputDefinitions(), (Map<String, Object>) value));
+                } catch (InputValidationException e) {
+                    message.add(e.getMessage());
                 }
             }
         }

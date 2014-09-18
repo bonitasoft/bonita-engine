@@ -19,8 +19,9 @@ import static org.bonitasoft.engine.bpm.contract.validation.MapBuilder.aMap;
 import static org.bonitasoft.engine.bpm.contract.validation.SInputDefinitionBuilder.anInput;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +30,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SComplexInputDefinitionImpl;
@@ -68,7 +68,6 @@ public class ComplexContractStructureValidatorTest {
         List<SSimpleInputDefinition> asList = asList(anInput(SType.BOOLEAN).withName("aSimple").build());
         SComplexInputDefinitionImpl complex = new SComplexInputDefinitionImpl("complex", "acomplexInput", asList, new ArrayList<SComplexInputDefinition>());
         contract.addComplexInput(complex);
-        when(typeValidator.isValid(any(SInputDefinition.class), any(Object.class))).thenReturn(true);
         
         Map<String,Object> simple = aMap().put("aSimple", true).build();
         Map<String,Object> put = aMap().put("complex", simple).build();
@@ -100,32 +99,15 @@ public class ComplexContractStructureValidatorTest {
         List<SSimpleInputDefinition> asList = asList(anInput(SType.BOOLEAN).withName("aSimple").build());
         SComplexInputDefinitionImpl complex = new SComplexInputDefinitionImpl("complex", "acomplexInput", asList, new ArrayList<SComplexInputDefinition>());
         contract.addComplexInput(complex);
-        
+        doThrow(new InputValidationException("error in type validation")).when(typeValidator).validate(eq(complex), any(Object.class));
         Map<String,Object> put = aMap().put("complex", "not a complex type").build();
         
         try {
             validator.validate(contract, put);
             fail("is missing");
         } catch (ContractViolationException e) {
-            assertThat(e.getExplanations()).contains("not a complex type cannot be assigned to COMPLEX type");
         }
-    }
-    
-    @Test
-    public void complex_type_cannot_be_null() throws Exception {
-        SContractDefinitionImpl contract = new SContractDefinitionImpl();
-        List<SSimpleInputDefinition> asList = asList(anInput(SType.BOOLEAN).withName("aSimple").build());
-        SComplexInputDefinitionImpl complex = new SComplexInputDefinitionImpl("complex", "acomplexInput", asList, new ArrayList<SComplexInputDefinition>());
-        contract.addComplexInput(complex);
         
-        Map<String,Object> put = new HashMap<String, Object>();
-        put.put("complex", null);
-        
-        try {
-            validator.validate(contract, put);
-            fail("is missing");
-        } catch (ContractViolationException e) {
-            assertThat(e.getExplanations()).contains("null cannot be assigned to COMPLEX type");
-        }
+        verify(typeValidator).validate(complex, "not a complex type");
     }
 }
