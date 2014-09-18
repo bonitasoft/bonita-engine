@@ -15,8 +15,9 @@ package org.bonitasoft.engine.identity;
 
 /**
  * Define how to handle conflicts when an organization is imported
- * 
+ *
  * @author Baptiste Mesta
+ * @since 6.0.0
  */
 public enum ImportPolicy {
 

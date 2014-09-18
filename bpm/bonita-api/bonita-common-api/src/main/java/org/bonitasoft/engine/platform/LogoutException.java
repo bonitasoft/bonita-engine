@@ -16,20 +16,32 @@ package org.bonitasoft.engine.platform;
 import org.bonitasoft.engine.exception.BonitaException;
 
 /**
+ * Indicates that a problem occurred during tenant logout action
+ *
  * @author Matthieu Chaffotte
  */
 public class LogoutException extends BonitaException {
 
     private static final long serialVersionUID = -5327606222750615923L;
 
+    /**
+     * @param message a String indicating the exception message
+     */
     public LogoutException(final String message) {
         super(message);
     }
 
+    /**
+     * @param cause a Throwable indicating the root cause
+     */
     public LogoutException(final Throwable cause) {
         super(cause);
     }
 
+    /**
+     * @param message a String indicating the exception message
+     * @param cause a Throwable indicating the root cause
+     */
     public LogoutException(final String message, final Throwable cause) {
         super(message, cause);
     }

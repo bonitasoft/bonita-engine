@@ -71,6 +71,9 @@ public class SDocumentContentImpl implements SDocumentContent {
 
     @Override
     public byte[] getContent() {
+        if(content == null) {
+            return new byte[0];
+        }
         return content;
     }
 

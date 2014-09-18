@@ -2239,8 +2239,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final SCommentService scommentService = tenantAccessor.getCommentService();
-        final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
             final AssignOrUnassignUserTask assignUserTask = new AssignOrUnassignUserTask(userId, userTaskId, activityInstanceService, tenantAccessor
                     .getFlowNodeStateManager().getStateBehaviors());

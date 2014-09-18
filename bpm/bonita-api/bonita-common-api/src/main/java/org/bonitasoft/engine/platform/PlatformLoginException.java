@@ -16,16 +16,24 @@ package org.bonitasoft.engine.platform;
 import org.bonitasoft.engine.exception.BonitaException;
 
 /**
+ * Indicates that a problem occurred during platform login action
+ *
  * @author Matthieu Chaffotte
  */
 public class PlatformLoginException extends BonitaException {
 
     private static final long serialVersionUID = 3075478879044920526L;
 
+    /**
+     * @param message a String indicating the exception message
+     */
     public PlatformLoginException(final String message) {
         super(message);
     }
 
+    /**
+     * @param cause a Throwable indicating the root cause
+     */
     public PlatformLoginException(final Throwable cause) {
         super(cause);
     }

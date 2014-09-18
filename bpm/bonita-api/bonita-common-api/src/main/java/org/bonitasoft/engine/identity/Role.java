@@ -15,30 +15,61 @@ package org.bonitasoft.engine.identity;
 
 import java.util.Date;
 
+import org.bonitasoft.engine.api.RoleAPI;
 import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
+ * represents a Role inside the organization.
+ *
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
+ * @see RoleAPI
+ * @since 6.0.0
  */
 public interface Role extends BonitaObject {
 
+    /**
+     * @return the role id
+     */
     long getId();
 
+    /**
+     * @return the role's name
+     */
     String getName();
 
+    /**
+     * @return the role's name to display
+     */
     String getDisplayName();
 
+    /**
+     * @return the role's description
+     */
     String getDescription();
 
+    /**
+     * @return the role's icon name
+     */
     String getIconName();
 
+    /**
+     * @return the role's icon file path
+     */
     String getIconPath();
 
+    /**
+     * @return the user's id that created the role
+     */
     long getCreatedBy();
 
+    /**
+     * @return the role's creation's date
+     */
     Date getCreationDate();
 
+    /**
+     * @return the role's last update date
+     */
     Date getLastUpdate();
-
 }

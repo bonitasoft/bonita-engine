@@ -16,7 +16,11 @@ package org.bonitasoft.engine.identity;
 import java.io.Serializable;
 
 /**
+ * represents a helper to update {@link CustomUserInfoValue}
+ *
  * @author Vincent Elcrin
+ * @see CustomUserInfoValue
+ * @since 6.3.1
  */
 public class CustomUserInfoValueUpdater implements Serializable {
 
@@ -24,10 +28,18 @@ public class CustomUserInfoValueUpdater implements Serializable {
 
     private final String value;
 
-    public CustomUserInfoValueUpdater(String value) {
+    /**
+     * creates a new instance with a value to update
+     * 
+     * @param value the value to update
+     */
+    public CustomUserInfoValueUpdater(final String value) {
         this.value = value;
     }
 
+    /**
+     * @return the value to update
+     */
     public String getValue() {
         return value;
     }

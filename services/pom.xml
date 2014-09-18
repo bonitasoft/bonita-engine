@@ -50,6 +50,6 @@
 		<module>bonita-page</module>
 		<module>bonita-time-tracker</module>
 		<module>bonita-business-application</module>
-	</modules>
-	
+			</modules>
+		
 </project>

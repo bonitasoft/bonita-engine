@@ -14,7 +14,10 @@
 package org.bonitasoft.engine.identity;
 
 /**
+ * holds constants about {@link CustomUserInfoValue} search
+ *
  * @author Vincent Elcrin
+ * @since 6.3.1
  */
 public final class CustomUserInfoValueSearchDescriptor {
 

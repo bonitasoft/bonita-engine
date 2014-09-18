@@ -72,7 +72,7 @@
 			<groupId>org.bonitasoft.engine.core.process.document</groupId>
 			<artifactId>bonita-process-document-model-impl</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 </project>
