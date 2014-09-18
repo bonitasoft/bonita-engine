@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +43,8 @@ import org.junit.Test;
 
 public class UserTaskContractTest extends CommonAPITest {
 
+    private static final String TASK2 = "task2";
+    private static final String TASK1 = "task1";
     private User matti;
 
     @Before
@@ -62,12 +65,12 @@ public class UserTaskContractTest extends CommonAPITest {
     public void createAContractAndGetIt() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
-        builder.addUserTask("task1", ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
+        builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
         .addRule("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("task1");
+        final HumanTaskInstance userTask = waitForUserTask(TASK1);
 
         final ContractDefinition contract = getProcessAPI().getUserTaskContract(userTask.getId());
 
@@ -96,13 +99,13 @@ public class UserTaskContractTest extends CommonAPITest {
         final SimpleInputDefinition expenseDate = new SimpleInputDefinitionImpl("date", Type.DATE, "expense date");
         final ComplexInputDefinition complexSubIput = new ComplexInputDefinitionImpl("date", "expense date", Arrays.asList(expenseType), null);
         //given
-        builder.addUserTask("task1", ACTOR_NAME).addContract()
+        builder.addUserTask(TASK1, ACTOR_NAME).addContract()
         .addComplexInput("expenseLine", "expense report line", Arrays.asList(expenseDate, expenseAmount), Arrays.asList(complexSubIput));
 
         //when
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("task1");
+        final HumanTaskInstance userTask = waitForUserTask(TASK1);
 
         //then
         final ContractDefinition contract = getProcessAPI().getUserTaskContract(userTask.getId());
@@ -130,14 +133,14 @@ public class UserTaskContractTest extends CommonAPITest {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         final String expectedExplanation = "numberOfDays must between one day and one year";
-        builder.addUserTask("task1", ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
+        builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
         .addRule("mandatory", "numberOfDays>1 && numberOfDays<365", expectedExplanation, "numberOfDays");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
 
         //when
-        final HumanTaskInstance task = waitForUserTask("task1");
+        final HumanTaskInstance task = waitForUserTask(TASK1);
         final Map<String, Object> inputs = new HashMap<String, Object>();
         inputs.put("numberOfDays", inputValue);
         try {
@@ -159,14 +162,14 @@ public class UserTaskContractTest extends CommonAPITest {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         final String expectedExplanation = "numberOfDays must between one day and one year";
-        builder.addUserTask("task1", ACTOR_NAME).addContract().addSimpleInput("comment", Type.TEXT, null)
+        builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("comment", Type.TEXT, null)
         .addRule("mandatory", "comment.equals(\"<tag>\")", expectedExplanation, "comment");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
 
         //when
-        final HumanTaskInstance task = waitForUserTask("task1");
+        final HumanTaskInstance task = waitForUserTask(TASK1);
         getProcessAPI().assignUserTask(task.getId(), matti.getId());
 
         //then no exceptions
@@ -180,11 +183,11 @@ public class UserTaskContractTest extends CommonAPITest {
     public void getExceptionWhenContractIsNotValid() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
-        builder.addUserTask("task1", ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null);
+        builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null);
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("task1");
+        final HumanTaskInstance userTask = waitForUserTask(TASK1);
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
 
         try {
@@ -205,20 +208,67 @@ public class UserTaskContractTest extends CommonAPITest {
     }
 
     @Test
+    public void use_a_complex_input_in_user_tasks() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
+        builder.addActor(ACTOR_NAME);
+        final SimpleInputDefinition expenseType = new SimpleInputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
+        final SimpleInputDefinition expenseAmount = new SimpleInputDefinitionImpl("expenseAmount", Type.DECIMAL, "expense amount");
+        final SimpleInputDefinition expenseDate = new SimpleInputDefinitionImpl("expenseDate", Type.DATE, "expense date");
+
+        //given
+        final UserTaskDefinitionBuilder userTaskDefinitionBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
+        userTaskDefinitionBuilder.addContract()
+        .addComplexInput("expenseLine", "expense report line", Arrays.asList(expenseType, expenseDate, expenseAmount), null);
+        final Map<String, Object> expense = new HashMap<String, Object>();
+        userTaskDefinitionBuilder.addData("expenseData", expense.getClass().getName(), null);
+        userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDataOperation("expenseData",
+                new ExpressionBuilder().createContractInputExpression("expenseLine", expense.getClass().getName())));
+        builder.addUserTask(TASK2, ACTOR_NAME).addTransition(TASK1, TASK2);
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        getProcessAPI().startProcess(processDefinition.getId());
+
+        //when
+        final HumanTaskInstance userTask = waitForUserTask(TASK1);
+        getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
+
+        final Map<String, Object> complexInput = new HashMap<String, Object>();
+        final Map<String, Object> simpleInputs = new HashMap<String, Object>();
+        simpleInputs.put("expenseType", "hotel");
+        simpleInputs.put("expenseAmount", 1523.54F);
+        simpleInputs.put("expenseDate", new Date(System.currentTimeMillis()));
+        complexInput.put("expenseLine", simpleInputs);
+        try {
+            getProcessAPI().executeUserTask(userTask.getId(), complexInput);
+        } catch (final ContractViolationException e) {
+            System.err.println(e.getExplanations());
+        }
+
+        //then
+        waitForUserTask(TASK2);
+
+        final ArchivedDataInstance archivedResult = getProcessAPI().getArchivedActivityDataInstance("expenseData", userTask.getId());
+        assertThat(archivedResult.getValue()).as("should have my expense line data").isEqualTo(simpleInputs);
+
+        //clean up
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
     public void runTaskWhenContractIsValid() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
-        final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask("task1", ACTOR_NAME);
+        final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
         userTaskBuilder.addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
         .addRule("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
         userTaskBuilder.addData("result", BigDecimal.class.getName(), null);
         userTaskBuilder.addOperation(new OperationBuilder().createSetDataOperation("result",
                 new ExpressionBuilder().createContractInputExpression("numberOfDays", Long.class.getName())));
-        builder.addUserTask("task2", ACTOR_NAME).addTransition("task1", "task2");
+        builder.addUserTask(TASK2, ACTOR_NAME).addTransition(TASK1, TASK2);
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("task1");
+        final HumanTaskInstance userTask = waitForUserTask(TASK1);
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
 
         final long expectedValue = 8l;
@@ -230,7 +280,7 @@ public class UserTaskContractTest extends CommonAPITest {
         } catch (final ContractViolationException e) {
             System.err.println(e.getExplanations());
         }
-        waitForUserTask("task2");
+        waitForUserTask(TASK2);
 
         final ArchivedDataInstance archivedResult = getProcessAPI().getArchivedActivityDataInstance("result", userTask.getId());
         assertThat(archivedResult.getValue()).isEqualTo(expectedValue);
@@ -242,12 +292,12 @@ public class UserTaskContractTest extends CommonAPITest {
     public void execute_user_task_should_throw_UserTaskNotFoundException() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
-        final UserTaskDefinitionBuilder userTaskBuilder = builder.addAutomaticTask("automaticTask").addUserTask("task1", ACTOR_NAME);
+        final UserTaskDefinitionBuilder userTaskBuilder = builder.addAutomaticTask("automaticTask").addUserTask(TASK1, ACTOR_NAME);
         userTaskBuilder.addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
         .addRule("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("task1");
+        final HumanTaskInstance userTask = waitForUserTask(TASK1);
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
 
         try {
@@ -268,12 +318,12 @@ public class UserTaskContractTest extends CommonAPITest {
     public void getExceptionWhenContractIsNotValidWithRules() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
-        builder.addUserTask("task1", ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
+        builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
         .addRule("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("task1");
+        final HumanTaskInstance userTask = waitForUserTask(TASK1);
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
 
         try {
