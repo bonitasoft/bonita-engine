@@ -28,12 +28,12 @@ import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
  */
 public class ContractValidator {
 
-    private final ContractStructureValidator structureValidator;
+    private final ComplexContractStructureValidator structureValidator;
     private final ContractRulesValidator rulesValidator;
 
     private final List<String> comments;
 
-    public ContractValidator(final ContractStructureValidator contractStructureValidator, final ContractRulesValidator contractRulesValidator) {
+    public ContractValidator(final ComplexContractStructureValidator contractStructureValidator, final ContractRulesValidator contractRulesValidator) {
         this.rulesValidator = contractRulesValidator;
         this.structureValidator = contractStructureValidator;
         comments = new ArrayList<String>();
@@ -41,7 +41,7 @@ public class ContractValidator {
 
     public boolean isValid(final SContractDefinition contract, final Map<String, Object> variables) {
         try {
-            structureValidator.validate(contract.getSimpleInputs(), variables);
+            structureValidator.validate(contract, variables);
             rulesValidator.validate(contract.getRules(), variables);
         } catch (ContractViolationException e) {
             comments.addAll(e.getExplanations());

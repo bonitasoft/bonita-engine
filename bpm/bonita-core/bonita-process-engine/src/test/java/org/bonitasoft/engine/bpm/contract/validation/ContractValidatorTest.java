@@ -41,7 +41,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ContractValidatorTest {
 
     @Mock
-    private ContractStructureValidator structureValidator;
+    private ComplexContractStructureValidator structureValidator;
 
     @Mock
     private ContractRulesValidator rulesValidator;
@@ -71,7 +71,7 @@ public class ContractValidatorTest {
         SContractDefinition contract = aContract().build();
         Map<String, Object> inputs = aMap().build();
         doThrow(new ContractViolationException("bad structure", new ArrayList<String>()))
-                .when(structureValidator).validate(contract.getSimpleInputs(), inputs);
+                .when(structureValidator).validate(contract, inputs);
 
         validator.isValid(contract, inputs);
 
@@ -83,7 +83,7 @@ public class ContractValidatorTest {
         SContractDefinition contract = aContract().build();
         Map<String, Object> inputs = aMap().build();
         doThrow(new ContractViolationException("bad structure", new ArrayList<String>()))
-                .when(structureValidator).validate(contract.getSimpleInputs(), inputs);
+                .when(structureValidator).validate(contract, inputs);
 
         boolean valid = validator.isValid(contract, inputs);
 
@@ -96,7 +96,7 @@ public class ContractValidatorTest {
         Map<String, Object> inputs = aMap().build();
         List<String> problems = Arrays.asList("There is problems with structure", "Might have issue with types too");
         doThrow(new ContractViolationException("bad structure", problems))
-                .when(structureValidator).validate(contract.getSimpleInputs(), inputs);
+                .when(structureValidator).validate(contract, inputs);
 
         validator.isValid(contract, inputs);
 

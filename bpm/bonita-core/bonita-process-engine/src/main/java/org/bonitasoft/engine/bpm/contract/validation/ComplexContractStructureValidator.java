@@ -34,7 +34,7 @@ public class ComplexContractStructureValidator {
         List<String> message = new ArrayList<String>();
         message.addAll(recursive(contract.getSimpleInputs(), contract.getComplexInputs(), inputs));
         if (!message.isEmpty()) {
-            throw new ContractViolationException("Ca marche pas", message);
+            throw new ContractViolationException("Error when validating inputs according to corresponding task contract", message);
         }
     }
 
