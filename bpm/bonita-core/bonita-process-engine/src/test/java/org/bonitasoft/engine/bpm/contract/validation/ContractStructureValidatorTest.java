@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2014 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -8,8 +21,11 @@ import static org.bonitasoft.engine.bpm.contract.validation.SInputDefinitionBuil
 import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
 import static org.bonitasoft.engine.core.process.definition.model.SType.INTEGER;
 import static org.bonitasoft.engine.core.process.definition.model.SType.TEXT;
+import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.DEBUG;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,14 +44,31 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ContractStructureValidatorTest {
 
     @Mock
-    TechnicalLoggerService logger;
-
+    private TechnicalLoggerService logger;
+    
     @Mock
     ContractTypeValidator typeValidator;
-
+    
     @InjectMocks
     private ContractStructureValidator validator;
 
+    @Test
+    public void should_log_inputs_provided_but_not_in_defined_in_contract() throws Exception {
+        SContractDefinition contract = aContract().withInput(anInput(TEXT).withName("aText").build()).build();
+        Map<String, Object> taskInputs = aMap()
+                .put("aText", "should be provided")
+                .put("someFieldNotDefinedInContract", true)
+                .put("someOtherFieldNotDefinedInContract", "42").build();
+        when(logger.isLoggable(ContractStructureValidator.class, DEBUG)).thenReturn(true);
+
+        validator.validate(contract, taskInputs);
+
+        verify(logger).log(ContractStructureValidator.class, DEBUG,
+                "Field [someFieldNotDefinedInContract] has been provided but is not expected in task contract");
+        verify(logger).log(ContractStructureValidator.class, DEBUG,
+                "Field [someOtherFieldNotDefinedInContract] has been provided but is not expected in task contract");
+    }
+    
     @Test
     public void should_pass_when_inputs_are_provided_and_valid() throws Exception {
         SContractDefinition contract = aContract()
@@ -45,7 +78,7 @@ public class ContractStructureValidatorTest {
                 .put("aText", "hello")
                 .put("aBoolean", true).build();
 
-        validator.validate(contract.getSimpleInputs(), taskInputs);
+        validator.validate(contract, taskInputs);
     }
 
     @Test
@@ -55,7 +88,7 @@ public class ContractStructureValidatorTest {
                     .withInput(anInput(TEXT).withName("aText").build())
                     .withInput(anInput(TEXT).withName("anotherText").build()).build();
 
-            validator.validate(contract.getSimpleInputs(), new HashMap<String, Object>());
+            validator.validate(contract, new HashMap<String, Object>());
             fail("expected exception has not been thrown");
         } catch (ContractViolationException e) {
             assertThat(e.getExplanations())
@@ -73,7 +106,7 @@ public class ContractStructureValidatorTest {
         Map<String, Object> taskInputs = aMap().put("anInteger", "thisIsNotAnInteger").put("aBoolean", "thisIsNotABoolean").build();
 
         try {
-            validator.validate(contract.getSimpleInputs(), taskInputs);
+            validator.validate(contract, taskInputs);
             fail("expected exception has not been thrown");
         } catch (ContractViolationException e) {
             assertThat(e.getExplanations())

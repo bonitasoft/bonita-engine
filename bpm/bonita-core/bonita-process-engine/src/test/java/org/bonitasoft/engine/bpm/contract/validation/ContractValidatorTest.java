@@ -41,7 +41,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ContractValidatorTest {
 
     @Mock
-    private ComplexContractStructureValidator structureValidator;
+    private ContractStructureValidator structureValidator;
 
     @Mock
     private ContractRulesValidator rulesValidator;

@@ -23,8 +23,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 public class ContractValidatorFactory {
 
     public ContractValidator createContractValidator(TechnicalLoggerService loggerService) {
-        ContractStructureValidator contractStructureValidator = new ContractStructureValidator(new ContractTypeValidator());
-        ComplexContractStructureValidator complexValidator = new ComplexContractStructureValidator(contractStructureValidator, loggerService);
+        ContractStructureValidator complexValidator = new ContractStructureValidator(new ContractTypeValidator(), loggerService);
         ContractRulesValidator contractRulesValidator = new ContractRulesValidator(loggerService);
         return new ContractValidator(complexValidator, contractRulesValidator);
     }

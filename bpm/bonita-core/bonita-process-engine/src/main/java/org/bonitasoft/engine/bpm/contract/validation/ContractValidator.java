@@ -28,12 +28,12 @@ import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
  */
 public class ContractValidator {
 
-    private final ComplexContractStructureValidator structureValidator;
+    private final ContractStructureValidator structureValidator;
     private final ContractRulesValidator rulesValidator;
 
     private final List<String> comments;
 
-    public ContractValidator(final ComplexContractStructureValidator contractStructureValidator, final ContractRulesValidator contractRulesValidator) {
+    public ContractValidator(final ContractStructureValidator contractStructureValidator, final ContractRulesValidator contractRulesValidator) {
         this.rulesValidator = contractRulesValidator;
         this.structureValidator = contractStructureValidator;
         comments = new ArrayList<String>();
