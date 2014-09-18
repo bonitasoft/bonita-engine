@@ -15,8 +15,12 @@ package org.bonitasoft.engine.bpm.contract.validation;
 
 import static java.util.Arrays.asList;
 import static org.bonitasoft.engine.bpm.contract.validation.MapBuilder.aMap;
+import static org.bonitasoft.engine.bpm.contract.validation.SContractDefinitionBuilder.aContract;
 import static org.bonitasoft.engine.bpm.contract.validation.SInputDefinitionBuilder.anInput;
+import static org.bonitasoft.engine.core.process.definition.model.SType.TEXT;
+import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.DEBUG;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,10 +28,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SComplexInputDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -38,11 +44,31 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ComplexContractStructureValidatorTest {
 
     @Mock
+    private TechnicalLoggerService logger;
+    
+    @Mock
     private ContractStructureValidator simpleInputValidator;
     
     @InjectMocks
     private ComplexContractStructureValidator validator;
 
+    @Test
+    public void should_log_inputs_provided_but_not_in_defined_in_contract() throws Exception {
+        SContractDefinition contract = aContract().withInput(anInput(TEXT).withName("aText").build()).build();
+        Map<String, Object> taskInputs = aMap()
+                .put("aText", "should be provided")
+                .put("someFieldNotDefinedInContract", true)
+                .put("someOtherFieldNotDefinedInContract", "42").build();
+        when(logger.isLoggable(ContractStructureValidator.class, DEBUG)).thenReturn(true);
+
+        validator.validate(contract, taskInputs);
+
+        verify(logger).log(ContractStructureValidator.class, DEBUG,
+                "Field [someFieldNotDefinedInContract] has been provided but is not expected in task contract");
+        verify(logger).log(ContractStructureValidator.class, DEBUG,
+                "Field [someOtherFieldNotDefinedInContract] has been provided but is not expected in task contract");
+    }
+    
     @Test
     public void should_validate_simple_inputs() throws Exception {
         SContractDefinitionImpl contract = new SContractDefinitionImpl();
@@ -50,7 +76,7 @@ public class ComplexContractStructureValidatorTest {
         
         validator.validate(contract, new HashMap<String, Object>());
         
-        verify(simpleInputValidator).validate(contract.getSimpleInputs(), new HashMap<String, Object>());
+        verify(simpleInputValidator).findEventualProblems(contract.getSimpleInputs(), new HashMap<String, Object>());
     }
     
     @Test
@@ -65,7 +91,7 @@ public class ComplexContractStructureValidatorTest {
         
         validator.validate(contract, put);
         
-        verify(simpleInputValidator).validate(asList, simple);
+        verify(simpleInputValidator).findEventualProblems(asList, simple);
     }
     
 //    @Test

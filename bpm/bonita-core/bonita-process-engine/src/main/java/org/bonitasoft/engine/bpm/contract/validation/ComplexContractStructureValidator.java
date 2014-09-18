@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.bpm.contract.validation;
 
+import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.DEBUG;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,14 +22,19 @@ import java.util.Map;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 public class ComplexContractStructureValidator {
 
     private ContractStructureValidator validator;
+    private TechnicalLoggerService logger;
 
-    public ComplexContractStructureValidator(ContractStructureValidator validator) {
+    public ComplexContractStructureValidator(ContractStructureValidator validator, TechnicalLoggerService loggerService) {
         this.validator = validator;
+        this.logger = loggerService;
     }
 
     public void validate(SContractDefinition contract, Map<String, Object> inputs) throws ContractViolationException {
@@ -43,11 +50,9 @@ public class ComplexContractStructureValidator {
         List<String> message = new ArrayList<String>();
 
         if (!simpleInputs.isEmpty()) {
-            try {
-                validator.validate(simpleInputs, inputs);
-            } catch (ContractViolationException e) {
-                message.addAll(e.getExplanations());
-            }
+            logInputsWhichAreNotInContract(DEBUG, simpleInputs, inputs);
+            List<String> problems = validator.findEventualProblems(simpleInputs, inputs);
+            message.addAll(problems);
         }
 
         for (SComplexInputDefinition def : complexInputs) {
@@ -59,5 +64,21 @@ public class ComplexContractStructureValidator {
             }
         }
         return message;
+    }
+    
+    private void logInputsWhichAreNotInContract(TechnicalLogSeverity severity, List<SSimpleInputDefinition> simpleInputs, Map<String, Object> inputs) {
+        if (logger.isLoggable(ContractStructureValidator.class, severity)) {
+            for (String input : getInputsWhichAreNotInContract(simpleInputs, inputs)) {
+                logger.log(ContractStructureValidator.class, severity, "Field [" + input + "] has been provided but is not expected in task contract");
+            }
+        }
+    }
+
+    private List<String> getInputsWhichAreNotInContract(List<SSimpleInputDefinition> simpleInputs, Map<String, Object> inputs) {
+        List<String> keySet = new ArrayList<String>(inputs.keySet());
+        for (SInputDefinition def : simpleInputs) {
+            keySet.remove(def.getName());
+        }
+        return keySet;
     }
 }

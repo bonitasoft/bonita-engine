@@ -8,11 +8,8 @@ import static org.bonitasoft.engine.bpm.contract.validation.SInputDefinitionBuil
 import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
 import static org.bonitasoft.engine.core.process.definition.model.SType.INTEGER;
 import static org.bonitasoft.engine.core.process.definition.model.SType.TEXT;
-import static org.bonitasoft.engine.log.technical.TechnicalLogSeverity.DEBUG;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,23 +46,6 @@ public class ContractStructureValidatorTest {
                 .put("aBoolean", true).build();
 
         validator.validate(contract.getSimpleInputs(), taskInputs);
-    }
-
-    @Test
-    public void should_log_inputs_provided_but_not_in_defined_in_contract() throws Exception {
-        SContractDefinition contract = aContract().withInput(anInput(TEXT).withName("aText").build()).build();
-        Map<String, Object> taskInputs = aMap()
-                .put("aText", "should be provided")
-                .put("someFieldNotDefinedInContract", true)
-                .put("someOtherFieldNotDefinedInContract", "42").build();
-        when(logger.isLoggable(ContractStructureValidator.class, DEBUG)).thenReturn(true);
-
-        validator.validate(contract.getSimpleInputs(), taskInputs);
-
-        verify(logger).log(ContractStructureValidator.class, DEBUG,
-                "Field [someFieldNotDefinedInContract] has been provided but is not expected in task contract");
-        verify(logger).log(ContractStructureValidator.class, DEBUG,
-                "Field [someOtherFieldNotDefinedInContract] has been provided but is not expected in task contract");
     }
 
     @Test
