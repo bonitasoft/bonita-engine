@@ -62,4 +62,15 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
         return this;
     }
 
+    public ContractDefinitionBuilder addMandatoryRule(String inputName) {
+        final StringBuilder expression = new StringBuilder().append(inputName).append("!=null");
+        expression.append(" && !");
+        expression.append(inputName);
+        expression.append(".toString().isEmpty()");
+
+        final RuleDefinitionImpl rule = new RuleDefinitionImpl(inputName, expression.toString(), new StringBuilder().append("input ").append(inputName).append(" is mandatory").toString());
+        rule.addInputName(inputName);
+        contract.addRule(rule);
+        return this;
+    }
 }
