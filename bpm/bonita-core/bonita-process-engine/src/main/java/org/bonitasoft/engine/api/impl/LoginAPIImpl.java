@@ -85,7 +85,7 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
     @Override
     @CustomTransactions
     public APISession login(final Map<String, Serializable> credentials) throws LoginException {
-        checkCredentials(credentials);
+        checkCredentialsAreNotNullOrEmpty(credentials);
         try {
             final Long tenantId = NumberUtils.isNumber(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID))) ? NumberUtils.toLong(String
                     .valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID))) : null;
@@ -109,19 +109,9 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         final String userName = credentials.get(AuthenticationConstants.BASIC_USERNAME) != null ? String.valueOf(credentials
                 .get(AuthenticationConstants.BASIC_USERNAME)) : null;
         final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-        final PlatformService platformService = platformServiceAccessor.getPlatformService();
-        final TransactionExecutor platformTransactionExecutor = platformServiceAccessor.getTransactionExecutor();
-        // first call before create session: put the platform in cache if necessary
-        final TransactionContentWithResult<STenant> getTenant;
-        if (tenantId == null) {
-            getTenant = new GetDefaultTenantInstance(platformService);
-        } else {
-            getTenant = new GetTenantInstance(tenantId, platformService);
-        }
-        platformTransactionExecutor.execute(getTenant);
-        final STenant sTenant = getTenant.getResult();
+        final STenant sTenant = getTenant(tenantId, platformServiceAccessor);
         final long localTenantId = sTenant.getId();
-        checkThatWeCanLogin(userName, platformService, sTenant);
+        checkThatWeCanLogin(userName, sTenant);
 
         final TenantServiceAccessor serviceAccessor = getTenantServiceAccessor(localTenantId);
         final LoginService loginService = serviceAccessor.getLoginService();
@@ -135,6 +125,20 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         return ModelConvertor.toAPISession(sSession, sTenant.getName());
     }
 
+    protected STenant getTenant(final Long tenantId, final PlatformServiceAccessor platformServiceAccessor) throws SBonitaException {
+        final PlatformService platformService = platformServiceAccessor.getPlatformService();
+        final TransactionExecutor platformTransactionExecutor = platformServiceAccessor.getTransactionExecutor();
+        // first call before create session: put the platform in cache if necessary
+        final TransactionContentWithResult<STenant> getTenant;
+        if (tenantId == null) {
+            getTenant = new GetDefaultTenantInstance(platformService);
+        } else {
+            getTenant = new GetTenantInstance(tenantId, platformService);
+        }
+        platformTransactionExecutor.execute(getTenant);
+        return getTenant.getResult();
+    }
+
     protected void checkUsernameAndPassword(final String userName, final String password) throws LoginException {
         if (userName == null || userName.isEmpty()) {
             throw new LoginException("User name is null or empty !! ");
@@ -144,14 +148,14 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
         }
     }
 
-    protected void checkCredentials(final Map<String, Serializable> credentials) throws LoginException {
+    protected void checkCredentialsAreNotNullOrEmpty(final Map<String, Serializable> credentials) throws LoginException {
         if (CollectionUtils.isEmpty(credentials)) {
             throw new LoginException("Credentials are null or empty !!");
         }
     }
 
-    protected void checkThatWeCanLogin(final String userName, final PlatformService platformService, final STenant sTenant) throws LoginException {
-        if (!platformService.isTenantActivated(sTenant)) {
+    protected void checkThatWeCanLogin(final String userName, final STenant sTenant) throws LoginException {
+        if (!sTenant.isActivated()) {
             throw new LoginException("Tenant " + sTenant.getName() + " is not activated !!");
         }
     }

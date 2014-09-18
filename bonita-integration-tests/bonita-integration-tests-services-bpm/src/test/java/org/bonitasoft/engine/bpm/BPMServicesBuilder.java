@@ -152,8 +152,8 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return getInstanceOf(PersistenceService.class);
     }
 
-    public Recorder getRecorder() {
-        return getInstanceOf(Recorder.class);
+    public Recorder getTenantRecorder() {
+        return getInstanceOf("tenantRecorderSync", Recorder.class);
     }
 
     @Override

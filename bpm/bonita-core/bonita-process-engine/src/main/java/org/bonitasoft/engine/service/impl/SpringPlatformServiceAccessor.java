@@ -19,7 +19,6 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
@@ -47,8 +46,6 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     private TechnicalLoggerService technicalLoggerService;
 
     private TransactionService transactionService;
-
-    private IdentityService identityService;
 
     private TransactionExecutor transactionExecutor;
 
@@ -104,14 +101,6 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
             platformService = SpringPlatformFileSystemBeanAccessor.getService(PlatformService.class);
         }
         return platformService;
-    }
-
-    @Override
-    public IdentityService getIdentityService() {
-        if (identityService == null) {
-            identityService = SpringPlatformFileSystemBeanAccessor.getService(IdentityService.class);
-        }
-        return identityService;
     }
 
     @Override

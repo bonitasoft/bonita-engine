@@ -48,8 +48,7 @@ public final class UpdateRecord extends Record {
         return updateRecord;
     }
 
-    public static UpdateRecord buildSetField(final PersistentObject entity, final String fieldName, final Object fieldValue, final Object oldValue,
-            final String message, final Enum<?> recordType, final Long... parentIds) {
+    public static UpdateRecord buildSetField(final PersistentObject entity, final String fieldName, final Object fieldValue, final Object oldValue) {
         final UpdateRecord updateRecord = new UpdateRecord(entity, oldValue);
         updateRecord.addField(fieldName, fieldValue);
         return updateRecord;

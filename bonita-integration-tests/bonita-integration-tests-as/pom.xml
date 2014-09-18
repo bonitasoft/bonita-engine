@@ -51,7 +51,6 @@
                 <module>bonita-deploy-ear3</module>
                 <module>bonita-deploy-war</module>
                 <module>bonita-integration-jboss5</module>
-                <module>bonita-integration-tomcat6</module>
                 <module>bonita-integration-tomcat7</module>
             </modules>
         </profile>
@@ -60,13 +59,6 @@
             <modules>
                 <module>bonita-deploy-ear3</module>
                 <module>bonita-integration-jboss5</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>tomcat6</id>
-            <modules>
-                <module>bonita-deploy-war</module>
-                <module>bonita-integration-tomcat6</module>
             </modules>
         </profile>
         <profile>

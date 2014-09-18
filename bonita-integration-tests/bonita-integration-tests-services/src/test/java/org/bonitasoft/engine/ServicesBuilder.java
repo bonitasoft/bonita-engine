@@ -88,9 +88,14 @@ public class ServicesBuilder implements ServicesResolver {
         return this.buildPersistence("history");
     }
 
-    public Recorder buildRecorder() {
+    public Recorder buildPlatformRecorder() {
         // The parameter sync is not used as there is now only one version of the Recorder
-        return getAccessor().getInstanceOf("recorderSync", Recorder.class);
+        return getAccessor().getInstanceOf("platformRecorderSync", Recorder.class);
+    }
+
+    public Recorder buildTenantRecorder() {
+        // The parameter sync is not used as there is now only one version of the Recorder
+        return getAccessor().getInstanceOf("tenantRecorderSync", Recorder.class);
     }
 
     public TransactionService buildTransactionService() {
