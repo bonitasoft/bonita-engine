@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
-import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -42,9 +41,9 @@ public class ContractStructureValidator {
         this.logger = loggerService;
     }
 
-    public void validate(SContractDefinition contract, Map<String, Object> inputs) throws ContractViolationException {
-        logInputsWhichAreNotInContract(DEBUG, contract, inputs);
-        List<String> problems = findEventualProblems(contract.getSimpleInputs(), inputs);
+    public void validate(List<SSimpleInputDefinition> simpleInputs, Map<String, Object> inputs) throws ContractViolationException {
+        logInputsWhichAreNotInContract(DEBUG, simpleInputs, inputs);
+        List<String> problems = findEventualProblems(simpleInputs, inputs);
         if (!problems.isEmpty()) {
             throw new ContractViolationException("Error in task inputs structure", problems);
         }
@@ -66,17 +65,17 @@ public class ContractStructureValidator {
         return problems;
     }
 
-    private void logInputsWhichAreNotInContract(TechnicalLogSeverity severity, SContractDefinition contract, Map<String, Object> inputs) {
+    private void logInputsWhichAreNotInContract(TechnicalLogSeverity severity, List<SSimpleInputDefinition> simpleInputs, Map<String, Object> inputs) {
         if (logger.isLoggable(ContractStructureValidator.class, severity)) {
-            for (String input : getInputsWhichAreNotInContract(contract, inputs)) {
+            for (String input : getInputsWhichAreNotInContract(simpleInputs, inputs)) {
                 logger.log(ContractStructureValidator.class, severity, "Field [" + input + "] has been provided but is not expected in task contract");
             }
         }
     }
 
-    private List<String> getInputsWhichAreNotInContract(SContractDefinition contract, Map<String, Object> inputs) {
+    private List<String> getInputsWhichAreNotInContract(List<SSimpleInputDefinition> simpleInputs, Map<String, Object> inputs) {
         List<String> keySet = new ArrayList<String>(inputs.keySet());
-        for (SInputDefinition def : contract.getSimpleInputs()) {
+        for (SInputDefinition def : simpleInputs) {
             keySet.remove(def.getName());
         }
         return keySet;

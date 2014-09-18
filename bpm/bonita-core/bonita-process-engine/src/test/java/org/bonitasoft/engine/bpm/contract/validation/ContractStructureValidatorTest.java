@@ -48,7 +48,7 @@ public class ContractStructureValidatorTest {
                 .put("aText", "hello")
                 .put("aBoolean", true).build();
 
-        validator.validate(contract, taskInputs);
+        validator.validate(contract.getSimpleInputs(), taskInputs);
     }
     
     @Test
@@ -61,7 +61,7 @@ public class ContractStructureValidatorTest {
                 .put("aText", "hello")
                 .put("aBoolean", true).build();
 
-        validator.validate(contract, taskInputs);
+        validator.validate(contract.getSimpleInputs(), taskInputs);
     }
 
     @Test
@@ -74,7 +74,7 @@ public class ContractStructureValidatorTest {
                 .put("someOtherFieldNotDefinedInContract", "42").build();
         when(logger.isLoggable(ContractStructureValidator.class, DEBUG)).thenReturn(true);
     
-        validator.validate(contract, taskInputs);
+        validator.validate(contract.getSimpleInputs(), taskInputs);
     
         verify(logger).log(ContractStructureValidator.class, DEBUG,
                 "Field [someFieldNotDefinedInContract] has been provided but is not expected in task contract");
@@ -89,7 +89,7 @@ public class ContractStructureValidatorTest {
                     .withInput(anInput(TEXT).withName("aText").build())
                     .withInput(anInput(TEXT).withName("anotherText").build()).build();
 
-            validator.validate(contract, new HashMap<String, Object>());
+            validator.validate(contract.getSimpleInputs(), new HashMap<String, Object>());
             fail("expected exception has not been thrown");
         } catch (ContractViolationException e) {
             assertThat(e.getExplanations())
@@ -106,7 +106,7 @@ public class ContractStructureValidatorTest {
         Map<String, Object> taskInputs = aMap().put("anInteger", "thisIsNotAnInteger").put("aBoolean", "thisIsNotABoolean").build();
 
         try {
-            validator.validate(contract, taskInputs);
+            validator.validate(contract.getSimpleInputs(), taskInputs);
             fail("expected exception has not been thrown");
         } catch (ContractViolationException e) {
             assertThat(e.getExplanations())

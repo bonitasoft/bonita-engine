@@ -41,7 +41,7 @@ public class ContractValidator {
 
     public boolean isValid(final SContractDefinition contract, final Map<String, Object> variables) {
         try {
-            structureValidator.validate(contract, variables);
+            structureValidator.validate(contract.getSimpleInputs(), variables);
             rulesValidator.validate(contract.getRules(), variables);
         } catch (ContractViolationException e) {
             comments.addAll(e.getExplanations());
