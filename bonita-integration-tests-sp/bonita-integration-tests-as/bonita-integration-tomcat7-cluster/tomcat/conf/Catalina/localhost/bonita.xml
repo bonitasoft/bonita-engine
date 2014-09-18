@@ -15,25 +15,36 @@
 	<!-- Default set of monitored resources -->
 	<WatchedResource>WEB-INF/web.xml</WatchedResource>
 
-	<!-- Uncomment this to disable session persistence across Tomcat restarts -->
-	<!-- <Manager pathname="" /> -->
-
-	<!-- Uncomment this to enable Comet connection tacking (provides events 
-		on session expiration as well as webapp lifecycle) -->
-	<!-- <Valve className="org.apache.catalina.valves.CometConnectionManagerValve" 
-		/> -->
 
 	<!-- Configure Datasource -->
-	<Resource name="bonitaDS" auth="Container" type="javax.sql.DataSource"
-		factory="bitronix.tm.resource.ResourceObjectFactory" uniqueName="jdbc/bonitaDSXA" />
+	<Resource name="bonitaDS" 
+	    auth="Container" 
+	    type="javax.sql.DataSource"
+		factory="bitronix.tm.resource.ResourceObjectFactory"
+		uniqueName="jdbc/bonitaDSXA" />
 
 	<!-- H2 -->
-	<Resource name="bonitaSequenceManagerDS" auth="Container" type="javax.sql.DataSource" 
-		maxActive="100" minIdle="10" maxWait="10000" initialSize="1" maxPoolSize="5" 
-		minPoolSize="1" maxConnectionAge="0" maxIdleTime="1800" maxIdleTimeExcessConnections="120" 
-		idleConnectionTestPeriod="30" acquireIncrement="3" testConnectionOnCheckout="true" 
-		removeAbandoned="true" logAbandoned="true" username="sa" password="" 
-		driverClassName="org.h2.Driver" url="jdbc:h2:tcp://localhost:7172/bonita6_journal;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;" />
+	<Resource name="bonitaSequenceManagerDS"
+		auth="Container"
+		type="javax.sql.DataSource" 
+		maxActive="100"
+		minIdle="10"
+		maxWait="10000"
+		initialSize="1"
+		maxPoolSize="5" 
+		minPoolSize="1"
+		maxConnectionAge="0"
+		maxIdleTime="1800"
+		maxIdleTimeExcessConnections="120" 
+		idleConnectionTestPeriod="30"
+		acquireIncrement="3"
+		testConnectionOnCheckout="true" 
+		removeAbandoned="true"
+		logAbandoned="true"
+		username="sa"
+		password=""
+		driverClassName="org.h2.Driver"
+		url="jdbc:h2:tcp://localhost:7172/bonita6_journal;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE;" />
 
 	<!-- MySQL -->
 	<!--

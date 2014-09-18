@@ -84,6 +84,8 @@ public class UpdateProcessInstance implements TransactionContent {
                 case FIFTH:
                     updateBuilder.updateStringIndex5(value);
                     break;
+                default:
+                    throw new IllegalStateException();
             }
         } else {
             final Map<ProcessInstanceField, Serializable> fields = descriptor.getFields();
@@ -104,6 +106,8 @@ public class UpdateProcessInstance implements TransactionContent {
                     case STRING_INDEX_5:
                         updateBuilder.updateStringIndex5((String) field.getValue());
                         break;
+                    default:
+                        throw new IllegalStateException();
                 }
             }
         }

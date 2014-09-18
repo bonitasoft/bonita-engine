@@ -36,7 +36,7 @@ public interface TenantManagementAPI {
      * Only IdentityAPI, ThemeAPI and ProfileAPI are accessible.
      * 
      * @throws UpdateException
-     *             if the tenant cannot be paused.
+     *         if the tenant cannot be paused.
      */
     void pause() throws UpdateException;
 
@@ -44,7 +44,7 @@ public interface TenantManagementAPI {
      * Resume the tenant to a normal state after a pause.
      * 
      * @throws UpdateException
-     *             if the tenant cannot be resumed.
+     *         if the tenant cannot be resumed.
      */
     void resume() throws UpdateException;
 
@@ -52,12 +52,12 @@ public interface TenantManagementAPI {
      * Installs a new business data model.
      * 
      * @param zip
-     *            the binary content of the business object model.
+     *        the binary content of the business object model.
      * @return the version of the Business Data Model just deployed.
      * @throws InvalidBusinessDataModelException
-     *             if the Business Data Model content passed as parameter is invalid.
+     *         if the Business Data Model content passed as parameter is invalid.
      * @throws BusinessDataRepositoryDeploymentException
-     *             if the deployment cannot be fulfilled completely.
+     *         if the deployment cannot be fulfilled completely.
      */
     String installBusinessDataModel(final byte[] zip) throws InvalidBusinessDataModelException, BusinessDataRepositoryDeploymentException;
 
@@ -65,7 +65,7 @@ public interface TenantManagementAPI {
      * Uninstalls the business data model.
      * 
      * @throws BusinessDataRepositoryDeploymentException
-     *             if the deployment cannot be fulfilled completely.
+     *         if the deployment cannot be fulfilled completely.
      */
     void uninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException;
 
@@ -73,14 +73,14 @@ public interface TenantManagementAPI {
      * Deletes all business data and uninstalls the business data model.
      * 
      * @throws BusinessDataRepositoryDeploymentException
-     *             if the deployment cannot be fulfilled completely.
+     *         if the deployment cannot be fulfilled completely.
      */
     void cleanAndUninstallBusinessDataModel() throws BusinessDataRepositoryDeploymentException;
 
     /**
      * @return zip content of the deployed client Business data model, null if no Business data model has been deployed
      * @throws BusinessDataRepositoryException
-     *             if the Business Data Model cannot be retrieved.
+     *         if the Business Data Model cannot be retrieved.
      */
     byte[] getClientBDMZip() throws BusinessDataRepositoryException;
 
@@ -89,7 +89,7 @@ public interface TenantManagementAPI {
      * 
      * @return the current Business Data Model version, if any, or null if no Business Data Model is currently deployed
      * @throws BusinessDataRepositoryException
-     *             if the BDM version cannot be retrieved properly.
+     *         if the BDM version cannot be retrieved properly.
      */
     String getBusinessDataModelVersion() throws BusinessDataRepositoryException;
 }

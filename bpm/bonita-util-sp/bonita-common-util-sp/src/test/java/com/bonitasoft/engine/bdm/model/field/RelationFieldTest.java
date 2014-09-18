@@ -28,7 +28,7 @@ public class RelationFieldTest {
     private final BusinessObject aBo = aBO("boName").withField(aBooleanField("aField")).build();
 
     @Test
-    public void should_not_be_marshallizable_without_reference() throws Exception {
+    public void should_not_be_marshallizable_without_reference() {
         final RelationField field = new RelationField();
         field.setName("aName");
         field.setType(Type.AGGREGATION);
@@ -38,7 +38,7 @@ public class RelationFieldTest {
 
     @Test
     @Ignore
-    public void should_not_be_marshallizable_without_name() throws Exception {
+    public void should_not_be_marshallizable_without_name() {
         final RelationField field = new RelationField();
         field.setType(Type.AGGREGATION);
         field.setReference(aBo);
@@ -47,7 +47,7 @@ public class RelationFieldTest {
     }
 
     @Test
-    public void should_not_be_marshallizable_without_type() throws Exception {
+    public void should_not_be_marshallizable_without_type() {
         final RelationField field = new RelationField();
         field.setReference(aBo);
         field.setName("aName");
@@ -56,7 +56,7 @@ public class RelationFieldTest {
     }
 
     @Test
-    public void should_be_marshallizable_with_only_name_type_and_reference() throws Exception {
+    public void should_be_marshallizable_with_only_name_type_and_reference() {
         final RelationField field = new RelationField();
         field.setName("aName");
         field.setType(Type.AGGREGATION);
@@ -66,7 +66,7 @@ public class RelationFieldTest {
     }
 
     @Test
-    public void should_not_be_marshallizable_whitout_fetchType() throws Exception {
+    public void should_not_be_marshallizable_whitout_fetchType() {
         final RelationField field = new RelationField();
         field.setName("aName");
         field.setType(Type.AGGREGATION);
@@ -78,14 +78,14 @@ public class RelationFieldTest {
     }
 
     @Test
-    public void should_have_a_default_fetchType_to_eager() throws Exception {
+    public void should_have_a_default_fetchType_to_eager() {
         final RelationField field = new RelationField();
 
         assertThat(field.getFetchType()).isEqualTo(FetchType.EAGER);
     }
 
     @Test
-    public void can_be_lazy() throws Exception {
+    public void can_be_lazy() {
         final RelationField field = new RelationField();
         field.setFetchType(FetchType.LAZY);
 

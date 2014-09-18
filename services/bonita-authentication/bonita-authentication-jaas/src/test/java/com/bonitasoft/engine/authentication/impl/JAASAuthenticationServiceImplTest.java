@@ -8,9 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.authentication.impl;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -31,9 +32,6 @@ import org.mockito.MockitoAnnotations;
 
 public class JAASAuthenticationServiceImplTest {
 
-    /**
-     * 
-     */
     private static final String JAVA_SECURITY_AUTH_LOGIN_CONFIG = "java.security.auth.login.config";
 
     private JAASAuthenticationServiceImpl jaasAuthService;
@@ -71,7 +69,7 @@ public class JAASAuthenticationServiceImplTest {
     }
 
     @Test
-    public void cannotLoginWithWrongPassword() throws Exception {
+    public void cannotLoginWithWrongPassword() {
         try {
             Map<String, Serializable> credentials = new HashMap<String, Serializable>();
             credentials.put(AuthenticationConstants.BASIC_PASSWORD, "wrongPassword");

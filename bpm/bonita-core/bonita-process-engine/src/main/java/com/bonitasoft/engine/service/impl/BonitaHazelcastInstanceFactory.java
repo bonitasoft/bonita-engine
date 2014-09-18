@@ -15,7 +15,6 @@ import java.util.List;
 import org.bonitasoft.engine.cache.CacheConfiguration;
 import org.bonitasoft.engine.cache.CacheConfigurations;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
@@ -106,7 +105,7 @@ public class BonitaHazelcastInstanceFactory implements PlatformLifecycleService 
     }
 
     @Override
-    public void stop() throws SBonitaException {
+    public void stop() {
     }
 
     public void destroy() {

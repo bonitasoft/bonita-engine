@@ -24,8 +24,6 @@ import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.tool.hbm2ddl.Target;
 
-import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
-
 /**
  * @author Matthieu Chaffotte
  */
@@ -67,14 +65,14 @@ public class SchemaManager {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Exception> drop(final Set<String> managedClasses) throws SBusinessDataRepositoryDeploymentException {
+    public List<Exception> drop(final Set<String> managedClasses) {
         final SchemaExport export = new SchemaExport(buildConfiguration(managedClasses));
         export.drop(Target.EXPORT);
         return export.getExceptions();
     }
 
     @SuppressWarnings("unchecked")
-    public List<Exception> update(final Set<String> managedClasses) throws SBusinessDataRepositoryDeploymentException {
+    public List<Exception> update(final Set<String> managedClasses) {
         final SchemaUpdate schemaUpdate = new SchemaUpdate(buildConfiguration(managedClasses));
         schemaUpdate.execute(Target.EXPORT);
         return schemaUpdate.getExceptions();

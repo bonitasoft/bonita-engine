@@ -77,7 +77,7 @@ public class UniqueNameValidationRuleTest {
     }
 
     @Test
-    public void should_validate_names_unicity_for_unique_constraints() throws Exception {
+    public void should_validate_names_unicity_for_unique_constraints() {
         final UniqueConstraint uniqueConstraint = aUniqueConstraint().withName("aUniqueConstraint").build();
         final UniqueConstraint uniqueConstraint2 = aUniqueConstraint().withName("anotherUniqueConstraint").build();
         final BusinessObject bo = aBoWithConstraints(uniqueConstraint, uniqueConstraint2);
@@ -88,7 +88,7 @@ public class UniqueNameValidationRuleTest {
     }
 
     @Test
-    public void should_validate_names_unicity_for_indexes() throws Exception {
+    public void should_validate_names_unicity_for_indexes() {
         final Index index = anIndex().withName("anIndex").build();
         final Index anotherIndex = anIndex().withName("anotherIndex").build();
         final BusinessObjectModel bom = aBOM().withBO(aBoWithIndexes(index, anotherIndex)).build();
@@ -99,7 +99,7 @@ public class UniqueNameValidationRuleTest {
     }
 
     @Test
-    public void should_concatenate_validation_errors() throws Exception {
+    public void should_concatenate_validation_errors() {
         final Index index = anIndex().withName("index").build();
         final UniqueConstraint uniqueConstraint = aUniqueConstraint().withName("constraint").build();
         final BusinessObjectModel bom = aBOM().withBO(aBO("bo").withIndex(index).withUniqueConstraint(uniqueConstraint).build()).build();

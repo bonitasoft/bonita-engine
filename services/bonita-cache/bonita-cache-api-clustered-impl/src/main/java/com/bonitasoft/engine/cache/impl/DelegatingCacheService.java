@@ -17,7 +17,6 @@ import java.util.Set;
 
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * Delegate cache request to local or distributed cache services
@@ -100,12 +99,12 @@ public class DelegatingCacheService implements CacheService {
     }
 
     @Override
-    public void stop() throws SBonitaException {
+    public void stop() {
         // do nothing it's done on on each instance using the NodeConfiguration that have all ServiceWithLifeCycle autowired using spring
     }
 
     @Override
-    public void pause() throws SBonitaException {
+    public void pause() {
         // nothing to do
     }
 

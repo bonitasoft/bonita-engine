@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.page.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,42 +45,42 @@ public class PageImplTest {
     }
 
     @Test
-    public void testGetId() throws Exception {
+    public void testGetId() {
         assertThat(pageImpl.getId()).isEqualTo(PAGE_ID);
     }
 
     @Test
-    public void testGetName() throws Exception {
+    public void testGetName() {
         assertThat(pageImpl.getName()).isEqualTo(NAME);
     }
 
     @Test
-    public void testIsProvided() throws Exception {
+    public void testIsProvided() {
         assertThat(pageImpl.isProvided()).isEqualTo(PROVIDED);
     }
 
     @Test
-    public void testGetDescription() throws Exception {
+    public void testGetDescription() {
         assertThat(pageImpl.getDescription()).isEqualTo(DESCRIPTION);
     }
 
     @Test
-    public void testGetInstallationDate() throws Exception {
+    public void testGetInstallationDate() {
         assertThat(pageImpl.getInstallationDate()).isEqualTo(new Date(installationDate));
     }
 
     @Test
-    public void testGetInstalledBy() throws Exception {
+    public void testGetInstalledBy() {
         assertThat(pageImpl.getInstalledBy()).isEqualTo(USER_ID);
     }
 
     @Test
-    public void testGetLastModificationDate() throws Exception {
+    public void testGetLastModificationDate() {
         assertThat(pageImpl.getLastModificationDate()).isEqualTo(new Date(modificationDate));
     }
 
     @Test
-    public void testGetDisplayName() throws Exception {
+    public void testGetDisplayName() {
         assertThat(pageImpl.getDisplayName()).isEqualTo(DISPLAY_NAME);
     }
 }

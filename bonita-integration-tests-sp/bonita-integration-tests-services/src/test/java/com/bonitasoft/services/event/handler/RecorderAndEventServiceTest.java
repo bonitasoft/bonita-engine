@@ -43,7 +43,7 @@ public class RecorderAndEventServiceTest extends CommonServiceSPTest {
     static {
         eventService = getServicesBuilder().buildEventService();
         persistenceService = getServicesBuilder().buildTenantPersistenceService();
-        recorder = getServicesBuilder().buildRecorder();
+        recorder = getServicesBuilder().buildTenantRecorder();
     }
 
     @AfterClass
@@ -70,7 +70,8 @@ public class RecorderAndEventServiceTest extends CommonServiceSPTest {
 
         // Make SUpdateEvent parameter
         final String eventType = getEventType(employee);
-        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(eventType).setObject(updateRecord.getEntity()).done();
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(eventType)
+                .setObject(updateRecord.getEntity()).done();
 
         final Employee oldEmployee = new Employee(employee);
         updateEvent.setOldObject(oldEmployee);
@@ -103,7 +104,8 @@ public class RecorderAndEventServiceTest extends CommonServiceSPTest {
 
         // Make SUpdateEvent parameter
         final String eventType = getEventType(employee);
-        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(eventType).setObject(updateRecord.getEntity()).done();
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(eventType)
+                .setObject(updateRecord.getEntity()).done();
 
         final Employee oldEmployee = new Employee(employee);
         updateEvent.setOldObject(oldEmployee);

@@ -1,8 +1,11 @@
-/**
+/*******************************************************************************
  * Copyright (C) 2014 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * 
- */
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bdm.validator.rule;
 
 import static com.bonitasoft.engine.bdm.validator.assertion.ValidationStatusAssert.assertThat;
@@ -24,19 +27,18 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
  * @author Romain Bioteau
- * 
  */
 public class BusinessObjectModelValidationRuleTest {
 
     private BusinessObjectModelValidationRule businessObjectModelValidationRule;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         businessObjectModelValidationRule = new BusinessObjectModelValidationRule();
     }
 
     @Test
-    public void should_apply_to_businessObjectModel() throws Exception {
+    public void should_apply_to_businessObjectModel() {
         assertThat(businessObjectModelValidationRule.appliesTo(new BusinessObject())).isFalse();
         assertThat(businessObjectModelValidationRule.appliesTo(new SimpleField())).isFalse();
         assertThat(businessObjectModelValidationRule.appliesTo(new UniqueConstraint())).isFalse();
@@ -45,12 +47,12 @@ public class BusinessObjectModelValidationRuleTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouddCheckRule_throw_IllegalArgumentException() throws Exception {
+    public void shouddCheckRule_throw_IllegalArgumentException() {
         businessObjectModelValidationRule.checkRule(new SimpleField());
     }
 
     @Test
-    public void should_validate_that_bom_has_at_least_one_businessObject() throws Exception {
+    public void should_validate_that_bom_has_at_least_one_businessObject() {
         final BusinessObjectModel bom = new BusinessObjectModel();
 
         final ValidationStatus validationStatus = businessObjectModelValidationRule.validate(bom);
@@ -59,7 +61,7 @@ public class BusinessObjectModelValidationRuleTest {
     }
 
     @Test
-    public void should_return_a_valid_status_when_bom_is_valid() throws Exception {
+    public void should_return_a_valid_status_when_bom_is_valid() {
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(new BusinessObject());
 
@@ -69,7 +71,7 @@ public class BusinessObjectModelValidationRuleTest {
     }
 
     @Test
-    public void should_return_a_error_status_when_bom_contains_invalid_query_names() throws Exception {
+    public void should_return_a_error_status_when_bom_contains_invalid_query_names() {
         final BusinessObjectModel bom = new BusinessObjectModel();
 
         final BusinessObject employee = new BusinessObject();

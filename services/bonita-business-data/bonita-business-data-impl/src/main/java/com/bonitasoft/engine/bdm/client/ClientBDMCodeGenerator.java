@@ -41,19 +41,18 @@ import com.sun.codemodel.JVar;
 public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
 
     private static final String CLIENT_RESOURCES_PACKAGES = "com.bonitasoft.engine.bdm.dao.client.resources";
-            
+
     public ClientBDMCodeGenerator() {
         super();
     }
 
     @Override
-    protected void addDAO(final BusinessObject bo, final JDefinedClass entity) throws JClassAlreadyExistsException, ClassNotFoundException {
+    protected void addDAO(final BusinessObject bo, final JDefinedClass entity) throws JClassAlreadyExistsException {
         final JDefinedClass daoInterface = createDAOInterface(bo, entity);
         createDAOImpl(bo, entity, daoInterface);
     }
 
-    private void createDAOImpl(final BusinessObject bo, final JDefinedClass entity, final JDefinedClass daoInterface) throws JClassAlreadyExistsException,
-    ClassNotFoundException {
+    private void createDAOImpl(final BusinessObject bo, final JDefinedClass entity, final JDefinedClass daoInterface) throws JClassAlreadyExistsException {
         final String daoImplClassName = toDaoImplClassname(bo);
         final JDefinedClass implClass = addClass(daoImplClassName);
         implClass._implements(daoInterface);
@@ -118,7 +117,6 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
         final JVar commandParametersRef = tryBody.decl(mapClass, "commandParameters", JExpr._new(hashMapClass));
         tryBody.invoke(commandParametersRef, "put").arg(JExpr.lit("queryName")).arg(JExpr.lit(entityName + "." + queryName));
 
-
         // Set if should returns a List or a single value
         boolean isCollection = false;
         final JClass collectionClass = getModel().ref(Collection.class);
@@ -180,7 +178,7 @@ public class ClientBDMCodeGenerator extends AbstractBDMCodeGenerator {
             body.invoke(commandParametersRef, "put").arg(JExpr.lit("queryParameters")).arg(JExpr.cast(getModel().ref(Serializable.class), queryParametersRef));
         }
     }
-    
+
     private String toDaoImplClassname(final BusinessObject bo) {
         return bo.getQualifiedName() + DAO_IMPL_SUFFIX;
     }

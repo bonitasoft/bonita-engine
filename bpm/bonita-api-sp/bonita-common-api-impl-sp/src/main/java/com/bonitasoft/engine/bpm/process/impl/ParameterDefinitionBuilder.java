@@ -12,7 +12,6 @@ import org.bonitasoft.engine.bpm.parameter.impl.ParameterDefinitionImpl;
 import org.bonitasoft.engine.bpm.process.impl.DescriptionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 
-
 /**
  * @author Matthieu Chaffotte
  */
@@ -20,13 +19,15 @@ public class ParameterDefinitionBuilder extends ProcessBuilderExt implements Des
 
     private final ParameterDefinitionImpl parameter;
 
-    ParameterDefinitionBuilder(final ProcessDefinitionBuilderExt processDefinitionBuilder, final DesignProcessDefinitionImpl process, final String parameterName,
+    ParameterDefinitionBuilder(final ProcessDefinitionBuilderExt processDefinitionBuilder, final DesignProcessDefinitionImpl process,
+            final String parameterName,
             final String type) {
         super(process, processDefinitionBuilder);
         parameter = new ParameterDefinitionImpl(parameterName, type);
         process.addParameter(parameter);
     }
 
+    @Override
     public ParameterDefinitionBuilder addDescription(final String description) {
         parameter.setDescription(description);
         return this;
