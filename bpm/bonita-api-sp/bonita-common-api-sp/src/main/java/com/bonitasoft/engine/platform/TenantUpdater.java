@@ -13,8 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Updater for tenants, it is used by {@link com.bonitasoft.engine.api.PlatformAPI#updateTenant(long, TenantUpdater)}
+ *
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
+ * @since 6.0.0
  */
 public class TenantUpdater implements Serializable {
 
