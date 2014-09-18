@@ -52,18 +52,6 @@ public class ContractStructureValidatorTest {
     }
 
     @Test
-    public void should_pass_when_complex_inputs_are_provided_and_valid() throws Exception {
-        SContractDefinition contract = aContract()
-                .withInput(anInput(TEXT).withName("aText").build())
-                .withInput(anInput(BOOLEAN).withName("aBoolean").build()).build();
-        Map<String, Object> taskInputs = aMap()
-                .put("aText", "hello")
-                .put("aBoolean", true).build();
-
-        validator.validate(contract.getSimpleInputs(), taskInputs);
-    }
-
-    @Test
     public void should_log_inputs_provided_but_not_in_defined_in_contract() throws Exception {
         SContractDefinition contract = aContract().withInput(anInput(TEXT).withName("aText").build()).build();
         Map<String, Object> taskInputs = aMap()

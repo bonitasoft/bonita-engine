@@ -29,7 +29,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  * Validate that task inputs fit with contract structure and types
  * 
  * @author Colin Puy
- *
  */
 public class ContractStructureValidator {
 
@@ -52,27 +51,22 @@ public class ContractStructureValidator {
     protected List<String> findEventualProblems(List<SSimpleInputDefinition> simpleInputs, Map<String, Object> inputs) {
         List<String> problems = new ArrayList<String>();
         for (SSimpleInputDefinition definition : simpleInputs) {
-            String problem = getInputProblem(definition, inputs);
-            if (problem != null) {
-                problems.add(problem);
+            try {
+                validateInput(definition, inputs);
+            } catch (InputValidationException e) {
+                problems.add(e.getMessage());
             }
         }
         return problems;
     }
 
-    private String getInputProblem(SSimpleInputDefinition definition, Map<String, Object> inputs) {
+    protected void validateInput(SInputDefinition definition, Map<String, Object> inputs) throws InputValidationException {
         String inputName = definition.getName();
         if (!inputs.containsKey(inputName)) {
-            return "Contract need field [" + inputName + "] but it has not been provided";
+            throw new InputValidationException("Contract need field [" + inputName + "] but it has not been provided");
         } else {
-            Object value = inputs.get(inputName);
-            try {
-                typeValidator.validate(definition, value);
-            } catch (InputValidationException e) {
-                return e.getMessage();
-            }
+            typeValidator.validate(definition, inputs.get(inputName));
         }
-        return null;
     }
 
     private void logInputsWhichAreNotInContract(TechnicalLogSeverity severity, List<SSimpleInputDefinition> simpleInputs, Map<String, Object> inputs) {

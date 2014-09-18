@@ -25,11 +25,9 @@ import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinitio
 public class ComplexContractStructureValidator {
 
     private ContractStructureValidator validator;
-    private ContractTypeValidator typeValidator;
 
-    public ComplexContractStructureValidator(ContractStructureValidator validator, ContractTypeValidator typeValidator) {
+    public ComplexContractStructureValidator(ContractStructureValidator validator) {
         this.validator = validator;
-        this.typeValidator = typeValidator;
     }
 
     public void validate(SContractDefinition contract, Map<String, Object> inputs) throws ContractViolationException {
@@ -53,17 +51,11 @@ public class ComplexContractStructureValidator {
         }
 
         for (SComplexInputDefinition def : complexInputs) {
-            if (!inputs.containsKey(def.getName())) {
-                message.add("Contract need field [" + def.getName() + "] but it has not been provided");
-            } else {
-                
-                Object value = inputs.get(def.getName());
-                try {
-                    typeValidator.validate(def, value);
-                    message.addAll(recursive(def.getSimpleInputDefinitions(), def.getComplexInputDefinitions(), (Map<String, Object>) value));
-                } catch (InputValidationException e) {
-                    message.add(e.getMessage());
-                }
+            try {
+                validator.validateInput(def, inputs);
+                message.addAll(recursive(def.getSimpleInputDefinitions(), def.getComplexInputDefinitions(), (Map<String, Object>) inputs.get(def.getName())));
+            } catch (InputValidationException e) {
+                message.add(e.getMessage());
             }
         }
         return message;
