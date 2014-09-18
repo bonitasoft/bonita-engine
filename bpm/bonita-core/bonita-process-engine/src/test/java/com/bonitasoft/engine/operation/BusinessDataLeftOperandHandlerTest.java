@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.operation;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -119,7 +127,7 @@ public class BusinessDataLeftOperandHandlerTest {
         doAnswer(new Answer<Void>() {
 
             @Override
-            public Void answer(final InvocationOnMock invocation) throws Throwable {
+            public Void answer(final InvocationOnMock invocation) {
                 return null;
             }
 
@@ -171,7 +179,7 @@ public class BusinessDataLeftOperandHandlerTest {
     }
 
     @Test
-    public void shouldGetOperatorType_Return_BUSINESS_DATA_JAVA_SETTER() throws Exception {
+    public void shouldGetOperatorType_Return_BUSINESS_DATA_JAVA_SETTER() {
         assertThat(leftOperandHandler.getType()).isEqualTo(SLeftOperand.TYPE_BUSINESS_DATA);
     }
 
@@ -376,7 +384,7 @@ public class BusinessDataLeftOperandHandlerTest {
     }
 
     @Test
-    public void handlerDoesNotSupportBatchUpdate() throws Exception {
+    public void handlerDoesNotSupportBatchUpdate() {
         assertThat(leftOperandHandler.supportBatchUpdate()).isFalse();
     }
 

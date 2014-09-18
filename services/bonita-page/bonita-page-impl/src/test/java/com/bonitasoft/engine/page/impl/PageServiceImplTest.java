@@ -404,7 +404,7 @@ public class PageServiceImplTest {
         doAnswer(new Answer<Object>() {
 
             @Override
-            public Object answer(final InvocationOnMock invocation) throws Throwable {
+            public Object answer(final InvocationOnMock invocation) {
                 // Deletion OK
                 return null;
             }
@@ -692,8 +692,8 @@ public class PageServiceImplTest {
 
         // given
         @SuppressWarnings("unchecked")
-        byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
-                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));;
+        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
         // when
         pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
 

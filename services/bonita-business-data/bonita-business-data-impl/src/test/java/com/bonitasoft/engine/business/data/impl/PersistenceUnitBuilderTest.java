@@ -19,7 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -40,15 +39,8 @@ public class PersistenceUnitBuilderTest {
         builder = new PersistenceUnitBuilder();
     }
 
-    /**
-     * @throws java.lang.Exception
-     */
-    @After
-    public void tearDown() throws Exception {
-    }
-
     @Test
-    public void shouldDone_WhenNothingIsCalledReturnsDefaultPersistenceUnits() throws Exception {
+    public void shouldDone_WhenNothingIsCalledReturnsDefaultPersistenceUnits() {
         Document document = builder.done();
         assertThat(document).isNotNull();
         assertThat(document.getElementsByTagName("persistence-unit").getLength()).isEqualTo(1);

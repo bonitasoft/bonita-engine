@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.page;
 
 import static com.bonitasoft.engine.test.persistence.builder.PageBuilder.aPage;
@@ -22,7 +30,7 @@ public class PageQueriesTest {
     private PageRepository repository;
 
     @Test
-    public void getPageContent_should_return_the_content_of_the_page() throws Exception {
+    public void getPageContent_should_return_the_content_of_the_page() {
         // given
         final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
         //
@@ -34,7 +42,7 @@ public class PageQueriesTest {
     }
 
     @Test
-    public void getPageByName_should_return_the_page_having_the_name() throws Exception {
+    public void getPageByName_should_return_the_page_having_the_name() {
         // given
         repository.add(aPage().withName("MyPage1").withContent("The content".getBytes()).build());
         final SPage page2 = repository.add(aPage().withName("MyPage2").withContent("The content".getBytes()).build());

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -36,7 +36,7 @@ public class EqualsBuilderTest extends CompilableCode {
     private File destDir;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         codeGenerator = new CodeGenerator();
         equalsBuilder = new EqualsBuilder();
         destDir = IOUtil.createTempDirectoryInDefaultTempDirectory("generationDir");

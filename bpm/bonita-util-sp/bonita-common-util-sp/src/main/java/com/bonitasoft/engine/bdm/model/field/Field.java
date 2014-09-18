@@ -70,8 +70,7 @@ public abstract class Field {
         if (obj instanceof Field) {
             final Field other = (Field) obj;
             return new EqualsBuilder().append(collection, other.collection).append(name, other.name).append(nullable, other.nullable).isEquals();
-        } else {
-            return false;
         }
+        return false;
     }
 }

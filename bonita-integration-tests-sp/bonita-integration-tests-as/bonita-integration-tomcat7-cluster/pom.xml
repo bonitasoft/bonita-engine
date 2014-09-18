@@ -8,17 +8,16 @@
 		<version>6.4.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>bonita-integration-tomcat6-cluster</artifactId>
+	<artifactId>bonita-integration-tomcat7-cluster</artifactId>
 	<packaging>jar</packaging>
 
 
 	<properties>
 		<cluster.group>mycluster</cluster.group>
 		<bonita.home.classifier>performance-cluster</bonita.home.classifier>
-		<tomcat.version>6.0.37</tomcat.version>
+		<tomcat.version>7.0.55</tomcat.version>
 		<tomcat.name>apache-tomcat-${tomcat.version}</tomcat.name>
-        <tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/${tomcat.name}.zip
-        </tomcat.url>
+        <tomcat.url>http://archive.apache.org/dist/tomcat/tomcat-7/v${tomcat.version}/bin/${tomcat.name}.zip</tomcat.url>
 		<tomcat.zip.folder>${user.home}</tomcat.zip.folder>
 
 		<server1.port>8386</server1.port>
@@ -238,7 +237,7 @@
 								</goals>
 								<configuration>
 									<container>
-										<containerId>tomcat6x</containerId>
+										<containerId>tomcat7x</containerId>
 										<home>${tomcat1.home}</home>
 										<systemProperties>
 											<!-- in order to identify on which node we are -->
@@ -283,7 +282,7 @@
 								</goals>
 								<configuration>
 									<container>
-										<containerId>tomcat6x</containerId>
+										<containerId>tomcat7x</containerId>
 										<home>${tomcat1.home}</home>
 										<systemProperties>
 											<!-- in order to identify on which node we are -->
@@ -320,7 +319,7 @@
 								</goals>
 								<configuration>
 									<container>
-										<containerId>tomcat6x</containerId>
+										<containerId>tomcat7x</containerId>
 										<home>${tomcat2.home}</home>
 										<systemProperties>
 											<bonita.home>${bonita.home}</bonita.home>
@@ -365,7 +364,7 @@
 								</goals>
 								<configuration>
 									<container>
-										<containerId>tomcat6x</containerId>
+										<containerId>tomcat7x</containerId>
 										<home>${tomcat2.home}</home>
 										<systemProperties>
 											<bonita.home>${bonita.home}</bonita.home>

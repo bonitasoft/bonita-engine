@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.log.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,7 +28,7 @@ public class MapQueriableLoggerStrategyTest {
     private Map<String, Boolean> map;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         System.clearProperty(DISABLE_LOGS_KEY);
         map = new HashMap<String, Boolean>();
         map.put("action1:INTERNAL", true);
@@ -28,7 +36,7 @@ public class MapQueriableLoggerStrategyTest {
     }
 
     @Test
-    public void isLoggable_should_return_false_if_propery_queryablelog_disable_is_set() throws Exception {
+    public void isLoggable_should_return_false_if_propery_queryablelog_disable_is_set() {
         // given
         System.setProperty(DISABLE_LOGS_KEY, "true");
         MapQueriableLoggerStrategy strategy = new MapQueriableLoggerStrategy(null);
@@ -41,7 +49,7 @@ public class MapQueriableLoggerStrategyTest {
     }
 
     @Test
-    public void isLoggable_shoud_return_true_when_value_in_map_is_true() throws Exception {
+    public void isLoggable_shoud_return_true_when_value_in_map_is_true() {
         // given
         MapQueriableLoggerStrategy strategy = new MapQueriableLoggerStrategy(map);
 
@@ -53,7 +61,7 @@ public class MapQueriableLoggerStrategyTest {
     }
 
     @Test
-    public void isLoggable_shoud_return_false_when_value_in_map_is_false() throws Exception {
+    public void isLoggable_shoud_return_false_when_value_in_map_is_false() {
         // given
         MapQueriableLoggerStrategy strategy = new MapQueriableLoggerStrategy(map);
 
@@ -65,7 +73,7 @@ public class MapQueriableLoggerStrategyTest {
     }
 
     @Test
-    public void isLoggable_shoud_throw_exception_if_map_doesnt_contain_key() throws Exception {
+    public void isLoggable_shoud_throw_exception_if_map_doesnt_contain_key() {
         // given
         MapQueriableLoggerStrategy strategy = new MapQueriableLoggerStrategy(map);
         String actionType = "unknowAction";

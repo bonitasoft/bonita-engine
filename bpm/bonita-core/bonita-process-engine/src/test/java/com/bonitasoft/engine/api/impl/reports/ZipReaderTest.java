@@ -28,7 +28,7 @@ public class ZipReaderTest {
         zip.read(new Reader() {
 
             @Override
-            public void read(final File zip, final File unzipped) throws Exception {
+            public void read(final File zip, final File unzipped) {
                 assertThat(unzipped).exists();
                 assertThat(Arrays.asList(unzipped.list()).toString()).isEqualTo("[myreport.properties]");
             }

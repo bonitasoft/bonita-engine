@@ -283,8 +283,7 @@ public final class SPModelConvertor extends ModelConvertor {
         final String displayName = (String) fields.get(PageField.DISPLAY_NAME);
         final String contentName = (String) fields.get(PageField.CONTENT_NAME);
         final SPageBuilder newSPageBuilder = BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
-                System.currentTimeMillis(), creatorUserId,
-                false, contentName, null);
+                System.currentTimeMillis(), creatorUserId, false, contentName);
         return newSPageBuilder.done();
     }
 
@@ -295,8 +294,7 @@ public final class SPModelConvertor extends ModelConvertor {
         final String displayName = (String) fields.get(PageField.DISPLAY_NAME);
         final String contentName = (String) fields.get(PageField.CONTENT_NAME);
         final SPageBuilder newSPageBuilder = BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
-                System.currentTimeMillis(), creatorUserId,
-                false, contentName, null);
+                System.currentTimeMillis(), creatorUserId, false, contentName);
         return newSPageBuilder.done();
     }
 

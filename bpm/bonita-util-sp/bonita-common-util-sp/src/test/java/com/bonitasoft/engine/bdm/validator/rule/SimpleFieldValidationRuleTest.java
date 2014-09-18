@@ -30,7 +30,7 @@ public class SimpleFieldValidationRuleTest {
     }
 
     @Test
-    public void should_validate_that_type_is_not_empty() throws Exception {
+    public void should_validate_that_type_is_not_empty() {
         SimpleField simpleField = new SimpleField();
 
         ValidationStatus validationStatus = simpleFieldValidationRule.validate(simpleField);
@@ -39,7 +39,7 @@ public class SimpleFieldValidationRuleTest {
     }
 
     @Test
-    public void should_return_a_valid_status_when_type_is_filled() throws Exception {
+    public void should_return_a_valid_status_when_type_is_filled() {
         SimpleField simpleField = new SimpleField();
         simpleField.setType(FieldType.BOOLEAN);
 

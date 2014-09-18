@@ -1,4 +1,13 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package org.bonita.pojo;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,18 +47,18 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
         })
 })
 @NamedQueries({
-    @NamedQuery(name = "Employee.findByFirstNameAndLastName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nAND e.lastName= :lastName\n"),
-    @NamedQuery(name = "Employee.findByFirstName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nORDER BY e.persistenceId"),
-    @NamedQuery(name = "Employee.findByLastName", query = "SELECT e\nFROM Employee e\nWHERE e.lastName= :lastName\nORDER BY e.persistenceId"),
-    @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId"),
-    @NamedQuery(name = "Employee.findByPhoneNumber", query = "SELECT e FROM Employee e WHERE :phoneNumber IN ELEMENTS(e.phoneNumbers)"),
-    @NamedQuery(name = "Employee.findByFirstNameAndLastNameNewOrder", query = "SELECT e FROM Employee e WHERE e.firstName =:firstName AND e.lastName = :lastName ORDER BY e.lastName"),
-    @NamedQuery(name = "Employee.findByFirstNameFetchAddresses", query = "SELECT e FROM Employee e INNER JOIN FETCH e.addresses WHERE e.firstName =:firstName ORDER BY e.lastName"),
-    @NamedQuery(name = "Employee.countEmployee", query = "SELECT COUNT(e) FROM Employee e")
+        @NamedQuery(name = "Employee.findByFirstNameAndLastName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nAND e.lastName= :lastName\n"),
+        @NamedQuery(name = "Employee.findByFirstName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nORDER BY e.persistenceId"),
+        @NamedQuery(name = "Employee.findByLastName", query = "SELECT e\nFROM Employee e\nWHERE e.lastName= :lastName\nORDER BY e.persistenceId"),
+        @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId"),
+        @NamedQuery(name = "Employee.findByPhoneNumber", query = "SELECT e FROM Employee e WHERE :phoneNumber IN ELEMENTS(e.phoneNumbers)"),
+        @NamedQuery(name = "Employee.findByFirstNameAndLastNameNewOrder", query = "SELECT e FROM Employee e WHERE e.firstName =:firstName AND e.lastName = :lastName ORDER BY e.lastName"),
+        @NamedQuery(name = "Employee.findByFirstNameFetchAddresses", query = "SELECT e FROM Employee e INNER JOIN FETCH e.addresses WHERE e.firstName =:firstName ORDER BY e.lastName"),
+        @NamedQuery(name = "Employee.countEmployee", query = "SELECT COUNT(e) FROM Employee e")
 })
-public class EmployeeForTesting implements com.bonitasoft.engine.bdm.Entity
-{
+public class EmployeeForTesting implements com.bonitasoft.engine.bdm.Entity {
 
+    private static final long serialVersionUID = 6685785209798954931L;
     @Id
     @GeneratedValue
     private Long persistenceId;
@@ -119,12 +128,12 @@ public class EmployeeForTesting implements com.bonitasoft.engine.bdm.Entity
     }
 
     public void addToPhoneNumbers(final String addTo) {
-        final List phoneNumbers = getPhoneNumbers();
+        final List<String> phoneNumbers = getPhoneNumbers();
         phoneNumbers.add(addTo);
     }
 
     public void removeFromPhoneNumbers(final String removeFrom) {
-        final List phoneNumbers = getPhoneNumbers();
+        final List<?> phoneNumbers = getPhoneNumbers();
         phoneNumbers.remove(removeFrom);
     }
 
@@ -138,12 +147,12 @@ public class EmployeeForTesting implements com.bonitasoft.engine.bdm.Entity
     }
 
     public void addToAddresses(final org.bonita.pojo.AddressForTesting addTo) {
-        final List addresses = getAddresses();
+        final List<AddressForTesting> addresses = getAddresses();
         addresses.add(addTo);
     }
 
     public void removeFromAddresses(final org.bonita.pojo.AddressForTesting removeFrom) {
-        final List addresses = getAddresses();
+        final List<?> addresses = getAddresses();
         addresses.remove(removeFrom);
     }
 

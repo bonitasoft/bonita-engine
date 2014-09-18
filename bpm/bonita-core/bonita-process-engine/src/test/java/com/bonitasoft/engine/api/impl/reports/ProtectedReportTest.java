@@ -47,7 +47,7 @@ public class ProtectedReportTest {
         report.deploy("src/test/resources/reports", new ReportDeployer() {
 
             @Override
-            public void deploy(final String name, final String description, final byte[] screenShot, final byte[] content) throws Exception {
+            public void deploy(final String name, final String description, final byte[] screenShot, final byte[] content) {
                 assertThat(name).isEqualTo("myreport");
             }
         });

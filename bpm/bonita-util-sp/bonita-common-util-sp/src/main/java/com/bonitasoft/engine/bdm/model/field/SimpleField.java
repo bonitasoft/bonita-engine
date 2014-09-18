@@ -55,9 +55,8 @@ public class SimpleField extends Field {
         if (obj instanceof SimpleField) {
             final SimpleField other = (SimpleField) obj;
             return new EqualsBuilder().appendSuper(super.equals(obj)).append(length, other.length).append(type, other.type).isEquals();
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Override

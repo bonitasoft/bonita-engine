@@ -36,9 +36,10 @@ import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.STenantNotFoundException;
+import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
+import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
 import org.bonitasoft.engine.platform.model.impl.STenantImpl;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -63,9 +64,7 @@ import com.bonitasoft.engine.service.TaskResult;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
- * 
  * @author Celine Souchet
- * 
  */
 @RunWith(MockitoJUnitRunner.class)
 public class TenantManagementAPIExtTest {
@@ -97,6 +96,7 @@ public class TenantManagementAPIExtTest {
 
     @Mock
     private DependencyResolver dependencyResolver;
+
     @Mock
     private TechnicalLoggerService technicalLoggerService;
 
@@ -116,7 +116,6 @@ public class TenantManagementAPIExtTest {
         when(platformServiceAccessor.getPlaformConfiguration()).thenReturn(nodeConfiguration);
         when(platformServiceAccessor.getSessionService()).thenReturn(sessionService);
         when(platformServiceAccessor.getTechnicalLoggerService()).thenReturn(technicalLoggerService);
-        when(platformServiceAccessor.getSessionService()).thenReturn(sessionService);
         when(platformServiceAccessor.getTenantServiceAccessor(tenantId)).thenReturn(tenantServiceAccessor);
 
         when(tenantServiceAccessor.getDependencyResolver()).thenReturn(dependencyResolver);
@@ -265,7 +264,7 @@ public class TenantManagementAPIExtTest {
     }
 
     @Test
-    public void pageApi_should_be_available_in_maintenance_mode() throws Exception {
+    public void pageApi_should_be_available_in_maintenance_mode() {
         // given:
         final Class<PageAPIExt> classPageApiExt = PageAPIExt.class;
 
@@ -361,7 +360,7 @@ public class TenantManagementAPIExtTest {
     public void pause_should_update_tenant_state_on_activated_tenant() throws Exception {
         // Given
         sTenant.setStatus(STenant.ACTIVATED);
-        doNothing().when(tenantManagementAPI).updateTenant(eq(platformService), any(EntityUpdateDescriptor.class), any(STenant.class));
+        doNothing().when(platformService).updateTenant(any(STenant.class), any(EntityUpdateDescriptor.class));
         doNothing().when(tenantManagementAPI).pauseServicesForTenant(eq(platformServiceAccessor), eq(tenantId));
 
         // When
@@ -369,13 +368,12 @@ public class TenantManagementAPIExtTest {
 
         // Then
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-        final String statusKey = BuilderFactory.get(STenantBuilderFactory.class).getStatusKey();
-        entityUpdateDescriptor.addField(statusKey, STenant.PAUSED);
-        verify(tenantManagementAPI).updateTenant(platformService, entityUpdateDescriptor, sTenant);
+        entityUpdateDescriptor.addField(STenantUpdateBuilderFactory.STATUS, STenant.PAUSED);
+        verify(platformService).updateTenant(sTenant, entityUpdateDescriptor);
     }
 
     @Test
-    public void tenantManagementAPI_should_have_class_annotation() throws Exception {
+    public void tenantManagementAPI_should_have_class_annotation() {
         // then:
         assertThat(TenantManagementAPIExt.class.isAnnotationPresent(AvailableWhenTenantIsPaused.class)).as(
                 "Annotation @AvailableWhenTenantIsPaused should be present on API class TenantManagementAPIExt").isTrue();

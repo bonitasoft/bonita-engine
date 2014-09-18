@@ -20,20 +20,24 @@ import org.bonitasoft.engine.session.APISession;
  */
 public interface LoginAPI extends org.bonitasoft.engine.api.LoginAPI {
 
+    static final String CLIENT_PROGRAM_NAME = "program_name";
+
+    static final String CLIENT_PROGRAM_TOKEN = "program_token";
+
     /**
      * Connects the user in order to use API methods of a tenant.
      * 
      * @param tenantId
-     *            the tenant identifier
+     *        the tenant identifier
      * @param userName
-     *            the user name
+     *        the user name
      * @param password
-     *            the password
+     *        the password
      * @return the session to use with other tenant API methods
      * @throws LoginException
-     *             occurs when an exception is thrown during the login (userName does not exist, or couple (userName, password) is incorrect)
+     *         occurs when an exception is thrown during the login (userName does not exist, or couple (userName, password) is incorrect)
      * @throws TenantIsPausedException
-     *             if the tenant is paused. No login is allowed for users other than the technical user.
+     *         if the tenant is paused. No login is allowed for users other than the technical user.
      * @since 6.0
      */
     @NoSessionRequired

@@ -46,49 +46,49 @@ public class DelegatingCacheServiceTest {
     }
 
     @Test
-    public void testStoreLocal() throws Exception {
+    public void storeLocal() throws Exception {
         delegatingCacheService.store("local", 1, "test");
         verifyZeroInteractions(distributedCache);
         verify(localCache).store("local", 1, "test");
     }
 
     @Test
-    public void testStoreDistributed() throws Exception {
+    public void storeDistributed() throws Exception {
         delegatingCacheService.store("distributed", 1, "test");
         verifyZeroInteractions(localCache);
         verify(distributedCache).store("distributed", 1, "test");
     }
 
     @Test
-    public void testRemoveLocal() throws Exception {
+    public void removeLocal() throws Exception {
         delegatingCacheService.remove("local", 1);
         verifyZeroInteractions(distributedCache);
         verify(localCache).remove("local", 1);
     }
 
     @Test
-    public void testRemoveDistributed() throws Exception {
+    public void removeDistributed() throws Exception {
         delegatingCacheService.remove("distributed", 1);
         verifyZeroInteractions(localCache);
         verify(distributedCache).remove("distributed", 1);
     }
 
     @Test
-    public void testGetLocal() throws Exception {
+    public void getLocal() throws Exception {
         when(localCache.get("local", 1)).thenReturn("test");
         assertEquals("test", delegatingCacheService.get("local", 1));
         verifyZeroInteractions(distributedCache);
     }
 
     @Test
-    public void testGetDistributed() throws Exception {
+    public void getDistributed() throws Exception {
         when(distributedCache.get("distributed", 1)).thenReturn("test");
         assertEquals("test", delegatingCacheService.get("distributed", 1));
         verifyZeroInteractions(localCache);
     }
 
     @Test
-    public void testGetKeysLocal() throws Exception {
+    public void getKeysLocal() throws Exception {
         final List expected = Arrays.asList("a", "b");
         when(localCache.getKeys("local")).thenReturn(expected);
         final List<?> keys = delegatingCacheService.getKeys("local");
@@ -97,7 +97,7 @@ public class DelegatingCacheServiceTest {
     }
 
     @Test
-    public void testGetKeysDistributed() throws Exception {
+    public void getKeysDistributed() throws Exception {
         final List expected = Arrays.asList("a", "b");
         when(distributedCache.getKeys("distributed")).thenReturn(expected);
         final List<?> keys = delegatingCacheService.getKeys("distributed");
@@ -106,42 +106,42 @@ public class DelegatingCacheServiceTest {
     }
 
     @Test
-    public void testClearLocal() throws Exception {
+    public void clearLocal() throws Exception {
         delegatingCacheService.clear("local");
         verifyZeroInteractions(distributedCache);
         verify(localCache).clear("local");
     }
 
     @Test
-    public void testClearDistributed() throws Exception {
+    public void clearDistributed() throws Exception {
         delegatingCacheService.clear("distributed");
         verifyZeroInteractions(localCache);
         verify(distributedCache).clear("distributed");
     }
 
     @Test
-    public void testClearAll() throws Exception {
+    public void clearAll() throws Exception {
         delegatingCacheService.clearAll();
         verify(distributedCache).clearAll();
         verify(distributedCache).clearAll();
     }
 
     @Test
-    public void testGetCacheSizeLocal() throws Exception {
+    public void getCacheSizeLocal() throws Exception {
         when(localCache.getCacheSize("local")).thenReturn(5);
         assertEquals(5, delegatingCacheService.getCacheSize("local"));
         verifyZeroInteractions(distributedCache);
     }
 
     @Test
-    public void testGetCacheSizeDistributed() throws Exception {
+    public void getCacheSizeDistributed() throws Exception {
         when(distributedCache.getCacheSize("distributed")).thenReturn(5);
         assertEquals(5, delegatingCacheService.getCacheSize("distributed"));
         verifyZeroInteractions(localCache);
     }
 
     @Test
-    public void testGetCachesNames() throws Exception {
+    public void getCachesNames() {
         when(localCache.getCachesNames()).thenReturn(Arrays.asList("a", "c"));
         when(distributedCache.getCachesNames()).thenReturn(Arrays.asList("b", "d"));
         final List<String> cachesNames = delegatingCacheService.getCachesNames();

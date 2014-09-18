@@ -6,7 +6,7 @@
  * Bonitasoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *
- *@since 6.2
+ * @since 6.2
  *******************************************************************************/
 package com.bonitasoft.engine.operation;
 
@@ -61,17 +61,6 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
     public Object update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         try {
-//            final SRefBusinessDataInstance refBusinessDataInstance = getRefBusinessDataInstance(sLeftOperand.getName(), containerId, containerType);
-//            final Entity businessData = businessDataRepository.merge(newBusinessDataValue);
-//            if (!businessData.getPersistenceId().equals(refBusinessDataInstance.getDataId())) {
-//                refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, businessData.getPersistenceId());
-//            final SRefBusinessDataInstance refBusinessDataInstance = getRefBusinessDataInstance(sLeftOperand.getName(), containerId, containerType);
-//            if (newBusinessDataValue.getPersistenceId() == null) {
-//                businessDataRepository.persist(newBusinessDataValue);
-//            }
-//            final Long businessDataId = newBusinessDataValue.getPersistenceId();
-//            if (!businessDataId.equals(refBusinessDataInstance.getDataId())) {
-//                refBusinessDataService.updateRefBusinessDataInstance(refBusinessDataInstance, newBusinessDataValue.getPersistenceId());
             final SRefBusinessDataInstance reference = getRefBusinessDataInstance(sLeftOperand.getName(), containerId, containerType);
             checkIsValidBusinessData(reference, newValue);
             if (newValue instanceof Entity) {
@@ -82,23 +71,20 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
                     refBusinessDataService.updateRefBusinessDataInstance(simpleRef, businessData.getPersistenceId());
                 }
                 return businessData;
-            } else {
-                final List<Entity> newBusinessDataValue = (List<Entity>) newValue;
-                final SMultiRefBusinessDataInstance multiRef = (SMultiRefBusinessDataInstance) reference;
-                final List<Long> businessDataIds = new ArrayList<Long>();
-                final List<Entity> updated = new ArrayList<Entity>();
-                for (final Entity entity : newBusinessDataValue) {
-                    final Entity businessData = businessDataRepository.merge(entity);
-                    businessDataIds.add(businessData.getPersistenceId());
-                    updated.add(businessData);
-                }
-                if (!multiRef.getDataIds().containsAll(businessDataIds) || multiRef.getDataIds().size() != businessDataIds.size()) {
-                    refBusinessDataService.updateRefBusinessDataInstance(multiRef, businessDataIds);
-                }
-                return updated;
             }
-//            return businessData;
-//            return newBusinessDataValue;
+            final List<Entity> newBusinessDataValue = (List<Entity>) newValue;
+            final SMultiRefBusinessDataInstance multiRef = (SMultiRefBusinessDataInstance) reference;
+            final List<Long> businessDataIds = new ArrayList<Long>();
+            final List<Entity> updated = new ArrayList<Entity>();
+            for (final Entity entity : newBusinessDataValue) {
+                final Entity businessData = businessDataRepository.merge(entity);
+                businessDataIds.add(businessData.getPersistenceId());
+                updated.add(businessData);
+            }
+            if (!multiRef.getDataIds().containsAll(businessDataIds) || multiRef.getDataIds().size() != businessDataIds.size()) {
+                refBusinessDataService.updateRefBusinessDataInstance(multiRef, businessDataIds);
+            }
+            return updated;
 
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
@@ -127,18 +113,15 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
                 final Long dataId = simpleRef.getDataId();
                 if (dataId != null) {
                     return businessDataRepository.findById(dataClass, dataId);
-                } else {
-                    return dataClass.newInstance();
                 }
-            } else {
-                final SMultiRefBusinessDataInstance multiRef = (SMultiRefBusinessDataInstance) reference;
-                final List<Long> dataIds = multiRef.getDataIds();
-                if (!dataIds.isEmpty()) {
-                    return businessDataRepository.findByIds(dataClass, dataIds);
-                } else {
-                    return Arrays.asList(dataClass.newInstance());
-                }
+                return dataClass.newInstance();
             }
+            final SMultiRefBusinessDataInstance multiRef = (SMultiRefBusinessDataInstance) reference;
+            final List<Long> dataIds = multiRef.getDataIds();
+            if (!dataIds.isEmpty()) {
+                return businessDataRepository.findByIds(dataClass, dataIds);
+            }
+            return Arrays.asList(dataClass.newInstance());
         } catch (final Exception e) {
             throw new SBonitaReadException(e);
         }

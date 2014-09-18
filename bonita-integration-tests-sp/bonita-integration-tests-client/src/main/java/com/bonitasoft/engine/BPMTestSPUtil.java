@@ -96,7 +96,7 @@ public class BPMTestSPUtil {
                     platformAPI.deactiveTenant(tenant.getId());
                 }
             } catch (final TenantDeactivationException tde) {
-
+                // Nothing to do
             }
             if (!tenant.isDefaultTenant()) {
                 platformAPI.deleteTenant(tenant.getId());
