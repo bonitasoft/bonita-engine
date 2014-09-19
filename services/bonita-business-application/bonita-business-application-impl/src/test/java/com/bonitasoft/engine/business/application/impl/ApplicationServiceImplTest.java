@@ -551,7 +551,7 @@ public class ApplicationServiceImplTest {
         assertThat(updatedApplication).isEqualTo(application);
     }
 
-    @Test(expected = SObjectModificationException.class)
+    @Test(expected = SObjectNotFoundException.class)
     public void updateApplicationPage_should_throw_SObjectModificationException_when_recorder_throws_SRecorderException() throws Exception {
         //given
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();

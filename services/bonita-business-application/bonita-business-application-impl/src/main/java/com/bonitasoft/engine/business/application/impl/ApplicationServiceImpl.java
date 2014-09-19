@@ -230,23 +230,23 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public SApplication updateApplication(final long applicationId, final EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException,
-    SInvalidNameException, SInvalidDisplayNameException, SBonitaReadException, SObjectAlreadyExistsException {
+            SInvalidNameException, SInvalidDisplayNameException, SBonitaReadException, SObjectAlreadyExistsException, SObjectNotFoundException {
         checkLicense();
         final String methodName = "updateApplication";
         final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.UPDATED, "Updating application with id " + applicationId);
 
+        final SApplication application = getApplication(applicationId);
+
+        if (updateDescriptor.getFields().containsKey(SApplicationFields.NAME)
+                && !application.getName().equals(updateDescriptor.getFields().get(SApplicationFields.NAME))) {
+            validateApplicationName((String) updateDescriptor.getFields().get(SApplicationFields.NAME));
+        }
+        if (updateDescriptor.getFields().containsKey(SApplicationFields.DISPLAY_NAME)
+                && !application.getDisplayName().equals(updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME))) {
+            validateApplicationDisplayName((String) updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME));
+        }
+
         try {
-            final SApplication application = getApplication(applicationId);
-
-            if (updateDescriptor.getFields().containsKey(SApplicationFields.NAME)
-                    && !application.getName().equals(updateDescriptor.getFields().get(SApplicationFields.NAME))) {
-                validateApplicationName((String) updateDescriptor.getFields().get(SApplicationFields.NAME));
-            }
-            if (updateDescriptor.getFields().containsKey(SApplicationFields.DISPLAY_NAME)
-                    && !application.getDisplayName().equals(updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME))) {
-                validateApplicationDisplayName((String) updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME));
-            }
-
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(application,
                     updateDescriptor);
             final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ApplicationService.APPLICATION)
@@ -254,6 +254,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             recorder.recordUpdate(updateRecord, updateEvent);
             log(applicationId, SQueriableLog.STATUS_OK, logBuilder, methodName);
             return application;
+
         } catch (final SBonitaException e) {
             log(applicationId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SObjectModificationException(e);
