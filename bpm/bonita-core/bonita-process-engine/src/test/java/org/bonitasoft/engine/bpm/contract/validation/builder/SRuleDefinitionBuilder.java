@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.bpm.contract.validation;
+package org.bonitasoft.engine.bpm.contract.validation.builder;
 
 import static java.util.Arrays.asList;
 

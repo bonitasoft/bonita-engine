@@ -38,10 +38,10 @@ public class ContractStructureValidator {
     }
 
     public void validate(SContractDefinition contract, Map<String, Object> inputs) throws ContractViolationException {
-        List<String> message = new ArrayList<String>();
-        message.addAll(recursive(contract.getSimpleInputs(), contract.getComplexInputs(), inputs));
-        if (!message.isEmpty()) {
-            throw new ContractViolationException("Error when validating inputs according to corresponding task contract", message);
+        List<String> messages = new ArrayList<String>();
+        messages.addAll(recursive(contract.getSimpleInputs(), contract.getComplexInputs(), inputs));
+        if (!messages.isEmpty()) {
+            throw new ContractViolationException("Error when validating inputs according to corresponding task contract", messages);
         }
     }
 

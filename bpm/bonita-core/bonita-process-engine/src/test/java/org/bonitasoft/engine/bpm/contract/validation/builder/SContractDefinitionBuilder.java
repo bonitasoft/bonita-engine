@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.bpm.contract.validation;
+package org.bonitasoft.engine.bpm.contract.validation.builder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +22,10 @@ public class SContractDefinitionBuilder {
     }
     
     public SContractDefinitionBuilder withInput(SSimpleInputDefinitionBuilder builder) {
+        return withInput(builder.build());
+    }
+    
+    public SContractDefinitionBuilder withInput(SComplexInputDefinitionBuilder builder) {
         return withInput(builder.build());
     }
     

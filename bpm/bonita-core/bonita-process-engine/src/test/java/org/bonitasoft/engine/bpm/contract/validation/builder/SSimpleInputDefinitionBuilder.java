@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.bpm.contract.validation;
+package org.bonitasoft.engine.bpm.contract.validation.builder;
 
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
