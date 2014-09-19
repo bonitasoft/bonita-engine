@@ -41,7 +41,7 @@ public class ContractStructureValidator {
         List<String> messages = new ArrayList<String>();
         messages.addAll(recursive(contract.getSimpleInputs(), contract.getComplexInputs(), inputs));
         if (!messages.isEmpty()) {
-            throw new ContractViolationException("Error when validating inputs according to corresponding task contract", messages);
+            throw new ContractViolationException("Error while validating expected inputs", messages);
         }
     }
 
@@ -75,7 +75,7 @@ public class ContractStructureValidator {
     private void validateInput(SInputDefinition definition, Map<String, Object> inputs) throws InputValidationException {
         String inputName = definition.getName();
         if (!inputs.containsKey(inputName)) {
-            throw new InputValidationException("Contract need field [" + inputName + "] but it has not been provided");
+            throw new InputValidationException("Expected input [" + inputName + "] is missing");
         } else {
             typeValidator.validate(definition, inputs.get(inputName));
         }
@@ -84,7 +84,7 @@ public class ContractStructureValidator {
     private void logInputsWhichAreNotInContract(TechnicalLogSeverity severity, List<SSimpleInputDefinition> simpleInputs, Map<String, Object> inputs) {
         if (logger.isLoggable(ContractStructureValidator.class, severity)) {
             for (String input : getInputsWhichAreNotInContract(simpleInputs, inputs)) {
-                logger.log(ContractStructureValidator.class, severity, "Field [" + input + "] has been provided but is not expected in task contract");
+                logger.log(ContractStructureValidator.class, severity, "Unexpected input [" + input + "] provided");
             }
         }
     }

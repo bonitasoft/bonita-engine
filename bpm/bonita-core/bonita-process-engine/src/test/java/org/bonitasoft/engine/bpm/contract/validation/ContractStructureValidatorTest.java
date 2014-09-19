@@ -71,9 +71,9 @@ public class ContractStructureValidatorTest {
         validator.validate(contract, taskInputs);
 
         verify(logger).log(ContractStructureValidator.class, DEBUG,
-                "Field [someFieldNotDefinedInContract] has been provided but is not expected in task contract");
+                "Unexpected input [someFieldNotDefinedInContract] provided");
         verify(logger).log(ContractStructureValidator.class, DEBUG,
-                "Field [someOtherFieldNotDefinedInContract] has been provided but is not expected in task contract");
+                "Unexpected input [someOtherFieldNotDefinedInContract] provided");
     }
 
     @Test
@@ -116,7 +116,7 @@ public class ContractStructureValidatorTest {
             fail("Expected ContractViolationException");
         } catch (ContractViolationException e) {
             assertThat(e.getExplanations())
-                    .containsOnly("Contract need field [aText] but it has not been provided", "Contract need field [anotherText] but it has not been provided");
+                    .containsOnly("Expected input [aText] is missing", "Expected input [anotherText] is missing");
         }
     }
 
@@ -130,7 +130,7 @@ public class ContractStructureValidatorTest {
             fail("Expected ContractViolationException");
         } catch (ContractViolationException e) {
             assertThat(e.getExplanations())
-                    .containsOnly("Contract need field [complex] but it has not been provided");
+                    .containsOnly("Expected input [complex] is missing");
         }
     }
 
@@ -145,7 +145,7 @@ public class ContractStructureValidatorTest {
             fail("expected exception has not been thrown");
         } catch (ContractViolationException e) {
             assertThat(e.getExplanations())
-                    .containsOnly("Contract need field [embedded] but it has not been provided");
+                    .containsOnly("Expected input [embedded] is missing");
         }
     }
 
