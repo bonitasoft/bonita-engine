@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,14 +15,12 @@ package org.bonitasoft.engine.bpm.process;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.api.ProcessManagementAPI;
 import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.DescriptionElement;
-import org.bonitasoft.engine.identity.User;
 
 /**
  * Gives access to the {@link ProcessDefinition} deployment information.<br/>
- * A <code>ProcessDeploymentInfo</code> has a {@link ConfigurationState}, which says if the process is <code>resolved</code> (all his basic configuration has a
+ * A <code>ProcessDeploymentInfo</code> has a {@link ConfigurationState}, which says if the process is <code>resolved</code> (all its basic configuration has a
  * proper value), or <code>unresolved</code> (some configuration has to be done before the process can be activated).
  * <p>
  * A <code>ProcessDeploymentInfo</code> has an {@link ActivationState}, which says if the process was set to <code>enabled</code> (logged users can start
@@ -57,13 +55,13 @@ public interface ProcessDeploymentInfo extends DescriptionElement, BaseElement {
 
     /**
      * Retrieves the {@link ProcessDefinition} display description. Unlike <code>description</code> that is static, the <code>display description</code> can be
-     * updated via {@link ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)}.
+     * updated via {@link org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)}.
      * <p>
      * When set, this field is used by the Bonita BPM Portal in the place of <code>description</code>.
      *
-     * @return a String representing the <code>ProcessDefinition</code> display description.
+     * @return a String representing the {@link ProcessDefinition} display description.
      * @see ProcessDefinition
-     * @see ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)
+     * @see org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)
      */
     String getDisplayDescription();
 
@@ -76,23 +74,23 @@ public interface ProcessDeploymentInfo extends DescriptionElement, BaseElement {
     Date getDeploymentDate();
 
     /**
-     * Retrieves the identifier of the Bonita BPM {@link User} who deployed the {@link ProcessDefinition}
+     * Retrieves the identifier of the Bonita BPM {@link org.bonitasoft.engine.identity.User} which deployed the {@link ProcessDefinition}
      *
-     * @return a long representing the identifier of the <code>Bonita BPM user</code> who deployed the process.
-     * @see User
+     * @return a long representing the identifier of the <code>Bonita BPM user</code> which deployed the process.
+     * @see org.bonitasoft.engine.identity.User
      * @see ProcessDefinition
      */
     long getDeployedBy();
 
     /**
      * Retrieves the {@link ProcessDefinition} display name. Unlike <code>name</code> that is static, the <code>display name</code> can be
-     * updated via {@link ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)}.
+     * updated via {@link org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)}.
      * <p>
      * When set this field is used by the Bonita BPM Portal in the place of <code>name</code>.
      *
      * @return a String representing the <code>ProcessDefinition</code> display name.
      * @see ProcessDefinition
-     * @see ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)
+     * @see org.bonitasoft.engine.api.ProcessManagementAPI#updateProcessDeploymentInfo(long, ProcessDeploymentInfoUpdater)
      */
     String getDisplayName();
 

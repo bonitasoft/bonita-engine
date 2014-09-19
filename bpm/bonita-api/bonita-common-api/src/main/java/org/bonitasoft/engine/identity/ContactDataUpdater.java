@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -22,6 +22,7 @@ import java.util.Map;
  *
  * @author Emmanuel Duchastenier
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  * @see ContactData
  * @since 6.0.0
  */
@@ -30,7 +31,7 @@ public class ContactDataUpdater implements Serializable {
     private static final long serialVersionUID = 7871478791386229141L;
 
     /**
-     * the available contact fields
+     * The available contact fields
      */
     public enum ContactDataField {
         EMAIL, PHONE, MOBILE, FAX, BUILDING, ROOM, ADDRESS, ZIP_CODE, CITY, STATE, COUNTRY, WEBSITE
@@ -46,98 +47,110 @@ public class ContactDataUpdater implements Serializable {
     }
 
     /**
-     * @param email the contact email to create
+     * @param email
+     *        The contact email to create
      */
     public void setEmail(final String email) {
         fields.put(ContactDataField.EMAIL, email);
     }
 
     /**
-     * @param email the contact phone number to create
+     * @param phoneNumber
+     *        The contact phone number to create
      */
     public void setPhoneNumber(final String phoneNumber) {
         fields.put(ContactDataField.PHONE, phoneNumber);
     }
 
     /**
-     * @param email the contact mobile number to create
+     * @param mobileNumber
+     *        The contact mobile number to create
      */
     public void setMobileNumber(final String mobileNumber) {
         fields.put(ContactDataField.MOBILE, mobileNumber);
     }
 
     /**
-     * @param email the contact fax number to create
+     * @param faxNumber
+     *        The contact fax number to create
      */
     public void setFaxNumber(final String faxNumber) {
         fields.put(ContactDataField.FAX, faxNumber);
     }
 
     /**
-     * @param email the contact building to create
+     * @param building
+     *        The contact building to create
      */
     public void setBuilding(final String building) {
         fields.put(ContactDataField.BUILDING, building);
     }
 
     /**
-     * @param email the contact room to create
+     * @param room
+     *        The contact room to create
      */
     public void setRoom(final String room) {
         fields.put(ContactDataField.ROOM, room);
     }
 
     /**
-     * @param email the contact address to create
+     * @param address
+     *        The contact address to create
      */
     public void setAddress(final String address) {
         fields.put(ContactDataField.ADDRESS, address);
     }
 
     /**
-     * @param email the contact ZIP code to create
+     * @param zipCode
+     *        The contact ZIP code to create
      */
     public void setZipCode(final String zipCode) {
         fields.put(ContactDataField.ZIP_CODE, zipCode);
     }
 
     /**
-     * @param email the contact city to create
+     * @param city
+     *        The contact city to create
      */
     public void setCity(final String city) {
         fields.put(ContactDataField.CITY, city);
     }
 
     /**
-     * @param email the contact state to create
+     * @param state
+     *        The contact state to create
      */
     public void setState(final String state) {
         fields.put(ContactDataField.STATE, state);
     }
 
     /**
-     * @param email the contact country to create
+     * @param country
+     *        The contact country to create
      */
     public void setCountry(final String country) {
         fields.put(ContactDataField.COUNTRY, country);
     }
 
     /**
-     * @param email the contact web site address to create
+     * @param website
+     *        The contact web site address to create
      */
     public void setWebsite(final String website) {
         fields.put(ContactDataField.WEBSITE, website);
     }
 
     /**
-     * @return the current contact data information to update
+     * @return The current contact data information to update
      */
     public Map<ContactDataField, Serializable> getFields() {
         return fields;
     }
 
     /**
-     * @return true if there are some contact data to update
+     * @return True if there are some contact data to update
      */
     public boolean hasFields() {
         return !fields.isEmpty();

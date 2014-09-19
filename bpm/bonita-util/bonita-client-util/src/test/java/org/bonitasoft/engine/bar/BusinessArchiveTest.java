@@ -26,6 +26,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -92,7 +93,8 @@ public class BusinessArchiveTest {
 
     @Before
     public void before() throws IOException {
-        tempFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("businessArchiveFolder");
+        final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+        tempFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("barFolder_" + jvmName);
         IOUtil.deleteDir(tempFolder);
         barFile = IOUtil.createTempFileInDefaultTempDirectory("businessArchive", ".bar");
         IOUtil.deleteFile(barFile, 2, 3);

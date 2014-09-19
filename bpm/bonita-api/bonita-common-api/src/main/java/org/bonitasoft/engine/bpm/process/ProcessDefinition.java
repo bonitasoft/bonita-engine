@@ -32,7 +32,7 @@ public interface ProcessDefinition extends NamedElement, BaseElement {
     String getVersion();
 
     /**
-     * @return the desciption of the process definition, as set at design-time.
+     * @return The description of the process definition, as set at design-time.
      */
     String getDescription();
 

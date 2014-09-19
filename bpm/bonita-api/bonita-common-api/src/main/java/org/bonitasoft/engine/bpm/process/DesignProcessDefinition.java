@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -34,28 +34,29 @@ import org.bonitasoft.engine.expression.Expression;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  * @author Laurent Leseigneur
+ * @version 6.3.5
+ * @since 6.0.0
  */
-@SuppressWarnings("deprecation")
 public interface DesignProcessDefinition extends ProcessDefinition {
 
     /**
-     * Retrieve the displayed name of the process definition, as set at design-time.
+     * Retrieves the displayed name of the process definition, as set at design-time.
      *
-     * @return the displayed name of the process definition, as set at design-time.
+     * @return The displayed name of the process definition, as set at design-time.
      */
     String getDisplayName();
 
     /**
-     * Retrieve the displayed description of the process definition, as set at design-time.
+     * Retrieves the displayed description of the process definition, as set at design-time.
      *
-     * @return the displayed description of the process definition, as set at design-time.
+     * @return The displayed description of the process definition, as set at design-time.
      */
     String getDisplayDescription();
 
     /**
-     * Retrieve the definition of the FlowElementContainerDefinition of the process container
+     * Retrieves the definition of the FlowElementContainerDefinition of the process container
      *
-     * @return the {@link FlowElementContainerDefinition} of the process container.<br/>
+     * @return The {@link FlowElementContainerDefinition} of the process container.<br/>
      *         return type FlowElementContainerDefinition in this package is deprecated. Instead use
      *         {@link org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition}
      */
@@ -63,14 +64,14 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     FlowElementContainerDefinition getProcessContainer();
 
     /**
-     * Retrieve a Set of ParameterDefinition objects from a ProcessDefinition
+     * Retrieves a Set of ParameterDefinition objects from a ProcessDefinition
      *
-     * @return as set of {@link ParameterDefinition} objects
+     * @return A set of {@link ParameterDefinition} objects
      */
     Set<ParameterDefinition> getParameters();
 
     /**
-     * Retrieve a Set of ActorDefinition objects from a ProcessDefinition
+     * Retrieves a Set of ActorDefinition objects from a ProcessDefinition
      *
      * @return A set of {@link ActorDefinition} objects.
      *         <br/>If no actors have been defined, return an empty Set.
@@ -91,40 +92,40 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     List<ActorDefinition> getActorsList();
 
     /**
-     * Retrieve the ActorDefinition of process's actor defined as initiator.
+     * Retrieves the ActorDefinition of process's actor defined as initiator.
      *
-     * @return the {@link ActorDefinition} of process's actor defined as initiator.
+     * @return The {@link ActorDefinition} of process's actor defined as initiator.
      * @since 6.1
      */
     ActorDefinition getActorInitiator();
-   
+
 
     /**
-     * Retrieve the label for the ProcessDefinition given search index.
+     * Retrieves the label for the ProcessDefinition given search index.
      * <p>
      * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
      * index</a> Bonitasoft documentation page
      * </p>
      *
      * @param index
-     *        the position of search index to retrieve. Valid values are between 1 and 5 (inclusive)
+     *        The position of search index to retrieve. Valid values are between 1 and 5 (inclusive)
      * @throws IndexOutOfBoundsException if index is invalid
-     * @return the label the Expression of the search index
+     * @return The label the Expression of the search index
      */
 
     String getStringIndexLabel(int index);
 
     /**
-     * Retrieve the Expression for the ProcessDefinition given search index.
+     * Retrieves the Expression for the ProcessDefinition given search index.
      * <p>
      * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
      * index</a> Bonitasoft documentation page
      * </p>
      *
      * @param index
-     *        the position of search index to retrieve. Valid values are between 1 and 5 (inclusive)
+     *        The position of search index to retrieve. Valid values are between 1 and 5 (inclusive)
      * @throws IndexOutOfBoundsException if index is invalid
-     * @return the {@link Expression} the Expression of the search index
+     * @return The {@link Expression} of the search index
      */
     Expression getStringIndexValue(int index);
 

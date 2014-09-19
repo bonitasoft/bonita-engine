@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -21,6 +21,7 @@ import java.util.Map;
  * represent a helper to update a {@link Group}
  *
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  * @see Group
  * @since 6.0.0
  */
@@ -45,49 +46,55 @@ public class GroupUpdater implements Serializable {
     }
 
     /**
-     * @param name the group's name to update
+     * @param name
+     *        The group's name to update
      */
     public void updateName(final String name) {
         fields.put(GroupField.NAME, name);
     }
 
     /**
-     * @param name the group's display name to update
+     * @param displayName
+     *        The group's display name to update
      */
     public void updateDisplayName(final String displayName) {
         fields.put(GroupField.DISPLAY_NAME, displayName);
     }
 
     /**
-     * @param name the group's description to update
+     * @param description
+     *        The group's description to update
      */
     public void updateDescription(final String description) {
         fields.put(GroupField.DESCRIPTION, description);
     }
 
     /**
-     * @param name the group's icon name to update
+     * @param iconName
+     *        The group's icon name to update
      */
     public void updateIconName(final String iconName) {
         fields.put(GroupField.ICON_NAME, iconName);
     }
 
     /**
-     * @param name the group's icon path to update
+     * @param iconPath
+     *        The group's icon path to update
      */
     public void updateIconPath(final String iconPath) {
         fields.put(GroupField.ICON_PATH, iconPath);
     }
 
     /**
-     * @param name the group's parent path to update
+     * @param parentPath
+     *        The group's parent path to update
      */
     public void updateParentPath(final String parentPath) {
         fields.put(GroupField.PARENT_PATH, parentPath);
     }
 
     /**
-     * @return the group's fields to update
+     * @return The group's fields to update
      */
     public Map<GroupField, Serializable> getFields() {
         return fields;

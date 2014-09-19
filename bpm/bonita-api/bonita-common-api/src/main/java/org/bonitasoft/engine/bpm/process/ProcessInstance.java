@@ -40,9 +40,9 @@ public interface ProcessInstance extends NamedElement, BaseElement {
     String getState();
 
     /**
-     * Get the date when this process instance is started.
+     * Get the date when this process instance was started.
      * 
-     * @return The date when this process instance is started.
+     * @return The date when this process instance was started.
      * @since 6.0.0
      */
     Date getStartDate();
@@ -74,10 +74,10 @@ public interface ProcessInstance extends NamedElement, BaseElement {
     long getStartedByDelegate();
 
     /**
-     * Get the date when this process instance is finished.
+     * Get the date when this process instance was finished.
      * It equals to null, if this process instance is not finished.
      * 
-     * @return The date when this process instance is finished.
+     * @return The date when this process instance was finished.
      * @since 6.0.0
      */
     Date getEndDate();
@@ -108,8 +108,8 @@ public interface ProcessInstance extends NamedElement, BaseElement {
     String getDescription();
 
     /**
-     * Get the identifier of the root process instance of this process instance.
-     * It equals to -1, if this process instance doesn't have a root process instance.
+     * Get the identifier of the root {@link ProcessInstance} of this process instance.
+     * Is -1 if this process instance is not a child of another process instance.
      * 
      * @return The identifier of the root process instance of this process instance.
      * @see ProcessInstance#getId()
@@ -120,7 +120,7 @@ public interface ProcessInstance extends NamedElement, BaseElement {
 
     /**
      * Get the identifier of the flow node instance who starts this process instance.
-     * It equals to -1, if this process instance is not a child of an other process instance.
+     * Is -1 if this process instance is not a child of another process instance.
      * 
      * @return The identifier of the flow node instance who starts this process instance.
      * @see org.bonitasoft.engine.bpm.flownode.CallActivityInstance#getId()
@@ -154,9 +154,9 @@ public interface ProcessInstance extends NamedElement, BaseElement {
     /**
      * This field is used to extend the meta data of the process instance.
      * It's the value corresponding to the string index label.
-     * Return an empty string, if there is no thirst string index.
+     * Return an empty string, if there is no third string index.
      * 
-     * @return The thirst string index of this process instance.
+     * @return The third string index of this process instance.
      * @see ProcessInstance#getStringIndexLabel(int)
      * @since 6.0.0
      */

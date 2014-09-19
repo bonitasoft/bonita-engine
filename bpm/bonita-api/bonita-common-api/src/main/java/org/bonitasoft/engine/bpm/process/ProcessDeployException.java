@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,13 +16,16 @@ package org.bonitasoft.engine.bpm.process;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
- * Thrown when a process fails to deploy.
+ * Thrown when a process fails to deploy. <br>
  * It also gives access to the ID of the process Definition that tried to be deployed, through method {@link #getProcessDefinitionId()}.
  * 
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  * @see #getProcessDefinitionId()
+ * @version 6.3.5
+ * @since 6.0.0
  */
 public class ProcessDeployException extends ExecutionException {
 
@@ -30,16 +33,31 @@ public class ProcessDeployException extends ExecutionException {
 
     private Long processDefinitionId;
 
+    /**
+     * Constructs a new exception with the specified detail message.
+     *
+     * @param message
+     *        The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
+     */
     public ProcessDeployException(final String message) {
         super(message);
     }
 
+    /**
+     * Constructs a new exception with the specified detail cause.
+     * 
+     * @param cause
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        cause is nonexistent or unknown.)
+     */
     public ProcessDeployException(final Throwable cause) {
         super(cause);
     }
 
     /**
-     * @return the processDefinitionId
+     * Get the identifier of the process definition who failed.
+     * 
+     * @return The identifier of the process definition who failed.
      */
     public Long getProcessDefinitionId() {
         return processDefinitionId;
