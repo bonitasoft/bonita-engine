@@ -150,23 +150,23 @@ public class ApplicationServiceImplTest {
     }
 
     @Test(expected = SInvalidDisplayNameException.class)
-    public void createApplication_should_throw_SInvalidApplicationDisplayName_when_display_name_is_empty() throws Exception {
+    public void createApplication_should_throw_SInvalidDisplayNameException_when_display_name_is_empty() throws Exception {
         //when
         applicationServiceActive.createApplication(buildApplication(APPLICATION_NAME, ""));
 
         //then exception
     }
 
-    @Test(expected = SInvalidNameException.class)
-    public void createApplication_should_throw_SObjectCreationException_when_displayname_is_null() throws Exception {
+    @Test(expected = SInvalidDisplayNameException.class)
+    public void createApplication_should_throw_SInvalidDisplayNameException_when_displayname_is_null() throws Exception {
         //when
         applicationServiceActive.createApplication(buildApplication(APPLICATION_NAME, null));
 
         //then exception
     }
 
-    @Test(expected = SInvalidNameException.class)
-    public void createApplication_should_throw_SObjectCreationException_when_displayname_is_empty_after_trim() throws Exception {
+    @Test(expected = SInvalidDisplayNameException.class)
+    public void createApplication_should_throw_SInvalidDisplayNameException_when_displayname_is_empty_after_trim() throws Exception {
         //when
         applicationServiceActive.createApplication(buildApplication(APPLICATION_NAME, " "));
 
