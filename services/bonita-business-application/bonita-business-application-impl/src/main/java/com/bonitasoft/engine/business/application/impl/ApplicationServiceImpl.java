@@ -45,6 +45,7 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.SInvalidDisplayNameException;
 import com.bonitasoft.engine.business.application.SInvalidNameException;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
@@ -87,7 +88,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public SApplication createApplication(final SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException,
-    SInvalidNameException {
+    SInvalidNameException, SInvalidDisplayNameException {
         checkLicense();
         final String methodName = "createApplication";
         final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.CREATED, "Creating application named " + application.getName());
@@ -116,19 +117,28 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     private void validateApplication(final SApplication application) throws SInvalidNameException, SBonitaReadException, SObjectAlreadyExistsException,
-    SObjectCreationException {
+    SObjectCreationException, SInvalidDisplayNameException {
         final String applicationName = application.getName();
+        validateApplicationName(applicationName);
+        validateApplicationDisplayName(application.getDisplayName());
+
+    }
+
+    private void validateApplicationName(final String applicationName) throws SInvalidNameException, SBonitaReadException, SObjectAlreadyExistsException {
         if (!URLValidator.isValid(applicationName)) {
             throw new SInvalidNameException(
                     "Invalid application name '"
                             + applicationName
                             + "': the name can not be null or empty and should contains only alpha numeric characters and the following special characters '-', '.', '_' or '~'");
         }
-        if (application.getDisplayName() == null || application.getDisplayName().trim().isEmpty()) {
-            throw new SObjectCreationException("The application display name can not be null or empty");
-        }
         if (hasApplicationWithName(applicationName)) {
             throw new SObjectAlreadyExistsException("An application already exists with name '" + applicationName + "'.");
+        }
+    }
+
+    private void validateApplicationDisplayName(final String applicationDisplayName) throws SInvalidDisplayNameException {
+        if (applicationDisplayName == null || applicationDisplayName.trim().isEmpty()) {
+            throw new SInvalidDisplayNameException("The application display name can not be null or empty");
         }
     }
 
@@ -216,12 +226,24 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public SApplication updateApplication(final long applicationId, final EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException {
+    public SApplication updateApplication(final long applicationId, final EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException,
+    SInvalidNameException, SInvalidDisplayNameException, SBonitaReadException, SObjectAlreadyExistsException {
         checkLicense();
         final String methodName = "updateApplication";
         final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.UPDATED, "Updating application with id " + applicationId);
+
         try {
             final SApplication application = getApplication(applicationId);
+
+            if (updateDescriptor.getFields().containsKey(SApplicationFields.NAME)
+                    && !application.getName().equals(updateDescriptor.getFields().get(SApplicationFields.NAME))) {
+                validateApplicationName((String) updateDescriptor.getFields().get(SApplicationFields.NAME));
+            }
+            if (updateDescriptor.getFields().containsKey(SApplicationFields.DISPLAY_NAME)
+                    && !application.getDisplayName().equals(updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME))) {
+                validateApplicationDisplayName((String) updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME));
+            }
+
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(application,
                     updateDescriptor);
             final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ApplicationService.APPLICATION)

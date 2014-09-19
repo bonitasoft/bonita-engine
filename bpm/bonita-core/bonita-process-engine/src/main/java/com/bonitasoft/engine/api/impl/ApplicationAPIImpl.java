@@ -37,6 +37,7 @@ import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
+import com.bonitasoft.engine.exception.InvalidDisplayNameException;
 import com.bonitasoft.engine.exception.InvalidNameException;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationMenuDescriptor;
@@ -53,7 +54,7 @@ import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
-    public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException, InvalidNameException {
+    public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException {
         return getApplicationAPIDelegate().createApplication(applicationCreator);
     }
 
@@ -112,7 +113,8 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException {
+    public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws AlreadyExistsException, UpdateException,
+    ApplicationNotFoundException, InvalidNameException, InvalidDisplayNameException {
         return getApplicationAPIDelegate().updateApplication(applicationId, updater);
     }
 
@@ -133,7 +135,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String name) throws AlreadyExistsException,
-    CreationException, InvalidNameException {
+    CreationException, InvalidNameException, InvalidDisplayNameException {
         return getApplicationPageAPIDelegate().createApplicationPage(applicationId, pagedId, name);
     }
 
@@ -158,7 +160,8 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException {
+    public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException, InvalidNameException,
+            InvalidDisplayNameException, AlreadyExistsException {
         getApplicationPageAPIDelegate().setApplicationHomePage(applicationId, applicationPageId);
     }
 

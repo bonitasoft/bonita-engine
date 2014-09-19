@@ -29,8 +29,10 @@ import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
+import com.bonitasoft.engine.business.application.SInvalidDisplayNameException;
 import com.bonitasoft.engine.business.application.SInvalidNameException;
 import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.exception.InvalidDisplayNameException;
 import com.bonitasoft.engine.exception.InvalidNameException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -63,6 +65,8 @@ public class ApplicationAPIDelegate {
             throw new AlreadyExistsException(e.getMessage());
         } catch (final SInvalidNameException e) {
             throw new InvalidNameException(e.getMessage());
+        } catch (final SInvalidDisplayNameException e) {
+            throw new InvalidDisplayNameException(e.getMessage());
         }
     }
 
@@ -94,12 +98,24 @@ public class ApplicationAPIDelegate {
         }
     }
 
-    public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException {
+    public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException,
+            AlreadyExistsException, InvalidNameException, InvalidDisplayNameException {
         try {
-            final SApplication sApplication = applicationService.updateApplication(applicationId, convertor.toApplicationUpdateDescriptor(updater));
+            SApplication sApplication;
+
+            sApplication = applicationService.updateApplication(applicationId, convertor.toApplicationUpdateDescriptor(updater));
+
             return convertor.toApplication(sApplication);
         } catch (final SObjectModificationException e) {
             throw new UpdateException(e);
+        } catch (final SInvalidNameException e) {
+            throw new InvalidNameException(e.getMessage());
+        } catch (final SInvalidDisplayNameException e) {
+            throw new InvalidDisplayNameException(e.getMessage());
+        } catch (final SBonitaReadException e) {
+            throw new UpdateException(e);
+        } catch (final SObjectAlreadyExistsException e) {
+            throw new AlreadyExistsException(e.getMessage());
         }
     }
 

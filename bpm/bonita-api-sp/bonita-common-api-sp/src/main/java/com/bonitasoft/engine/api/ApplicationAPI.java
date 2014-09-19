@@ -25,6 +25,7 @@ import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
+import com.bonitasoft.engine.exception.InvalidDisplayNameException;
 import com.bonitasoft.engine.exception.InvalidNameException;
 import com.bonitasoft.engine.page.Page;
 
@@ -44,8 +45,11 @@ public interface ApplicationAPI {
      * @return the created {@link Application}
      * @throws AlreadyExistsException if an application already exists with the same name
      * @throws CreationException if an error occurs during the creation
+     * @throws InvalidNameException if the name is empty
+     * @throws InvalidDisplayNameException if the display name is empty
      */
-    Application createApplication(ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException, InvalidNameException;
+    Application createApplication(ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException, InvalidNameException,
+    InvalidDisplayNameException;
 
     /**
      * Retrieves an {@link Application} from its identifier.
@@ -72,10 +76,15 @@ public interface ApplicationAPI {
      * @return the <code>Application</code> as it is after the update.
      * @throws ApplicationNotFoundException if no <code>Applicaton</code> is found with the given id
      * @throws UpdateException if an error occurs during the update
+     * @throws AlreadyExistsException if update with an already existing Name
+     * @throws InvalidNameException if the name is empty
+     * @throws InvalidDisplayNameException if the display name is empty
      * @see Application
      * @see ApplicationUpdater
      */
-    Application updateApplication(long applicationId, ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException;
+    Application updateApplication(long applicationId, ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException, AlreadyExistsException,
+    InvalidNameException,
+    InvalidDisplayNameException;
 
     /**
      * Searches for applications with specific search criteria.
@@ -139,9 +148,14 @@ public interface ApplicationAPI {
      *
      * @param applicationId the {@link Application} identifier
      * @param applicationPageId the identifier of the {@link ApplicationPage} to be used as home page
-     * @throws UpdateException if an error occurs during the home page definition
+     * @throws ApplicationNotFoundException if no <code>Applicaton</code> is found with the given id
+     * @throws UpdateException if an error occurs during the update
+     * @throws AlreadyExistsException if update with an already existing Name
+     * @throws InvalidNameException if the name is empty
+     * @throws InvalidDisplayNameException if the display name is empty
      */
-    void setApplicationHomePage(long applicationId, long applicationPageId) throws UpdateException;
+    void setApplicationHomePage(long applicationId, long applicationPageId) throws UpdateException, InvalidNameException,
+    InvalidDisplayNameException, AlreadyExistsException;
 
     /**
      * Retrieves the application home page

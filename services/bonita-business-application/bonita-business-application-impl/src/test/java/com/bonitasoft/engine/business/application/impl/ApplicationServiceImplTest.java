@@ -50,6 +50,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.SInvalidDisplayNameException;
 import com.bonitasoft.engine.business.application.SInvalidNameException;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
@@ -144,6 +145,14 @@ public class ApplicationServiceImplTest {
     public void createApplication_should_throw_SInvalidApplicationName_when_name_is_invalid() throws Exception {
         //when
         applicationServiceActive.createApplication(buildApplication("name with spaces", APPLICATION_DISP_NAME));
+
+        //then exception
+    }
+
+    @Test(expected = SInvalidDisplayNameException.class)
+    public void createApplication_should_throw_SInvalidApplicationDisplayName_when_display_name_is_empty() throws Exception {
+        //when
+        applicationServiceActive.createApplication(buildApplication(APPLICATION_NAME, ""));
 
         //then exception
     }
