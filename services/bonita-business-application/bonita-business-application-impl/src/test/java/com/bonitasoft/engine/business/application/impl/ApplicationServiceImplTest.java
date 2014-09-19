@@ -157,7 +157,7 @@ public class ApplicationServiceImplTest {
         //then exception
     }
 
-    @Test(expected = SObjectCreationException.class)
+    @Test(expected = SInvalidNameException.class)
     public void createApplication_should_throw_SObjectCreationException_when_displayname_is_null() throws Exception {
         //when
         applicationServiceActive.createApplication(buildApplication(APPLICATION_NAME, null));
@@ -165,7 +165,7 @@ public class ApplicationServiceImplTest {
         //then exception
     }
 
-    @Test(expected = SObjectCreationException.class)
+    @Test(expected = SInvalidNameException.class)
     public void createApplication_should_throw_SObjectCreationException_when_displayname_is_empty_after_trim() throws Exception {
         //when
         applicationServiceActive.createApplication(buildApplication(APPLICATION_NAME, " "));
