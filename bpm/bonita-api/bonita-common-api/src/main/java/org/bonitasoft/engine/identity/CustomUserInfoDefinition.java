@@ -16,7 +16,7 @@ package org.bonitasoft.engine.identity;
 import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
- * Describes a custom user info definition that will be available for all {@link User}s in the organization.
+ * Describes a custom user information definition that will be available for all {@link User}s in the organization.
  *
  * @author Vincent Elcrin
  * @see User

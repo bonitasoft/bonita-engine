@@ -18,7 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Represents a helper to create {@link ContactData}
+ * Represents a helper for creating {@link ContactData}. Chaining is possible with this creator to ease the ContactData creation.
+ * <br/>
+ * For instance, new ContactDataCreator().setEmail("john.doe@bonitasoft.com").setPhoneNumber("012456789");
  *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -46,8 +48,8 @@ public class ContactDataCreator implements Serializable {
 
     /**
      * @param email
-     *        The contact email to create
-     * @return The current {@link ContactDataCreator} for chaining purpose
+     *        The contact email address to create
+     * @return The current {@link ContactDataCreator} 
      */
     public ContactDataCreator setEmail(final String email) {
         fields.put(ContactDataField.EMAIL, email);
@@ -57,7 +59,7 @@ public class ContactDataCreator implements Serializable {
     /**
      * @param phoneNumber
      *        The contact phone number to create
-     * @return The current {@link ContactDataCreator} for chaining purpose
+     * @return The current {@link ContactDataCreator} 
      */
     public ContactDataCreator setPhoneNumber(final String phoneNumber) {
         fields.put(ContactDataField.PHONE, phoneNumber);
@@ -67,7 +69,7 @@ public class ContactDataCreator implements Serializable {
     /**
      * @param mobileNumber
      *        The contact mobile number to create
-     * @return The current {@link ContactDataCreator} for chaining purpose
+     * @return The current {@link ContactDataCreator} 
      */
     public ContactDataCreator setMobileNumber(final String mobileNumber) {
         fields.put(ContactDataField.MOBILE, mobileNumber);
@@ -77,7 +79,7 @@ public class ContactDataCreator implements Serializable {
     /**
      * @param faxNumber
      *        The contact fax number to create
-     * @return The current {@link ContactDataCreator} for chaining purpose
+     * @return The current {@link ContactDataCreator} 
      */
     public ContactDataCreator setFaxNumber(final String faxNumber) {
         fields.put(ContactDataField.FAX, faxNumber);
@@ -87,7 +89,7 @@ public class ContactDataCreator implements Serializable {
     /**
      * @param building
      *        The contact building to create
-     * @return The current {@link ContactDataCreator} for chaining purpose
+     * @return The current {@link ContactDataCreator} 
      */
     public ContactDataCreator setBuilding(final String building) {
         fields.put(ContactDataField.BUILDING, building);
@@ -97,7 +99,7 @@ public class ContactDataCreator implements Serializable {
     /**
      * @param room
      *        The contact room to create
-     * @return The current {@link ContactDataCreator} for chaining purpose
+     * @return The current {@link ContactDataCreator} 
      */
     public ContactDataCreator setRoom(final String room) {
         fields.put(ContactDataField.ROOM, room);
@@ -107,7 +109,7 @@ public class ContactDataCreator implements Serializable {
     /**
      * @param address
      *        The contact address to create
-     * @return The current {@link ContactDataCreator} for chaining purpose
+     * @return The current {@link ContactDataCreator} 
      */
     public ContactDataCreator setAddress(final String address) {
         fields.put(ContactDataField.ADDRESS, address);
@@ -117,7 +119,7 @@ public class ContactDataCreator implements Serializable {
     /**
      * @param zipCode
      *        The contact ZIP code to create
-     * @return The current {@link ContactDataCreator} for chaining purpose
+     * @return The current {@link ContactDataCreator} 
      */
     public ContactDataCreator setZipCode(final String zipCode) {
         fields.put(ContactDataField.ZIP_CODE, zipCode);
@@ -127,7 +129,7 @@ public class ContactDataCreator implements Serializable {
     /**
      * @param city
      *        The contact city to create
-     * @return The current {@link ContactDataCreator} for chaining purpose
+     * @return The current {@link ContactDataCreator} 
      */
     public ContactDataCreator setCity(final String city) {
         fields.put(ContactDataField.CITY, city);
@@ -137,7 +139,7 @@ public class ContactDataCreator implements Serializable {
     /**
      * @param state
      *        The contact state to create
-     * @return The current {@link ContactDataCreator} for chaining purpose
+     * @return The current {@link ContactDataCreator} 
      */
     public ContactDataCreator setState(final String state) {
         fields.put(ContactDataField.STATE, state);
@@ -147,7 +149,7 @@ public class ContactDataCreator implements Serializable {
     /**
      * @param country
      *        The contact country to create
-     * @return The current {@link ContactDataCreator} for chaining purpose
+     * @return The current {@link ContactDataCreator} 
      */
     public ContactDataCreator setCountry(final String country) {
         fields.put(ContactDataField.COUNTRY, country);
@@ -157,7 +159,7 @@ public class ContactDataCreator implements Serializable {
     /**
      * @param website
      *        The contact web site address to create
-     * @return The current {@link ContactDataCreator} for chaining purpose
+     * @return The current {@link ContactDataCreator} 
      */
     public ContactDataCreator setWebsite(final String website) {
         fields.put(ContactDataField.WEBSITE, website);

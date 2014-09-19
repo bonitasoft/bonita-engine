@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * represent a helper in creating a {@link Group}
+ * represent a helper for creating a {@link Group}
  *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -94,7 +94,7 @@ public class GroupCreator implements Serializable {
     }
 
     /**
-     * @return The information associated to the group to create
+     * @return The information associated with the group to create
      */
     public Map<GroupField, Serializable> getFields() {
         return fields;

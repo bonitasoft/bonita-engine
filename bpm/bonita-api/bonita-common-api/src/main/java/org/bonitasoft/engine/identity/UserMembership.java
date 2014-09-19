@@ -20,9 +20,9 @@ import org.bonitasoft.engine.bpm.BonitaObject;
 /**
  * represents a relation between {@link User} and {@link Role} and {@link Group} inside the organization.
  * <p>
- * A {@link User} may be related to whether a {@link Group} whether a {@link Role} or both. Thus, if a {@link User} is linked to a {@link Group} only, the
- * {@link Role} methods of this class will return null or 0. On the other hand, if a user is a member of a {@link Role} only, the {@link Group} methods of this
- * class will return null or 0.
+ * A {@link User} can be associated with a {@link Group} or a {@link Role} or both.
+ * If a User is associated with a Group only, the
+ * Role methods of this class will return null or 0. If a user is associated with a Role only, the Group methods of this class will return null or 0.
  *
  * @author Bole Zhang
  * @author Matthieu Chaffotte
@@ -54,12 +54,12 @@ public interface UserMembership extends BonitaObject {
     long getGroupId();
 
     /**
-     * @return the user's id that assigned this user membership
+     * @return the id of the user that assigned this user membership
      */
     long getAssignedBy();
 
     /**
-     * @return the user membership's assignation date
+     * @return the date this membership was assigned
      */
     Date getAssignedDate();
 
@@ -74,12 +74,12 @@ public interface UserMembership extends BonitaObject {
     String getRoleName();
 
     /**
-     * @return the user membership's username
+     * @return the username of the user that is assigned this membership
      */
     String getUsername();
 
     /**
-     * @return the user's name that created this membership's
+     * @return the name of the user that created this membership
      */
     String getAssignedByName();
 

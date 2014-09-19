@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * represent a helper to update a {@link Role}
+ * represents a helper for updating a {@link Role}
  *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -47,7 +47,7 @@ public class RoleUpdater implements Serializable {
 
     /**
      * @param name
-     *        The role's name to update
+     *        The role's new name to update
      * @return The current {@link RoleUpdater} for chaining purpose
      */
     public RoleUpdater setName(final String name) {

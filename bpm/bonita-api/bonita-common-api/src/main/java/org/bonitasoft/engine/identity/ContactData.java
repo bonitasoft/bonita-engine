@@ -16,7 +16,7 @@ package org.bonitasoft.engine.identity;
 import java.io.Serializable;
 
 /**
- * represents the a user contact data
+ * represents a user contact data
  *
  * @author Matthieu Chaffotte
  * @since 6.0.0

@@ -59,7 +59,7 @@ public interface Role extends BonitaObject {
     String getIconPath();
 
     /**
-     * @return the user's id that created the role
+     * @return the id of the user that created the role
      */
     long getCreatedBy();
 

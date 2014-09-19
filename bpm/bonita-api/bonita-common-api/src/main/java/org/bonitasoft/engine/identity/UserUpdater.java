@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * represent a helper to update a {@link User}
+ * represent a helper for updating a {@link User}
  *
  * @author Matthieu Chaffotte
  * @author Celine Souchet

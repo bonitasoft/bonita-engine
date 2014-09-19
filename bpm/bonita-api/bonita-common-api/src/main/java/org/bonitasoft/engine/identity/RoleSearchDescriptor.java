@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.identity;
 
 /**
- * holds constants about {@link Role} search
+ * holds constants about {@link Role} search filters.
  *
  * @author Matthieu Chaffotte
  * @see Role
@@ -22,10 +22,13 @@ package org.bonitasoft.engine.identity;
  */
 public class RoleSearchDescriptor {
 
+	/** filter search on Role's id*/
     public static final String ID = "id";
 
+	/** filter search on Role's name*/
     public static final String NAME = "name";
 
+    /** filter search on Role's display name*/
     public static final String DISPLAY_NAME = "displayName";
 
 }
