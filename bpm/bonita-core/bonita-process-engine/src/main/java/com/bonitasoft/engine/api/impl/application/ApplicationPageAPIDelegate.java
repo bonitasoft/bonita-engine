@@ -25,6 +25,7 @@ import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
+import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
@@ -57,7 +58,7 @@ public class ApplicationPageAPIDelegate {
     }
 
     public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException, InvalidNameException,
-    InvalidDisplayNameException, AlreadyExistsException {
+            InvalidDisplayNameException, AlreadyExistsException, ApplicationNotFoundException {
         final SApplicationUpdateBuilder updateBuilder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance();
         updateBuilder.updateHomePageId(applicationPageId);
         try {
@@ -73,6 +74,8 @@ public class ApplicationPageAPIDelegate {
             throw new UpdateException(e.getMessage());
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
+        } catch (final SObjectNotFoundException e) {
+            throw new ApplicationNotFoundException(applicationId);
         }
     }
 

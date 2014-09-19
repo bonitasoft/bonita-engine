@@ -37,14 +37,14 @@ public interface ApplicationService {
     String APPLICATION_MENU = "APPLICATION_MENU";
 
     SApplication createApplication(SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException, SInvalidNameException,
-            SInvalidDisplayNameException;
+    SInvalidDisplayNameException;
 
     SApplication getApplication(long applicationId) throws SBonitaReadException, SObjectNotFoundException;
 
     void deleteApplication(long applicationId) throws SObjectModificationException, SObjectNotFoundException;
 
     SApplication updateApplication(long applicationId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException, SInvalidNameException,
-    SInvalidDisplayNameException, SBonitaReadException, SObjectAlreadyExistsException;
+    SInvalidDisplayNameException, SBonitaReadException, SObjectAlreadyExistsException, SObjectNotFoundException;
 
     long getNumberOfApplications(QueryOptions options) throws SBonitaReadException;
 

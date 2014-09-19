@@ -98,8 +98,8 @@ public class ApplicationAPIDelegate {
         }
     }
 
-    public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException,
-            AlreadyExistsException, InvalidNameException, InvalidDisplayNameException {
+    public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws UpdateException,
+    AlreadyExistsException, InvalidNameException, InvalidDisplayNameException, ApplicationNotFoundException {
         try {
             SApplication sApplication;
 
@@ -116,6 +116,8 @@ public class ApplicationAPIDelegate {
             throw new UpdateException(e);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
+        } catch (final SObjectNotFoundException e) {
+            throw new ApplicationNotFoundException(applicationId);
         }
     }
 

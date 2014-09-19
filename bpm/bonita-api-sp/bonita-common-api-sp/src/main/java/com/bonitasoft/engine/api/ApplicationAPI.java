@@ -155,7 +155,7 @@ public interface ApplicationAPI {
      * @throws InvalidDisplayNameException if the display name is empty
      */
     void setApplicationHomePage(long applicationId, long applicationPageId) throws UpdateException, InvalidNameException,
-    InvalidDisplayNameException, AlreadyExistsException;
+    InvalidDisplayNameException, AlreadyExistsException, ApplicationNotFoundException;
 
     /**
      * Retrieves the application home page
