@@ -4,15 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 
-import org.junit.Before;
 import org.junit.Test;
 
 public class StringUtilsTest {
-
-    @Before
-    public void init() {
-        System.setProperty("file.separator", "\\");
-    }
 
     @Test
     public void uniformizePathPatternShouldChangeAllSlashesToSystemDependentSeparator() throws Exception {
