@@ -101,6 +101,9 @@ public class ApplicationServiceImpl implements ApplicationService {
         } catch (final SInvalidNameException e) {
             log(application.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw e;
+        } catch (final SInvalidDisplayNameException e) {
+            log(application.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            throw e;
         } catch (final SObjectAlreadyExistsException e) {
             log(application.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw e;
