@@ -9,7 +9,8 @@
 	</parent>
 
     <name>Bonita Global Javadoc</name>
-
+	<artifactId>bonita-global-javadoc</artifactId>
+	
     <dependencies>
         <dependency>
             <groupId>org.bonitasoft.engine.api</groupId>
