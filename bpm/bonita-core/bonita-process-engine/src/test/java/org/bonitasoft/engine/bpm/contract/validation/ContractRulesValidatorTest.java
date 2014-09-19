@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.bonitasoft.engine.bpm.contract.validation.MapBuilder.aMap;
 import static org.bonitasoft.engine.bpm.contract.validation.SContractDefinitionBuilder.aContract;
-import static org.bonitasoft.engine.bpm.contract.validation.SInputDefinitionBuilder.anInput;
+import static org.bonitasoft.engine.bpm.contract.validation.SSimpleInputDefinitionBuilder.anInput;
 import static org.bonitasoft.engine.bpm.contract.validation.SRuleDefinitionBuilder.aRuleFor;
 import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
 import static org.mockito.Matchers.anyString;

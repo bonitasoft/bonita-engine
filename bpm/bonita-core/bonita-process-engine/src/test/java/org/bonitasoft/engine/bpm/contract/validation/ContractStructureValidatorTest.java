@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.bonitasoft.engine.bpm.contract.validation.MapBuilder.aMap;
 import static org.bonitasoft.engine.bpm.contract.validation.SContractDefinitionBuilder.aContract;
-import static org.bonitasoft.engine.bpm.contract.validation.SInputDefinitionBuilder.anInput;
+import static org.bonitasoft.engine.bpm.contract.validation.SSimpleInputDefinitionBuilder.anInput;
 import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
 import static org.bonitasoft.engine.core.process.definition.model.SType.INTEGER;
 import static org.bonitasoft.engine.core.process.definition.model.SType.TEXT;
@@ -27,12 +27,17 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
+import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SType;
+import org.bonitasoft.engine.core.process.definition.model.impl.SComplexInputDefinitionImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,10 +50,10 @@ public class ContractStructureValidatorTest {
 
     @Mock
     private TechnicalLoggerService logger;
-    
+
     @Mock
     ContractTypeValidator typeValidator;
-    
+
     @InjectMocks
     private ContractStructureValidator validator;
 
@@ -68,7 +73,7 @@ public class ContractStructureValidatorTest {
         verify(logger).log(ContractStructureValidator.class, DEBUG,
                 "Field [someOtherFieldNotDefinedInContract] has been provided but is not expected in task contract");
     }
-    
+
     @Test
     public void should_pass_when_inputs_are_provided_and_valid() throws Exception {
         SContractDefinition contract = aContract()
@@ -77,6 +82,24 @@ public class ContractStructureValidatorTest {
         Map<String, Object> taskInputs = aMap()
                 .put("aText", "hello")
                 .put("aBoolean", true).build();
+
+        validator.validate(contract, taskInputs);
+
+    }
+
+    @Test
+    public void should_pass_when_complex_inputs_are_provided_and_valid() throws Exception {
+        SInputDefinition sComplexInputDefinitionImpl = new SComplexInputDefinitionImpl("complex", "description", Arrays.asList(anInput(SType.TEXT).withName(
+                "embedded").build()), new ArrayList<SComplexInputDefinition>());
+        SContractDefinition contract = aContract()
+                .withInput(anInput(TEXT).withName("aText"))
+                .withInput(anInput(BOOLEAN).withName("aBoolean"))
+                .withInput(sComplexInputDefinitionImpl).build();
+        Map<String, Object> taskInputs = aMap()
+                .put("aText", "hello")
+                .put("aBoolean", true)
+                .put("complex", aMap().put("embedded", "aValue").build())
+                .build();
 
         validator.validate(contract, taskInputs);
     }
@@ -97,13 +120,48 @@ public class ContractStructureValidatorTest {
     }
 
     @Test
-    public void should_throw_exception_with_explanation_when_types_are_not_valid() throws Exception {
+    public void should_throw_exception_with_explanations_when_complex_inputs_are_missing() throws Exception {
+        SInputDefinition sComplexInputDefinitionImpl = new SComplexInputDefinitionImpl("complex", "description", Arrays.asList(anInput(SType.TEXT).withName(
+                "embedded").build()), new ArrayList<SComplexInputDefinition>());
         SContractDefinition contract = aContract()
-                .withInput(anInput(INTEGER).withName("anInteger").build())
-                .withInput(anInput(BOOLEAN).withName("aBoolean").build()).build();
+                .withInput(sComplexInputDefinitionImpl).build();
+
+        try {
+            validator.validate(contract, new HashMap<String, Object>());
+            fail("expected exception has not been thrown");
+        } catch (ContractViolationException e) {
+            assertThat(e.getExplanations())
+                    .containsOnly("Contract need field [complex] but it has not been provided");
+        }
+    }
+
+    @Test
+    public void should_throw_exception_with_explanations_when_complex_inputs_leaf_are_missing() throws Exception {
+        SInputDefinition sComplexInputDefinitionImpl = new SComplexInputDefinitionImpl("complex", "description", Arrays.asList(anInput(SType.TEXT).withName(
+                "embedded").build()), new ArrayList<SComplexInputDefinition>());
+        SContractDefinition contract = aContract()
+                .withInput(sComplexInputDefinitionImpl).build();
+
+        Map<String, Object> map = aMap().put("complex", aMap().build()).build();
+        try {
+            validator.validate(contract, map);
+            fail("expected exception has not been thrown");
+        } catch (ContractViolationException e) {
+            assertThat(e.getExplanations())
+                    .containsOnly("Contract need field [embedded] but it has not been provided");
+        }
+    }
+
+    @Test
+    public void should_throw_exception_with_explanation_when_types_are_not_valid() throws Exception {
+        SInputDefinition sComplexInputDefinitionImpl = new SComplexInputDefinitionImpl("complex", "description", Arrays.asList(anInput(SType.TEXT).withName(
+                "embedded").build()), new ArrayList<SComplexInputDefinition>());
+        SContractDefinition contract = aContract()
+                .withInput(anInput(INTEGER).withName("anInteger"))
+                .withInput(sComplexInputDefinitionImpl).build();
         doThrow(new InputValidationException("type error explanation"))
                 .when(typeValidator).validate(any(SInputDefinition.class), any(Object.class));
-        Map<String, Object> taskInputs = aMap().put("anInteger", "thisIsNotAnInteger").put("aBoolean", "thisIsNotABoolean").build();
+        Map<String, Object> taskInputs = aMap().put("anInteger", "thisIsNotAnInteger").put("complex", "thisIsNotAComplex").build();
 
         try {
             validator.validate(contract, taskInputs);
