@@ -44,9 +44,8 @@ public class DeepRegexFileFilter extends AbstractFileFilter {
     }
 
     @Override
-    public boolean accept(final File dir, final String name) {
-        String fullName = dir.getAbsolutePath() + File.separator + name;
-        fullName = StringUtils.uniformizePathPattern(fullName);
+    public boolean accept(final File file) {
+        String fullName = StringUtils.uniformizePathPattern(file.getAbsolutePath());
         return regExPattern.matcher(fullName).matches();
     }
 

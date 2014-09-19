@@ -13,20 +13,21 @@
  **/
 package org.bonitasoft.engine.commons;
 
+import java.io.File;
+
 /**
  * String manipulation utilitary class.
  *
  * @author Emmanuel Duchastenier
  */
 public class StringUtils {
-
     /**
-     * Replaces all "\" character with "/" character, and ensures that there is no double "/".
+     * Replaces all "\" or "/" characters to sytem-dependent {@link File#separator} character, and ensures that there is no consecutive doubles.
      *
      * @param path the path-like string to clean.
      * @return the cleaned path-like string.
      */
     public static String uniformizePathPattern(final String path) {
-        return path.replaceAll("\\\\", "/").replaceAll("/{2,}", "/");
+        return path.replaceAll("[\\\\/]", File.separator).replaceAll(File.separator + "{2,}", File.separator);
     }
 }

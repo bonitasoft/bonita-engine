@@ -2238,10 +2238,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void assignUserTask(final long userTaskId, final long userId) throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final SCommentService scommentService = tenantAccessor.getCommentService();
-        final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
             final AssignOrUnassignUserTask assignUserTask = new AssignOrUnassignUserTask(userId, userTaskId, activityInstanceService, tenantAccessor
                     .getFlowNodeStateManager().getStateBehaviors());
@@ -2490,19 +2487,19 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final BonitaHomeNotSetException e) {
             throw new RetrieveException("Problem accessing basic Bonita Home server resources", e);
         }
-        final String patternPathSeparator = "/";
+        final String sep = File.separator;
         processesFolder = StringUtils.uniformizePathPattern(processesFolder);
-        if (!processesFolder.endsWith(patternPathSeparator)) {
-            processesFolder = processesFolder + patternPathSeparator;
+        if (!processesFolder.endsWith(sep)) {
+            processesFolder = processesFolder + sep;
         }
-        processesFolder = processesFolder + processDefinitionId + patternPathSeparator;
+        processesFolder = processesFolder + processDefinitionId + sep;
         final File processDirectory = new File(processesFolder);
         final Collection<File> files = FileUtils.listFiles(processDirectory, new DeepRegexFileFilter(processDirectory, filenamesPattern),
                 DirectoryFileFilter.DIRECTORY);
         final Map<String, byte[]> res = new HashMap<String, byte[]>(files.size());
         try {
             for (final File f : files) {
-                res.put(generateRelativeResourcePath(patternPathSeparator, processDirectory, f), IOUtil.getAllContentFrom(f));
+                res.put(generateRelativeResourcePath(processDirectory, f), IOUtil.getAllContentFrom(f));
             }
         } catch (final IOException e) {
             throw new RetrieveException("Problem accessing resources " + filenamesPattern + " for processDefinitionId: " + processDefinitionId, e);
@@ -2510,10 +2507,10 @@ public class ProcessAPIImpl implements ProcessAPI {
         return res;
     }
 
-    protected String generateRelativeResourcePath(final String patternPathSeparator, final File processDirectory, final File f) {
+    protected String generateRelativeResourcePath(final File processDirectory, final File f) {
         String path = StringUtils.uniformizePathPattern(f.getAbsolutePath().replace(processDirectory.getAbsolutePath(), ""));
-        // remove first forward slash, if any:
-        if (path.startsWith("/")) {
+        // remove first slash, if any:
+        if (path.startsWith(File.separator)) {
             path = path.substring(1);
         }
         return path;

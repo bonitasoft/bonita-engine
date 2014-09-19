@@ -154,7 +154,7 @@ public class ProcessAPIImplTest {
         final String resourceRelativePath = "resource/toto.lst";
 
         // when:
-        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath("/", new File(pathname), new File(pathname + File.separator
+        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
                 + resourceRelativePath));
 
         // then:
@@ -168,7 +168,7 @@ public class ProcessAPIImplTest {
         final String resourceRelativePath = "resource/toto.lst";
 
         // when:
-        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath("/", new File(pathname), new File(pathname + File.separator
+        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
                 + resourceRelativePath));
 
         // then:
@@ -182,7 +182,7 @@ public class ProcessAPIImplTest {
         final String resourceRelativePath = "resource/toto.lst";
 
         // when:
-        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath("/", new File(pathname), new File(pathname + File.separator
+        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
                 + resourceRelativePath));
 
         // then:
