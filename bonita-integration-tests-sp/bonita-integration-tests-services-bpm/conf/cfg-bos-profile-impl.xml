@@ -4,7 +4,7 @@
 
 	<bean id="profileService" class="org.bonitasoft.engine.profile.impl.ProfileServiceImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="recorder" ref="recorderSync" />
+		<constructor-arg name="recorder" ref="tenantRecorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 		<constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />

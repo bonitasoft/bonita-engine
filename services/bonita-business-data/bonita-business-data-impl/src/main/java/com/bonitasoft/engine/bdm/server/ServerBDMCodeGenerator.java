@@ -46,13 +46,12 @@ public class ServerBDMCodeGenerator extends AbstractBDMCodeGenerator {
     }
 
     @Override
-    protected void addDAO(final BusinessObject bo, final JDefinedClass entity) throws JClassAlreadyExistsException, ClassNotFoundException {
+    protected void addDAO(final BusinessObject bo, final JDefinedClass entity) throws JClassAlreadyExistsException {
         final JDefinedClass daoInterface = createDAOInterface(bo, entity);
         createDAOImpl(bo, entity, daoInterface);
     }
 
-    private void createDAOImpl(final BusinessObject bo, final JDefinedClass entity, final JDefinedClass daoInterface) throws JClassAlreadyExistsException,
-    ClassNotFoundException {
+    private void createDAOImpl(final BusinessObject bo, final JDefinedClass entity, final JDefinedClass daoInterface) throws JClassAlreadyExistsException {
         final String daoImplClassName = toDaoImplClassname(bo);
         final JDefinedClass implClass = addClass(daoImplClassName);
         implClass._implements(daoInterface);
@@ -62,13 +61,13 @@ public class ServerBDMCodeGenerator extends AbstractBDMCodeGenerator {
         // Add method for provided queries
         for (final Query q : BDMQueryUtil.createProvidedQueriesForBusinessObject(bo)) {
             final JMethod method = createMethodForQuery(entity, implClass, q);
-            addQueryMethodBody(entity, method, q.getName(), entity.fullName(), businessDataRepository);
+            addQueryMethodBody(entity, method, q.getName(), businessDataRepository);
         }
 
         // Add method for queries
         for (final Query q : bo.getQueries()) {
             final JMethod method = createMethodForQuery(entity, implClass, q);
-            addQueryMethodBody(entity, method, q.getName(), entity.fullName(), businessDataRepository);
+            addQueryMethodBody(entity, method, q.getName(), businessDataRepository);
         }
 
         final JMethod method = createMethodForNewInstance(bo, entity, implClass);
@@ -86,10 +85,8 @@ public class ServerBDMCodeGenerator extends AbstractBDMCodeGenerator {
         return service;
     }
 
-    private void addQueryMethodBody(final JDefinedClass entity, final JMethod method, final String queryName, final String returnType,
-            final JFieldVar businessDataRepository) throws ClassNotFoundException {
+    private void addQueryMethodBody(final JDefinedClass entity, final JMethod method, final String queryName, final JFieldVar businessDataRepository) {
         final String entityName = entity.name();
-
         final JTryBlock tryBlock = method.body()._try();
         final JBlock tryBody = tryBlock.body();
 

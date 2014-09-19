@@ -83,7 +83,7 @@ public class StateBehaviorsExt extends StateBehaviors {
     public void updateOutputData(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
             final SMultiInstanceLoopCharacteristics miLoop, final int numberOfInstanceMax) throws SDataInstanceException, SActivityStateExecutionException {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
-        final SBusinessDataDefinition businessData = processContainer.getBusinessDataDefinition(miLoop.getLoopDataInputRef());
+        final SBusinessDataDefinition businessData = processContainer.getBusinessDataDefinition(miLoop.getLoopDataOutputRef());
         if (businessData == null) {
             super.updateOutputData(processDefinition, flowNodeInstance, miLoop, numberOfInstanceMax);
         }

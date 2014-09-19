@@ -284,7 +284,7 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
     }
 
     @Test
-    public void importProfileReplaceDuplicate_should_skip_new_default_profile() throws BonitaException, IOException, SAXException {
+    public void importProfileReplaceDuplicate_should_skip_new_default_profile() throws BonitaException, IOException {
         // given
         final InputStream xmlStream1 = ProfileImportAndExportSPITest.class.getResourceAsStream("SkipNewDefaultProfile.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream1);
@@ -298,11 +298,11 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
         expectedImportStatus.setStatus(Status.SKIPPED);
 
         assertThat(importStatusResults).contains(expectedImportStatus);
-
+        xmlStream1.close();
     }
 
     @Test
-    public void importProfileReplaceDuplicate_should_skip_default_profile_modification() throws BonitaException, IOException, SAXException {
+    public void importProfileReplaceDuplicate_should_skip_default_profile_modification() throws BonitaException, IOException {
         // given
         final InputStream xmlStream1 = ProfileImportAndExportSPITest.class.getResourceAsStream("Profile_Data_bug.xml");
         final byte[] xmlContent = IOUtils.toByteArray(xmlStream1);
@@ -320,12 +320,12 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
         final ImportStatus administratorImportStatus = importStatusResults.get(0);
         assertThat(administratorImportStatus.getName()).as("Administrator should have imported").isEqualTo("Administrator");
         assertThat(administratorImportStatus.getStatus()).as("Administrator should have imported").isEqualTo(Status.REPLACED);
-
+        xmlStream1.close();
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import", "Export" }, story = "Import and export profiles.", jira = "")
     @Test
-    public void importAndExportWithMissingCustomPage() throws BonitaException, IOException, SAXException {
+    public void importAndExportWithMissingCustomPage() throws BonitaException, IOException {
         final ImportError groupImportError = new ImportError("unknown", Type.GROUP);
         final ImportError pageImportError = new ImportError("unknown", Type.PAGE);
         final ImportError roleImportError = new ImportError("unknown", Type.ROLE);
@@ -364,8 +364,7 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
         assertThat(status.get(0).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
         final List<ImportError> errors = status.get(0).getErrors();
         assertThat(errors.size()).isEqualTo(3);
-        assertThat(errors).as("should have 3 import errors").contains(groupImportError, pageImportError, roleImportError);;
-
+        assertThat(errors).as("should have 3 import errors").contains(groupImportError, pageImportError, roleImportError);
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import" }, story = "Import profile on other duplicate.", jira = "")
@@ -553,6 +552,9 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
 
         final byte[] profilebytes = xmlBytes;
         assertEquals(new String(xmlBytes), new String(profilebytes));
+
+        xmlStreamig.close();
+        xmlStreamrp.close();
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Import" }, story = "Import profiles and delete existing.", jira = "")
@@ -646,6 +648,8 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
             final SearchResult<ProfileMember> searchpms1 = getProfileAPI().searchProfileMembers("user", searchOptionsBuilderI.done());
             assertEquals(0, searchpms1.getCount());
         }
+        xmlStream.close();
+        xmlStream1.close();
     }
 
     @Cover(classes = ProfileAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Profile", "Export", "Wrong parameter" }, story = "Execute profile export  with wrong parameter", jira = "ENGINE-586")

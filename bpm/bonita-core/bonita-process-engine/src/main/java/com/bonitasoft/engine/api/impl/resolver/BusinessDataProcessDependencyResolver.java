@@ -20,7 +20,6 @@ import org.bonitasoft.engine.bpm.process.Problem.Level;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProblemImpl;
 import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
@@ -31,8 +30,7 @@ import com.bonitasoft.engine.business.data.BusinessDataRepository;
 public class BusinessDataProcessDependencyResolver implements ProcessDependencyResolver {
 
     @Override
-    public boolean resolve(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition sDefinition)
-            throws BonitaException {
+    public boolean resolve(final TenantServiceAccessor tenantAccessor, final BusinessArchive businessArchive, final SProcessDefinition sDefinition) {
         return checkResolution(tenantAccessor, sDefinition).isEmpty();
     }
 

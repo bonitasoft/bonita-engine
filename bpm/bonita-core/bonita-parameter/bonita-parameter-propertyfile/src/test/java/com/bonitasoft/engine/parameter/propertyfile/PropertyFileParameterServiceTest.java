@@ -28,7 +28,6 @@ import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -92,12 +91,8 @@ public class PropertyFileParameterServiceTest {
 
     }
 
-    @After
-    public void tearDown() throws Exception {
-    }
-
     @Test
-    public void testUpdate() throws Exception {
+    public void update() throws Exception {
         propertyFileParameterService.addAll(PROCESS_DEFINITION_ID, Collections.<String, String> singletonMap("aParam", "paramValue"));
 
         propertyFileParameterService.update(PROCESS_DEFINITION_ID, "aParam", "newValue");
@@ -106,7 +101,7 @@ public class PropertyFileParameterServiceTest {
     }
 
     @Test
-    public void testUpdateParameterWithNullValuye() throws Exception {
+    public void updateParameterWithNullValuye() throws Exception {
         propertyFileParameterService.addAll(PROCESS_DEFINITION_ID, Collections.<String, String> singletonMap("aParam", "paramValue"));
 
         propertyFileParameterService.update(PROCESS_DEFINITION_ID, "aParam", null);
@@ -115,12 +110,12 @@ public class PropertyFileParameterServiceTest {
     }
 
     @Test(expected = SParameterNameNotFoundException.class)
-    public void testUpdateUnexistingParameter() throws Exception {
+    public void updateUnexistingParameter() throws Exception {
         propertyFileParameterService.update(PROCESS_DEFINITION_ID, "aParam", "newValue");
     }
 
     @Test
-    public void testAddAll() throws Exception {
+    public void addAll() throws Exception {
         final Map<String, String> parameters = new HashMap<String, String>(3);
         parameters.put("param1", "value1");
         parameters.put("param2", "value2");
@@ -132,7 +127,7 @@ public class PropertyFileParameterServiceTest {
     }
 
     @Test
-    public void testDeleteAll() throws Exception {
+    public void deleteAll() throws Exception {
         propertyFileParameterService.addAll(PROCESS_DEFINITION_ID, Collections.<String, String> singletonMap("param", "test"));
 
         propertyFileParameterService.deleteAll(PROCESS_DEFINITION_ID);
@@ -143,33 +138,33 @@ public class PropertyFileParameterServiceTest {
     }
 
     @Test(expected = SParameterProcessNotFoundException.class)
-    public void testDeleteAllWhenParametersDoesNotExists() throws Exception {
+    public void deleteAllWhenParametersDoesNotExists() throws Exception {
         propertyFile.delete();
         propertyFileParameterService.deleteAll(PROCESS_DEFINITION_ID);
     }
 
     @Test
-    public void testContainsNullValues() throws Exception {
+    public void containsNullValues() throws Exception {
         propertyFileParameterService.addAll(PROCESS_DEFINITION_ID, Collections.<String, String> singletonMap("nullParam", null));
 
         assertTrue(propertyFileParameterService.containsNullValues(PROCESS_DEFINITION_ID));
     }
 
     @Test
-    public void testNotContainsNullValues() throws Exception {
+    public void notContainsNullValues() throws Exception {
         propertyFileParameterService.addAll(PROCESS_DEFINITION_ID, Collections.<String, String> singletonMap("param", "test"));
 
         assertFalse(propertyFileParameterService.containsNullValues(PROCESS_DEFINITION_ID));
     }
 
     @Test(expected = SParameterProcessNotFoundException.class)
-    public void testCacheThrowException() throws Exception {
+    public void cacheThrowException() throws Exception {
         doThrow(new SCacheException("exception")).when(cacheService).store(anyString(), anyString(), Matchers.<Properties> any(Properties.class));
         propertyFileParameterService.addAll(PROCESS_DEFINITION_ID, Collections.<String, String> singletonMap("aParam", "paramValue"));
     }
 
     @Test
-    public void testGetParameter() throws Exception {
+    public void getParameter() throws Exception {
         propertyFileParameterService.addAll(PROCESS_DEFINITION_ID, Collections.<String, String> singletonMap("aParam", "paramValue"));
 
         final SParameter sParameter = propertyFileParameterService.get(PROCESS_DEFINITION_ID, "aParam");
@@ -179,7 +174,7 @@ public class PropertyFileParameterServiceTest {
     }
 
     @Test
-    public void testGetParameterWithCache() throws Exception {
+    public void getParameterWithCache() throws Exception {
         final Properties properties = new Properties();
         properties.put("aParam", "paramValue");
         when(cacheService.get(anyString(), anyString())).thenReturn(properties);
@@ -188,14 +183,14 @@ public class PropertyFileParameterServiceTest {
     }
 
     @Test(expected = SParameterProcessNotFoundException.class)
-    public void testGetUnexistingParameter() throws Exception {
+    public void getUnexistingParameter() throws Exception {
         propertyFileParameterService.addAll(PROCESS_DEFINITION_ID, Collections.<String, String> singletonMap("otherParam", "paramValue"));
 
         propertyFileParameterService.get(PROCESS_DEFINITION_ID, "aParam");
     }
 
     @Test
-    public void testGetParameters() throws Exception {
+    public void getParameters() throws Exception {
         final Map<String, String> map = new HashMap<String, String>(3);
         map.put("c", "value3");
         map.put("a", "value1");
@@ -210,7 +205,7 @@ public class PropertyFileParameterServiceTest {
     }
 
     @Test
-    public void testGetParametersOrdered() throws Exception {
+    public void getParametersOrdered() throws Exception {
         final Map<String, String> map = new HashMap<String, String>(3);
         map.put("c", "value3");
         map.put("a", "value1");
@@ -225,7 +220,7 @@ public class PropertyFileParameterServiceTest {
     }
 
     @Test
-    public void testGetParametersPaginated() throws Exception {
+    public void getParametersPaginated() throws Exception {
         final Map<String, String> map = new HashMap<String, String>(3);
         map.put("a", "value1");
         map.put("b", "value2");
@@ -241,7 +236,7 @@ public class PropertyFileParameterServiceTest {
     }
 
     @Test
-    public void testGetParametersPaginatedOutOfBound() throws Exception {
+    public void getParametersPaginatedOutOfBound() throws Exception {
         final Map<String, String> map = new HashMap<String, String>(3);
         map.put("a", "value1");
         map.put("b", "value2");
@@ -252,7 +247,7 @@ public class PropertyFileParameterServiceTest {
     }
 
     @Test
-    public void testGetNullValues() throws Exception {
+    public void getNullValues() throws Exception {
         final Map<String, String> map = new HashMap<String, String>(3);
         map.put("nullParam", null);
         map.put("emptyParam", "");

@@ -20,7 +20,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 public class ValidationRuleTest {
 
     @Test
-    public void should_apply_to_type_parameter_class() throws Exception {
+    public void should_apply_to_type_parameter_class() {
         ExceptionRule objectRule = new ExceptionRule();
 
         boolean apply = objectRule.appliesTo(new Exception());
@@ -29,7 +29,7 @@ public class ValidationRuleTest {
     }
 
     @Test
-    public void should_apply_to_type_parameter_subclass() throws Exception {
+    public void should_apply_to_type_parameter_subclass() {
         ExceptionRule objectRule = new ExceptionRule();
 
         boolean apply = objectRule.appliesTo(new RuntimeException());
@@ -38,7 +38,7 @@ public class ValidationRuleTest {
     }
 
     @Test
-    public void should_not_apply_to_other_type() throws Exception {
+    public void should_not_apply_to_other_type() {
         ExceptionRule objectRule = new ExceptionRule();
 
         boolean apply = objectRule.appliesTo(new Throwable());
@@ -47,7 +47,7 @@ public class ValidationRuleTest {
     }
 
     @Test
-    public void should_not_apply_to_null() throws Exception {
+    public void should_not_apply_to_null() {
         ExceptionRule objectRule = new ExceptionRule();
 
         boolean apply = objectRule.appliesTo(null);
@@ -56,14 +56,14 @@ public class ValidationRuleTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void should_throw_exception_when_trying_to_check_rule_on_object_that_rule_cannot_apply_on() throws Exception {
+    public void should_throw_exception_when_trying_to_check_rule_on_object_that_rule_cannot_apply_on() {
         ExceptionRule objectRule = new ExceptionRule();
 
         objectRule.checkRule(new String());
     }
 
     @Test
-    public void should_validate_object_according_to_the_implemented_validation_strategy() throws Exception {
+    public void should_validate_object_according_to_the_implemented_validation_strategy() {
         ValidationStatus expectedValidationStatus = new ValidationStatus();
         ExceptionRule objectRule = new ExceptionRule(expectedValidationStatus);
 
@@ -74,6 +74,7 @@ public class ValidationRuleTest {
 
     /**
      * ValidationRule test implementation - return the given validationStatus
+     * 
      * @author Colin PUY
      */
     private class ExceptionRule extends ValidationRule<Exception> {

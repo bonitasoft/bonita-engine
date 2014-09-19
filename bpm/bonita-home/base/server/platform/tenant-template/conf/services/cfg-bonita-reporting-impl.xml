@@ -5,7 +5,7 @@
 		<constructor-arg name="dataSource" ref="bonitaDSJNDI" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="queryPreProcessor" ref="queryPreProcessor" />
-		<constructor-arg name="recorder" ref="recorderSync" />
+		<constructor-arg name="recorder" ref="tenantRecorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />

@@ -29,6 +29,7 @@ public class Index implements NamedElement {
     @XmlElement(name = "fieldName", required = true)
     private List<String> fieldNames;
 
+    @Override
     public String getName() {
         return name;
     }

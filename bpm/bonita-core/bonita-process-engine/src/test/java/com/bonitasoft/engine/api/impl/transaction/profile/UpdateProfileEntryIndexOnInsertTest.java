@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.api.impl.transaction.profile;
 
 import static org.mockito.Matchers.any;
@@ -16,7 +24,6 @@ import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileEntryUpdateBuilder;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -39,10 +46,6 @@ public class UpdateProfileEntryIndexOnInsertTest {
     @Mock
     private SProfileEntry sProfileEntry;
 
-    @Before
-    public void before() throws Exception {
-    }
-
     @Test
     public void should_updateProfileEntryIndex_update_profileMetaData() throws Exception {
 
@@ -51,21 +54,18 @@ public class UpdateProfileEntryIndexOnInsertTest {
         final Answer<List<SProfileEntry>> answer = new Answer<List<SProfileEntry>>() {
 
             @Override
-            public List<SProfileEntry> answer(final InvocationOnMock invocation) throws Throwable {
+            public List<SProfileEntry> answer(final InvocationOnMock invocation) {
                 final Object[] args = invocation.getArguments();
                 final QueryOptions queryOptions = (QueryOptions) args[0];
                 if (queryOptions.getFromIndex() == 0) {
                     return Arrays.asList(sProfileEntry);
                 }
-                else {
-                    return new ArrayList<SProfileEntry>();
-                }
+                return new ArrayList<SProfileEntry>();
             }
 
         };
 
         when(profileService.searchProfileEntries(any(QueryOptions.class))).thenAnswer(answer);
-        // doReturn(entityUpdateDescriptor).when(updateProfileEntry).getProfileEntryUpdateDescriptor();
 
         // when
         updateProfileEntry.execute();
