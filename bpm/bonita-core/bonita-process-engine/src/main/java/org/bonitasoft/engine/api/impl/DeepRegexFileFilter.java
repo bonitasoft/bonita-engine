@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,35 +16,38 @@ package org.bonitasoft.engine.api.impl;
 import java.io.File;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.filefilter.AbstractFileFilter;
 import org.apache.commons.io.filefilter.RegexFileFilter;
+import org.bonitasoft.engine.commons.StringUtils;
 
 /**
- * Identical to RegexFileFilter, but accept files based on the complete file path and name, not only name.
- * 
+ * Identical to {@link RegexFileFilter}, but accept files based on the complete file path and name, not only its name.
+ *
  * @author Emmanuel Duchastenier
  */
-public class DeepRegexFileFilter extends RegexFileFilter {
-
-    private static final long serialVersionUID = -8894250238822765740L;
+public class DeepRegexFileFilter extends AbstractFileFilter {
 
     /**
      * The regular expression pattern that will be used to match filenames
      */
-    private final Pattern pattern;
+    private final Pattern regExPattern;
 
     public DeepRegexFileFilter(final String pattern) {
-        super(pattern);
         if (pattern == null) {
             throw new IllegalArgumentException("Pattern is missing");
         }
-        this.pattern = Pattern.compile(pattern);
+        regExPattern = Pattern.compile(pattern);
+    }
+
+    public DeepRegexFileFilter(final File parentDir, final String pattern) {
+        this(StringUtils.uniformizePathPattern(parentDir.getAbsolutePath()) + "/" + pattern);
     }
 
     @Override
     public boolean accept(final File dir, final String name) {
         String fullName = dir.getAbsolutePath() + File.separator + name;
-        fullName = fullName.replaceAll("\\\\", "/");
-        return pattern.matcher(fullName).matches();
+        fullName = StringUtils.uniformizePathPattern(fullName);
+        return regExPattern.matcher(fullName).matches();
     }
 
 }
