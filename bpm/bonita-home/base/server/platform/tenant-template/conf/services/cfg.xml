@@ -6,8 +6,8 @@
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="technicalLoggerService" ref="tenantTechnicalLoggerService" />
 	</bean>
-
-	<bean id="recorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
+	
+	<bean id="tenantRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 		<constructor-arg name="eventService" ref="eventService" />
