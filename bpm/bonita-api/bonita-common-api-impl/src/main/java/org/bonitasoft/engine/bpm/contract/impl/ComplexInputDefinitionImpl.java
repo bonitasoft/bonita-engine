@@ -50,12 +50,12 @@ public class ComplexInputDefinitionImpl extends InputDefinitionImpl implements C
     }
 
     @Override
-    public List<SimpleInputDefinition> getSimpleInputDefinitions() {
+    public List<SimpleInputDefinition> getSimpleInputs() {
         return simpleInputDefinitions;
     }
 
     @Override
-    public List<ComplexInputDefinition> getComplexInputDefinitions() {
+    public List<ComplexInputDefinition> getComplexInputs() {
         return complexInputDefinitions;
     }
 

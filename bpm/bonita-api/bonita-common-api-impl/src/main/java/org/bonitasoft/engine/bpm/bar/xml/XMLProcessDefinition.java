@@ -585,10 +585,10 @@ public class XMLProcessDefinition {
         final XMLNode inputNode = new XMLNode(CONTRACT_COMPLEX_INPUT_NODE);
         inputNode.addAttribute(NAME, input.getName());
         inputNode.addAttribute(DESCRIPTION, input.getDescription());
-        for (final SimpleInputDefinition inputDefinition : input.getSimpleInputDefinitions()) {
+        for (final SimpleInputDefinition inputDefinition : input.getSimpleInputs()) {
             inputNode.addChild(createSimpleInputNode(inputDefinition));
         }
-        for (final ComplexInputDefinition inputDefinition : input.getComplexInputDefinitions()) {
+        for (final ComplexInputDefinition inputDefinition : input.getComplexInputs()) {
             inputNode.addChild(createComplexInputNode(inputDefinition));
         }
         return inputNode;

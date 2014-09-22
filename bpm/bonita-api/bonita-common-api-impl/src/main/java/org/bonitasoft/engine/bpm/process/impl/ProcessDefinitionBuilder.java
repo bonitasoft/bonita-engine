@@ -260,7 +260,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     private void validateContractInput(final ComplexInputDefinition complexInputDefinition) {
         validateContractInputName(complexInputDefinition.getName());
-        validateUserTaskContractInputs(complexInputDefinition.getSimpleInputDefinitions(), complexInputDefinition.getComplexInputDefinitions());
+        validateUserTaskContractInputs(complexInputDefinition.getSimpleInputs(), complexInputDefinition.getComplexInputs());
     }
 
     private void validateContractInput(final SimpleInputDefinition inputDefinition) {

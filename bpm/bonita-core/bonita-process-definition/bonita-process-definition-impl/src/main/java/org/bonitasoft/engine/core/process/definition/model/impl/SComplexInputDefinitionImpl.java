@@ -44,10 +44,10 @@ public class SComplexInputDefinitionImpl extends SInputDefinitionImpl implements
     public SComplexInputDefinitionImpl(final ComplexInputDefinition input) {
         this(input.getName());
         setDescription(input.getDescription());
-        for (final SimpleInputDefinition simpleInputDefinition : input.getSimpleInputDefinitions()) {
+        for (final SimpleInputDefinition simpleInputDefinition : input.getSimpleInputs()) {
             simpleInputDefinitions.add(new SSimpleInputDefinitionImpl(simpleInputDefinition));
         }
-        for (final ComplexInputDefinition complexInputDefinition : input.getComplexInputDefinitions()) {
+        for (final ComplexInputDefinition complexInputDefinition : input.getComplexInputs()) {
             complexInputDefinitions.add(new SComplexInputDefinitionImpl(complexInputDefinition));
         }
     }

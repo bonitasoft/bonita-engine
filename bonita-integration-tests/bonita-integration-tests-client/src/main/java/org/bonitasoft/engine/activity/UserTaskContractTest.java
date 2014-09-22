@@ -113,8 +113,8 @@ public class UserTaskContractTest extends CommonAPITest {
         final ComplexInputDefinition complexInput = contract.getComplexInputs().get(0);
         assertThat(complexInput.getName()).isEqualTo("expenseLine");
         assertThat(complexInput.getDescription()).isEqualTo("expense report line");
-        assertThat(complexInput.getSimpleInputDefinitions()).as("should have 2 simples inputs").hasSize(2);
-        assertThat(complexInput.getComplexInputDefinitions()).as("should have 1 complex input").hasSize(1);
+        assertThat(complexInput.getSimpleInputs()).as("should have 2 simples inputs").hasSize(2);
+        assertThat(complexInput.getComplexInputs()).as("should have 1 complex input").hasSize(1);
 
         //clean up
         disableAndDeleteProcess(processDefinition);
