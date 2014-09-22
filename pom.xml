@@ -216,7 +216,8 @@
                                 <include>com.bonitasoft.engine.*</include>
                             </includes>
                             <excludes>
-                                <excludes>**/*BuilderImpl.java,**/*FactoryImpl.java</excludes>
+                                <excludes>**/*BuilderImpl.java</excludes>
+                                <excludes>**/*FactoryImpl.java</excludes>
                             </excludes>
                         </configuration>
                     </plugin>
