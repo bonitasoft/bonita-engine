@@ -13,9 +13,6 @@
  **/
 package org.bonitasoft.engine.archive.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.archive.ArchivingStrategy;
@@ -73,13 +70,13 @@ public class ArchiveServiceImpl implements ArchiveService {
         final String methodName = "recordInserts";
         logBeforeMethod(TechnicalLogSeverity.TRACE, methodName);
         if (records != null) {
-            final List<ArchivedPersistentObject> archivedObjects = createArchivedObjectsList(time, records);
-            final BatchArchiveCallable callable = new BatchArchiveCallable(definitiveArchivePersistenceService, archivedObjects);
+            assignArchiveDate(time, records);
+            final BatchArchiveCallable callable = buildBatchArchiveCallable(records);
 
             try {
                 transactionService.registerBeforeCommitCallable(callable);
             } catch (final STransactionNotFoundException e) {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
+                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                     logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register the beforeCommitCallable to log queriable logs: transaction not found",
                             e);
                 }
@@ -89,22 +86,17 @@ public class ArchiveServiceImpl implements ArchiveService {
         logAfterMethod(TechnicalLogSeverity.TRACE, methodName);
     }
 
-    /**
-     * @param time
-     * @param records
-     * @return
-     * @throws SRecorderException
-     */
-    protected List<ArchivedPersistentObject> createArchivedObjectsList(final long time, final ArchiveInsertRecord... records) throws SRecorderException {
-        final List<ArchivedPersistentObject> archivedObjects = new ArrayList<ArchivedPersistentObject>();
+    // As a protected method for test purposes.
+    protected BatchArchiveCallable buildBatchArchiveCallable(final ArchiveInsertRecord... records) throws SRecorderException {
+        return new BatchArchiveCallable(definitiveArchivePersistenceService, records);
+    }
+
+    private void assignArchiveDate(final long time, final ArchiveInsertRecord... records) throws SRecorderException {
         for (final ArchiveInsertRecord record : records) {
             if (record != null) {
-                final ArchivedPersistentObject entity = record.getEntity();
-                setArchiveDate(entity, time);
-                archivedObjects.add(entity);
+                setArchiveDate(record.getEntity(), time);
             }
         }
-        return archivedObjects;
     }
 
     private void setArchiveDate(final ArchivedPersistentObject entity, final long time) throws SRecorderException {
@@ -116,6 +108,7 @@ public class ArchiveServiceImpl implements ArchiveService {
             }
         }
     }
+
 
     @Override
     public void recordDelete(final DeleteRecord record) throws SRecorderException {
