@@ -43,52 +43,52 @@
 						</complexInputDefinition>
 						<inputDefinition description="comment" name="comment" type="TEXT" />
 					</inputDefinitions>
-					<ruleDefinitions>
-						<ruleDefinition name="username_rule">
+					<constraintDefinitions>
+						<constraintDefinition name="username_constraint">
 							<conditionalExpression>userName != null</conditionalExpression>
 							<explanation>user name is mandatory</explanation>
 							<inputDefinitionNames>
 								<inputDefinitionName>userName</inputDefinitionName>
 							</inputDefinitionNames>
-						</ruleDefinition>
-						<ruleDefinition name="approval_rule">
+						</constraintDefinition>
+						<constraintDefinition name="approval_constraint">
 							<conditionalExpression>isValid != null</conditionalExpression>
 							<explanation>approval is mandatory</explanation>
 							<inputDefinitionNames>
 								<inputDefinitionName>isValid</inputDefinitionName>
 							</inputDefinitionNames>
-						</ruleDefinition>
-						<ruleDefinition name="date_rule">
+						</constraintDefinition>
+						<constraintDefinition name="date_constraint">
 							<conditionalExpression>endDate.after(startDate)</conditionalExpression>
 							<explanation>end date sould be after start date</explanation>
 							<inputDefinitionNames>
 								<inputDefinitionName>startDate</inputDefinitionName>
 								<inputDefinitionName>endDate</inputDefinitionName>
 							</inputDefinitionNames>
-						</ruleDefinition>
-						<ruleDefinition name="comment_rule">
+						</constraintDefinition>
+						<constraintDefinition name="comment_constraint">
 							<conditionalExpression>isValid || (comment != null)</conditionalExpression>
 							<explanation>comment is mandatory</explanation>
 							<inputDefinitionNames>
 								<inputDefinitionName>isValid</inputDefinitionName>
 								<inputDefinitionName>comment</inputDefinitionName>
 							</inputDefinitionNames>
-						</ruleDefinition>
-						<ruleDefinition name="special char rule">
+						</constraintDefinition>
+						<constraintDefinition name="special char constraint">
 							<conditionalExpression>comment.length 	> 5 </conditionalExpression>
 							<explanation>comment should have at min 5 char </explanation>
 							<inputDefinitionNames>
 								<inputDefinitionName>comment</inputDefinitionName>
 							</inputDefinitionNames>
-						</ruleDefinition>
-						<ruleDefinition name="special char rule">
+						</constraintDefinition>
+						<constraintDefinition name="special char constraint">
 							<conditionalExpression><![CDATA[comment.equals"<comment>"]]></conditionalExpression>
 							<explanation>comment should have at min 5 char </explanation>
 							<inputDefinitionNames>
 								<inputDefinitionName>comment</inputDefinitionName>
 							</inputDefinitionNames>
-						</ruleDefinition>
-					</ruleDefinitions>
+						</constraintDefinition>
+					</constraintDefinitions>
 				</contract>
 			</userTask>
 			<startEvent id="-6268532758171441342" interrupting="true"

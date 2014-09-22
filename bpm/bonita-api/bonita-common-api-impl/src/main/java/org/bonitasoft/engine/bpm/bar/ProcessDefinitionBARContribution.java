@@ -42,6 +42,7 @@ import org.bonitasoft.engine.bpm.bar.xml.ComplexInputDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ConditionalExpressionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ConnectorDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ConnectorDefinitionInputBinding;
+import org.bonitasoft.engine.bpm.bar.xml.ConstraintDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ContractDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CorrelationBinding;
 import org.bonitasoft.engine.bpm.bar.xml.CorrelationKeyBinding;
@@ -75,7 +76,6 @@ import org.bonitasoft.engine.bpm.bar.xml.ParameterDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ProcessDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ReceiveTaskDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.RightOperandBinding;
-import org.bonitasoft.engine.bpm.bar.xml.RuleDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.SendTaskDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.SimpleInputDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.StandardLoopCharacteristicsBinding;
@@ -182,7 +182,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         bindings.add(ContractDefinitionBinding.class);
         bindings.add(SimpleInputDefinitionBinding.class);
         bindings.add(ComplexInputDefinitionBinding.class);
-        bindings.add(RuleDefinitionBinding.class);
+        bindings.add(ConstraintDefinitionBinding.class);
 
         //        final InputStream schemaStream = ProcessDefinitionBARContribution.class.getResourceAsStream("ProcessDefinition.xsd");
         //        try {

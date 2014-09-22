@@ -52,8 +52,8 @@ import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.ConstraintDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.RuleDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
@@ -167,7 +167,7 @@ import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
@@ -2015,8 +2015,8 @@ public class ModelConvertor {
         for (final SComplexInputDefinition input : sContract.getComplexInputs()) {
             contract.addComplexInput(toComplexInput(input));
         }
-        for (final SRuleDefinition sRule : sContract.getRules()) {
-            final RuleDefinitionImpl rule = new RuleDefinitionImpl(sRule.getName(), sRule.getExpression(), sRule.getExplanation());
+        for (final SConstraintDefinition sRule : sContract.getConstraints()) {
+            final ConstraintDefinitionImpl rule = new ConstraintDefinitionImpl(sRule.getName(), sRule.getExpression(), sRule.getExplanation());
             for (final String inputName : sRule.getInputNames()) {
                 rule.addInputName(inputName);
             }

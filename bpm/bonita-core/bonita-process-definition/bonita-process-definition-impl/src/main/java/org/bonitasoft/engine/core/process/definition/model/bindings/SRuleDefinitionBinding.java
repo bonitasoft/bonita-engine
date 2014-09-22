@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.core.process.definition.model.impl.SRuleDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
 import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
@@ -37,9 +37,9 @@ public class SRuleDefinitionBinding extends SNamedElementBinding {
 
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws SXMLParseException {
-        if (XMLSProcessDefinition.RULE_EXPRESSION.equals(name)) {
+        if (XMLSProcessDefinition.CONSTRAINT_EXPRESSION.equals(name)) {
             expression = value;
-        } else if (XMLSProcessDefinition.RULE_EXPLANATION.equals(name)) {
+        } else if (XMLSProcessDefinition.CONSTRAINT_EXPLANATION.equals(name)) {
             explanation = value;
         } else if (XMLSProcessDefinition.INPUT_NAME.equals(name)) {
             inputNames.add(value);
@@ -52,7 +52,7 @@ public class SRuleDefinitionBinding extends SNamedElementBinding {
 
     @Override
     public Object getObject() {
-        final SRuleDefinitionImpl rule = new SRuleDefinitionImpl(name, expression, explanation);
+        final SConstraintDefinitionImpl rule = new SConstraintDefinitionImpl(name, expression, explanation);
         for (final String inputName : inputNames) {
             rule.addInputName(inputName);
         }
@@ -61,7 +61,7 @@ public class SRuleDefinitionBinding extends SNamedElementBinding {
 
     @Override
     public String getElementTag() {
-        return XMLSProcessDefinition.CONTRACT_RULE_NODE;
+        return XMLSProcessDefinition.CONTRACT_CONSTRAINT_NODE;
     }
 
 }

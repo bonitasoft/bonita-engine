@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * @author Matthieu Chaffotte
  */
-public interface SRuleDefinition extends SNamedElement {
+public interface SConstraintDefinition extends SNamedElement {
 
     String getExpression();
 

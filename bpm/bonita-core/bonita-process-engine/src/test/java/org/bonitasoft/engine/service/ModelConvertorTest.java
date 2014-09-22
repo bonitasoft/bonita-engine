@@ -13,21 +13,21 @@ import org.bonitasoft.engine.api.impl.DummySCustomUserInfoValue;
 import java.util.Arrays;
 
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
+import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.contract.RuleDefinition;
 import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.RuleDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.ConstraintDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SComplexInputDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
-import org.bonitasoft.engine.core.process.definition.model.impl.SRuleDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
 import org.bonitasoft.engine.core.process.definition.model.impl.SSimpleInputDefinitionImpl;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.identity.CustomUserInfoValue;
@@ -111,25 +111,25 @@ public class ModelConvertorTest {
         final SimpleInputDefinition expectedSimpleInput = new SimpleInputDefinitionImpl("name", Type.TEXT, "description");
         final ComplexInputDefinition expectedComplexInput = new ComplexInputDefinitionImpl("complex input", "complex description",
                 Arrays.asList(expectedSimpleInput), null);
-        final RuleDefinition expectedRule = new RuleDefinitionImpl("name", "expression", "explanation");
+        final ConstraintDefinition expectedRule = new ConstraintDefinitionImpl("name", "expression", "explanation");
         expectedRule.getInputNames().add("input1");
         expectedRule.getInputNames().add("input2");
 
 
         //when
         final SContractDefinition contractDefinition = new SContractDefinitionImpl();
-        final SRuleDefinition sRule = new SRuleDefinitionImpl(expectedRule);
+        final SConstraintDefinition sRule = new SConstraintDefinitionImpl(expectedRule);
         final SSimpleInputDefinition sSimpleInput = new SSimpleInputDefinitionImpl(expectedSimpleInput);
         final SComplexInputDefinition sComplexInput = new SComplexInputDefinitionImpl(expectedComplexInput);
 
-        contractDefinition.getRules().add(sRule);
+        contractDefinition.getConstraints().add(sRule);
         contractDefinition.getSimpleInputs().add(sSimpleInput);
         contractDefinition.getComplexInputs().add(sComplexInput);
 
         final ContractDefinition contract = ModelConvertor.toContract(contractDefinition);
 
         //then
-        assertThat(contract.getRules()).as("should convert rules").containsExactly(expectedRule);
+        assertThat(contract.getConstraints()).as("should convert rules").containsExactly(expectedRule);
         assertThat(contract.getSimpleInputs()).as("should convert simple inputs").containsExactly(expectedSimpleInput);
         assertThat(contract.getComplexInputs()).as("should convert complex inputs").containsExactly(expectedComplexInput);
     }

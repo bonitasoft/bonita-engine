@@ -29,6 +29,7 @@ import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefiniti
 import org.bonitasoft.engine.core.process.definition.model.SCallActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
@@ -41,7 +42,6 @@ import org.bonitasoft.engine.core.process.definition.model.SMultiInstanceLoopCha
 import org.bonitasoft.engine.core.process.definition.model.SParameterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SReceiveTaskDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSendTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
@@ -351,13 +351,13 @@ public class XMLSProcessDefinition {
 
     public static final String TYPE = "type";
 
-    public static final String CONTRACT_RULES_NODE = "ruleDefinitions";
+    public static final String CONTRACT_CONSTRAINTS_NODE = "constraintDefinitions";
 
-    public static final String CONTRACT_RULE_NODE = "ruleDefinition";
+    public static final String CONTRACT_CONSTRAINT_NODE = "constraintDefinition";
 
-    public static final String RULE_EXPRESSION = "conditionalExpression";
+    public static final String CONSTRAINT_EXPRESSION = "conditionalExpression";
 
-    public static final String RULE_EXPLANATION = "explanation";
+    public static final String CONSTRAINT_EXPLANATION = "explanation";
 
     public static final String INPUT_NAMES = "inputDefinitionNames";
 
@@ -580,23 +580,23 @@ public class XMLSProcessDefinition {
         if (!inputsNode.getChildNodes().isEmpty()) {
             contractNode.addChild(inputsNode);
         }
-        final List<SRuleDefinition> rules = contract.getRules();
+        final List<SConstraintDefinition> rules = contract.getConstraints();
         if (!rules.isEmpty()) {
-            final XMLNode rulesNode = new XMLNode(CONTRACT_RULES_NODE);
+            final XMLNode rulesNode = new XMLNode(CONTRACT_CONSTRAINTS_NODE);
             contractNode.addChild(rulesNode);
 
-            for (final SRuleDefinition rule : rules) {
+            for (final SConstraintDefinition rule : rules) {
                 rulesNode.addChild(createRuleNode(rule));
             }
         }
         return contractNode;
     }
 
-    private XMLNode createRuleNode(final SRuleDefinition rule) {
-        final XMLNode ruleNode = new XMLNode(CONTRACT_RULE_NODE);
+    private XMLNode createRuleNode(final SConstraintDefinition rule) {
+        final XMLNode ruleNode = new XMLNode(CONTRACT_CONSTRAINT_NODE);
         ruleNode.addAttribute(NAME, rule.getName());
-        ruleNode.addChild(RULE_EXPRESSION, rule.getExpression());
-        ruleNode.addChild(RULE_EXPLANATION, rule.getExplanation());
+        ruleNode.addChild(CONSTRAINT_EXPRESSION, rule.getExpression());
+        ruleNode.addChild(CONSTRAINT_EXPLANATION, rule.getExplanation());
         final XMLNode namesNode = new XMLNode(INPUT_NAMES);
         ruleNode.addChild(namesNode);
         for (final String inputName : rule.getInputNames()) {

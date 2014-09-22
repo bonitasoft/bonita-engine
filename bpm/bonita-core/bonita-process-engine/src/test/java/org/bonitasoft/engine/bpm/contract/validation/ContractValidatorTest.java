@@ -30,7 +30,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -44,13 +44,13 @@ public class ContractValidatorTest {
     private ContractStructureValidator structureValidator;
 
     @Mock
-    private ContractRulesValidator rulesValidator;
+    private ContractConstraintsValidator rulesValidator;
 
     @InjectMocks
     private ContractValidator validator;
 
-    private List<SRuleDefinition> anyRules() {
-        return anyListOf(SRuleDefinition.class);
+    private List<SConstraintDefinition> anyRules() {
+        return anyListOf(SConstraintDefinition.class);
     }
 
     private Map<String, Object> anyInputs() {
@@ -108,7 +108,7 @@ public class ContractValidatorTest {
         SContractDefinition contract = aContract().build();
         Map<String, Object> inputs = aMap().build();
         doThrow(new ContractViolationException("rule failure", new ArrayList<String>()))
-                .when(rulesValidator).validate(contract.getRules(), inputs);
+                .when(rulesValidator).validate(contract.getConstraints(), inputs);
 
         boolean valid = validator.isValid(contract, inputs);
 
@@ -121,7 +121,7 @@ public class ContractValidatorTest {
         Map<String, Object> inputs = aMap().build();
         List<String> problems = asList("There is problems with a rule", "Might have issue with other rule too");
         doThrow(new ContractViolationException("rule failure", problems))
-                .when(rulesValidator).validate(contract.getRules(), inputs);
+                .when(rulesValidator).validate(contract.getConstraints(), inputs);
 
         validator.isValid(contract, inputs);
 

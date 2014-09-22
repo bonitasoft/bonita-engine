@@ -24,6 +24,6 @@ public interface SContractDefinition extends SBaseElement {
 
     List<SComplexInputDefinition> getComplexInputs();
 
-    List<SRuleDefinition> getRules();
+    List<SConstraintDefinition> getConstraints();
 
 }

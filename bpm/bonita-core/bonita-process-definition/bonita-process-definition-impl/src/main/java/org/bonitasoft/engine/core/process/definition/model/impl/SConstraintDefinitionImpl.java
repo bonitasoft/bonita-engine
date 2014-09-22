@@ -16,13 +16,13 @@ package org.bonitasoft.engine.core.process.definition.model.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.contract.RuleDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
+import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class SRuleDefinitionImpl extends SNamedElementImpl implements SRuleDefinition {
+public class SConstraintDefinitionImpl extends SNamedElementImpl implements SConstraintDefinition {
 
     private static final long serialVersionUID = 1663246823634006952L;
 
@@ -32,14 +32,14 @@ public class SRuleDefinitionImpl extends SNamedElementImpl implements SRuleDefin
 
     private final List<String> inputNames;
 
-    public SRuleDefinitionImpl(final String name, final String expression, final String explanation) {
+    public SConstraintDefinitionImpl(final String name, final String expression, final String explanation) {
         super(name);
         inputNames = new ArrayList<String>();
         this.explanation = explanation;
         this.expression = expression;
     }
 
-    public SRuleDefinitionImpl(final RuleDefinition rule) {
+    public SConstraintDefinitionImpl(final ConstraintDefinition rule) {
         this(rule.getName(), rule.getExpression(), rule.getExplanation());
         for (final String inputName : rule.getInputNames()) {
             inputNames.add(inputName);
@@ -86,7 +86,7 @@ public class SRuleDefinitionImpl extends SNamedElementImpl implements SRuleDefin
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final SRuleDefinitionImpl other = (SRuleDefinitionImpl) obj;
+        final SConstraintDefinitionImpl other = (SConstraintDefinitionImpl) obj;
         if (explanation == null) {
             if (other.explanation != null) {
                 return false;

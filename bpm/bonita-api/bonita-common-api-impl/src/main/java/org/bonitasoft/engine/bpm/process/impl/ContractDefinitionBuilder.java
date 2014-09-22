@@ -19,8 +19,8 @@ import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.ConstraintDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
-import org.bonitasoft.engine.bpm.contract.impl.RuleDefinitionImpl;
 import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskDefinitionImpl;
@@ -53,22 +53,22 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
         return this;
     }
 
-    public ContractDefinitionBuilder addRule(final String name, final String expression, final String explanation, final String... inputNames) {
-        final RuleDefinitionImpl rule = new RuleDefinitionImpl(name, expression, explanation);
+    public ContractDefinitionBuilder addConstraint(final String name, final String expression, final String explanation, final String... inputNames) {
+        final ConstraintDefinitionImpl constraintDefinition = new ConstraintDefinitionImpl(name, expression, explanation);
         for (final String inputName : inputNames) {
-            rule.addInputName(inputName);
+            constraintDefinition.addInputName(inputName);
         }
-        contract.addRule(rule);
+        contract.addRule(constraintDefinition);
         return this;
     }
 
-    public ContractDefinitionBuilder addMandatoryRule(String inputName) {
+    public ContractDefinitionBuilder addMandatoryConstraint(String inputName) {
         final StringBuilder expression = new StringBuilder().append(inputName).append("!=null");
         expression.append(" && !");
         expression.append(inputName);
         expression.append(".toString().isEmpty()");
 
-        final RuleDefinitionImpl rule = new RuleDefinitionImpl(inputName, expression.toString(), new StringBuilder().append("input ").append(inputName).append(" is mandatory").toString());
+        final ConstraintDefinitionImpl rule = new ConstraintDefinitionImpl(inputName, expression.toString(), new StringBuilder().append("input ").append(inputName).append(" is mandatory").toString());
         rule.addInputName(inputName);
         contract.addRule(rule);
         return this;

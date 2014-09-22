@@ -19,12 +19,12 @@ import org.bonitasoft.engine.bpm.NamedElement;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 
 /**
- * A <code>RuleDefinition</code> is a constraint when executing the {@link UserTaskInstance}.
+ * A <code>ConstraintDefinition</code> is a constraint when executing the {@link UserTaskInstance}.
  *
  * @author Matthieu Chaffotte
  * @since 7.0
  */
-public interface RuleDefinition extends NamedElement {
+public interface ConstraintDefinition extends NamedElement {
 
     /**
      * Returns the boolean condition used to validate a part of the {@link ContractDefinition}.

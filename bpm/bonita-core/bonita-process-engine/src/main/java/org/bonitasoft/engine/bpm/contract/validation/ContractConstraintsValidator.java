@@ -18,43 +18,43 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
-import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.mvel2.MVEL;
 
-public class ContractRulesValidator {
+public class ContractConstraintsValidator {
 
-    private TechnicalLoggerService logger;
+    private final TechnicalLoggerService logger;
 
-    public ContractRulesValidator(TechnicalLoggerService logger) {
+    public ContractConstraintsValidator(final TechnicalLoggerService logger) {
         this.logger = logger;
     }
 
-    public void validate(final List<SRuleDefinition> rules, final Map<String, Object> variables) throws ContractViolationException {
-        List<String> comments = new ArrayList<String>();
-        for (final SRuleDefinition rule : rules) {
-            log(TechnicalLogSeverity.DEBUG, "Evaluating rule [" + rule.getName() + "] on input(s) " + rule.getInputNames());
+    public void validate(final List<SConstraintDefinition> constraints, final Map<String, Object> variables) throws ContractViolationException {
+        final List<String> comments = new ArrayList<String>();
+        for (final SConstraintDefinition constraint : constraints) {
+            log(TechnicalLogSeverity.DEBUG, "Evaluating constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames());
             Boolean valid;
             try {
-                valid = MVEL.evalToBoolean(rule.getExpression(), variables);
+                valid = MVEL.evalToBoolean(constraint.getExpression(), variables);
             } catch (final Exception e) {
                 valid = Boolean.FALSE;
             }
             if (!valid) {
-                log(TechnicalLogSeverity.WARNING, "Rule [" + rule.getName() + "] on input(s) " + rule.getInputNames() + " is not valid");
-                comments.add(rule.getExplanation());
+                log(TechnicalLogSeverity.WARNING, "Constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames() + " is not valid");
+                comments.add(constraint.getExplanation());
             }
         }
-        
+
         if (!comments.isEmpty()) {
             throw new ContractViolationException("Error while validating rules", comments);
         }
     }
 
     private void log(final TechnicalLogSeverity severity, final String message) {
-        if (logger.isLoggable(ContractRulesValidator.class, severity)) {
-            logger.log(ContractRulesValidator.class, severity, message);
+        if (logger.isLoggable(ContractConstraintsValidator.class, severity)) {
+            logger.log(ContractConstraintsValidator.class, severity, message);
         }
     }
 }

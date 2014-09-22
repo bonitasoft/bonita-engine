@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.aMap;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDefinitionBuilder.aContract;
-import static org.bonitasoft.engine.bpm.contract.validation.builder.SRuleDefinitionBuilder.aRuleFor;
+import static org.bonitasoft.engine.bpm.contract.validation.builder.SConstraintDefinitionBuilder.aRuleFor;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SSimpleInputDefinitionBuilder.anInput;
 import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
 import static org.mockito.Matchers.anyString;
@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.impl.SRuleDefinitionImpl;
+import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
@@ -29,7 +29,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ContractRulesValidatorTest {
+public class ContractConstraintsValidatorTest {
 
     private static final String NICE_COMMENT = "no way!";
     private static final String COMMENT = "comment";
@@ -39,51 +39,51 @@ public class ContractRulesValidatorTest {
     private TechnicalLoggerService loggerService;
 
     @InjectMocks
-    private ContractRulesValidator validator;
+    private ContractConstraintsValidator validator;
 
     @Before
     public void setUp() {
-        when(loggerService.isLoggable(ContractRulesValidator.class, TechnicalLogSeverity.DEBUG)).thenReturn(true);
-        when(loggerService.isLoggable(ContractRulesValidator.class, TechnicalLogSeverity.WARNING)).thenReturn(true);
+        when(loggerService.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG)).thenReturn(true);
+        when(loggerService.isLoggable(ContractConstraintsValidator.class, TechnicalLogSeverity.WARNING)).thenReturn(true);
     }
 
-    private SContractDefinition buildContractWithInputsAndRules() {
+    private SContractDefinition buildContractWithInputsAndConstraints() {
         return aContract()
                 .withInput(anInput(BOOLEAN).withName(IS_VALID).build())
                 .withInput(anInput(BOOLEAN).withName(IS_VALID).build())
-                .withRule(aRuleFor(IS_VALID).name("Mandatory").expression("isValid != null").explanation("isValid must be set").build())
-                .withRule(aRuleFor(IS_VALID, COMMENT).name("Comment_Needed_If_Not_Valid").expression("isValid || !isValid && comment != null")
+                .withConstraint(aRuleFor(IS_VALID).name("Mandatory").expression("isValid != null").explanation("isValid must be set").build())
+                .withConstraint(aRuleFor(IS_VALID, COMMENT).name("Comment_Needed_If_Not_Valid").expression("isValid || !isValid && comment != null")
                         .explanation("A comment is required when no validation").build())
-                .build();
+                        .build();
     }
 
     @Test
     public void should_log_all_rules_in_debug_mode() throws Exception {
-        final SContractDefinition contract = buildContractWithInputsAndRules();
-        Map<String, Object> variables = aMap().put(IS_VALID, false).put(COMMENT, NICE_COMMENT).build();
+        final SContractDefinition contract = buildContractWithInputsAndConstraints();
+        final Map<String, Object> variables = aMap().put(IS_VALID, false).put(COMMENT, NICE_COMMENT).build();
 
-        validator.validate(contract.getRules(), variables);
+        validator.validate(contract.getConstraints(), variables);
 
         //then
-        verify(loggerService).log(ContractRulesValidator.class, TechnicalLogSeverity.DEBUG, "Evaluating rule [Mandatory] on input(s) [isValid]");
-        verify(loggerService).log(ContractRulesValidator.class, TechnicalLogSeverity.DEBUG,
-                "Evaluating rule [Comment_Needed_If_Not_Valid] on input(s) [isValid, comment]");
-        verify(loggerService, never()).log(eq(ContractRulesValidator.class), eq(TechnicalLogSeverity.WARNING), anyString());
+        verify(loggerService).log(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG, "Evaluating constraint [Mandatory] on input(s) [isValid]");
+        verify(loggerService).log(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG,
+                "Evaluating constraint [Comment_Needed_If_Not_Valid] on input(s) [isValid, comment]");
+        verify(loggerService, never()).log(eq(ContractConstraintsValidator.class), eq(TechnicalLogSeverity.WARNING), anyString());
     }
 
     @Test
-    public void isValid_should_log_invalid_rules_in_warning_mode() throws Exception {
+    public void isValid_should_log_invalid_constraints_in_warning_mode() throws Exception {
         final Map<String, Object> variables = new HashMap<String, Object>();
         variables.put(IS_VALID, false);
         variables.put(COMMENT, null);
-        final SContractDefinition contract = buildContractWithInputsAndRules();
+        final SContractDefinition contract = buildContractWithInputsAndConstraints();
 
         try {
-            validator.validate(contract.getRules(), variables);
+            validator.validate(contract.getConstraints(), variables);
             fail("validation should fail");
-        } catch (Exception e) {
-            verify(loggerService).log(ContractRulesValidator.class, TechnicalLogSeverity.WARNING,
-                    "Rule [Comment_Needed_If_Not_Valid] on input(s) [isValid, comment] is not valid");
+        } catch (final Exception e) {
+            verify(loggerService).log(ContractConstraintsValidator.class, TechnicalLogSeverity.WARNING,
+                    "Constraint [Comment_Needed_If_Not_Valid] on input(s) [isValid, comment] is not valid");
         }
     }
 
@@ -93,15 +93,15 @@ public class ContractRulesValidatorTest {
         final Map<String, Object> variables = new HashMap<String, Object>();
         variables.put(IS_VALID, false);
         variables.put(COMMENT, NICE_COMMENT);
-        final SContractDefinition contract = buildContractWithInputsAndRules();
-        final SRuleDefinitionImpl badRule = new SRuleDefinitionImpl("bad rule", "a == b", "failing rule");
-        contract.getRules().add(badRule);
+        final SContractDefinition contract = buildContractWithInputsAndConstraints();
+        final SConstraintDefinitionImpl badRule = new SConstraintDefinitionImpl("bad rule", "a == b", "failing rule");
+        contract.getConstraints().add(badRule);
 
         //when
         try {
-            validator.validate(contract.getRules(), variables);
+            validator.validate(contract.getConstraints(), variables);
             fail("validation should fail");
-        } catch (ContractViolationException e) {
+        } catch (final ContractViolationException e) {
             assertThat(e.getExplanations()).hasSize(1).containsExactly(badRule.getExplanation());
         }
 

@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
+import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.contract.RuleDefinition;
 import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 
 /**
@@ -36,13 +36,13 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
 
     private final List<SComplexInputDefinition> complexInputs;
 
-    private final List<SRuleDefinition> rules;
+    private final List<SConstraintDefinition> constraints;
 
     public SContractDefinitionImpl() {
         super();
         simpleInputs = new ArrayList<SSimpleInputDefinition>();
         complexInputs = new ArrayList<SComplexInputDefinition>();
-        rules = new ArrayList<SRuleDefinition>();
+        constraints = new ArrayList<SConstraintDefinition>();
     }
 
     public SContractDefinitionImpl(final ContractDefinition contract) {
@@ -53,8 +53,8 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
         for (final ComplexInputDefinition input : contract.getComplexInputs()) {
             complexInputs.add(new SComplexInputDefinitionImpl(input));
         }
-        for (final RuleDefinition rule : contract.getRules()) {
-            rules.add(new SRuleDefinitionImpl(rule));
+        for (final ConstraintDefinition rule : contract.getConstraints()) {
+            constraints.add(new SConstraintDefinitionImpl(rule));
         }
     }
 
@@ -72,12 +72,12 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
     }
 
     @Override
-    public List<SRuleDefinition> getRules() {
-        return rules;
+    public List<SConstraintDefinition> getConstraints() {
+        return constraints;
     }
 
-    public void addRule(final SRuleDefinition rule) {
-        rules.add(rule);
+    public void addRule(final SConstraintDefinition rule) {
+        constraints.add(rule);
     }
 
 
@@ -92,7 +92,7 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (complexInputs == null ? 0 : complexInputs.hashCode());
-        result = prime * result + (rules == null ? 0 : rules.hashCode());
+        result = prime * result + (constraints == null ? 0 : constraints.hashCode());
         result = prime * result + (simpleInputs == null ? 0 : simpleInputs.hashCode());
         return result;
     }
@@ -116,11 +116,11 @@ public class SContractDefinitionImpl extends SBaseElementImpl implements SContra
         } else if (!complexInputs.equals(other.complexInputs)) {
             return false;
         }
-        if (rules == null) {
-            if (other.rules != null) {
+        if (constraints == null) {
+            if (other.constraints != null) {
                 return false;
             }
-        } else if (!rules.equals(other.rules)) {
+        } else if (!constraints.equals(other.constraints)) {
             return false;
         }
         if (simpleInputs == null) {

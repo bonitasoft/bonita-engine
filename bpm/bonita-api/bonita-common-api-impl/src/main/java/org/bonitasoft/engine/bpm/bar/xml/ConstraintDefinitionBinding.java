@@ -17,13 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.contract.impl.RuleDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.ConstraintDefinitionImpl;
 import org.bonitasoft.engine.io.xml.XMLParseException;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class RuleDefinitionBinding extends NamedElementBinding {
+public class ConstraintDefinitionBinding extends NamedElementBinding {
 
     private String expression;
 
@@ -31,15 +31,15 @@ public class RuleDefinitionBinding extends NamedElementBinding {
 
     private final List<String> inputNames;
 
-    public RuleDefinitionBinding() {
+    public ConstraintDefinitionBinding() {
         inputNames = new ArrayList<String>();
     }
 
     @Override
     public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
-        if (XMLProcessDefinition.RULE_EXPRESSION.equals(name)) {
+        if (XMLProcessDefinition.CONSTRAINT_EXPRESSION.equals(name)) {
             expression = value;
-        } else if (XMLProcessDefinition.RULE_EXPLANATION.equals(name)) {
+        } else if (XMLProcessDefinition.CONSTRAINT_EXPLANATION.equals(name)) {
             explanation = value;
         } else if (XMLProcessDefinition.INPUT_NAME.equals(name)) {
             inputNames.add(value);
@@ -52,7 +52,7 @@ public class RuleDefinitionBinding extends NamedElementBinding {
 
     @Override
     public Object getObject() {
-        final RuleDefinitionImpl rule = new RuleDefinitionImpl(name, expression, explanation);
+        final ConstraintDefinitionImpl rule = new ConstraintDefinitionImpl(name, expression, explanation);
         for (final String inputName : inputNames) {
             rule.addInputName(inputName);
         }
@@ -61,7 +61,7 @@ public class RuleDefinitionBinding extends NamedElementBinding {
 
     @Override
     public String getElementTag() {
-        return XMLProcessDefinition.CONTRACT_RULE_NODE;
+        return XMLProcessDefinition.CONTRACT_CONSTRAINT_NODE;
     }
 
 }

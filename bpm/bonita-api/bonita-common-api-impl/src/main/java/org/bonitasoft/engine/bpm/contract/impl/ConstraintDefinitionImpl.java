@@ -16,12 +16,12 @@ package org.bonitasoft.engine.bpm.contract.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.bpm.contract.RuleDefinition;
+import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 
 /**
  * @author Matthieu Chaffotte
  */
-public class RuleDefinitionImpl implements RuleDefinition {
+public class ConstraintDefinitionImpl implements ConstraintDefinition {
 
     private static final long serialVersionUID = 2793703451225519896L;
 
@@ -30,7 +30,7 @@ public class RuleDefinitionImpl implements RuleDefinition {
     private final String explanation;
     private final List<String> inputNames;
 
-    public RuleDefinitionImpl(final String name, final String expression, final String explanation) {
+    public ConstraintDefinitionImpl(final String name, final String expression, final String explanation) {
         this.name = name;
         inputNames = new ArrayList<String>();
         this.explanation = explanation;
@@ -79,7 +79,7 @@ public class RuleDefinitionImpl implements RuleDefinition {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final RuleDefinitionImpl other = (RuleDefinitionImpl) obj;
+        final ConstraintDefinitionImpl other = (ConstraintDefinitionImpl) obj;
         if (name == null) {
             if (other.name != null) {
                 return false;

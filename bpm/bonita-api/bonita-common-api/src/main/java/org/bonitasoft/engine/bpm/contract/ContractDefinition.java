@@ -48,6 +48,6 @@ public interface ContractDefinition extends BonitaObject {
      *
      * @return the validation rules of the contract
      */
-    List<RuleDefinition> getRules();
+    List<ConstraintDefinition> getConstraints();
 
 }

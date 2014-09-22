@@ -16,7 +16,7 @@ package org.bonitasoft.engine.bpm.bar.xml;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
-import org.bonitasoft.engine.bpm.contract.RuleDefinition;
+import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
 import org.bonitasoft.engine.io.xml.ElementBinding;
@@ -49,8 +49,8 @@ public class ContractDefinitionBinding extends ElementBinding {
         else if (XMLProcessDefinition.CONTRACT_COMPLEX_INPUT_NODE.equals(name)) {
             contract.addComplexInput((ComplexInputDefinition) value);
         }
-        else if (XMLProcessDefinition.CONTRACT_RULE_NODE.equals(name)) {
-            contract.addRule((RuleDefinition) value);
+        else if (XMLProcessDefinition.CONTRACT_CONSTRAINT_NODE.equals(name)) {
+            contract.addRule((ConstraintDefinition) value);
         }
     }
 

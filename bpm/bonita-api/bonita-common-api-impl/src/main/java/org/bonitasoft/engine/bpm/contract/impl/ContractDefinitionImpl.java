@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
+import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
-import org.bonitasoft.engine.bpm.contract.RuleDefinition;
 import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 
 /**
@@ -29,7 +29,7 @@ public class ContractDefinitionImpl implements ContractDefinition {
 
     private static final long serialVersionUID = 786706819903231008L;
 
-    private final List<RuleDefinition> rules;
+    private final List<ConstraintDefinition> rules;
 
     private final List<ComplexInputDefinition> complexInputs;
 
@@ -38,7 +38,7 @@ public class ContractDefinitionImpl implements ContractDefinition {
     public ContractDefinitionImpl() {
         simpleInputs = new ArrayList<SimpleInputDefinition>();
         complexInputs = new ArrayList<ComplexInputDefinition>();
-        rules = new ArrayList<RuleDefinition>();
+        rules = new ArrayList<ConstraintDefinition>();
     }
 
     public void addSimpleInput(final SimpleInputDefinition input) {
@@ -50,11 +50,11 @@ public class ContractDefinitionImpl implements ContractDefinition {
     }
 
     @Override
-    public List<RuleDefinition> getRules() {
+    public List<ConstraintDefinition> getConstraints() {
         return rules;
     }
 
-    public void addRule(final RuleDefinition rule) {
+    public void addRule(final ConstraintDefinition rule) {
         rules.add(rule);
     }
 

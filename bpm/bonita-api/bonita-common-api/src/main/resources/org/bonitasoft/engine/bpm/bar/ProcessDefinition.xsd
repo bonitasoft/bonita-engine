@@ -401,11 +401,11 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="ruleDefinitions" minOccurs="0"
+			<xs:element name="constraintDefinitions" minOccurs="0"
 				maxOccurs="1">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="ruleDefinition" type="definition:RuleDefinition"
+						<xs:element name="constraintDefinition" type="definition:ConstraintDefinition"
 							minOccurs="0" maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
@@ -444,7 +444,7 @@
 		</xs:complexContent>
 	</xs:complexType>
 
-	<xs:complexType name="RuleDefinition">
+	<xs:complexType name="ConstraintDefinition">
 		<xs:complexContent>
 			<xs:extension base="definition:NamedElement">
 				<xs:sequence>

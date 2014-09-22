@@ -6,7 +6,7 @@ import java.util.List;
 import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SRuleDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.impl.SContractDefinitionImpl;
 
@@ -15,7 +15,7 @@ public class SContractDefinitionBuilder {
 
     private List<SSimpleInputDefinition> simpleInputs = new ArrayList<SSimpleInputDefinition>();
     private List<SComplexInputDefinition> complexInputs = new ArrayList<SComplexInputDefinition>();
-    private List<SRuleDefinition> rules = new ArrayList<SRuleDefinition>();
+    private List<SConstraintDefinition> constraints = new ArrayList<SConstraintDefinition>();
 
     public static SContractDefinitionBuilder aContract() {
         return new SContractDefinitionBuilder();
@@ -39,8 +39,8 @@ public class SContractDefinitionBuilder {
         return this;
     }
     
-    public SContractDefinitionBuilder withRule(SRuleDefinition rule) {
-        rules.add(rule);
+    public SContractDefinitionBuilder withConstraint(SConstraintDefinition constraint) {
+        constraints.add(constraint);
         return this;
     }
     
@@ -52,8 +52,8 @@ public class SContractDefinitionBuilder {
         for (SComplexInputDefinition input : complexInputs) {
             contract.addComplexInput(input);
         }
-        for (SRuleDefinition rule : rules) {
-            contract.addRule(rule);
+        for (SConstraintDefinition constraint : constraints) {
+            contract.addRule(constraint);
         }
         return contract;
     }

@@ -29,16 +29,16 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 public class ContractStructureValidator {
 
-    private ContractTypeValidator typeValidator;
-    private TechnicalLoggerService logger;
+    private final ContractTypeValidator typeValidator;
+    private final TechnicalLoggerService logger;
 
-    public ContractStructureValidator(ContractTypeValidator typeValidator, TechnicalLoggerService loggerService) {
+    public ContractStructureValidator(final ContractTypeValidator typeValidator, final TechnicalLoggerService loggerService) {
         this.typeValidator = typeValidator;
-        this.logger = loggerService;
+        logger = loggerService;
     }
 
-    public void validate(SContractDefinition contract, Map<String, Object> inputs) throws ContractViolationException {
-        List<String> messages = new ArrayList<String>();
+    public void validate(final SContractDefinition contract, final Map<String, Object> inputs) throws ContractViolationException {
+        final List<String> messages = new ArrayList<String>();
         messages.addAll(recursive(contract.getSimpleInputs(), contract.getComplexInputs(), inputs));
         if (!messages.isEmpty()) {
             throw new ContractViolationException("Error while validating expected inputs", messages);
@@ -46,34 +46,34 @@ public class ContractStructureValidator {
     }
 
     @SuppressWarnings("unchecked")
-    private List<String> recursive(List<SSimpleInputDefinition> simpleInputs, List<SComplexInputDefinition> complexInputs, Map<String, Object> inputs) {
+    private List<String> recursive(final List<SSimpleInputDefinition> simpleInputs, final List<SComplexInputDefinition> complexInputs, final Map<String, Object> inputs) {
 
         logInputsWhichAreNotInContract(DEBUG, simpleInputs, inputs);
         
-        List<String> message = new ArrayList<String>();
-        for (SInputDefinition def : union(simpleInputs, complexInputs)) {
+        final List<String> message = new ArrayList<String>();
+        for (final SInputDefinition def : union(simpleInputs, complexInputs)) {
             try {
                 validateInput(def, inputs);
                 if (def instanceof SComplexInputDefinition) {
-                    SComplexInputDefinition complex = (SComplexInputDefinition) def;
+                    final SComplexInputDefinition complex = (SComplexInputDefinition) def;
                     message.addAll(recursive(complex.getSimpleInputDefinitions(), complex.getComplexInputDefinitions(), (Map<String, Object>) inputs.get(def.getName())));
                 }
-            } catch (InputValidationException e) {
+            } catch (final InputValidationException e) {
                 message.add(e.getMessage());
             }
         }
         return message;
     }
 
-    private List<SInputDefinition> union(List<SSimpleInputDefinition> simpleInputs, List<SComplexInputDefinition> complexInputs) {
-        List<SInputDefinition> all = new ArrayList<SInputDefinition>();
+    private List<SInputDefinition> union(final List<SSimpleInputDefinition> simpleInputs, final List<SComplexInputDefinition> complexInputs) {
+        final List<SInputDefinition> all = new ArrayList<SInputDefinition>();
         all.addAll(simpleInputs);
         all.addAll(complexInputs);
         return all;
     }
 
-    private void validateInput(SInputDefinition definition, Map<String, Object> inputs) throws InputValidationException {
-        String inputName = definition.getName();
+    private void validateInput(final SInputDefinition definition, final Map<String, Object> inputs) throws InputValidationException {
+        final String inputName = definition.getName();
         if (!inputs.containsKey(inputName)) {
             throw new InputValidationException("Expected input [" + inputName + "] is missing");
         } else {
@@ -81,17 +81,17 @@ public class ContractStructureValidator {
         }
     }
 
-    private void logInputsWhichAreNotInContract(TechnicalLogSeverity severity, List<SSimpleInputDefinition> simpleInputs, Map<String, Object> inputs) {
+    private void logInputsWhichAreNotInContract(final TechnicalLogSeverity severity, final List<SSimpleInputDefinition> simpleInputs, final Map<String, Object> inputs) {
         if (logger.isLoggable(ContractStructureValidator.class, severity)) {
-            for (String input : getInputsWhichAreNotInContract(simpleInputs, inputs)) {
+            for (final String input : getInputsWhichAreNotInContract(simpleInputs, inputs)) {
                 logger.log(ContractStructureValidator.class, severity, "Unexpected input [" + input + "] provided");
             }
         }
     }
 
-    private List<String> getInputsWhichAreNotInContract(List<SSimpleInputDefinition> simpleInputs, Map<String, Object> inputs) {
-        List<String> keySet = new ArrayList<String>(inputs.keySet());
-        for (SInputDefinition def : simpleInputs) {
+    private List<String> getInputsWhichAreNotInContract(final List<SSimpleInputDefinition> simpleInputs, final Map<String, Object> inputs) {
+        final List<String> keySet = new ArrayList<String>(inputs.keySet());
+        for (final SInputDefinition def : simpleInputs) {
             keySet.remove(def.getName());
         }
         return keySet;
