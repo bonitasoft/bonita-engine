@@ -23,16 +23,12 @@ import java.io.File;
 public class StringUtils {
 
     /**
-     * Replaces all "\" or "/" characters to sytem-dependent {@link File#separator} character, and ensures that there is no consecutive doubles.
+     * Replaces all "\" character with "/" character, and ensures that there is no double "/".
      *
      * @param path the path-like string to clean.
      * @return the cleaned path-like string.
      */
     public static String uniformizePathPattern(final String path) {
-        String replace = path.replace("\\", File.separator).replace("/", File.separator);
-        while (replace.indexOf(File.separator + File.separator) != -1) {
-            replace = replace.replace(File.separator + File.separator, File.separator);
-        }
-        return replace;
+        return path.replaceAll("\\\\", "/").replaceAll("/{2,}", "/");
     }
 }
