@@ -2015,12 +2015,12 @@ public class ModelConvertor {
         for (final SComplexInputDefinition input : sContract.getComplexInputs()) {
             contract.addComplexInput(toComplexInput(input));
         }
-        for (final SConstraintDefinition sRule : sContract.getConstraints()) {
-            final ConstraintDefinitionImpl rule = new ConstraintDefinitionImpl(sRule.getName(), sRule.getExpression(), sRule.getExplanation());
-            for (final String inputName : sRule.getInputNames()) {
-                rule.addInputName(inputName);
+        for (final SConstraintDefinition sConstraintDefinition : sContract.getConstraints()) {
+            final ConstraintDefinitionImpl constraint = new ConstraintDefinitionImpl(sConstraintDefinition.getName(), sConstraintDefinition.getExpression(), sConstraintDefinition.getExplanation());
+            for (final String inputName : sConstraintDefinition.getInputNames()) {
+                constraint.addInputName(inputName);
             }
-            contract.addRule(rule);
+            contract.addConstraint(constraint);
         }
         return contract;
     }

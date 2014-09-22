@@ -29,7 +29,7 @@ public class ContractDefinitionImpl implements ContractDefinition {
 
     private static final long serialVersionUID = 786706819903231008L;
 
-    private final List<ConstraintDefinition> rules;
+    private final List<ConstraintDefinition> constraints;
 
     private final List<ComplexInputDefinition> complexInputs;
 
@@ -38,11 +38,15 @@ public class ContractDefinitionImpl implements ContractDefinition {
     public ContractDefinitionImpl() {
         simpleInputs = new ArrayList<SimpleInputDefinition>();
         complexInputs = new ArrayList<ComplexInputDefinition>();
-        rules = new ArrayList<ConstraintDefinition>();
+        constraints = new ArrayList<ConstraintDefinition>();
     }
 
     public void addSimpleInput(final SimpleInputDefinition input) {
         simpleInputs.add(input);
+    }
+
+    public void addConstraint(final ConstraintDefinition constraint) {
+        constraints.add(constraint);
     }
 
     public void addComplexInput(final ComplexInputDefinition complexInput) {
@@ -51,11 +55,7 @@ public class ContractDefinitionImpl implements ContractDefinition {
 
     @Override
     public List<ConstraintDefinition> getConstraints() {
-        return rules;
-    }
-
-    public void addRule(final ConstraintDefinition rule) {
-        rules.add(rule);
+        return constraints;
     }
 
     @Override

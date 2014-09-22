@@ -50,7 +50,7 @@ public class ContractDefinitionBinding extends ElementBinding {
             contract.addComplexInput((ComplexInputDefinition) value);
         }
         else if (XMLProcessDefinition.CONTRACT_CONSTRAINT_NODE.equals(name)) {
-            contract.addRule((ConstraintDefinition) value);
+            contract.addConstraint((ConstraintDefinition) value);
         }
     }
 

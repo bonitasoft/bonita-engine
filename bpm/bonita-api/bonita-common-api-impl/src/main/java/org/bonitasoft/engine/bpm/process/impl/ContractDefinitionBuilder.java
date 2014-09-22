@@ -58,19 +58,20 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
         for (final String inputName : inputNames) {
             constraintDefinition.addInputName(inputName);
         }
-        contract.addRule(constraintDefinition);
+        contract.addConstraint(constraintDefinition);
         return this;
     }
 
-    public ContractDefinitionBuilder addMandatoryConstraint(String inputName) {
+    public ContractDefinitionBuilder addMandatoryConstraint(final String inputName) {
         final StringBuilder expression = new StringBuilder().append(inputName).append("!=null");
         expression.append(" && !");
         expression.append(inputName);
         expression.append(".toString().isEmpty()");
 
-        final ConstraintDefinitionImpl rule = new ConstraintDefinitionImpl(inputName, expression.toString(), new StringBuilder().append("input ").append(inputName).append(" is mandatory").toString());
-        rule.addInputName(inputName);
-        contract.addRule(rule);
+        final ConstraintDefinitionImpl constraint = new ConstraintDefinitionImpl(inputName, expression.toString(), new StringBuilder().append("input ")
+                .append(inputName).append(" is mandatory").toString());
+        constraint.addInputName(inputName);
+        contract.addConstraint(constraint);
         return this;
     }
 }
