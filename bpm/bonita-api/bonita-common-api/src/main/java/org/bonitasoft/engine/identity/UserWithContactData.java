@@ -16,7 +16,7 @@ package org.bonitasoft.engine.identity;
 import java.io.Serializable;
 
 /**
- * represents a association of a {@link User} and its {@link ContactData}
+ * represents an association of a {@link User} and its {@link ContactData}
  *
  * @author Matthieu Chaffotte
  * @see User
