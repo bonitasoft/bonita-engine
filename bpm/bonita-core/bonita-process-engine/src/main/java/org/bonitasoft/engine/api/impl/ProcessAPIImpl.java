@@ -2510,7 +2510,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     protected String generateRelativeResourcePath(final File processDirectory, final File f) {
         String path = StringUtils.uniformizePathPattern(f.getAbsolutePath().replace(processDirectory.getAbsolutePath(), ""));
         // remove first slash, if any:
-        if (path.startsWith(File.separator)) {
+        if (path.startsWith("/")) {
             path = path.substring(1);
         }
         return path;
