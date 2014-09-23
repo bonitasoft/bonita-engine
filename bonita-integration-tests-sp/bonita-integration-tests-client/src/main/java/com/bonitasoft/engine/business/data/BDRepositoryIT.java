@@ -30,6 +30,7 @@ import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -1019,6 +1020,40 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         disableAndDeleteProcess(processDefinition);
         disableAndDeleteProcess(subProcessDefinition);
+    }
+
+    @Test
+    public void testName() throws Exception {
+
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployees", "import " + EMPLOYEE_QUALIF_CLASSNAME
+                + "; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';"
+                + " Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; [jane, john]", List.class.getName());
+
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("MBIMI", "1.2-beta");
+        builder.addBusinessData("myEmployees", EMPLOYEE_QUALIF_CLASSNAME, employeeExpression).setMultiple(true);
+        builder.addData("names", List.class.getName(), null);
+        builder.addActor(ACTOR_NAME);
+        final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask("step1", ACTOR_NAME);
+        userTaskBuilder.addBusinessData("employee", EMPLOYEE_QUALIF_CLASSNAME);
+        userTaskBuilder.addShortTextData("name", null);
+        userTaskBuilder.addMultiInstance(false, "myEmployees").addDataInputItemRef("employee").addDataOutputItemRef("name").addLoopDataOutputRef("names");
+        userTaskBuilder.addOperation(new OperationBuilder().createSetDataOperation("name", new ExpressionBuilder().createConstantStringExpression("Doe")));
+        builder.addUserTask("step2", ACTOR_NAME);
+        builder.addTransition("step1", "step2");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+
+        final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
+        HumanTaskInstance userTask = waitForUserTask("step1", instance);
+        assignAndExecuteStep(userTask, matti.getId());
+        userTask = waitForUserTask("step1", instance);
+        assignAndExecuteStep(userTask, matti.getId());
+
+        waitForUserTask("step2", instance.getId());
+
+        final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("names", instance.getId());
+        assertThat(dataInstance.getValue().toString()).isEqualTo("[Doe, Doe]");
+
+        disableAndDeleteProcess(processDefinition);
     }
 
 }
