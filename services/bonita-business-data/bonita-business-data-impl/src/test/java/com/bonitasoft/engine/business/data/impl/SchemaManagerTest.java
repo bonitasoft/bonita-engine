@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.business.data.impl;
 
 import static org.junit.Assert.fail;
@@ -20,7 +28,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.bonitasoft.engine.BOMBuilder;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
-import com.bonitasoft.engine.business.data.SBusinessDataRepositoryDeploymentException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
@@ -43,18 +50,18 @@ public class SchemaManagerTest {
     }
 
     @Test
-    public void executeUpdateAndDropScriptsShouldWorkWithAllSupportedTypes() throws Exception {
+    public void executeUpdateAndDropScriptsShouldWorkWithAllSupportedTypes() {
         final BusinessObjectModel bom = BOMBuilder.aBOM().buildModelWithAllSupportedTypes();
         updateAndDropSchema(bom);
     }
 
     @Test
-    public void executeUpdateAndDropScriptsShouldSupportConstraints() throws Exception {
+    public void executeUpdateAndDropScriptsShouldSupportConstraints() {
         final BusinessObjectModel bom = BOMBuilder.aBOM().buildModelWithConstrainedFields();
         updateAndDropSchema(bom);
     }
 
-    protected void updateAndDropSchema(final BusinessObjectModel bom) throws SBusinessDataRepositoryDeploymentException {
+    protected void updateAndDropSchema(final BusinessObjectModel bom) {
         final List<Exception> updateExceptions = schemaManager.update(bom.getBusinessObjectsClassNames());
         if (!updateExceptions.isEmpty()) {
             fail("Upating schema fails due to: " + updateExceptions);

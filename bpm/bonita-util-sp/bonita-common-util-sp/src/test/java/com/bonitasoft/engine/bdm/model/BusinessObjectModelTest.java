@@ -25,14 +25,14 @@ import org.junit.Test;
 public class BusinessObjectModelTest {
 
     @Test
-    public void cannot_be_marshalled_when_it_has_no_business_object() throws Exception {
+    public void cannot_be_marshalled_when_it_has_no_business_object() {
         final BusinessObjectModel businessObjectModel = new BusinessObjectModel();
 
         assertThat(businessObjectModel).cannotBeMarshalled();
     }
 
     @Test
-    public void can_be_marshalled_when_it_has_at_least_one_business_object() throws Exception {
+    public void can_be_marshalled_when_it_has_at_least_one_business_object() {
         final BusinessObjectModel businessObjectModel = new BusinessObjectModel();
         businessObjectModel.addBusinessObject(aBO("aBo").withField(aStringField("aField").build()).build());
 
@@ -40,7 +40,7 @@ public class BusinessObjectModelTest {
     }
 
     @Test
-    public void should_have_already_declared_business_object_in_relation_fields() throws Exception {
+    public void should_have_already_declared_business_object_in_relation_fields() {
         final BusinessObject notInModelBO = aBO("notInModelBo").withField(aStringField("aField").build()).build();
         final BusinessObjectModel businessObjectModel = new BusinessObjectModel();
         businessObjectModel.addBusinessObject(aBO("aBo").withField(anAggregationField("aggreg", notInModelBO)).build());
@@ -54,7 +54,7 @@ public class BusinessObjectModelTest {
     }
 
     @Test
-    public void should_list_distincts_business_object_class_names() throws Exception {
+    public void should_list_distincts_business_object_class_names() {
         final String aClassName = "aClassName";
         final String anotherClassName = "anotherClassName";
         final BusinessObjectModel bom = aBOM().withBOs(aBO(aClassName).build(), aBO(aClassName).build(), aBO(anotherClassName).build()).build();

@@ -1,8 +1,11 @@
-/**
- * Copyright (C) 2014 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- *
- */
+/*******************************************************************************
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bdm.validator.rule;
 
 import static com.bonitasoft.engine.bdm.builder.BusinessObjectBuilder.aBO;
@@ -23,19 +26,18 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 
 /**
  * @author Romain Bioteau
- *
  */
 public class BusinessObjectValidationRuleTest {
 
     private BusinessObjectValidationRule businessObjectValidationRule;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         businessObjectValidationRule = new BusinessObjectValidationRule();
     }
 
     @Test
-    public void should_apply_to_businessObject() throws Exception {
+    public void should_apply_to_businessObject() {
         assertThat(businessObjectValidationRule.appliesTo(new BusinessObjectModel())).isFalse();
         assertThat(businessObjectValidationRule.appliesTo(new SimpleField())).isFalse();
         assertThat(businessObjectValidationRule.appliesTo(new UniqueConstraint())).isFalse();
@@ -44,12 +46,12 @@ public class BusinessObjectValidationRuleTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouddCheckRule_throw_IllegalArgumentException() throws Exception {
+    public void shouddCheckRule_throw_IllegalArgumentException() {
         businessObjectValidationRule.checkRule(new SimpleField());
     }
 
     @Test
-    public void should_validate_that_qualified_name_is_not_null() throws Exception {
+    public void should_validate_that_qualified_name_is_not_null() {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName(null);
 
@@ -59,7 +61,7 @@ public class BusinessObjectValidationRuleTest {
     }
 
     @Test
-    public void shoudCheckRule_returns_valid_status() throws Exception {
+    public void shoudCheckRule_returns_valid_status() {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Bo");
         final SimpleField field = new SimpleField();
@@ -74,7 +76,7 @@ public class BusinessObjectValidationRuleTest {
     }
 
     @Test
-    public void shoudCheckRule_returns_error_status() throws Exception {
+    public void shoudCheckRule_returns_error_status() {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Bo2");
         ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
@@ -95,7 +97,7 @@ public class BusinessObjectValidationRuleTest {
     }
 
     @Test
-    public void shoudCheckRule_returns_error_status_for_duplicated_query_name() throws Exception {
+    public void shoudCheckRule_returns_error_status_for_duplicated_query_name() {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Bo2");
         final SimpleField field = new SimpleField();
@@ -108,7 +110,7 @@ public class BusinessObjectValidationRuleTest {
     }
 
     @Test
-    public void shoudCheckRule_returns_error_status_for_duplicated_constraint_name() throws Exception {
+    public void shoudCheckRule_returns_error_status_for_duplicated_constraint_name() {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Bo2");
         final SimpleField field = new SimpleField();
@@ -121,7 +123,7 @@ public class BusinessObjectValidationRuleTest {
     }
 
     @Test
-    public void should_validate_that_simple_name_contain_no_underscore() throws Exception {
+    public void should_validate_that_simple_name_contain_no_underscore() {
         final BusinessObject businessObject = aBO("Name_withUnderscore").withField(aBooleanField("field")).build();
 
         final ValidationStatus validationStatus = businessObjectValidationRule.validate(businessObject);

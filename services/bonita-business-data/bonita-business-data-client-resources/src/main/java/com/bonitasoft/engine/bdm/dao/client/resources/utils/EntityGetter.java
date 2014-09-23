@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bdm.dao.client.resources.utils;
 
 import static com.bonitasoft.engine.bdm.dao.client.resources.utils.Capitalizer.capitalize;
@@ -15,7 +23,7 @@ import com.bonitasoft.engine.bdm.model.field.Field;
  */
 public class EntityGetter {
 
-    private Method method;
+    private final Method method;
 
     public EntityGetter(Method method) {
         checkIsGetter(method);
@@ -36,13 +44,12 @@ public class EntityGetter {
     public String getCapitalizedFieldName() {
         return method.getName().substring(3);
     }
-    
+
     public String getReturnTypeClassName() {
         if (returnsList()) {
             return List.class.getName();
-        } else {
-            return method.getReturnType().getName();
         }
+        return method.getReturnType().getName();
     }
 
     public String getAssociatedNamedQuery() {
@@ -60,8 +67,7 @@ public class EntityGetter {
             final ParameterizedType listType = (ParameterizedType) method.getGenericReturnType();
             final Class<?> type = (Class<?>) listType.getActualTypeArguments()[0];
             return type;
-        } else {
-            return method.getReturnType();
         }
+        return method.getReturnType();
     }
 }

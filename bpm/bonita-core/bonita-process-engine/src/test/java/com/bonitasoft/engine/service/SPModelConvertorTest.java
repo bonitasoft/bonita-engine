@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -10,7 +18,7 @@ import com.bonitasoft.engine.platform.Tenant;
 public class SPModelConvertorTest {
 
     @Test
-    public void clientToServerTenantConversionShouldTreatAllFields() throws Exception {
+    public void clientToServerTenantConversionShouldTreatAllFields() {
         final String name = "tenant_conversion_test";
         final String createdBy = "Scoobidoo";
         final long created = 4874411255L;
@@ -33,15 +41,5 @@ public class SPModelConvertorTest {
         assertThat(tenant.getIconPath()).isEqualTo(iconPath);
         assertThat(tenant.getState()).isEqualTo(status);
     }
-
-    // @Test
-    // public void defaultTenantMaintenanceModeIsFalse() throws Exception {
-    // final STenant sTenant = BuilderFactory.get(STenantBuilderFactory.class)
-    // .createNewInstance("model_conversion", "Scoobidoo", 4874411255L, "activated", false).done();
-    // Tenant tenant = SPModelConvertor.toTenant(sTenant);
-    //
-    //
-    // // assertThat(tenant. isInMaintenance()).isEqualTo(false);
-    // }
 
 }
