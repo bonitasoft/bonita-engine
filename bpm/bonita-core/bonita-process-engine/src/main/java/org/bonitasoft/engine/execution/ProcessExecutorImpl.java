@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2014 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -63,7 +63,6 @@ import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.TransitionState;
-import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.exception.SProcessDocumentCreationException;
@@ -263,7 +262,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                     if ((defaultTransition = getDefaultTransition(sDefinition, flowNodeInstance)) == null) {
                         chosenTransitionDefinitions = new ArrayList<STransitionDefinition>(1);
                     } else {
-                        List<STransitionDefinition> transitions = new ArrayList<STransitionDefinition>(1);
+                        final List<STransitionDefinition> transitions = new ArrayList<STransitionDefinition>(1);
                         transitions.add(defaultTransition);
                         return transitions;
                     }
@@ -316,7 +315,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private void throwSActivityExecutionException(final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance)
             throws SActivityExecutionException {
-        SActivityExecutionException exception = new SActivityExecutionException("There is no default transition on " + flowNodeInstance.getName()
+        final SActivityExecutionException exception = new SActivityExecutionException("There is no default transition on " + flowNodeInstance.getName()
                 + ", but no outgoing transition had a valid condition.");
         exception.setProcessDefinitionNameOnContext(sDefinition.getName());
         exception.setProcessDefinitionVersionOnContext(sDefinition.getVersion());
@@ -740,7 +739,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     /**
      * Evaluate the split of the element
      * The element contains the current token it received
-     * 
+     *
      * @return
      *         number of token of the process
      */
@@ -795,8 +794,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private int updateTokens(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance,
             final int numberOfTokenToMerge, final FlowNodeTransitionsWrapper transitionsDescriptor, final FlowMerger merger)
-            throws SObjectModificationException, SObjectNotFoundException, SObjectReadException, SObjectCreationException, SGatewayModificationException,
-            SWorkRegisterException, SBonitaException {
+                    throws SObjectModificationException, SObjectNotFoundException, SObjectReadException, SObjectCreationException, SGatewayModificationException,
+                    SWorkRegisterException, SBonitaException {
         // handle token creation/deletion
         if (merger.mustConsumeInputTokenOnTakingTransition()) {
             tokenService.deleteTokens(sProcessInstance.getId(), child.getTokenRefId(), numberOfTokenToMerge);
@@ -878,7 +877,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     public SProcessInstance start(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final long starterId, final long starterSubstituteId,
             final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
             final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final long callerId, final long subProcessDefinitionId)
-            throws SProcessInstanceCreationException {
+                    throws SProcessInstanceCreationException {
         try {
             final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
             final FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, getFilter(targetSFlowNodeDefinitionId), subProcessDefinitionId);
@@ -915,7 +914,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
             final boolean isInitializing = initialize(starterId, sProcessDefinition, sProcessInstance, expressionContext,
                     operations != null ? new ArrayList<SOperation>(operations) : operations, context, selector.getContainer(), connectors,
-                    selector);
+                            selector);
             try {
                 handleEventSubProcess(sProcessDefinition, sProcessInstance, selector.getSubProcessDefinitionId());
             } catch (final SProcessInstanceCreationException e) {
@@ -970,7 +969,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final ConnectorResult result = connectorService.executeMutipleEvaluation(processDefinition.getId(), connectorId, version, connectorsExps,
                     contextInputValues, Thread.currentThread().getContextClassLoader(), expcontext);
             final List<Operation> outputs = connectorDefinition.getOutputs();
-            connectorService.executeOutputOperation(ServerModelConvertor.convertOperations(outputs), expcontext, result);
+            connectorService.executeOutputOperation(ModelConvertor.convertOperations(outputs), expcontext, result);
         }
     }
 
@@ -984,7 +983,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     @Override
     public SProcessInstance startElements(final SProcessInstance sProcessInstance, final FlowNodeSelector selector) throws SProcessInstanceCreationException,
-            SFlowNodeExecutionException {
+    SFlowNodeExecutionException {
         final List<SFlowNodeInstance> flowNodeInstances = initializeFirstExecutableElements(sProcessInstance, selector);
         // process is initialized and now the engine trigger jobs to execute other activities, give the hand back
         ProcessInstanceState state;
@@ -1030,7 +1029,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         // Execute Activities
         for (final SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
             workService
-                    .registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, parentProcessInstanceId, sFlowNodeInstance.getId(), null, null));
+            .registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, parentProcessInstanceId, sFlowNodeInstance.getId(), null, null));
         }
     }
 

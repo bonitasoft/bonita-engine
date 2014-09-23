@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -74,7 +74,6 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.instance.model.*;
 import org.bonitasoft.engine.core.process.instance.model.archive.*;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
@@ -1518,10 +1517,10 @@ public class ModelConvertor {
                 .createNewInstance()
                 .setOperator(operation.getOperator())
                 .setType(SOperatorType.valueOf(operation.getType().name()))
-                .setRightOperand(ServerModelConvertor.convertExpression(operation.getRightOperand()))
+                .setRightOperand(ModelConvertor.constructSExpression(operation.getRightOperand()))
                 .setLeftOperand(
                         BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(operation.getLeftOperand().getName())
-                                .setType(operation.getLeftOperand().getType()).done()).done();
+                        .setType(operation.getLeftOperand().getType()).done()).done();
     }
 
     public static List<SOperation> convertOperations(final List<Operation> operations) {
@@ -1843,6 +1842,25 @@ public class ModelConvertor {
         final ThemeType type = ThemeType.valueOf(sTheme.getType().name());
         final Date lastUpdateDate = new Date(sTheme.getLastUpdateDate());
         return new ThemeImpl(sTheme.getContent(), sTheme.getCssContent(), sTheme.isDefault(), type, lastUpdateDate);
+    }
+
+    public static CustomUserInfoDefinitionImpl convert(SCustomUserInfoDefinition sDefinition) {
+        CustomUserInfoDefinitionImpl definition = new CustomUserInfoDefinitionImpl();
+        definition.setId(sDefinition.getId());
+        definition.setName(sDefinition.getName());
+        definition.setDescription(sDefinition.getDescription());
+        return definition;
+    }
+
+    public static CustomUserInfoValueImpl convert(SCustomUserInfoValue sValue) {
+        if (sValue == null) {
+            return null;
+        }
+        CustomUserInfoValueImpl value = new CustomUserInfoValueImpl();
+        value.setDefinitionId(sValue.getDefinitionId());
+        value.setUserId(sValue.getUserId());
+        value.setValue(sValue.getValue());
+        return value;
     }
 
 }

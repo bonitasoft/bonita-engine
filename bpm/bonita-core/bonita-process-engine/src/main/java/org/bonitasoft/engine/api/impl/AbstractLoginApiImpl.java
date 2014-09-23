@@ -19,7 +19,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.SPlatformNotFoundException;
+import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;

@@ -22,8 +22,6 @@ import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,8 +44,6 @@ public class ConstantExpressionExecutorStrategyTest {
      * 
      * @throws SExpressionEvaluationException
      */
-    @Cover(classes = { ConstantExpressionExecutorStrategyTest.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Evaluate", "Expression", "Constant",
-            "Date" }, jira = "ENGINE-1559, ENGINE-1099")
     @Test
     public final void evaluateDate() throws SExpressionEvaluationException {
         final SExpression sExpression = buildExpression("2013-07-18T14:49:26.86+02:00", SExpression.TYPE_CONSTANT, Date.class.getName(), null, null);
@@ -56,8 +52,6 @@ public class ConstantExpressionExecutorStrategyTest {
         assertNotNull(result);
     }
 
-    @Cover(classes = { ConstantExpressionExecutorStrategyTest.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Evaluate", "Expression", "Constant",
-            "Date" }, jira = "ENGINE-1559, ENGINE-1099")
     @Test
     public final void evaluateDateWithoutTimeZone() throws SExpressionEvaluationException {
         final SExpression sExpression = buildExpression("2013-07-18T14:49:26.86", SExpression.TYPE_CONSTANT, Date.class.getName(), null, null);
@@ -66,8 +60,6 @@ public class ConstantExpressionExecutorStrategyTest {
         assertNotNull(result);
     }
 
-    @Cover(classes = { ConstantExpressionExecutorStrategyTest.class }, concept = BPMNConcept.EXPRESSIONS, keywords = { "Evaluate", "Expression", "Constant",
-            "Date" }, jira = "ENGINE-1559, ENGINE-1099")
     @Test
     public final void evaluateDateWithoutMilliseconds() throws SExpressionEvaluationException {
         final SExpression sExpression = buildExpression("2013-07-18T14:49:26+02:00", SExpression.TYPE_CONSTANT, Date.class.getName(), null, null);

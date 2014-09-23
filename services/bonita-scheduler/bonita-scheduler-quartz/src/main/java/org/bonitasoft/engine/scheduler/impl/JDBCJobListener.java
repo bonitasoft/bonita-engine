@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- * 
+ *
  * @since 6.1
  */
 package org.bonitasoft.engine.scheduler.impl;
@@ -24,6 +24,8 @@ import java.util.List;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -54,10 +56,13 @@ public class JDBCJobListener extends AbstractJobListener {
 
     private final IncidentService incidentService;
 
-    public JDBCJobListener(final JobService jobService, final IncidentService incidentService) {
+    private final TechnicalLoggerService logger;
+
+    public JDBCJobListener(final JobService jobService, final IncidentService incidentService, final TechnicalLoggerService logger) {
         super();
         this.jobService = jobService;
         this.incidentService = incidentService;
+        this.logger = logger;
     }
 
     @Override
@@ -131,9 +136,19 @@ public class JDBCJobListener extends AbstractJobListener {
 
     private void deleteJobIfNotScheduledAnyMore(final Long jobDescriptorId) throws SJobDescriptorNotFoundException, SJobDescriptorReadException,
     SSchedulerException {
-        final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
-        if (!getSchedulerService().isStillScheduled(jobDescriptor)) {
-            getSchedulerService().delete(jobDescriptor.getJobName());
+        try {
+            final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
+            if (!getSchedulerService().isStillScheduled(jobDescriptor)) {
+                getSchedulerService().delete(jobDescriptor.getJobName());
+            }
+        } catch (final SJobDescriptorNotFoundException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                final StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("jobDescriptor with id");
+                stringBuilder.append(jobDescriptorId);
+                stringBuilder.append(" already deleted, ignore it");
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, stringBuilder.toString());
+            }
         }
     }
 
