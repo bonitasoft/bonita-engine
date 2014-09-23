@@ -1,6 +1,6 @@
 package org.bonitasoft.engine.accessors;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,9 +30,10 @@ public class TenantAccessorTest {
             TenantAPIAccessor.getLoginAPI();
         } catch (final ServerAPIException e) {
             e.printStackTrace();
+            return;
+        } finally {
             APITypeManager.setAPITypeAndParams(apiType, parameters);
             TenantAPIAccessor.getLoginAPI();
-            return;
         }
 
         fail("This statement should not be reached.");
