@@ -49,6 +49,8 @@ public class SADocumentMappingBuilderFactoryImpl implements SADocumentMappingBui
 
     static final String CREATION_DATE = "creationDate";
 
+    static final String DESCRIPTION = "description";
+
     @Override
     public SADocumentMappingBuilder createNewInstance() {
         final SADocumentMappingImpl documentMapping = new SADocumentMappingImpl();
@@ -121,4 +123,8 @@ public class SADocumentMappingBuilderFactoryImpl implements SADocumentMappingBui
         return URL;
     }
 
+    @Override
+    public String getDescriptionKey() {
+        return DESCRIPTION;
+    }
 }
