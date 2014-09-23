@@ -15,6 +15,7 @@ package org.bonitasoft.engine.bpm.contract.validation;
 
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SSimpleInputDefinitionBuilder.anInput;
 import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
+import static org.bonitasoft.engine.core.process.definition.model.SType.DECIMAL;
 
 import java.util.HashMap;
 
@@ -38,7 +39,18 @@ public class ContractTypeValidatorTest {
         
         contractTypeValidator.validate(definition, "not a boolean");
     }
-    
+
+    @Test
+    public void should_decimal_validation_accept_integer() throws Exception {
+        //given
+        SInputDefinition definition = anInput(DECIMAL).build();
+
+        //when
+        contractTypeValidator.validate(definition,2);
+
+        //then no exception
+    }
+
     @Test(expected = InputValidationException.class)
     public void should_not_validate_null_for_a_complex_type() throws Exception {
         SComplexInputDefinitionImpl definition = new SComplexInputDefinitionImpl("a complex definition");

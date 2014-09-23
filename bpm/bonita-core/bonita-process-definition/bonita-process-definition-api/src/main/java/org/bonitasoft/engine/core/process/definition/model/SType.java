@@ -27,18 +27,19 @@ public enum SType {
     BOOLEAN(Boolean.class),
     DATE(Date.class),
     INTEGER(Integer.class, Long.class, BigInteger.class, Short.class, Byte.class),
-    DECIMAL(Float.class, Double.class, BigDecimal.class);
+    DECIMAL(Float.class, Double.class, BigDecimal.class, Integer.class, Long.class, BigInteger.class, Short.class, Byte.class);
 
     private List<Class<?>> assignableTypes;
 
-    SType(Class<?>... assignableTypes) {
+    SType(final Class<?>... assignableTypes) {
         this.assignableTypes = Arrays.asList(assignableTypes);
     }
 
-    public boolean validate(Object object) {
-        if (object == null)
+    public boolean validate(final Object object) {
+        if (object == null) {
             return true;
-        for (Class<?> clazz : assignableTypes) {
+        }
+        for (final Class<?> clazz : assignableTypes) {
             if (object.getClass().isAssignableFrom(clazz)) {
                 return true;
             }

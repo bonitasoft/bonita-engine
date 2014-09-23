@@ -62,7 +62,8 @@ public class UserTaskContractTest extends CommonAPITest {
     }
 
     @Test
-    public void createAContractAndGetIt() throws Exception {
+    public void should_getUserTaskContract_return_the_contract() throws Exception {
+        //given
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
@@ -72,8 +73,10 @@ public class UserTaskContractTest extends CommonAPITest {
         getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance userTask = waitForUserTask(TASK1);
 
+        //when
         final ContractDefinition contract = getProcessAPI().getUserTaskContract(userTask.getId());
 
+        //then
         assertThat(contract.getSimpleInputs()).hasSize(1);
         final SimpleInputDefinition input = contract.getSimpleInputs().get(0);
         assertThat(input.getName()).isEqualTo("numberOfDays");
@@ -87,11 +90,12 @@ public class UserTaskContractTest extends CommonAPITest {
         assertThat(rule.getExplanation()).isEqualTo("numberOfDays must be set");
         assertThat(rule.getInputNames()).containsExactly("numberOfDays");
 
+        //clean up
         disableAndDeleteProcess(processDefinition);
     }
 
     @Test
-    public void createAContractWithAComplexInput() throws Exception {
+    public void should_getUserTaskContract_return_contract_with_complex_inputs() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         final SimpleInputDefinition expenseType = new SimpleInputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
@@ -128,34 +132,6 @@ public class UserTaskContractTest extends CommonAPITest {
         }
     }
 
-    private void check_invalid_contract_with_special_char(final long inputValue) throws Exception {
-        //given
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
-        builder.addActor(ACTOR_NAME);
-        final String expectedExplanation = "numberOfDays must between one day and one year";
-        builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
-        .addConstraint("mandatory", "numberOfDays>1 && numberOfDays<365", expectedExplanation, "numberOfDays");
-
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
-        getProcessAPI().startProcess(processDefinition.getId());
-
-        //when
-        final HumanTaskInstance task = waitForUserTask(TASK1);
-        final Map<String, Object> inputs = new HashMap<String, Object>();
-        inputs.put("numberOfDays", inputValue);
-        try {
-            getProcessAPI().executeUserTask(task.getId(), inputs);
-            fail("should throw ContractViolationException");
-        } catch (final ContractViolationException e) {
-            //then
-            assertThat(e.getExplanations()).as("rule should be violated").isNotEmpty().contains(expectedExplanation);
-        } finally {
-            disableAndDeleteProcess(processDefinition);
-
-        }
-
-    }
-
     @Test
     public void should_execute_a_contract_with_xml_tag_in_rule() throws Exception {
         //given
@@ -180,7 +156,35 @@ public class UserTaskContractTest extends CommonAPITest {
     }
 
     @Test
-    public void getExceptionWhenContractIsNotValid() throws Exception {
+    public void should_execute_a_contract_with_integer_in_decimal() throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
+        builder.addActor(ACTOR_NAME);
+        final UserTaskDefinitionBuilder userTask = builder.addUserTask(TASK1, ACTOR_NAME);
+
+        final Integer value = 2;
+        userTask.addContract().addSimpleInput("decimal", Type.DECIMAL, null);
+        userTask.addData("variable", Number.class.getName(), null);
+        userTask.addOperation(new OperationBuilder().createSetDataOperation("variable",
+                new ExpressionBuilder().createContractInputExpression("decimal", Number.class.getName())));
+
+        //when
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance task = waitForUserTask(TASK1);
+        getProcessAPI().assignUserTask(task.getId(), matti.getId());
+
+        //then
+        final Map<String, Object> map = new HashMap<String, Object>();
+        map.put("decimal", 2);
+        getProcessAPI().executeUserTask(task.getId(), map);
+
+        //clean up
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void should_invalid_contract_throw_ContractViolationException() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null);
@@ -255,7 +259,7 @@ public class UserTaskContractTest extends CommonAPITest {
     }
 
     @Test
-    public void runTaskWhenContractIsValid() throws Exception {
+    public void should_execute_user_task_when_contract_is_valid() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
@@ -315,7 +319,7 @@ public class UserTaskContractTest extends CommonAPITest {
     }
 
     @Test
-    public void getExceptionWhenContractIsNotValidWithConstraints() throws Exception {
+    public void should_ContractIsNotValidException_keep_task_ready() throws Exception {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
@@ -335,13 +339,14 @@ public class UserTaskContractTest extends CommonAPITest {
         } catch (final ContractViolationException e) {
             final String state = getProcessAPI().getActivityInstanceState(userTask.getId());
             assertThat(state).isEqualTo("ready");
+            assertThat(e.getExplanations()).as("should get explainations").isNotEmpty();
         }
 
         disableAndDeleteProcess(processDefinition);
     }
 
     @Test
-    public void executeConnectorWithJNDILookupAndAPICall() throws Exception {
+    public void should_connector_use_input_values() throws Exception {
         final Expression processNameExpression = new ExpressionBuilder().createConstantStringExpression(PROCESS_NAME);
         final Expression processVersionExpression = new ExpressionBuilder().createContractInputExpression("inputVersion", String.class.getName());
         final Expression outputExpression = new ExpressionBuilder().createContractInputExpression("processInputId", BigInteger.class.getName());
@@ -375,10 +380,38 @@ public class UserTaskContractTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    public ProcessDefinition deployAndEnableProcessWithTestConnectorWithAPICall(final ProcessDefinitionBuilder processDefinitionBuilder)
+    private ProcessDefinition deployAndEnableProcessWithTestConnectorWithAPICall(final ProcessDefinitionBuilder processDefinitionBuilder)
             throws InvalidBusinessArchiveFormatException, BonitaException, IOException {
         return deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, ACTOR_NAME, matti, "TestConnectorWithAPICall.impl",
                 TestConnectorWithAPICall.class, "TestConnectorWithAPICall.jar");
+    }
+
+    private void check_invalid_contract_with_special_char(final long inputValue) throws Exception {
+        //given
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
+        builder.addActor(ACTOR_NAME);
+        final String expectedExplanation = "numberOfDays must between one day and one year";
+        builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
+        .addConstraint("mandatory", "numberOfDays>1 && numberOfDays<365", expectedExplanation, "numberOfDays");
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        getProcessAPI().startProcess(processDefinition.getId());
+
+        //when
+        final HumanTaskInstance task = waitForUserTask(TASK1);
+        final Map<String, Object> inputs = new HashMap<String, Object>();
+        inputs.put("numberOfDays", inputValue);
+        try {
+            getProcessAPI().executeUserTask(task.getId(), inputs);
+            fail("should throw ContractViolationException");
+        } catch (final ContractViolationException e) {
+            //then
+            assertThat(e.getExplanations()).as("rule should be violated").isNotEmpty().contains(expectedExplanation);
+        } finally {
+            disableAndDeleteProcess(processDefinition);
+
+        }
+
     }
 
 }
