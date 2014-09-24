@@ -34,17 +34,21 @@ public class DocumentValue implements Serializable {
 
     private String url;
 
-    private final boolean hasContent;
+    private boolean hasContent;
+
+    private Long documentId;
+
+    private boolean hasChanged;
 
     /**
      * Represent the value of a document, content, mime type and file name is given
      * 
      * @param content
-     *            content of the document
+     *        content of the document
      * @param mimeType
-     *            mime type of the document
+     *        mime type of the document
      * @param fileName
-     *            file name of the document
+     *        file name of the document
      */
     public DocumentValue(final byte[] content, final String mimeType, final String fileName) {
         super();
@@ -52,18 +56,22 @@ public class DocumentValue implements Serializable {
         this.mimeType = mimeType;
         this.fileName = fileName;
         hasContent = true;
+        hasChanged = false;
+        documentId = null;
     }
 
     /**
      * Represent the value of an external document, only the url is given
      * 
      * @param url
-     *            url of the document
+     *        url of the document
      */
     public DocumentValue(final String url) {
         super();
         this.url = url;
         hasContent = false;
+        hasChanged = false;
+        documentId = null;
     }
 
     public byte[] getContent() {
@@ -78,72 +86,114 @@ public class DocumentValue implements Serializable {
         return fileName;
     }
 
+
     public String getUrl() {
         return url;
     }
 
+    /**
+     * @return true if the document to create is stored internally or externally with an URL
+     */
     public boolean hasContent() {
         return hasContent;
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.hashCode(content);
-        result = prime * result + (fileName == null ? 0 : fileName.hashCode());
-        result = prime * result + (hasContent ? 1231 : 1237);
-        result = prime * result + (mimeType == null ? 0 : mimeType.hashCode());
-        result = prime * result + (url == null ? 0 : url.hashCode());
-        return result;
+    public void setContent(byte[] content) {
+        this.content = content;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setHasContent(boolean hasContent) {
+        this.hasContent = hasContent;
+    }
+
+    /**
+     * Indicate which document will be updated <br/>
+     * Used only when updating list of document
+     *
+     * @return the id of the document to update
+     */
+    public Long getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(Long documentId) {
+        this.documentId = documentId;
+    }
+
+    /**
+     * If the document value updates an existing document, this getter tels us if the content is modified and should be updated
+     *
+     * @return true if the content of the original document has changed
+     */
+    public boolean hasChanged() {
+        return hasChanged;
+    }
+
+    public void setHasChanged(boolean hasChanged) {
+        this.hasChanged = hasChanged;
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
+    public boolean equals(Object o) {
+        if (this == o)
             return true;
-        }
-        if (obj == null) {
+        if (o == null || getClass() != o.getClass())
             return false;
-        }
-        if (getClass() != obj.getClass()) {
+
+        DocumentValue that = (DocumentValue) o;
+
+        if (hasChanged != that.hasChanged)
             return false;
-        }
-        final DocumentValue other = (DocumentValue) obj;
-        if (!Arrays.equals(content, other.content)) {
+        if (hasContent != that.hasContent)
             return false;
-        }
-        if (fileName == null) {
-            if (other.fileName != null) {
-                return false;
-            }
-        } else if (!fileName.equals(other.fileName)) {
+        if (!Arrays.equals(content, that.content))
             return false;
-        }
-        if (hasContent != other.hasContent) {
+        if (documentId != null ? !documentId.equals(that.documentId) : that.documentId != null)
             return false;
-        }
-        if (mimeType == null) {
-            if (other.mimeType != null) {
-                return false;
-            }
-        } else if (!mimeType.equals(other.mimeType)) {
+        if (fileName != null ? !fileName.equals(that.fileName) : that.fileName != null)
             return false;
-        }
-        if (url == null) {
-            if (other.url != null) {
-                return false;
-            }
-        } else if (!url.equals(other.url)) {
+        if (mimeType != null ? !mimeType.equals(that.mimeType) : that.mimeType != null)
             return false;
-        }
+        if (url != null ? !url.equals(that.url) : that.url != null)
+            return false;
+
         return true;
     }
 
     @Override
-    public String toString() {
-        return "DocumentValue [content=" + Arrays.toString(content) + ", mimeType=" + mimeType + ", fileName=" + fileName + ", url=" + url + ", hasContent="
-                + hasContent + "]";
+    public int hashCode() {
+        int result = content != null ? Arrays.hashCode(content) : 0;
+        result = 31 * result + (mimeType != null ? mimeType.hashCode() : 0);
+        result = 31 * result + (fileName != null ? fileName.hashCode() : 0);
+        result = 31 * result + (url != null ? url.hashCode() : 0);
+        result = 31 * result + (hasContent ? 1 : 0);
+        result = 31 * result + (documentId != null ? documentId.hashCode() : 0);
+        result = 31 * result + (hasChanged ? 1 : 0);
+        return result;
     }
 
+    @Override
+    public String toString() {
+        return "DocumentValue{" +
+                "content=" + Arrays.toString(content) +
+                ", mimeType='" + mimeType + '\'' +
+                ", fileName='" + fileName + '\'' +
+                ", url='" + url + '\'' +
+                ", hasContent=" + hasContent +
+                ", documentId=" + documentId +
+                ", hasChanged=" + hasChanged +
+                '}';
+    }
 }

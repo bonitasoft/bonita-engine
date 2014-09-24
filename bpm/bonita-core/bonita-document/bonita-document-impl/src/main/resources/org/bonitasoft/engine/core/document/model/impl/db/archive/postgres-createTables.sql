@@ -7,6 +7,7 @@ CREATE TABLE arch_document_mapping (
   name VARCHAR(50) NOT NULL,
   description TEXT,
   version VARCHAR(10) NOT NULL,
+  index_ INT NOT NULL,
   archiveDate INT8 NOT NULL,
   PRIMARY KEY (tenantid, ID)
 );

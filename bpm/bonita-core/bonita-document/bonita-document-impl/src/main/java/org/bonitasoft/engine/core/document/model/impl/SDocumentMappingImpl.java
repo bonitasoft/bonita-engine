@@ -30,6 +30,7 @@ public class SDocumentMappingImpl implements SDocumentMapping {
     private String name;
     private String description;
     private String version;
+    private int index;
 
 
     public SDocumentMappingImpl() {
@@ -103,6 +104,14 @@ public class SDocumentMappingImpl implements SDocumentMapping {
         this.version = version;
     }
 
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -112,6 +121,7 @@ public class SDocumentMappingImpl implements SDocumentMapping {
 
         if (documentId != that.documentId) return false;
         if (id != that.id) return false;
+        if (index != that.index) return false;
         if (processInstanceId != that.processInstanceId) return false;
         if (tenantId != that.tenantId) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
@@ -130,6 +140,7 @@ public class SDocumentMappingImpl implements SDocumentMapping {
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + index;
         return result;
     }
 
@@ -143,6 +154,7 @@ public class SDocumentMappingImpl implements SDocumentMapping {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", version='" + version + '\'' +
+                ", index=" + index +
                 '}';
     }
 }

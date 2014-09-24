@@ -21,6 +21,7 @@
         <property name="name" type="string" column="name"/>
         <property name="description" type="string" column="description"/>
         <property name="version" type="string" column="version"/>
+        <property name="index" type="int" column="index_"/>
         <property name="archiveDate" type="long" column="archiveDate"/>
         <filter name="tenantFilter"/>
     </class>
@@ -36,6 +37,7 @@
         <property name="name" type="string" column="name"/>
         <property name="description" type="string" column="description"/>
         <property name="version" type="string" column="version"/>
+        <property name="index" type="int" column="index_"/>
         <property name="archiveDate" type="long" column="archiveDate"/>
         <property name="documentId" type="long" column="documentid"/>
         <many-to-one name="document" class="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" insert="false" update="false" lazy="false">

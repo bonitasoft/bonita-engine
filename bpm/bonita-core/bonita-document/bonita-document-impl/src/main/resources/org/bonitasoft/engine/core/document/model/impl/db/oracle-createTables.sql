@@ -18,5 +18,6 @@ CREATE TABLE document_mapping (
   name VARCHAR2(50) NOT NULL,
   description VARCHAR2(1024),
   version VARCHAR2(10) NOT NULL,
+  index_ INT NOT NULL,
   PRIMARY KEY (tenantid, ID)
 );

@@ -96,9 +96,34 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         assertEquals("documentName", result.getName());
         assertEquals(processInstanceId, result.getProcessInstanceId());
         assertEquals(document.getUrl(), result.getUrl());
+        assertEquals(-1, result.getIndex());
 
         // Clean up
         delete(result);
+    }
+    @Cover(classes = { DocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Attach", "ProcessInstance", "Document" }, jira = "")
+    @Test
+    public void attachDocumentToProcessInList() throws SBonitaException {
+        transactionService.begin();
+        final SDocument document0 = buildProcessDocumentWithUrl(1);
+        final SDocument document1 = buildProcessDocumentWithUrl(1);
+        final SMappedDocument result0 = documentService.attachDocumentToProcessInstance(document0, processInstanceId, "documentName", "the description",0);
+        final SMappedDocument result1 = documentService.attachDocumentToProcessInstance(document1, processInstanceId, "documentName", "the description",1);
+        transactionService.complete();
+
+        assertEquals(document0.getAuthor(), result0.getAuthor());
+        assertEquals(document0.getFileName(), result0.getFileName());
+        assertEquals(document0.getMimeType(), result0.getMimeType());
+        assertEquals(document0.getCreationDate(), result0.getCreationDate());
+        assertEquals("documentName", result0.getName());
+        assertEquals(processInstanceId, result0.getProcessInstanceId());
+        assertEquals(document0.getUrl(), result0.getUrl());
+        assertEquals(0, result0.getIndex());
+        assertEquals(1, result1.getIndex());
+
+        // Clean up
+        delete(result0);
+        delete(result1);
     }
 
     @Cover(classes = { DocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Get", "DocumentMapping", "Id" }, jira = "")

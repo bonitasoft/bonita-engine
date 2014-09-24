@@ -17,6 +17,7 @@
         <property name="name" type="string" column="name"/>
         <property name="description" type="string" column="description"/>
         <property name="version" type="string" column="version"/>
+        <property name="index" type="int" column="index_"/>
         <filter name="tenantFilter"/>
     </class>
 
@@ -61,6 +62,7 @@
         <property name="name" type="string" column="name"/>
         <property name="description" type="string" column="description"/>
         <property name="version" type="string" column="version"/>
+        <property name="index" type="int" column="index_"/>
         <many-to-one name="document" class="SLightDocumentImpl" insert="false" update="false" lazy="false">
             <column name="tenantid"/>
             <column name="documentid"/>

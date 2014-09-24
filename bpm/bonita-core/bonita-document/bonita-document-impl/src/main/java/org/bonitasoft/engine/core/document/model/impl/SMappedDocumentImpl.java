@@ -31,6 +31,7 @@ public class SMappedDocumentImpl implements SMappedDocument {
     private String name;
     private String description;
     private String version;
+    private int index;
     private SLightDocument document;
 
 
@@ -45,6 +46,7 @@ public class SMappedDocumentImpl implements SMappedDocument {
         this.document = document;
         this.documentId = documentMapping.getDocumentId();
         this.processInstanceId = documentMapping.getProcessInstanceId();
+        this.index = documentMapping.getIndex();
     }
 
     public SMappedDocumentImpl(SADocumentMapping documentMapping, SLightDocument document) {
@@ -55,6 +57,7 @@ public class SMappedDocumentImpl implements SMappedDocument {
         this.name = documentMapping.getName();
         this.description = documentMapping.getDescription();
         this.version = documentMapping.getVersion();
+        this.index = documentMapping.getIndex();
     }
 
     public long getDocumentId() {
@@ -156,6 +159,14 @@ public class SMappedDocumentImpl implements SMappedDocument {
         return SMappedDocumentImpl.class.getName();
     }
 
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -165,6 +176,7 @@ public class SMappedDocumentImpl implements SMappedDocument {
 
         if (documentId != that.documentId) return false;
         if (id != that.id) return false;
+        if (index != that.index) return false;
         if (processInstanceId != that.processInstanceId) return false;
         if (tenantId != that.tenantId) return false;
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
@@ -184,21 +196,9 @@ public class SMappedDocumentImpl implements SMappedDocument {
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + index;
         result = 31 * result + (document != null ? document.hashCode() : 0);
         return result;
     }
 
-    @Override
-    public String toString() {
-        return "SMappedDocumentImpl{" +
-                "id=" + id +
-                ", tenantId=" + tenantId +
-                ", documentId=" + documentId +
-                ", processInstanceId=" + processInstanceId +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", version='" + version + '\'' +
-                ", document=" + document +
-                '}';
-    }
 }

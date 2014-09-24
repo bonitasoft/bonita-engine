@@ -17,12 +17,17 @@ package org.bonitasoft.engine.core.document.api;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
-import org.bonitasoft.engine.core.document.exception.*;
+import org.bonitasoft.engine.core.document.exception.SDocumentException;
+import org.bonitasoft.engine.core.document.exception.SDocumentMappingDeletionException;
+import org.bonitasoft.engine.core.document.exception.SDocumentMappingException;
+import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
+import org.bonitasoft.engine.core.document.exception.SProcessDocumentContentNotFoundException;
+import org.bonitasoft.engine.core.document.exception.SProcessDocumentCreationException;
+import org.bonitasoft.engine.core.document.exception.SProcessDocumentDeletionException;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 import org.bonitasoft.engine.core.document.model.SLightDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
-import org.bonitasoft.engine.core.document.model.archive.SADocumentMapping;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -36,7 +41,6 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
  * @since 6.0
  */
 public interface DocumentService {
-
 
     String DOCUMENT = "DOCUMENT";
     String DOCUMENTMAPPING = "DOCUMENTMAPPING";
@@ -55,7 +59,26 @@ public interface DocumentService {
      * @throws org.bonitasoft.engine.core.document.exception.SProcessDocumentCreationException
      *         when the storage has failed
      */
-    SMappedDocument attachDocumentToProcessInstance(SDocument document, long processInstanceId, String name, String description) throws SProcessDocumentCreationException;
+    SMappedDocument attachDocumentToProcessInstance(SDocument document, long processInstanceId, String name, String description)
+            throws SProcessDocumentCreationException;
+
+    /**
+     * Save a document
+     *
+     * @param document
+     *        the document to store
+     * @param processInstanceId
+     *        the process instance id to attach the document to
+     * @param name
+     * @param description
+     * @param index
+     *        the index in the list of document
+     * @return The document image from database
+     * @throws org.bonitasoft.engine.core.document.exception.SProcessDocumentCreationException
+     *         when the storage has failed
+     */
+    SMappedDocument attachDocumentToProcessInstance(SDocument document, long processInstanceId, String name, String description, int index)
+            throws SProcessDocumentCreationException;
 
     /**
      * Modify document information
@@ -68,16 +91,16 @@ public interface DocumentService {
      * @throws SProcessDocumentCreationException
      *         when the update has failed
      */
-    SMappedDocument updateDocumentOfProcessInstance(SDocument document, long processInstanceId, String name, String description) throws SProcessDocumentCreationException;
-
+    SMappedDocument updateDocumentOfProcessInstance(SDocument document, long processInstanceId, String name, String description)
+            throws SProcessDocumentCreationException;
 
     /**
      * remove the current version of the document but archive it before
      *
      * @param processInstanceId
-     *          id of the process havind the document
+     *        id of the process havind the document
      * @param documentName
-     *          name of the document
+     *        name of the document
      * @throws SDocumentNotFoundException
      * @throws SObjectModificationException
      */
@@ -279,7 +302,6 @@ public interface DocumentService {
      */
     SAMappedDocument getArchivedDocument(long archivedProcessDocumentId) throws SDocumentNotFoundException;
 
-
     void deleteDocument(SLightDocument document) throws SProcessDocumentDeletionException;
 
     /**
@@ -307,20 +329,16 @@ public interface DocumentService {
      */
     void deleteArchivedDocuments(long instanceId) throws SDocumentMappingDeletionException;
 
-
     /**
      * archive the specific document mapping in the archive date
      *
      * @param documentMapping
-     *            document mapping will be archived
+     *        document mapping will be archived
      * @param archiveDate
-     *            the archive time
+     *        the archive time
      * @throws org.bonitasoft.engine.core.document.exception.SDocumentMappingException
      * @since 6.4.0
      */
     void archive(SDocumentMapping documentMapping, long archiveDate) throws SDocumentMappingException;
-
-
-
 
 }

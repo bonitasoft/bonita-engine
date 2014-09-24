@@ -14,7 +14,11 @@
  */
 package org.bonitasoft.engine.core.document.api.impl;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
@@ -22,7 +26,14 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.exception.*;
+import org.bonitasoft.engine.core.document.exception.SDocumentException;
+import org.bonitasoft.engine.core.document.exception.SDocumentMappingDeletionException;
+import org.bonitasoft.engine.core.document.exception.SDocumentMappingException;
+import org.bonitasoft.engine.core.document.exception.SDocumentMappingNotFoundException;
+import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
+import org.bonitasoft.engine.core.document.exception.SProcessDocumentContentNotFoundException;
+import org.bonitasoft.engine.core.document.exception.SProcessDocumentCreationException;
+import org.bonitasoft.engine.core.document.exception.SProcessDocumentDeletionException;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 import org.bonitasoft.engine.core.document.model.SLightDocument;
@@ -40,7 +51,14 @@ import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.*;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -77,7 +95,19 @@ public class DocumentServiceImpl implements DocumentService {
             throws SProcessDocumentCreationException {
         try {
             insertDocument(document);
-            SDocumentMapping documentMapping = create(document.getId(), processInstanceId, name, description);
+            SDocumentMapping documentMapping = create(document.getId(), processInstanceId, name, description, -1);
+            return new SMappedDocumentImpl(documentMapping, document);
+        } catch (final SBonitaException e) {
+            throw new SProcessDocumentCreationException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public SMappedDocument attachDocumentToProcessInstance(final SDocument document, long processInstanceId, String name, String description, int index)
+            throws SProcessDocumentCreationException {
+        try {
+            insertDocument(document);
+            SDocumentMapping documentMapping = create(document.getId(), processInstanceId, name, description, index);
             return new SMappedDocumentImpl(documentMapping, document);
         } catch (final SBonitaException e) {
             throw new SProcessDocumentCreationException(e.getMessage(), e);
@@ -419,10 +449,11 @@ public class DocumentServiceImpl implements DocumentService {
         }
     }
 
-    private SDocumentMapping create(long documentId, long processInstanceId, String name, String description) throws SRecorderException {
+    private SDocumentMapping create(long documentId, long processInstanceId, String name, String description, int index) throws SRecorderException {
         SDocumentMappingImpl documentMapping = new SDocumentMappingImpl(documentId, processInstanceId, name);
         documentMapping.setDescription(description);
         documentMapping.setVersion("1");
+        documentMapping.setIndex(index);
         final InsertRecord insertRecord = new InsertRecord(documentMapping);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(DOCUMENTMAPPING, EventActionType.CREATED)) {

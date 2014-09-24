@@ -19,6 +19,7 @@ CREATE TABLE document_mapping (
   name NVARCHAR(50) NOT NULL,
   description NVARCHAR(MAX),
   version NVARCHAR(10) NOT NULL,
+  index_ INT NOT NULL,
   PRIMARY KEY (tenantid, ID)
 )
 GO
