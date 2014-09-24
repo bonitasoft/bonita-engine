@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-cache</artifactId>
 		<groupId>com.bonitasoft.engine.cache</groupId>
-		<version>6.3.7.RC1</version>
+		<version>6.3.7-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-cache-api-clustered-impl</artifactId>
