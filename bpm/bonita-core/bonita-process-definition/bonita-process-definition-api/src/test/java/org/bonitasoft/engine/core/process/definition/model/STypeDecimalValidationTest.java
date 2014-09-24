@@ -70,13 +70,18 @@ public class STypeDecimalValidationTest {
     }
 
     @Test
+    public void Integer_are_valid() throws Exception {
+
+        boolean intValidation = SType.DECIMAL.validate(53);
+
+        assertThat(intValidation).isTrue();
+    }
+
+    @Test
     public void other_types_are_not_valid() throws Exception {
 
         boolean stringValidation = SType.DECIMAL.validate("54");
         assertThat(stringValidation).isFalse();
-
-        boolean intValidation = SType.DECIMAL.validate(53);
-        assertThat(intValidation).isFalse();
 
         boolean booleanValidation = SType.DECIMAL.validate(true);
         assertThat(booleanValidation).isFalse();
