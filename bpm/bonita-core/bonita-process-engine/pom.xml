@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-core</artifactId>
 		<groupId>com.bonitasoft.engine.core</groupId>
-		<version>6.3.7-SNAPSHOT</version>
+		<version>6.3.7.RC1</version>
 	</parent>
 
 	<artifactId>bonita-process-engine</artifactId>
