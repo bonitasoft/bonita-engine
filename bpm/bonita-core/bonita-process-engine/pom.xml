@@ -166,11 +166,6 @@
             <artifactId>bonita-dependency-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-			<groupId>org.bonitasoft.engine.document</groupId>
-			<artifactId>bonita-document-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.events</groupId>
 			<artifactId>bonita-events-api</artifactId>
