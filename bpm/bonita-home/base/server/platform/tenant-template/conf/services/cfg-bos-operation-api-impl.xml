@@ -1,64 +1,79 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="operationService" class="org.bonitasoft.engine.core.operation.impl.OperationServiceImpl">
-		<constructor-arg name="operationExecutorStrategyProvider" ref="operationExecutorStrategyProvider" />
-		<constructor-arg name="leftOperandHandlerProvider" ref="leftOperandHandlerProvider" />
-		<constructor-arg name="expressionResolverService" ref="expressionResolverService" />
-		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-	</bean>
+    <bean id="operationService" class="org.bonitasoft.engine.core.operation.impl.OperationServiceImpl">
+        <constructor-arg name="operationExecutorStrategyProvider" ref="operationExecutorStrategyProvider"/>
+        <constructor-arg name="leftOperandHandlerProvider" ref="leftOperandHandlerProvider"/>
+        <constructor-arg name="expressionResolverService" ref="expressionResolverService"/>
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService"/>
+    </bean>
 
-	<bean id="operationExecutorStrategyProvider" class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider" autowire="constructor" />
+    <bean id="operationExecutorStrategyProvider"
+          class="org.bonitasoft.engine.core.operation.OperationExecutorStrategyProvider" autowire="constructor"/>
 
-	<bean id="leftOperandHandlerProvider" class="org.bonitasoft.engine.core.operation.LeftOperandHandlerProvider">
-		<property name="leftOperandHandlers">
-			<list>
-				<ref bean="dataLeftOperandHandler" />
-				<ref bean="transientDataLeftOperandHandler" />
-				<ref bean="externalDataLeftOperandHandler" />
-				<ref bean="documentLeftOperandHandler" />
-				<ref bean="stringIndexLeftOperandHandler" />
-				<ref bean="businessDataLeftOperandHandler" />
-			</list>
-		</property>
-	</bean>
+    <bean id="leftOperandHandlerProvider" class="org.bonitasoft.engine.core.operation.LeftOperandHandlerProvider">
+        <property name="leftOperandHandlers">
+            <list>
+                <ref bean="dataLeftOperandHandler"/>
+                <ref bean="transientDataLeftOperandHandler"/>
+                <ref bean="externalDataLeftOperandHandler"/>
+                <ref bean="documentLeftOperandHandler"/>
+                <ref bean="documentListLeftOperandHandler"/>
+                <ref bean="stringIndexLeftOperandHandler"/>
+                <ref bean="businessDataLeftOperandHandler"/>
+            </list>
+        </property>
+    </bean>
 
-	<bean id="assignmentOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.AssignmentOperationExecutorStrategy" />
+    <bean id="assignmentOperationExecutorStrategy"
+          class="org.bonitasoft.engine.core.operation.impl.AssignmentOperationExecutorStrategy"/>
 
-	<bean id="dataLeftOperandHandler" class="org.bonitasoft.engine.core.operation.impl.DataLeftOperandHandler">
-		<constructor-arg name="dataInstanceService" ref="dataInstanceService" />
-	</bean>
+    <bean id="dataLeftOperandHandler" class="org.bonitasoft.engine.core.operation.impl.DataLeftOperandHandler">
+        <constructor-arg name="dataInstanceService" ref="dataInstanceService"/>
+    </bean>
 
-	<bean id="transientDataLeftOperandHandler" class="org.bonitasoft.engine.operation.TransientDataLeftOperandHandler">
-		<constructor-arg name="transientDataService" ref="transientDataService" />
-		<constructor-arg name="flownodeInstanceService" ref="activityInstanceService" />
-		<constructor-arg name="processDefinitionService" ref="processDefinitionManager" />
-		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
-		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
-	</bean>
-	
-	<bean id="externalDataLeftOperandHandler" class="org.bonitasoft.engine.core.operation.impl.ExternalDataLeftOperandHandler"/>
+    <bean id="transientDataLeftOperandHandler" class="org.bonitasoft.engine.operation.TransientDataLeftOperandHandler">
+        <constructor-arg name="transientDataService" ref="transientDataService"/>
+        <constructor-arg name="flownodeInstanceService" ref="activityInstanceService"/>
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager"/>
+        <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator"/>
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService"/>
+    </bean>
 
-	<bean id="javaMethodOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy" />
+    <bean id="externalDataLeftOperandHandler"
+          class="org.bonitasoft.engine.core.operation.impl.ExternalDataLeftOperandHandler"/>
 
-	<bean id="xpathUpdateQueryOperationExecutorStrategy" class="org.bonitasoft.engine.core.operation.impl.XpathUpdateQueryOperationExecutorStrategy" />
+    <bean id="javaMethodOperationExecutorStrategy"
+          class="org.bonitasoft.engine.core.operation.impl.JavaMethodOperationExecutorStrategy"/>
 
-	<bean id="documentLeftOperandHandler" class="org.bonitasoft.engine.operation.DocumentLeftOperandHandler">
-		<constructor-arg name="documentService" ref="documentService" />
-		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
-		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="sessionService" ref="sessionService" />
-	</bean>
+    <bean id="xpathUpdateQueryOperationExecutorStrategy"
+          class="org.bonitasoft.engine.core.operation.impl.XpathUpdateQueryOperationExecutorStrategy"/>
 
-	<bean id="businessDataLeftOperandHandler" class="com.bonitasoft.engine.operation.BusinessDataLeftOperandHandler">
-		<constructor-arg name="businessDataRepository" ref="businessDataRepository" />
-		<constructor-arg name="refBusinessDataService" ref="refBusinessDataService" />
-		<constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
-	</bean>
+    <bean id="documentLeftOperandHandler" class="org.bonitasoft.engine.operation.DocumentLeftOperandHandler">
+        <constructor-arg name="documentService" ref="documentService"/>
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService"/>
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor"/>
+        <constructor-arg name="sessionService" ref="sessionService"/>
+    </bean>
 
-	<bean id="stringIndexLeftOperandHandler" class="com.bonitasoft.engine.operation.StringIndexLeftOperandHandler">
-		<constructor-arg name="processInstanceService" ref="processInstanceService" />
-		<constructor-arg name="activityInstanceService" ref="activityInstanceService" />
-	</bean>
+    <bean id="documentListLeftOperandHandler" class="org.bonitasoft.engine.operation.DocumentListLeftOperandHandler">
+        <constructor-arg name="documentService" ref="documentService"/>
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService"/>
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor"/>
+        <constructor-arg name="sessionService" ref="sessionService"/>
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager"/>
+        <constructor-arg name="processInstanceService" ref="processInstanceService"/>
+    </bean>
+
+    <bean id="businessDataLeftOperandHandler" class="com.bonitasoft.engine.operation.BusinessDataLeftOperandHandler">
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository"/>
+        <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService"/>
+    </bean>
+
+    <bean id="stringIndexLeftOperandHandler" class="com.bonitasoft.engine.operation.StringIndexLeftOperandHandler">
+        <constructor-arg name="processInstanceService" ref="processInstanceService"/>
+        <constructor-arg name="activityInstanceService" ref="activityInstanceService"/>
+    </bean>
 
 </beans>

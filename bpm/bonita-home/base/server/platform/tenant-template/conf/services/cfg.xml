@@ -141,6 +141,14 @@
         <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService"/>
     </bean>
 
+    <bean id="documentListReferenceExpressionExecutorStrategy"
+          class="org.bonitasoft.engine.expression.DocumentListReferenceExpressionExecutorStrategy">
+        <constructor-arg name="documentService" ref="documentService"/>
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService"/>
+        <constructor-arg name="processDefinitionService" ref="processDefinitionManager"/>
+        <constructor-arg name="processInstanceService" ref="processInstanceService"/>
+    </bean>
+
     <bean id="dependencyResolver" class="org.bonitasoft.engine.api.impl.resolver.DependencyResolver">
         <constructor-arg name="dependencyResolvers">
             <list>
