@@ -62,7 +62,7 @@ public class DocumentValue implements Serializable {
 
     /**
      * Represent the value of an external document, only the url is given
-     * 
+     *
      * @param url
      *        url of the document
      */
@@ -72,6 +72,58 @@ public class DocumentValue implements Serializable {
         hasContent = false;
         hasChanged = false;
         documentId = null;
+    }
+
+    /**
+     * Represent an existing document that did not changed.
+     * It is used to update document list.
+     *
+     * @param documentId
+     *      the id of the existing document (mapping)
+     *
+     */
+    public DocumentValue(final long documentId) {
+        super();
+        hasChanged = false;
+        this.documentId = documentId;
+    }
+
+    /**
+     * Represent an existing document that changed with the content and metadata in parameters.
+     * It is used in document list to add a new version of this document.
+     * @param documentId
+     *      the id of the existing document (mapping)
+     * @param content
+     *        content of the document
+     * @param mimeType
+     *        mime type of the document
+     * @param fileName
+     *        file name of the document
+     *
+     */
+    public DocumentValue(final long documentId, final byte[] content, final String mimeType, final String fileName) {
+        super();
+        this.content = content;
+        this.mimeType = mimeType;
+        this.fileName = fileName;
+        hasContent = true;
+        hasChanged = true;
+        this.documentId = documentId;
+    }
+
+    /**
+     * Represent an existing document that changed to an external document.
+     * It is used in document list to add a new version of this document.
+     *
+     * @param documentId
+     *      the id of the existing document (mapping)
+     */
+    public DocumentValue(final long documentId, final String url) {
+        super();
+        this.url = url;
+        hasContent = false;
+        hasChanged = true;
+        this.documentId = documentId;
     }
 
     public byte[] getContent() {

@@ -14,12 +14,16 @@
  */
 package org.bonitasoft.engine.operation;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
+import org.bonitasoft.engine.core.document.exception.SProcessDocumentCreationException;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
@@ -35,6 +39,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
@@ -63,57 +68,91 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     public Object update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         List<DocumentValue> documentList = toCheckedList(newValue);
-
         final String documentName = sLeftOperand.getName();
 
-        long processInstanceId;
         try {
-            processInstanceId = getProcessInstanceId(containerId, containerType);
-
+            long processInstanceId = getProcessInstanceId(containerId, containerType);
             // get the list having the name
-            List<SMappedDocument> currentList;
-            currentList = documentService.getDocumentList(documentName, processInstanceId);
-            // if it's not a list it throws an exception
-
-            if (currentList.isEmpty() && !isListDefinedInDefinition(documentName, processInstanceId, processDefinitionService, processInstanceService)) {
-                throw new SOperationExecutionException("Unable to find the list " + documentName + " on process instance " + processInstanceId
-                        + "nothing in database and nothing declared in the definition");
-            }
+            List<SMappedDocument> currentList = getExistingDocumentList(documentName, processInstanceId);
             // iterate on elements
             int index;
             for (index = 0; index < documentList.size(); index++) {
-                DocumentValue documentValue = documentList.get(index);
-
-                // if documentId not null
-                if (documentValue.getDocumentId() != null) {
-                    // if hasChanged update
-                    if (documentValue.hasChanged()) {
-                        documentService.updateDocumentOfList(currentList.get(index), createDocumentObject(documentValue), index);
-                    } else {
-                        // else update the index if needed
-                        if (currentList.get(index).getIndex() != index) {
-                            // update index
-                            documentService.updateDocumentIndex(currentList.get(index), index);
-                        }
-                    }
-
-                } else {
-                    // if documentId null
-                    // create new element
-                    documentService.attachDocumentToProcessInstance(createDocumentObject(documentValue), processInstanceId, documentName, null, index);
-                }
+                processDocumentOnIndex(documentList, documentName, processInstanceId, currentList, index);
             }
 
             // when no more elements in documentList remove elements above
-            for (; index < currentList.size(); index++) {
-                documentService.removeCurrentVersion(currentList.get(index));
-            }
+            removeOthersDocuments(currentList);
 
             return documentList;
+        } catch (final SOperationExecutionException e) {
+            throw e;
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
         }
 
+    }
+
+    private List<SMappedDocument> getExistingDocumentList(String documentName, long processInstanceId) throws SBonitaReadException, SObjectNotFoundException,
+            SOperationExecutionException {
+        List<SMappedDocument> currentList;
+        currentList = documentService.getDocumentList(documentName, processInstanceId);
+        // if it's not a list it throws an exception
+        if (currentList.isEmpty() && !isListDefinedInDefinition(documentName, processInstanceId, processDefinitionService, processInstanceService)) {
+//            try {
+//                documentService.getMappedDocument(processInstanceId,documentName);
+//            } catch (SDocumentNotFoundException e) {
+//                throw new SOperationExecutionException("Unable to find the list " + documentName + " on process instance " + processInstanceId
+//                        + ", nothing in database and nothing declared in the definition");
+//            }
+            throw new SOperationExecutionException("Unable to find the list " + documentName + " on process instance " + processInstanceId
+                    + ", nothing in database and nothing declared in the definition");
+        }
+        return currentList;
+    }
+
+    private void removeOthersDocuments(List<SMappedDocument> currentList) throws SDocumentNotFoundException, SObjectModificationException {
+        for (SMappedDocument mappedDocument : currentList) {
+            documentService.removeCurrentVersion(mappedDocument);
+        }
+
+    }
+
+    private void processDocumentOnIndex(List<DocumentValue> documentList, String documentName, long processInstanceId, List<SMappedDocument> currentList,
+            int index) throws SProcessDocumentCreationException, SSessionNotFoundException, SOperationExecutionException {
+        DocumentValue documentValue = documentList.get(index);
+
+        if (documentValue.getDocumentId() != null) {
+            // if hasChanged update
+            SMappedDocument documentToUpdate = getDocumentHavingDocumentIdAndRemoveFromList(currentList, documentValue.getDocumentId(), documentName, processInstanceId);
+            updateExistingDocument(documentToUpdate, index, documentValue);
+        } else {
+            // create new element
+            documentService.attachDocumentToProcessInstance(createDocumentObject(documentValue), processInstanceId, documentName, null, index);
+        }
+    }
+
+    private void updateExistingDocument(SMappedDocument documentToUpdate, int index, DocumentValue documentValue) throws SProcessDocumentCreationException,
+            SSessionNotFoundException, SOperationExecutionException {
+        if (documentValue.hasChanged()) {
+            documentService.updateDocumentOfList(documentToUpdate, createDocumentObject(documentValue), index);
+        } else {
+            //  update the index if needed
+            if ( documentToUpdate.getIndex() != index) {
+                documentService.updateDocumentIndex(documentToUpdate, index);
+            }
+        }
+    }
+
+    private SMappedDocument getDocumentHavingDocumentIdAndRemoveFromList(List<SMappedDocument> currentList, Long documentId, String documentName, Long processInstanceId) throws SOperationExecutionException {
+        Iterator<SMappedDocument> iterator = currentList.iterator();
+        while(iterator.hasNext()){
+            SMappedDocument next = iterator.next();
+            if (next.getDocumentId() == documentId) {
+                iterator.remove();
+                return next;
+            }
+        }
+        throw new SOperationExecutionException("The document with id " + documentId + " was not in the list "+documentName+" of process instance "+processInstanceId);
     }
 
     @Override

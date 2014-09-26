@@ -16,13 +16,7 @@ package org.bonitasoft.engine.process.document;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.matchers.ListElementMatcher.nameAre;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -543,8 +537,10 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertEquals(processInstance.getId(), document.getProcessInstanceId());
         assertEquals(user.getId(), document.getAuthor());
 
-        assertThat(getProcessAPI().searchDocuments( new SearchOptionsBuilder(0, 45).searchTerm("Doc").done()).getResult().get(0).getId()).isEqualTo(document.getId());
-        assertThat(getProcessAPI().searchDocuments( new SearchOptionsBuilder(0, 45).searchTerm("This is").done()).getResult().get(0).getId()).isEqualTo(document.getId());
+        assertThat(getProcessAPI().searchDocuments(new SearchOptionsBuilder(0, 45).searchTerm("Doc").done()).getResult().get(0).getId()).isEqualTo(
+                document.getId());
+        assertThat(getProcessAPI().searchDocuments(new SearchOptionsBuilder(0, 45).searchTerm("This is").done()).getResult().get(0).getId()).isEqualTo(
+                document.getId());
         disableAndDeleteProcess(processInstance.getProcessDefinitionId());
     }
 
@@ -587,7 +583,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
     public void searchArchivedDocuments() throws Exception {
         // first time search, no document in archive table.
         final ProcessInstance processInstance = deployAndEnableWithActorAndStartIt(user);
-    getProcessAPI().attachDocument(processInstance.getId(), "Doc 1", "doc1.jpg", "image", "Hello World".getBytes(), "This is a description");
+        getProcessAPI().attachDocument(processInstance.getId(), "Doc 1", "doc1.jpg", "image", "Hello World".getBytes(), "This is a description");
         SearchOptionsBuilder searchOptionsBuilder;
         searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
         searchOptionsBuilder.filter(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId());
@@ -620,7 +616,9 @@ public class DocumentIntegrationTest extends CommonAPITest {
             assertEquals(1, documentSearch.getCount());
             assertEquals(afterUpdate.getName(), archivedDocument.getName());
 
-            assertThat(getProcessAPI().searchArchivedDocuments(new SearchOptionsBuilder(0, 45).searchTerm("This is").done()).getResult().get(0).getDocumentContentFileName()).isEqualTo("doc1.jpg");
+            assertThat(
+                    getProcessAPI().searchArchivedDocuments(new SearchOptionsBuilder(0, 45).searchTerm("This is").done()).getResult().get(0)
+                            .getDocumentContentFileName()).isEqualTo("doc1.jpg");
 
         } finally {
             disableAndDeleteProcess(processInstance.getProcessDefinitionId());
@@ -1295,15 +1293,42 @@ public class DocumentIntegrationTest extends CommonAPITest {
         return new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
     }
 
-
     @Test
     public void processWithDocumentList() throws Exception {
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithListOfDoc", "1.0");
         builder.addActor("john");
-        builder.addUserTask("step1","john");
+        builder.addLongData("doc1Id", null);
+        builder.addLongData("doc2Id", null);
+        builder.addUserTask("step1", "john");
+        Expression scriptExpression1 = new ExpressionBuilder()
+                .createGroovyScriptExpression(
+                        "updateDocs",
+                        "[new org.bonitasoft.engine.bpm.document.DocumentValue(doc2Id), " +
+                                "new org.bonitasoft.engine.bpm.document.DocumentValue(\"newFile\".getBytes(),\"plain/text\",\"file.txt\")," +
+                                "new org.bonitasoft.engine.bpm.document.DocumentValue(doc1Id,\"updatedDocFromUrl\".getBytes(),\"plain/text\",\"file.txt\")]",
+                        List.class.getName(),
+                        new ExpressionBuilder().createDataExpression("doc1Id", Long.class.getName()),
+                        new ExpressionBuilder().createDataExpression("doc2Id", Long.class.getName()));
+        Expression scriptExpression2 = new ExpressionBuilder()
+                .createGroovyScriptExpression(
+                        "updateDocs",
+                        "[new org.bonitasoft.engine.bpm.document.DocumentValue(\"updatedDoc\".getBytes(),\"plain/text\",\"file.txt\")]",
+                        List.class.getName(),
+                        new ExpressionBuilder().createDataExpression("doc2Id", Long.class.getName()));
+        UserTaskDefinitionBuilder userTaskDefinitionBuilder = builder.addUserTask("updateStep", "john");
+        userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDocumentList("invoices", scriptExpression1));
+        userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDocumentList("emptyList", scriptExpression2));
+//        userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDocumentList("unknown", scriptExpression2));
+        builder.addUserTask("verifyStep", "john");
+        builder.addTransition("step1", "updateStep");
+        builder.addTransition("updateStep", "verifyStep");
         DocumentListDefinitionBuilder invoices = builder.addDocumentListDefinition("invoices");
         invoices.addDescription("My invoices");
-        String script = "[new org.bonitasoft.engine.bpm.document.DocumentValue(\"http://www.myrul.com/mydoc.txt\"), new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello\".getBytes(),\"plain/text\",\"file.txt\")]";
+        String script = "[new org.bonitasoft.engine.bpm.document.DocumentValue(\"http://www.myrul.com/mydoc.txt\"), " +
+                "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello1\".getBytes(),\"plain/text\",\"file.txt\")," +
+                "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello2\".getBytes(),\"plain/text\",\"file.txt\")," +
+                "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello3\".getBytes(),\"plain/text\",\"file.txt\")" +
+                "]";
         invoices.addInitialValue(new ExpressionBuilder().createGroovyScriptExpression("initialDocs",
                 script,
                 List.class.getName()));
@@ -1311,38 +1336,70 @@ public class DocumentIntegrationTest extends CommonAPITest {
         User john = createUser("john", "bpm");
         ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "john", john);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step1");
+        HumanTaskInstance step1 = waitForUserTask("step1");
 
         //we have a process with an initialized list and a non initialized list
 
         //check with api methods
         List<Document> invoices1 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices");
-        assertThat(invoices1).hasSize(2);
+        assertThat(invoices1).hasSize(4);
         Document urlDocument = invoices1.get(0);
         assertThat(urlDocument.getUrl()).isEqualTo("http://www.myrul.com/mydoc.txt");
         Document fileDocument = invoices1.get(1);
         assertThat(fileDocument.hasContent()).isTrue();
         assertThat(fileDocument.getContentFileName()).isEqualTo("file.txt");
-        assertThat(getProcessAPI().getDocumentContent(fileDocument.getContentStorageId())).isEqualTo("hello".getBytes());
+        assertThat(getProcessAPI().getDocumentContent(fileDocument.getContentStorageId())).isEqualTo("hello1".getBytes());
         List<Document> emptyList = getProcessAPI().getDocumentList(processInstance.getId(), "emptyList");
         assertThat(emptyList).isEmpty();
         try {
 
             getProcessAPI().getDocumentList(processInstance.getId(), "unknown");
             fail("should not find document list unknown");
-        }catch ( DocumentNotFoundException e){
+        } catch (DocumentNotFoundException e) {
             //ok
         }
-
-
+        getProcessAPI().updateProcessDataInstance("doc1Id",processInstance.getId(),urlDocument.getId());
+        getProcessAPI().updateProcessDataInstance("doc2Id",processInstance.getId(),fileDocument.getId());
 
         //execute operation to update
+        assignAndExecuteStep(step1, john.getId());
+        HumanTaskInstance updateStep = waitForUserTask("updateStep");
+        assignAndExecuteStep(updateStep,john.getId());
+        waitForUserTask("verifyStep");
 
         //check with api methods
+        invoices1 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices");
+        assertThat(invoices1).hasSize(3);
+        Document movedFileDocument = invoices1.get(0);
+        assertThat(movedFileDocument).isEqualTo(fileDocument);// was in index 2, now in index 1
 
-        //check with  expression
+        Document newFileDocument = invoices1.get(1);
+        assertThat(newFileDocument.hasContent()).isTrue();
+        assertThat(newFileDocument.getContentFileName()).isEqualTo("file.txt");
+        assertThat(getProcessAPI().getDocumentContent(newFileDocument.getContentStorageId())).isEqualTo("newFile".getBytes());
 
-        //add list with api method
+        Document updatedUrlFile = invoices1.get(2);
+        assertThat(updatedUrlFile.getId()).isEqualTo(urlDocument.getId());
+        assertThat(updatedUrlFile.hasContent()).isTrue();
+        assertThat(updatedUrlFile.getContentFileName()).isEqualTo("file.txt");
+        assertThat(updatedUrlFile.getVersion()).isEqualTo("2");
+        assertThat(new String(getProcessAPI().getDocumentContent(updatedUrlFile.getContentStorageId()))).isEqualTo("updatedDocFromUrl");
+
+        emptyList = getProcessAPI().getDocumentList(processInstance.getId(), "emptyList");
+        assertThat(emptyList).hasSize(1);
+
+        newFileDocument = emptyList.get(0);
+        assertThat(newFileDocument.hasContent()).isTrue();
+        assertThat(newFileDocument.getContentFileName()).isEqualTo("file.txt");
+        assertThat(getProcessAPI().getDocumentContent(newFileDocument.getContentStorageId())).isEqualTo("updatedDoc".getBytes());
+
+
+//        List<Document> unknown = getProcessAPI().getDocumentList(processInstance.getId(), "unknown");
+//        assertThat(unknown).hasSize(1);
+
+        //TODO add list with api method
+
+        //TODO check with  expression
 
         disableAndDeleteProcess(processDefinition);
         deleteUser(john);

@@ -148,10 +148,23 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public void updateDocumentIndex(final SMappedDocument mappedDocument, int index) throws SProcessDocumentCreationException {
         try {
-            updateMapping(mappedDocument.getDocumentId(), mappedDocument, mappedDocument.getDescription(), index);
+            Map<String, Object> params = new HashMap<String, Object>(2);
+            params.put("index", index);
+            updateFields(mappedDocument, params);
         } catch (SRecorderException e) {
             throw new SProcessDocumentCreationException(e);
         }
+    }
+
+    private void updateFields(SDocumentMapping mappedDocument, Map<String, Object> params) throws SRecorderException {
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(mappedDocument,
+                params);
+        SUpdateEvent updateEvent = null;
+        if (eventService.hasHandlers(DOCUMENTMAPPING, EventActionType.UPDATED)) {
+            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DOCUMENTMAPPING).setObject(mappedDocument)
+                    .done();
+        }
+        recorder.recordUpdate(updateRecord, updateEvent);
     }
 
     private void updateMapping(long documentId, SDocumentMapping sDocumentMapping, String description, int index) throws SRecorderException {
@@ -160,14 +173,7 @@ public class DocumentServiceImpl implements DocumentService {
         params.put("description", description);
         params.put("version", incrementVersion(sDocumentMapping.getVersion()));
         params.put("index", index);
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sDocumentMapping,
-                params);
-        SUpdateEvent updateEvent = null;
-        if (eventService.hasHandlers(DOCUMENTMAPPING, EventActionType.UPDATED)) {
-            updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DOCUMENTMAPPING).setObject(sDocumentMapping)
-                    .done();
-        }
-        recorder.recordUpdate(updateRecord, updateEvent);
+        updateFields(sDocumentMapping, params);
     }
 
     private String incrementVersion(String version) {
