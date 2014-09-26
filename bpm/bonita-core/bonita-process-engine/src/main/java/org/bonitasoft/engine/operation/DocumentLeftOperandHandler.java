@@ -14,24 +14,20 @@
 package org.bonitasoft.engine.operation;
 
 import org.bonitasoft.engine.bpm.document.DocumentValue;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
+import org.bonitasoft.engine.core.document.exception.SProcessDocumentCreationException;
+import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
-import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilder;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
-import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.model.SDocument;
-import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
  * Updates of creates a document of the process.
@@ -43,69 +39,29 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class DocumentLeftOperandHandler implements LeftOperandHandler {
+public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandler {
 
     DocumentService documentService;
 
-    private final ActivityInstanceService activityInstanceService;
-
-    private final SessionAccessor sessionAccessor;
-
-    private final SessionService sessionService;
-
     public DocumentLeftOperandHandler(final DocumentService documentService, final ActivityInstanceService activityInstanceService,
             final SessionAccessor sessionAccessor, final SessionService sessionService) {
+        super(activityInstanceService, sessionAccessor, sessionService, documentService);
         this.documentService = documentService;
-        this.activityInstanceService = activityInstanceService;
-        this.sessionAccessor = sessionAccessor;
-        this.sessionService = sessionService;
     }
 
     @Override
     public Object update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
-        final boolean isDocumentWithContent = newValue instanceof DocumentValue;
-        if (!isDocumentWithContent && newValue != null) {
-            throw new SOperationExecutionException("Document operation only accepts an expression returning a DocumentValue and not "
-                    + newValue.getClass().getName());
-        }
-
+        DocumentValue documentValue = toCheckedDocumentValue(newValue);
         final String documentName = sLeftOperand.getName();
         long processInstanceId;
         try {
-            if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(containerType)) {
-                processInstanceId = containerId;
-            } else {
-                final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(containerId);
-                processInstanceId = flowNodeInstance.getParentProcessInstanceId();
-            }
+            processInstanceId = getProcessInstanceId(containerId, containerType);
             if (newValue == null) {
                 // we just delete the current version
-                try {
-                    documentService.removeCurrentVersion(processInstanceId, documentName);
-                } catch (final SDocumentNotFoundException e) {
-                    // nothing to do
-                }
+                deleteDocument(documentName, processInstanceId);
             } else {
-                long authorId;
-                try {
-                    final long sessionId = sessionAccessor.getSessionId();
-                    authorId = sessionService.getSession(sessionId).getUserId();
-                } catch (final SessionIdNotSetException e) {
-                    authorId = -1;
-                }
-
-                final DocumentValue documentValue = (DocumentValue) newValue;
-                final SDocument document = createDocument(authorId, documentValue, documentValue.hasContent(),
-                        documentValue.getUrl());
-                try {
-                    // Let's check if the document already exists:
-                    SMappedDocument mappedDocument = documentService.getMappedDocument(processInstanceId, documentName);
-                    // a document exist, update it with the new values
-                        documentService.updateDocumentOfProcessInstance(document, processInstanceId, documentName, mappedDocument.getDescription());
-                } catch (final SDocumentNotFoundException e) {
-                        documentService.attachDocumentToProcessInstance(document, processInstanceId, documentName, null);
-                }
+                createOrUpdateDocument(documentValue, documentName, processInstanceId);
             }
             return newValue;
         } catch (final SBonitaException e) {
@@ -114,17 +70,17 @@ public class DocumentLeftOperandHandler implements LeftOperandHandler {
 
     }
 
-    private SDocument createDocument(final long authorId, final DocumentValue documentValue,
-            final boolean hasContent, final String documentUrl) {
-        final SDocumentBuilder processDocumentBuilder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance();
-        processDocumentBuilder.setFileName(documentValue.getFileName());
-        processDocumentBuilder.setMimeType(documentValue.getMimeType());
-        processDocumentBuilder.setAuthor(authorId);
-        processDocumentBuilder.setCreationDate(System.currentTimeMillis());
-        processDocumentBuilder.setHasContent(hasContent);
-        processDocumentBuilder.setURL(documentUrl);
-        processDocumentBuilder.setContent(documentValue.getContent());
-        return processDocumentBuilder.done();
+    private void createOrUpdateDocument(DocumentValue newValue, String documentName, long processInstanceId) throws SSessionNotFoundException,
+            SBonitaReadException, SProcessDocumentCreationException {
+        final SDocument document = createDocumentObject(newValue);
+        try {
+            // Let's check if the document already exists:
+            SMappedDocument mappedDocument = documentService.getMappedDocument(processInstanceId, documentName);
+            // a document exist, update it with the new values
+            documentService.updateDocumentOfProcessInstance(document, processInstanceId, documentName, mappedDocument.getDescription());
+        } catch (final SDocumentNotFoundException e) {
+            documentService.attachDocumentToProcessInstance(document, processInstanceId, documentName, null);
+        }
     }
 
     @Override

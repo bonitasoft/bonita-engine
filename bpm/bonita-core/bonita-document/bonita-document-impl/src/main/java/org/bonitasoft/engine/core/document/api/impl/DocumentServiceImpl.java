@@ -88,6 +88,7 @@ public class DocumentServiceImpl implements DocumentService {
         this.eventService = eventService;
         this.archiveService = archiveService;
         definitiveArchiveReadPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+
     }
 
     @Override
@@ -118,23 +119,47 @@ public class DocumentServiceImpl implements DocumentService {
     public SMappedDocument updateDocumentOfProcessInstance(final SDocument document, final long processInstanceId, String name, String description)
             throws SProcessDocumentCreationException {
         try {
-            //insert new document
-            insertDocument(document);
-            //update mapping
             SDocumentMapping sDocumentMapping = getMappedDocument(processInstanceId, name);
-            archive(sDocumentMapping, System.currentTimeMillis());
-            updateMapping(document, sDocumentMapping, description);
-            return new SMappedDocumentImpl(sDocumentMapping, document);
+            return updateMappedDocument(document, description, -1, sDocumentMapping);
+
         } catch (final SBonitaException e) {
             throw new SProcessDocumentCreationException(e.getMessage(), e);
         }
     }
 
-    private void updateMapping(SDocument document, SDocumentMapping sDocumentMapping, String description) throws SRecorderException {
+    private SMappedDocument updateMappedDocument(SDocument document, String description, int index, SDocumentMapping sDocumentMapping) throws SRecorderException, SDocumentMappingException {
+        //insert new document
+        insertDocument(document);
+        //update mapping
+        archive(sDocumentMapping, System.currentTimeMillis());
+        updateMapping(document.getId(), sDocumentMapping, description,index);
+        return new SMappedDocumentImpl(sDocumentMapping, document);
+    }
+
+    @Override
+    public void updateDocumentOfList(final SMappedDocument mappedDocument, final SDocument document, int index) throws SProcessDocumentCreationException {
+        try {
+            updateMappedDocument(document,null,index,mappedDocument);
+        } catch (final SBonitaException e) {
+            throw new SProcessDocumentCreationException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void updateDocumentIndex(final SMappedDocument mappedDocument, int index) throws SProcessDocumentCreationException {
+        try {
+            updateMapping(mappedDocument.getDocumentId(), mappedDocument, mappedDocument.getDescription(), index);
+        } catch (SRecorderException e) {
+            throw new SProcessDocumentCreationException(e);
+        }
+    }
+
+    private void updateMapping(long documentId, SDocumentMapping sDocumentMapping, String description, int index) throws SRecorderException {
         Map<String, Object> params = new HashMap<String, Object>(2);
-        params.put("documentId", document.getId());
+        params.put("documentId", documentId);
         params.put("description", description);
         params.put("version", incrementVersion(sDocumentMapping.getVersion()));
+        params.put("index", index);
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sDocumentMapping,
                 params);
         SUpdateEvent updateEvent = null;
@@ -330,17 +355,22 @@ public class DocumentServiceImpl implements DocumentService {
         }
     }
 
-    @Override
-    public void removeCurrentVersion(final long processInstanceId, final String documentName) throws SDocumentNotFoundException, SObjectModificationException {
+    public void removeCurrentVersion(SMappedDocument document) throws SDocumentNotFoundException, SObjectModificationException {
         try {
-            final SMappedDocument docMapping = getMappedDocument(processInstanceId, documentName);
-            archive(docMapping, System.currentTimeMillis());
-            removeDocument(docMapping);
+            archive(document, System.currentTimeMillis());
+            removeDocument(document);
         } catch (final SDocumentMappingException e) {
             throw new SObjectModificationException(e);
         } catch (SProcessDocumentDeletionException e) {
             throw new SObjectModificationException(e);
-        } catch (final SBonitaReadException e) {
+        }
+    }
+
+    @Override
+    public void removeCurrentVersion(final long processInstanceId, final String documentName) throws SDocumentNotFoundException, SObjectModificationException {
+        try {
+            removeCurrentVersion(getMappedDocument(processInstanceId, documentName));
+        } catch (SBonitaReadException e) {
             throw new SObjectModificationException(e);
         }
     }
@@ -477,5 +507,19 @@ public class DocumentServiceImpl implements DocumentService {
             }
         }
     }
+
+    @Override
+    public List<SMappedDocument> getDocumentList(String documentName, long processInstanceId) throws SBonitaReadException {
+        List<SMappedDocument> mappedDocuments;
+        List<SMappedDocument> result = new ArrayList<SMappedDocument>();
+        QueryOptions queryOptions = new QueryOptions(0, 100);
+        do {
+            mappedDocuments = persistenceService.selectList(SelectDescriptorBuilder.getDocumentList(documentName, processInstanceId, queryOptions));
+            result.addAll(mappedDocuments);
+            queryOptions = QueryOptions.getNextPage(queryOptions);
+        } while (mappedDocuments.size() == 100);
+        return result;
+    }
+
 
 }

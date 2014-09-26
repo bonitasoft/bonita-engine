@@ -81,4 +81,9 @@ public interface SFlowElementContainerDefinition extends SBaseElement {
 
     boolean containsInclusiveGateway();
 
+    /**
+     * @return the document list definitions
+     * @since 6.4.0
+     */
+    List<SDocumentListDefinition> getDocumentListDefinitions();
 }

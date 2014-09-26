@@ -472,4 +472,8 @@ public interface DocumentAPI {
      * @since 6.0
      */
     ArchivedDocument getArchivedVersionOfProcessDocument(long sourceObjectId) throws ArchivedDocumentNotFoundException;
+
+
+    List<Document> getDocumentList(long processInstanceId, String name) throws DocumentNotFoundException;
+
 }

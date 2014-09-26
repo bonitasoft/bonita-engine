@@ -31,6 +31,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.connector.InvalidEvaluationConnectorConditionException;
+import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -45,8 +46,12 @@ import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
+import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.exception.SProcessDocumentCreationException;
+import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilder;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
@@ -56,6 +61,7 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SDocumentListDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
@@ -64,10 +70,6 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.TransitionState;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
-import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.exception.SProcessDocumentCreationException;
-import org.bonitasoft.engine.core.document.model.SDocument;
-import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -587,6 +589,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         // Create SDataInstances
         bpmInstancesCreator.createDataInstances(sProcessInstance, processContainer, sProcessDefinition, expressionContext, operations, context);
         createDocuments(sProcessDefinition, sProcessInstance, userId);
+        createDocumentLists(sProcessDefinition, sProcessInstance, userId, expressionContext, context);
         if (connectors != null) {
             executeConnectors(sProcessDefinition, sProcessInstance, connectors);
         }
@@ -612,10 +615,11 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 if (document.getFile() != null) {
                     final String file = document.getFile();// should always exists...validation on businessarchive
                     final byte[] content = FileUtils.readFileToByteArray(new File(documentsFolder, file));
-                    attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getContentMimeType(), content, authorId, document.getDescription());
+                    attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getContentMimeType(), content, authorId,
+                            document.getDescription(), -1);
                 } else if (document.getUrl() != null) {
                     attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getContentMimeType(), document.getUrl(),
-                            authorId, document.getDescription());
+                            authorId, document.getDescription(), -1);
                 } else {
                     throw new SProcessDocumentCreationException("Unable to create documents. A document was defined without url or content.");
                 }
@@ -623,16 +627,72 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         }
     }
 
-    protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
-                                             final String url, final long authorId, String description) throws SProcessDocumentCreationException {
-        final SDocument attachment = buildExternalProcessDocumentReference(fileName, mimeType, authorId, url);
-        return documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, description);
+    @SuppressWarnings("unchecked")
+    protected void createDocumentLists(final SProcessDefinition sDefinition, final SProcessInstance processInstance, final long authorId,
+            SExpressionContext expressionContext, Map<String, Object> context)
+            throws SBonitaException {
+        final SFlowElementContainerDefinition processContainer = sDefinition.getProcessContainer();
+        final List<SDocumentListDefinition> documentListDefinitions = processContainer.getDocumentListDefinitions();
+        if (!documentListDefinitions.isEmpty()) {
+            List<Object> initialValues = evaluateInitialExpressionsOfDocumentLists(processInstance, expressionContext, context, documentListDefinitions);
+            for (int i = 0; i < documentListDefinitions.size(); i++) {
+                attachDocumentForList(processInstance, authorId, (List<DocumentValue>) initialValues.get(i), documentListDefinitions.get(i));
+            }
+        }
+    }
+
+    private void attachDocumentForList(SProcessInstance processInstance, long authorId, List<DocumentValue> initialValue,
+            SDocumentListDefinition documentListDefinition) throws SProcessDocumentCreationException {
+        if (initialValue != null) {
+            for (int index = 0; index < initialValue.size(); index++) {
+                DocumentValue documentValue = initialValue.get(index);
+                if (documentValue != null) {
+                    if (documentValue.hasContent()) {
+                        attachDocument(processInstance.getId(), documentListDefinition.getName(), documentValue.getFileName(), documentValue.getMimeType(),
+                                documentValue.getContent(), authorId, documentListDefinition.getDescription(), index);
+                    } else {
+                        attachDocument(processInstance.getId(), documentListDefinition.getName(), documentValue.getFileName(), documentValue.getMimeType(),
+                                documentValue.getUrl(), authorId, documentListDefinition.getDescription(), index);
+                    }
+                }
+            }
+        }
+    }
+
+    private List<Object> evaluateInitialExpressionsOfDocumentLists(SProcessInstance processInstance, SExpressionContext expressionContext,
+            Map<String, Object> context, List<SDocumentListDefinition> documentListDefinitions) throws SExpressionTypeUnknownException,
+            SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException {
+        ArrayList<SExpression> initialValuesExpressions = new ArrayList<SExpression>(documentListDefinitions.size());
+        for (final SDocumentListDefinition documentList : documentListDefinitions) {
+            initialValuesExpressions.add(documentList.getExpression());
+        }
+        SExpressionContext currentExpressionContext = getsExpressionContext(processInstance, expressionContext, context);
+        return expressionResolverService.evaluate(initialValuesExpressions, currentExpressionContext);
+    }
+
+    private SExpressionContext getsExpressionContext(SProcessInstance processInstance, SExpressionContext expressionContext, Map<String, Object> context) {
+        SExpressionContext currentExpressionContext;
+        if (expressionContext != null) {
+            expressionContext.setInputValues(context);
+            currentExpressionContext = expressionContext;
+        } else {
+            currentExpressionContext = new SExpressionContext(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
+                    processInstance.getProcessDefinitionId());
+            currentExpressionContext.setInputValues(context);
+        }
+        return currentExpressionContext;
     }
 
     protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
-                                             final byte[] documentContent, final long authorId, String description) throws SProcessDocumentCreationException {
+            final String url, final long authorId, String description, int index) throws SProcessDocumentCreationException {
+        final SDocument attachment = buildExternalProcessDocumentReference(fileName, mimeType, authorId, url);
+        return documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, description, index);
+    }
+
+    protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
+            final byte[] documentContent, final long authorId, String description, int index) throws SProcessDocumentCreationException {
         final SDocument attachment = buildProcessDocument(fileName, mimeType, authorId, documentContent);
-        return documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, description);
+        return documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, description, index);
     }
 
     private SDocument buildExternalProcessDocumentReference(final String fileName,
@@ -644,7 +704,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     private SDocument buildProcessDocument(final String fileName, final String mimetype,
-                                           final long authorId, byte[] content) {
+            final long authorId, byte[] content) {
         final SDocumentBuilder documentBuilder = initDocumentBuilder(fileName, mimetype, authorId);
         documentBuilder.setHasContent(true);
         documentBuilder.setContent(content);
@@ -652,7 +712,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     private SDocumentBuilder initDocumentBuilder(final String fileName, final String mimetype,
-                                                 final long authorId) {
+            final long authorId) {
         final SDocumentBuilder documentBuilder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance();
         documentBuilder.setFileName(fileName);
         documentBuilder.setMimeType(mimetype);
@@ -794,8 +854,8 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     private int updateTokens(final SProcessDefinition sProcessDefinition, final SFlowNodeInstance child, final SProcessInstance sProcessInstance,
             final int numberOfTokenToMerge, final FlowNodeTransitionsWrapper transitionsDescriptor, final FlowMerger merger)
-                    throws SObjectModificationException, SObjectNotFoundException, SObjectReadException, SObjectCreationException, SGatewayModificationException,
-                    SWorkRegisterException, SBonitaException {
+            throws SObjectModificationException, SObjectNotFoundException, SObjectReadException, SObjectCreationException, SGatewayModificationException,
+            SWorkRegisterException, SBonitaException {
         // handle token creation/deletion
         if (merger.mustConsumeInputTokenOnTakingTransition()) {
             tokenService.deleteTokens(sProcessInstance.getId(), child.getTokenRefId(), numberOfTokenToMerge);
@@ -877,7 +937,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     public SProcessInstance start(final long processDefinitionId, final long targetSFlowNodeDefinitionId, final long starterId, final long starterSubstituteId,
             final SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
             final List<ConnectorDefinitionWithInputValues> connectorsWithInput, final long callerId, final long subProcessDefinitionId)
-                    throws SProcessInstanceCreationException {
+            throws SProcessInstanceCreationException {
         try {
             final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
             final FlowNodeSelector selector = new FlowNodeSelector(sProcessDefinition, getFilter(targetSFlowNodeDefinitionId), subProcessDefinitionId);
@@ -914,7 +974,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
             final boolean isInitializing = initialize(starterId, sProcessDefinition, sProcessInstance, expressionContext,
                     operations != null ? new ArrayList<SOperation>(operations) : operations, context, selector.getContainer(), connectors,
-                            selector);
+                    selector);
             try {
                 handleEventSubProcess(sProcessDefinition, sProcessInstance, selector.getSubProcessDefinitionId());
             } catch (final SProcessInstanceCreationException e) {
@@ -983,7 +1043,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     @Override
     public SProcessInstance startElements(final SProcessInstance sProcessInstance, final FlowNodeSelector selector) throws SProcessInstanceCreationException,
-    SFlowNodeExecutionException {
+            SFlowNodeExecutionException {
         final List<SFlowNodeInstance> flowNodeInstances = initializeFirstExecutableElements(sProcessInstance, selector);
         // process is initialized and now the engine trigger jobs to execute other activities, give the hand back
         ProcessInstanceState state;
@@ -1029,7 +1089,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         // Execute Activities
         for (final SFlowNodeInstance sFlowNodeInstance : sFlowNodeInstances) {
             workService
-            .registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, parentProcessInstanceId, sFlowNodeInstance.getId(), null, null));
+                    .registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, parentProcessInstanceId, sFlowNodeInstance.getId(), null, null));
         }
     }
 

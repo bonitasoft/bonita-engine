@@ -415,6 +415,11 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     }
 
     @Override
+    public DocumentListDefinitionBuilder addDocumentListDefinition(final String name) {
+        return new DocumentListDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name);
+    }
+
+    @Override
     public ProcessDefinitionBuilder addDescription(final String description) {
         process.setDescription(description);
         return this;

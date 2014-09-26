@@ -1,714 +1,776 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:definition="http://www.bonitasoft.org/ns/process/client/6.3" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.bonitasoft.org/ns/process/client/6.3"
-	elementFormDefault="qualified">
+<xs:schema xmlns:definition="http://www.bonitasoft.org/ns/process/client/6.3"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.bonitasoft.org/ns/process/client/6.3"
+           elementFormDefault="qualified">
 
-	<xs:element name="processDefinition" type="definition:ProcessDefinition" />
+    <xs:element name="processDefinition" type="definition:ProcessDefinition"/>
 
-	<xs:complexType name="ProcessDefinition">
-		<xs:annotation>
-			<xs:documentation>Process definition client side</xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:extension base="definition:NamedElement">
-				<xs:all>
-					<xs:element name="stringIndexes">
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element type="definition:StringIndex" name="stringIndex" minOccurs="0" maxOccurs="unbounded" />
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
-					<xs:element name="flowElements">
-						<xs:complexType>
-							<xs:complexContent>
-								<xs:extension base="definition:FlowElementDefinition" />
-							</xs:complexContent>
-						</xs:complexType>
-					</xs:element>
-					<xs:element name="dependencies">
-						<xs:complexType>
-							<xs:all>
-								<xs:element name="parameters">
-									<xs:complexType>
-										<xs:sequence>
-											<xs:element type="definition:ParameterDefinition" name="parameter" minOccurs="0" maxOccurs="unbounded" />
-										</xs:sequence>
-									</xs:complexType>
-								</xs:element>
-								<xs:element name="actors">
-									<xs:complexType>
-										<xs:sequence>
-											<xs:element type="definition:ActorDefinition" name="actor" minOccurs="0" maxOccurs="unbounded" />
-										</xs:sequence>
-									</xs:complexType>
-								</xs:element>
-							</xs:all>
-						</xs:complexType>
-					</xs:element>
-					<xs:element name="actorInitiator" minOccurs="0" maxOccurs="1">
-						<xs:complexType>
-							<xs:attribute name="name" type="xs:string" use="required" />
-						</xs:complexType>
-					</xs:element>
-				</xs:all>
-				<xs:attribute type="xs:string" name="version" use="required" />
-				<xs:attribute type="xs:string" name="bos_version" use="required" />
-				<xs:attribute type="xs:string" name="displayName" />
-				<xs:attribute type="xs:string" name="displayDescription" />
-				<xs:attribute type="xs:string" name="stringIndexLabel1" />
-				<xs:attribute type="xs:string" name="stringIndexLabel2" />
-				<xs:attribute type="xs:string" name="stringIndexLabel3" />
-				<xs:attribute type="xs:string" name="stringIndexLabel4" />
-				<xs:attribute type="xs:string" name="stringIndexLabel5" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="ProcessDefinition">
+        <xs:annotation>
+            <xs:documentation>Process definition client side</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="definition:NamedElement">
+                <xs:all>
+                    <xs:element name="stringIndexes">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element type="definition:StringIndex" name="stringIndex" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="flowElements">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension base="definition:FlowElementDefinition"/>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="dependencies">
+                        <xs:complexType>
+                            <xs:all>
+                                <xs:element name="parameters">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element type="definition:ParameterDefinition" name="parameter"
+                                                        minOccurs="0" maxOccurs="unbounded"/>
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                </xs:element>
+                                <xs:element name="actors">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element type="definition:ActorDefinition" name="actor" minOccurs="0"
+                                                        maxOccurs="unbounded"/>
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:all>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="actorInitiator" minOccurs="0" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:attribute name="name" type="xs:string" use="required"/>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:all>
+                <xs:attribute type="xs:string" name="version" use="required"/>
+                <xs:attribute type="xs:string" name="bos_version" use="required"/>
+                <xs:attribute type="xs:string" name="displayName"/>
+                <xs:attribute type="xs:string" name="displayDescription"/>
+                <xs:attribute type="xs:string" name="stringIndexLabel1"/>
+                <xs:attribute type="xs:string" name="stringIndexLabel2"/>
+                <xs:attribute type="xs:string" name="stringIndexLabel3"/>
+                <xs:attribute type="xs:string" name="stringIndexLabel4"/>
+                <xs:attribute type="xs:string" name="stringIndexLabel5"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="ParameterDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:NamedElement">
-				<xs:sequence>
-					<xs:element name="description" type="xs:string" minOccurs="0" />
-				</xs:sequence>
-				<xs:attribute name="type" type="xs:string" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="ParameterDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:NamedElement">
+                <xs:sequence>
+                    <xs:element name="description" type="xs:string" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute name="type" type="xs:string"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="StringIndex">
-		<xs:sequence>
-			<xs:element name="expression" type="definition:Expression" minOccurs="0" maxOccurs="1" />
-		</xs:sequence>
-		<xs:attribute name="index" type="xs:int" />
-		<xs:attribute name="label" type="xs:string" />
-	</xs:complexType>
+    <xs:complexType name="StringIndex">
+        <xs:sequence>
+            <xs:element name="expression" type="definition:Expression" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="index" type="xs:int"/>
+        <xs:attribute name="label" type="xs:string"/>
+    </xs:complexType>
 
-	<xs:complexType name="ActorDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:NamedElement">
-				<xs:all>
-					<xs:element name="description" type="xs:string" minOccurs="0" />
-				</xs:all>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="ActorDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:NamedElement">
+                <xs:all>
+                    <xs:element name="description" type="xs:string" minOccurs="0"/>
+                </xs:all>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="FlowElementDefinition">
-		<xs:all>
-			<xs:element name="flowNodes">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:choice minOccurs="0" maxOccurs="unbounded">
-							<xs:element type="definition:UserTaskDefinition" name="userTask" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:ManualTaskDefinition" name="manualTask" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:AutomaticTaskDefinition" name="automaticTask" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:ReceiveTaskDefinition" name="receiveTask" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:SendTaskDefinition" name="sendTask" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:CallActivityDefinition" name="callActivity" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:GatewayDefinition" name="gateway" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:StartEventDefinition" name="startEvent" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:IntermediateCatchEventDefinition" name="intermediateCatchEvent" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:IntermediateThrowEventDefinition" name="intermediateThrowEvent" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:EndEventDefinition" name="endEvent" minOccurs="0" maxOccurs="unbounded" />
-							<xs:element type="definition:SubProcessDefinition" name="subProcess" minOccurs="0" maxOccurs="unbounded" />
-						</xs:choice>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="businessDataDefinitions" minOccurs="0" maxOccurs="1">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element type="definition:BusinessDataDefinition" name="businessDataDefinition" minOccurs="0" maxOccurs="unbounded" />
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="transitions">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element type="definition:TransitionDefinition" name="transition" minOccurs="0" maxOccurs="unbounded" />
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="connectors" minOccurs="0">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element type="definition:ConnectorDefinition" name="connector" minOccurs="0" maxOccurs="unbounded" />
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="dataDefinitions">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:choice minOccurs="0" maxOccurs="unbounded">
-							<xs:element type="definition:DataDefinition" name="dataDefinition" />
-							<xs:element type="definition:TextDataDefinition" name="textDataDefinition" />
-							<xs:element type="definition:XMLDataDefinition" name="xmlDataDefinition" />
-						</xs:choice>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="documentDefinitions">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element type="definition:DocumentDefinition" name="documentDefinition" minOccurs="0" maxOccurs="unbounded" />
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-		</xs:all>
-	</xs:complexType>
+    <xs:complexType name="FlowElementDefinition">
+        <xs:all>
+            <xs:element name="flowNodes">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:choice minOccurs="0" maxOccurs="unbounded">
+                            <xs:element type="definition:UserTaskDefinition" name="userTask" minOccurs="0"
+                                        maxOccurs="unbounded"/>
+                            <xs:element type="definition:ManualTaskDefinition" name="manualTask" minOccurs="0"
+                                        maxOccurs="unbounded"/>
+                            <xs:element type="definition:AutomaticTaskDefinition" name="automaticTask" minOccurs="0"
+                                        maxOccurs="unbounded"/>
+                            <xs:element type="definition:ReceiveTaskDefinition" name="receiveTask" minOccurs="0"
+                                        maxOccurs="unbounded"/>
+                            <xs:element type="definition:SendTaskDefinition" name="sendTask" minOccurs="0"
+                                        maxOccurs="unbounded"/>
+                            <xs:element type="definition:CallActivityDefinition" name="callActivity" minOccurs="0"
+                                        maxOccurs="unbounded"/>
+                            <xs:element type="definition:GatewayDefinition" name="gateway" minOccurs="0"
+                                        maxOccurs="unbounded"/>
+                            <xs:element type="definition:StartEventDefinition" name="startEvent" minOccurs="0"
+                                        maxOccurs="unbounded"/>
+                            <xs:element type="definition:IntermediateCatchEventDefinition" name="intermediateCatchEvent"
+                                        minOccurs="0" maxOccurs="unbounded"/>
+                            <xs:element type="definition:IntermediateThrowEventDefinition" name="intermediateThrowEvent"
+                                        minOccurs="0" maxOccurs="unbounded"/>
+                            <xs:element type="definition:EndEventDefinition" name="endEvent" minOccurs="0"
+                                        maxOccurs="unbounded"/>
+                            <xs:element type="definition:SubProcessDefinition" name="subProcess" minOccurs="0"
+                                        maxOccurs="unbounded"/>
+                        </xs:choice>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="businessDataDefinitions" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="definition:BusinessDataDefinition" name="businessDataDefinition" minOccurs="0"
+                                    maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="transitions">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="definition:TransitionDefinition" name="transition" minOccurs="0"
+                                    maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="connectors" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="definition:ConnectorDefinition" name="connector" minOccurs="0"
+                                    maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="dataDefinitions">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:choice minOccurs="0" maxOccurs="unbounded">
+                            <xs:element type="definition:DataDefinition" name="dataDefinition"/>
+                            <xs:element type="definition:TextDataDefinition" name="textDataDefinition"/>
+                            <xs:element type="definition:XMLDataDefinition" name="xmlDataDefinition"/>
+                        </xs:choice>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="documentDefinitions">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="definition:DocumentDefinition" name="documentDefinition" minOccurs="0"
+                                    maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="documentListDefinitions">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="definition:DocumentListDefinition" name="documentListDefinition" minOccurs="0"
+                                    maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
 
-	<xs:complexType name="FlowNodeDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:NamedElement">
-				<xs:sequence>
-					<xs:element name="displayName" type="definition:Expression" minOccurs="0" maxOccurs="1" />
-					<xs:element name="displayDescription" type="definition:Expression" minOccurs="0" maxOccurs="1" />
-					<xs:element name="displayDescriptionAfterCompletion" type="definition:Expression" minOccurs="0" maxOccurs="1" />
-					<xs:element name="incomingTransition" type="definition:TransitionDefinitionRef" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element name="outgoingTransition" type="definition:TransitionDefinitionRef" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element name="defaultTransition" type="definition:TransitionDefinitionRef" minOccurs="0" maxOccurs="1" />
-					<xs:element name="connector" type="definition:ConnectorDefinition" minOccurs="0" maxOccurs="unbounded" />
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="FlowNodeDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:NamedElement">
+                <xs:sequence>
+                    <xs:element name="displayName" type="definition:Expression" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="displayDescription" type="definition:Expression" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="displayDescriptionAfterCompletion" type="definition:Expression" minOccurs="0"
+                                maxOccurs="1"/>
+                    <xs:element name="incomingTransition" type="definition:TransitionDefinitionRef" minOccurs="0"
+                                maxOccurs="unbounded"/>
+                    <xs:element name="outgoingTransition" type="definition:TransitionDefinitionRef" minOccurs="0"
+                                maxOccurs="unbounded"/>
+                    <xs:element name="defaultTransition" type="definition:TransitionDefinitionRef" minOccurs="0"
+                                maxOccurs="1"/>
+                    <xs:element name="connector" type="definition:ConnectorDefinition" minOccurs="0"
+                                maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="ActivityDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:FlowNodeDefinition">
-				<xs:sequence>
-					<xs:element name="dataDefinitions">
-						<xs:complexType>
-							<xs:sequence>
-								<xs:choice minOccurs="0" maxOccurs="unbounded">
-									<xs:element type="definition:DataDefinition" name="dataDefinition" />
-									<xs:element type="definition:TextDataDefinition" name="textDataDefinition" />
-									<xs:element type="definition:XMLDataDefinition" name="xmlDataDefinition" />
-								</xs:choice>
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
-					<xs:element name="businessDataDefinitions" minOccurs="0" maxOccurs="1">
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element type="definition:BusinessDataDefinition" name="businessDataDefinition" minOccurs="0" maxOccurs="2" />
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
-					<xs:element name="operations" maxOccurs="1">
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element type="definition:Operation" name="operation" minOccurs="0" maxOccurs="unbounded" />
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
-					<xs:choice minOccurs="0">
-						<xs:element name="standardLoopCharacteristics" type="definition:StandardLoopCharacteristics" />
-						<xs:element name="multiInstanceLoopCharacteristics" type="definition:MultiInstanceLoopCharacteristics" />
-					</xs:choice>
-					<xs:element name="boundaryEvents" maxOccurs="1">
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element type="definition:BoundaryEventDefinition" name="boundaryEvent" minOccurs="0" maxOccurs="unbounded" />
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="ActivityDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:FlowNodeDefinition">
+                <xs:sequence>
+                    <xs:element name="dataDefinitions">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element type="definition:DataDefinition" name="dataDefinition"/>
+                                    <xs:element type="definition:TextDataDefinition" name="textDataDefinition"/>
+                                    <xs:element type="definition:XMLDataDefinition" name="xmlDataDefinition"/>
+                                </xs:choice>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="businessDataDefinitions" minOccurs="0" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element type="definition:BusinessDataDefinition" name="businessDataDefinition"
+                                            minOccurs="0" maxOccurs="2"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="operations" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element type="definition:Operation" name="operation" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:choice minOccurs="0">
+                        <xs:element name="standardLoopCharacteristics" type="definition:StandardLoopCharacteristics"/>
+                        <xs:element name="multiInstanceLoopCharacteristics"
+                                    type="definition:MultiInstanceLoopCharacteristics"/>
+                    </xs:choice>
+                    <xs:element name="boundaryEvents" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element type="definition:BoundaryEventDefinition" name="boundaryEvent" minOccurs="0"
+                                            maxOccurs="unbounded"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="SubProcessDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:ActivityDefinition">
-				<xs:sequence>
-					<xs:element name="flowElements">
-						<xs:complexType>
-							<xs:complexContent>
-								<xs:extension base="definition:FlowElementDefinition" />
-							</xs:complexContent>
-						</xs:complexType>
-					</xs:element>
-				</xs:sequence>
-				<xs:attribute name="triggeredByEvent" type="xs:boolean" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="SubProcessDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:ActivityDefinition">
+                <xs:sequence>
+                    <xs:element name="flowElements">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension base="definition:FlowElementDefinition"/>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="triggeredByEvent" type="xs:boolean"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="AutomaticTaskDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:ActivityDefinition" />
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="AutomaticTaskDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:ActivityDefinition"/>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="HumanTaskDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:ActivityDefinition">
-				<xs:sequence>
-					<xs:element name="userFilter" type="definition:UserFilterDefinition" minOccurs="0" />
-				</xs:sequence>
-				<xs:attribute name="actorName" type="xs:string" />
-				<xs:attribute name="priority" type="xs:string" />
-				<xs:attribute name="expectedDuration" type="xs:long" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="HumanTaskDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:ActivityDefinition">
+                <xs:sequence>
+                    <xs:element name="userFilter" type="definition:UserFilterDefinition" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute name="actorName" type="xs:string"/>
+                <xs:attribute name="priority" type="xs:string"/>
+                <xs:attribute name="expectedDuration" type="xs:long"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="UserTaskDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:HumanTaskDefinition" />
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="UserTaskDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:HumanTaskDefinition"/>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="ManualTaskDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:HumanTaskDefinition" />
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="ManualTaskDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:HumanTaskDefinition"/>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="ReceiveTaskDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:ActivityDefinition">
-				<xs:sequence>
-					<xs:element name="catchMessageEventTrigger" type="definition:CatchMessageEventTriggerDefinition" />
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="ReceiveTaskDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:ActivityDefinition">
+                <xs:sequence>
+                    <xs:element name="catchMessageEventTrigger" type="definition:CatchMessageEventTriggerDefinition"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="SendTaskDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:ActivityDefinition">
-				<xs:sequence>
-					<xs:element name="throwMessageEventTrigger" type="definition:ThrowMessageEventTriggerDefinition" />
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="SendTaskDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:ActivityDefinition">
+                <xs:sequence>
+                    <xs:element name="throwMessageEventTrigger" type="definition:ThrowMessageEventTriggerDefinition"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="CallActivityDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:ActivityDefinition">
-				<xs:sequence>
-					<xs:element type="definition:Expression" name="callableElement" minOccurs="1" maxOccurs="1" />
-					<xs:element type="definition:Expression" name="callableElementVersion" minOccurs="0" maxOccurs="1" />
-					<xs:element type="definition:Operation" name="dataInputOperation" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element type="definition:Operation" name="dataOutputOperation" minOccurs="0" maxOccurs="unbounded" />
-				</xs:sequence>
-				<xs:attribute name="callableElementType">
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:enumeration value="PROCESS" />
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:attribute>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="CallActivityDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:ActivityDefinition">
+                <xs:sequence>
+                    <xs:element type="definition:Expression" name="callableElement" minOccurs="1" maxOccurs="1"/>
+                    <xs:element type="definition:Expression" name="callableElementVersion" minOccurs="0" maxOccurs="1"/>
+                    <xs:element type="definition:Operation" name="dataInputOperation" minOccurs="0"
+                                maxOccurs="unbounded"/>
+                    <xs:element type="definition:Operation" name="dataOutputOperation" minOccurs="0"
+                                maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute name="callableElementType">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="PROCESS"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="TransitionDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:NamedElement">
-				<xs:sequence>
-					<xs:element name="condition" type="definition:Expression" minOccurs="0" />
-				</xs:sequence>
-				<xs:attribute name="source" type="xs:long" />
-				<xs:attribute name="target" type="xs:long" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="TransitionDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:NamedElement">
+                <xs:sequence>
+                    <xs:element name="condition" type="definition:Expression" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute name="source" type="xs:long"/>
+                <xs:attribute name="target" type="xs:long"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="TransitionDefinitionRef">
-		<xs:attribute name="idref" type="xs:long" use="required" />
-	</xs:complexType>
+    <xs:complexType name="TransitionDefinitionRef">
+        <xs:attribute name="idref" type="xs:long" use="required"/>
+    </xs:complexType>
 
-	<xs:complexType name="GatewayDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:FlowNodeDefinition">
-				<xs:attribute name="gatewayType">
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:enumeration value="PARALLEL" />
-							<xs:enumeration value="INCLUSIVE" />
-							<xs:enumeration value="EXCLUSIVE" />
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:attribute>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="GatewayDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:FlowNodeDefinition">
+                <xs:attribute name="gatewayType">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="PARALLEL"/>
+                            <xs:enumeration value="INCLUSIVE"/>
+                            <xs:enumeration value="EXCLUSIVE"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="ConnectorDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:NamedElement">
-				<xs:all>
-					<xs:element name="inputs" type="definition:Inputs" />
-					<xs:element name="outputs" type="definition:Outputs" />
-				</xs:all>
-				<xs:attribute name="connectorId" />
-				<xs:attribute name="version" />
-				<xs:attribute name="activationEvent">
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:enumeration value="ON_START" />
-							<xs:enumeration value="ON_ENTER" />
-							<xs:enumeration value="ON_FINISH" />
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:attribute>
-				<xs:attribute name="failAction" use="required">
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:enumeration value="FAIL" />
-							<xs:enumeration value="ERROR_EVENT" />
-							<xs:enumeration value="IGNORE" />
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:attribute>
-				<xs:attribute name="errorCode">
-				</xs:attribute>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="ConnectorDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:NamedElement">
+                <xs:all>
+                    <xs:element name="inputs" type="definition:Inputs"/>
+                    <xs:element name="outputs" type="definition:Outputs"/>
+                </xs:all>
+                <xs:attribute name="connectorId"/>
+                <xs:attribute name="version"/>
+                <xs:attribute name="activationEvent">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="ON_START"/>
+                            <xs:enumeration value="ON_ENTER"/>
+                            <xs:enumeration value="ON_FINISH"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="failAction" use="required">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="FAIL"/>
+                            <xs:enumeration value="ERROR_EVENT"/>
+                            <xs:enumeration value="IGNORE"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="errorCode">
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="UserFilterDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:NamedElement">
-				<xs:all>
-					<xs:element name="inputs" type="definition:Inputs" />
-				</xs:all>
-				<xs:attribute name="userFilterId" />
-				<xs:attribute name="version" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="UserFilterDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:NamedElement">
+                <xs:all>
+                    <xs:element name="inputs" type="definition:Inputs"/>
+                </xs:all>
+                <xs:attribute name="userFilterId"/>
+                <xs:attribute name="version"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="IOExpression">
-		<xs:complexContent>
-			<xs:extension base="definition:NamedElement">
-				<xs:all>
-					<xs:element name="expression" type="definition:Expression" />
-				</xs:all>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="IOExpression">
+        <xs:complexContent>
+            <xs:extension base="definition:NamedElement">
+                <xs:all>
+                    <xs:element name="expression" type="definition:Expression"/>
+                </xs:all>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="Inputs">
-		<xs:sequence>
-			<xs:element name="input" minOccurs="0" maxOccurs="unbounded" type="definition:IOExpression" />
-		</xs:sequence>
-	</xs:complexType>
+    <xs:complexType name="Inputs">
+        <xs:sequence>
+            <xs:element name="input" minOccurs="0" maxOccurs="unbounded" type="definition:IOExpression"/>
+        </xs:sequence>
+    </xs:complexType>
 
-	<xs:complexType name="Outputs">
-		<xs:sequence>
-			<xs:element name="operation" minOccurs="0" maxOccurs="unbounded" type="definition:Operation" />
-		</xs:sequence>
-	</xs:complexType>
+    <xs:complexType name="Outputs">
+        <xs:sequence>
+            <xs:element name="operation" minOccurs="0" maxOccurs="unbounded" type="definition:Operation"/>
+        </xs:sequence>
+    </xs:complexType>
 
-	<xs:complexType name="BusinessDataDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:NamedElement">
-				<xs:all>
-					<xs:element name="description" type="xs:string" minOccurs="0" />
-					<xs:element name="defaultValue" type="definition:Expression" minOccurs="0" />
-				</xs:all>
- 				<xs:attribute name="className" type="xs:string" />
- 				<xs:attribute name="multiple" type="xs:boolean" default="false" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="BusinessDataDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:NamedElement">
+                <xs:all>
+                    <xs:element name="description" type="xs:string" minOccurs="0"/>
+                    <xs:element name="defaultValue" type="definition:Expression" minOccurs="0"/>
+                </xs:all>
+                <xs:attribute name="className" type="xs:string"/>
+                <xs:attribute name="multiple" type="xs:boolean" default="false"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="DataDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:NamedElement">
-				<xs:all>
-					<xs:element name="description" type="xs:string" minOccurs="0" />
-					<xs:element name="defaultValue" type="definition:Expression" minOccurs="0" />
-				</xs:all>
-				<xs:attribute name="transient" type="xs:boolean" />
-				<xs:attribute name="className" type="xs:string" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="DataDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:NamedElement">
+                <xs:all>
+                    <xs:element name="description" type="xs:string" minOccurs="0"/>
+                    <xs:element name="defaultValue" type="definition:Expression" minOccurs="0"/>
+                </xs:all>
+                <xs:attribute name="transient" type="xs:boolean"/>
+                <xs:attribute name="className" type="xs:string"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="TextDataDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:NamedElement">
-				<xs:all>
-					<xs:element name="description" type="xs:string" minOccurs="0" />
-					<xs:element name="defaultValue" type="definition:Expression" minOccurs="0" />
-				</xs:all>
-				<xs:attribute name="transient" type="xs:boolean" />
-				<xs:attribute name="className" type="xs:string" />
-				<xs:attribute name="longText" type="xs:boolean" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="TextDataDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:NamedElement">
+                <xs:all>
+                    <xs:element name="description" type="xs:string" minOccurs="0"/>
+                    <xs:element name="defaultValue" type="definition:Expression" minOccurs="0"/>
+                </xs:all>
+                <xs:attribute name="transient" type="xs:boolean"/>
+                <xs:attribute name="className" type="xs:string"/>
+                <xs:attribute name="longText" type="xs:boolean"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="XMLDataDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:NamedElement">
-				<xs:all>
-					<xs:element name="description" type="xs:string" minOccurs="0" />
-					<xs:element name="defaultValue" type="definition:Expression" minOccurs="0" />
-					<xs:element name="namespace" type="xs:string" minOccurs="0" />
-					<xs:element name="element" type="xs:string" minOccurs="0" />
-				</xs:all>
-				<xs:attribute name="transient" type="xs:boolean" />
-				<xs:attribute name="className" type="xs:string" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="XMLDataDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:NamedElement">
+                <xs:all>
+                    <xs:element name="description" type="xs:string" minOccurs="0"/>
+                    <xs:element name="defaultValue" type="definition:Expression" minOccurs="0"/>
+                    <xs:element name="namespace" type="xs:string" minOccurs="0"/>
+                    <xs:element name="element" type="xs:string" minOccurs="0"/>
+                </xs:all>
+                <xs:attribute name="transient" type="xs:boolean"/>
+                <xs:attribute name="className" type="xs:string"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="DocumentDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:NamedElement">
-				<xs:all>
-					<xs:element name="description" type="xs:string" minOccurs="0" />
-					<xs:element name="url" type="xs:string" minOccurs="0" />
-					<xs:element name="file" type="xs:string" minOccurs="0" />
-					<xs:element name="fileName" type="xs:string" minOccurs="0" />
-				</xs:all>
-				<xs:attribute name="mimeType" type="xs:string" use="required" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="DocumentDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:NamedElement">
+                <xs:all>
+                    <xs:element name="description" type="xs:string" minOccurs="0"/>
+                    <xs:element name="url" type="xs:string" minOccurs="0"/>
+                    <xs:element name="file" type="xs:string" minOccurs="0"/>
+                    <xs:element name="fileName" type="xs:string" minOccurs="0"/>
+                </xs:all>
+                <xs:attribute name="mimeType" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="LoopCharacteristics" />
+    <xs:complexType name="DocumentListDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:NamedElement">
+                <xs:all>
+                    <xs:element name="description" type="xs:string" minOccurs="0"/>
+                    <xs:element name="expression" type="definition:Expression" minOccurs="0"/>
+                </xs:all>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="StandardLoopCharacteristics">
-		<xs:complexContent>
-			<xs:extension base="definition:LoopCharacteristics">
-				<xs:sequence>
-					<xs:element name="loopCondition" type="definition:Expression" />
-					<xs:element name="loopMax" type="definition:Expression" minOccurs="0" />
-				</xs:sequence>
-				<xs:attribute name="testBefore" type="xs:boolean" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="LoopCharacteristics"/>
 
-	<xs:complexType name="MultiInstanceLoopCharacteristics">
-		<xs:sequence>
-			<xs:element name="loopCardinality" type="definition:Expression" minOccurs="0" />
-			<xs:element name="completionCondition" type="definition:Expression" minOccurs="0" />
-		</xs:sequence>
-		<xs:attribute name="isSequential" type="xs:boolean" />
-		<xs:attribute name="loopDataInputRef" type="xs:string" />
-		<xs:attribute name="loopDataOutputRef" type="xs:string" />
-		<xs:attribute name="dataInputItemRef" type="xs:string" />
-		<xs:attribute name="dataOutputItemRef" type="xs:string" />
-	</xs:complexType>
+    <xs:complexType name="StandardLoopCharacteristics">
+        <xs:complexContent>
+            <xs:extension base="definition:LoopCharacteristics">
+                <xs:sequence>
+                    <xs:element name="loopCondition" type="definition:Expression"/>
+                    <xs:element name="loopMax" type="definition:Expression" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute name="testBefore" type="xs:boolean"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="EventDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:FlowNodeDefinition">
-				<xs:sequence>
-					<xs:element name="eventTrigger" type="definition:EventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="MultiInstanceLoopCharacteristics">
+        <xs:sequence>
+            <xs:element name="loopCardinality" type="definition:Expression" minOccurs="0"/>
+            <xs:element name="completionCondition" type="definition:Expression" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="isSequential" type="xs:boolean"/>
+        <xs:attribute name="loopDataInputRef" type="xs:string"/>
+        <xs:attribute name="loopDataOutputRef" type="xs:string"/>
+        <xs:attribute name="dataInputItemRef" type="xs:string"/>
+        <xs:attribute name="dataOutputItemRef" type="xs:string"/>
+    </xs:complexType>
 
-	<xs:complexType name="CatchEventDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:EventDefinition">
-				<xs:sequence>
-					<xs:element name="timerEventTrigger" type="definition:TimerEventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element name="catchMessageEventTrigger" type="definition:CatchMessageEventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element name="catchSignalEventTrigger" type="definition:CatchSignalEventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
-				</xs:sequence>
-				<xs:attribute name="interrupting">
-					<xs:simpleType>
-						<xs:restriction base="xs:boolean" />
-					</xs:simpleType>
-				</xs:attribute>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="EventDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:FlowNodeDefinition">
+                <xs:sequence>
+                    <xs:element name="eventTrigger" type="definition:EventTriggerDefinition" minOccurs="0"
+                                maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="BoundaryEventDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:CatchEventDefinition">
-				<xs:sequence>
-					<xs:element name="catchErrorEventTrigger" type="definition:CatchErrorEventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="CatchEventDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:EventDefinition">
+                <xs:sequence>
+                    <xs:element name="timerEventTrigger" type="definition:TimerEventTriggerDefinition" minOccurs="0"
+                                maxOccurs="unbounded"/>
+                    <xs:element name="catchMessageEventTrigger" type="definition:CatchMessageEventTriggerDefinition"
+                                minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="catchSignalEventTrigger" type="definition:CatchSignalEventTriggerDefinition"
+                                minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute name="interrupting">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:boolean"/>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="ThrowEventDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:EventDefinition">
-				<xs:sequence>
-					<xs:element name="throwMessageEventTrigger" type="definition:ThrowMessageEventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element name="throwSignalEventTrigger" type="definition:ThrowSignalEventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="BoundaryEventDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:CatchEventDefinition">
+                <xs:sequence>
+                    <xs:element name="catchErrorEventTrigger" type="definition:CatchErrorEventTriggerDefinition"
+                                minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="EventTriggerDefinition" />
+    <xs:complexType name="ThrowEventDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:EventDefinition">
+                <xs:sequence>
+                    <xs:element name="throwMessageEventTrigger" type="definition:ThrowMessageEventTriggerDefinition"
+                                minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="throwSignalEventTrigger" type="definition:ThrowSignalEventTriggerDefinition"
+                                minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="TimerEventTriggerDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:EventTriggerDefinition">
-				<xs:sequence>
-					<xs:element name="expression" type="definition:Expression" />
-				</xs:sequence>
-				<xs:attribute name="type">
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:enumeration value="CYCLE" />
-							<xs:enumeration value="DATE" />
-							<xs:enumeration value="DURATION" />
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:attribute>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="EventTriggerDefinition"/>
 
-	<xs:complexType name="CatchSignalEventTriggerDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:EventTriggerDefinition">
-				<xs:attribute name="name" type="xs:string" use="required" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="TimerEventTriggerDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:EventTriggerDefinition">
+                <xs:sequence>
+                    <xs:element name="expression" type="definition:Expression"/>
+                </xs:sequence>
+                <xs:attribute name="type">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="CYCLE"/>
+                            <xs:enumeration value="DATE"/>
+                            <xs:enumeration value="DURATION"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="CatchErrorEventTriggerDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:EventTriggerDefinition">
-				<xs:attribute name="errorCode" type="xs:string" use="optional" /> <!-- for the catch event the error code is optional -->
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="CatchSignalEventTriggerDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:EventTriggerDefinition">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="CatchMessageEventTriggerDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:EventTriggerDefinition">
-				<xs:sequence>
-					<xs:element name="correlation" type="definition:CorrelationDefinition" minOccurs="0" maxOccurs="5" />
-					<xs:element name="operation" type="definition:Operation" minOccurs="0" maxOccurs="unbounded" />
-				</xs:sequence>
-				<xs:attribute name="name" type="xs:string" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="CatchErrorEventTriggerDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:EventTriggerDefinition">
+                <xs:attribute name="errorCode" type="xs:string" use="optional"/>
+                <!-- for the catch event the error code is optional -->
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="ThrowMessageEventTriggerDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:EventTriggerDefinition">
-				<xs:sequence>
-					<xs:element name="targetProcess" type="definition:Expression" minOccurs="1" />
-					<xs:element name="targetFlowNode" type="definition:Expression" minOccurs="0" />
-					<xs:element name="dataDefinition" type="definition:DataDefinition" minOccurs="0" maxOccurs="unbounded" />
-					<xs:element name="correlation" type="definition:CorrelationDefinition" minOccurs="0" maxOccurs="5" />
-				</xs:sequence>
-				<xs:attribute name="name" type="xs:string" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="CatchMessageEventTriggerDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:EventTriggerDefinition">
+                <xs:sequence>
+                    <xs:element name="correlation" type="definition:CorrelationDefinition" minOccurs="0" maxOccurs="5"/>
+                    <xs:element name="operation" type="definition:Operation" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute name="name" type="xs:string"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="CorrelationDefinition">
-		<xs:sequence>
-			<xs:element name="key" type="definition:Expression" minOccurs="1" maxOccurs="1" />
-			<xs:element name="value" type="definition:Expression" minOccurs="1" maxOccurs="1" />
-		</xs:sequence>
-	</xs:complexType>
+    <xs:complexType name="ThrowMessageEventTriggerDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:EventTriggerDefinition">
+                <xs:sequence>
+                    <xs:element name="targetProcess" type="definition:Expression" minOccurs="1"/>
+                    <xs:element name="targetFlowNode" type="definition:Expression" minOccurs="0"/>
+                    <xs:element name="dataDefinition" type="definition:DataDefinition" minOccurs="0"
+                                maxOccurs="unbounded"/>
+                    <xs:element name="correlation" type="definition:CorrelationDefinition" minOccurs="0" maxOccurs="5"/>
+                </xs:sequence>
+                <xs:attribute name="name" type="xs:string"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="ThrowSignalEventTriggerDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:EventTriggerDefinition">
-				<xs:attribute name="name" type="xs:string" use="required" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="CorrelationDefinition">
+        <xs:sequence>
+            <xs:element name="key" type="definition:Expression" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="value" type="definition:Expression" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
 
-	<xs:complexType name="ThrowErrorEventTriggerDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:EventTriggerDefinition">
-				<xs:attribute name="errorCode" type="xs:string" use="required" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="ThrowSignalEventTriggerDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:EventTriggerDefinition">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="TerminateEventTriggerDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:EventTriggerDefinition" />
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="ThrowErrorEventTriggerDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:EventTriggerDefinition">
+                <xs:attribute name="errorCode" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="StartEventDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:CatchEventDefinition">
-				<xs:sequence>
-					<xs:element name="catchErrorEventTrigger" type="definition:CatchErrorEventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="TerminateEventTriggerDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:EventTriggerDefinition"/>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="IntermediateCatchEventDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:CatchEventDefinition" />
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="StartEventDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:CatchEventDefinition">
+                <xs:sequence>
+                    <xs:element name="catchErrorEventTrigger" type="definition:CatchErrorEventTriggerDefinition"
+                                minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="EndEventDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:ThrowEventDefinition">
-				<xs:sequence>
-					<xs:element name="terminateEventTrigger" type="definition:TerminateEventTriggerDefinition" minOccurs="0" maxOccurs="1" />
-					<xs:element name="throwErrorEventTrigger" type="definition:ThrowErrorEventTriggerDefinition" minOccurs="0" maxOccurs="unbounded" />
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="IntermediateCatchEventDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:CatchEventDefinition"/>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="IntermediateThrowEventDefinition">
-		<xs:complexContent>
-			<xs:extension base="definition:ThrowEventDefinition" />
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="EndEventDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:ThrowEventDefinition">
+                <xs:sequence>
+                    <xs:element name="terminateEventTrigger" type="definition:TerminateEventTriggerDefinition"
+                                minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="throwErrorEventTrigger" type="definition:ThrowErrorEventTriggerDefinition"
+                                minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="Expression">
-		<xs:sequence>
-			<xs:element name="content" type="xs:string" minOccurs="1" />
-			<xs:element name="expression" type="definition:Expression" minOccurs="0" maxOccurs="unbounded" />
-		</xs:sequence>
-		<xs:attribute name="name" type="xs:string" />
-		<xs:attribute name="expressionType" />
-		<xs:attribute name="returnType" />
-		<xs:attribute name="interpreter" />
-	</xs:complexType>
+    <xs:complexType name="IntermediateThrowEventDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:ThrowEventDefinition"/>
+        </xs:complexContent>
+    </xs:complexType>
 
-	<xs:complexType name="Operation">
-		<xs:all>
-			<xs:element name="rightOperand" type="definition:Expression" minOccurs="0" />
-			<xs:element name="leftOperand" type="definition:LeftOperand" minOccurs="1" />
-		</xs:all>
-		<xs:attribute name="operator" />
-		<xs:attribute name="operatorType" />
-	</xs:complexType>
+    <xs:complexType name="Expression">
+        <xs:sequence>
+            <xs:element name="content" type="xs:string" minOccurs="1"/>
+            <xs:element name="expression" type="definition:Expression" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string"/>
+        <xs:attribute name="expressionType"/>
+        <xs:attribute name="returnType"/>
+        <xs:attribute name="interpreter"/>
+    </xs:complexType>
 
-	<xs:complexType name="LeftOperand">
-		<xs:attribute name="name" />
-		<xs:attribute name="type" />
-	</xs:complexType>
+    <xs:complexType name="Operation">
+        <xs:all>
+            <xs:element name="rightOperand" type="definition:Expression" minOccurs="0"/>
+            <xs:element name="leftOperand" type="definition:LeftOperand" minOccurs="1"/>
+        </xs:all>
+        <xs:attribute name="operator"/>
+        <xs:attribute name="operatorType"/>
+    </xs:complexType>
 
-	<xs:complexType name="NamedElement">
-		<xs:complexContent>
-			<xs:extension base="definition:BaseElement">
-				<xs:attribute name="name" type="xs:string" use="required" />
-				<xs:attribute name="description" type="xs:string" />
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+    <xs:complexType name="LeftOperand">
+        <xs:attribute name="name"/>
+        <xs:attribute name="type"/>
+    </xs:complexType>
 
-	<xs:complexType name="BaseElement">
-		<xs:attribute name="id" type="xs:long" />
-	</xs:complexType>
+    <xs:complexType name="NamedElement">
+        <xs:complexContent>
+            <xs:extension base="definition:BaseElement">
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="description" type="xs:string"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="BaseElement">
+        <xs:attribute name="id" type="xs:long"/>
+    </xs:complexType>
 
 </xs:schema>

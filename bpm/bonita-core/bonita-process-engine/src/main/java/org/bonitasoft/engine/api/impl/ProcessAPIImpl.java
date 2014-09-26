@@ -199,6 +199,7 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
@@ -339,6 +340,7 @@ import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.log.LogMessageBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.operation.DocumentListLeftOperandHandler;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
@@ -5927,6 +5929,26 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new DeletionException("Unable to delete the document "+documentId, e);
         } catch (SBonitaReadException e) {
             throw new DeletionException("Unable to delete the document "+documentId, e);
+        }
+    }
+
+    @Override
+    public List<Document> getDocumentList(long processInstanceId, String name) throws DocumentNotFoundException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final DocumentService documentService = tenantAccessor.getDocumentService();
+        ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        try {
+        List<SMappedDocument> documentList = documentService.getDocumentList(name, processInstanceId);
+        //FIXME exception handling
+            if (documentList.isEmpty() && !DocumentListLeftOperandHandler.isListDefinedInDefinition(name, processInstanceId, processDefinitionService, processInstanceService)) {
+                throw new DocumentNotFoundException("doc not found");
+            }
+            return ModelConvertor.toDocuments(documentList, documentService);
+        } catch (SObjectNotFoundException e) {
+            throw new DocumentNotFoundException(e);
+        } catch (SBonitaReadException e) {
+            throw new RetrieveException(e);
         }
     }
 }

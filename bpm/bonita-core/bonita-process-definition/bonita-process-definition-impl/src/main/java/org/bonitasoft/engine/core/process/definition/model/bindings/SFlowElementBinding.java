@@ -22,6 +22,7 @@ import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SDocumentListDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SBoundaryEventDefinition;
@@ -64,6 +65,8 @@ public class SFlowElementBinding extends ElementBinding {
 
     private final List<SDocumentDefinition> documentDefinitions = new ArrayList<SDocumentDefinition>();
 
+    private final List<SDocumentListDefinition> documentListDefinitions = new ArrayList<SDocumentListDefinition>();
+
     private final List<SConnectorDefinition> connectors = new ArrayList<SConnectorDefinition>();
 
     @Override
@@ -93,6 +96,8 @@ public class SFlowElementBinding extends ElementBinding {
             dataDefinitions.add((SDataDefinition) value);
         } else if (XMLSProcessDefinition.DOCUMENT_DEFINITION_NODE.equals(name)) {
             documentDefinitions.add((SDocumentDefinition) value);
+        } else if (XMLSProcessDefinition.DOCUMENT_LIST_DEFINITION_NODE.equals(name)) {
+            documentListDefinitions.add((SDocumentListDefinition) value);
         } else if (XMLSProcessDefinition.GATEWAY_NODE.equals(name)) {
             gateways.add((SGatewayDefinitionImpl) value);
         } else if (XMLSProcessDefinition.TRANSITION_NODE.equals(name)) {
@@ -133,6 +138,9 @@ public class SFlowElementBinding extends ElementBinding {
         }
         for (final SDocumentDefinition documentDefinition : documentDefinitions) {
             container.addDocumentDefinition(documentDefinition);
+        }
+        for (final SDocumentListDefinition documentListDefinition : documentListDefinitions) {
+            container.addDocumentListDefinition(documentListDefinition);
         }
         for (final SStartEventDefinitionImpl startEvent : startEvents) {
             container.addStartEvent(startEvent);

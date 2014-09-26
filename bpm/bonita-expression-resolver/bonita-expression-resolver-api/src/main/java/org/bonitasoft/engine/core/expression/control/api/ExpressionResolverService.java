@@ -65,7 +65,7 @@ public interface ExpressionResolverService {
      * @param expressions
      *            a list of expressions will be evaluated
      * @param contextDependency
-     *            the expressionContext, it can contain some value informations or evaluated enviorenment for expressions
+     *            the expressionContext, it can contain some value information or evaluated environment for expressions
      * @return the evaluated expression result
      * @throws SExpressionTypeUnknownException
      * @throws SExpressionEvaluationException

@@ -17,6 +17,7 @@ package org.bonitasoft.engine.core.document.api;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.exception.SDocumentException;
 import org.bonitasoft.engine.core.document.exception.SDocumentMappingDeletionException;
 import org.bonitasoft.engine.core.document.exception.SDocumentMappingException;
@@ -86,7 +87,9 @@ public interface DocumentService {
      * @param document
      *        the document will be updated to
      * @param name
+     *      name of the document
      * @param description
+     *      description of the document
      * @return the updated SDocumentMapping object
      * @throws SProcessDocumentCreationException
      *         when the update has failed
@@ -97,8 +100,18 @@ public interface DocumentService {
     /**
      * remove the current version of the document but archive it before
      *
+     * @param document
+     *      the document mapping to remove
+     * @throws SDocumentNotFoundException
+     * @throws SObjectModificationException
+     */
+    void removeCurrentVersion(SMappedDocument document) throws SDocumentNotFoundException, SObjectModificationException;
+
+    /**
+     * remove the current version of the document but archive it before
+     *
      * @param processInstanceId
-     *        id of the process havind the document
+     *        id of the process having the document
      * @param documentName
      *        name of the document
      * @throws SDocumentNotFoundException
@@ -340,5 +353,46 @@ public interface DocumentService {
      * @since 6.4.0
      */
     void archive(SDocumentMapping documentMapping, long archiveDate) throws SDocumentMappingException;
+
+
+    /**
+     *
+     * @param mappedDocument
+     *      the document to update
+     * @param document
+     *      the new content
+     * @param index
+     *      the new index
+     * @throws SProcessDocumentCreationException
+     * @since 6.4.0
+     */
+    void updateDocumentOfList(final SMappedDocument mappedDocument, final SDocument document, int index) throws SProcessDocumentCreationException;
+
+
+    /**
+     *  update the index of a document inside the list
+     *
+     * @param mappedDocument
+     *      the document to update
+     * @param index
+     *      the new index
+     * @throws SProcessDocumentCreationException
+     * @since 6.4.0
+     */
+    void updateDocumentIndex(final SMappedDocument mappedDocument, int index) throws SProcessDocumentCreationException;
+
+    /**
+     *
+     * Get a list of document. if there is no document in the list returns an empty list
+     *
+     * @param documentName
+     *      the name of the document list
+     * @param processInstanceId
+     * the id of the process instance that contains the list
+     * @return
+     *      the list of document
+     * @since 6.4.0
+     */
+    List<SMappedDocument> getDocumentList(String documentName, long processInstanceId) throws SBonitaReadException;
 
 }

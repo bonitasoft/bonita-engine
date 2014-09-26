@@ -1,41 +1,43 @@
-/**
- * Copyright (C) 2012 BonitaSoft S.A.
+/*
+ *
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2.0 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 package org.bonitasoft.engine.core.document.model.recorder;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
-import org.bonitasoft.engine.core.document.model.archive.SADocumentMapping;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
-import org.bonitasoft.engine.persistence.*;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 
 /**
  * @author Emmanuel Duchastenier
  * @author Nicolas Chabanoles
+ * @author Baptiste Mesta
  */
 public class SelectDescriptorBuilder {
 
-    public static <T extends PersistentObject> SelectByIdDescriptor<T> getElementById(final Class<T> clazz, final String elementName, final long id) {
-        return new SelectByIdDescriptor<T>("get" + elementName + "ById", clazz, id);
-    }
-
     public static SelectListDescriptor<SMappedDocument> getDocumentMappingsForProcessInstance(final long processInstanceId, final int fromIndex,
-                                                                                              final int maxResults, final String sortFieldOrder, final OrderByType orderBy) {
-        QueryOptions queryOptions = null;
+            final int maxResults, final String sortFieldOrder, final OrderByType orderBy) {
+        QueryOptions queryOptions;
         String queryName = "getSMappedDocumentOfProcess";
         if (sortFieldOrder == null) {
             queryOptions = new QueryOptions(fromIndex, maxResults);
@@ -61,7 +63,8 @@ public class SelectDescriptorBuilder {
         return new SelectOneDescriptor<Long>("getNumberOfSMappedDocumentOfProcess", parameters, SDocument.class);
     }
 
-    public static SelectListDescriptor<SAMappedDocument> getSAMappedDocumentOfProcessWithName(final long processInstanceId, final String documentName, final long time) {
+    public static SelectListDescriptor<SAMappedDocument> getSAMappedDocumentOfProcessWithName(final long processInstanceId, final String documentName,
+            final long time) {
         final Map<String, Object> parameters = new HashMap<String, Object>(3);
         parameters.put("processInstanceId", processInstanceId);
         parameters.put("name", documentName);
@@ -78,5 +81,13 @@ public class SelectDescriptorBuilder {
         final Map<String, Object> parameters = new HashMap<String, Object>(1);
         parameters.put("sourceObjectId", documentId);
         return new SelectOneDescriptor<SAMappedDocument>("getArchivedVersionOfDocument", parameters, SAMappedDocument.class);
+    }
+
+    public static SelectListDescriptor<SMappedDocument> getDocumentList(String name, long processInstanceId, QueryOptions queryOptions) {
+        final Map<String, Object> parameters = new HashMap<String, Object>(3);
+        parameters.put("processInstanceId", processInstanceId);
+        parameters.put("name", name);
+        return new SelectListDescriptor<SMappedDocument>("getDocumentList", parameters, SMappedDocument.class,
+                queryOptions);
     }
 }
