@@ -52,6 +52,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-ear-plugin</artifactId>
+                <version>2.9.1</version>
                 <configuration>
                     <defaultJavaBundleDir>lib</defaultJavaBundleDir>
                     <modules>
@@ -87,15 +88,11 @@
                     </modules>
 
                     <generateApplicationXml>true</generateApplicationXml>
-                    <version>1.4</version>
+                    <version>7</version>
                     <displayName>Bonita Application</displayName>
+                    <!-- WARNING : the applicationName is used for JNDI lookup in EJB client connection URL in org.bonitasoft.engine.api.EJB3ServerAPI -->
+                    <applicationName>bonita-ear</applicationName>
                     <description>Bonita Application</description>
-
-                    <jboss>
-                        <version>5</version>
-                        <loader-repository>com.bonitasoft.engine:archive=${project.artifactId}-${project.version}.ear
-                        </loader-repository>
-                    </jboss>
 
                 </configuration>
             </plugin>
