@@ -1,10 +1,25 @@
 package org.bonitasoft.engine.api.impl;
 
-import static java.util.Arrays.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -130,6 +145,48 @@ public class ProcessAPIImplTest {
             verify(lockService).lock(processInstanceId, SFlowElementsContainerType.PROCESS.name(), tenantId);
             verify(lockService).unlock(any(BonitaLock.class), eq(tenantId));
         }
+    }
+
+    @Test
+    public void generateRelativeResourcePathShouldHandleBackslashOS() throws Exception {
+        // given:
+        String pathname = "C:\\hello\\hi\\folder";
+        final String resourceRelativePath = "resource/toto.lst";
+
+        // when:
+        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
+                + resourceRelativePath));
+
+        // then:
+        assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
+    }
+
+    @Test
+    public void generateRelativeResourcePathShouldNotContainFirstSlash() throws Exception {
+        // given:
+        String pathname = "/home/target/some_folder/";
+        final String resourceRelativePath = "resource/toto.lst";
+
+        // when:
+        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
+                + resourceRelativePath));
+
+        // then:
+        assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
+    }
+
+    @Test
+    public void generateRelativeResourcePathShouldWorkWithRelativeInitialPath() throws Exception {
+        // given:
+        String pathname = "target/nuns";
+        final String resourceRelativePath = "resource/toto.lst";
+
+        // when:
+        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
+                + resourceRelativePath));
+
+        // then:
+        assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
     }
 
     @Test
@@ -288,7 +345,7 @@ public class ProcessAPIImplTest {
         when(sDataInstance.getClassName()).thenReturn(Integer.class.getName());
         final List<SDataInstance> sDataInstances = Lists.newArrayList(sDataInstance);
         when(transientDataService.getDataInstances(activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), startIndex, nbResults))
-        .thenReturn(sDataInstances);
+                .thenReturn(sDataInstances);
         final IntegerDataInstanceImpl dataInstance = mock(IntegerDataInstanceImpl.class);
         doReturn(Lists.newArrayList(dataInstance)).when(processAPI).convertModelToDataInstances(sDataInstances);
 

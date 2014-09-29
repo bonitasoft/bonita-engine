@@ -33,14 +33,17 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+	    <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+	    <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+	    <scope>runtime</scope>
         </dependency>
     </dependencies>
 
@@ -50,7 +53,7 @@
             <modules>
                 <module>bonita-deploy-ear3</module>
                 <module>bonita-deploy-war</module>
-                <module>bonita-integration-jboss5</module>
+                <module>bonita-integration-jboss7</module>
                 <module>bonita-integration-tomcat7</module>
             </modules>
         </profile>
@@ -58,7 +61,7 @@
             <id>jboss</id>
             <modules>
                 <module>bonita-deploy-ear3</module>
-                <module>bonita-integration-jboss5</module>
+                <module>bonita-integration-jboss7</module>
             </modules>
         </profile>
         <profile>

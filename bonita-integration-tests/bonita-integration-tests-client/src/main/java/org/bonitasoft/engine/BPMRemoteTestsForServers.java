@@ -12,6 +12,7 @@ import org.bonitasoft.engine.login.PlatformLoginAPITest;
 import org.bonitasoft.engine.operation.OperationTest;
 import org.bonitasoft.engine.platform.command.PlatformCommandTest;
 import org.bonitasoft.engine.process.ProcessManagementTest;
+import org.bonitasoft.engine.process.task.PendingTasksTest;
 import org.bonitasoft.engine.profile.ProfileITest;
 import org.bonitasoft.engine.search.SearchProcessInstanceTest;
 import org.bonitasoft.engine.supervisor.ProcessSupervisedTest;
@@ -26,6 +27,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ProcessManagementTest.class,
         ProfileITest.class,
         SearchProcessInstanceTest.class,
+        PendingTasksTest.class,
         SignalEventTest.class,
         UserTest.class,
         LoginAPITest.class,
