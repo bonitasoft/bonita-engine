@@ -26,6 +26,15 @@ public interface STenant extends PersistentObject {
 
     String ACTIVATED = "ACTIVATED";
 
+    /**
+     * Return true if the tenant is activated else return false.
+     * 
+     * @param sTenant
+     * @return true if the tenant is activated
+     * @since 6.0
+     */
+    boolean isActivated();
+
     String getName();
 
     String getDescription();

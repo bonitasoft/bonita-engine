@@ -14,29 +14,39 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-model</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.operation</groupId>
-			<artifactId>bonita-operation-model</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-	  		<groupId>org.bonitasoft.engine.core</groupId>
-	  		<artifactId>bonita-expression-resolver-api</artifactId>
-	  		<version>${project.version}</version>
-	  	</dependency>
-	  	<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			 <scope>test</scope>
-		</dependency>
-	  	<dependency>
 	  		<groupId>org.bonitasoft.engine.identity</groupId>
 	  		<artifactId>bonita-identity-api</artifactId>
 	  		<version>${project.version}</version>
 	  	</dependency>
+	  	<dependency>
+	  		<groupId>org.bonitasoft.engine.persistence</groupId>
+	  		<artifactId>bonita-persistence-read</artifactId>
+	  		<version>${project.version}</version>
+	  	</dependency>
+	  	<dependency>
+	  		<groupId>org.bonitasoft.engine.core.process.definition</groupId>
+	  		<artifactId>bonita-process-definition-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+	  		<groupId>org.bonitasoft.engine.recorder</groupId>
+	  		<artifactId>bonita-recorder-api</artifactId>
+	  		<version>${project.version}</version>
+	  	</dependency>
+	  	<dependency>
+	  		<groupId>org.bonitasoft.engine.api</groupId>
+	  		<artifactId>bonita-common-api</artifactId>
+	  		<version>${project.version}</version>
+		</dependency>
+	  	<dependency>
+	  		<groupId>org.bonitasoft.engine</groupId>
+	  		<artifactId>bonita-commons</artifactId>
+	  		<version>${project.version}</version>
+	  	</dependency>
+	  	
+	  	<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
 	</dependencies>
 </project>

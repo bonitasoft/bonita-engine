@@ -4,7 +4,7 @@
 	<bean id="processDefinitionManager" class="org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl">
 		<constructor-arg name="cacheService" ref="cacheService" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
-		<constructor-arg name="recorder" ref="recorderSync" />
+		<constructor-arg name="recorder" ref="tenantRecorderSync" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="sessionService" ref="sessionService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />

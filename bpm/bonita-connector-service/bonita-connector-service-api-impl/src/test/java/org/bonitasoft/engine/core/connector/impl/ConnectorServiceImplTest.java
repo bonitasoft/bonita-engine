@@ -13,9 +13,8 @@
  **/
 package org.bonitasoft.engine.core.connector.impl;
 
-import static org.bonitasoft.engine.matchers.ListContainsMatcher.namesContain;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
@@ -25,6 +24,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,7 +43,6 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.tracking.TimeTracker;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
@@ -116,7 +115,6 @@ public class ConnectorServiceImplTest {
     }
 
     @Test
-    @Cover(classes = { ConnectorServiceImpl.class }, concept = Cover.BPMNConcept.CONNECTOR, keywords = { "connector dependencies" }, jira = "ENGINE-1186")
     public void setNewConnectorImplemCleansOldDependencies() throws Exception {
         final long tenantId = 98774L;
         final long processDefId = 17L;
@@ -149,7 +147,7 @@ public class ConnectorServiceImplTest {
 
             assertEquals(2, jarFiles.length);
             final List<File> jars = Arrays.asList(jarFiles);
-            assertThat("Not all jar files have been found", jars, namesContain(hoogardenConnectorJar, dep1Jar));
+            assertThat(names(jars)).as("Not all jar files have been found").contains(hoogardenConnectorJar, dep1Jar);
 
             zipFileMap = new HashMap<String, byte[]>(1);
             zipFileMap.put("GrimbergenBeerConnector.impl", "GrimbergenBeerConnector.impl".getBytes());
@@ -170,8 +168,15 @@ public class ConnectorServiceImplTest {
         }
     }
 
+    private List<String> names(List<File> files) {
+        ArrayList<String> names = new ArrayList<String>();
+        for (File file : files) {
+            names.add(file.getName());
+        }
+        return names;
+    }
+    
     @Test
-    @Cover(classes = { ConnectorServiceImpl.class }, concept = Cover.BPMNConcept.CONNECTOR, keywords = { "connector dependencies" }, jira = "ENGINE-1466")
     public void setConnectorImplementationOverwritesExistingJars() throws Exception {
         final long tenantId = 98774L;
         final long processDefId = 17L;
@@ -226,7 +231,6 @@ public class ConnectorServiceImplTest {
     }
 
     @Test
-    @Cover(classes = { ConnectorServiceImpl.class }, concept = Cover.BPMNConcept.CONNECTOR, keywords = { "connector dependencies" }, jira = "ENGINE-1411")
     public void setConnectorImplementationDoesNotCareWhereTheJarsAre() throws Exception {
         final long tenantId = 98774L;
         final long processDefId = 17L;
@@ -259,7 +263,7 @@ public class ConnectorServiceImplTest {
 
             assertEquals(2, jarFiles.length);
             final List<File> jars = Arrays.asList(jarFiles);
-            assertThat("Not all jar files have been found", jars, namesContain(hoogardenConnectorJar, dep1Jar));
+            assertThat(names(jars)).as("Not all jar files have been found").contains(hoogardenConnectorJar, dep1Jar);
 
             zipFileMap = new HashMap<String, byte[]>(1);
             zipFileMap.put("GrimbergenBeerConnector.impl", "GrimbergenBeerConnector.impl".getBytes());

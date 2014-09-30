@@ -20,8 +20,18 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.bonitasoft.engine.persistence</groupId>
+			<artifactId>bonita-persistence-read</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.bonitasoft.engine.recorder</groupId>
-			<artifactId>bonita-recorder-model</artifactId>
+			<artifactId>bonita-recorder-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -30,5 +40,4 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
-
 </project>

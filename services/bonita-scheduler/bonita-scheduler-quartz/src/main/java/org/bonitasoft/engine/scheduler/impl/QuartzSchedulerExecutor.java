@@ -18,7 +18,6 @@ import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -130,7 +129,8 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
-    public void executeNow(final long jobId, final String groupName, final String jobName, final boolean disallowConcurrentExecution) throws SSchedulerException {
+    public void executeNow(final long jobId, final String groupName, final String jobName, final boolean disallowConcurrentExecution)
+            throws SSchedulerException {
         try {
             checkSchedulerState();
             final JobDetail jobDetail = getJobDetail(jobId, groupName, jobName, disallowConcurrentExecution);
@@ -142,7 +142,8 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
-    public void executeAgain(final long jobId, final String groupName, final String jobName, final boolean disallowConcurrentExecution) throws SSchedulerException {
+    public void executeAgain(final long jobId, final String groupName, final String jobName, final boolean disallowConcurrentExecution)
+            throws SSchedulerException {
         try {
             final JobDetail jobDetail2 = scheduler.getJobDetail(new JobKey(jobName, String.valueOf(groupName)));
             final org.quartz.Trigger trigger = TriggerBuilder.newTrigger()
@@ -268,7 +269,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         }
     }
 
-    private void checkSchedulerState() throws SSchedulerException {
+    protected void checkSchedulerState() throws SSchedulerException {
         if (scheduler == null) {
             throw new SSchedulerException("The scheduler is not started");
         }
@@ -285,12 +286,12 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
-    public void deleteJobs(String groupName) throws SSchedulerException {
+    public void deleteJobs(final String groupName) throws SSchedulerException {
         try {
             checkSchedulerState();
             final Set<JobKey> jobNames = scheduler.getJobKeys(jobGroupEquals(groupName));
             for (final JobKey jobKey : jobNames) {
-            	scheduler.deleteJob(jobKey);
+                scheduler.deleteJob(jobKey);
             }
         } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
@@ -298,7 +299,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
-    public List<String> getJobs(String groupName) throws SSchedulerException {
+    public List<String> getJobs(final String groupName) throws SSchedulerException {
         try {
             checkSchedulerState();
             final Set<JobKey> jobKeys = scheduler.getJobKeys(jobGroupEquals(groupName));
@@ -340,9 +341,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         boolean stillScheduled = false;
         try {
             final List<? extends org.quartz.Trigger> triggers = scheduler.getTriggersOfJob(new JobKey(jobName, groupName));
-            final Iterator<? extends org.quartz.Trigger> iterator = triggers.iterator();
-            while (!stillScheduled && iterator.hasNext()) {
-                final org.quartz.Trigger trigger = iterator.next();
+            for (final org.quartz.Trigger trigger : triggers) {
                 if (trigger.getNextFireTime() != null) {
                     stillScheduled = true;
                 }
@@ -359,10 +358,8 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         try {
             final List<String> triggerGroupNames = scheduler.getTriggerGroupNames();
             for (final String triggerGroupName : triggerGroupNames) {
-                final Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroupName));
-                for (final TriggerKey triggerKey : triggerKeys) {
-                    final TriggerState triggerState = scheduler.getTriggerState(triggerKey);
-                    if (TriggerState.ERROR.equals(triggerState)) {
+                for (final TriggerKey triggerKey : scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroupName))) {
+                    if (TriggerState.ERROR.equals(scheduler.getTriggerState(triggerKey))) {
                         scheduler.pauseTrigger(triggerKey);
                         scheduler.resumeTrigger(triggerKey);
                     }

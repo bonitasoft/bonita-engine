@@ -19,7 +19,6 @@
 		<module>bonita-persistence-api</module>
 		<module>bonita-persistence-hibernate</module>
 		<module>bonita-persistence-db</module>
-		<module>bonita-persistence-hibernate-test</module>
 		<module>bonita-delete-api</module>
 		<module>bonita-delete-impl</module>
 		<module>bonita-sequence-api</module>

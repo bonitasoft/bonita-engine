@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -22,12 +22,13 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.service.ModelConvertor;
 
 /**
  * @author Zhao Na
+ * @author Matthieu Chaffotte
  */
 public class EvaluateExpressionsInstanceLevelAndArchived extends AbstractEvaluateExpressionsInstance implements
 TransactionContentWithResult<Map<String, Serializable>> {
@@ -71,7 +72,7 @@ TransactionContentWithResult<Map<String, Serializable>> {
             for (final Expression exp : exps) {
                 final Map<String, Serializable> partialContext = getPartialContext(expressions, exp);
                 context.setSerializableInputValues(partialContext);
-                final SExpression sexp = ServerModelConvertor.convertExpression(exp);
+                final SExpression sexp = ModelConvertor.constructSExpression(exp);
                 final Serializable res = (Serializable) expressionResolver.evaluate(sexp, context);
                 results.put(buildName(exp), res);// MAYBE instead of exp.getNAME
             }

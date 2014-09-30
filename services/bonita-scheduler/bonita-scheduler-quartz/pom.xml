@@ -16,6 +16,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.scheduler</groupId>
+			<artifactId>bonita-scheduler-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.scheduler</groupId>
 			<artifactId>bonita-scheduler-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -26,7 +31,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.persistence</groupId>
-			<artifactId>bonita-persistence-api</artifactId>
+			<artifactId>bonita-persistence-read</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -64,12 +69,10 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-            <scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
@@ -77,5 +80,4 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
 </project>

@@ -15,6 +15,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.sessionaccessor</groupId>
+			<artifactId>bonita-session-accessor-read</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.sessionaccessor</groupId>
 			<artifactId>bonita-session-accessor-write</artifactId>
 			<version>${project.version}</version>
 		</dependency>

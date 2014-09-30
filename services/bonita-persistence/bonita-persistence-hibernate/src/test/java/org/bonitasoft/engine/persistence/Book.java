@@ -2,9 +2,6 @@ package org.bonitasoft.engine.persistence;
 
 public class Book implements PersistentObject {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     String title;

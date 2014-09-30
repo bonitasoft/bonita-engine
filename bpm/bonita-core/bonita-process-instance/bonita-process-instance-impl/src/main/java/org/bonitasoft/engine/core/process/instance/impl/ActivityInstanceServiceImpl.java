@@ -36,17 +36,13 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
-import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SHiddenTaskInstanceLogBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SManualTaskInstanceBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.SManualTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingLogBuilder;
@@ -163,31 +159,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
             stb.append(">");
             getLogger().log(this.getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
         }
-    }
-
-    @Override
-    public SManualTaskInstance createManualUserTask(final long userTaskId, final String name, final long flowNodeDefinitionId, final String displayName,
-            final long userId, final String description, final long dueDate, final STaskPriority priority) throws SActivityCreationException,
-            SFlowNodeNotFoundException, SFlowNodeReadException {
-        final SHumanTaskInstance parentUserTask = (SHumanTaskInstance) getFlowNodeInstance(userTaskId);
-        final SManualTaskInstanceBuilderFactory manualTaskInstanceBuilderFact = BuilderFactory.get(SManualTaskInstanceBuilderFactory.class);
-        final long processDefinitionId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilderFact.getProcessDefinitionIndex());
-        final long rootProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilderFact.getRootProcessInstanceIndex());
-        final long parentProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilderFact.getParentProcessInstanceIndex());
-        final SManualTaskInstanceBuilder createNewManualTaskInstance = manualTaskInstanceBuilderFact.createNewManualTaskInstance(name, flowNodeDefinitionId,
-                parentUserTask.getRootContainerId(), userTaskId, parentUserTask.getActorId(), processDefinitionId, rootProcessInstanceId,
-                parentProcessInstanceId);
-        createNewManualTaskInstance.setParentContainerId(userTaskId);
-        createNewManualTaskInstance.setParentActivityInstanceId(userTaskId);
-        createNewManualTaskInstance.setAssigneeId(userId);
-        createNewManualTaskInstance.setExpectedEndDate(dueDate);
-        createNewManualTaskInstance.setDescription(description);
-        createNewManualTaskInstance.setDisplayDescription(description);
-        createNewManualTaskInstance.setDisplayName(displayName);
-        createNewManualTaskInstance.setPriority(priority);
-        final SActivityInstance sActivityInstance = createNewManualTaskInstance.done();
-        createActivityInstance(sActivityInstance);
-        return (SManualTaskInstance) sActivityInstance;
     }
 
     protected SPendingActivityMappingLogBuilder getQueriableLog(final ActionType actionType, final String message, final SPendingActivityMapping mapping) {
