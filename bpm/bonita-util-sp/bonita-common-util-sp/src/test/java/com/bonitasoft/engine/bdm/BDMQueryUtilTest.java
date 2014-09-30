@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bdm;
 
 import static ch.lambdaj.Lambda.extract;
@@ -26,7 +34,7 @@ import com.bonitasoft.engine.bdm.model.field.SimpleField;
 public class BDMQueryUtilTest {
 
     @Test
-    public void should_createQueryNameForUniqueConstraint_return_queryname() throws Exception {
+    public void should_createQueryNameForUniqueConstraint_return_queryname() {
         final UniqueConstraint uniqueConstraint = new UniqueConstraint();
         uniqueConstraint.setFieldNames(Arrays.asList("name"));
         final String queryNameForUniqueConstraint = BDMQueryUtil.createQueryNameForUniqueConstraint(uniqueConstraint);
@@ -35,7 +43,7 @@ public class BDMQueryUtilTest {
     }
 
     @Test
-    public void should_createQueryContentForUniqueConstraint_return_query_content_with_parameters() throws Exception {
+    public void should_createQueryContentForUniqueConstraint_return_query_content_with_parameters() {
         final UniqueConstraint uniqueConstraint = new UniqueConstraint();
         uniqueConstraint.setFieldNames(Arrays.asList("name"));
         final String queryContentForUniqueConstraint = BDMQueryUtil.createQueryContentForUniqueConstraint("org.bonita.Employee", uniqueConstraint);
@@ -43,7 +51,7 @@ public class BDMQueryUtilTest {
     }
 
     @Test
-    public void createProvidedQueriesForBOShouldNotGenerateGetAllForUniqueConstraint() throws Exception {
+    public void createProvidedQueriesForBOShouldNotGenerateGetAllForUniqueConstraint() {
         // given:
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("com.corp.Arrival");
@@ -61,7 +69,7 @@ public class BDMQueryUtilTest {
     }
 
     @Test
-    public void createProvidedQueriesForBOWithOneUniqueAndOneNonUniqueFieldShouldGenerate3Queries() throws Exception {
+    public void createProvidedQueriesForBOWithOneUniqueAndOneNonUniqueFieldShouldGenerate3Queries() {
         // given:
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("com.corp.Arrival");
@@ -77,7 +85,7 @@ public class BDMQueryUtilTest {
     }
 
     @Test
-    public void createProvidedQueriesForShouldNotGenerateAQueryForRelationField() throws Exception {
+    public void createProvidedQueriesForShouldNotGenerateAQueryForRelationField() {
         // given:
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("com.corp.Arrival");
@@ -111,7 +119,7 @@ public class BDMQueryUtilTest {
     }
 
     @Test
-    public void should_createQuerForUniqueConstraint_return_query_with_parameters() throws Exception {
+    public void should_createQuerForUniqueConstraint_return_query_with_parameters() {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Employee");
         final SimpleField field = new SimpleField();
@@ -130,7 +138,7 @@ public class BDMQueryUtilTest {
     }
 
     @Test
-    public void should_createQueryForField_return_query_with_parameters() throws Exception {
+    public void should_createQueryForField_return_query_with_parameters() {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Employee");
         final SimpleField field = new SimpleField();
@@ -147,7 +155,7 @@ public class BDMQueryUtilTest {
     }
 
     @Test
-    public void should_createSelectAllQueryreturn_query_without_parameters() throws Exception {
+    public void should_createSelectAllQueryreturn_query_without_parameters() {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Employee");
         final SimpleField field = new SimpleField();
@@ -165,7 +173,7 @@ public class BDMQueryUtilTest {
     }
 
     @Test
-    public void should_getAllProvidedQueriesNameForBusinessObject_not_return_query_for_RelationFields() throws Exception {
+    public void should_getAllProvidedQueriesNameForBusinessObject_not_return_query_for_RelationFields() {
         final BusinessObject bo = new BusinessObject();
         bo.setQualifiedName("org.bonita.Employee");
         final SimpleField field = new SimpleField();
@@ -183,7 +191,7 @@ public class BDMQueryUtilTest {
     }
 
     @Test
-    public void createSelectAllQueryShouldGenerateOrderByPersistenceId() throws Exception {
+    public void createSelectAllQueryShouldGenerateOrderByPersistenceId() {
         // when:
         final String queryContent = BDMQueryUtil.createSelectAllQueryContent("MyBizObject");
         // then:
@@ -191,7 +199,7 @@ public class BDMQueryUtilTest {
     }
 
     @Test
-    public void createQueryContentForFieldShouldGenerateOrderByPersistenceId() throws Exception {
+    public void createQueryContentForFieldShouldGenerateOrderByPersistenceId() {
         // when:
         final String queryContent = BDMQueryUtil.createQueryContentForField("NerfSurvey", new SimpleField());
         // then:
@@ -199,7 +207,7 @@ public class BDMQueryUtilTest {
     }
 
     @Test
-    public void createDefaultQueryForLazyFieldShouldGenerateValidQuery() throws Exception {
+    public void createDefaultQueryForLazyFieldShouldGenerateValidQuery() {
         //given:
 
         final BusinessObject addressBo = new BusinessObject();
@@ -249,6 +257,5 @@ public class BDMQueryUtilTest {
         assertThat(query.getReturnType()).isEqualTo(List.class.getName());
         assertThat(query.getQueryParameters()).extracting("name", "className").contains(tuple(Field.PERSISTENCE_ID, Long.class.getName()));
     }
-
 
 }

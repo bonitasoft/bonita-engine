@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.bonitasoft.engine.test</groupId>
+		<artifactId>bonita-integration-tests-as-sp</artifactId>
+		<version>6.4.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>bonita-integration-jboss5-sp</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Bonita - Integration Tests on JBoss AS 5</name>
+
+	<properties>
+		<jboss5.version>jboss-5.1.0.GA-jdk6</jboss5.version>
+		<jboss.name>jboss-5.1.0.GA</jboss.name>
+		<jboss.web.port>7081</jboss.web.port>
+		<jboss.ajp.port>8010</jboss.ajp.port>
+		<provider.port>7100</provider.port>
+		<invokerLocatorPort>3874</invokerLocatorPort>
+		<jboss.url>http://sourceforge.net/projects/jboss/files/JBoss/JBoss-5.1.0.GA/jboss-5.1.0.GA-jdk6.zip/download</jboss.url>
+		<jboss.zip.folder>${user.home}</jboss.zip.folder>
+		<jboss.home>${project.build.directory}/${jboss.name}</jboss.home>
+		<jboss.default.dir>${jboss.home}/server/default</jboss.default.dir>
+		<jboss.conf.dir>${jboss.default.dir}/conf</jboss.conf.dir>
+		<jboss.deploy.dir>${jboss.default.dir}/deploy</jboss.deploy.dir>
+		<jboss.lib.dir>${jboss.default.dir}/lib</jboss.lib.dir>
+
+		<bonita.home>${jboss.home}/bonita</bonita.home>
+		<if.task>net.sf.antcontrib.logic.IfTask</if.task>
+
+        <db.vendor>h2</db.vendor>
+
+		<cargo.jvmargs>-Xms1024m -Xmx1024m -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError</cargo.jvmargs>
+		<invoker.port>4422</invoker.port>
+		<!-- -Xdebug -->
+		<!-- -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8787 -Xnoagent -Djava.compiler=NONE -->
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>ant-contrib</groupId>
+			<artifactId>ant-contrib</artifactId>
+			<version>1.0b3</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>ant</artifactId>
+					<groupId>ant</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+        <dependency>
+            <groupId>org.bonitasoft.jboss</groupId>
+            <artifactId>bonita-jboss-h2-mbean</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>tests</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>com.bonitasoft.engine</groupId>
+                                            <artifactId>bonita-home-sp</artifactId>
+                                            <version>${project.version}</version>
+                                            <classifier>${bonita.home.classifier}</classifier>
+                                            <type>zip</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${distrib.dir}/resources</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>com.bonitasoft.engine.test</groupId>
+                                            <artifactId>bonita-deploy-ear3-sp</artifactId>
+                                            <version>${project.version}</version>
+                                            <type>ear</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${distrib.dir}/ear/ejb3</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>com.h2database</groupId>
+                                            <artifactId>h2</artifactId>
+                                            <outputDirectory>${project.build.directory}/driver</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>mysql</groupId>
+                                            <artifactId>mysql-connector-java</artifactId>
+                                            <outputDirectory>${project.build.directory}/driver</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.postgresql</groupId>
+                                            <artifactId>postgresql</artifactId>
+                                            <outputDirectory>${project.build.directory}/driver</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.bonitasoft.jboss</groupId>
+                                            <artifactId>bonita-jboss-h2-mbean</artifactId>
+                                            <outputDirectory>${project.build.directory}/driver</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>JBoss AS installation</id>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<phase>pre-integration-test</phase>
+								<inherited>false</inherited>
+								<configuration>
+									<target>
+                                        <taskdef name="if" classname="${if.task}"
+                                                 classpathref="maven.runtime.classpath"/>
+                                        <available property="jboss.present"
+                                                   file="${jboss.zip.folder}/${jboss.name}.zip"/>
+										<if>
+											<not>
+                                                <isset property="jboss.present"/>
+											</not>
+											<then>
+                                                <get src="${jboss.url}" dest="${jboss.zip.folder}/${jboss.name}.zip"/>
+											</then>
+										</if>
+                                        <unzip dest="${project.build.directory}"
+                                               src="${jboss.zip.folder}/${jboss.name}.zip"/>
+
+                                        <!-- Update database configuration -->
+                                        <property file="jboss/${db.vendor}/database.properties"/>
+
+                                        <property name="bindings.xml"
+                                                  location="${jboss.conf.dir}/bindingservice.beans/META-INF/bindings-jboss-beans.xml"/>
+                                        <replace file="${bindings.xml}"
+                                                 token="&lt;property name=&quot;port&quot;&gt;1099&lt;/property&gt;"
+                                                 value="&lt;property name=&quot;port&quot;&gt;${provider.port}&lt;/property&gt;"/>
+                                        <replace file="${bindings.xml}"
+                                                 token="&lt;property name=&quot;port&quot;&gt;4444&lt;/property&gt;"
+                                                 value="&lt;property name=&quot;port&quot;&gt;0&lt;/property&gt;"/>
+                                        <replace file="${bindings.xml}"
+                                                 token="&lt;property name=&quot;port&quot;&gt;1098&lt;/property&gt;"
+                                                 value="&lt;property name=&quot;port&quot;&gt;0&lt;/property&gt;"/>
+                                        <replace file="${bindings.xml}"
+                                                 token="&lt;property name=&quot;port&quot;&gt;4445&lt;/property&gt;"
+                                                 value="&lt;property name=&quot;port&quot;&gt;0&lt;/property&gt;"/>
+                                        <replace file="${bindings.xml}"
+                                                 token="&lt;property name=&quot;port&quot;&gt;4446&lt;/property&gt;"
+                                                 value="&lt;property name=&quot;port&quot;&gt;0&lt;/property&gt;"/>
+                                        <replace file="${bindings.xml}"
+                                                 token="&lt;property name=&quot;port&quot;&gt;8083&lt;/property&gt;"
+                                                 value="&lt;property name=&quot;port&quot;&gt;0&lt;/property&gt;"/>
+
+                                        <replace file="${jboss.conf.dir}/jboss-service.xml"
+                                                 token="&lt;attribute name=&quot;DefaultCacheTimeout&quot;&gt;1800&lt;/attribute&gt;"
+                                                 value="&lt;attribute name=&quot;DefaultCacheTimeout&quot;&gt;0&lt;/attribute&gt;"/>
+                                        <replace file="${jboss.conf.dir}/jboss-service.xml"
+                                                 token="&lt;attribute name=&quot;DefaultCacheResolution&quot;&gt;60&lt;/attribute&gt;"
+                                                 value="&lt;attribute name=&quot;DefaultCacheResolution&quot;&gt;0&lt;/attribute&gt;"/>
+                                        <replace file="${jboss.conf.dir}/jboss-service.xml"
+                                                 token="&lt;attribute name=&quot;CallByValue&quot;&gt;false&lt;/attribute&gt;"
+                                                 value="&lt;attribute name=&quot;CallByValue&quot;&gt;true&lt;/attribute&gt;"/>
+										<!-- Workaround JBoss bug: https://issues.jboss.org/browse/JBAS-6981 -->
+										<replace file="${jboss.conf.dir}/bootstrap/profile.xml"
+											token="&lt;constructor&gt;&lt;parameter&gt;&lt;inject bean=&quot;BootstrapProfileFactory&quot; property=&quot;attachmentStoreRoot&quot; /&gt;&lt;/parameter&gt;&lt;/constructor&gt;"
+                                                 value="&lt;constructor&gt;&lt;parameter class=&quot;java.io.File&quot;&gt;&lt;inject bean=&quot;BootstrapProfileFactory&quot; property=&quot;attachmentStoreRoot&quot; /&gt;&lt;/parameter&gt;&lt;/constructor&gt;"/>
+
+                                        <replace file="${jboss.deploy.dir}ers/ear-deployer-jboss-beans.xml"
+                                                 token="&lt;property name=&quot;isolated&quot;&gt;false&lt;/property&gt;"
+                                                 value="&lt;property name=&quot;isolated&quot;&gt;true&lt;/property&gt;"/>
+                                        <replace file="${jboss.deploy.dir}ers/ear-deployer-jboss-beans.xml"
+                                                 token="&lt;property name=&quot;callByValue&quot;&gt;false&lt;/property&gt;"
+                                                 value="&lt;property name=&quot;callByValue&quot;&gt;true&lt;/property&gt;"/>
+
+                                        <replace file="${jboss.deploy.dir}/ejb3-connectors-jboss-beans.xml"
+                                                 token="&lt;parameter&gt;3873&lt;/parameter&gt;"
+                                                 value="&lt;parameter&gt;${invokerLocatorPort}&lt;/parameter&gt;"/>
+
+                                        <replace file="${jboss.deploy.dir}/jbossweb.sar/server.xml"
+                                                 token="port=&quot;8080&quot;"
+                                                 value="port=&quot;${jboss.web.port}&quot;"/>
+                                        <replace file="${jboss.deploy.dir}/jbossweb.sar/server.xml"
+                                                 token="port=&quot;8009&quot;"
+                                                 value="port=&quot;${jboss.ajp.port}&quot;"/>
+
+                                        <replace file="${jboss.home}/bin/run.conf" token="-XX:MaxPermSize=256m"
+                                                 value="-XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError"/>
+
+                                        <copy todir="${jboss.deploy.dir}"
+                                              file="${distrib.dir}/ear/ejb3/bonita-deploy-ear3-sp-${project.version}.ear"/>
+
+										<copy todir="${jboss.deploy.dir}">
+											<fileset dir="jboss/server/default/deploy">
+                                                <include name="${db.vendor}-ds.xml"/>
+                                            </fileset>
+                                        </copy>
+										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.ip#" value="${database.ip}" />
+										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.port#" value="${database.port}" />
+										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.user#" value="${database.user}" />
+										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.password#" value="${database.password}" />
+										<replace file="${jboss.deploy.dir}/postgres-ds.xml" token="#database.name#" value="${database.name}" />
+										<copy todir="${jboss.lib.dir}">
+											<fileset dir="target/driver">
+                                                <include name="*jar"/>
+											</fileset>
+										</copy>
+
+										<!-- Create default bonita.home folder -->
+										<copy todir="${bonita.home}" verbose="true">
+                                            <fileset dir="${distrib.dir}/resources/home/"/>
+										</copy>
+
+                                        <copy file="${basedir}/client/bonita-client.properties"
+                                              todir="${bonita.home}/client/conf" overwrite="true"/>
+                                        <replace file="${bonita.home}/client/conf/bonita-client.properties"
+                                                 token="#provider.port#" value="${provider.port}"/>
+
+										<!-- Change Dialect of BDR -->
+                                        <replaceregexp
+                                                file="${bonita.home}/server/platform/tenant-template/conf/bonita-server.properties"
+                                                match="businessdata.hibernate.dialect=.*"
+                                                replace="businessdata.hibernate.dialect=org.hibernate.dialect.PostgreSQL82Dialect"
+                                                byline="true"/>
+                                        <replace
+                                                file="${bonita.home}/server/platform/tenant-template/conf/bonita-server.properties"
+                                                token="org.bonitasoft.engine.persistence.JNDIBitronixJtaPlatform"
+                                                value="org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform"
+                                                failOnNoReplacements="true"/>
+                                        <replace
+                                                file="${bonita.home}/server/platform/tenant-template/conf/bonita-server.properties"
+                                                token="java:comp/env/" value=""
+                                                failOnNoReplacements="true"/>
+
+										<copy todir="${bonita.home}/server/licenses" failonerror="true">
+                                            <fileset dir="${user.home}/lic" includes="*.lic"/>
+										</copy>
+									</target>
+								</configuration>
+							</execution>
+							<execution>
+								<id>run JBoss tests</id>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<phase>integration-test</phase>
+								<inherited>false</inherited>
+								<configuration>
+									<target>
+										<path id="test.path">
+											<pathelement path="${env.CLASSPATH}" />
+											<path refid="maven.test.classpath" />
+											<pathelement path="${test_classpath}" />
+										</path>
+										<echo message="test.path= ${test.path}" />
+										<path id="jboss.path">
+											<pathelement path="${env.CLASSPATH}" />
+											<fileset dir="${jboss.home}/client">
+												<include name="jbossall-client.jar" />
+											</fileset>
+										</path>
+
+										<waitfor maxwait="1" maxwaitunit="minute">
+											<socket server="localhost" port="${provider.port}" />
+										</waitfor>
+
+										<mkdir dir="${report.xml}" />
+										<junit printsummary="yes" fork="yes" forkmode="once" showoutput="true" maxmemory="256m">
+											<classpath refid="test.path" />
+											<classpath refid="jboss.path" />
+											<sysproperty key="bonita.home" value="${bonita.home}" />
+											<formatter type="xml" />
+											<test todir="${report.xml}" name="${test.class}" />
+										</junit>
+										<junitreport todir="${report.xml}">
+											<fileset dir="${report.xml}" includes="TEST-*.xml" />
+											<report todir="${report.results}" />
+										</junitreport>
+
+										<copy todir="${surefire.reports}">
+											<fileset dir="${report.xml}" />
+										</copy>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.cargo</groupId>
+						<artifactId>cargo-maven2-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>start-container</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>start</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>stop-container</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>stop</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<container>
+								<containerId>jboss51x</containerId>
+                                <type>installed</type>
+								<home>${jboss.home}</home>
+								<systemProperties>
+                                    <jboss.vfs.cache>org.jboss.virtual.plugins.cache.IterableTimedVFSCache</jboss.vfs.cache>
+                                    <jboss.vfs.cache.TimedPolicyCaching.lifetime>500</jboss.vfs.cache.TimedPolicyCaching.lifetime>
+									<bonita.home>${bonita.home}</bonita.home>
+									<sysprop.bonita.transaction.manager>java:/TransactionManager</sysprop.bonita.transaction.manager>
+									<sysprop.bonita.userTransaction>UserTransaction</sysprop.bonita.userTransaction>
+									<sysprop.bonita.database.journal.datasource.name>bonitaDS</sysprop.bonita.database.journal.datasource.name>
+									<sysprop.bonita.database.sequence.manager.datasource.name>bonitaSequenceManagerDS</sysprop.bonita.database.sequence.manager.datasource.name>
+									<sysprop.bonita.hibernate.transaction.jta_platform>org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform</sysprop.bonita.hibernate.transaction.jta_platform>
+                                    <sysprop.bonita.db.vendor>${db.vendor}</sysprop.bonita.db.vendor>
+									<jboss.server.log.threshold>WARN</jboss.server.log.threshold>
+								</systemProperties>
+                                <timeout>360000</timeout>
+							</container>
+							<configuration>
+								<type>existing</type>
+								<home>${jboss.home}/server/default</home>
+								<properties>
+									<cargo.jboss.configuration>default</cargo.jboss.configuration>
+									<cargo.servlet.port>${jboss.web.port}</cargo.servlet.port>
+									<cargo.rmi.port>${provider.port}</cargo.rmi.port>
+									<cargo.jvmargs>${cargo.jvmargs}</cargo.jvmargs>
+									<cargo.jboss.jrmp.invoker.port>${invoker.port}</cargo.jboss.jrmp.invoker.port>
+								</properties>
+							</configuration>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<!-- the profile package-all is declared here only to deactivate the profile tests (active by default) -->
+		<profile>
+			<id>package-all</id>
+		</profile>
+	</profiles>
+
+</project>

@@ -16,7 +16,6 @@ import java.util.Map;
 import org.bonitasoft.engine.cache.CommonCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.LogUtil;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -220,12 +219,12 @@ public abstract class CommonClusteredCacheService implements CommonCacheService 
     }
 
     @Override
-    public void stop() throws SBonitaException {
+    public void stop() {
         // do nothing, we start/stop hazelcast, not this service
     }
 
     @Override
-    public void pause() throws SBonitaException {
+    public void pause() {
         // nothing to do
     }
 

@@ -63,7 +63,7 @@ public class CodeGenerator {
         hashCodeBuilder = new HashCodeBuilder();
     }
 
-    public void generate(final File destDir) throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException, ClassNotFoundException {
+    public void generate(final File destDir) throws IOException {
         final PrintStream stream = new PrintStream(new NullStream());
         try {
             model.build(destDir, stream);
@@ -87,7 +87,7 @@ public class CodeGenerator {
     }
 
     public JDefinedClass addInterface(final String fullyqualifiedName) throws JClassAlreadyExistsException {
-        if(fullyqualifiedName.indexOf(".") == -1){
+        if (fullyqualifiedName.indexOf(".") == -1) {
             return model.rootPackage()._class(JMod.PUBLIC, fullyqualifiedName, ClassType.INTERFACE);
         }
         return model._class(fullyqualifiedName, ClassType.INTERFACE);
@@ -131,7 +131,7 @@ public class CodeGenerator {
         return collectionJClass.narrow(narrowClass);
     }
 
-    protected JFieldVar addListField(final JDefinedClass entityClass, final Field field) throws JClassAlreadyExistsException {
+    protected JFieldVar addListField(final JDefinedClass entityClass, final Field field) {
         final JClass fieldClass = toJavaClass(field);
         final JClass fieldListClass = narrowClass(List.class, fieldClass);
         final JClass arrayListFieldClazz = narrowClass(ArrayList.class, fieldClass);
@@ -147,10 +147,9 @@ public class CodeGenerator {
         if (field instanceof SimpleField) {
             final Class<?> fieldClass = ((SimpleField) field).getType().getClazz();
             return getModel().ref(fieldClass);
-        } else {
-            final String qualifiedName = ((RelationField) field).getReference().getQualifiedName();
-            return getModel().ref(qualifiedName);
         }
+        final String qualifiedName = ((RelationField) field).getReference().getQualifiedName();
+        return getModel().ref(qualifiedName);
     }
 
     public JClass toJavaClass(final FieldType type) {

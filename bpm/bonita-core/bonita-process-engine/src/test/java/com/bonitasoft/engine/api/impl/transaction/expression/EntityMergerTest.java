@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.api.impl.transaction.expression;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,18 +41,18 @@ public class EntityMergerTest {
     private EntityMerger entityMerger;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         entityMerger = new EntityMerger(bdrService);
     }
 
     @Test
-    public void merge_an_single_entity_should_call_merge_on_bdrService() throws Exception {
+    public void merge_an_single_entity_should_call_merge_on_bdrService() {
         entityMerger.merge(testEntity);
         verify(bdrService).merge(testEntity);
     }
 
     @Test
-    public void merge_a_collection_of_entity_should_call_merge_on_bdrService_for_each_entity() throws Exception {
+    public void merge_a_collection_of_entity_should_call_merge_on_bdrService_for_each_entity() {
         final List<Entity> listOfEntities = new ArrayList<Entity>();
         listOfEntities.add(testEntity);
         listOfEntities.add(testEntity);
@@ -54,14 +62,14 @@ public class EntityMergerTest {
     }
 
     @Test
-    public void merge_a_simple_serializable_should_not_call_merge_on_bdrService() throws Exception {
+    public void merge_a_simple_serializable_should_not_call_merge_on_bdrService() {
         final String hello = "Hello";
         assertThat(entityMerger.merge("Hello")).isEqualTo(hello);
         verifyZeroInteractions(bdrService);
     }
 
     @Test
-    public void merge_a_collection_of_simple_serializable_should_not_call_merge_on_bdrService() throws Exception {
+    public void merge_a_collection_of_simple_serializable_should_not_call_merge_on_bdrService() {
         final List<String> listOfEntities = new ArrayList<String>();
         listOfEntities.add("Hello");
         listOfEntities.add("Goodbye");

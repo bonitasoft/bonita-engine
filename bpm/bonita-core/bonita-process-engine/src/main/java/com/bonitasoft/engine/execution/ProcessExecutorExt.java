@@ -106,7 +106,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
             final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors,
             final FlowNodeSelector selectorForConnectorOnEnter)
-                    throws SProcessInstanceCreationException {
+            throws SProcessInstanceCreationException {
         if (expressionContext == null) {
             expressionContext = new SExpressionContext();
         }
@@ -144,7 +144,8 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
                         primaryKey = businessData.getPersistenceId();
                     }
                     final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
-                    final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), primaryKey, bdd.getClassName())
+                    final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), primaryKey,
+                            bdd.getClassName())
                             .done();
                     refBusinessDataService.addRefBusinessDataInstance(instance);
                 }
@@ -173,7 +174,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
     }
 
     private void initializeStringIndexes(final SProcessInstance sInstance, final SProcessDefinition sDefinition) throws SExpressionTypeUnknownException,
-    SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, SProcessInstanceModificationException {
+            SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, SProcessInstanceModificationException {
         final SExpressionContext contextDependency = new SExpressionContext(sInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
                 sDefinition.getId());
         boolean update = false;
@@ -199,6 +200,8 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
                     case 5:
                         updateBuilder.updateStringIndex5(String.valueOf(evaluate));
                         break;
+                    default:
+                        throw new IllegalStateException();
                 }
             }
         }

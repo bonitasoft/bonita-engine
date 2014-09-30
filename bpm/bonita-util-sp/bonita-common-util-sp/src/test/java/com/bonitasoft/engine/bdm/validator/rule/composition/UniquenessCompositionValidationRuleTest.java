@@ -34,7 +34,7 @@ public class UniquenessCompositionValidationRuleTest {
     }
 
     @Test
-    public void should_validate_that_a_bom_with_no_relation_fields_is_valid() throws Exception {
+    public void should_validate_that_a_bom_with_no_relation_fields_is_valid() {
         final BusinessObjectModel bom = aBOM().withBO(aBO("aBo").build()).build();
 
         final ValidationStatus validationStatus = rule.validate(bom);
@@ -43,7 +43,7 @@ public class UniquenessCompositionValidationRuleTest {
     }
 
     @Test
-    public void should_validate_that_a_bom_with_no_composition_is_valid() throws Exception {
+    public void should_validate_that_a_bom_with_no_composition_is_valid() {
         final BusinessObject aggregated = aBO("aggregated").build();
         final BusinessObject bo = aBO("aBo").withField(anAggregationField("aggreg", aggregated)).build();
         final BusinessObjectModel bom = aBOM().withBOs(bo, aggregated).build();
@@ -54,7 +54,7 @@ public class UniquenessCompositionValidationRuleTest {
     }
 
     @Test
-    public void should_validate_that_a_bom_with_composed_bo_in_only_one_bo_is_valid() throws Exception {
+    public void should_validate_that_a_bom_with_composed_bo_in_only_one_bo_is_valid() {
         final BusinessObject composite = aBO("composite").build();
         final BusinessObject bo = aBO("aBo").withField(aCompositionField("composite", composite)).build();
         final BusinessObject composite2 = aBO("composite2").build();
@@ -67,7 +67,7 @@ public class UniquenessCompositionValidationRuleTest {
     }
 
     @Test
-    public void should_validate_that_a_bom_with_a_bo_composed_in_two_bos_is_invalid() throws Exception {
+    public void should_validate_that_a_bom_with_a_bo_composed_in_two_bos_is_invalid() {
         final BusinessObject composite = aBO("composite").build();
         final BusinessObject firstBO = aBO("firstBO").withField(aCompositionField("boOneComposite", composite)).build();
         final BusinessObject secondBO = aBO("secondBO").withField(aCompositionField("boTwoComposite", composite)).build();

@@ -26,14 +26,17 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.work.RestartException;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.STenantNotFoundException;
+import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilder;
+import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.impl.transaction.PauseServiceStrategy;
@@ -115,16 +118,16 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
                 throw new UpdateException("Can't " + (shouldBePaused ? "pause" : "resume") + " a tenant in state " + tenant.getStatus());
             }
 
-            final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-            final STenantBuilderFactory tenantBuilderFact = BuilderFactory.get(STenantBuilderFactory.class);
+            final STenantUpdateBuilderFactory updateBuilderFactory = BuilderFactory.get(STenantUpdateBuilderFactory.class);
+            final STenantUpdateBuilder updateDescriptor = updateBuilderFactory.createNewInstance();
             if (shouldBePaused) {
-                descriptor.addField(tenantBuilderFact.getStatusKey(), STenant.PAUSED);
+                updateDescriptor.setStatus(STenant.PAUSED);
                 pauseServicesForTenant(platformServiceAccessor, tenantId);
             } else {
-                descriptor.addField(tenantBuilderFact.getStatusKey(), STenant.ACTIVATED);
+                updateDescriptor.setStatus(STenant.ACTIVATED);
                 resumeServicesForTenant(platformServiceAccessor, tenantId);
             }
-            updateTenant(platformService, descriptor, tenant);
+            updateTenant(platformService, updateDescriptor, tenant);
         } catch (final STenantNotFoundException e) {
             throw new UpdateException("Tenant does not exist", e);
         }
@@ -160,7 +163,6 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
             setTenantClassloaderAndUpdateStateOfTenantServicesWithLifecycle(platformServiceAccessor, tenantId, new ResumeServiceStrategy());
 
             afterServiceStartOfRestartHandlersOfTenant(platformServiceAccessor, tenantId);
-
         } catch (final RestartException e) {
             throw new UpdateException("Unable to resume all elements of the work service.", e);
         } catch (final SSchedulerException e) {
@@ -168,7 +170,8 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         }
     }
 
-    private void beforeServiceStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformServiceAccessor, final long tenantId) throws RestartException {
+    private void beforeServiceStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformServiceAccessor, final long tenantId)
+            throws RestartException {
         final NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlaformConfiguration();
         final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
         final List<TenantRestartHandler> tenantRestartHandlers = nodeConfiguration.getTenantRestartHandlers();
@@ -221,9 +224,9 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
         }
     }
 
-    protected void updateTenant(final PlatformService platformService, final EntityUpdateDescriptor descriptor, final STenant tenant) throws UpdateException {
+    protected void updateTenant(final PlatformService platformService, final STenantUpdateBuilder descriptor, final STenant tenant) throws UpdateException {
         try {
-            platformService.updateTenant(tenant, descriptor);
+            platformService.updateTenant(tenant, descriptor.done());
         } catch (final SBonitaException e) {
             throw new UpdateException("Could not update the tenant pause mode", e);
         }

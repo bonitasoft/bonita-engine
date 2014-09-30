@@ -2,7 +2,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
     <bean id="breakpointService" class="com.bonitasoft.engine.core.process.instance.impl.BreakpointServiceImpl">
-        <constructor-arg name="recorder" ref="recorderSync" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="persistenceRead" ref="persistenceService" />
         <constructor-arg name="eventService" ref="eventService" />
         <constructor-arg name="cacheService" ref="cacheService" />
@@ -11,7 +11,7 @@
     </bean>
 
 	<bean id="refBusinessDataService" class="com.bonitasoft.engine.core.process.instance.impl.RefBusinessDataServiceImpl">
-        <constructor-arg name="recorder" ref="recorderSync" />
+        <constructor-arg name="recorder" ref="tenantRecorderSync" />
         <constructor-arg name="persistenceRead" ref="persistenceService" />
         <constructor-arg name="eventService" ref="eventService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
