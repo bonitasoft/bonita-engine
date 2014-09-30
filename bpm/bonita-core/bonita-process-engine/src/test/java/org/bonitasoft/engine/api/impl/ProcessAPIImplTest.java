@@ -56,6 +56,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
@@ -71,6 +72,7 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
@@ -541,5 +543,81 @@ public class ProcessAPIImplTest {
 
         // When
         processAPI.deleteArchivedProcessInstances(archivedProcessInstanceId);
+    }
+
+    @Test(expected = ProcessInstanceHierarchicalDeletionException.class)
+    public void deleteArchivedProcessInstances_by_ids_should_throw_exception_when_parent_still_active() throws Exception {
+        // Given
+        final long archivedProcessInstanceId = 42l;
+        final List<SAProcessInstance> archivedProcessInstancesToDelete = Arrays.asList(mock(SAProcessInstance.class));
+        doReturn(archivedProcessInstancesToDelete).when(processInstanceService).getArchivedProcessInstances(Arrays.asList(archivedProcessInstanceId));
+        doThrow(new SProcessInstanceHierarchicalDeletionException("Parent still active", archivedProcessInstanceId)).when(processInstanceService)
+                .deleteParentArchivedProcessInstancesAndElements(archivedProcessInstancesToDelete);
+
+        // When
+        processAPI.deleteArchivedProcessInstances(archivedProcessInstanceId);
+    }
+
+    @Test
+    public void deleteArchivedProcessInstance_by_id_should_do_nothing_when_no_archived_process_instance() throws Exception {
+        // Given
+        final long archivedProcessInstanceId = 42l;
+        doReturn(null).when(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
+
+        // When
+        processAPI.deleteArchivedProcessInstance(archivedProcessInstanceId);
+
+        // Then
+        verify(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
+        verify(processInstanceService, never()).deleteParentArchivedProcessInstanceAndElements(any(SAProcessInstance.class));
+    }
+
+    @Test
+    public void deleteArchivedProcessInstance_by_id_should_delete_archived_process_instance_when_exist() throws Exception {
+        // Given
+        final long archivedProcessInstanceId = 42l;
+        doReturn(mock(SAProcessInstance.class)).when(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
+
+        // When
+        processAPI.deleteArchivedProcessInstance(archivedProcessInstanceId);
+
+        // Then
+        verify(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
+        verify(processInstanceService).deleteParentArchivedProcessInstanceAndElements(any(SAProcessInstance.class));
+    }
+
+    @Test(expected = DeletionException.class)
+    public void deleteArchivedProcessInstance_by_id_should_throw_exception_when_getArchivedProcessInstance_throws_exception() throws Exception {
+        // Given
+        final long archivedProcessInstanceId = 42l;
+        doThrow(new SProcessInstanceReadException(new Exception())).when(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
+
+        // When
+        processAPI.deleteArchivedProcessInstance(archivedProcessInstanceId);
+    }
+
+    @Test(expected = DeletionException.class)
+    public void deleteArchivedProcessInstance_by_id_should_throw_exception_when_deleteParentArchivedProcessInstanceAndElements_throws_exception()
+            throws Exception {
+        // Given
+        final long archivedProcessInstanceId = 42l;
+        doReturn(mock(SAProcessInstance.class)).when(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
+        doThrow(new SProcessInstanceModificationException(new Exception())).when(processInstanceService).deleteParentArchivedProcessInstanceAndElements(
+                any(SAProcessInstance.class));
+
+        // When
+        processAPI.deleteArchivedProcessInstance(archivedProcessInstanceId);
+    }
+
+    @Test(expected = ProcessInstanceHierarchicalDeletionException.class)
+    public void deleteArchivedProcessInstance_by_id_should_throw_exception_when_parent_still_active() throws Exception {
+        // Given
+        final long archivedProcessInstanceId = 42l;
+        doReturn(mock(SAProcessInstance.class)).when(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
+        doThrow(new SProcessInstanceHierarchicalDeletionException("Parent still active", archivedProcessInstanceId)).when(processInstanceService)
+                .deleteParentArchivedProcessInstanceAndElements(any(SAProcessInstance.class));
+
+        // When
+        processAPI.deleteArchivedProcessInstance(archivedProcessInstanceId);
     }
 }

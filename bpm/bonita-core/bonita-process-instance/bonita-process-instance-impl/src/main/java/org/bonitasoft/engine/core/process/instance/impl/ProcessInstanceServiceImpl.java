@@ -47,6 +47,7 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SAProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
@@ -272,7 +273,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         return nbDeleted;
     }
 
-    protected void deleteParentArchivedProcessInstanceAndElements(final SAProcessInstance saProcessInstance) throws SFlowNodeReadException,
+    @Override
+    public void deleteParentArchivedProcessInstanceAndElements(final SAProcessInstance saProcessInstance) throws SFlowNodeReadException,
             SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
         checkIfCallerIsNotActive(saProcessInstance.getCallerId());
         try {
@@ -280,9 +282,12 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             deleteArchivedProcessInstance(saProcessInstance);
         } catch (final SProcessInstanceModificationException e) {
             try {
-                getArchivedProcessInstance(saProcessInstance.getId());
-                // archived process is still here, that's not normal. The problem must be raised:
-                throw e;
+                final SAProcessInstance saProcessInstance2 = getArchivedProcessInstance(saProcessInstance.getId());
+                if (saProcessInstance2 != null) {
+                    // archived process is still here, that's not normal. The problem must be raised:
+                    throw e;
+                }
+                logArchivedProcessInstanceNotFound(new SAProcessInstanceNotFoundException(saProcessInstance.getId()));
             } catch (final SProcessInstanceModificationException e1) {
                 throw e;
             } catch (final SBonitaException e1) {
@@ -891,17 +896,12 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
-    public SAProcessInstance getArchivedProcessInstance(final long archivedProcessInstanceId) throws SProcessInstanceReadException,
-            SProcessInstanceNotFoundException {
+    public SAProcessInstance getArchivedProcessInstance(final long archivedProcessInstanceId) throws SProcessInstanceReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             final Map<String, Object> parameters = Collections.singletonMap("id", (Object) archivedProcessInstanceId);
-            final SAProcessInstance saProcessInstance = persistenceService.selectOne(new SelectOneDescriptor<SAProcessInstance>("getArchivedProcessInstance",
+            return persistenceService.selectOne(new SelectOneDescriptor<SAProcessInstance>("getArchivedProcessInstance",
                     parameters, SAProcessInstance.class));
-            if (saProcessInstance == null) {
-                throw new SProcessInstanceNotFoundException(archivedProcessInstanceId);
-            }
-            return saProcessInstance;
         } catch (final SBonitaReadException e) {
             throw new SProcessInstanceReadException(e);
         }

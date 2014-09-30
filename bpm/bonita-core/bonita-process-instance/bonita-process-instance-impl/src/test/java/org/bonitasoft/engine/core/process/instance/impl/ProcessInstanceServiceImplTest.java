@@ -54,6 +54,7 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Before;
 import org.junit.Test;
@@ -146,7 +147,7 @@ public class ProcessInstanceServiceImplTest {
     }
 
     @Test
-    public void deleteParentPIAndElementsOnAbsentProcessShouldBeIgnored() throws Exception {
+    public void deleteParentProcessInstanceAndElementsOnAbsentProcessShouldBeIgnored() throws Exception {
         // given:
         doThrow(SProcessInstanceModificationException.class).when(processInstanceService).deleteProcessInstance(processInstance);
         doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService).getProcessInstance(processInstanceId);
@@ -160,7 +161,7 @@ public class ProcessInstanceServiceImplTest {
     }
 
     @Test(expected = SBonitaException.class)
-    public void exceptionInDeleteParentPIAndElementsOnStillExistingProcessShouldRaiseException() throws Exception {
+    public void deleteParentProcessInstanceAndElementsOnStillExistingProcessShouldRaiseException() throws Exception {
         // given:
         doThrow(SProcessInstanceModificationException.class).when(processInstanceService).deleteProcessInstance(processInstance);
         // getProcessInstance normally returns:
@@ -176,12 +177,11 @@ public class ProcessInstanceServiceImplTest {
     }
 
     @Test
-    public void deleteParentArchivedPIAndElementsOnAbsentProcessShouldBeIgnored() throws Exception {
+    public void deleteParentArchivedProcessInstanceAndElementsOnAbsentProcessShouldBeIgnored() throws Exception {
         // given:
         doThrow(new SProcessInstanceModificationException(new Exception())).when(processInstanceService).deleteArchivedProcessInstanceElements(anyLong(),
                 anyLong());
-        doThrow(new SProcessInstanceNotFoundException(aProcessInstance.getId())).when(processInstanceService).getArchivedProcessInstance(
-                archivedProcessInstanceId);
+        doReturn(null).when(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
         doNothing().when(processInstanceService).logArchivedProcessInstanceNotFound(any(SProcessInstanceModificationException.class));
 
         // when:
@@ -191,8 +191,23 @@ public class ProcessInstanceServiceImplTest {
         verify(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
     }
 
-    @Test(expected = SBonitaException.class)
-    public void exceptionInDeleteParentArchivedPIAndElementsOnStillExistingProcessShouldRaiseException() throws Exception {
+    @Test
+    public void deleteParentArchivedProcessInstanceAndElements_should_be_ignored_when_error_to_getArchivedProcessInstance() throws Exception {
+        // given:
+        doThrow(new SProcessInstanceModificationException(new Exception())).when(processInstanceService).deleteArchivedProcessInstanceElements(anyLong(),
+                anyLong());
+        doThrow(new SProcessInstanceReadException(new Exception())).when(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
+        doNothing().when(processInstanceService).logArchivedProcessInstanceNotFound(any(SProcessInstanceModificationException.class));
+
+        // when:
+        processInstanceService.deleteParentArchivedProcessInstanceAndElements(aProcessInstance);
+
+        // then:
+        verify(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
+    }
+
+    @Test(expected = SProcessInstanceModificationException.class)
+    public void deleteParentArchivedProcessInstanceAndElementsOnStillExistingProcessShouldRaiseException() throws Exception {
         // given:
         doThrow(SProcessInstanceModificationException.class).when(processInstanceService).deleteArchivedProcessInstanceElements(anyLong(), anyLong());
         // getProcessInstance normally returns:
@@ -282,5 +297,36 @@ public class ProcessInstanceServiceImplTest {
 
         // When
         processInstanceService.getArchivedProcessInstances(archivedProcessInstanceIds);
+    }
+
+    @Test
+    public void getArchivedProcessInstance_should_return_archived_process_instance() throws Exception {
+        // Given
+        final long archivedProcessInstanceId = 41L;
+        final Map<String, Object> parameters = Collections.singletonMap("id", (Object) archivedProcessInstanceId);
+        final SelectOneDescriptor<SAProcessInstance> selectOneDescriptor = new SelectOneDescriptor<SAProcessInstance>(
+                "getArchivedProcessInstance", parameters, SAProcessInstance.class);
+        final SAProcessInstance saProcessInstance = mock(SAProcessInstance.class);
+        doReturn(saProcessInstance).when(readPersistenceService).selectOne(selectOneDescriptor);
+
+        // When
+        final SAProcessInstance archivedProcessInstance = processInstanceService.getArchivedProcessInstance(archivedProcessInstanceId);
+
+        // Then
+        assertEquals("The result should be equals to the list returned by the mock.", saProcessInstance, archivedProcessInstance);
+        verify(readPersistenceService).selectOne(selectOneDescriptor);
+    }
+
+    @Test(expected = SProcessInstanceReadException.class)
+    public void getArchivedProcessInstance_should_throw_exception_when_there_is_problem() throws Exception {
+        // Given
+        final long archivedProcessInstanceId = 41L;
+        final Map<String, Object> parameters = Collections.singletonMap("id", (Object) archivedProcessInstanceId);
+        final SelectOneDescriptor<SAProcessInstance> selectOneDescriptor = new SelectOneDescriptor<SAProcessInstance>(
+                "getArchivedProcessInstance", parameters, SAProcessInstance.class);
+        doThrow(new SBonitaReadException("plop")).when(readPersistenceService).selectOne(selectOneDescriptor);
+
+        // When
+        processInstanceService.getArchivedProcessInstance(archivedProcessInstanceId);
     }
 }

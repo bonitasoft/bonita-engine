@@ -1106,13 +1106,13 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ArchivedProcessInstance getArchivedProcessInstance(final long id) throws ArchivedProcessInstanceNotFoundException, RetrieveException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         try {
             final SAProcessInstance archivedProcessInstance = processInstanceService.getArchivedProcessInstance(id);
+            if (archivedProcessInstance == null) {
+                throw new ArchivedProcessInstanceNotFoundException(id);
+            }
             return ModelConvertor.toArchivedProcessInstance(archivedProcessInstance);
-        } catch (final SProcessInstanceNotFoundException e) {
-            throw new ArchivedProcessInstanceNotFoundException(e);
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
@@ -1121,7 +1121,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ArchivedProcessInstance getFinalArchivedProcessInstance(final long processInstanceId) throws ArchivedProcessInstanceNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
 
         final GetLastArchivedProcessInstance getProcessInstance = new GetLastArchivedProcessInstance(processInstanceService, processInstanceId,
@@ -3681,6 +3680,25 @@ public class ProcessAPIImpl implements ProcessAPI {
                 return processInstanceService.deleteParentArchivedProcessInstancesAndElements(saProcessInstances);
             }
             return 0;
+        } catch (final SProcessInstanceHierarchicalDeletionException e) {
+            throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
+        } catch (final SBonitaException e) {
+            throw new DeletionException(e);
+        }
+    }
+
+    @Override
+    public void deleteArchivedProcessInstance(final long archivedProcessInstanceId) throws DeletionException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+
+        try {
+            final SAProcessInstance saProcessInstance = processInstanceService.getArchivedProcessInstance(archivedProcessInstanceId);
+            if (saProcessInstance != null) {
+                processInstanceService.deleteParentArchivedProcessInstanceAndElements(saProcessInstance);
+            }
+        } catch (final SProcessInstanceHierarchicalDeletionException e) {
+            throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }

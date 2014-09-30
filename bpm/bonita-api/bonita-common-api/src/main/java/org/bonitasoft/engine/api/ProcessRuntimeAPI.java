@@ -345,7 +345,7 @@ public interface ProcessRuntimeAPI {
      * Passing {@link Integer#MAX_VALUE} identifiers is discouraged as the amount of operations may be large and may thus result in timeout operation.
      * 
      * @param archivedProcessInstanceIds
-     *            Identifier of the {@link ArchivedProcessInstance} to delete
+     *            Identifier of the {@link ArchivedProcessInstance}s to delete
      * @return The number of elements that have been deleted in any state. For example, process instance can be archived is several states: Cancelled,
      *         Aborted, Completed, Failed
      * @throws DeletionException
@@ -353,6 +353,17 @@ public interface ProcessRuntimeAPI {
      * @since 6.4.0
      */
     long deleteArchivedProcessInstances(Long... archivedProcessInstanceIds) throws DeletionException;
+
+    /**
+     * Delete the specific archived process instance.
+     * 
+     * @param archivedProcessInstanceId
+     *            Identifier of the {@link ArchivedProcessInstance} to delete
+     * @throws DeletionException
+     *             If the process instance can't be deleted because of a parent that is still active
+     * @since 6.4.0
+     */
+    void deleteArchivedProcessInstance(long archivedProcessInstanceId) throws DeletionException;
 
     /**
      * Start an instance of the process with the specified process definition, using the current session user.
