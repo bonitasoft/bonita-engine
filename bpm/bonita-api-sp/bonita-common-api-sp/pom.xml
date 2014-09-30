@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine.api</groupId>
 		<artifactId>bonita-api-sp</artifactId>
-		<version>6.3.7</version>
+		<version>6.3.7-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-common-api-sp</artifactId>
