@@ -151,6 +151,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
                 }
             }
             createDocuments(sDefinition, sInstance, userId);
+            createDocumentLists(sDefinition, sInstance, userId, expressionContext, context);
             if (connectors != null) {
                 executeConnectors(sDefinition, sInstance, connectors);
             }
