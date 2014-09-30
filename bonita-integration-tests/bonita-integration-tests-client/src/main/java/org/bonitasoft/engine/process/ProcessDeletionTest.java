@@ -1,6 +1,23 @@
+/**
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **
+ * @since 6.0
+ */
 package org.bonitasoft.engine.process;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +33,15 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessActivationException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor;
+import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.impl.DocumentDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
@@ -49,7 +70,7 @@ public class ProcessDeletionTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-         loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         pedro = getIdentityAPI().createUser(USERNAME, PASSWORD);
         processDefinitions = new ArrayList<ProcessDefinition>();
     }
@@ -65,7 +86,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("process To Delete", "2.5");
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 10; i++) {
             final String activityName = "step2" + i;
             processDefinitionBuilder.addUserTask(activityName, ACTOR_NAME);
             processDefinitionBuilder.addTransition("step1", activityName);
@@ -95,7 +116,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", processInstance, pedro);
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 10; i++) {
             waitForUserTask("step2" + i, processInstance);
         }
 
@@ -111,17 +132,45 @@ public class ProcessDeletionTest extends CommonAPITest {
     public void deleteArchivedProcessInstanceAlsoDeleteArchivedElements() throws Exception {
         final ProcessDefinition processDefinition = deployProcessWithSeveralOutGoingTransitions();
         processDefinitions.add(processDefinition); // To clean in the end
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance, pedro);
-        for (int i = 0; i < 30; i++) {
-            waitForUserTaskAndExecuteIt("step2" + i, processInstance, pedro);
-        }
-        waitForProcessToFinish(processInstance);
+        final ProcessInstance processInstance = startAndFinishProcess(processDefinition);
         getProcessAPI().deleteArchivedProcessInstances(processDefinition.getId(), 0, 50);
 
         final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(processInstance.getId(), 0, 100,
                 ActivityInstanceCriterion.DEFAULT);
         assertEquals(0, taskInstances.size());
+    }
+
+    @Test
+    @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete process instance", "Delete", "Process definition" }, jira = "BS-10374")
+    public void deleteArchivedProcessInstanceByIdsAlsoDeleteArchivedElements() throws Exception {
+        final ProcessDefinition processDefinition = deployProcessWithSeveralOutGoingTransitions();
+        processDefinitions.add(processDefinition); // To clean in the end
+        final ProcessInstance processInstance1 = startAndFinishProcess(processDefinition);
+        startAndFinishProcess(processDefinition);
+
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
+        searchOptionsBuilder.sort(ProcessInstanceSearchDescriptor.NAME, Order.ASC);
+        final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().searchArchivedProcessInstancesInAllStates(searchOptionsBuilder.done())
+                .getResult();
+        getProcessAPI().deleteArchivedProcessInstances(archivedProcessInstances.get(0).getId(), archivedProcessInstances.get(2).getId());
+
+        final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(processInstance1.getId(), 0, 100,
+                ActivityInstanceCriterion.DEFAULT);
+        assertEquals(0, taskInstances.size());
+        final long numberOfArchivedProcessInstancesAfterDelete = getProcessAPI().searchArchivedProcessInstancesInAllStates(searchOptionsBuilder.done())
+                .getCount();
+        assertEquals(archivedProcessInstances.size() - 2, numberOfArchivedProcessInstancesAfterDelete);
+    }
+
+    private ProcessInstance startAndFinishProcess(final ProcessDefinition processDefinition) throws ProcessDefinitionNotFoundException,
+            ProcessActivationException, ProcessExecutionException, Exception {
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTaskAndExecuteIt("step1", processInstance, pedro);
+        for (int i = 0; i < 10; i++) {
+            waitForUserTaskAndExecuteIt("step2" + i, processInstance, pedro);
+        }
+        waitForProcessToFinish(processInstance);
+        return processInstance;
     }
 
     @Test

@@ -79,7 +79,7 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceHierarchicalDeletionException
      */
     void deleteProcessInstance(long processInstanceId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SFlowNodeReadException,
-    SProcessInstanceModificationException, SProcessInstanceHierarchicalDeletionException;
+            SProcessInstanceModificationException, SProcessInstanceHierarchicalDeletionException;
 
     /**
      * Delete the specified process instance
@@ -92,7 +92,7 @@ public interface ProcessInstanceService {
      * @since 6.0
      */
     void deleteProcessInstance(SProcessInstance processInstance) throws SFlowNodeReadException, SProcessInstanceModificationException,
-    SProcessInstanceHierarchicalDeletionException;
+            SProcessInstanceHierarchicalDeletionException;
 
     /**
      * Delete the specified process instances with id, and their elements archived and not, if are not a subProcess
@@ -103,7 +103,7 @@ public interface ProcessInstanceService {
      * @since 6.1
      */
     long deleteParentProcessInstanceAndElements(List<SProcessInstance> sProcessInstances) throws SFlowNodeReadException,
-    SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
+            SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
      * Delete the specified process instance with id, and its elements archived and not, if are not a subProcess
@@ -118,7 +118,7 @@ public interface ProcessInstanceService {
      * @since 6.1
      */
     void deleteParentProcessInstanceAndElements(long processInstanceId) throws SProcessInstanceReadException, SProcessInstanceNotFoundException,
-    SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
+            SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
      * Get process instance by its id
@@ -155,7 +155,7 @@ public interface ProcessInstanceService {
      * @since 6.0
      */
     void setStateCategory(SProcessInstance processInstance, SStateCategory stateCatetory) throws SProcessInstanceNotFoundException,
-    SProcessInstanceModificationException;
+            SProcessInstanceModificationException;
 
     /**
      * Delete specified archived process instance
@@ -180,7 +180,7 @@ public interface ProcessInstanceService {
      * @since 6.1
      */
     long deleteParentArchivedProcessInstancesAndElements(List<SAProcessInstance> saProcessInstances) throws SFlowNodeReadException,
-    SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
+            SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
      * Delete all archived elements related to the specified process instance, even the archived process instances
@@ -192,7 +192,7 @@ public interface ProcessInstanceService {
      * @since 6.0
      */
     void deleteArchivedProcessInstanceElements(long processInstanceId, final long processDefinitionId) throws SFlowNodeReadException,
-    SProcessInstanceModificationException;
+            SProcessInstanceModificationException;
 
     /**
      * Get child instance identifiers for specific process instance, this can be used for pagination
@@ -233,6 +233,17 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceReadException
      */
     long getNumberOfChildInstancesOfProcessInstance(long processInstanceId) throws SProcessInstanceReadException;
+
+    /**
+     * Get the archived process instances corresponding to the identifiers
+     * 
+     * @param archivedProcessInstanceIds
+     *            Identifier of the {@link SAProcessInstance}s
+     * @return The list of {@link SAProcessInstance}
+     * @throws SProcessInstanceReadException
+     * @since 6.4.0
+     */
+    List<SAProcessInstance> getArchivedProcessInstances(List<Long> archivedProcessInstanceIds) throws SProcessInstanceReadException;
 
     /**
      * Get total number of archived process instances according to specific criteria
@@ -466,7 +477,7 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceModificationException
      */
     void deleteFlowNodeInstance(SFlowNodeInstance flowNodeInstance, SProcessDefinition processDefinition) throws SFlowNodeReadException,
-    SProcessInstanceModificationException;
+            SProcessInstanceModificationException;
 
     /**
      * @param processDefinitionId

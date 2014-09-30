@@ -283,9 +283,9 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 getArchivedProcessInstance(saProcessInstance.getId());
                 // archived process is still here, that's not normal. The problem must be raised:
                 throw e;
-            } catch (SProcessInstanceReadException e1) {
-                logArchivedProcessInstanceNotFound(e);
-            } catch (SProcessInstanceNotFoundException e1) {
+            } catch (final SProcessInstanceModificationException e1) {
+                throw e;
+            } catch (final SBonitaException e1) {
                 logArchivedProcessInstanceNotFound(e);
             }
         }
@@ -902,6 +902,19 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 throw new SProcessInstanceNotFoundException(archivedProcessInstanceId);
             }
             return saProcessInstance;
+        } catch (final SBonitaReadException e) {
+            throw new SProcessInstanceReadException(e);
+        }
+    }
+
+    @Override
+    public List<SAProcessInstance> getArchivedProcessInstances(final List<Long> archivedProcessInstanceIds) throws SProcessInstanceReadException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("ids", (Object) archivedProcessInstanceIds);
+            final SelectListDescriptor<SAProcessInstance> saProcessInstances = new SelectListDescriptor<SAProcessInstance>(
+                    "getArchivedProcessInstances", parameters, SAProcessInstance.class, new QueryOptions(0, archivedProcessInstanceIds.size()));
+            return persistenceService.selectList(saProcessInstances);
         } catch (final SBonitaReadException e) {
             throw new SProcessInstanceReadException(e);
         }
