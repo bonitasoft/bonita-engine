@@ -1319,7 +1319,11 @@ public class DocumentIntegrationTest extends CommonAPITest {
         userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDocumentList("invoices", scriptExpression1));
         userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDocumentList("emptyList", scriptExpression2));
 //        userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDocumentList("unknown", scriptExpression2));
-        builder.addUserTask("verifyStep", "john");
+        UserTaskDefinitionBuilder verifyStepBuilder = builder.addUserTask("verifyStep", "john");
+        verifyStepBuilder.addDisplayDescription(new ExpressionBuilder().createGroovyScriptExpression("getInvoicesListSize",
+                "String.valueOf(invoices.size())",
+                String.class.getName(),
+                new ExpressionBuilder().createDocumentListExpression("invoices")));
         builder.addTransition("step1", "updateStep");
         builder.addTransition("updateStep", "verifyStep");
         DocumentListDefinitionBuilder invoices = builder.addDocumentListDefinition("invoices");
@@ -1336,7 +1340,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         User john = createUser("john", "bpm");
         ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "john", john);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        HumanTaskInstance step1 = waitForUserTask("step1");
+        HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
 
         //we have a process with an initialized list and a non initialized list
 
@@ -1363,9 +1367,9 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
         //execute operation to update
         assignAndExecuteStep(step1, john.getId());
-        HumanTaskInstance updateStep = waitForUserTask("updateStep");
+        HumanTaskInstance updateStep = waitForUserTask("updateStep",processInstance);
         assignAndExecuteStep(updateStep,john.getId());
-        waitForUserTask("verifyStep");
+        HumanTaskInstance verifyStep = waitForUserTask("verifyStep");
 
         //check with api methods
         invoices1 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices");
@@ -1399,7 +1403,9 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
         //TODO add list with api method
 
-        //TODO check with  expression
+        //expression is executed on the display name of the verify step, the display name is the list size
+        assertThat(verifyStep.getDisplayDescription()).isEqualTo("3");
+
 
         disableAndDeleteProcess(processDefinition);
         deleteUser(john);

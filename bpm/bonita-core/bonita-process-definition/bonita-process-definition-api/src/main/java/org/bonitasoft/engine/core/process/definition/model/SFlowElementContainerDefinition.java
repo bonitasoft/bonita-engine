@@ -67,8 +67,10 @@ public interface SFlowElementContainerDefinition extends SBaseElement {
     List<SDocumentDefinition> getDocumentDefinitions();
 
     /**
-     * @param connectorDefinitionId
+     * @param name
+     *      the name of the connector definition
      * @return
+     *      the connector definition having that name
      * @since 6.1
      */
     SConnectorDefinition getConnectorDefinition(String name);
