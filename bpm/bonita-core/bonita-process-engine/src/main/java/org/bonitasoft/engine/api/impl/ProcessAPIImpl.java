@@ -457,7 +457,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private SearchResult<HumanTaskInstance> searchHumanTasksTransaction(final SearchOptions searchOptions) throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
@@ -474,7 +474,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SearchOptions searchOptions = builder.done();
 
         try {
-            final boolean hasOpenProcessInstances = searchProcessInstances(APIUtils.getTenantAccessor(), searchOptions).getCount() > 0;
+            final boolean hasOpenProcessInstances = searchProcessInstances(getTenantAccessor(), searchOptions).getCount() > 0;
             if (hasOpenProcessInstances) {
                 throw new DeletionException("Some active process instances are still found, process #" + processDefinitionId + " can't be deleted.");
             }
@@ -500,7 +500,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @CustomTransactions
     @Deprecated
     public void deleteProcess(final long processDefinitionId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         // multiple tx here because we must lock instances when deleting them
         // but if the second tx crash we can relaunch delete process without issues
         final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
@@ -694,7 +694,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessDefinition deploy(final BusinessArchive businessArchive) throws ProcessDeployException, AlreadyExistsException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final DependencyService dependencyService = tenantAccessor.getDependencyService();
         final DesignProcessDefinition designProcessDefinition = businessArchive.getProcessDefinition();
@@ -748,7 +748,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public byte[] exportBarProcessContentUnderHome(final long processDefinitionId) throws ProcessExportException {
         String processesFolder;
         try {
-            final long tenantId = APIUtils.getTenantAccessor().getTenantId();
+            final long tenantId = getTenantAccessor().getTenantId();
             processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
         } catch (final BonitaHomeNotSetException e) {
             throw new BonitaRuntimeException(e);
@@ -807,7 +807,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @CustomTransactions
     @Deprecated
     public void disableAndDelete(final long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException, DeletionException {
-        final TransactionExecutor transactionExecutor = APIUtils.getTenantAccessor().getTransactionExecutor();
+        final TransactionExecutor transactionExecutor = getTenantAccessor().getTransactionExecutor();
         try {
             transactionExecutor.execute(new TransactionContent() {
 
@@ -844,7 +844,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void enableProcess(final long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessEnablementException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         try {
@@ -881,7 +881,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction) throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final LockService lockService = tenantAccessor.getLockService();
@@ -931,7 +931,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     protected void addSystemCommentOnProcessInstanceWhenExecutingTaskFor(final SFlowNodeInstance flowNodeInstance, final long executerUserId,
             final long executerSubstituteUserId) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         final SCommentService commentService = tenantAccessor.getCommentService();
 
@@ -964,7 +964,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<ActivityInstance> getActivities(final long processInstanceId, final int startIndex, final int maxResults) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         try {
@@ -977,7 +977,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getNumberOfProcessDeploymentInfos() {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final TransactionContentWithResult<Long> transactionContentWithResult = new GetNumberOfProcessDeploymentInfos(processDefinitionService);
         try {
@@ -990,7 +990,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessDefinition getProcessDefinition(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         try {
             final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
@@ -1004,7 +1004,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public DesignProcessDefinition getDesignProcessDefinition(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final File processFolder = getProcessFolder(processDefinitionId, tenantAccessor.getTenantId());
             final File processDesignFile = new File(processFolder, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
@@ -1021,7 +1021,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessDeploymentInfo getProcessDeploymentInfo(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         try {
             final TransactionContentWithResult<SProcessDefinitionDeployInfo> transactionContentWithResult = new GetProcessDefinitionDeployInfo(
@@ -1044,7 +1044,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessInstance getProcessInstance(final long processInstanceId) throws ProcessInstanceNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         try {
             final SProcessInstance sProcessInstance = getSProcessInstance(processInstanceId);
@@ -1057,14 +1057,14 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     protected SProcessInstance getSProcessInstance(final long processInstanceId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         return processInstanceService.getProcessInstance(processInstanceId);
     }
 
     @Override
     public List<ArchivedProcessInstance> getArchivedProcessInstances(final long processInstanceId, final int startIndex, final int maxResults) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
@@ -1081,7 +1081,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ArchivedProcessInstance getArchivedProcessInstance(final long id) throws ArchivedProcessInstanceNotFoundException, RetrieveException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         try {
@@ -1096,7 +1096,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ArchivedProcessInstance getFinalArchivedProcessInstance(final long processInstanceId) throws ArchivedProcessInstanceNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
 
@@ -1117,7 +1117,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ProcessInstance startProcess(final long processDefinitionId) throws ProcessActivationException, ProcessExecutionException {
         try {
-            return startProcess(APIUtils.getUserId(), processDefinitionId);
+            return startProcess(getUserId(), processDefinitionId);
         } catch (final ProcessDefinitionNotFoundException e) {
             throw new ProcessExecutionException(e);
         }
@@ -1131,7 +1131,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public int getNumberOfActors(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
         final GetNumberOfActors getNumberofActors = new GetNumberOfActors(processDefinitionService, processDefinitionId);
@@ -1145,7 +1145,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<ActorInstance> getActors(final long processDefinitionId, final int startIndex, final int maxResults, final ActorCriterion sort) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         try {
             OrderByType order;
@@ -1171,7 +1171,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<ActorMember> getActorMembers(final long actorId, final int startIndex, final int maxResults) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
         try {
@@ -1185,7 +1185,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getNumberOfActorMembers(final long actorId) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final GetNumberOfActorMembers numberOfActorMembers = new GetNumberOfActorMembers(actorMappingService, actorId);
@@ -1199,7 +1199,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getNumberOfUsersOfActor(final long actorId) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final GetNumberOfUsersOfActor numberOfUsersOfActor = new GetNumberOfUsersOfActor(actorMappingService, actorId);
@@ -1209,7 +1209,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getNumberOfRolesOfActor(final long actorId) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final GetNumberOfRolesOfActor numberOfRolesOfActor = new GetNumberOfRolesOfActor(actorMappingService, actorId);
@@ -1219,7 +1219,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getNumberOfGroupsOfActor(final long actorId) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final GetNumberOfGroupsOfActor numberOfGroupsOfActor = new GetNumberOfGroupsOfActor(actorMappingService, actorId);
@@ -1229,7 +1229,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getNumberOfMembershipsOfActor(final long actorId) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final GetNumberOfMembershipsOfActor getNumber = new GetNumberOfMembershipsOfActor(actorMappingService, actorId);
@@ -1242,7 +1242,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         if (descriptor == null || descriptor.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final SActorUpdateBuilder actorUpdateBuilder = BuilderFactory.get(SActorUpdateBuilderFactory.class).createNewInstance();
@@ -1273,7 +1273,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ActorMember addUserToActor(final long actorId, final long userId) throws CreationException, AlreadyExistsException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
         try {
@@ -1292,7 +1292,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private void checkIfActorMappingForUserAlreadyExists(final long actorId, final long userId)
             throws AlreadyExistsException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
         try {
@@ -1319,7 +1319,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ActorMember addGroupToActor(final long actorId, final long groupId) throws CreationException, AlreadyExistsException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         try {
             // Check if the mapping already to throw a specific exception
@@ -1337,7 +1337,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private void checkIfActorMappingForGroupAlreadyExists(final long actorId, final long groupId)
             throws AlreadyExistsException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
         try {
@@ -1364,7 +1364,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ActorMember addRoleToActor(final long actorId, final long roleId) throws CreationException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
         try {
@@ -1382,7 +1382,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void checkIfActorMappingForRoleAlreadyExists(final long actorId, final long roleId) throws AlreadyExistsException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
         try {
@@ -1421,7 +1421,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ActorMember addRoleAndGroupToActor(final long actorId, final long roleId, final long groupId) throws CreationException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
         try {
@@ -1438,7 +1438,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void checkIfActorMappingForMembershipAlreadyExists(final long actorId, final long roleId, final long groupId) throws AlreadyExistsException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
         try {
@@ -1454,7 +1454,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void removeActorMember(final long actorMemberId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final RemoveActorMember removeActorMember = new RemoveActorMember(actorMappingService, actorMemberId);
@@ -1474,7 +1474,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ActorInstance getActor(final long actorId) throws ActorNotFoundException {
         try {
-            final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+            final TenantServiceAccessor tenantAccessor = getTenantAccessor();
             final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
             final GetActor getActor = new GetActor(actorMappingService, actorId);
@@ -1487,7 +1487,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ActivityInstance getActivityInstance(final long activityInstanceId) throws ActivityInstanceNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final SActivityInstance sActivityInstance;
@@ -1502,14 +1502,14 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     protected SActivityInstance getSActivityInstance(final long activityInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         return activityInstanceService.getActivityInstance(activityInstanceId);
     }
 
     @Override
     public FlowNodeInstance getFlowNodeInstance(final long flowNodeInstanceId) throws FlowNodeInstanceNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
@@ -1526,7 +1526,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<HumanTaskInstance> getAssignedHumanTaskInstances(final long userId, final int startIndex, final int maxResults,
             final ActivityInstanceCriterion pagingCriterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForActivityInstance(pagingCriterion);
 
@@ -1547,7 +1547,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<HumanTaskInstance> getPendingHumanTaskInstances(final long userId, final int startIndex, final int maxResults,
             final ActivityInstanceCriterion pagingCriterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForActivityInstance(pagingCriterion);
@@ -1584,7 +1584,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ArchivedActivityInstance getArchivedActivityInstance(final long activityInstanceId) throws ActivityInstanceNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final GetArchivedActivityInstance getActivityInstance = new GetArchivedActivityInstance(activityInstanceService, activityInstanceId);
@@ -1601,7 +1601,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ArchivedFlowNodeInstance getArchivedFlowNodeInstance(final long archivedFlowNodeInstanceId) throws ArchivedFlowNodeInstanceNotFoundException,
     RetrieveException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
@@ -1618,7 +1618,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<ProcessInstance> getProcessInstances(final int startIndex, final int maxResults, final ProcessInstanceCriterion criterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForProcessInstance(criterion);
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(startIndex, maxResults);
@@ -1634,7 +1634,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getNumberOfProcessInstances() {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
@@ -1669,7 +1669,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<ArchivedProcessInstance> getArchivedProcessInstances(final int startIndex, final int maxResults, final ProcessInstanceCriterion criterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForProcessInstance(criterion);
 
@@ -1696,7 +1696,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getNumberOfArchivedProcessInstances() {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
 
@@ -1713,7 +1713,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<ArchivedProcessInstance> searchArchivedProcessInstances(final SearchOptions searchOptions) throws RetrieveException, SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SearchArchivedProcessInstancesWithoutSubProcess searchArchivedProcessInstances = new SearchArchivedProcessInstancesWithoutSubProcess(
@@ -1728,7 +1728,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<ArchivedProcessInstance> searchArchivedProcessInstancesInAllStates(final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SearchArchivedProcessInstances searchArchivedProcessInstances = new SearchArchivedProcessInstances(processInstanceService,
@@ -1744,7 +1744,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<ActivityInstance> getOpenActivityInstances(final long processInstanceId, final int startIndex, final int maxResults,
             final ActivityInstanceCriterion criterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
 
@@ -1766,7 +1766,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<ArchivedActivityInstance> getArchivedActivityInstances(final long processInstanceId, final int startIndex, final int maxResults,
             final ActivityInstanceCriterion criterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final List<ArchivedActivityInstance> archivedActivityInstances = getArchivedActivityInstances(processInstanceId, startIndex, maxResults, criterion,
                 tenantAccessor);
         return archivedActivityInstances;
@@ -1791,7 +1791,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public int getNumberOfOpenedActivityInstances(final long processInstanceId) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
 
         final TransactionContentWithResult<Integer> transactionContentWithResult = new GetNumberOfActivityInstance(processInstanceId, activityInstanceService);
@@ -1805,7 +1805,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Category createCategory(final String name, final String description) throws AlreadyExistsException, CreationException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
 
         try {
@@ -1821,7 +1821,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Category getCategory(final long categoryId) throws CategoryNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         try {
@@ -1836,7 +1836,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getNumberOfCategories() {
-        final CategoryService categoryService = APIUtils.getTenantAccessor().getCategoryService();
+        final CategoryService categoryService = getTenantAccessor().getCategoryService();
         try {
             final GetNumberOfCategories getNumberOfCategories = new GetNumberOfCategories(categoryService);
             getNumberOfCategories.execute();
@@ -1848,7 +1848,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<Category> getCategories(final int startIndex, final int maxResults, final CategoryCriterion sortCriterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SCategoryBuilderFactory fact = BuilderFactory.get(SCategoryBuilderFactory.class);
 
         final CategoryService categoryService = tenantAccessor.getCategoryService();
@@ -1878,8 +1878,8 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void addCategoriesToProcess(final long processDefinitionId, final List<Long> categoryIds) throws AlreadyExistsException, CreationException {
         try {
-            final CategoryService categoryService = APIUtils.getTenantAccessor().getCategoryService();
-            final ProcessDefinitionService processDefinitionService = APIUtils.getTenantAccessor().getProcessDefinitionService();
+            final CategoryService categoryService = getTenantAccessor().getCategoryService();
+            final ProcessDefinitionService processDefinitionService = getTenantAccessor().getProcessDefinitionService();
             for (final Long categoryId : categoryIds) {
                 new AddProcessDefinitionToCategory(categoryId, processDefinitionId, categoryService, processDefinitionService).execute();
             }
@@ -1893,7 +1893,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void removeCategoriesFromProcess(final long processDefinitionId, final List<Long> categoryIds) throws DeletionException {
         try {
-            final CategoryService categoryService = APIUtils.getTenantAccessor().getCategoryService();
+            final CategoryService categoryService = getTenantAccessor().getCategoryService();
             final TransactionContent transactionContent = new RemoveCategoriesFromProcessDefinition(processDefinitionId, categoryIds, categoryService);
             transactionContent.execute();
         } catch (final SBonitaException sbe) {
@@ -1904,8 +1904,8 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void addProcessDefinitionToCategory(final long categoryId, final long processDefinitionId) throws AlreadyExistsException, CreationException {
         try {
-            final CategoryService categoryService = APIUtils.getTenantAccessor().getCategoryService();
-            final ProcessDefinitionService processDefinitionService = APIUtils.getTenantAccessor().getProcessDefinitionService();
+            final CategoryService categoryService = getTenantAccessor().getCategoryService();
+            final ProcessDefinitionService processDefinitionService = getTenantAccessor().getProcessDefinitionService();
             final TransactionContent transactionContent = new AddProcessDefinitionToCategory(categoryId, processDefinitionId, categoryService,
                     processDefinitionService);
             transactionContent.execute();
@@ -1923,8 +1923,8 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void addProcessDefinitionsToCategory(final long categoryId, final List<Long> processDefinitionIds) throws AlreadyExistsException, CreationException {
         try {
-            final CategoryService categoryService = APIUtils.getTenantAccessor().getCategoryService();
-            final ProcessDefinitionService processDefinitionService = APIUtils.getTenantAccessor().getProcessDefinitionService();
+            final CategoryService categoryService = getTenantAccessor().getCategoryService();
+            final ProcessDefinitionService processDefinitionService = getTenantAccessor().getProcessDefinitionService();
             for (final Long processDefinitionId : processDefinitionIds) {
                 new AddProcessDefinitionToCategory(categoryId, processDefinitionId, categoryService, processDefinitionService).execute();
             }
@@ -1942,7 +1942,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public long getNumberOfCategories(final long processDefinitionId) {
         try {
-            final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+            final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
             final CategoryService categoryService = tenantAccessor.getCategoryService();
             final GetNumberOfCategoriesOfProcess getNumberOfCategoriesOfProcess = new GetNumberOfCategoriesOfProcess(categoryService, processDefinitionId);
@@ -1956,7 +1956,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public long getNumberOfProcessDefinitionsOfCategory(final long categoryId) {
         try {
-            final CategoryService categoryService = APIUtils.getTenantAccessor().getCategoryService();
+            final CategoryService categoryService = getTenantAccessor().getCategoryService();
             return categoryService.getNumberOfProcessDeploymentInfosOfCategory(categoryId);
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
@@ -1969,7 +1969,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         if (sortCriterion == null) {
             throw new IllegalArgumentException("You must to have a criterion to sort your result.");
         }
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final OrderByType order = buildOrderByType(sortCriterion.getOrder());
         final String field = sortCriterion.getField();
@@ -1986,7 +1986,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<Category> getCategoriesOfProcessDefinition(final long processDefinitionId, final int startIndex, final int maxResults,
             final CategoryCriterion sortingCriterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         try {
@@ -2004,7 +2004,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<Category> getCategoriesUnrelatedToProcessDefinition(final long processDefinitionId, final int startIndex, final int maxResults,
             final CategoryCriterion sortingCriterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         try {
@@ -2020,7 +2020,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         if (updater == null || updater.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
 
         try {
@@ -2053,7 +2053,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         if (categoryId <= 0) {
             throw new DeletionException("Category id can not be less than 0!");
         }
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
 
         final DeleteSCategory deleteSCategory = new DeleteSCategory(categoryService, categoryId);
@@ -2066,7 +2066,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getNumberOfUncategorizedProcessDefinitions() {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
@@ -2087,7 +2087,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<ProcessDeploymentInfo> getUncategorizedProcessDeploymentInfos(final int startIndex, final int maxResults,
             final ProcessDeploymentInfoCriterion sortCriterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         try {
             final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults, SProcessDefinitionDeployInfo.class, sortCriterion.getField(),
@@ -2103,7 +2103,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public long getNumberOfProcessDeploymentInfosUnrelatedToCategory(final long categoryId) {
         try {
-            final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+            final TenantServiceAccessor tenantAccessor = getTenantAccessor();
             final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
             final GetNumberOfProcessDeploymentInfosUnrelatedToCategory transactionContentWithResult = new GetNumberOfProcessDeploymentInfosUnrelatedToCategory(
@@ -2118,7 +2118,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<ProcessDeploymentInfo> getProcessDeploymentInfosUnrelatedToCategory(final long categoryId, final int startIndex, final int maxResults,
             final ProcessDeploymentInfoCriterion sortingCriterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
         try {
@@ -2132,7 +2132,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Deprecated
     @Override
     public void removeAllCategoriesFromProcessDefinition(final long processDefinitionId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         final TransactionContent transactionContent = new RemoveProcessDefinitionsOfCategory(processDefinitionId, categoryService);
         try {
@@ -2145,7 +2145,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Deprecated
     @Override
     public void removeAllProcessDefinitionsFromCategory(final long categoryId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
 
         final RemoveProcessDefinitionsOfCategory remove = new RemoveProcessDefinitionsOfCategory(categoryService, categoryId);
@@ -2158,7 +2158,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long removeCategoriesFromProcessDefinition(final long processDefinitionId, final int startIndex, final int maxResults) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         final SProcessCategoryMappingBuilderFactory fact = BuilderFactory.get(SProcessCategoryMappingBuilderFactory.class);
 
@@ -2176,7 +2176,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long removeProcessDefinitionsFromCategory(final long categoryId, final int startIndex, final int maxResults) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
         final SProcessCategoryMappingBuilderFactory fact = BuilderFactory.get(SProcessCategoryMappingBuilderFactory.class);
 
@@ -2194,7 +2194,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<EventInstance> getEventInstances(final long rootContainerId, final int startIndex, final int maxResults, final EventCriterion criterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
@@ -2212,7 +2212,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void assignUserTask(final long userTaskId, final long userId) throws UpdateException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final SCommentService scommentService = tenantAccessor.getCommentService();
@@ -2232,7 +2232,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void updateActorsOfUserTask(final long userTaskId) throws UpdateException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         try {
             final SHumanTaskInstance humanTaskInstance = getSHumanTaskInstance(userTaskId);
@@ -2270,7 +2270,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void createPendingMappingsAndAssignHumanTask(final long humanTaskInstanceId, final FilterResult result) throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final List<Long> userIds = result.getResult();
         for (final Long userId : userIds) {
             createPendingMappingForUser(humanTaskInstanceId, userId);
@@ -2282,7 +2282,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private FilterResult executeFilter(final long processDefinitionId, final long humanTaskInstanceId, final String actorName,
             final SUserFilterDefinition sUserFilterDefinition) throws SUserFilterExecutionException, SClassLoaderException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final UserFilterService userFilterService = tenantAccessor.getUserFilterService();
         final ClassLoader processClassloader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
@@ -2294,7 +2294,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private void cleanPendingMappingsAndUnassignHumanTask(final long userTaskId, final SHumanTaskInstance humanTaskInstance) throws SFlowNodeNotFoundException,
     SFlowNodeReadException, SActivityModificationException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         // release
         if (humanTaskInstance.getAssigneeId() > 0) {
@@ -2304,7 +2304,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private SHumanTaskInstance getSHumanTaskInstance(final long userTaskId) throws SFlowNodeNotFoundException, SFlowNodeReadException, UpdateException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SFlowNodeInstance flowNodeInstance = tenantAccessor.getActivityInstanceService().getFlowNodeInstance(userTaskId);
         if (!(flowNodeInstance instanceof SHumanTaskInstance)) {
             throw new UpdateException("The identifier does not refer to a human task");
@@ -2313,7 +2313,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private void createPendingMappingForUser(final long humanTaskInstanceId, final Long userId) throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final SPendingActivityMappingBuilderFactory sPendingActivityMappingBuilderFactory = BuilderFactory.get(SPendingActivityMappingBuilderFactory.class);
         final SPendingActivityMapping mapping = sPendingActivityMappingBuilderFactory.createNewInstanceForUser(humanTaskInstanceId, userId)
@@ -2327,7 +2327,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         List<DataDefinition> subDataDefinitionList = Collections.emptyList();
         List<SDataDefinition> sdataDefinitionList = Collections.emptyList();
         final TenantServiceAccessor tenantAccessor;
-        tenantAccessor = APIUtils.getTenantAccessor();
+        tenantAccessor = getTenantAccessor();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(processDefinitionId, processDefinitionService);
@@ -2368,7 +2368,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             throws ProcessDefinitionNotFoundException {
         List<DataDefinition> subDataDefinitionList = Collections.emptyList();
         final TenantServiceAccessor tenantAccessor;
-        tenantAccessor = APIUtils.getTenantAccessor();
+        tenantAccessor = getTenantAccessor();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(processDefinitionId, processDefinitionService);
@@ -2396,7 +2396,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public HumanTaskInstance getHumanTaskInstance(final long activityInstanceId) throws ActivityInstanceNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
@@ -2413,7 +2413,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getNumberOfAssignedHumanTaskInstances(final long userId) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
 
         try {
@@ -2427,7 +2427,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Map<Long, Long> getNumberOfOpenTasks(final List<Long> userIds) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
 
         try {
@@ -2441,7 +2441,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getNumberOfPendingHumanTaskInstances(final long userId) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
 
@@ -2462,7 +2462,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         String processesFolder;
         TenantServiceAccessor tenantAccessor;
         try {
-            tenantAccessor = APIUtils.getTenantAccessor();
+            tenantAccessor = getTenantAccessor();
             processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
         } catch (final BonitaHomeNotSetException e) {
             throw new RetrieveException("Problem accessing basic Bonita Home server resources", e);
@@ -2487,7 +2487,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getLatestProcessDefinitionId(final String processName) throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
         final TransactionContentWithResult<Long> transactionContent = new GetLatestProcessDefinitionId(processDefinitionService, processName);
@@ -2501,7 +2501,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<DataInstance> getProcessDataInstances(final long processInstanceId, final int startIndex, final int maxResults) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
@@ -2523,7 +2523,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public DataInstance getProcessDataInstance(final String dataName, final long processInstanceId) throws DataNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
@@ -2550,7 +2550,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void updateProcessDataInstances(final long processInstanceId, final Map<String, Serializable> dataNameValues) throws UpdateException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -2589,7 +2589,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<DataInstance> getActivityDataInstances(final long activityInstanceId, final int startIndex, final int maxResults) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
@@ -2612,7 +2612,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public DataInstance getActivityDataInstance(final String dataName, final long activityInstanceId) throws DataNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
@@ -2636,7 +2636,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void updateActivityDataInstance(final String dataName, final long activityInstanceId, final Serializable dataValue) throws UpdateException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
@@ -2667,7 +2667,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public DataInstance getActivityTransientDataInstance(final String dataName, final long activityInstanceId) throws DataNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final TransientDataService transientDataService = tenantAccessor.getTransientDataService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
@@ -2698,7 +2698,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<DataInstance> getActivityTransientDataInstances(final long activityInstanceId, final int startIndex, final int maxResults) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final TransientDataService transientDataService = tenantAccessor.getTransientDataService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
@@ -2728,7 +2728,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void updateActivityTransientDataInstance(final String dataName, final long activityInstanceId, final Serializable dataValue) throws UpdateException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final TransientDataService transientDataService = tenantAccessor.getTransientDataService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
@@ -2762,7 +2762,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void importActorMapping(final long processDefinitionId, final String xmlContent) throws ActorMappingImportException {
         if (xmlContent != null) {
-            final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+            final TenantServiceAccessor tenantAccessor = getTenantAccessor();
             final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
             final IdentityService identityService = tenantAccessor.getIdentityService();
             final Parser parser = tenantAccessor.getActorMappingParser();
@@ -2777,7 +2777,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public String exportActorMapping(final long processDefinitionId) throws ActorMappingExportException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final XMLWriter writer = tenantAccessor.getXMLWriter();
@@ -2792,7 +2792,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public boolean isInvolvedInProcessInstance(final long userId, final long processInstanceId) throws ProcessInstanceNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
             final List<OrderByOption> orderByOptions = Arrays.asList(new OrderByOption(SHumanTaskInstance.class, "id", OrderByType.ASC));
@@ -2825,7 +2825,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private void checkIfProcessInstanceExistsWhenNoHumanTask(final long processInstanceId) throws SBonitaSearchException, SProcessInstanceReadException,
     ProcessInstanceNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
 
         final List<FilterOption> filterOptions = Arrays.asList(new FilterOption(SHumanTaskInstance.class, "logicalGroup4", processInstanceId));
@@ -2841,7 +2841,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private boolean checkIfUserIsActorMemberOrManagerOfActorMember(final long userId, final long actorId) throws SBonitaReadException, SUserNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
         return actorMappingService.isUserInActorMemberOrManagerOfAUserInActorMember(userId, actorId);
@@ -2849,7 +2849,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getProcessInstanceIdFromActivityInstanceId(final long activityInstanceId) throws ProcessInstanceNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             final SActivityInstance sActivityInstance = getSActivityInstance(activityInstanceId);
             return sActivityInstance.getRootContainerId();
@@ -2861,7 +2861,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getProcessDefinitionIdFromActivityInstanceId(final long activityInstanceId) throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         try {
             final SActivityInstance sActivityInstance = getSActivityInstance(activityInstanceId);
@@ -2873,7 +2873,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getProcessDefinitionIdFromProcessInstanceId(final long processInstanceId) throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         try {
             final SProcessInstance sProcessInstance = getSProcessInstance(processInstanceId);
@@ -2888,7 +2888,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Date getActivityReachedStateDate(final long activityInstanceId, final String stateName) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
 
         final int stateId = ModelConvertor.getServerActivityStateId(stateName);
@@ -2904,14 +2904,14 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Set<String> getSupportedStates(final FlowNodeType nodeType) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         return flowNodeStateManager.getSupportedState(nodeType);
     }
 
     @Override
     public void updateActivityInstanceVariables(final long activityInstanceId, final Map<String, Serializable> variables) throws UpdateException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
@@ -2939,7 +2939,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void updateActivityInstanceVariables(final List<Operation> operations, final long activityInstanceId,
             final Map<String, Serializable> expressionContexts) throws UpdateException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final OperationService operationService = tenantAccessor.getOperationService();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
@@ -3045,7 +3045,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public String getActivityInstanceState(final long activityInstanceId) throws ActivityInstanceNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         try {
             final SActivityInstance sActivityInstance = getSActivityInstance(activityInstanceId);
@@ -3065,7 +3065,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getProcessDefinitionId(final String name, final String version) throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
         final TransactionContentWithResult<Long> transactionContent = new GetProcessDefinitionIDByNameAndVersion(processDefinitionService, name, version);
@@ -3080,7 +3080,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void releaseUserTask(final long userTaskId) throws ActivityInstanceNotFoundException, UpdateException {
         final TenantServiceAccessor tenantAccessor;
-        tenantAccessor = APIUtils.getTenantAccessor();
+        tenantAccessor = getTenantAccessor();
 
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
@@ -3103,7 +3103,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         if (processDeploymentInfoUpdater == null || processDeploymentInfoUpdater.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
@@ -3121,7 +3121,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<ProcessDeploymentInfo> getStartableProcessDeploymentInfosForActors(final Set<Long> actorIds, final int startIndex, final int maxResults,
             final ProcessDeploymentInfoCriterion sortingCriterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -3194,7 +3194,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public boolean isAllowedToStartProcess(final long processDefinitionId, final Set<Long> actorIds) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
 
         final GetActorsByActorIds getActorsByActorIds = new GetActorsByActorIds(actorMappingService, new ArrayList<Long>(actorIds));
@@ -3217,7 +3217,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ActorInstance getActorInitiator(final long processDefinitionId) throws ActorNotFoundException, ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
@@ -3244,7 +3244,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public int getNumberOfActivityDataDefinitions(final long processDefinitionId, final String activityName) throws ProcessDefinitionNotFoundException,
     ActivityDefinitionNotFoundException {
         List<SDataDefinition> sdataDefinitionList = Collections.emptyList();
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final GetProcessDefinition getProcessDefinition = new GetProcessDefinition(processDefinitionId, processDefinitionService);
@@ -3277,7 +3277,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public int getNumberOfProcessDataDefinitions(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
@@ -3310,7 +3310,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     protected List<Operation> createSetDataOperation(final long processDefinitionId, final Map<String, Serializable> initialVariables)
             throws ProcessExecutionException {
-        final ClassLoaderService classLoaderService = APIUtils.getTenantAccessor().getClassLoaderService();
+        final ClassLoaderService classLoaderService = getTenantAccessor().getClassLoaderService();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         final List<Operation> operations = new ArrayList<Operation>();
         try {
@@ -3362,7 +3362,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private long getNumberOfDataInstancesOfContainer(final long instanceId, final DataInstanceContainer containerType) throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         return dataInstanceService.getNumberOfDataInstances(instanceId, containerType);
     }
@@ -3449,7 +3449,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final Map<String, Map<String, Serializable>> inputValues, final List<Operation> operations, final Map<String, Serializable> operationInputValues,
             final long processDefinitionId) throws ConnectorExecutionException {
         checkConnectorParameters(connectorInputParameters, inputValues);
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
@@ -3500,7 +3500,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void setActivityStateById(final long activityInstanceId, final int stateId) throws UpdateException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final FlowNodeExecutor flowNodeExecutor = tenantAccessor.getFlowNodeExecutor();
         final StateBehaviors stateBehaviors = new StateBehaviors(tenantAccessor.getBPMInstancesCreator(), tenantAccessor.getEventsHandler(),
                 tenantAccessor.getActivityInstanceService(), tenantAccessor.getUserFilterService(), tenantAccessor.getClassLoaderService(),
@@ -3524,7 +3524,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void setTaskPriority(final long humanTaskInstanceId, final TaskPriority priority) throws UpdateException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
 
         try {
@@ -3538,7 +3538,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     @Deprecated
     public void deleteProcessInstances(final long processDefinitionId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             deleteProcessInstancesFromProcessDefinition(processDefinitionId, tenantAccessor);
             new DeleteArchivedProcessInstances(tenantAccessor, processDefinitionId).execute();
@@ -3572,7 +3572,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     @CustomTransactions
     public long deleteProcessInstances(final long processDefinitionId, final int startIndex, final int maxResults) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final UserTransactionService userTxService = tenantAccessor.getUserTransactionService();
         try {
@@ -3627,7 +3627,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long deleteArchivedProcessInstances(final long processDefinitionId, final int startIndex, final int maxResults) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
 
         try {
@@ -3669,7 +3669,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     @CustomTransactions
     public void deleteProcessInstance(final long processInstanceId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final LockService lockService = tenantAccessor.getLockService();
         final String objectType = SFlowElementsContainerType.PROCESS.name();
         try {
@@ -3694,7 +3694,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         searchOptionsBuilder.differentFrom(ProcessInstanceSearchDescriptor.STATE_ID, ProcessInstanceState.COMPLETED.getId());
         searchOptionsBuilder.filter(ProcessInstanceSearchDescriptor.CALLER_ID, -1);
         try {
-            return searchProcessInstances(APIUtils.getTenantAccessor(), searchOptionsBuilder.done());
+            return searchProcessInstances(getTenantAccessor(), searchOptionsBuilder.done());
         } catch (final SSearchException e) {
             throw new SearchException(e);
         }
@@ -3703,7 +3703,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ProcessInstance> searchProcessInstances(final SearchOptions searchOptions) throws SearchException {
         try {
-            return searchProcessInstances(APIUtils.getTenantAccessor(), searchOptions);
+            return searchProcessInstances(getTenantAccessor(), searchOptions);
         } catch (final SSearchException e) {
             throw new SearchException(e);
         }
@@ -3711,7 +3711,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<ProcessInstance> searchOpenProcessInstancesSupervisedBy(final long userId, final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final IdentityService identityService = tenantAccessor.getIdentityService();
         final GetSUser getUser = new GetSUser(identityService, userId);
@@ -3736,7 +3736,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosStartedBy(final long userId, final SearchOptions searchOptions)
             throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -3753,7 +3753,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfos(final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -3770,7 +3770,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosCanBeStartedBy(final long userId, final SearchOptions searchOptions)
             throws RetrieveException, SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final SearchProcessDefinitionsDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchProcessDefinitionsDescriptor();
@@ -3794,7 +3794,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(final long managerUserId,
             final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor serviceAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
         final SearchProcessDefinitionsDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchProcessDefinitionsDescriptor();
@@ -3818,7 +3818,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksFor(final long userId,
             final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor serviceAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
         final SearchProcessDefinitionsDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchProcessDefinitionsDescriptor();
@@ -3835,7 +3835,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedBy(final long supervisorId,
             final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor serviceAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
         final SearchProcessDefinitionsDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchProcessDefinitionsDescriptor();
@@ -3852,7 +3852,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(final SearchOptions searchOptions)
             throws SearchException {
-        final TenantServiceAccessor serviceAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
         final SearchProcessDefinitionsDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchProcessDefinitionsDescriptor();
@@ -3869,7 +3869,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosSupervisedBy(final long userId, final SearchOptions searchOptions)
             throws SearchException {
-        final TenantServiceAccessor serviceAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = serviceAccessor.getProcessDefinitionService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
         final SearchProcessDefinitionsDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchProcessDefinitionsDescriptor();
@@ -3885,7 +3885,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<HumanTaskInstance> searchAssignedTasksSupervisedBy(final long supervisorId, final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor serviceAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final FlowNodeStateManager flowNodeStateManager = serviceAccessor.getFlowNodeStateManager();
         final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
@@ -3902,7 +3902,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ArchivedHumanTaskInstance> searchArchivedHumanTasksSupervisedBy(final long supervisorId, final SearchOptions searchOptions)
             throws SearchException {
-        final TenantServiceAccessor serviceAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final FlowNodeStateManager flowNodeStateManager = serviceAccessor.getFlowNodeStateManager();
         final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = serviceAccessor.getSearchEntitiesDescriptor();
@@ -3919,7 +3919,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<ProcessSupervisor> searchProcessSupervisors(final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor serviceAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
         final SearchProcessSupervisorDescriptor searchDescriptor = new SearchProcessSupervisorDescriptor();
         final SearchSupervisors searchSupervisorsTransaction = new SearchSupervisors(supervisorService, searchDescriptor, searchOptions);
@@ -3933,7 +3933,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public boolean isUserProcessSupervisor(final long processDefinitionId, final long userId) {
-        final TenantServiceAccessor serviceAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
         try {
             return supervisorService.isProcessSupervisor(processDefinitionId, userId);
@@ -3944,7 +3944,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void deleteSupervisor(final long supervisorId) throws DeletionException {
-        final TenantServiceAccessor serviceAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
         final TechnicalLoggerService technicalLoggerService = serviceAccessor.getTechnicalLoggerService();
         try {
@@ -3961,7 +3961,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void deleteSupervisor(final Long processDefinitionId, final Long userId, final Long roleId, final Long groupId) throws DeletionException {
-        final TenantServiceAccessor serviceAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
         final TechnicalLoggerService technicalLoggerService = serviceAccessor.getTechnicalLoggerService();
 
@@ -4020,7 +4020,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private ProcessSupervisor createSupervisor(final SProcessSupervisor sProcessSupervisor) throws CreationException, AlreadyExistsException {
-        final TenantServiceAccessor tenantServiceAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantServiceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = tenantServiceAccessor.getSupervisorService();
         final TechnicalLoggerService technicalLoggerService = tenantServiceAccessor.getTechnicalLoggerService();
 
@@ -4055,7 +4055,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     protected List<SProcessSupervisor> searchSProcessSupervisors(final Long processDefinitionId, final Long userId, final Long groupId, final Long roleId)
             throws SBonitaSearchException {
-        final TenantServiceAccessor serviceAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
         final SProcessSupervisorBuilderFactory sProcessSupervisorBuilderFactory = BuilderFactory.get(SProcessSupervisorBuilderFactory.class);
 
@@ -4084,7 +4084,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfosCanBeStartedBy(final long userId, final SearchOptions searchOptions)
             throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -4102,7 +4102,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ArchivedHumanTaskInstance> searchArchivedHumanTasksManagedBy(final long managerUserId, final SearchOptions searchOptions)
             throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
@@ -4118,7 +4118,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<ProcessInstance> searchOpenProcessInstancesInvolvingUser(final long userId, final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
@@ -4136,7 +4136,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ProcessInstance> searchOpenProcessInstancesInvolvingUsersManagedBy(final long managerUserId, final SearchOptions searchOptions)
             throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
@@ -4153,7 +4153,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<ArchivedHumanTaskInstance> searchArchivedHumanTasks(final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
@@ -4170,7 +4170,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<HumanTaskInstance> searchAssignedTasksManagedBy(final long managerUserId, final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -4188,7 +4188,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ArchivedProcessInstance> searchArchivedProcessInstancesSupervisedBy(final long userId, final SearchOptions searchOptions)
             throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
@@ -4205,7 +4205,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ArchivedProcessInstance> searchArchivedProcessInstancesInvolvingUser(final long userId, final SearchOptions searchOptions)
             throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
@@ -4231,7 +4231,7 @@ public class ProcessAPIImpl implements ProcessAPI {
      */
     private SearchResult<HumanTaskInstance> searchTasksForUser(final long userId, final SearchOptions searchOptions, final boolean orAssignedToUser)
             throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
@@ -4252,7 +4252,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<HumanTaskInstance> searchPendingTasksSupervisedBy(final long userId, final SearchOptions searchOptions) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
@@ -4269,7 +4269,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<Comment> searchComments(final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SCommentService commentService = tenantAccessor.getCommentService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
@@ -4295,7 +4295,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     @Deprecated
     public Comment addComment(final long processInstanceId, final String comment) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         try {
             tenantAccessor.getProcessInstanceService().getProcessInstance(processInstanceId);
         } catch (final SProcessInstanceReadException e) {
@@ -4317,7 +4317,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Deprecated
     @Override
     public List<Comment> getComments(final long processInstanceId) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SCommentService commentService = tenantAccessor.getCommentService();
         try {
             final List<SComment> sComments = commentService.getComments(processInstanceId);
@@ -4415,7 +4415,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<HumanTaskInstance> searchPendingTasksManagedBy(final long managerUserId, final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -4432,7 +4432,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Map<Long, Long> getNumberOfOverdueOpenTasks(final List<Long> userIds) throws RetrieveException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
 
         try {
@@ -4445,7 +4445,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfos(final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -4462,7 +4462,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<Comment> searchCommentsManagedBy(final long managerUserId, final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SCommentService commentService = tenantAccessor.getCommentService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
@@ -4478,7 +4478,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<Comment> searchCommentsInvolvingUser(final long userId, final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SCommentService commentService = tenantAccessor.getCommentService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
@@ -4495,7 +4495,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<Long> getChildrenInstanceIdsOfProcessInstance(final long processInstanceId, final int startIndex, final int maxResults,
             final ProcessInstanceCriterion criterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
 
         long totalNumber;
@@ -4515,7 +4515,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfosSupervisedBy(final long userId, final SearchOptions searchOptions)
             throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -4532,7 +4532,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromIds(final List<Long> processDefinitionIds) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
         try {
@@ -4551,7 +4551,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<ConnectorImplementationDescriptor> getConnectorImplementations(final long processDefinitionId, final int startIndex, final int maxsResults,
             final ConnectorCriterion sortingCriterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForConnectorImplementation(sortingCriterion);
@@ -4568,7 +4568,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long getNumberOfConnectorImplementations(final long processDefinitionId) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final GetNumberOfConnectorImplementations transactionContent = new GetNumberOfConnectorImplementations(connectorService, processDefinitionId,
@@ -4583,7 +4583,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<ActivityInstance> searchActivities(final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -4600,7 +4600,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<ArchivedFlowNodeInstance> searchArchivedFlowNodeInstances(final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -4617,7 +4617,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<FlowNodeInstance> searchFlowNodeInstances(final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -4634,7 +4634,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<ArchivedActivityInstance> searchArchivedActivities(final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -4652,7 +4652,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ConnectorImplementationDescriptor getConnectorImplementation(final long processDefinitionId, final String connectorId, final String connectorVersion)
             throws ConnectorNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
         final GetConnectorImplementation transactionContent = new GetConnectorImplementation(connectorService, processDefinitionId, connectorId,
@@ -4668,7 +4668,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void cancelProcessInstance(final long processInstanceId) throws ProcessInstanceNotFoundException, UpdateException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final LockService lockService = tenantAccessor.getLockService();
         final TransactionalProcessInstanceInterruptor processInstanceInterruptor = buildProcessInstanceInterruptor(tenantAccessor);
         // lock process execution
@@ -4676,7 +4676,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         BonitaLock lock = null;
         try {
             lock = lockService.lock(processInstanceId, objectType, tenantAccessor.getTenantId());
-            processInstanceInterruptor.interruptProcessInstance(processInstanceId, SStateCategory.CANCELLING, APIUtils.getUserId());
+            processInstanceInterruptor.interruptProcessInstance(processInstanceId, SStateCategory.CANCELLING, getUserId());
         } catch (final SProcessInstanceNotFoundException spinfe) {
             throw new ProcessInstanceNotFoundException(processInstanceId);
         } catch (final SBonitaException e) {
@@ -4702,7 +4702,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void setProcessInstanceState(final ProcessInstance processInstance, final String state) throws UpdateException {
         // NOW, is only available for COMPLETED, ABORTED, CANCELLED, STARTED
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         try {
@@ -4719,7 +4719,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromProcessInstanceIds(final List<Long> processInstanceIds) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
         try {
@@ -4733,7 +4733,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Map<Long, ProcessDeploymentInfo> getProcessDeploymentInfosFromArchivedProcessInstanceIds(final List<Long> archivedProcessInstantsIds) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
         try {
@@ -4771,7 +4771,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void retryTask(final long activityInstanceId) throws ActivityExecutionException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
         final FlowNodeExecutor flowNodeExecutor = tenantAccessor.getFlowNodeExecutor();
@@ -4793,7 +4793,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             flowNodeExecutor.setStateByStateId(processDefinitionId, activity.getId(), stateId);
             // execute the flow node only if it is not the final state
             if (!state.isTerminal()) {
-                final long userIdFromSession = APIUtils.getUserId();
+                final long userIdFromSession = getUserId();
                 // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
                 processExecutor.executeFlowNode(activityInstanceId, null, null, activity.getParentProcessInstanceId(), userIdFromSession, userIdFromSession);
             }
@@ -4815,7 +4815,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<ArchivedComment> searchArchivedComments(final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SCommentService sCommentService = tenantAccessor.getCommentService();
@@ -4831,7 +4831,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ArchivedComment getArchivedComment(final long archivedCommentId) throws RetrieveException, NotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SCommentService sCommentService = tenantAccessor.getCommentService();
         try {
@@ -4846,7 +4846,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Map<Long, ActorInstance> getActorsFromActorIds(final List<Long> actorIds) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final Map<Long, ActorInstance> res = new HashMap<Long, ActorInstance>();
         final ActorMappingService actormappingService = tenantAccessor.getActorMappingService();
@@ -4865,7 +4865,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<HumanTaskInstance> searchPendingHiddenTasks(final long userId, final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -4882,7 +4882,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void hideTasks(final long userId, final Long... activityInstanceId) throws UpdateException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TransactionContent hideTasksTx = new HideTasks(tenantAccessor.getActivityInstanceService(), userId, activityInstanceId);
         try {
             hideTasksTx.execute();
@@ -4893,7 +4893,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void unhideTasks(final long userId, final Long... activityInstanceId) throws UpdateException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final TransactionContent unhideTasksTx = new UnhideTasks(tenantAccessor.getActivityInstanceService(), userId, activityInstanceId);
         try {
@@ -4906,7 +4906,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public Serializable evaluateExpressionOnProcessDefinition(final Expression expression, final Map<String, Serializable> context,
             final long processDefinitionId) throws ExpressionEvaluationException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ExpressionResolverService expressionResolverService = tenantAccessor.getExpressionResolverService();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
@@ -4936,7 +4936,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         if (dueDate == null) {
             throw new UpdateException("Unable to update a due date to null");
         }
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
@@ -4951,7 +4951,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public boolean isTaskHidden(final long userTaskId, final long userId) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final IsTaskHidden hideTasksTx = new IsTaskHidden(tenantAccessor.getActivityInstanceService(), userId, userTaskId);
         try {
@@ -4981,7 +4981,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void sendSignal(final String signalName) throws SendEventException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         final SThrowSignalEventTriggerDefinition signalEventTriggerDefinition = BuilderFactory.get(SThrowSignalEventTriggerDefinitionBuilderFactory.class)
@@ -5005,7 +5005,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         if (correlations != null && correlations.size() > 5) {
             throw new SendEventException("Too many correlations: a message can not have more than 5 correlations.");
         }
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final EventsHandler eventsHandler = tenantAccessor.getEventsHandler();
         final ExpressionResolverService expressionResolverService = tenantAccessor.getExpressionResolverService();
@@ -5054,7 +5054,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<Problem> getProcessResolutionProblems(final long processDefinitionId) throws ProcessDefinitionNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
         final List<ProcessDependencyResolver> resolvers = tenantAccessor.getDependencyResolver().getResolvers();
@@ -5079,7 +5079,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<ProcessDeploymentInfo> getProcessDeploymentInfos(final int startIndex, final int maxResults,
             final ProcessDeploymentInfoCriterion pagingCriterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
         final SearchProcessDefinitionsDescriptor processDefinitionsDescriptor = tenantAccessor.getSearchEntitiesDescriptor()
@@ -5097,7 +5097,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<ProcessDeploymentInfo> getProcessDeploymentInfosWithActorOnlyForGroup(final long groupId, final int startIndex, final int maxResults,
             final ProcessDeploymentInfoCriterion sortingCriterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
         final SearchProcessDefinitionsDescriptor processDefinitionsDescriptor = tenantAccessor.getSearchEntitiesDescriptor()
@@ -5115,7 +5115,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<ProcessDeploymentInfo> getProcessDeploymentInfosWithActorOnlyForGroups(final List<Long> groupIds, final int startIndex, final int maxResults,
             final ProcessDeploymentInfoCriterion sortingCriterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
         final SearchProcessDefinitionsDescriptor processDefinitionsDescriptor = tenantAccessor.getSearchEntitiesDescriptor()
@@ -5133,7 +5133,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<ProcessDeploymentInfo> getProcessDeploymentInfosWithActorOnlyForRole(final long roleId, final int startIndex, final int maxResults,
             final ProcessDeploymentInfoCriterion sortingCriterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
         final SearchProcessDefinitionsDescriptor processDefinitionsDescriptor = tenantAccessor.getSearchEntitiesDescriptor()
@@ -5152,7 +5152,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<ProcessDeploymentInfo> getProcessDeploymentInfosWithActorOnlyForRoles(final List<Long> roleIds, final int startIndex, final int maxResults,
             final ProcessDeploymentInfoCriterion sortingCriterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
         final SearchProcessDefinitionsDescriptor processDefinitionsDescriptor = tenantAccessor.getSearchEntitiesDescriptor()
@@ -5170,7 +5170,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<ProcessDeploymentInfo> getProcessDeploymentInfosWithActorOnlyForUser(final long userId, final int startIndex, final int maxResults,
             final ProcessDeploymentInfoCriterion sortingCriterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final SearchProcessDefinitionsDescriptor processDefinitionsDescriptor = tenantAccessor.getSearchEntitiesDescriptor()
@@ -5188,7 +5188,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<ProcessDeploymentInfo> getProcessDeploymentInfosWithActorOnlyForUsers(final List<Long> userIds, final int startIndex, final int maxResults,
             final ProcessDeploymentInfoCriterion sortingCriterion) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final SearchProcessDefinitionsDescriptor processDefinitionsDescriptor = tenantAccessor.getSearchEntitiesDescriptor()
@@ -5205,7 +5205,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<ConnectorInstance> searchConnectorInstances(final SearchOptions searchOptions) throws RetrieveException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
@@ -5221,7 +5221,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<ArchivedConnectorInstance> searchArchivedConnectorInstances(final SearchOptions searchOptions) throws RetrieveException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
@@ -5276,7 +5276,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<User> searchUsersWhoCanStartProcessDefinition(final long processDefinitionId, final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
@@ -5294,7 +5294,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> evaluateExpressionsAtProcessInstanciation(final long processInstanceId,
             final Map<Expression, Map<String, Serializable>> expressions) throws ExpressionEvaluationException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         try {
             try {
@@ -5409,7 +5409,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private Map<String, Serializable> evaluateExpressionsDefinitionLevel(final Map<Expression, Map<String, Serializable>> expressionsAndTheirPartialContext,
             final long processDefinitionId) throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ExpressionResolverService expressionResolverService = tenantAccessor.getExpressionResolverService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final EvaluateExpressionsDefinitionLevel evaluations = createDefinitionLevelExpressionEvaluator(expressionsAndTheirPartialContext, processDefinitionId, expressionResolverService, processDefinitionService);
@@ -5426,7 +5426,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private Map<String, Serializable> evaluateExpressionsInstanceLevel(final Map<Expression, Map<String, Serializable>> expressions, final long containerId,
             final String containerType, final long processDefinitionId) throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ExpressionResolverService expressionService = tenantAccessor.getExpressionResolverService();
 
         final EvaluateExpressionsInstanceLevel evaluations = createInstanceLevelExpressionEvaluator(expressions, containerId, containerType, processDefinitionId, expressionService);
@@ -5442,7 +5442,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private Map<String, Serializable> evaluateExpressionsInstanceLevelAndArchived(final Map<Expression, Map<String, Serializable>> expressions,
             final long containerId, final String containerType, final long processDefinitionId, final long time) throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ExpressionResolverService expressionService = tenantAccessor.getExpressionResolverService();
         final EvaluateExpressionsInstanceLevelAndArchived evaluations = createInstanceAndArchivedLevelExpressionEvaluator(expressions, containerId, containerType, processDefinitionId, time, expressionService);
         evaluations.execute();
@@ -5457,7 +5457,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private ArchivedProcessInstance getStartedArchivedProcessInstance(final long processInstanceId) throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
 
@@ -5478,7 +5478,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private ArchivedProcessInstance getLastArchivedProcessInstance(final long processInstanceId) throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final GetLastArchivedProcessInstance searchArchivedProcessInstances = new GetLastArchivedProcessInstance(processInstanceService, processInstanceId,
@@ -5490,7 +5490,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<FailedJob> getFailedJobs(final int startIndex, final int maxResults) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final JobService jobService = tenantAccessor.getJobService();
         try {
             final List<SFailedJob> failedJobs = jobService.getFailedJobs(startIndex, maxResults);
@@ -5507,7 +5507,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void replayFailedJob(final long jobDescriptorId, final Map<String, Serializable> parameters) throws ExecutionException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SchedulerService schedulerService = tenantAccessor.getSchedulerService();
         try {
             if (parameters == null || parameters.isEmpty()) {
@@ -5539,7 +5539,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ArchivedDataInstance getArchivedProcessDataInstance(final String dataName, final long processInstanceId) throws ArchivedDataNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         try {
             final SADataInstance dataInstance = dataInstanceService.getLastSADataInstance(dataName, processInstanceId,
@@ -5552,7 +5552,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ArchivedDataInstance getArchivedActivityDataInstance(final String dataName, final long activityInstanceId) throws ArchivedDataNotFoundException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         try {
             final SADataInstance dataInstance = dataInstanceService.getLastSADataInstance(dataName, activityInstanceId,
@@ -5565,7 +5565,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<ArchivedDataInstance> getArchivedProcessDataInstances(final long processInstanceId, final int startIndex, final int maxResults) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         try {
             final List<SADataInstance> dataInstances = dataInstanceService.getLastLocalSADataInstances(processInstanceId,
@@ -5578,7 +5578,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<ArchivedDataInstance> getArchivedActivityDataInstances(final long activityInstanceId, final int startIndex, final int maxResults) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         try {
             final List<SADataInstance> dataInstances = dataInstanceService.getLastLocalSADataInstances(activityInstanceId,
@@ -5591,12 +5591,12 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<User> getPossibleUsersOfPendingHumanTask(final long humanTaskInstanceId, final int startIndex, final int maxResults) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
             // pagination of this method is based on order by username:
             final List<Long> userIds = activityInstanceService.getPossibleUserIdsOfPendingTasks(humanTaskInstanceId, startIndex, maxResults);
-            final IdentityService identityService = APIUtils.getTenantAccessor().getIdentityService();
+            final IdentityService identityService = getTenantAccessor().getIdentityService();
             // This method below is also ordered by username, so the order is preserved:
             final List<SUser> sUsers = identityService.getUsers(userIds);
             return ModelConvertor.toUsers(sUsers);
@@ -5607,7 +5607,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public List<User> getPossibleUsersOfHumanTask(final long processDefinitionId, final String humanTaskName, final int startIndex, final int maxResults) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         try {
             final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
@@ -5637,7 +5637,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public List<Long> getUserIdsForActor(final long processDefinitionId, final String actorName, final int startIndex, final int maxResults) {
         try {
-            return getUserIdsForActor(APIUtils.getTenantAccessor(), processDefinitionId, actorName, startIndex, maxResults);
+            return getUserIdsForActor(getTenantAccessor(), processDefinitionId, actorName, startIndex, maxResults);
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
@@ -5645,7 +5645,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public SearchResult<User> searchUsersWhoCanExecutePendingHumanTask(final long humanTaskInstanceId, final SearchOptions searchOptions) {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final SearchUserDescriptor searchDescriptor = searchEntitiesDescriptor.getSearchUserDescriptor();
@@ -5662,7 +5662,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<HumanTaskInstance> searchAssignedAndPendingHumanTasksFor(final long rootProcessDefinitionId, final long userId,
             final SearchOptions searchOptions) throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
@@ -5680,7 +5680,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<HumanTaskInstance> searchAssignedAndPendingHumanTasks(final long rootProcessDefinitionId, final SearchOptions searchOptions)
             throws SearchException {
-        final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
@@ -5712,11 +5712,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     TenantServiceAccessor getTenantAccessor() {
-        return APIUtils.getTenantAccessor();
+        return getTenantAccessor();
     }
 
     long getUserId(){
-        return APIUtils.getUserId();
+        return getUserId();
     }
 
 }
