@@ -677,9 +677,9 @@ public class ModelConvertor {
         aFlowNode.setParentContainerId(saFlowNode.getParentContainerId());
         aFlowNode.setRootContainerId(saFlowNode.getRootContainerId());
         aFlowNode.setSourceObjectId(saFlowNode.getSourceObjectId());
-        aFlowNode.setProcessDefinitionId(saFlowNode.getLogicalGroup(0));
-        aFlowNode.setProcessInstanceId(saFlowNode.getLogicalGroup(1));
-        aFlowNode.setParentActivityInstanceId(saFlowNode.getLogicalGroup(2));
+        aFlowNode.setProcessDefinitionId(saFlowNode.getProcessDefinitionId());
+        aFlowNode.setProcessInstanceId(saFlowNode.getParentProcessInstanceId());
+        aFlowNode.setParentActivityInstanceId(saFlowNode.getParentActivityInstanceId());
         aFlowNode.setDescription(saFlowNode.getDescription());
         aFlowNode.setDisplayName(saFlowNode.getDisplayName());
         aFlowNode.setDisplayDescription(saFlowNode.getDisplayDescription());
@@ -1649,7 +1649,7 @@ public class ModelConvertor {
                 .setRightOperand(ServerModelConvertor.convertExpression(operation.getRightOperand()))
                 .setLeftOperand(
                         BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(operation.getLeftOperand().getName())
-                                .setType(operation.getLeftOperand().getType()).done()).done();
+                        .setType(operation.getLeftOperand().getType()).done()).done();
     }
 
     public static List<SOperation> convertOperations(final List<Operation> operations) {
