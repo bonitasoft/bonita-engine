@@ -77,7 +77,7 @@ public class DocumentListReferenceExpressionExecutorStrategyTest {
     @Test
     public void should_getDocument_return_empty() throws Exception {
         //given
-        doReturn(Collections.emptyList()).when(documentService).getDocumentList("theList",45l);
+        doReturn(Collections.emptyList()).when(documentService).getDocumentList("theList",45l,0,100);
         initDefinition("theList");
 
         //when
@@ -90,7 +90,7 @@ public class DocumentListReferenceExpressionExecutorStrategyTest {
     @Test
     public void should_getDocument_return_null() throws Exception {
         //given
-        doReturn(Collections.emptyList()).when(documentService).getDocumentList("theList",45l);
+        doReturn(Collections.emptyList()).when(documentService).getDocumentList("theList",45l,0,100);
         initDefinition("notTheList");
 
         //when
@@ -103,7 +103,7 @@ public class DocumentListReferenceExpressionExecutorStrategyTest {
     public void should_getDocument_return_theList() throws Exception {
         //given
         List<SMappedDocument> toBeReturned = Collections.singletonList(mock(SMappedDocument.class));
-        doReturn(toBeReturned).when(documentService).getDocumentList("theList",45l);
+        doReturn(toBeReturned).when(documentService).getDocumentList("theList",45l,0,100);
 
         //when
         List<Document> theList = documentListReferenceExpressionExecutorStrategy.getDocument(45l, "theList");

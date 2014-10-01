@@ -14,6 +14,7 @@
  */
 package org.bonitasoft.engine.operation;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -38,6 +39,7 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
@@ -100,7 +102,7 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     private List<SMappedDocument> getExistingDocumentList(String documentName, long processInstanceId) throws SBonitaReadException, SObjectNotFoundException,
             SOperationExecutionException {
         List<SMappedDocument> currentList;
-        currentList = documentService.getDocumentList(documentName, processInstanceId);
+        currentList = getAllDocumentOfTheList(processInstanceId,documentName);
         // if it's not a list it throws an exception
         if (currentList.isEmpty() && !isListDefinedInDefinition(documentName, processInstanceId, processDefinitionService, processInstanceService)) {
 //            try {
@@ -113,6 +115,19 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
                     + ", nothing in database and nothing declared in the definition");
         }
         return currentList;
+    }
+
+
+    private List<SMappedDocument> getAllDocumentOfTheList(long processInstanceId, String name) throws SBonitaReadException {
+        QueryOptions queryOptions = new QueryOptions(0, 100);
+        List<SMappedDocument> mappedDocuments;
+        List<SMappedDocument> result = new ArrayList<SMappedDocument>();
+        do {
+            mappedDocuments = documentService.getDocumentList(name, processInstanceId, queryOptions.getFromIndex(), queryOptions.getNumberOfResults());
+            result.addAll(mappedDocuments);
+            queryOptions = QueryOptions.getNextPage(queryOptions);
+        } while (mappedDocuments.size() == 100);
+        return result;
     }
 
     private void removeOthersDocuments(List<SMappedDocument> currentList) throws SDocumentNotFoundException, SObjectModificationException {

@@ -389,10 +389,14 @@ public interface DocumentService {
      *      the name of the document list
      * @param processInstanceId
      * the id of the process instance that contains the list
+     * @param fromIndex
+     *      pagination parameter
+     * @param numberOfResult
+     *      pagination parameter
      * @return
      *      the list of document
      * @since 6.4.0
      */
-    List<SMappedDocument> getDocumentList(String documentName, long processInstanceId) throws SBonitaReadException;
+    List<SMappedDocument> getDocumentList(String documentName, long processInstanceId, int fromIndex, int numberOfResult) throws SBonitaReadException;
 
 }

@@ -485,12 +485,16 @@ public interface DocumentAPI {
      *        the id of the process instance that contains the list
      * @param name
      *        the name of the document list
+     * @param fromIndex
+     *        start from this number
+     * @param numberOfResult
+     *        the number of result to resturn
      * @return
      *         the document list
      * @throws DocumentNotFoundException
      * @since 6.4.0
      */
-    List<Document> getDocumentList(long processInstanceId, String name) throws DocumentNotFoundException;
+    List<Document> getDocumentList(long processInstanceId, String name, int fromIndex, int numberOfResult) throws DocumentNotFoundException;
 
     /**
      * Get a document list that have the specified name on the process

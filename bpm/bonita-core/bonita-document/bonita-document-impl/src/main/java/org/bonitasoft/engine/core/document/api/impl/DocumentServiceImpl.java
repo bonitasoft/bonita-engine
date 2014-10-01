@@ -127,19 +127,20 @@ public class DocumentServiceImpl implements DocumentService {
         }
     }
 
-    private SMappedDocument updateMappedDocument(SDocument document, String description, int index, SDocumentMapping sDocumentMapping) throws SRecorderException, SDocumentMappingException {
+    private SMappedDocument updateMappedDocument(SDocument document, String description, int index, SDocumentMapping sDocumentMapping)
+            throws SRecorderException, SDocumentMappingException {
         //insert new document
         insertDocument(document);
         //update mapping
         archive(sDocumentMapping, System.currentTimeMillis());
-        updateMapping(document.getId(), sDocumentMapping, description,index);
+        updateMapping(document.getId(), sDocumentMapping, description, index);
         return new SMappedDocumentImpl(sDocumentMapping, document);
     }
 
     @Override
     public void updateDocumentOfList(final SMappedDocument mappedDocument, final SDocument document, int index) throws SProcessDocumentCreationException {
         try {
-            updateMappedDocument(document,null,index,mappedDocument);
+            updateMappedDocument(document, null, index, mappedDocument);
         } catch (final SBonitaException e) {
             throw new SProcessDocumentCreationException(e.getMessage(), e);
         }
@@ -515,17 +516,9 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<SMappedDocument> getDocumentList(String documentName, long processInstanceId) throws SBonitaReadException {
-        List<SMappedDocument> mappedDocuments;
-        List<SMappedDocument> result = new ArrayList<SMappedDocument>();
-        QueryOptions queryOptions = new QueryOptions(0, 100);
-        do {
-            mappedDocuments = persistenceService.selectList(SelectDescriptorBuilder.getDocumentList(documentName, processInstanceId, queryOptions));
-            result.addAll(mappedDocuments);
-            queryOptions = QueryOptions.getNextPage(queryOptions);
-        } while (mappedDocuments.size() == 100);
-        return result;
+    public List<SMappedDocument> getDocumentList(String documentName, long processInstanceId, int fromIndex, int numberOfResult) throws SBonitaReadException {
+        return persistenceService.selectList(SelectDescriptorBuilder.getDocumentList(documentName, processInstanceId, new QueryOptions(fromIndex,
+                numberOfResult)));
     }
-
 
 }

@@ -1345,7 +1345,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         //we have a process with an initialized list and a non initialized list
 
         //check with api methods
-        List<Document> invoices1 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices");
+        List<Document> invoices1 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices",0,100);
         assertThat(invoices1).hasSize(4);
         Document urlDocument = invoices1.get(0);
         assertThat(urlDocument.getUrl()).isEqualTo("http://www.myrul.com/mydoc.txt");
@@ -1353,11 +1353,11 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertThat(fileDocument.hasContent()).isTrue();
         assertThat(fileDocument.getContentFileName()).isEqualTo("file.txt");
         assertThat(getProcessAPI().getDocumentContent(fileDocument.getContentStorageId())).isEqualTo("hello1".getBytes());
-        List<Document> emptyList = getProcessAPI().getDocumentList(processInstance.getId(), "emptyList");
+        List<Document> emptyList = getProcessAPI().getDocumentList(processInstance.getId(), "emptyList",0,100);
         assertThat(emptyList).isEmpty();
         try {
 
-            getProcessAPI().getDocumentList(processInstance.getId(), "unknown");
+            getProcessAPI().getDocumentList(processInstance.getId(), "unknown",0,100);
             fail("should not find document list unknown");
         } catch (DocumentNotFoundException e) {
             //ok
@@ -1372,7 +1372,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         HumanTaskInstance verifyStep = waitForUserTask("verifyStep");
 
         //check with api methods
-        invoices1 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices");
+        invoices1 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices",0,100);
         assertThat(invoices1).hasSize(3);
         Document movedFileDocument = invoices1.get(0);
         assertThat(movedFileDocument).isEqualTo(fileDocument);// was in index 2, now in index 1
@@ -1389,7 +1389,10 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertThat(updatedUrlFile.getVersion()).isEqualTo("2");
         assertThat(new String(getProcessAPI().getDocumentContent(updatedUrlFile.getContentStorageId()))).isEqualTo("updatedDocFromUrl");
 
-        emptyList = getProcessAPI().getDocumentList(processInstance.getId(), "emptyList");
+
+        assertThat(getProcessAPI().getDocumentList(processInstance.getId(), "invoices",1,1).get(0)).isEqualTo(newFileDocument);
+
+        emptyList = getProcessAPI().getDocumentList(processInstance.getId(), "emptyList",0,100);
         assertThat(emptyList).hasSize(1);
 
         newFileDocument = emptyList.get(0);
@@ -1404,7 +1407,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         //modify list with api method
         getProcessAPI().setDocumentList(processInstance.getId(),"invoices",Arrays.asList(new DocumentValue(updatedUrlFile.getId())) );
 
-        List<Document> invoices2 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices");
+        List<Document> invoices2 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices",0,100);
         assertThat(invoices2).hasSize(1);
         updatedUrlFile = invoices2.get(0);
         assertThat(updatedUrlFile.getId()).isEqualTo(urlDocument.getId());

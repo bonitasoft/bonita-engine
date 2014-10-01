@@ -80,7 +80,7 @@ public class DocumentServiceImplTest {
         List<SMappedDocumentImpl> documentList = Arrays.asList(new SMappedDocumentImpl(), new SMappedDocumentImpl());
         doReturn(documentList).when(persistenceService).selectList(any(SelectListDescriptor.class));
         //when
-        List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l);
+        List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l,0,100);
         //then
         assertThat(theList).isEqualTo(documentList);
     }
@@ -92,7 +92,7 @@ public class DocumentServiceImplTest {
         List<SMappedDocument> documentList2 = constructList(50);
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(documentList1, documentList2);
         //when
-        List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l);
+        List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l,0,100);
         //then
         documentList1.addAll(documentList2);
         assertThat(theList).isEqualTo(documentList1);
@@ -105,7 +105,7 @@ public class DocumentServiceImplTest {
         List<SMappedDocument> documentList2 = constructList(0);
         when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(documentList1, documentList2);
         //when
-        List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l);
+        List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l,0,100);
         //then
         assertThat(theList).isEqualTo(documentList1);
     }
@@ -123,7 +123,7 @@ public class DocumentServiceImplTest {
         //given
         doReturn(Collections.emptyList()).when(persistenceService).selectList(any(SelectListDescriptor.class));
         //when
-        List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l);
+        List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l,0,100);
         //then
         assertThat(theList).isEmpty();
     }

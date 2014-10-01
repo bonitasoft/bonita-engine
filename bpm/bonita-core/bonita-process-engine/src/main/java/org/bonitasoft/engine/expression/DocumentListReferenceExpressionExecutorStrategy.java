@@ -24,7 +24,6 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
-import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -36,6 +35,7 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.operation.DocumentListLeftOperandHandler;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
 
@@ -53,7 +53,8 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
     private ProcessDefinitionService processDefinitionService;
 
     public DocumentListReferenceExpressionExecutorStrategy(final DocumentService documentService,
-            final FlowNodeInstanceService flowNodeInstanceService, ProcessDefinitionService processDefinitionService, ProcessInstanceService processInstanceService) {
+            final FlowNodeInstanceService flowNodeInstanceService, ProcessDefinitionService processDefinitionService,
+            ProcessInstanceService processInstanceService) {
         this.documentService = documentService;
         this.flowNodeInstanceService = flowNodeInstanceService;
         this.processDefinitionService = processDefinitionService;
@@ -92,15 +93,28 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
     }
 
     List<Document> getDocument(final long processInstanceId, final String name) throws SBonitaReadException {
-        List<SMappedDocument> documentList = documentService.getDocumentList(name, processInstanceId);
+        List<SMappedDocument> documentList = getAllDocumentOfTheList(processInstanceId, name);
         try {
-            if (documentList.isEmpty() && !DocumentListLeftOperandHandler.isListDefinedInDefinition(name, processInstanceId, processDefinitionService, processInstanceService)) {
+            if (documentList.isEmpty()
+                    && !DocumentListLeftOperandHandler.isListDefinedInDefinition(name, processInstanceId, processDefinitionService, processInstanceService)) {
                 return null;
             }
         } catch (SObjectNotFoundException e) {
             return null;
         }
         return ModelConvertor.toDocuments(documentList, documentService);
+    }
+
+    private List<SMappedDocument> getAllDocumentOfTheList(long processInstanceId, String name) throws SBonitaReadException {
+        QueryOptions queryOptions = new QueryOptions(0, 100);
+        List<SMappedDocument> mappedDocuments;
+        List<SMappedDocument> result = new ArrayList<SMappedDocument>();
+        do {
+            mappedDocuments = documentService.getDocumentList(name, processInstanceId, queryOptions.getFromIndex(), queryOptions.getNumberOfResults());
+            result.addAll(mappedDocuments);
+            queryOptions = QueryOptions.getNextPage(queryOptions);
+        } while (mappedDocuments.size() == 100);
+        return result;
     }
 
     private long getProcessInstance(final Long containerId, final String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException,

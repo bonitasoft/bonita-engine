@@ -31,7 +31,6 @@ import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.exception.SDocumentException;
@@ -43,7 +42,6 @@ import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilder;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
-import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -63,7 +61,6 @@ import org.bonitasoft.engine.search.document.SearchDocuments;
 import org.bonitasoft.engine.search.document.SearchDocumentsSupervisedBy;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
 
 /**
  * @author Baptiste Mesta
@@ -409,13 +406,13 @@ public class DocumentAPIImpl implements DocumentAPI {
     }
 
     @Override
-    public List<Document> getDocumentList(long processInstanceId, String name) throws DocumentNotFoundException {
+    public List<Document> getDocumentList(long processInstanceId, String name, int fromIndex, int numberOfResult) throws DocumentNotFoundException {
         final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
         final DocumentService documentService = tenantAccessor.getDocumentService();
         ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         try {
-            List<SMappedDocument> documentList = documentService.getDocumentList(name, processInstanceId);
+            List<SMappedDocument> documentList = documentService.getDocumentList(name, processInstanceId,fromIndex,numberOfResult);
             //FIXME exception handling
             if (documentList.isEmpty()
                     && !DocumentListLeftOperandHandler.isListDefinedInDefinition(name, processInstanceId, processDefinitionService, processInstanceService)) {
