@@ -1401,7 +1401,18 @@ public class DocumentIntegrationTest extends CommonAPITest {
 //        List<Document> unknown = getProcessAPI().getDocumentList(processInstance.getId(), "unknown");
 //        assertThat(unknown).hasSize(1);
 
-        //TODO add list with api method
+        //modify list with api method
+        getProcessAPI().setDocumentList(processInstance.getId(),"invoices",Arrays.asList(new DocumentValue(updatedUrlFile.getId())) );
+
+        List<Document> invoices2 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices");
+        assertThat(invoices2).hasSize(1);
+        updatedUrlFile = invoices2.get(0);
+        assertThat(updatedUrlFile.getId()).isEqualTo(urlDocument.getId());
+        assertThat(updatedUrlFile.hasContent()).isTrue();
+        assertThat(updatedUrlFile.getContentFileName()).isEqualTo("file.txt");
+        assertThat(updatedUrlFile.getVersion()).isEqualTo("2");
+        assertThat(new String(getProcessAPI().getDocumentContent(updatedUrlFile.getContentStorageId()))).isEqualTo("updatedDocFromUrl");
+
 
         //expression is executed on the display name of the verify step, the display name is the list size
         assertThat(verifyStep.getDisplayDescription()).isEqualTo("3");

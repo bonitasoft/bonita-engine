@@ -72,16 +72,8 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
 
         try {
             long processInstanceId = getProcessInstanceId(containerId, containerType);
-            // get the list having the name
-            List<SMappedDocument> currentList = getExistingDocumentList(documentName, processInstanceId);
-            // iterate on elements
-            int index;
-            for (index = 0; index < documentList.size(); index++) {
-                processDocumentOnIndex(documentList, documentName, processInstanceId, currentList, index);
-            }
+            setDocumentList(documentList, documentName, processInstanceId);
 
-            // when no more elements in documentList remove elements above
-            removeOthersDocuments(currentList);
 
             return documentList;
         } catch (final SOperationExecutionException e) {
@@ -90,6 +82,19 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
             throw new SOperationExecutionException(e);
         }
 
+    }
+
+    public void setDocumentList(List<DocumentValue> documentList, String documentName, long processInstanceId) throws SBonitaReadException, SObjectNotFoundException, SOperationExecutionException, SProcessDocumentCreationException, SSessionNotFoundException, SDocumentNotFoundException, SObjectModificationException {
+        // get the list having the name
+        List<SMappedDocument> currentList = getExistingDocumentList(documentName, processInstanceId);
+        // iterate on elements
+        int index;
+        for (index = 0; index < documentList.size(); index++) {
+            processDocumentOnIndex(documentList, documentName, processInstanceId, currentList, index);
+        }
+
+        // when no more elements in documentList remove elements above
+        removeOthersDocuments(currentList);
     }
 
     private List<SMappedDocument> getExistingDocumentList(String documentName, long processInstanceId) throws SBonitaReadException, SObjectNotFoundException,
@@ -147,7 +152,7 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
         Iterator<SMappedDocument> iterator = currentList.iterator();
         while(iterator.hasNext()){
             SMappedDocument next = iterator.next();
-            if (next.getDocumentId() == documentId) {
+            if (next.getId() == documentId) {
                 iterator.remove();
                 return next;
             }
