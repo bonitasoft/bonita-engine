@@ -145,7 +145,6 @@ public class PlatformMonitoringServiceImpl extends MonitoringServiceImpl impleme
     }
 
     @Override
-    @SuppressWarnings("restriction")
     public long getProcessCpuTime() {
         final com.sun.management.OperatingSystemMXBean operatingSystemMXBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory
                 .getOperatingSystemMXBean();
@@ -153,7 +152,6 @@ public class PlatformMonitoringServiceImpl extends MonitoringServiceImpl impleme
     }
 
     @Override
-    @SuppressWarnings("restriction")
     public long getCommittedVirtualMemorySize() {
         final com.sun.management.OperatingSystemMXBean operatingSystemMXBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory
                 .getOperatingSystemMXBean();
@@ -161,7 +159,6 @@ public class PlatformMonitoringServiceImpl extends MonitoringServiceImpl impleme
     }
 
     @Override
-    @SuppressWarnings("restriction")
     public long getTotalSwapSpaceSize() {
         final com.sun.management.OperatingSystemMXBean operatingSystemMXBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory
                 .getOperatingSystemMXBean();
@@ -169,7 +166,6 @@ public class PlatformMonitoringServiceImpl extends MonitoringServiceImpl impleme
     }
 
     @Override
-    @SuppressWarnings("restriction")
     public long getFreeSwapSpaceSize() {
         final com.sun.management.OperatingSystemMXBean operatingSystemMXBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory
                 .getOperatingSystemMXBean();
@@ -177,7 +173,6 @@ public class PlatformMonitoringServiceImpl extends MonitoringServiceImpl impleme
     }
 
     @Override
-    @SuppressWarnings("restriction")
     public long getFreePhysicalMemorySize() {
         final com.sun.management.OperatingSystemMXBean operatingSystemMXBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory
                 .getOperatingSystemMXBean();
@@ -185,7 +180,6 @@ public class PlatformMonitoringServiceImpl extends MonitoringServiceImpl impleme
     }
 
     @Override
-    @SuppressWarnings("restriction")
     public long getTotalPhysicalMemorySize() {
         final com.sun.management.OperatingSystemMXBean operatingSystemMXBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory
                 .getOperatingSystemMXBean();

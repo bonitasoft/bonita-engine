@@ -71,7 +71,7 @@ public class BusinessArchiveFactory {
 
     /**
      * Create a business archive from a valid file or folder
-     * 
+     *
      * @param barOrFolder
      * @return
      * @throws IOException
@@ -114,7 +114,7 @@ public class BusinessArchiveFactory {
 
     public static void writeBusinessArchiveToFile(final BusinessArchive businessArchive, final File businessArchiveFile) throws IOException {
         // FIXME put it in tmp folder of the bonita home
-        final File tempFile = IOUtil.createTempDirectoryInDefaultTempDirectory("tempBusinessArchiveFolder");
+        final File tempFile = IOUtil.createTempDirectoryInDefaultTempDirectory("tempBarFolder");
         writeBusinessArchiveToFolder(businessArchive, tempFile);
         zipBarFolder(businessArchiveFile, tempFile);
         IOUtil.deleteDir(tempFile);
