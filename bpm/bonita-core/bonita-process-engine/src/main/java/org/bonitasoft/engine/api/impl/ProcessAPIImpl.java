@@ -5712,11 +5712,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     TenantServiceAccessor getTenantAccessor() {
-        return getTenantAccessor();
+        return APIUtils.getTenantAccessor();
     }
 
     long getUserId(){
-        return getUserId();
+        return APIUtils.getUserId();
     }
 
 }
