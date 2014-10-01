@@ -41,4 +41,6 @@ public interface ArchivedDocument extends NamedElement, BaseElement, ArchivedEle
 
     String getContentStorageId();
 
+    String getVersion();
+
 }

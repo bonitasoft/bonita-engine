@@ -20,7 +20,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bonitasoft.engine.bpm.document.ArchivedDocumentsSearchDescriptor;
+import org.bonitasoft.engine.bpm.document.DocumentsSearchDescriptor;
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.core.document.model.archive.builder.SADocumentMappingBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
@@ -40,22 +42,24 @@ public class SearchArchivedDocumentDescriptor extends SearchEntityDescriptor {
         final SADocumentMappingBuilderFactory fact = BuilderFactory.get(SADocumentMappingBuilderFactory.class);
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.ARCHIVE_DATE,
                 new FieldDescriptor(SAMappedDocument.class, fact.getArchiveDateKey()));
-//        searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.CONTENT_STORAGE_ID,
-//                new FieldDescriptor(SAMappedDocument.class, fact.getContentStorageIdKey()));
+        //        searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.CONTENT_STORAGE_ID,
+        //                new FieldDescriptor(SAMappedDocument.class, fact.getContentStorageIdKey()));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_AUTHOR,
-                new FieldDescriptor(SAMappedDocument.class, "document."+fact.getAuthorKey()));
+                new FieldDescriptor(SAMappedDocument.class, "document." + fact.getAuthorKey()));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_CONTENT_FILENAME,
-                new FieldDescriptor(SAMappedDocument.class, "document."+fact.getFileNameKey()));
+                new FieldDescriptor(SAMappedDocument.class, "document." + fact.getFileNameKey()));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_CONTENT_MIMETYPE,
-                new FieldDescriptor(SAMappedDocument.class, "document."+fact.getMimeTypeKey()));
+                new FieldDescriptor(SAMappedDocument.class, "document." + fact.getMimeTypeKey()));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_CREATIONDATE,
-                new FieldDescriptor(SAMappedDocument.class, "document."+fact.getCreationDateKey()));
+                new FieldDescriptor(SAMappedDocument.class, "document." + fact.getCreationDateKey()));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_HAS_CONTENT,
-                new FieldDescriptor(SAMappedDocument.class, "document."+fact.getHasContentKey()));
+                new FieldDescriptor(SAMappedDocument.class, "document." + fact.getHasContentKey()));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_NAME,
                 new FieldDescriptor(SAMappedDocument.class, fact.getNameKey()));
+        searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_DESCRIPTION, new FieldDescriptor(SAMappedDocument.class, fact.getDescriptionKey()));
+        searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_VERSION, new FieldDescriptor(SAMappedDocument.class, fact.getVersionKey()));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.DOCUMENT_URL,
-                new FieldDescriptor(SAMappedDocument.class, "document."+fact.getURLKey()));
+                new FieldDescriptor(SAMappedDocument.class, "document." + fact.getURLKey()));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID,
                 new FieldDescriptor(SAMappedDocument.class, fact.getProcessInstanceIdKey()));
         searchEntityKeys.put(ArchivedDocumentsSearchDescriptor.SOURCEOBJECT_ID,
@@ -65,9 +69,9 @@ public class SearchArchivedDocumentDescriptor extends SearchEntityDescriptor {
         final Set<String> documentFields = new HashSet<String>(7);
         documentFields.add(fact.getNameKey());
         documentFields.add(fact.getDescriptionKey());
-        documentFields.add("document."+fact.getFileNameKey());
-        documentFields.add("document."+fact.getMimeTypeKey());
-        documentFields.add("document."+fact.getURLKey());
+        documentFields.add("document." + fact.getFileNameKey());
+        documentFields.add("document." + fact.getMimeTypeKey());
+        documentFields.add("document." + fact.getURLKey());
         documentAllFields.put(SAMappedDocument.class, documentFields);
     }
 

@@ -41,6 +41,8 @@ public class SDocumentBuilderFactoryImpl  implements SDocumentBuilderFactory {
 
     static final String URL = "url";
 
+    static final String VERSION = "version";
+
     static final String DESCRIPTION = "description";
 
 
@@ -96,5 +98,10 @@ public class SDocumentBuilderFactoryImpl  implements SDocumentBuilderFactory {
     @Override
     public String getDescriptionKey() {
         return DESCRIPTION;
+    }
+
+    @Override
+    public String getVersionKey() {
+        return VERSION;
     }
 }

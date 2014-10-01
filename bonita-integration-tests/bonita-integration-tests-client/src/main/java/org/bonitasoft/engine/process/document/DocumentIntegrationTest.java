@@ -1377,10 +1377,10 @@ public class DocumentIntegrationTest extends CommonAPITest {
         Document movedFileDocument = invoices1.get(0);
         assertThat(movedFileDocument).isEqualTo(fileDocument);// was in index 2, now in index 1
 
-        Document newFileDocument = invoices1.get(1);
-        assertThat(newFileDocument.hasContent()).isTrue();
-        assertThat(newFileDocument.getContentFileName()).isEqualTo("file.txt");
-        assertThat(getProcessAPI().getDocumentContent(newFileDocument.getContentStorageId())).isEqualTo("newFile".getBytes());
+        Document emptyListDoc = invoices1.get(1);
+        assertThat(emptyListDoc.hasContent()).isTrue();
+        assertThat(emptyListDoc.getContentFileName()).isEqualTo("file.txt");
+        assertThat(getProcessAPI().getDocumentContent(emptyListDoc.getContentStorageId())).isEqualTo("newFile".getBytes());
 
         Document updatedUrlFile = invoices1.get(2);
         assertThat(updatedUrlFile.getId()).isEqualTo(urlDocument.getId());
@@ -1390,15 +1390,15 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertThat(new String(getProcessAPI().getDocumentContent(updatedUrlFile.getContentStorageId()))).isEqualTo("updatedDocFromUrl");
 
 
-        assertThat(getProcessAPI().getDocumentList(processInstance.getId(), "invoices",1,1).get(0)).isEqualTo(newFileDocument);
+        assertThat(getProcessAPI().getDocumentList(processInstance.getId(), "invoices",1,1).get(0)).isEqualTo(emptyListDoc);
 
         emptyList = getProcessAPI().getDocumentList(processInstance.getId(), "emptyList",0,100);
         assertThat(emptyList).hasSize(1);
 
-        newFileDocument = emptyList.get(0);
-        assertThat(newFileDocument.hasContent()).isTrue();
-        assertThat(newFileDocument.getContentFileName()).isEqualTo("file.txt");
-        assertThat(getProcessAPI().getDocumentContent(newFileDocument.getContentStorageId())).isEqualTo("updatedDoc".getBytes());
+        emptyListDoc = emptyList.get(0);
+        assertThat(emptyListDoc.hasContent()).isTrue();
+        assertThat(emptyListDoc.getContentFileName()).isEqualTo("file.txt");
+        assertThat(getProcessAPI().getDocumentContent(emptyListDoc.getContentStorageId())).isEqualTo("updatedDoc".getBytes());
 
 
 //        List<Document> unknown = getProcessAPI().getDocumentList(processInstance.getId(), "unknown");
@@ -1420,6 +1420,29 @@ public class DocumentIntegrationTest extends CommonAPITest {
         //expression is executed on the display name of the verify step, the display name is the list size
         assertThat(verifyStep.getDisplayDescription()).isEqualTo("3");
 
+
+        //update empty list to have 3 version archived
+        getProcessAPI().setDocumentList(processInstance.getId(),"emptyList",
+                Arrays.asList(new DocumentValue(emptyListDoc.getId(),"anUrl1"),new DocumentValue("anUrl2")));
+        getProcessAPI().setDocumentList(processInstance.getId(),"emptyList",
+                Arrays.asList(new DocumentValue("anUrl3"),new DocumentValue("anUrl4")));
+
+        SearchResult<ArchivedDocument> searchAllVersions = getProcessAPI().searchArchivedDocuments(new SearchOptionsBuilder(0, 100)
+                .filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId())
+                .sort(DocumentsSearchDescriptor.DOCUMENT_NAME, Order.ASC)
+                .sort(DocumentsSearchDescriptor.DOCUMENT_VERSION, Order.ASC).done());
+
+
+        assertThat(searchAllVersions.getCount()).isEqualTo(8);
+        List<ArchivedDocument> result = searchAllVersions.getResult();
+        assertThat(result.get(0).getName()).isEqualTo("emptyList");
+        assertThat(result.get(0).getVersion()).isEqualTo("1");
+        assertThat(result.get(1).getName()).isEqualTo("emptyList");
+        assertThat(result.get(1).getVersion()).isEqualTo("1");
+        assertThat(result.get(2).getName()).isEqualTo("emptyList");
+        assertThat(result.get(2).getVersion()).isEqualTo("2");
+        assertThat(result.get(3).getName()).isEqualTo("invoices");
+        assertThat(result.get(3).getVersion()).isEqualTo("1");
 
         disableAndDeleteProcess(processDefinition);
         deleteUser(john);

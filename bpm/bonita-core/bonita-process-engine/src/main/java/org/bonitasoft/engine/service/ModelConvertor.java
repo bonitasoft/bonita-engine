@@ -1413,6 +1413,7 @@ public class ModelConvertor {
         documentImpl.setDocumentHasContent(mappedDocument.hasContent());
         documentImpl.setDocumentURL(mappedDocument.getUrl());
         documentImpl.setSourceObjectId(mappedDocument.getSourceObjectId());
+        documentImpl.setVersion(mappedDocument.getVersion());
         return documentImpl;
     }
 

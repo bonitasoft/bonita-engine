@@ -51,7 +51,8 @@ public class SearchDocumentDescriptor extends SearchEntityDescriptor {
         searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_HAS_CONTENT,
                 new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + fact.getHasContentKey()));
         searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_NAME, new FieldDescriptor(SMappedDocument.class, fact.getNameKey()));
-        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_NAME, new FieldDescriptor(SMappedDocument.class, fact.getNameKey()));
+        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_DESCRIPTION, new FieldDescriptor(SMappedDocument.class, fact.getDescriptionKey()));
+        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_VERSION, new FieldDescriptor(SMappedDocument.class, fact.getVersionKey()));
         searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_URL, new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + fact.getURLKey()));
         searchEntityKeys.put(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, new FieldDescriptor(SMappedDocument.class, "processInstanceId"));
 

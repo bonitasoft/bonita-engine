@@ -51,6 +51,8 @@ public class SADocumentMappingBuilderFactoryImpl implements SADocumentMappingBui
 
     static final String DESCRIPTION = "description";
 
+    static final String VERSION = "version";
+
     @Override
     public SADocumentMappingBuilder createNewInstance() {
         final SADocumentMappingImpl documentMapping = new SADocumentMappingImpl();
@@ -126,5 +128,10 @@ public class SADocumentMappingBuilderFactoryImpl implements SADocumentMappingBui
     @Override
     public String getDescriptionKey() {
         return DESCRIPTION;
+    }
+
+    @Override
+    public String getVersionKey() {
+        return VERSION;
     }
 }

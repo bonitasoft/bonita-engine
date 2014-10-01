@@ -51,4 +51,6 @@ public interface SADocumentMappingBuilderFactory {
     SADocumentMappingBuilder createNewInstance(SDocumentMapping documentMapping);
 
     String getDescriptionKey();
+
+    String getVersionKey();
 }

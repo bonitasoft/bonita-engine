@@ -45,6 +45,8 @@ public class ArchivedDocumentImpl extends NamedElementImpl implements ArchivedDo
 
     private Date documentCreationDate;
 
+    private String version;
+
     public ArchivedDocumentImpl(final String name) {
         super(name);
     }
@@ -139,6 +141,15 @@ public class ArchivedDocumentImpl extends NamedElementImpl implements ArchivedDo
         this.documentCreationDate = documentCreationDate;
     }
 
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -161,6 +172,7 @@ public class ArchivedDocumentImpl extends NamedElementImpl implements ArchivedDo
         if (documentCreationDate != null ? !documentCreationDate.equals(that.documentCreationDate) : that.documentCreationDate != null)
             return false;
         if (documentURL != null ? !documentURL.equals(that.documentURL) : that.documentURL != null) return false;
+        if (version != null ? !version.equals(that.version) : that.version != null) return false;
 
         return true;
     }
@@ -178,6 +190,7 @@ public class ArchivedDocumentImpl extends NamedElementImpl implements ArchivedDo
         result = 31 * result + (documentContentFileName != null ? documentContentFileName.hashCode() : 0);
         result = 31 * result + (documentContentMimeType != null ? documentContentMimeType.hashCode() : 0);
         result = 31 * result + (documentCreationDate != null ? documentCreationDate.hashCode() : 0);
+        result = 31 * result + (version != null ? version.hashCode() : 0);
         return result;
     }
 
@@ -194,6 +207,7 @@ public class ArchivedDocumentImpl extends NamedElementImpl implements ArchivedDo
                 ", documentContentFileName='" + documentContentFileName + '\'' +
                 ", documentContentMimeType='" + documentContentMimeType + '\'' +
                 ", documentCreationDate=" + documentCreationDate +
+                ", version='" + version + '\'' +
                 "} " + super.toString();
     }
 }
