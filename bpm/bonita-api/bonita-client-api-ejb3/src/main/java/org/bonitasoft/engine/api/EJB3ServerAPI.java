@@ -29,22 +29,30 @@ import org.bonitasoft.engine.exception.ServerAPIException;
 /**
  * @author Matthieu Chaffotte
  * @author Aurelien Pupier
+ * @author Julien Reboul
  */
+
 public class EJB3ServerAPI implements ServerAPI {
+
+    public static final String EJB_NAMING_REFERENCE_PROPERTY = "org.bonitasoft.engine.ejb.naming.reference";
 
     private static final long serialVersionUID = 1L;
 
-    private final ServerAPI remoteServAPI;
+    protected volatile ServerAPI remoteServAPI;
+
+    protected static final String SERVER_API_BEAN_NAME_JBOSS7 = "ejb:bonita-ear/bonita-ejb/serverAPIBean!org.bonitasoft.engine.api.internal.ServerAPI";
+
+    protected Map<String, String> parameters;
 
     public EJB3ServerAPI(final Map<String, String> parameters) throws ServerAPIException {
-        try {
-            remoteServAPI = lookup("serverAPI", new Hashtable<String, String>(parameters));
-        } catch (final NamingException e) {
-            throw new ServerAPIException(e);
-        }
+        this.parameters = parameters;
+        initServerAPIReference();
     }
 
-    private ServerAPI lookup(final String name, final Hashtable<String, String> environment) throws NamingException {
+    public EJB3ServerAPI() throws RemoteException {
+    }
+
+    protected ServerAPI lookup(final String name, final Hashtable<String, String> environment) throws NamingException {
         InitialContext initialContext = null;
         if (environment != null) {
             initialContext = new InitialContext(environment);
@@ -56,8 +64,21 @@ public class EJB3ServerAPI implements ServerAPI {
 
     @Override
     public Object invokeMethod(final Map<String, Serializable> options, final String apiInterfaceName, final String methodName,
-    	final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
-    	return remoteServAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
+            final List<String> classNameParameters, final Object[] parametersValues) throws ServerWrappedException, RemoteException {
+        return remoteServAPI.invokeMethod(options, apiInterfaceName, methodName, classNameParameters, parametersValues);
     }
 
+    protected void initServerAPIReference() throws ServerAPIException {
+        String serverAPIBeanName;
+        if (parameters == null || (serverAPIBeanName = parameters.get(EJB_NAMING_REFERENCE_PROPERTY)) == null) {
+            serverAPIBeanName = SERVER_API_BEAN_NAME_JBOSS7;
+        }
+        try {
+            remoteServAPI = lookup(serverAPIBeanName, new Hashtable<String, String>(
+                    parameters));
+        } catch (final NamingException e) {
+            throw new ServerAPIException("[" + serverAPIBeanName + "] Reference To Server API does not exists. Edit bonita-client.properties#"
+                    + EJB3ServerAPI.EJB_NAMING_REFERENCE_PROPERTY + " property to change the reference name", e);
+        }
+    }
 }

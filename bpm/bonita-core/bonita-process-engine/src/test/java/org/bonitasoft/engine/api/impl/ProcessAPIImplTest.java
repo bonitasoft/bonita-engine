@@ -32,6 +32,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -179,6 +180,48 @@ public class ProcessAPIImplTest {
             verify(lockService).lock(processInstanceId, SFlowElementsContainerType.PROCESS.name(), tenantId);
             verify(lockService).unlock(any(BonitaLock.class), eq(tenantId));
         }
+    }
+
+    @Test
+    public void generateRelativeResourcePathShouldHandleBackslashOS() {
+        // given:
+        String pathname = "C:\\hello\\hi\\folder";
+        final String resourceRelativePath = "resource/toto.lst";
+
+        // when:
+        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
+                + resourceRelativePath));
+
+        // then:
+        assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
+    }
+
+    @Test
+    public void generateRelativeResourcePathShouldNotContainFirstSlash() {
+        // given:
+        String pathname = "/home/target/some_folder/";
+        final String resourceRelativePath = "resource/toto.lst";
+
+        // when:
+        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
+                + resourceRelativePath));
+
+        // then:
+        assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
+    }
+
+    @Test
+    public void generateRelativeResourcePathShouldWorkWithRelativeInitialPath() {
+        // given:
+        String pathname = "target/nuns";
+        final String resourceRelativePath = "resource/toto.lst";
+
+        // when:
+        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
+                + resourceRelativePath));
+
+        // then:
+        assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
     }
 
     @Test

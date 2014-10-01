@@ -27,7 +27,7 @@ import org.bonitasoft.engine.io.IOUtil;
 
 /**
  * Read or write {@link BusinessArchive} from/to file system
- * 
+ *
  * @author Baptiste Mesta
  */
 public class BusinessArchiveFactory {
@@ -47,7 +47,7 @@ public class BusinessArchiveFactory {
 
     /**
      * Create a business archive from an {@link InputStream}
-     * 
+     *
      * @param inputStream
      * @return
      *         the business archived that was in the input stream
@@ -60,7 +60,7 @@ public class BusinessArchiveFactory {
         File barFolder = null;
 
         try {
-            barFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("tempBusinessArchive");
+            barFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("tempBarFolder");
             IOUtil.unzipToFolder(inputStream, barFolder);
 
             return getBusinessArchive(barFolder);
@@ -75,7 +75,7 @@ public class BusinessArchiveFactory {
 
     /**
      * Create a business archive from a valid file or folder
-     * 
+     *
      * @param barOrFolder
      *        the folder or file that contains the business archive to read
      * @return
@@ -101,7 +101,7 @@ public class BusinessArchiveFactory {
         }
     }
 
-    private static BusinessArchive getBusinessArchive(File barFolder) throws IOException, InvalidBusinessArchiveFormatException {
+    private static BusinessArchive getBusinessArchive(final File barFolder) throws IOException, InvalidBusinessArchiveFormatException {
         final BusinessArchive businessArchive = new BusinessArchive();
         for (final BusinessArchiveContribution contribution : contributions) {
             if (!contribution.readFromBarFolder(businessArchive, barFolder) && contribution.isMandatory()) {
@@ -115,7 +115,7 @@ public class BusinessArchiveFactory {
      * Write the {@link BusinessArchive} to the folder given in parameter
      * <p>
      * the written business archive the uncompressed version of {@link #writeBusinessArchiveToFile(BusinessArchive, File)}
-     * 
+     *
      * @param businessArchive
      *        the {@link BusinessArchive} to write
      * @param folderPath
@@ -139,7 +139,7 @@ public class BusinessArchiveFactory {
      * Write the {@link BusinessArchive} to the .bar file given in parameter.
      * <p>
      * this file can then be read using {@link #readBusinessArchive(File)}
-     * 
+     *
      * @param businessArchive
      *        the {@link BusinessArchive} to write
      * @param folderPath
@@ -148,7 +148,7 @@ public class BusinessArchiveFactory {
      */
     public static void writeBusinessArchiveToFile(final BusinessArchive businessArchive, final File businessArchiveFile) throws IOException {
         // FIXME put it in tmp folder of the bonita home
-        final File tempFile = IOUtil.createTempDirectoryInDefaultTempDirectory("tempBusinessArchiveFolder");
+        final File tempFile = IOUtil.createTempDirectoryInDefaultTempDirectory("tempBarFolder");
         try {
             writeBusinessArchiveToFolder(businessArchive, tempFile);
             zipBarFolder(businessArchiveFile, tempFile);
@@ -161,7 +161,7 @@ public class BusinessArchiveFactory {
      * Save the uncompressed business archive folder to a compressed file.
      * <p>
      * this file can then be read using {@link #readBusinessArchive(File)}
-     * 
+     *
      * @param destFile
      * @param folderPath
      * @return

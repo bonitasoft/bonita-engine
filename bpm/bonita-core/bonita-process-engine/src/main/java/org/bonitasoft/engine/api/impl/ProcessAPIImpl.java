@@ -206,6 +206,7 @@ import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
+import org.bonitasoft.engine.commons.StringUtils;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
@@ -2236,10 +2237,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void assignUserTask(final long userTaskId, final long userId) throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final SCommentService scommentService = tenantAccessor.getCommentService();
-        final IdentityService identityService = tenantAccessor.getIdentityService();
         try {
             final AssignOrUnassignUserTask assignUserTask = new AssignOrUnassignUserTask(userId, userTaskId, activityInstanceService, tenantAccessor
                     .getFlowNodeStateManager().getStateBehaviors());
@@ -2483,29 +2481,38 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, byte[]> getProcessResources(final long processDefinitionId, final String filenamesPattern) throws RetrieveException {
         String processesFolder;
-        TenantServiceAccessor tenantAccessor;
         try {
-            tenantAccessor = getTenantAccessor();
-            processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantAccessor.getTenantId());
+            processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(getTenantAccessor().getTenantId());
         } catch (final BonitaHomeNotSetException e) {
             throw new RetrieveException("Problem accessing basic Bonita Home server resources", e);
         }
-        processesFolder = processesFolder.replaceAll("\\\\", "/");
-        if (!processesFolder.endsWith("/")) {
-            processesFolder = processesFolder + "/";
+        final String sep = File.separator;
+        processesFolder = StringUtils.uniformizePathPattern(processesFolder);
+        if (!processesFolder.endsWith(sep)) {
+            processesFolder = processesFolder + sep;
         }
-        processesFolder = processesFolder + processDefinitionId + "/";
-        final Collection<File> files = FileUtils.listFiles(new File(processesFolder), new DeepRegexFileFilter(processesFolder + filenamesPattern),
+        processesFolder = processesFolder + processDefinitionId + sep;
+        final File processDirectory = new File(processesFolder);
+        final Collection<File> files = FileUtils.listFiles(processDirectory, new DeepRegexFileFilter(processDirectory, filenamesPattern),
                 DirectoryFileFilter.DIRECTORY);
         final Map<String, byte[]> res = new HashMap<String, byte[]>(files.size());
         try {
             for (final File f : files) {
-                res.put(f.getAbsolutePath().replaceAll("\\\\", "/").replaceFirst(processesFolder, ""), IOUtil.getAllContentFrom(f));
+                res.put(generateRelativeResourcePath(processDirectory, f), IOUtil.getAllContentFrom(f));
             }
         } catch (final IOException e) {
             throw new RetrieveException("Problem accessing resources " + filenamesPattern + " for processDefinitionId: " + processDefinitionId, e);
         }
         return res;
+    }
+
+    protected String generateRelativeResourcePath(final File processDirectory, final File f) {
+        String path = StringUtils.uniformizePathPattern(f.getAbsolutePath().replace(processDirectory.getAbsolutePath(), ""));
+        // remove first slash, if any:
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
+        return path;
     }
 
     @Override
@@ -4288,7 +4295,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     /**
      * @param orAssignedToUser
-     *            do we also want to retrieve tasks directly assigned to this user ?
+     *        do we also want to retrieve tasks directly assigned to this user ?
      * @throws SearchException
      */
     private SearchResult<HumanTaskInstance> searchTasksForUser(final long userId, final SearchOptions searchOptions, final boolean orAssignedToUser)
