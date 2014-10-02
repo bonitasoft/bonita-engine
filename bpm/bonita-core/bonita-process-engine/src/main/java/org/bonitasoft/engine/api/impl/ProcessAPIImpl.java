@@ -5708,8 +5708,8 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void emptyContentOfArchivedDocument(long documentId) throws DocumentException, DocumentNotFoundException {
-        documentAPIImpl.emptyContentOfArchivedDocument(documentId);
+    public void deleteContentOfArchivedDocument(long documentId) throws DocumentException, DocumentNotFoundException {
+        documentAPIImpl.deleteContentOfArchivedDocument(documentId);
     }
 
     TenantServiceAccessor getTenantAccessor() {

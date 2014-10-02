@@ -275,7 +275,7 @@ public interface DocumentAPI {
      * Remove the document with the specified identifier and returns it.
      * <p>
      * this archive and delete mapping on the process, i.e. the content of the document itself will be kept in database, use
-     * {@link #emptyContentOfArchivedDocument} to delete the content
+     * {@link #deleteContentOfArchivedDocument} to delete the content
      * </p>
      *
      * @param documentId
@@ -526,5 +526,5 @@ public interface DocumentAPI {
      * @throws DocumentException
      * @since 6.4.0
      */
-    void emptyContentOfArchivedDocument(long documentId) throws DocumentException, DocumentNotFoundException;
+    void deleteContentOfArchivedDocument(long documentId) throws DocumentException, DocumentNotFoundException;
 }

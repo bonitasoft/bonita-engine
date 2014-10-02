@@ -1472,7 +1472,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
         ArchivedDocument archDov1v1 = archivedDocumentSearchResult.getResult().get(0);
         assertThat(archDov1v1.getContentStorageId()).isEqualTo(doc1v1.getContentStorageId());
-        getProcessAPI().emptyContentOfArchivedDocument(archDov1v1.getId());
+        getProcessAPI().deleteContentOfArchivedDocument(archDov1v1.getId());
 
 
         //then

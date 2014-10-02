@@ -436,7 +436,7 @@ public class DocumentAPIImpl implements DocumentAPI {
     }
 
     @Override
-    public void emptyContentOfArchivedDocument(long documentId) throws DocumentException, DocumentNotFoundException {
+    public void deleteContentOfArchivedDocument(long documentId) throws DocumentException, DocumentNotFoundException {
         TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
         DocumentService documentService = tenantAccessor.getDocumentService();
         try{
