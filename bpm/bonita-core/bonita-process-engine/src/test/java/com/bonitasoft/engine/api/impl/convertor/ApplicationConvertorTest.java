@@ -56,6 +56,7 @@ public class ApplicationConvertorTest {
     private static final String APP_NAME = "app";
     private static final String APP_DISPLAY_NAME = "My application";
     private static final String APP_PAGE_NAME = "firstPage";
+    private static final long LOGGED_USER_ID = 10;
     private final ApplicationConvertor convertor = new ApplicationConvertor();
 
     @Test
@@ -155,13 +156,14 @@ public class ApplicationConvertorTest {
         updater.setProfileId(10L);
         updater.setState(ApplicationState.ACTIVATED.name());
 
+
         //when
-        final EntityUpdateDescriptor updateDescriptor = convertor.toApplicationUpdateDescriptor(updater);
+        final EntityUpdateDescriptor updateDescriptor = convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID);
 
         //then
         assertThat(updateDescriptor).isNotNull();
         final Map<String, Object> fields = updateDescriptor.getFields();
-        assertThat(fields).hasSize(8);
+        assertThat(fields).hasSize(9);
         assertThat(fields.get(SApplicationFields.NAME)).isEqualTo("My-updated-app");
         assertThat(fields.get(SApplicationFields.DISPLAY_NAME)).isEqualTo("Updated display name");
         assertThat(fields.get(SApplicationFields.VERSION)).isEqualTo("1.1");
@@ -170,6 +172,7 @@ public class ApplicationConvertorTest {
         assertThat(fields.get(SApplicationFields.ICON_PATH)).isEqualTo("/newIcon.jpg");
         assertThat(fields.get(SApplicationFields.PROFILE_ID)).isEqualTo(10L);
         assertThat(fields.get(SApplicationFields.STATE)).isEqualTo(ApplicationState.ACTIVATED.name());
+        assertThat(fields.get(SApplicationFields.UPDATED_BY)).isEqualTo(LOGGED_USER_ID);
     }
 
     @Test
@@ -178,7 +181,7 @@ public class ApplicationConvertorTest {
         final ApplicationUpdater updater = new ApplicationUpdater();
 
         //when
-        final EntityUpdateDescriptor updateDescriptor = convertor.toApplicationUpdateDescriptor(updater);
+        final EntityUpdateDescriptor updateDescriptor = convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID);
 
         //then
         assertThat(updateDescriptor).isNotNull();

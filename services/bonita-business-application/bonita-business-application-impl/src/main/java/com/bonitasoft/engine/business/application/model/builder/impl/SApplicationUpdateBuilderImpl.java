@@ -90,4 +90,10 @@ public class SApplicationUpdateBuilderImpl implements SApplicationUpdateBuilder 
         return this;
     }
 
+    @Override
+    public SApplicationUpdateBuilder updateUpdatedBy(final Long updaterUserId) {
+        descriptor.addField(SApplicationFields.UPDATED_BY, updaterUserId);
+        return this;
+    }
+
 }

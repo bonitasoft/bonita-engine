@@ -86,7 +86,7 @@ public class ApplicationConvertor {
         return applications;
     }
 
-    public EntityUpdateDescriptor toApplicationUpdateDescriptor(final ApplicationUpdater updater) {
+    public EntityUpdateDescriptor toApplicationUpdateDescriptor(final ApplicationUpdater updater, final long updaterUserId) {
         final SApplicationUpdateBuilder builder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance();
         for (final Entry<ApplicationField, Serializable> entry : updater.getFields().entrySet()) {
             switch (entry.getKey()) {
@@ -125,6 +125,11 @@ public class ApplicationConvertor {
                     break;
             }
         }
+
+        if (builder.done().getFields().size() > 0) {
+            builder.updateUpdatedBy(updaterUserId);
+        }
+
         return builder.done();
     }
 

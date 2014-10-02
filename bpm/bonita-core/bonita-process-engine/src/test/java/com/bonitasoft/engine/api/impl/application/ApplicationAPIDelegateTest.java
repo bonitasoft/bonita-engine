@@ -222,7 +222,7 @@ public class ApplicationAPIDelegateTest {
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setName("new name");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        given(convertor.toApplicationUpdateDescriptor(updater)).willReturn(updateDescriptor);
+        given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willReturn(sApplication);
         given(convertor.toApplication(sApplication)).willReturn(application);
 
@@ -241,7 +241,7 @@ public class ApplicationAPIDelegateTest {
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setName("new name");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        given(convertor.toApplicationUpdateDescriptor(updater)).willReturn(updateDescriptor);
+        given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectModificationException());
         given(convertor.toApplication(sApplication)).willReturn(application);
 

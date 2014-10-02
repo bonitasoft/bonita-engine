@@ -102,8 +102,7 @@ public class ApplicationAPIDelegate {
     AlreadyExistsException, InvalidNameException, InvalidDisplayNameException, ApplicationNotFoundException {
         try {
             SApplication sApplication;
-
-            sApplication = applicationService.updateApplication(applicationId, convertor.toApplicationUpdateDescriptor(updater));
+            sApplication = applicationService.updateApplication(applicationId, convertor.toApplicationUpdateDescriptor(updater, loggedUserId));
 
             return convertor.toApplication(sApplication);
         } catch (final SObjectModificationException e) {

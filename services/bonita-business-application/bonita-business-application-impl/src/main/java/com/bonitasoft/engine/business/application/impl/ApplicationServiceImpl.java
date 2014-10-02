@@ -50,6 +50,7 @@ import com.bonitasoft.engine.business.application.SInvalidNameException;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationBuilderFactory;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationLogBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuLogBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationPageLogBuilder;
@@ -72,6 +73,8 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     private final QueriableLoggerService queriableLoggerService;
 
+    private final SApplicationBuilderFactory applicationKeyProvider;
+
     private final boolean active;
 
     public ApplicationServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final QueriableLoggerService queriableLoggerService) {
@@ -84,6 +87,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.queriableLoggerService = queriableLoggerService;
+        applicationKeyProvider = BuilderFactory.get(SApplicationBuilderFactory.class);
     }
 
     @Override
@@ -229,10 +233,12 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public SApplication updateApplication(final long applicationId, final EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException,
-            SInvalidNameException, SInvalidDisplayNameException, SBonitaReadException, SObjectAlreadyExistsException, SObjectNotFoundException {
+    public SApplication updateApplication(final long applicationId, final EntityUpdateDescriptor updateDescriptor)
+            throws SObjectModificationException,
+    SInvalidNameException, SInvalidDisplayNameException, SBonitaReadException, SObjectAlreadyExistsException, SObjectNotFoundException {
         checkLicense();
         final String methodName = "updateApplication";
+        final long now = System.currentTimeMillis();
         final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.UPDATED, "Updating application with id " + applicationId);
 
         final SApplication application = getApplication(applicationId);
@@ -245,6 +251,8 @@ public class ApplicationServiceImpl implements ApplicationService {
                 && !application.getDisplayName().equals(updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME))) {
             validateApplicationDisplayName((String) updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME));
         }
+
+        updateDescriptor.addField(applicationKeyProvider.getLastUpdatedDateKey(), now);
 
         try {
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(application,
