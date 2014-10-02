@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.net.URL;
 import java.nio.MappedByteBuffer;
@@ -53,6 +54,8 @@ public class IOUtil {
     private static final int BUFFER_SIZE = 100000;
 
     public static final String FILE_ENCODING = "UTF-8";
+
+    private static final String JVM_NAME = ManagementFactory.getRuntimeMXBean().getName();
 
     public static byte[] generateJar(final Class<?>... classes) throws IOException {
         return generateJar(getResources(classes));
@@ -207,7 +210,7 @@ public class IOUtil {
     }
 
     public static File createTempDirectoryInDefaultTempDirectory(final String directoryName) {
-        final File tmpDir = new File(TMP_DIRECTORY, directoryName + "_" + String.valueOf(System.currentTimeMillis()));
+        final File tmpDir = new File(TMP_DIRECTORY, directoryName + "_" + JVM_NAME + "_" + String.valueOf(System.currentTimeMillis()));
         createTempDirectory(tmpDir);
         return tmpDir;
     }
