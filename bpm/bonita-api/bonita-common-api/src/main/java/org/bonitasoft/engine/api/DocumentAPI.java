@@ -24,6 +24,7 @@ import org.bonitasoft.engine.bpm.document.DocumentException;
 import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.identity.UserNotFoundException;
@@ -74,21 +75,16 @@ public interface DocumentAPI {
             DocumentAttachmentException;
 
     /**
-     * Attach a document by reference to the specified process instance.<br/>
-     * The document itself does not contain content but is a reference to external content specified by its URL.
+     * Attach a new document version to a process instance.
+     * <p>
+     * Depending on the DocumentValue given the document will be internal (with content) or external (with url).
+     * The document state is archived and is then updated to the new version
+     * </p>
      *
-     * @param processInstanceId
-     *        The identifier of the process instance
-     * @param documentName
-     *        The name of the document
-     * @param fileName
-     *        The filename of the document content
-     * @param mimeType
-     *        The MimeType of the document content (optional)
-     * @param url
-     *        The URL of the document content
-     * @param description
-     *        The description for the document
+     * @param documentId
+     *        The identifier of the document to update
+     * @param documentValue
+     *        the value of the document
      * @return a document object
      * @throws ProcessInstanceNotFoundException
      *         when the processInstanceId does not refer to an existing process instance
@@ -96,11 +92,48 @@ public interface DocumentAPI {
      *         when the session is not valid
      * @throws DocumentAttachmentException
      *         when an error occurs while attaching the document
-     * @since 6.4
+     * @throws org.bonitasoft.engine.exception.AlreadyExistsException
+     *         when an error occurs while attaching the document
+     * @since 6.4.0
      */
-    Document attachDocument(long processInstanceId, String documentName, String fileName, String mimeType, String url, String description)
+    Document updateDocument(long documentId, DocumentValue documentValue) throws ProcessInstanceNotFoundException,
+            DocumentAttachmentException, AlreadyExistsException;
+
+    /**
+     * Attach a new document to a process instance.
+     * <p>
+     * Depending on the DocumentValue given the document will be internal (with content) or external (with url).
+     * <ol>
+     * <li>If the target document is a list of document then we append it to the list</li>
+     * <li>If the target document is a list of document and the index is set on the document value then we insert the element in the list at the specified
+     * index</li>
+     * <li>If the target single document or is non existent in the definition we create it</li>
+     * <li>If the target single document and is already existent an exception is thrown</li>
+     * </ol>
+     * </p>
+     *
+     * @param processInstanceId
+     *        The identifier of the process instance
+     * @param documentName
+     *        The name of the document
+     * @param description
+     *        The description of the document
+     * @param documentValue
+     *        the value of the document
+     * @return a document object
+     * @throws ProcessInstanceNotFoundException
+     *         when the processInstanceId does not refer to an existing process instance
+     * @throws InvalidSessionException
+     *         when the session is not valid
+     * @throws DocumentAttachmentException
+     *         when an error occurs while attaching the document
+     * @throws org.bonitasoft.engine.exception.AlreadyExistsException
+     *         when an error occurs while attaching the document
+     * @since 6.4.0
+     */
+    Document addDocument(long processInstanceId, String documentName, String description, DocumentValue documentValue)
             throws ProcessInstanceNotFoundException,
-            DocumentAttachmentException;
+            DocumentAttachmentException, AlreadyExistsException;
 
     /**
      * Attach the given document to the specified process instance.<br />
@@ -129,34 +162,6 @@ public interface DocumentAPI {
             throws ProcessInstanceNotFoundException, DocumentAttachmentException;
 
     /**
-     * Attach the given document to the specified process instance.<br />
-     * The content is stored to enable later retrieval.
-     *
-     * @param processInstanceId
-     *        The identifier of the process instance
-     * @param documentName
-     *        The name of the document
-     * @param fileName
-     *        The name of the file containing the document
-     * @param mimeType
-     *        The MimeType of the document content (optional)
-     * @param documentContent
-     *        The content of the document
-     * @param description
-     *        The description for the document
-     * @return a document object
-     * @throws ProcessInstanceNotFoundException
-     **         when the processInstanceId does not refer to an existing process instance
-     * @throws InvalidSessionException
-     *         when the session is not valid
-     * @throws DocumentAttachmentException
-     *         when an error occurs while attaching the document
-     * @since 6.4
-     */
-    Document attachDocument(long processInstanceId, String documentName, String fileName, String mimeType, byte[] documentContent, String description)
-            throws ProcessInstanceNotFoundException, DocumentAttachmentException;
-
-    /**
      * Attach a new version of a document by reference to the specified process instance. The referenced document is
      * a new version of the named document.
      *
@@ -178,32 +183,6 @@ public interface DocumentAPI {
      * @since 6.0
      */
     Document attachNewDocumentVersion(long processInstanceId, String documentName, String fileName, String mimeType, String url)
-            throws DocumentAttachmentException;
-
-    /**
-     * Attach a new version of a document by reference to the specified process instance. The referenced document is
-     * a new version of the named document.
-     * 
-     * @param processInstanceId
-     *        The identifier of the process instance
-     * @param documentName
-     *        The name of the document
-     * @param fileName
-     *        The name of the file containing the document
-     * @param mimeType
-     *        The MimeType of the document content (optional)
-     * @param url
-     *        The URL of the document content
-     * @param description
-     *        The description for the document
-     * @return a document object
-     * @throws InvalidSessionException
-     *         when the session is not valid
-     * @throws DocumentAttachmentException
-     *         when an error occurs while attaching the new version of the document
-     * @since 6.4
-     */
-    Document attachNewDocumentVersion(long processInstanceId, String documentName, String fileName, String mimeType, String url, String description)
             throws DocumentAttachmentException;
 
     /**
@@ -231,33 +210,6 @@ public interface DocumentAPI {
             throws DocumentAttachmentException;
 
     /**
-     * Attach a new document version to the specified process instance. The document is a new version of the named document.<br />
-     * The content is stored to enable later retrieval.
-     *
-     * @param processInstanceId
-     *        The identifier of the process instance
-     * @param documentName
-     *        The name of the document
-     * @param contentFileName
-     *        The name of the file containing the content of the document
-     * @param contentMimeType
-     *        The MimeType of the document content (optional)
-     * @param documentContent
-     *        The content of the document
-     * @param description
-     *        The description for the document
-     * @return a document object
-     * @throws InvalidSessionException
-     *         when the session is not valid
-     * @throws DocumentAttachmentException
-     *         when an error occurs while attaching the new version of the document
-     * @since 6.4
-     */
-    Document attachNewDocumentVersion(long processInstanceId, String documentName, String contentFileName, String contentMimeType, byte[] documentContent,
-            String description)
-            throws DocumentAttachmentException;
-
-    /**
      * Get the document with the specified identifier.
      *
      * @param documentId
@@ -267,7 +219,7 @@ public interface DocumentAPI {
      *         when the document identifier does not refer to an existing document
      * @throws InvalidSessionException
      *         when the session is not valid
-     * @since 6.4
+     * @since 6.0
      */
     Document getDocument(long documentId) throws DocumentNotFoundException;
 

@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.bpm.document;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 /**
  * Class that holds a content + mime type and a name OR the url if it's an external document.
@@ -40,8 +39,10 @@ public class DocumentValue implements Serializable {
 
     private boolean hasChanged;
 
+    private int index = -1;
+
     /**
-     * Represent the value of a document, content, mime type and file name is given
+     * Represent the value of a document. Content, mime type and file name are given
      * 
      * @param content
      *        content of the document
@@ -79,8 +80,7 @@ public class DocumentValue implements Serializable {
      * It is used to update document list.
      *
      * @param documentId
-     *      the id of the existing document (mapping)
-     *
+     *        the id of the existing document (mapping)
      */
     public DocumentValue(final long documentId) {
         super();
@@ -91,15 +91,15 @@ public class DocumentValue implements Serializable {
     /**
      * Represent an existing document that changed with the content and metadata in parameters.
      * It is used in document list to add a new version of this document.
+     * 
      * @param documentId
-     *      the id of the existing document (mapping)
+     *        the id of the existing document (mapping)
      * @param content
      *        content of the document
      * @param mimeType
      *        mime type of the document
      * @param fileName
      *        file name of the document
-     *
      */
     public DocumentValue(final long documentId, final byte[] content, final String mimeType, final String fileName) {
         super();
@@ -116,7 +116,7 @@ public class DocumentValue implements Serializable {
      * It is used in document list to add a new version of this document.
      *
      * @param documentId
-     *      the id of the existing document (mapping)
+     *        the id of the existing document (mapping)
      */
     public DocumentValue(final long documentId, final String url) {
         super();
@@ -137,7 +137,6 @@ public class DocumentValue implements Serializable {
     public String getFileName() {
         return fileName;
     }
-
 
     public String getUrl() {
         return url;
@@ -197,55 +196,18 @@ public class DocumentValue implements Serializable {
         this.hasChanged = hasChanged;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-
-        DocumentValue that = (DocumentValue) o;
-
-        if (hasChanged != that.hasChanged)
-            return false;
-        if (hasContent != that.hasContent)
-            return false;
-        if (!Arrays.equals(content, that.content))
-            return false;
-        if (documentId != null ? !documentId.equals(that.documentId) : that.documentId != null)
-            return false;
-        if (fileName != null ? !fileName.equals(that.fileName) : that.fileName != null)
-            return false;
-        if (mimeType != null ? !mimeType.equals(that.mimeType) : that.mimeType != null)
-            return false;
-        if (url != null ? !url.equals(that.url) : that.url != null)
-            return false;
-
-        return true;
+    public int getIndex() {
+        return index;
     }
 
-    @Override
-    public int hashCode() {
-        int result = content != null ? Arrays.hashCode(content) : 0;
-        result = 31 * result + (mimeType != null ? mimeType.hashCode() : 0);
-        result = 31 * result + (fileName != null ? fileName.hashCode() : 0);
-        result = 31 * result + (url != null ? url.hashCode() : 0);
-        result = 31 * result + (hasContent ? 1 : 0);
-        result = 31 * result + (documentId != null ? documentId.hashCode() : 0);
-        result = 31 * result + (hasChanged ? 1 : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "DocumentValue{" +
-                "content=" + Arrays.toString(content) +
-                ", mimeType='" + mimeType + '\'' +
-                ", fileName='" + fileName + '\'' +
-                ", url='" + url + '\'' +
-                ", hasContent=" + hasContent +
-                ", documentId=" + documentId +
-                ", hasChanged=" + hasChanged +
-                '}';
+    /**
+     * Index of were to put the document inside the list. Only used when using API method attach document.
+     * 
+     * @param index
+     *        index in the list
+     */
+    public DocumentValue setIndex(int index) {
+        this.index = index;
+        return this;
     }
 }

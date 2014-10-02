@@ -37,6 +37,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -605,7 +606,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     protected void createDocuments(final SProcessDefinition sDefinition, final SProcessInstance sProcessInstance, final long authorId)
-            throws SDocumentCreationException, BonitaHomeNotSetException, STenantIdNotSetException, IOException {
+            throws SDocumentCreationException, BonitaHomeNotSetException, STenantIdNotSetException, IOException, SObjectAlreadyExistsException {
         final SFlowElementContainerDefinition processContainer = sDefinition.getProcessContainer();
         final List<SDocumentDefinition> documentDefinitions = processContainer.getDocumentDefinitions();
         if (!documentDefinitions.isEmpty()) {
@@ -640,7 +641,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     private void attachDocumentForList(SProcessInstance processInstance, long authorId, List<DocumentValue> initialValue,
-            SDocumentListDefinition documentListDefinition) throws SDocumentCreationException {
+            SDocumentListDefinition documentListDefinition) throws SDocumentCreationException, SObjectAlreadyExistsException {
         if (initialValue != null) {
             for (int index = 0; index < initialValue.size(); index++) {
                 DocumentValue documentValue = initialValue.get(index);
@@ -682,13 +683,13 @@ public class ProcessExecutorImpl implements ProcessExecutor {
     }
 
     protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
-            final String url, final long authorId, String description, int index) throws SDocumentCreationException {
+            final String url, final long authorId, String description, int index) throws SDocumentCreationException, SObjectAlreadyExistsException {
         final SDocument attachment = buildExternalProcessDocumentReference(fileName, mimeType, authorId, url);
         return documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, description, index);
     }
 
     protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
-            final byte[] documentContent, final long authorId, String description, int index) throws SDocumentCreationException {
+            final byte[] documentContent, final long authorId, String description, int index) throws SDocumentCreationException, SObjectAlreadyExistsException {
         final SDocument attachment = buildProcessDocument(fileName, mimeType, authorId, documentContent);
         return documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, description, index);
     }

@@ -4324,34 +4324,14 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Document attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType, final String url, String description)
-            throws DocumentAttachmentException {
-        return documentAPIImpl.attachDocument(processInstanceId, documentName, fileName, mimeType, url, description);
-    }
-
-    @Override
     public Document attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType, final String url)
             throws DocumentAttachmentException {
         return documentAPIImpl.attachDocument(processInstanceId, documentName, fileName, mimeType, url);
     }
-
-
-
-    @Override
-    public Document attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
-                                   final byte[] documentContent, String description) throws DocumentAttachmentException {
-        return documentAPIImpl.attachDocument(processInstanceId, documentName, fileName, mimeType, documentContent, description);
-    }
-
     @Override
     public Document attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
                                    final byte[] documentContent) throws DocumentAttachmentException {
         return documentAPIImpl.attachDocument(processInstanceId, documentName, fileName, mimeType, documentContent);
-    }
-    @Override
-    public Document attachNewDocumentVersion(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
-                                             final String url, String description) throws DocumentAttachmentException {
-        return documentAPIImpl.attachNewDocumentVersion(processInstanceId, documentName, fileName, mimeType, url, description);
     }
 
     @Override
@@ -4360,11 +4340,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         return documentAPIImpl.attachNewDocumentVersion(processInstanceId, documentName, fileName, mimeType, url);
     }
 
-    @Override
-    public Document attachNewDocumentVersion(final long processInstanceId, final String documentName, final String contentFileName,
-                                             final String contentMimeType, final byte[] documentContent, String description) throws DocumentAttachmentException {
-        return documentAPIImpl.attachNewDocumentVersion(processInstanceId, documentName, contentFileName, contentMimeType, documentContent, description);
-    }
     @Override
     public Document attachNewDocumentVersion(final long processInstanceId, final String documentName, final String contentFileName,
                                              final String contentMimeType, final byte[] documentContent) throws DocumentAttachmentException {
@@ -5720,4 +5695,13 @@ public class ProcessAPIImpl implements ProcessAPI {
         return APIUtils.getUserId();
     }
 
+    @Override
+    public Document addDocument(long processInstanceId, String documentName, String description, DocumentValue documentValue) throws ProcessInstanceNotFoundException, DocumentAttachmentException, AlreadyExistsException {
+        return documentAPIImpl.addDocument(processInstanceId, documentName, description, documentValue);
+    }
+
+    @Override
+    public Document updateDocument(long documentId, DocumentValue documentValue) throws ProcessInstanceNotFoundException, DocumentAttachmentException, AlreadyExistsException {
+        return documentAPIImpl.updateDocument(documentId, documentValue);
+    }
 }

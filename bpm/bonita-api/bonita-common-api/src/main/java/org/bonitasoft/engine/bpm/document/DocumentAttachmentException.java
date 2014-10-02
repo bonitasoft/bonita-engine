@@ -42,4 +42,7 @@ public class DocumentAttachmentException extends ExecutionException {
         super(cause);
     }
 
+    public DocumentAttachmentException(String s) {
+        super(s);
+    }
 }

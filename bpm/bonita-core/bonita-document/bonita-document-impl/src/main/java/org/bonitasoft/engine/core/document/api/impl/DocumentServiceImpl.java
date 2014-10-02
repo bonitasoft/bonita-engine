@@ -24,6 +24,7 @@ import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.exception.SDocumentCreationException;
@@ -105,13 +106,23 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public SMappedDocument attachDocumentToProcessInstance(final SDocument document, long processInstanceId, String name, String description, int index)
-            throws SDocumentCreationException {
+            throws SDocumentCreationException, SObjectAlreadyExistsException {
         try {
+            if(index == -1){
+                SMappedDocument mappedDocumentInternal = getMappedDocumentInternal(processInstanceId, name);
+                if(mappedDocumentInternal != null){
+                    throw new SObjectAlreadyExistsException("A document already exists with name "+name+" and process instance id "+processInstanceId);
+                }
+            }
             insertDocument(document);
             SDocumentMapping documentMapping = create(document.getId(), processInstanceId, name, description, index);
             return new SMappedDocumentImpl(documentMapping, document);
-        } catch (final SBonitaException e) {
-            throw new SDocumentCreationException(e.getMessage(), e);
+        } catch (SObjectAlreadyExistsException e) {
+            throw new SObjectAlreadyExistsException(e);
+        } catch (SRecorderException e) {
+            throw new SDocumentCreationException(e);
+        } catch (SBonitaReadException e) {
+            throw new SDocumentCreationException(e);
         }
     }
 
@@ -121,7 +132,6 @@ public class DocumentServiceImpl implements DocumentService {
         try {
             SDocumentMapping sDocumentMapping = getMappedDocument(processInstanceId, name);
             return updateMappedDocument(document, description, -1, sDocumentMapping);
-
         } catch (final SBonitaException e) {
             throw new SDocumentCreationException(e.getMessage(), e);
         }
@@ -251,16 +261,20 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public SMappedDocument getMappedDocument(long processInstanceId, String documentName) throws SDocumentNotFoundException, SBonitaReadException {
+        final SMappedDocument document = getMappedDocumentInternal(processInstanceId, documentName);
+        if (document == null) {
+            throw new SDocumentNotFoundException("Document not found: " + documentName + " for process instance: " + processInstanceId);
+        }
+        return document;
+    }
+
+    private SMappedDocument getMappedDocumentInternal(long processInstanceId, String documentName) throws SBonitaReadException {
         final Map<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("processInstanceId", processInstanceId);
         parameters.put("name", documentName);
         SelectOneDescriptor<SMappedDocument> selectOneDescriptor = new SelectOneDescriptor<SMappedDocument>("getSMappedDocumentOfProcessWithName", parameters,
                 SDocument.class);
-        final SMappedDocument document = persistenceService.selectOne(selectOneDescriptor);
-        if (document == null) {
-            throw new SDocumentNotFoundException("Document not found: " + documentName + " for process instance: " + processInstanceId);
-        }
-        return document;
+        return persistenceService.selectOne(selectOneDescriptor);
     }
 
     @Override
@@ -537,5 +551,12 @@ public class DocumentServiceImpl implements DocumentService {
                     .done();
         }
         recorder.recordUpdate(updateRecord, updateEvent);
+    }
+
+    @Override
+    public SMappedDocument updateDocument(long documentId, int index, SDocument sDocument) throws SBonitaReadException, SDocumentNotFoundException, SDocumentMappingException, SRecorderException {
+    SDocumentMapping sDocumentMapping = getMappedDocument(documentId);
+        //TODO update indexes
+        return updateMappedDocument(sDocument, sDocumentMapping.getDescription(), index, sDocumentMapping);
     }
 }

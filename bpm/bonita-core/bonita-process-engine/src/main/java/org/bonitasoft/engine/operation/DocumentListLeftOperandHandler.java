@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
@@ -87,7 +88,7 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
 
     public void setDocumentList(List<DocumentValue> documentList, String documentName, long processInstanceId) throws SBonitaReadException,
             SObjectNotFoundException, SOperationExecutionException, SDocumentCreationException, SSessionNotFoundException, SDocumentNotFoundException,
-            SObjectModificationException {
+            SObjectModificationException, SObjectAlreadyExistsException {
         // get the list having the name
         List<SMappedDocument> currentList = getExistingDocumentList(documentName, processInstanceId);
         // iterate on elements
@@ -103,7 +104,7 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     private List<SMappedDocument> getExistingDocumentList(String documentName, long processInstanceId) throws SBonitaReadException, SObjectNotFoundException,
             SOperationExecutionException {
         List<SMappedDocument> currentList;
-        currentList = getAllDocumentOfTheList(processInstanceId, documentName);
+        currentList = getAllDocumentOfTheList(processInstanceId, documentName, documentService);
         // if it's not a list it throws an exception
         if (currentList.isEmpty() && !isListDefinedInDefinition(documentName, processInstanceId, processDefinitionService, processInstanceService)) {
             //            try {
@@ -118,7 +119,7 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
         return currentList;
     }
 
-    private List<SMappedDocument> getAllDocumentOfTheList(long processInstanceId, String name) throws SBonitaReadException {
+    public static List<SMappedDocument> getAllDocumentOfTheList(long processInstanceId, String name, DocumentService documentService) throws SBonitaReadException {
         QueryOptions queryOptions = new QueryOptions(0, 100);
         List<SMappedDocument> mappedDocuments;
         List<SMappedDocument> result = new ArrayList<SMappedDocument>();
@@ -138,7 +139,7 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     }
 
     private void processDocumentOnIndex(List<DocumentValue> documentList, String documentName, long processInstanceId, List<SMappedDocument> currentList,
-            int index) throws SDocumentCreationException, SSessionNotFoundException, SOperationExecutionException {
+            int index) throws SDocumentCreationException, SSessionNotFoundException, SOperationExecutionException, SObjectAlreadyExistsException {
         DocumentValue documentValue = documentList.get(index);
 
         if (documentValue.getDocumentId() != null) {

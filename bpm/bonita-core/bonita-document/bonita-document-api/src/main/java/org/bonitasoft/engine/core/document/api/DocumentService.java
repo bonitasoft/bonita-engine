@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.document.api;
 
 import java.util.List;
 
+import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.core.document.exception.SDocumentCreationException;
 import org.bonitasoft.engine.core.document.exception.SDocumentDeletionException;
@@ -78,7 +79,7 @@ public interface DocumentService {
      *         when the storage has failed
      */
     SMappedDocument attachDocumentToProcessInstance(SDocument document, long processInstanceId, String name, String description, int index)
-            throws SDocumentCreationException;
+            throws SDocumentCreationException, SObjectAlreadyExistsException;
 
     /**
      * Modify document information
@@ -407,4 +408,17 @@ public interface DocumentService {
      * @since 6.4.0
      */
     void emptyContentOfArchivedDocument(long documentId) throws SDocumentNotFoundException, SBonitaReadException, SRecorderException;
+
+    /**
+     * update the document having the documentId with this new version
+     * 
+     * @param documentId
+     *        the id of the document to update
+     * @param index
+     *        the index in the list of document
+     * @param sDocument
+     *        the new version of the document @return
+     *        the resulting document
+     */
+    SMappedDocument updateDocument(long documentId, int index, SDocument sDocument) throws SBonitaReadException, SDocumentNotFoundException, SDocumentMappingException, SRecorderException;
 }
