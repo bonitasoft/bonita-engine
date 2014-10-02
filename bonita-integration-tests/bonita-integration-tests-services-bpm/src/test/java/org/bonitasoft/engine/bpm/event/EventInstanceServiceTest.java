@@ -144,20 +144,6 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
         });
     }
 
-    private void checkTimerEventTriggerInstance(final STimerEventTriggerInstance expectedTriggerInstance,
-            final SEventTriggerInstance retrievedEventTriggerInstance) {
-        assertTrue(retrievedEventTriggerInstance instanceof STimerEventTriggerInstance);
-        final STimerEventTriggerInstance retrievedTimer = (STimerEventTriggerInstance) retrievedEventTriggerInstance;
-        assertEquals(expectedTriggerInstance.getTimerType(), retrievedTimer.getTimerType());
-        assertEquals(expectedTriggerInstance.getTimerValue(), retrievedTimer.getTimerValue());
-        checkEventTriggerInstance(expectedTriggerInstance, retrievedEventTriggerInstance);
-    }
-
-    private void checkEventTriggerInstance(final SEventTriggerInstance expectedTriggerInstance, final SEventTriggerInstance retrievedEventTriggerInstance) {
-        assertEquals(expectedTriggerInstance.getId(), retrievedEventTriggerInstance.getId());
-        assertEquals(expectedTriggerInstance.getEventInstanceId(), retrievedEventTriggerInstance.getEventInstanceId());
-    }
-
     private STimerEventTriggerInstance createTimerEventTriggerInstance(final long eventInstanceId, final STimerType timerType, final long timerValue)
             throws Exception {
         final STimerEventTriggerInstance triggerInstance = BuilderFactory.get(STimerEventTriggerInstanceBuilderFactory.class)
@@ -418,36 +404,6 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
         getEventInstance(startEventInstance.getId());
     }
 
-    @Test
-    public void testCreateAndRetrieveEventTriggerInstance() throws Exception {
-        final SProcessInstance processInstance = createSProcessInstance();
-        final SEventInstance startEventInstance = createSStartEventInstance("startEvent", 1, processInstance.getId(), 5,
-                processInstance.getId());
-
-        List<SEventTriggerInstance> triggerInstances = getEventTriggerInstances(startEventInstance.getId(), 0, 5);
-        assertTrue(triggerInstances.isEmpty());
-
-        final STimerEventTriggerInstance triggerInstance = createTimerEventTriggerInstance(startEventInstance.getId(),
-                STimerType.DURATION, 1000);
-        triggerInstances = getEventTriggerInstances(startEventInstance.getId(), 0, 5);
-        assertEquals(1, triggerInstances.size());
-        checkTimerEventTriggerInstance(triggerInstance, triggerInstances.get(0));
-
-        deleteSProcessInstance(processInstance);
-
-    }
-
-    private List<SEventTriggerInstance> getEventTriggerInstances(final long eventInstanceId, final int fromIndex, final int maxResults) throws Exception {
-        return userTransactionService.executeInTransaction(new Callable<List<SEventTriggerInstance>>() {
-
-            @Override
-            public List<SEventTriggerInstance> call() throws Exception {
-                return eventInstanceService.getEventTriggerInstances(eventInstanceId, fromIndex, maxResults,
-                        BuilderFactory.get(SEventTriggerInstanceBuilderFactory.class).getIdKey(), OrderByType.ASC);
-            }
-        });
-    }
-
     private <T extends SWaitingEvent> List<T> searchWaitingEvents(final Class<T> clazz, final QueryOptions searchOptions) throws Exception {
         return transactionService.executeInTransaction(new Callable<List<T>>() {
 
@@ -488,37 +444,15 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
         });
     }
 
-    @Test
-    public void testRetrieveEventTriggerInstanceById() throws Exception {
-        final SProcessInstance processInstance = createSProcessInstance();
-        final SEventInstance startEventInstance = createSStartEventInstance("startEvent", 1, processInstance.getId(), 5,
-                processInstance.getId());
-
-        final STimerEventTriggerInstance triggerInstance = createTimerEventTriggerInstance(startEventInstance.getId(), STimerType.DURATION, 1000);
-        final SEventTriggerInstance retrievedEventTrigger = getEventTrigger(triggerInstance.getId());
-        checkTimerEventTriggerInstance(triggerInstance, retrievedEventTrigger);
-
-        deleteSProcessInstance(processInstance);
-    }
-
-    private SEventTriggerInstance getEventTrigger(final long triggerEventInstanceId) throws Exception {
-        return transactionService.executeInTransaction(new Callable<SEventTriggerInstance>() {
-
-            @Override
-            public SEventTriggerInstance call() throws Exception {
-                return eventInstanceService.getEventTriggerInstance(triggerEventInstanceId);
-            }
-        });
-    }
-
-    private List<SEventTriggerInstance> getEventTriggers(final long eventInstanceId, final int fromIndex, final int maxResults, final String fieldName,
-            final OrderByType orderByType) throws Exception {
+    private List<SEventTriggerInstance> getEventTriggers(final long eventInstanceId, final int fromIndex, final int maxResults, final OrderByType orderByType)
+            throws Exception {
         return transactionService.executeInTransaction(new Callable<List<SEventTriggerInstance>>() {
 
             @Override
             public List<SEventTriggerInstance> call() throws Exception {
-                return eventInstanceService.getEventTriggerInstances(eventInstanceId, fromIndex, maxResults,
-                        fieldName, orderByType);
+                final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SEventTriggerInstance.class, BuilderFactory.get(
+                        SEventTriggerInstanceBuilderFactory.class).getIdKey(), orderByType);
+                return eventInstanceService.getEventTriggerInstances(eventInstanceId, queryOptions);
             }
         });
     }
@@ -531,14 +465,12 @@ public class EventInstanceServiceTest extends CommonBPMServicesTest {
         createTimerEventTriggerInstance(startEventInstance.getId(), STimerType.DURATION, 1000);
 
         List<SEventTriggerInstance> eventTriggers = getEventTriggers(startEventInstance.getId(), 0, 10,
-                BuilderFactory.get(SEventTriggerInstanceBuilderFactory.class).getEventInstanceIdKey(),
                 OrderByType.ASC);
         assertEquals(1, eventTriggers.size());
 
         deleteSProcessInstance(processInstance);
 
-        eventTriggers = getEventTriggers(startEventInstance.getId(), 0, 10, BuilderFactory.get(SEventTriggerInstanceBuilderFactory.class)
-                .getEventInstanceIdKey(), OrderByType.ASC);
+        eventTriggers = getEventTriggers(startEventInstance.getId(), 0, 10, OrderByType.ASC);
         assertEquals(0, eventTriggers.size());
     }
 

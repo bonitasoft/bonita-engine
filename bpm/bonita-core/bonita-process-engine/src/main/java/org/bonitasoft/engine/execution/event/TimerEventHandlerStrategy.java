@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -29,12 +29,16 @@ import org.bonitasoft.engine.core.process.definition.model.event.SEventDefinitio
 import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.STimerEventTriggerDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.trigger.STimerType;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.STimerEventTriggerInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
@@ -56,6 +60,7 @@ import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class TimerEventHandlerStrategy extends EventHandlerStrategy {
 
@@ -65,12 +70,15 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
 
     private final ExpressionResolverService expressionResolverService;
 
+    private final EventInstanceService eventInstanceService;
+
     private final TechnicalLoggerService logger;
 
     public TimerEventHandlerStrategy(final ExpressionResolverService expressionResolverService, final SchedulerService schedulerService,
-            final TechnicalLoggerService logger) {
+            final EventInstanceService eventInstanceService, final TechnicalLoggerService logger) {
         this.schedulerService = schedulerService;
         this.expressionResolverService = expressionResolverService;
+        this.eventInstanceService = eventInstanceService;
         this.logger = logger;
     }
 
@@ -80,7 +88,7 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
         final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), eventDefinition, eventInstance);
         final SJobDescriptor jobDescriptor = getJobDescriptor(jobName);
         final List<SJobParameter> jobParameters = getJobParameters(processDefinition, eventDefinition, eventInstance);
-        scheduleJob(processDefinition, eventInstance, sEventTriggerDefinition, jobDescriptor, jobParameters);
+        scheduleJob(processDefinition, eventInstance, (STimerEventTriggerDefinition) sEventTriggerDefinition, jobDescriptor, jobParameters);
     }
 
     protected Trigger getTrigger(final STimerEventTriggerDefinition timerTrigger, final SCatchEventInstance eventInstance, final long processDefinitionId)
@@ -144,14 +152,20 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
 
         // TODO not only process scope
 
-        scheduleJob(processDefinition, null, sEventTriggerDefinition, jobDescriptor, jobParameters);
+        scheduleJob(processDefinition, null, (STimerEventTriggerDefinition) sEventTriggerDefinition, jobDescriptor, jobParameters);
     }
 
     private void scheduleJob(final SProcessDefinition processDefinition, final SCatchEventInstance eventInstance,
-            final SEventTriggerDefinition sEventTriggerDefinition, final SJobDescriptor jobDescriptor, final List<SJobParameter> jobParameters)
+            final STimerEventTriggerDefinition sEventTriggerDefinition, final SJobDescriptor jobDescriptor, final List<SJobParameter> jobParameters)
             throws SBonitaException {
-        final Trigger trigger = getTrigger((STimerEventTriggerDefinition) sEventTriggerDefinition, eventInstance, processDefinition.getId());
+        final Trigger trigger = getTrigger(sEventTriggerDefinition, eventInstance, processDefinition.getId());
         schedulerService.schedule(jobDescriptor, jobParameters, trigger);
+        if (sEventTriggerDefinition.getTimerType() != STimerType.CYCLE) {
+            final STimerEventTriggerInstance sEventTriggerInstance = BuilderFactory.get(STimerEventTriggerInstanceBuilderFactory.class)
+                    .createNewTimerEventTriggerInstance(eventInstance.getId(), eventInstance.getName(), trigger.getStartDate().getTime(), trigger.getName())
+                    .done();
+            eventInstanceService.createEventTriggerInstance(sEventTriggerInstance);
+        }
     }
 
     private List<SJobParameter> getJobParameters(final SProcessDefinition processDefinition, final SEventDefinition eventDefinition,

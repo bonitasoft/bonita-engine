@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,17 +13,13 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder.event.trigger;
 
-import org.bonitasoft.engine.core.process.definition.model.event.trigger.STimerType;
-
 /**
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public interface STimerEventTriggerInstanceBuilderFactory extends SEventTriggerInstanceBuilderFactory {
 
-    STimerEventTriggerInstanceBuilder createNewTimerEventTriggerInstance(final long eventInstanceId, final STimerType timerType, final long timerValue);
-
-    String getTimerTypeKey();
-
-    String getTimerValueKey();
+    STimerEventTriggerInstanceBuilder createNewTimerEventTriggerInstance(long eventInstanceId, String eventInstanceName, long executionDate,
+            String jobTriggerName);
 
 }

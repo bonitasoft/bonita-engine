@@ -16,21 +16,16 @@ package org.bonitasoft.engine.core.process.instance.api.event;
 import java.util.List;
 
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceCreationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceDeletionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
@@ -64,15 +59,13 @@ public interface EventInstanceService extends FlowNodeInstanceService {
 
     void createEventInstance(SEventInstance eventInstance) throws SEventInstanceCreationException;
 
-    void createEventTriggerInstance(SEventTriggerInstance eventTriggerInstance) throws SEventTriggerInstanceCreationException;
+    void createEventTriggerInstance(SEventTriggerInstance sEventTriggerInstance) throws SEventTriggerInstanceCreationException;
 
     void createMessageInstance(SMessageInstance messageInstance) throws SMessageInstanceCreationException;
 
     void createWaitingEvent(SWaitingEvent waitingEvent) throws SWaitingEventCreationException;
 
     SWaitingErrorEvent getBoundaryWaitingErrorEvent(long relatedActivityInstanceId, String errorCode) throws SWaitingEventReadException;
-
-    SEventInstance getEventInstance(long eventInstanceId) throws SEventInstanceNotFoundException, SEventInstanceReadException;
 
     List<SEventInstance> getEventInstances(long rootContainerId, int fromIndex, int maxResults, String fieldName, OrderByType orderByType)
             throws SEventInstanceReadException;
@@ -87,11 +80,7 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      */
     List<SBoundaryEventInstance> getActivityBoundaryEventInstances(long activityInstanceId, int fromIndex, int maxResults) throws SEventInstanceReadException;
 
-    SEventTriggerInstance getEventTriggerInstance(long eventTriggerInstanceId) throws SEventTriggerInstanceNotFoundException,
-            SEventTriggerInstanceReadException;
-
-    List<SEventTriggerInstance> getEventTriggerInstances(long eventInstanceId, int fromIndex, int maxResults, String fieldName, OrderByType orderByType)
-            throws SEventTriggerInstanceReadException;
+    SEventTriggerInstance getEventTriggerInstance(long eventTriggerInstanceId) throws SEventTriggerInstanceReadException;
 
     List<SEventTriggerInstance> getEventTriggerInstances(long eventInstanceId, QueryOptions queryOptions) throws SEventTriggerInstanceReadException;
 
@@ -120,9 +109,9 @@ public interface EventInstanceService extends FlowNodeInstanceService {
 
     List<SMessageEventCouple> getMessageEventCouples(int fromIndex, int maxResults) throws SEventTriggerInstanceReadException;
 
-    SWaitingMessageEvent getWaitingMessage(long waitingMessageId) throws SWaitingEventNotFoundException, SWaitingEventReadException;
+    SWaitingMessageEvent getWaitingMessage(long waitingMessageId) throws SWaitingEventReadException;
 
-    SMessageInstance getMessageInstance(long messageInstanceId) throws SMessageInstanceNotFoundException, SMessageInstanceReadException;
+    SMessageInstance getMessageInstance(long messageInstanceId) throws SMessageInstanceReadException;
 
     void updateWaitingMessage(SWaitingMessageEvent waitingMessageEvent, EntityUpdateDescriptor descriptor) throws SWaitingEventModificationException;
 
@@ -135,8 +124,6 @@ public interface EventInstanceService extends FlowNodeInstanceService {
     <T extends SEventTriggerInstance> List<T> searchEventTriggerInstances(Class<T> entityClass, QueryOptions searchOptions) throws SBonitaSearchException;
 
     long getNumberOfEventTriggerInstances(Class<? extends SEventTriggerInstance> entityClass, QueryOptions countOptions) throws SBonitaSearchException;
-
-    SWaitingEvent getWaitingEvent(Long waintingEventId) throws SWaitingEventNotFoundException, SWaitingEventReadException;
 
     /**
      * @param eventInstanceId
@@ -159,23 +146,43 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      * @throws SFlowNodeReadException
      * @since 6.1
      */
-    void deleteWaitingEvents(SFlowNodeInstance flowNodeInstance) throws SWaitingEventModificationException, SFlowNodeReadException;
+    void deleteWaitingEvents(SFlowNodeInstance flowNodeInstance) throws SWaitingEventModificationException, SBonitaSearchException;
 
     /**
-     * Resets all Message Instances marked as handled, so that they are elligible to match Waiting Events again.
+     * Resets all Message Instances marked as handled, so that they are eligible to match Waiting Events again.
      * 
      * @throws SMessageModificationException
-     *         if an error occurs when resetting the 'handled' flag.
+     *             if an error occurs when resetting the 'handled' flag.
      */
     int resetProgressMessageInstances() throws SMessageModificationException;
 
     /**
-     * Resets all Waiting Message Events marked as 'in progress", so that they are elligible to match Message Instances again.
+     * Resets all Waiting Message Events marked as 'in progress", so that they are eligible to match Message Instances again.
      * 
      * @return the number of waiting events reset.
      * @throws SWaitingEventModificationException
-     *         if an error occurs when resetting the 'progress' flag.
+     *             if an error occurs when resetting the 'progress' flag.
      */
     int resetInProgressWaitingEvents() throws SWaitingEventModificationException;
+
+    /**
+     * @param processInstanceId
+     *            The identifier of the process instance
+     * @param searchOptions
+     *            Criteria of the search
+     * @return The number of EventTriggerInstances on the specific process instance & corresponding to the criteria
+     * @since 6.4.0
+     */
+    long getNumberOfEventTriggerInstances(long processInstanceId, QueryOptions queryOptions) throws SBonitaSearchException;
+
+    /**
+     * @param processInstanceId
+     *            The identifier of the process instance
+     * @param searchOptions
+     *            Criteria of the search
+     * @return The list of EventTriggerInstances on the specific process instance & corresponding to the criteria
+     * @since 6.4.0
+     */
+    List<SEventTriggerInstance> searchEventTriggerInstances(long processInstanceId, QueryOptions queryOptions) throws SBonitaSearchException;
 
 }

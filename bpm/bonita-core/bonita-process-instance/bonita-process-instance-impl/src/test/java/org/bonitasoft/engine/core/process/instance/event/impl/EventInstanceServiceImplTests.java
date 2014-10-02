@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2014 Bonitasoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,32 +11,23 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.process.instance.model.event.trigger;
+package org.bonitasoft.engine.core.process.instance.event.impl;
+
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * @author Celine Souchet
  * @version 6.4.0
  * @since 6.4.0
  */
-public interface STimerEventTriggerInstance extends SEventTriggerInstance {
-
-    /**
-     * @return The date of the execution of the trigger
-     * @since 6.4.0
-     */
-    long getExecutionDate();
-
-    /**
-     * @return The name of the trigger of the job
-     * @see org.quartz.Trigger
-     * @since 6.4.0
-     */
-    String getJobTriggerName();
-
-    /**
-     * @return The name of the {@link org.bonitasoft.engine.core.process.instance.model.event.SEventInstance}
-     * @since 6.4.0
-     */
-    String getEventInstanceName();
+@RunWith(Suite.class)
+@SuiteClasses({
+        EventInstanceServiceImplForEventTest.class,
+        EventInstanceServiceImplForEventTriggerTest.class,
+        EventInstanceServiceImplForMessageTest.class,
+        EventInstanceServiceImplForWaitingTest.class })
+public class EventInstanceServiceImplTests {
 
 }
