@@ -11,6 +11,7 @@ package com.bonitasoft.engine;
 import org.bonitasoft.engine.BonitaSuiteRunner;
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.process.task.PendingTasksTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
@@ -42,6 +43,7 @@ import com.bonitasoft.engine.tenant.TenantIT;
     ExternalCommandsTestSP.class,
     TaskOnDemandTest.class,
     ProcessManagementTest.class,
+    PendingTasksTest.class,
     ProcessSupervisedTest.class,
     ProfileSPITest.class,
     MonitoringAPITest.class,

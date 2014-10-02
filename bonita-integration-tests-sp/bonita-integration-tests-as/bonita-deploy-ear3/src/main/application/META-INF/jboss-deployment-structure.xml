@@ -1,0 +1,13 @@
+<jboss-deployment-structure>
+    <ear-subdeployments-isolated>false</ear-subdeployments-isolated>
+    <deployment>
+      <dependencies>
+       <system>
+        <paths>
+         <path name="javax/annotation/processing"/>
+         <path name="com/sun/management"/>
+        </paths>
+       </system>
+      </dependencies>
+    </deployment>
+</jboss-deployment-structure>

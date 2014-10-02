@@ -9,3 +9,4 @@ Temporary*.java
 *.orig
 engine-sp-it.exec
 *.tmp
+**/bin

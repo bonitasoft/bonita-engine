@@ -12,11 +12,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import com.bonitasoft.engine.bdm.BusinessObjectDAOFactoryTest;
+
 /**
  * @author Emmanuel Duchastenier
  */
 @RunWith(Suite.class)
-@SuiteClasses({ BusinessArchiveTests.class })
+@SuiteClasses({ BusinessArchiveTests.class, BusinessObjectDAOFactoryTest.class })
 public class BusinessArchiveTestSuite {
 
 }
