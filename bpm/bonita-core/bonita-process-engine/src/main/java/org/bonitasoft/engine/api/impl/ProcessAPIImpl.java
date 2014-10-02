@@ -5707,6 +5707,11 @@ public class ProcessAPIImpl implements ProcessAPI {
         documentAPIImpl.setDocumentList(processInstanceId, name, documentsValues);
     }
 
+    @Override
+    public void emptyContentOfArchivedDocument(long documentId) throws DocumentException, DocumentNotFoundException {
+        documentAPIImpl.emptyContentOfArchivedDocument(documentId);
+    }
+
     TenantServiceAccessor getTenantAccessor() {
         return APIUtils.getTenantAccessor();
     }

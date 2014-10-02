@@ -20,6 +20,7 @@ import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
@@ -312,7 +313,8 @@ public class RecorderTest extends CommonServiceTest {
         final Human humanToUpdate = getHumanByFirstName("firstName");
         assertNotNull(humanToUpdate);
         final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(HUMAN).setObject(human).done();
-        recorder.recordUpdate(UpdateRecord.buildSetField(humanToUpdate, "firstName", "firstName", "firstNameUpdate"), updateEvent);
+        Map<String, Object> stringObjectMap = Collections.<String, Object>singletonMap("firstName", "firstName");
+        recorder.recordUpdate(UpdateRecord.buildSetFields(humanToUpdate, stringObjectMap), updateEvent);
         getTransactionService().setRollbackOnly();
         getTransactionService().complete();
 

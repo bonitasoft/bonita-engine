@@ -17,7 +17,7 @@ import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
-import org.bonitasoft.engine.core.document.exception.SProcessDocumentCreationException;
+import org.bonitasoft.engine.core.document.exception.SDocumentCreationException;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -71,7 +71,7 @@ public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandl
     }
 
     private void createOrUpdateDocument(DocumentValue newValue, String documentName, long processInstanceId) throws SSessionNotFoundException,
-            SBonitaReadException, SProcessDocumentCreationException {
+            SBonitaReadException, SDocumentCreationException {
         final SDocument document = createDocumentObject(newValue);
         try {
             // Let's check if the document already exists:

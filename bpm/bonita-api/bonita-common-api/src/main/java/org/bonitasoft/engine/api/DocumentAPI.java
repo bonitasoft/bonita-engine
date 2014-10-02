@@ -273,6 +273,10 @@ public interface DocumentAPI {
 
     /**
      * Remove the document with the specified identifier and returns it.
+     * <p>
+     * this archive and delete mapping on the process, i.e. the content of the document itself will be kept in database, use
+     * {@link #emptyContentOfArchivedDocument} to delete the content
+     * </p>
      *
      * @param documentId
      *        The identifier of the document to retrieve
@@ -281,7 +285,7 @@ public interface DocumentAPI {
      *         when the document identifier does not refer to an existing document
      * @throws InvalidSessionException
      *         when the session is not valid
-     * @since 6.0
+     * @since 6.4.0
      */
     Document removeDocument(long documentId) throws DocumentNotFoundException, DeletionException;
 
@@ -509,4 +513,18 @@ public interface DocumentAPI {
      */
     void setDocumentList(long processInstanceId, String name, List<DocumentValue> documentsValues) throws DocumentNotFoundException, DocumentException;
 
+    /**
+     * Remove the content of an archived document while keeping it's metadata.
+     * <p>
+     * After calling this method you will not be able to retrieve the content of the document since it will be erased from the database.
+     * This method can be useful for keeping history of a document without overloading the database.
+     * </p>
+     *
+     * @param documentId
+     *        the id of the archived document to remove content on
+     * @throws DocumentNotFoundException
+     * @throws DocumentException
+     * @since 6.4.0
+     */
+    void emptyContentOfArchivedDocument(long documentId) throws DocumentException, DocumentNotFoundException;
 }

@@ -1448,4 +1448,43 @@ public class DocumentIntegrationTest extends CommonAPITest {
         deleteUser(john);
     }
 
+
+    @Test
+    public void deleteContentOfArchivedDocumentTest() throws Exception {
+        //given
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithDocumentToDelete", "1.0");
+        User john = createUser("john", "bpm");
+        builder.addActor("actor");
+        builder.addUserTask("step1","actor");
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "actor", john);
+
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        Document doc1v1 = getProcessAPI().attachDocument(processInstance.getId(), "doc1", "fileWithContent.txt", "plain/text", "TheContent1".getBytes());
+        getProcessAPI().attachNewDocumentVersion(processInstance.getId(), "doc1", "fileWithContent.txt", "plain/text", "theUrl");
+        Document doc1v3 = getProcessAPI().attachNewDocumentVersion(processInstance.getId(), "doc1", "fileWithContent.txt", "plain/text", "TheContent2".getBytes());
+        Document doc2v1 = getProcessAPI().attachDocument(processInstance.getId(), "doc2", "fileWithContent.txt", "plain/text", "TheContent".getBytes());
+        Document doc2v2 = getProcessAPI().attachNewDocumentVersion(processInstance.getId(), "doc2", "fileWithContent.txt", "plain/text", "TheContent2".getBytes());
+        Document doc2v3 = getProcessAPI().attachNewDocumentVersion(processInstance.getId(), "doc2", "fileWithContent.txt", "plain/text", "TheContent3".getBytes());
+
+        //when
+        SearchResult<ArchivedDocument> archivedDocumentSearchResult = getProcessAPI().searchArchivedDocuments(new SearchOptionsBuilder(0, 100).filter(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId()).filter(ArchivedDocumentsSearchDescriptor.DOCUMENT_NAME, "doc1").sort(ArchivedDocumentsSearchDescriptor.DOCUMENT_VERSION, Order.ASC).done());
+
+
+        ArchivedDocument archDov1v1 = archivedDocumentSearchResult.getResult().get(0);
+        assertThat(archDov1v1.getContentStorageId()).isEqualTo(doc1v1.getContentStorageId());
+        getProcessAPI().emptyContentOfArchivedDocument(archDov1v1.getId());
+
+
+        //then
+        assertThat(getProcessAPI().getDocumentContent(doc1v1.getContentStorageId())).isNull();
+        assertThat(getProcessAPI().getDocumentContent(doc1v3.getContentStorageId())).isNotNull();
+        assertThat(getProcessAPI().getDocumentContent(doc2v1.getContentStorageId())).isNotNull();
+        assertThat(getProcessAPI().getDocumentContent(doc2v2.getContentStorageId())).isNotNull();
+        assertThat(getProcessAPI().getDocumentContent(doc2v3.getContentStorageId())).isNotNull();
+
+
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(john);
+    }
+
 }
