@@ -1179,6 +1179,21 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
     }
 
+    @Test
+    public void startProcessWithDocumentDefinitionWithNoInitialValue() throws Exception {
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithDocumentWithLongName", "1.0");
+        processBuilder.addActor(ACTOR_NAME).addUserTask("step1", ACTOR_NAME);
+    processBuilder.addDocumentDefinition("plop");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
+        getProcessAPI().startProcess(processDefinition.getId());
+
+        //process should be started even if no initial valu on document
+        waitForUserTask("step1");
+
+        disableAndDeleteProcess(processDefinition.getId());
+
+    }
+
     private Expression getDocumentValueExpressionWithUrl(final String url) throws InvalidExpressionException {
         return new ExpressionBuilder().createGroovyScriptExpression("script", "return new org.bonitasoft.engine.bpm.document.DocumentValue(\"" + url + "\");",
                 DocumentValue.class.getName());

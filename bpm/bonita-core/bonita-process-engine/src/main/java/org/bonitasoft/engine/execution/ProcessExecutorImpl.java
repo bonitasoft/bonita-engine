@@ -620,8 +620,6 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                 } else if (document.getUrl() != null) {
                     attachDocument(sProcessInstance.getId(), document.getName(), document.getFileName(), document.getContentMimeType(), document.getUrl(),
                             authorId, document.getDescription(), -1);
-                } else {
-                    throw new SDocumentCreationException("Unable to create documents. A document was defined without url or content.");
                 }
             }
         }

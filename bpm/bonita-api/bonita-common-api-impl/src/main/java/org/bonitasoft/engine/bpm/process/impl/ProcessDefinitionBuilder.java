@@ -330,9 +330,6 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     private void validateDocuments(final FlowElementContainerDefinition processContainer) {
         for (final DocumentDefinition document : processContainer.getDocumentDefinitions()) {
-            if ((document.getFileName() == null || document.getFileName().isEmpty()) && (document.getUrl() == null || document.getUrl().isEmpty())) {
-                designErrors.add("A document definition must have a file name or an URL: " + document.getName());
-            }
             if (document.getUrl() != null && document.getUrl().length() > MAX_CHARACTER_URL) {
                 designErrors.add("An url can't have more than " + MAX_CHARACTER_URL + " characters.");
             }
