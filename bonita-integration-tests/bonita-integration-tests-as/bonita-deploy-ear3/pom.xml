@@ -81,17 +81,13 @@
 							<artifactId>commons-pool</artifactId>
 						</jarModule>
 					</modules>
-
 					<generateApplicationXml>true</generateApplicationXml>
-					<version>5</version>
+					<version>7</version>
 					<displayName>Bonita Application</displayName>
+                    <!-- WARNING : the applicationName is used for JNDI lookup in EJB client connection URL in org.bonitasoft.engine.api.EJB3ServerAPI -->
+                    <applicationName>bonita-ear</applicationName>
 					<description>Bonita Application</description>
 					<defaultJavaBundleDir>lib</defaultJavaBundleDir>
-
-					<jboss>
-						<version>5</version>
-						<loader-repository>org.bonitasoft.engine:archive=${project.artifactId}-${project.version}.ear</loader-repository>
-					</jboss>
 
 				</configuration>
 			</plugin>
