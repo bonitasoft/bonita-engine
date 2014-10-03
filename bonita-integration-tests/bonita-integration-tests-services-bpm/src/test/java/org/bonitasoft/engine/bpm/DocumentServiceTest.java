@@ -256,14 +256,14 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
     private void delete(final List<SMappedDocument> sDocuments) throws SBonitaException {
         transactionService.begin();
         for (final SMappedDocument sDocument : sDocuments) {
-            documentService.removeDocument(sDocument);
+            documentService.removeCurrentVersion(sDocument);
         }
         transactionService.complete();
     }
 
     private void delete(final SMappedDocument mappedDocument) throws SBonitaException {
         transactionService.begin();
-        documentService.removeDocument(mappedDocument);
+        documentService.removeCurrentVersion(mappedDocument);
         documentService.deleteDocument(documentService.getDocument(mappedDocument.getDocumentId()));
         transactionService.complete();
     }
