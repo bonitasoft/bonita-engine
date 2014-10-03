@@ -264,6 +264,8 @@ public interface DocumentService {
      */
     long getNumberOfArchivedDocuments(QueryOptions queryOptions) throws SBonitaSearchException;
 
+    void removeDocument(SMappedDocument mappedDocument) throws SDocumentDeletionException;
+
     /**
      * Search all archived documents according to the query criteria.
      *

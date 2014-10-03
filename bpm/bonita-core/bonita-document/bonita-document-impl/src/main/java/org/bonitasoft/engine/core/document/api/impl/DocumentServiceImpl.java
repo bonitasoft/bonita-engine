@@ -432,6 +432,7 @@ public class DocumentServiceImpl implements DocumentService {
         recorder.recordDelete(deleteRecord, deleteEvent);
     }
 
+    @Override
     public void removeDocument(final SMappedDocument mappedDocument) throws SDocumentDeletionException {
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(mappedDocument);
