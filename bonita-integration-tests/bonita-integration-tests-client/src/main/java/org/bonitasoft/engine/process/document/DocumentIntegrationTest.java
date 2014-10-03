@@ -140,7 +140,11 @@ public class DocumentIntegrationTest extends CommonAPITest {
             } catch (DocumentNotFoundException e) {
                 //ok
             }
-            //TODO check content is deleted?
+            SearchResult<ArchivedDocument> archivedDocumentSearchResult = getProcessAPI().searchArchivedDocuments(
+                    new SearchOptionsBuilder(0, 100).filter(ArchivedDocumentsSearchDescriptor.SOURCEOBJECT_ID, document.getId()).done());
+            assertThat(archivedDocumentSearchResult.getResult()).hasSize(1);
+            assertThat(archivedDocumentSearchResult.getResult().get(0).getContentStorageId()).isEqualTo(document.getContentStorageId());
+            assertThat(getProcessAPI().getDocumentContent(document.getContentStorageId())).isEqualTo(new byte[] { 1, 2, 3 });
 
         } finally {
             disableAndDeleteProcess(pi.getProcessDefinitionId());
@@ -523,10 +527,11 @@ public class DocumentIntegrationTest extends CommonAPITest {
     public void searchDocuments() throws Exception {
         // add a new document, search it.
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
-        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessDoc","12000");
-        builder.addActor("actor").addUserTask("step1","actor");
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessDoc", "12000");
+        builder.addActor("actor").addUserTask("step1", "actor");
         builder.addDocumentDefinition("Doc1").addDescription("This is a description").addContentFileName("doc.jpg").addMimeType("image").addFile("doc.jpg");
-        BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(builder.done()).addDocumentResource(new BarResource("doc.jpg", "Hello World".getBytes()));
+        BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(builder.done())
+                .addDocumentResource(new BarResource("doc.jpg", "Hello World".getBytes()));
         ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), "actor", user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         searchOptionsBuilder.filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId());
@@ -1183,7 +1188,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
     public void startProcessWithDocumentDefinitionWithNoInitialValue() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithDocumentWithLongName", "1.0");
         processBuilder.addActor(ACTOR_NAME).addUserTask("step1", ACTOR_NAME);
-    processBuilder.addDocumentDefinition("plop");
+        processBuilder.addDocumentDefinition("plop");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
         getProcessAPI().startProcess(processDefinition.getId());
 
@@ -1333,7 +1338,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         UserTaskDefinitionBuilder userTaskDefinitionBuilder = builder.addUserTask("updateStep", "john");
         userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDocumentList("invoices", scriptExpression1));
         userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDocumentList("emptyList", scriptExpression2));
-//        userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDocumentList("unknown", scriptExpression2));
+        //        userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDocumentList("unknown", scriptExpression2));
         UserTaskDefinitionBuilder verifyStepBuilder = builder.addUserTask("verifyStep", "john");
         verifyStepBuilder.addDisplayDescription(new ExpressionBuilder().createGroovyScriptExpression("getInvoicesListSize",
                 "String.valueOf(invoices.size())",
@@ -1360,7 +1365,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         //we have a process with an initialized list and a non initialized list
 
         //check with api methods
-        List<Document> invoices1 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices",0,100);
+        List<Document> invoices1 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices", 0, 100);
         assertThat(invoices1).hasSize(4);
         Document urlDocument = invoices1.get(0);
         assertThat(urlDocument.getUrl()).isEqualTo("http://www.myrul.com/mydoc.txt");
@@ -1368,26 +1373,26 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertThat(fileDocument.hasContent()).isTrue();
         assertThat(fileDocument.getContentFileName()).isEqualTo("file.txt");
         assertThat(getProcessAPI().getDocumentContent(fileDocument.getContentStorageId())).isEqualTo("hello1".getBytes());
-        List<Document> emptyList = getProcessAPI().getDocumentList(processInstance.getId(), "emptyList",0,100);
+        List<Document> emptyList = getProcessAPI().getDocumentList(processInstance.getId(), "emptyList", 0, 100);
         assertThat(emptyList).isEmpty();
         try {
 
-            getProcessAPI().getDocumentList(processInstance.getId(), "unknown",0,100);
+            getProcessAPI().getDocumentList(processInstance.getId(), "unknown", 0, 100);
             fail("should not find document list unknown");
         } catch (DocumentNotFoundException e) {
             //ok
         }
-        getProcessAPI().updateProcessDataInstance("doc1Id",processInstance.getId(),urlDocument.getId());
-        getProcessAPI().updateProcessDataInstance("doc2Id",processInstance.getId(),fileDocument.getId());
+        getProcessAPI().updateProcessDataInstance("doc1Id", processInstance.getId(), urlDocument.getId());
+        getProcessAPI().updateProcessDataInstance("doc2Id", processInstance.getId(), fileDocument.getId());
 
         //execute operation to update
         assignAndExecuteStep(step1, john.getId());
-        HumanTaskInstance updateStep = waitForUserTask("updateStep",processInstance);
-        assignAndExecuteStep(updateStep,john.getId());
+        HumanTaskInstance updateStep = waitForUserTask("updateStep", processInstance);
+        assignAndExecuteStep(updateStep, john.getId());
         HumanTaskInstance verifyStep = waitForUserTask("verifyStep");
 
         //check with api methods
-        invoices1 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices",0,100);
+        invoices1 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices", 0, 100);
         assertThat(invoices1).hasSize(3);
         Document movedFileDocument = invoices1.get(0);
         assertThat(movedFileDocument).isEqualTo(fileDocument);// was in index 2, now in index 1
@@ -1404,10 +1409,9 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertThat(updatedUrlFile.getVersion()).isEqualTo("2");
         assertThat(new String(getProcessAPI().getDocumentContent(updatedUrlFile.getContentStorageId()))).isEqualTo("updatedDocFromUrl");
 
+        assertThat(getProcessAPI().getDocumentList(processInstance.getId(), "invoices", 1, 1).get(0)).isEqualTo(emptyListDoc);
 
-        assertThat(getProcessAPI().getDocumentList(processInstance.getId(), "invoices",1,1).get(0)).isEqualTo(emptyListDoc);
-
-        emptyList = getProcessAPI().getDocumentList(processInstance.getId(), "emptyList",0,100);
+        emptyList = getProcessAPI().getDocumentList(processInstance.getId(), "emptyList", 0, 100);
         assertThat(emptyList).hasSize(1);
 
         emptyListDoc = emptyList.get(0);
@@ -1415,14 +1419,13 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertThat(emptyListDoc.getContentFileName()).isEqualTo("file.txt");
         assertThat(getProcessAPI().getDocumentContent(emptyListDoc.getContentStorageId())).isEqualTo("updatedDoc".getBytes());
 
-
-//        List<Document> unknown = getProcessAPI().getDocumentList(processInstance.getId(), "unknown");
-//        assertThat(unknown).hasSize(1);
+        //        List<Document> unknown = getProcessAPI().getDocumentList(processInstance.getId(), "unknown");
+        //        assertThat(unknown).hasSize(1);
 
         //modify list with api method
-        getProcessAPI().setDocumentList(processInstance.getId(),"invoices",Arrays.asList(new DocumentValue(updatedUrlFile.getId())) );
+        getProcessAPI().setDocumentList(processInstance.getId(), "invoices", Arrays.asList(new DocumentValue(updatedUrlFile.getId())));
 
-        List<Document> invoices2 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices",0,100);
+        List<Document> invoices2 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices", 0, 100);
         assertThat(invoices2).hasSize(1);
         updatedUrlFile = invoices2.get(0);
         assertThat(updatedUrlFile.getId()).isEqualTo(urlDocument.getId());
@@ -1431,22 +1434,19 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertThat(updatedUrlFile.getVersion()).isEqualTo("2");
         assertThat(new String(getProcessAPI().getDocumentContent(updatedUrlFile.getContentStorageId()))).isEqualTo("updatedDocFromUrl");
 
-
         //expression is executed on the display name of the verify step, the display name is the list size
         assertThat(verifyStep.getDisplayDescription()).isEqualTo("3");
 
-
         //update empty list to have 3 version archived
-        getProcessAPI().setDocumentList(processInstance.getId(),"emptyList",
-                Arrays.asList(new DocumentValue(emptyListDoc.getId(),"anUrl1"),new DocumentValue("anUrl2")));
-        getProcessAPI().setDocumentList(processInstance.getId(),"emptyList",
-                Arrays.asList(new DocumentValue("anUrl3"),new DocumentValue("anUrl4")));
+        getProcessAPI().setDocumentList(processInstance.getId(), "emptyList",
+                Arrays.asList(new DocumentValue(emptyListDoc.getId(), "anUrl1"), new DocumentValue("anUrl2")));
+        getProcessAPI().setDocumentList(processInstance.getId(), "emptyList",
+                Arrays.asList(new DocumentValue("anUrl3"), new DocumentValue("anUrl4")));
 
         SearchResult<ArchivedDocument> searchAllVersions = getProcessAPI().searchArchivedDocuments(new SearchOptionsBuilder(0, 100)
                 .filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId())
                 .sort(DocumentsSearchDescriptor.DOCUMENT_NAME, Order.ASC)
                 .sort(DocumentsSearchDescriptor.DOCUMENT_VERSION, Order.ASC).done());
-
 
         assertThat(searchAllVersions.getCount()).isEqualTo(8);
         List<ArchivedDocument> result = searchAllVersions.getResult();
@@ -1463,32 +1463,35 @@ public class DocumentIntegrationTest extends CommonAPITest {
         deleteUser(john);
     }
 
-
     @Test
     public void deleteContentOfArchivedDocumentTest() throws Exception {
         //given
         ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processWithDocumentToDelete", "1.0");
         User john = createUser("john", "bpm");
         builder.addActor("actor");
-        builder.addUserTask("step1","actor");
+        builder.addUserTask("step1", "actor");
         ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "actor", john);
 
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         Document doc1v1 = getProcessAPI().attachDocument(processInstance.getId(), "doc1", "fileWithContent.txt", "plain/text", "TheContent1".getBytes());
         getProcessAPI().attachNewDocumentVersion(processInstance.getId(), "doc1", "fileWithContent.txt", "plain/text", "theUrl");
-        Document doc1v3 = getProcessAPI().attachNewDocumentVersion(processInstance.getId(), "doc1", "fileWithContent.txt", "plain/text", "TheContent2".getBytes());
+        Document doc1v3 = getProcessAPI().attachNewDocumentVersion(processInstance.getId(), "doc1", "fileWithContent.txt", "plain/text",
+                "TheContent2".getBytes());
         Document doc2v1 = getProcessAPI().attachDocument(processInstance.getId(), "doc2", "fileWithContent.txt", "plain/text", "TheContent".getBytes());
-        Document doc2v2 = getProcessAPI().attachNewDocumentVersion(processInstance.getId(), "doc2", "fileWithContent.txt", "plain/text", "TheContent2".getBytes());
-        Document doc2v3 = getProcessAPI().attachNewDocumentVersion(processInstance.getId(), "doc2", "fileWithContent.txt", "plain/text", "TheContent3".getBytes());
+        Document doc2v2 = getProcessAPI().attachNewDocumentVersion(processInstance.getId(), "doc2", "fileWithContent.txt", "plain/text",
+                "TheContent2".getBytes());
+        Document doc2v3 = getProcessAPI().attachNewDocumentVersion(processInstance.getId(), "doc2", "fileWithContent.txt", "plain/text",
+                "TheContent3".getBytes());
 
         //when
-        SearchResult<ArchivedDocument> archivedDocumentSearchResult = getProcessAPI().searchArchivedDocuments(new SearchOptionsBuilder(0, 100).filter(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId()).filter(ArchivedDocumentsSearchDescriptor.DOCUMENT_NAME, "doc1").sort(ArchivedDocumentsSearchDescriptor.DOCUMENT_VERSION, Order.ASC).done());
-
+        SearchResult<ArchivedDocument> archivedDocumentSearchResult = getProcessAPI().searchArchivedDocuments(
+                new SearchOptionsBuilder(0, 100).filter(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId())
+                        .filter(ArchivedDocumentsSearchDescriptor.DOCUMENT_NAME, "doc1").sort(ArchivedDocumentsSearchDescriptor.DOCUMENT_VERSION, Order.ASC)
+                        .done());
 
         ArchivedDocument archDov1v1 = archivedDocumentSearchResult.getResult().get(0);
         assertThat(archDov1v1.getContentStorageId()).isEqualTo(doc1v1.getContentStorageId());
         getProcessAPI().deleteContentOfArchivedDocument(archDov1v1.getId());
-
 
         //then
         assertThat(getProcessAPI().getDocumentContent(doc1v1.getContentStorageId())).isNull();
@@ -1497,53 +1500,54 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertThat(getProcessAPI().getDocumentContent(doc2v2.getContentStorageId())).isNotNull();
         assertThat(getProcessAPI().getDocumentContent(doc2v3.getContentStorageId())).isNotNull();
 
-
         disableAndDeleteProcess(processDefinition);
         deleteUser(john);
     }
 
-
     @Test
     public void add_and_update_a_signle_document() throws Exception {
         //process with doc1 init and doc2 non init
-        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithDocToUpdate","1.0");
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithDocToUpdate", "1.0");
         builder.addDocumentDefinition("doc1").addUrl("the url");
         builder.addDocumentDefinition("doc2");
-        builder.addActor("actor").addUserTask("step1","actor");
+        builder.addActor("actor").addUserTask("step1", "actor");
         ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "actor", user);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         //add doc2
-        getProcessAPI().addDocument(processInstance.getId(),"doc2","my doc",new DocumentValue("the new url"));
+        getProcessAPI().addDocument(processInstance.getId(), "doc2", "my doc", new DocumentValue("the new url"));
         //add doc3
-        getProcessAPI().addDocument(processInstance.getId(),"doc3","my doc",new DocumentValue("the new url"));
+        getProcessAPI().addDocument(processInstance.getId(), "doc3", "my doc", new DocumentValue("the new url"));
         //add doc1: fail
-        try{
-            getProcessAPI().addDocument(processInstance.getId(),"doc1","my doc",new DocumentValue("the new url"));
+        try {
+            getProcessAPI().addDocument(processInstance.getId(), "doc1", "my doc", new DocumentValue("the new url"));
             fail("should not be able to add a document on an existing document");
-        }catch (AlreadyExistsException e){
+        } catch (AlreadyExistsException e) {
             //ok
         }
         //add doc4 with index: fail
-        try{
-            getProcessAPI().addDocument(processInstance.getId(),"doc1","my doc",new DocumentValue("the new url").setIndex(12));
+        try {
+            getProcessAPI().addDocument(processInstance.getId(), "doc1", "my doc", new DocumentValue("the new url").setIndex(12));
             fail("should not be able to add a document with index when there is no list");
-        }catch (DocumentAttachmentException e){
+        } catch (DocumentAttachmentException e) {
             //ok
         }
 
-        List<Document> result = getProcessAPI().searchDocuments(new SearchOptionsBuilder(0, 100).filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId()).sort(DocumentsSearchDescriptor.DOCUMENT_NAME, Order.ASC).done()).getResult();
+        List<Document> result = getProcessAPI().searchDocuments(
+                new SearchOptionsBuilder(0, 100).filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId())
+                        .sort(DocumentsSearchDescriptor.DOCUMENT_NAME, Order.ASC).done()).getResult();
         assertThat(result).hasSize(3);
         assertThat(result.get(0).getName()).isEqualTo("doc1");
         assertThat(result.get(1).getName()).isEqualTo("doc2");
         assertThat(result.get(2).getName()).isEqualTo("doc3");
 
         //update doc1
-        getProcessAPI().updateDocument(result.get(0).getId(),new DocumentValue("the new url updated"));
+        getProcessAPI().updateDocument(result.get(0).getId(), new DocumentValue("the new url updated"));
         //update doc2
-        getProcessAPI().updateDocument(result.get(1).getId(),new DocumentValue("the new url updated"));
+        getProcessAPI().updateDocument(result.get(1).getId(), new DocumentValue("the new url updated"));
 
-
-        result = getProcessAPI().searchDocuments(new SearchOptionsBuilder(0, 100).filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId()).sort(DocumentsSearchDescriptor.DOCUMENT_NAME, Order.ASC).done()).getResult();
+        result = getProcessAPI().searchDocuments(
+                new SearchOptionsBuilder(0, 100).filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId())
+                        .sort(DocumentsSearchDescriptor.DOCUMENT_NAME, Order.ASC).done()).getResult();
         assertThat(result).hasSize(3);
         assertThat(result.get(0).getVersion()).isEqualTo("2");
         assertThat(result.get(1).getVersion()).isEqualTo("2");
@@ -1551,9 +1555,10 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
         disableAndDeleteProcess(processDefinition);
     }
+
     @Test
     public void add_and_update_a_list_of_document() throws Exception {
-        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithDocToUpdate","1.0");
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithDocToUpdate", "1.0");
         //process with list1 with init value
         String script = "[new org.bonitasoft.engine.bpm.document.DocumentValue(\"http://www.myrul.com/mydoc.txt\"), " +
                 "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello1\".getBytes(),\"plain/text\",\"file.txt\")," +
@@ -1565,25 +1570,25 @@ public class DocumentIntegrationTest extends CommonAPITest {
                 List.class.getName()));
         //process with list2 without initial value
         builder.addDocumentListDefinition("list2");
-        builder.addActor("actor").addUserTask("step1","actor");
+        builder.addActor("actor").addUserTask("step1", "actor");
         ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "actor", user);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         //add doc1_1 to list1
         getProcessAPI().addDocument(processInstance.getId(), "list1", "doc list", new DocumentValue("doc1_1"));
         //add doc1_2 to list1 with bad index: fail
-        try{
-            getProcessAPI().addDocument(processInstance.getId(),"list1","doc list",new DocumentValue("doc1_2").setIndex(12));
+        try {
+            getProcessAPI().addDocument(processInstance.getId(), "list1", "doc list", new DocumentValue("doc1_2").setIndex(12));
             fail("should not be able to add a document on a list with bad index");
-        }catch (DocumentAttachmentException e){
+        } catch (DocumentAttachmentException e) {
             //ok
         }
         //add doc1_2 to list1 with good index
-        getProcessAPI().addDocument(processInstance.getId(),"list1","doc list",new DocumentValue("doc1_2").setIndex(0));
+        getProcessAPI().addDocument(processInstance.getId(), "list1", "doc list", new DocumentValue("doc1_2").setIndex(0));
         //add doc1_3 to list1 at the end
-        getProcessAPI().addDocument(processInstance.getId(),"list1","doc list",new DocumentValue("doc1_3"));
+        getProcessAPI().addDocument(processInstance.getId(), "list1", "doc list", new DocumentValue("doc1_3"));
         //add doc2 to list2
-        getProcessAPI().addDocument(processInstance.getId(),"list2","doc list",new DocumentValue("doc2"));
+        getProcessAPI().addDocument(processInstance.getId(), "list2", "doc list", new DocumentValue("doc2"));
         //check added
         List<Document> list1 = getProcessAPI().getDocumentList(processInstance.getId(), "list1", 0, 100);
         List<Document> list2 = getProcessAPI().getDocumentList(processInstance.getId(), "list2", 0, 100);

@@ -232,7 +232,7 @@ public interface DocumentAPI {
      *
      * @param documentId
      *        The identifier of the document to retrieve
-     * @return a document object
+     * @return the removed document object
      * @throws DocumentNotFoundException
      *         when the document identifier does not refer to an existing document
      * @throws InvalidSessionException

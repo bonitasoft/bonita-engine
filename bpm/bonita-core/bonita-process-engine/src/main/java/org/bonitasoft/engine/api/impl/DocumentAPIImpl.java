@@ -33,6 +33,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.exception.SDocumentCreationException;
@@ -445,13 +446,13 @@ public class DocumentAPIImpl implements DocumentAPI {
         final DocumentService documentService = tenantAccessor.getDocumentService();
         try {
             SMappedDocument document = documentService.getMappedDocument(documentId);
-            documentService.removeDocument(document);
+            documentService.removeCurrentVersion(document);
             return ModelConvertor.toDocument(document, documentService);
         } catch (final SDocumentNotFoundException e) {
             throw new DocumentNotFoundException("Unable to delete the document " + documentId + " because it does not exists", e);
-        } catch (SDocumentDeletionException e) {
-            throw new DeletionException("Unable to delete the document " + documentId, e);
         } catch (SBonitaReadException e) {
+            throw new DeletionException("Unable to delete the document " + documentId, e);
+        } catch (SObjectModificationException e) {
             throw new DeletionException("Unable to delete the document " + documentId, e);
         }
     }
@@ -492,7 +493,7 @@ public class DocumentAPIImpl implements DocumentAPI {
         TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
         DocumentService documentService = tenantAccessor.getDocumentService();
         try{
-            documentService.emptyContentOfArchivedDocument(documentId);
+            documentService.deleteContentOfArchivedDocument(documentId);
         }catch (SDocumentNotFoundException e){
             throw new DocumentNotFoundException("The document with id "+documentId+" could not be found",e);
         }catch (SBonitaException e ){

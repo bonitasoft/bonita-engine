@@ -432,7 +432,6 @@ public class DocumentServiceImpl implements DocumentService {
         recorder.recordDelete(deleteRecord, deleteEvent);
     }
 
-    @Override
     public void removeDocument(final SMappedDocument mappedDocument) throws SDocumentDeletionException {
         try {
             final DeleteRecord deleteRecord = new DeleteRecord(mappedDocument);
@@ -541,7 +540,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public void emptyContentOfArchivedDocument(long documentId) throws SDocumentNotFoundException, SBonitaReadException, SRecorderException {
+    public void deleteContentOfArchivedDocument(long documentId) throws SDocumentNotFoundException, SBonitaReadException, SRecorderException {
         SAMappedDocument archivedDocument = getArchivedDocument(documentId);
         SDocument document = getDocumentWithContent(archivedDocument.getDocumentId());
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(document,Collections.singletonMap("content",null));

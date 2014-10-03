@@ -98,7 +98,11 @@ public interface DocumentService {
             throws SDocumentCreationException;
 
     /**
-     * remove the current version of the document but archive it before
+     * Remove this document.
+     * <p>
+     * this archive and delete mapping on the process, i.e. the content of the document itself will be kept in database, use
+     * {@link #deleteContentOfArchivedDocument(long)} to delete the content
+     * </p>
      *
      * @param document
      *        the document mapping to remove
@@ -108,8 +112,11 @@ public interface DocumentService {
     void removeCurrentVersion(SMappedDocument document) throws SDocumentNotFoundException, SObjectModificationException;
 
     /**
-     * remove the current version of the document but archive it before
-     *
+     * Remove the document with the specified process instance and name
+     * <p>
+     * this archive and delete mapping on the process, i.e. the content of the document itself will be kept in database, use
+     * {@link #deleteContentOfArchivedDocument(long)} to delete the content
+     * </p>
      * @param processInstanceId
      *        id of the process having the document
      * @param documentName
@@ -317,13 +324,6 @@ public interface DocumentService {
 
     void deleteDocument(SLightDocument document) throws SDocumentDeletionException;
 
-    /**
-     * Remove document
-     *
-     * @param sProcessDocument
-     * @throws SDocumentDeletionException
-     */
-    void removeDocument(SMappedDocument sProcessDocument) throws SDocumentDeletionException;
 
     /**
      * Delete documents from a specified process instance
@@ -407,7 +407,7 @@ public interface DocumentService {
      * @throws SDocumentNotFoundException
      * @since 6.4.0
      */
-    void emptyContentOfArchivedDocument(long documentId) throws SDocumentNotFoundException, SBonitaReadException, SRecorderException;
+    void deleteContentOfArchivedDocument(long documentId) throws SDocumentNotFoundException, SBonitaReadException, SRecorderException;
 
     /**
      * update the document having the documentId with this new version
