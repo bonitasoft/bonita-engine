@@ -20,7 +20,9 @@ import java.util.Map;
 import org.bonitasoft.engine.identity.ContactDataCreator.ContactDataField;
 
 /**
- * represents a helper for {@link User} creation
+ * represents a helper for creating {@link User}. Chaining is possible with this creator to ease the {@link User} creation.
+ * <br/>
+ * For instance, new UserCreator("john.doe", "password").setFirstname("John").setLastname("Doe");
  *
  * @author Matthieu Chaffotte
  * @see User
@@ -59,7 +61,7 @@ public class UserCreator implements Serializable {
 
     /**
      * @param firstName the user's firstname to create
-     * @return the current {@link UserCreator} for chaining purpose
+     * @return the current {@link UserCreator}
      */
     public UserCreator setFirstName(final String firstName) {
         fields.put(UserField.FIRST_NAME, firstName);
@@ -68,7 +70,7 @@ public class UserCreator implements Serializable {
 
     /**
      * @param lastName the user's lastName to create
-     * @return the current {@link UserCreator} for chaining purpose
+     * @return the current {@link UserCreator}
      */
     public UserCreator setLastName(final String lastName) {
         fields.put(UserField.LAST_NAME, lastName);
@@ -77,7 +79,7 @@ public class UserCreator implements Serializable {
 
     /**
      * @param iconName the user's icon name to create
-     * @return the current {@link UserCreator} for chaining purpose
+     * @return the current {@link UserCreator}
      */
     public UserCreator setIconName(final String iconName) {
         fields.put(UserField.ICON_NAME, iconName);
@@ -86,7 +88,7 @@ public class UserCreator implements Serializable {
 
     /**
      * @param iconPath the user's icon path to create
-     * @return the current {@link UserCreator} for chaining purpose
+     * @return the current {@link UserCreator}
      */
     public UserCreator setIconPath(final String iconPath) {
         fields.put(UserField.ICON_PATH, iconPath);
@@ -95,7 +97,7 @@ public class UserCreator implements Serializable {
 
     /**
      * @param title the user's title to create
-     * @return the current {@link UserCreator} for chaining purpose
+     * @return the current {@link UserCreator}
      */
     public UserCreator setTitle(final String title) {
         fields.put(UserField.TITLE, title);
@@ -104,7 +106,7 @@ public class UserCreator implements Serializable {
 
     /**
      * @param jobTitle the user's jobTitle to create
-     * @return the current {@link UserCreator} for chaining purpose
+     * @return the current {@link UserCreator}
      */
     public UserCreator setJobTitle(final String jobTitle) {
         fields.put(UserField.JOB_TITLE, jobTitle);
@@ -113,7 +115,7 @@ public class UserCreator implements Serializable {
 
     /**
      * @param managerUserId the user's manager id to create
-     * @return the current {@link UserCreator} for chaining purpose
+     * @return the current {@link UserCreator}
      */
     public UserCreator setManagerUserId(final long managerUserId) {
         fields.put(UserField.MANAGER_ID, managerUserId);
@@ -121,8 +123,8 @@ public class UserCreator implements Serializable {
     }
 
     /**
-     * @param enabled allow to know if the user is enable inside organization
-     * @return the current {@link UserCreator} for chaining purpose
+     * @param enabled enabled Boolean set to true if the user is enabled inside the organization
+     * @return the current {@link UserCreator}
      */
     public UserCreator setEnabled(final boolean enabled) {
         fields.put(UserField.ENABLED, enabled);
@@ -152,7 +154,7 @@ public class UserCreator implements Serializable {
 
     /**
      * @param creator the user's personal contact information to create
-     * @return the current {@link UserCreator} for chaining purpose
+     * @return the current {@link UserCreator}
      */
     public UserCreator setPersonalContactData(final ContactDataCreator creator) {
         if (creator != null && creator.getFields() != null) {
@@ -163,7 +165,7 @@ public class UserCreator implements Serializable {
 
     /**
      * @param creator the user's professional contact information to create
-     * @return the current {@link UserCreator} for chaining purpose
+     * @return the current {@link UserCreator}
      */
     public UserCreator setProfessionalContactData(final ContactDataCreator creator) {
         if (creator != null && creator.getFields() != null) {

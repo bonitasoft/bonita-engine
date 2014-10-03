@@ -18,7 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * represent a helper to update a {@link Role}
+ * represents a helper for updating a {@link Role}. Chaining is possible with this updator to ease the {@link Role} update.
+ * <br/>
+ * For instance, new RoleUpdater("member").setDisplayName("Member").setIconName("userIcon");
  *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -47,7 +49,7 @@ public class RoleUpdater implements Serializable {
 
     /**
      * @param name
-     *        The role's name to update
+     *        The role's new name to update
      * @return The current {@link RoleUpdater} for chaining purpose
      */
     public RoleUpdater setName(final String name) {

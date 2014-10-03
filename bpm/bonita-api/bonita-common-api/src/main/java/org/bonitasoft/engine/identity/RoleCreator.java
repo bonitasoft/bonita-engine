@@ -18,7 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * represents a helper for {@link Role} creation
+ * represents a helper for creating a {@link Role}. Chaining is possible with this creator to ease the {@link Role} creation.
+ * <br/>
+ * For instance, new RoleCreator("member").setDisplayName("Member").setIconName("userIcon");
  *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -52,7 +54,7 @@ public class RoleCreator implements Serializable {
     /**
      * @param displayName
      *        The role's display name to create
-     * @return The current {@link RoleCreator} for chaining purpose
+     * @return The current {@link RoleCreator}
      */
     public RoleCreator setDisplayName(final String displayName) {
         fields.put(RoleField.DISPLAY_NAME, displayName);
@@ -62,7 +64,7 @@ public class RoleCreator implements Serializable {
     /**
      * @param description
      *        The role's description to create
-     * @return The current {@link RoleCreator} for chaining purpose
+     * @return The current {@link RoleCreator}
      */
     public RoleCreator setDescription(final String description) {
         fields.put(RoleField.DESCRIPTION, description);
@@ -72,7 +74,7 @@ public class RoleCreator implements Serializable {
     /**
      * @param iconName
      *        The role's icon name to create
-     * @return The current {@link RoleCreator} for chaining purpose
+     * @return The current {@link RoleCreator}
      */
     public RoleCreator setIconName(final String iconName) {
         fields.put(RoleField.ICON_NAME, iconName);
@@ -82,7 +84,7 @@ public class RoleCreator implements Serializable {
     /**
      * @param iconPath
      *        The role's icon path to create
-     * @return The current {@link RoleCreator} for chaining purpose
+     * @return The current {@link RoleCreator}
      */
     public RoleCreator setIconPath(final String iconPath) {
         fields.put(RoleField.ICON_PATH, iconPath);

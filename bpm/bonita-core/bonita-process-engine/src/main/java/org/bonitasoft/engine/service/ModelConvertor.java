@@ -680,9 +680,9 @@ public class ModelConvertor {
         aFlowNode.setParentContainerId(saFlowNode.getParentContainerId());
         aFlowNode.setRootContainerId(saFlowNode.getRootContainerId());
         aFlowNode.setSourceObjectId(saFlowNode.getSourceObjectId());
-        aFlowNode.setProcessDefinitionId(saFlowNode.getLogicalGroup(0));
-        aFlowNode.setProcessInstanceId(saFlowNode.getLogicalGroup(1));
-        aFlowNode.setParentActivityInstanceId(saFlowNode.getLogicalGroup(2));
+        aFlowNode.setProcessDefinitionId(saFlowNode.getProcessDefinitionId());
+        aFlowNode.setProcessInstanceId(saFlowNode.getParentProcessInstanceId());
+        aFlowNode.setParentActivityInstanceId(saFlowNode.getParentActivityInstanceId());
         aFlowNode.setDescription(saFlowNode.getDescription());
         aFlowNode.setDisplayName(saFlowNode.getDisplayName());
         aFlowNode.setDisplayDescription(saFlowNode.getDisplayDescription());

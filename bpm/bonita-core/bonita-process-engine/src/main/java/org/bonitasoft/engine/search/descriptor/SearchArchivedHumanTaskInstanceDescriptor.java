@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,16 +13,16 @@
  **/
 package org.bonitasoft.engine.search.descriptor;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Julien Mege
@@ -43,6 +43,10 @@ public class SearchArchivedHumanTaskInstanceDescriptor extends SearchEntityDescr
                 new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getProcessDefinitionKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID,
                 new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getRootProcessInstanceKey()));
+        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID,
+                new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getRootProcessInstanceKey()));
+        entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID,
+                new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getParentProcessInstanceKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.ORIGINAL_HUMAN_TASK_ID,
                 new FieldDescriptor(SAHumanTaskInstance.class, keyProvider.getSourceObjectIdKey()));
         entityKeys.put(ArchivedHumanTaskInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID,

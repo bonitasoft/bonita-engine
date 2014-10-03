@@ -58,7 +58,7 @@ public interface Group extends BonitaObject {
     String getIconPath();
 
     /**
-     * @return the user's id that created the group
+     * @return the id of the user that created the group
      */
     long getCreatedBy();
 

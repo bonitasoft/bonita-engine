@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.identity;
 
 /**
- * represent group criterion sort orders
+ * represents group criterion sort orders
  *
  * @author Lu Kai
  * @author Matthieu Chaffotte

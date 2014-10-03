@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * represent a helper to update a {@link Group}
+ * represent a helper fpr updating a {@link Group}
  *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -30,7 +30,7 @@ public class GroupUpdater implements Serializable {
     private static final long serialVersionUID = 728214104237982027L;
 
     /**
-     * represent the available {@link Group} fields
+     * represents the available {@link Group} fields
      */
     public enum GroupField {
         NAME, DISPLAY_NAME, DESCRIPTION, ICON_NAME, ICON_PATH, PARENT_PATH;

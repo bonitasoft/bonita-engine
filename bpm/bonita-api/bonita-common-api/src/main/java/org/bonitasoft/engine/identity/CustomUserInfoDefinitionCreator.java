@@ -16,7 +16,7 @@ package org.bonitasoft.engine.identity;
 import java.io.Serializable;
 
 /**
- * represent a helper in creating {@link CustomUserInfoDefinition}.
+ * represents a helper for creating a {@link CustomUserInfoDefinition}.
  *
  * @author Vincent Elcrin
  * @see CustomUserInfoDefinition
@@ -31,7 +31,7 @@ public class CustomUserInfoDefinitionCreator implements Serializable {
     private String description;
 
     /**
-     * creates a new {@link CustomUserInfoDefinitionCreator} with a given name
+     * creates a new {@link CustomUserInfoDefinitionCreator} with the specified name
      *
      * @param name the name to set
      */
@@ -40,7 +40,7 @@ public class CustomUserInfoDefinitionCreator implements Serializable {
     }
 
     /**
-     * creates a new {@link CustomUserInfoDefinitionCreator} with a given name and description
+     * creates a new {@link CustomUserInfoDefinitionCreator} with the specified name and description
      *
      * @param name the name to set
      * @param description the description to set
