@@ -61,6 +61,10 @@ public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandl
                 // we just delete the current version
                 deleteDocument(documentName, processInstanceId);
             } else {
+                if(documentValue.getDocumentId() != null && !documentValue.hasChanged()){
+                    //do not update if the document value say it did not changed
+                    return newValue;
+                }
                 createOrUpdateDocument(documentValue, documentName, processInstanceId);
             }
             return newValue;

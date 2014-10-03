@@ -120,4 +120,16 @@ public class DocumentLeftOperandHandlerTest {
 
     }
 
+
+
+    @Test
+    public void should_not_update_if_has_change_is_false() throws Exception {
+        //given
+        doReturn(mock(SMappedDocument.class)).when(documentService).getMappedDocument(45l, "myDoc");
+        //when
+        handler.update(createLeftOperand("myDoc"), new DocumentValue(123l), 45l, "PROCESS_INSTANCE");
+        //then
+        verify(documentService,times(0)).updateDocumentOfProcessInstance(any(SDocument.class), eq(45l), eq("myDoc"), isNull(String.class));
+    }
+
 }
