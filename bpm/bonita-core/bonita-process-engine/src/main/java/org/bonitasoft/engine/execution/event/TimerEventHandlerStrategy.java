@@ -160,7 +160,7 @@ public class TimerEventHandlerStrategy extends EventHandlerStrategy {
             throws SBonitaException {
         final Trigger trigger = getTrigger(sEventTriggerDefinition, eventInstance, processDefinition.getId());
         schedulerService.schedule(jobDescriptor, jobParameters, trigger);
-        if (sEventTriggerDefinition.getTimerType() != STimerType.CYCLE) {
+        if (sEventTriggerDefinition.getTimerType() != STimerType.CYCLE && eventInstance != null) {
             final STimerEventTriggerInstance sEventTriggerInstance = BuilderFactory.get(STimerEventTriggerInstanceBuilderFactory.class)
                     .createNewTimerEventTriggerInstance(eventInstance.getId(), eventInstance.getName(), trigger.getStartDate().getTime(), trigger.getName())
                     .done();

@@ -180,6 +180,7 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.SendEventException;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
+import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
@@ -384,6 +385,7 @@ import org.bonitasoft.engine.search.document.SearchArchivedDocuments;
 import org.bonitasoft.engine.search.document.SearchArchivedDocumentsSupervisedBy;
 import org.bonitasoft.engine.search.document.SearchDocuments;
 import org.bonitasoft.engine.search.document.SearchDocumentsSupervisedBy;
+import org.bonitasoft.engine.search.events.trigger.SearchTimerEventTriggerInstances;
 import org.bonitasoft.engine.search.flownode.SearchArchivedFlowNodeInstances;
 import org.bonitasoft.engine.search.flownode.SearchFlowNodeInstances;
 import org.bonitasoft.engine.search.identity.SearchUsersWhoCanExecutePendingHumanTaskDeploymentInfo;
@@ -4295,7 +4297,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     /**
      * @param orAssignedToUser
-     *        do we also want to retrieve tasks directly assigned to this user ?
+     *            do we also want to retrieve tasks directly assigned to this user ?
      * @throws SearchException
      */
     private SearchResult<HumanTaskInstance> searchTasksForUser(final long userId, final SearchOptions searchOptions, final boolean orAssignedToUser)
@@ -4817,7 +4819,6 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public SearchResult<FlowNodeInstance> searchFlowNodeInstances(final SearchOptions searchOptions) throws SearchException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
@@ -4829,6 +4830,22 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new SearchException(e);
         }
         return searchFlowNodeInstancesTransaction.getResult();
+    }
+
+    @Override
+    public SearchResult<TimerEventTriggerInstance> searchTimerEventTriggerInstances(final long processInstanceId, final SearchOptions searchOptions)
+            throws SearchException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+        final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
+        final SearchTimerEventTriggerInstances transaction = new SearchTimerEventTriggerInstances(eventInstanceService,
+                searchEntitiesDescriptor.getSearchEventTriggerInstanceDescriptor(), processInstanceId, searchOptions);
+        try {
+            transaction.execute();
+        } catch (final SBonitaException e) {
+            throw new SearchException(e);
+        }
+        return transaction.getResult();
     }
 
     @Override

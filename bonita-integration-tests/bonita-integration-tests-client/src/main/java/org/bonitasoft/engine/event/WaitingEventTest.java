@@ -19,7 +19,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
 import org.bonitasoft.engine.bpm.flownode.WaitingEventSearchDescriptor;
 import org.bonitasoft.engine.exception.BonitaException;
@@ -29,7 +28,7 @@ import org.bonitasoft.engine.search.SearchResult;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class EventsAPITest extends CommonAPITest {
+public class WaitingEventTest extends AbstractEventTest {
 
     private static final String SEARCH_WAITING_EVENTS_COMMAND = "searchWaitingEventsCommand";
 

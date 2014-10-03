@@ -346,11 +346,11 @@ public class EventInstanceServiceImplForEventTriggerTest {
         // Given
         final int processInstanceId = 2;
         final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
-        doReturn(3L).when(persistenceService).getNumberOfEntities(eq(SEventTriggerInstance.class), eq("ByProcessInstance"), eq(queryOptions),
+        doReturn(3L).when(persistenceService).getNumberOfEntities(eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"), eq(queryOptions),
                 Matchers.<Map<String, Object>> any());
 
         // When
-        final long result = eventInstanceServiceImpl.getNumberOfEventTriggerInstances(processInstanceId, queryOptions);
+        final long result = eventInstanceServiceImpl.getNumberOfTimerEventTriggerInstances(processInstanceId, queryOptions);
 
         // Then
         assertEquals("Should be equals to the result of the mock.", 3L, result);
@@ -361,12 +361,12 @@ public class EventInstanceServiceImplForEventTriggerTest {
         // Given
         final int processInstanceId = 2;
         final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
-        doThrow(new SBonitaReadException("")).when(persistenceService).getNumberOfEntities(eq(SEventTriggerInstance.class), eq("ByProcessInstance"),
+        doThrow(new SBonitaReadException("")).when(persistenceService).getNumberOfEntities(eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"),
                 eq(queryOptions),
                 Matchers.<Map<String, Object>> any());
 
         // When
-        eventInstanceServiceImpl.getNumberOfEventTriggerInstances(processInstanceId, queryOptions);
+        eventInstanceServiceImpl.getNumberOfTimerEventTriggerInstances(processInstanceId, queryOptions);
     }
 
     /**
@@ -380,11 +380,11 @@ public class EventInstanceServiceImplForEventTriggerTest {
         final int processInstanceId = 2;
         final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
         final List<STimerEventTriggerInstanceImpl> triggerInstanceImpls = Arrays.asList(new STimerEventTriggerInstanceImpl());
-        doReturn(triggerInstanceImpls).when(persistenceService).searchEntity(eq(SEventTriggerInstance.class), eq("ByProcessInstance"), eq(queryOptions),
+        doReturn(triggerInstanceImpls).when(persistenceService).searchEntity(eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"), eq(queryOptions),
                 Matchers.<Map<String, Object>> any());
 
         // When
-        final List<SEventTriggerInstance> result = eventInstanceServiceImpl.searchEventTriggerInstances(processInstanceId, queryOptions);
+        final List<STimerEventTriggerInstance> result = eventInstanceServiceImpl.searchTimerEventTriggerInstances(processInstanceId, queryOptions);
 
         // Then
         assertEquals("Should be equals to the result of the mock.", triggerInstanceImpls, result);
@@ -395,11 +395,11 @@ public class EventInstanceServiceImplForEventTriggerTest {
         // Given
         final int processInstanceId = 2;
         final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
-        doThrow(new SBonitaReadException("")).when(persistenceService).searchEntity(eq(SEventTriggerInstance.class), eq("ByProcessInstance"),
+        doThrow(new SBonitaReadException("")).when(persistenceService).searchEntity(eq(STimerEventTriggerInstance.class), eq("ByProcessInstance"),
                 eq(queryOptions), Matchers.<Map<String, Object>> any());
 
         // When
-        eventInstanceServiceImpl.searchEventTriggerInstances(processInstanceId, queryOptions);
+        eventInstanceServiceImpl.searchTimerEventTriggerInstances(processInstanceId, queryOptions);
     }
 
 }

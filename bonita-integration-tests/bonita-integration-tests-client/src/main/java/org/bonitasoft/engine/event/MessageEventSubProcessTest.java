@@ -24,28 +24,20 @@ import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
-import org.bonitasoft.engine.bpm.process.impl.CatchMessageEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
-import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.expression.InvalidExpressionException;
-import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -53,72 +45,7 @@ import org.junit.Test;
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
  */
-public class MessageEventSubProcessTest extends EventsAPITest {
-
-    private static final String INT_DATA_NAME = "count";
-
-    private static final String SHORT_DATA_NAME = "content";
-
-    private static final String SUB_PROCESS_START_NAME = "messageStart";
-
-    private static final String SUB_PROCESS_USER_TASK_NAME = "subStep";
-
-    private static final String PARENT_PROCESS_USER_TASK_NAME = "step1";
-
-    private static final String THROW_MESSAGE_TASK_NAME = "messageTask";
-
-    private static final String MESSAGE_NAME = "canStart";
-
-    private User john;
-
-    @Before
-    public void beforeTest() throws BonitaException {
-         loginOnDefaultTenantWithDefaultTechnicalUser();
-        john = createUser(USERNAME, PASSWORD);
-        logoutOnTenant();
-        loginOnDefaultTenantWith(USERNAME, PASSWORD);
-    }
-
-    @After
-    public void afterTest() throws BonitaException {
-        deleteUser(john);
-        logoutOnTenant();
-    }
-
-    private ProcessDefinition deployAndEnableProcessWithCallActivity(final String targetProcessName, final String targetVersion) throws BonitaException {
-        final Expression targetProcessExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
-        final Expression targetVersionExpr = new ExpressionBuilder().createConstantStringExpression(targetVersion);
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithCallActivity", "1.0");
-        builder.addActor(ACTOR_NAME);
-        builder.addStartEvent("start");
-        builder.addCallActivity("callActivity", targetProcessExpr, targetVersionExpr);
-        builder.addUserTask("step2", ACTOR_NAME);
-        builder.addEndEvent("end");
-        builder.addTransition("start", "callActivity");
-        builder.addTransition("callActivity", "step2");
-        builder.addTransition("step2", "end");
-        final DesignProcessDefinition processDefinition = builder.done();
-        return deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, john);
-    }
-
-    private ProcessDefinition deployAndEnableProcessWithMessageEventSubProcess() throws BonitaException {
-        final ProcessDefinitionBuilder builder = buildParentProcess(false);
-        buildSubProcess(builder, false, null);
-        final DesignProcessDefinition processDefinition = builder.done();
-        return deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, john);
-    }
-
-    private ProcessDefinition deployAndEnableProcessWithMessageEventSubProcessAndData() throws BonitaException {
-        return deployAndEnableProcessWithMessageEventSubProcessAndData(null);
-    }
-
-    private ProcessDefinition deployAndEnableProcessWithMessageEventSubProcessAndData(final List<BEntry<Expression, Expression>> correlations)
-            throws BonitaException {
-        final ProcessDefinitionBuilder builder = buildParentProcess(true);
-        buildSubProcess(builder, true, correlations);
-        final DesignProcessDefinition processDefinition = builder.done();
-        return deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, john);
-    }
+public class MessageEventSubProcessTest extends WaitingEventTest {
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "message" }, jira = "ENGINE-1841", story = "transmit data to start message event of eventsubprocess")
     @Test
@@ -136,7 +63,7 @@ public class MessageEventSubProcessTest extends EventsAPITest {
                 .addOperation(
                         new OperationBuilder().createSetDataOperation("aData", new ExpressionBuilder().createDataExpression("msgData", String.class.getName())));
         subProcessBuilder.addTransition("start", "stepInSubProcess");
-        final ProcessDefinition receiveProcess = deployAndEnableProcessWithActor(receiveProcessBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition receiveProcess = deployAndEnableProcessWithActor(receiveProcessBuilder.done(), ACTOR_NAME, donaBenta);
 
         // create an other process that send a message
         final ProcessDefinitionBuilder sendProcessBuilder = new ProcessDefinitionBuilder().createNewInstance("SendMsgProcess", "1.0");
@@ -157,48 +84,6 @@ public class MessageEventSubProcessTest extends EventsAPITest {
 
         disableAndDeleteProcess(sendProcess, receiveProcess);
 
-    }
-
-    private ProcessDefinitionBuilder buildParentProcess(final boolean withDatas) throws InvalidExpressionException {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
-        builder.addActor(ACTOR_NAME);
-        builder.addStartEvent("start");
-        builder.addUserTask(PARENT_PROCESS_USER_TASK_NAME, ACTOR_NAME);
-        builder.addEndEvent("end");
-        builder.addTransition("start", PARENT_PROCESS_USER_TASK_NAME);
-        builder.addTransition(PARENT_PROCESS_USER_TASK_NAME, "end");
-
-        if (withDatas) {
-            builder.addShortTextData(SHORT_DATA_NAME, new ExpressionBuilder().createConstantStringExpression("parentVar"));
-            builder.addIntegerData(INT_DATA_NAME, new ExpressionBuilder().createConstantIntegerExpression(1));
-        }
-        return builder;
-    }
-
-    private void buildSubProcess(final ProcessDefinitionBuilder builder, final boolean withDatas, final List<BEntry<Expression, Expression>> correlations)
-            throws InvalidExpressionException {
-        final SubProcessDefinitionBuilder subProcessBuilder = builder.addSubProcess("eventSubProcess", true).getSubProcessBuilder();
-        final CatchMessageEventTriggerDefinitionBuilder messageEventTrigger = subProcessBuilder.addStartEvent(SUB_PROCESS_START_NAME).addMessageEventTrigger(
-                MESSAGE_NAME);
-        final UserTaskDefinitionBuilder userTask = subProcessBuilder.addUserTask(SUB_PROCESS_USER_TASK_NAME, ACTOR_NAME);
-        subProcessBuilder.addEndEvent("endSubProcess");
-        subProcessBuilder.addTransition(SUB_PROCESS_START_NAME, SUB_PROCESS_USER_TASK_NAME);
-        subProcessBuilder.addTransition(SUB_PROCESS_USER_TASK_NAME, "endSubProcess");
-
-        if (withDatas) {
-            subProcessBuilder.addShortTextData(SHORT_DATA_NAME, new ExpressionBuilder().createConstantStringExpression("childVar"));
-            subProcessBuilder.addDoubleData("value", new ExpressionBuilder().createConstantDoubleExpression(10.0));
-            addCorrelations(messageEventTrigger, correlations);
-            userTask.addShortTextData(SHORT_DATA_NAME, new ExpressionBuilder().createConstantStringExpression("childActivityVar"));
-        }
-    }
-
-    private void addCorrelations(final CatchMessageEventTriggerDefinitionBuilder messageEventTrigger, final List<BEntry<Expression, Expression>> correlations) {
-        if (correlations != null) {
-            for (final BEntry<Expression, Expression> correlation : correlations) {
-                messageEventTrigger.addCorrelation(correlation.getKey(), correlation.getValue());
-            }
-        }
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "message" }, jira = "ENGINE-536")
@@ -223,7 +108,7 @@ public class MessageEventSubProcessTest extends EventsAPITest {
         checkNumberOfWaitingEvents(SUB_PROCESS_START_NAME, 0);
 
         waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
-        assignAndExecuteStep(subStep, john.getId());
+        assignAndExecuteStep(subStep, donaBenta.getId());
         waitForArchivedActivity(eventSubProcessActivity.getId(), TestStates.NORMAL_FINAL);
         waitForProcessToFinish(subProcInst);
         waitForProcessToFinish(processInstance, TestStates.ABORTED);
@@ -253,7 +138,7 @@ public class MessageEventSubProcessTest extends EventsAPITest {
         senderBuilder.addTransition(startName, THROW_MESSAGE_TASK_NAME);
         senderBuilder.addTransition(THROW_MESSAGE_TASK_NAME, PARENT_PROCESS_USER_TASK_NAME);
         senderBuilder.addTransition(PARENT_PROCESS_USER_TASK_NAME, endName);
-        final ProcessDefinition senderProcessDefinition = deployAndEnableProcessWithActor(senderBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition senderProcessDefinition = deployAndEnableProcessWithActor(senderBuilder.done(), ACTOR_NAME, donaBenta);
 
         // Create and deploy Receiver process with SubProcess
         final ProcessDefinitionBuilder receiverBuilder = new ProcessDefinitionBuilder().createNewInstance(receiverProcessName, "1.0");
@@ -266,14 +151,14 @@ public class MessageEventSubProcessTest extends EventsAPITest {
         subProcessBuilder.addStartEvent(SUB_PROCESS_START_NAME).addMessageEventTrigger(MESSAGE_NAME + 1);
         subProcessBuilder.addUserTask(SUB_PROCESS_USER_TASK_NAME, ACTOR_NAME);
         subProcessBuilder.addTransition(SUB_PROCESS_START_NAME, SUB_PROCESS_USER_TASK_NAME);
-        final ProcessDefinition receiverProcessDefinition = deployAndEnableProcessWithActor(receiverBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition receiverProcessDefinition = deployAndEnableProcessWithActor(receiverBuilder.done(), ACTOR_NAME, donaBenta);
 
         // Start and execute the Sender process
         final ProcessInstance processInstance = getProcessAPI().startProcess(senderProcessDefinition.getId());
         final ActivityInstance step1 = waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance);
-        waitForPendingTasks(john.getId(), 2);
+        waitForPendingTasks(donaBenta.getId(), 2);
         checkNumberOfWaitingEventsInProcess(receiverProcessName, 2);
-        assignAndExecuteStep(step1.getId(), john.getId());
+        assignAndExecuteStep(step1.getId(), donaBenta.getId());
         waitForProcessToFinish(processInstance);
         // the parent process instance is supposed to finished, so no more waiting events are expected
         checkNumberOfWaitingEvents(startName, 1);
@@ -283,7 +168,7 @@ public class MessageEventSubProcessTest extends EventsAPITest {
         searchOptionsBuilder.filter(ProcessInstanceSearchDescriptor.NAME, receiverProcessName);
         final ProcessInstance receiverProcessInstance = getProcessAPI().searchOpenProcessInstances(searchOptionsBuilder.done()).getResult().get(0);
         waitForUserTask(SUB_PROCESS_USER_TASK_NAME, receiverProcessInstance.getId());
-        assertEquals(1, getProcessAPI().getNumberOfPendingHumanTaskInstances(john.getId()));
+        assertEquals(1, getProcessAPI().getNumberOfPendingHumanTaskInstances(donaBenta.getId()));
 
         // Clean-up
         disableAndDeleteProcess(senderProcessDefinition.getId());
@@ -300,7 +185,7 @@ public class MessageEventSubProcessTest extends EventsAPITest {
         assertEquals(1, activities.size());
         checkNumberOfWaitingEvents(SUB_PROCESS_START_NAME, 1);
 
-        assignAndExecuteStep(step1, john.getId());
+        assignAndExecuteStep(step1, donaBenta.getId());
 
         waitForArchivedActivity(step1.getId(), TestStates.NORMAL_FINAL);
         waitForProcessToFinish(processInstance);
@@ -356,7 +241,7 @@ public class MessageEventSubProcessTest extends EventsAPITest {
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "message", "parent process data" }, jira = "ENGINE-536")
     @Test
     public void subProcessCanAccessParentData() throws Exception {
-        final ProcessDefinition process = deployAndEnableProcessWithMessageEventSubProcessAndData();
+        final ProcessDefinition process = deployAndEnableProcessWithMessageEventSubProcessAndData(null);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
         waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance.getId());
 
@@ -371,7 +256,7 @@ public class MessageEventSubProcessTest extends EventsAPITest {
         checkProcessDataInstance(SHORT_DATA_NAME, processInstance.getId(), "parentVar");
         checkActivityDataInstance(SHORT_DATA_NAME, subStep.getId(), "childActivityVar");
 
-        assignAndExecuteStep(subStep, john.getId());
+        assignAndExecuteStep(subStep, donaBenta.getId());
         waitForProcessToFinish(subProcInst);
         waitForProcessToFinish(processInstance, TestStates.ABORTED);
 
@@ -406,11 +291,11 @@ public class MessageEventSubProcessTest extends EventsAPITest {
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
         waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
-        assignAndExecuteStep(subStep, john.getId());
+        assignAndExecuteStep(subStep, donaBenta.getId());
         waitForProcessToFinish(subProcInst);
         waitForProcessToFinish(calledProcInst, TestStates.ABORTED);
 
-        waitForUserTaskAndExecuteIt("step2", processInstance, john);
+        waitForUserTaskAndExecuteIt("step2", processInstance, donaBenta);
         waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(callerProcess);

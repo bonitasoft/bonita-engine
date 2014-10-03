@@ -13,6 +13,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessage
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl;
@@ -156,6 +157,12 @@ public class TestRepository {
         getSession().save(sHiddenTaskInstanceImpl);
         return (SHiddenTaskInstanceImpl) getSession().get(sHiddenTaskInstanceImpl.getClass(),
                 new PersistentObjectId(sHiddenTaskInstanceImpl.getId(), sHiddenTaskInstanceImpl.getTenantId()));
+    }
+
+    public SEventTriggerInstanceImpl add(final SEventTriggerInstanceImpl sEventTriggerInstanceImpl) {
+        getSession().save(sEventTriggerInstanceImpl);
+        return (SEventTriggerInstanceImpl) getSession().get(sEventTriggerInstanceImpl.getClass(),
+                new PersistentObjectId(sEventTriggerInstanceImpl.getId(), sEventTriggerInstanceImpl.getTenantId()));
     }
 
     public SCustomUserInfoDefinition add(final SCustomUserInfoDefinitionImpl infoDef) {

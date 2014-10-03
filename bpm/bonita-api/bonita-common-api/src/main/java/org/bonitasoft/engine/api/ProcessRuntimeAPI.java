@@ -57,6 +57,7 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.SendEventException;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
+import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
@@ -2369,5 +2370,17 @@ public interface ProcessRuntimeAPI {
      * @since 6.3.3
      */
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Search the {@link TimerEventTriggerInstance} on the specific {@link ProcessInstance}.
+     * 
+     * @param searchOptions
+     *            The search criterion.
+     * @return The list of the timer event triggers
+     * @throws SearchException
+     *             If an exception occurs when getting the timer event triggers.
+     * @since 6.4.0
+     */
+    SearchResult<TimerEventTriggerInstance> searchTimerEventTriggerInstances(long processInstanceId, SearchOptions searchOptions) throws SearchException;
 
 }

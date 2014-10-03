@@ -21,121 +21,33 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.TimerType;
-import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
-import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.expression.Expression;
-import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
  */
-public class TimerEventSubProcessTest extends CommonAPITest {
-
-    private static final String DATE_FORMAT_WITH_MS = "yyyyy-mm-dd hh:mm:ss SSSSS";
-    private User john;
-
-    @Before
-    public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
-        john = createUser(USERNAME, PASSWORD);
-        logoutOnTenant();
-        loginOnDefaultTenantWith(USERNAME, PASSWORD);
-    }
-
-    @After
-    public void afterTest() throws BonitaException {
-        deleteUser(john);
-        logoutOnTenant();
-    }
-
-    private ProcessDefinition deployAndEnableProcessWithTimerEventSubProcess(final long timerDuration) throws BonitaException {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
-        builder.addActor("mainActor");
-        builder.addStartEvent("start");
-        builder.addUserTask("step1", "mainActor");
-        builder.addEndEvent("end");
-        builder.addTransition("start", "step1");
-        builder.addTransition("step1", "end");
-        final SubProcessDefinitionBuilder subProcessBuilder = builder.addSubProcess("eventSubProcess", true).getSubProcessBuilder();
-        subProcessBuilder.addStartEvent("timerStart").addTimerEventTriggerDefinition(TimerType.DURATION,
-                new ExpressionBuilder().createConstantLongExpression(timerDuration));
-        subProcessBuilder.addUserTask("subStep", "mainActor");
-        subProcessBuilder.addEndEvent("endSubProcess");
-        subProcessBuilder.addTransition("timerStart", "subStep");
-        subProcessBuilder.addTransition("subStep", "endSubProcess");
-        final DesignProcessDefinition processDefinition = builder.done();
-        return deployAndEnableProcessWithActor(processDefinition, "mainActor", john);
-    }
-
-    private ProcessDefinition deployAndEnableProcessWithCallActivity(final String processName, final String targetProcessName, final String targetVersion)
-            throws BonitaException {
-        final Expression targetProcessExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
-        final Expression targetVersionExpr = new ExpressionBuilder().createConstantStringExpression(targetVersion);
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0");
-        builder.addActor("mainActor");
-        builder.addStartEvent("start");
-        builder.addCallActivity("callActivity", targetProcessExpr, targetVersionExpr);
-        builder.addUserTask("step2", "mainActor");
-        builder.addEndEvent("end");
-        builder.addTransition("start", "callActivity");
-        builder.addTransition("callActivity", "step2");
-        builder.addTransition("step2", "end");
-        final DesignProcessDefinition processDefinition = builder.done();
-        return deployAndEnableProcessWithActor(processDefinition, "mainActor", john);
-    }
-
-    private ProcessDefinition deployAndEnableProcessWithTimerEventSubProcessAndData(final long timerDuration) throws BonitaException {
-        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
-        builder.addShortTextData("content", new ExpressionBuilder().createConstantStringExpression("parentVar"));
-        builder.addIntegerData("count", new ExpressionBuilder().createConstantIntegerExpression(1));
-        builder.addActor("mainActor");
-        builder.addStartEvent("start");
-        builder.addUserTask("step1", "mainActor");
-        builder.addEndEvent("end");
-        builder.addTransition("start", "step1");
-        builder.addTransition("step1", "end");
-        final SubProcessDefinitionBuilder subProcessBuilder = builder.addSubProcess("eventSubProcess", true).getSubProcessBuilder();
-        subProcessBuilder.addShortTextData("content", new ExpressionBuilder().createConstantStringExpression("childVar"));
-        subProcessBuilder.addDoubleData("value", new ExpressionBuilder().createConstantDoubleExpression(10.0));
-        subProcessBuilder.addStartEvent("timerStart").addTimerEventTriggerDefinition(TimerType.DURATION,
-                new ExpressionBuilder().createConstantLongExpression(timerDuration));
-        subProcessBuilder.addUserTask("subStep", "mainActor").addShortTextData("content",
-                new ExpressionBuilder().createConstantStringExpression("childActivityVar"));
-        subProcessBuilder.addEndEvent("endSubProcess");
-        subProcessBuilder.addTransition("timerStart", "subStep");
-        subProcessBuilder.addTransition("subStep", "endSubProcess");
-        final DesignProcessDefinition processDefinition = builder.done();
-        return deployAndEnableProcessWithActor(processDefinition, "mainActor", john);
-    }
+public class TimerEventSubProcessTest extends AbstractEventTest {
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer" }, jira = "ENGINE-536")
     @Test
-    public void testTimerEventSubProcessTriggered() throws Exception {
-        //given
+    public void timerEventSubProcessTriggered() throws Exception {
+        // given
         final int timerDuration = 2000;
         final ProcessDefinition process = deployAndEnableProcessWithTimerEventSubProcess(timerDuration);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
 
-        //when
+        // when
         final ActivityInstance subStep = waitForUserTask("subStep", processInstance);
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
@@ -144,8 +56,8 @@ public class TimerEventSubProcessTest extends CommonAPITest {
                 String.format("process started at %s should trigger subprocess at %s (+ %d ms) ", formatedDate(processStartDate),
                         formatedDate(subProcInst.getStartDate()), timerDuration)).isAfter(processStartDate);
 
-        //cleanup
-        assignAndExecuteStep(subStep, john.getId());
+        // cleanup
+        assignAndExecuteStep(subStep, donaBenta.getId());
         waitForProcessToFinish(subProcInst);
         disableAndDeleteProcess(process.getId());
     }
@@ -161,7 +73,7 @@ public class TimerEventSubProcessTest extends CommonAPITest {
         final int timerDuration = 6000;
         final ProcessDefinition process = deployAndEnableProcessWithTimerEventSubProcess(timerDuration);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance, john);
+        waitForUserTaskAndExecuteIt("step1", processInstance, donaBenta);
         waitForProcessToFinish(processInstance);
         Thread.sleep(timerDuration);
 
@@ -184,7 +96,7 @@ public class TimerEventSubProcessTest extends CommonAPITest {
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer", "parent process data" }, jira = "ENGINE-536")
     @Test
-    public void testSubProcessCanAccessParentData() throws Exception {
+    public void subProcessCanAccessParentData() throws Exception {
         final int timerDuration = 2000;
         final ProcessDefinition process = deployAndEnableProcessWithTimerEventSubProcessAndData(timerDuration);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
@@ -198,7 +110,7 @@ public class TimerEventSubProcessTest extends CommonAPITest {
         checkProcessDataInstance("content", processInstance.getId(), "parentVar");
         checkActivityDataInstance("content", subStep.getId(), "childActivityVar");
 
-        assignAndExecuteStep(subStep, john.getId());
+        assignAndExecuteStep(subStep, donaBenta.getId());
         waitForProcessToFinish(subProcInst);
         waitForProcessToFinish(processInstance, TestStates.ABORTED);
 
@@ -220,10 +132,8 @@ public class TimerEventSubProcessTest extends CommonAPITest {
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "timer", "call activity" }, jira = "ENGINE-536")
     @Test
     public void timerEventSubProcInsideTargetCallActivity() throws Exception {
-        final int timerDuration = 2000;
-        final ProcessDefinition targetProcess = deployAndEnableProcessWithTimerEventSubProcess(timerDuration);
-        final ProcessDefinition callerProcess = deployAndEnableProcessWithCallActivity("ProcessWithCallActivity", targetProcess.getName(),
-                targetProcess.getVersion());
+        final ProcessDefinition targetProcess = deployAndEnableProcessWithTimerEventSubProcess(2000);
+        final ProcessDefinition callerProcess = deployAndEnableProcessWithCallActivity(targetProcess.getName(), targetProcess.getVersion());
         final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcess.getId());
         final ActivityInstance step1 = waitForUserTask("step1", processInstance);
         final ActivityInstance subStep = waitForUserTask("subStep", processInstance);
@@ -231,11 +141,11 @@ public class TimerEventSubProcessTest extends CommonAPITest {
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
         waitForFlowNodeInState(processInstance, "step1", TestStates.ABORTED, true);
-        assignAndExecuteStep(subStep, john.getId());
+        assignAndExecuteStep(subStep, donaBenta.getId());
         waitForProcessToFinish(subProcInst);
         waitForProcessToBeInState(calledProcInst, ProcessInstanceState.ABORTED);
 
-        waitForUserTaskAndExecuteIt("step2", processInstance, john);
+        waitForUserTaskAndExecuteIt("step2", processInstance, donaBenta);
         waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(callerProcess.getId());

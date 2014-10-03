@@ -57,6 +57,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
@@ -75,6 +76,7 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.expression.Expression;
@@ -86,9 +88,14 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
+import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
@@ -141,6 +148,12 @@ public class ProcessAPIImplTest {
     @Mock
     private SchedulerService schedulerService;
 
+    @Mock
+    private SearchEntitiesDescriptor searchEntitiesDescriptor;
+
+    @Mock
+    private EventInstanceService eventInstanceService;
+
     @Spy
     @InjectMocks
     private ProcessAPIImpl processAPI;
@@ -158,6 +171,8 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getOperationService()).thenReturn(operationService);
         when(tenantAccessor.getActorMappingService()).thenReturn(actorMappingService);
         when(tenantAccessor.getSchedulerService()).thenReturn(schedulerService);
+        when(tenantAccessor.getSearchEntitiesDescriptor()).thenReturn(searchEntitiesDescriptor);
+        when(tenantAccessor.getEventInstanceService()).thenReturn(eventInstanceService);
     }
 
     @Test
@@ -662,5 +677,18 @@ public class ProcessAPIImplTest {
 
         // When
         processAPI.deleteArchivedProcessInstance(archivedProcessInstanceId);
+    }
+
+    @Test(expected = SearchException.class)
+    public void searchEventTriggerInstances_should_throw_exception_when_transaction_throws_exception() throws Exception {
+        // Given
+        final long processInstanceId = 42l;
+        final SearchOptions searchOptions = new SearchOptionsBuilder(0, 10).done();
+
+        doThrow(new SBonitaSearchException(new Exception())).when(eventInstanceService).getNumberOfTimerEventTriggerInstances(eq(processInstanceId),
+                any(QueryOptions.class));
+
+        // When
+        processAPI.searchTimerEventTriggerInstances(processInstanceId, searchOptions);
     }
 }

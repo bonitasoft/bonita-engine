@@ -37,6 +37,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
@@ -170,19 +171,19 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      *            The identifier of the process instance
      * @param searchOptions
      *            Criteria of the search
-     * @return The number of EventTriggerInstances on the specific process instance & corresponding to the criteria
+     * @return The number of STimerEventTriggerInstance on the specific process instance & corresponding to the criteria
      * @since 6.4.0
      */
-    long getNumberOfEventTriggerInstances(long processInstanceId, QueryOptions queryOptions) throws SBonitaSearchException;
+    long getNumberOfTimerEventTriggerInstances(long processInstanceId, QueryOptions queryOptions) throws SBonitaSearchException;
 
     /**
      * @param processInstanceId
      *            The identifier of the process instance
      * @param searchOptions
      *            Criteria of the search
-     * @return The list of EventTriggerInstances on the specific process instance & corresponding to the criteria
+     * @return The list of STimerEventTriggerInstance on the specific process instance & corresponding to the criteria
      * @since 6.4.0
      */
-    List<SEventTriggerInstance> searchEventTriggerInstances(long processInstanceId, QueryOptions queryOptions) throws SBonitaSearchException;
+    List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(long processInstanceId, QueryOptions queryOptions) throws SBonitaSearchException;
 
 }

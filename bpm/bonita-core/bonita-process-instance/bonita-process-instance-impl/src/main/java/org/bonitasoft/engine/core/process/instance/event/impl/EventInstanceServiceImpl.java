@@ -44,6 +44,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
@@ -415,20 +416,21 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     }
 
     @Override
-    public long getNumberOfEventTriggerInstances(final long processInstanceId, final QueryOptions queryOptions) throws SBonitaSearchException {
+    public long getNumberOfTimerEventTriggerInstances(final long processInstanceId, final QueryOptions queryOptions) throws SBonitaSearchException {
         try {
             final Map<String, Object> parameters = Collections.singletonMap("processInstanceId", (Object) processInstanceId);
-            return getPersistenceService().getNumberOfEntities(SEventTriggerInstance.class, "ByProcessInstance", queryOptions, parameters);
+            return getPersistenceService().getNumberOfEntities(STimerEventTriggerInstance.class, "ByProcessInstance", queryOptions, parameters);
         } catch (final SBonitaReadException e) {
             throw new SBonitaSearchException(e);
         }
     }
 
     @Override
-    public List<SEventTriggerInstance> searchEventTriggerInstances(final long processInstanceId, final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(final long processInstanceId, final QueryOptions queryOptions)
+            throws SBonitaSearchException {
         try {
             final Map<String, Object> parameters = Collections.singletonMap("processInstanceId", (Object) processInstanceId);
-            return getPersistenceService().searchEntity(SEventTriggerInstance.class, "ByProcessInstance", queryOptions, parameters);
+            return getPersistenceService().searchEntity(STimerEventTriggerInstance.class, "ByProcessInstance", queryOptions, parameters);
         } catch (final SBonitaReadException e) {
             throw new SBonitaSearchException(e);
         }
