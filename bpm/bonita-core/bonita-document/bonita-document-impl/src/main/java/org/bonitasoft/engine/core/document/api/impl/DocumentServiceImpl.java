@@ -34,7 +34,6 @@ import org.bonitasoft.engine.core.document.exception.SDocumentMappingDeletionExc
 import org.bonitasoft.engine.core.document.exception.SDocumentMappingException;
 import org.bonitasoft.engine.core.document.exception.SDocumentMappingNotFoundException;
 import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
-import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 import org.bonitasoft.engine.core.document.model.SLightDocument;
@@ -108,10 +107,10 @@ public class DocumentServiceImpl implements DocumentService {
     public SMappedDocument attachDocumentToProcessInstance(final SDocument document, long processInstanceId, String name, String description, int index)
             throws SDocumentCreationException, SObjectAlreadyExistsException {
         try {
-            if(index == -1){
+            if (index == -1) {
                 SMappedDocument mappedDocumentInternal = getMappedDocumentInternal(processInstanceId, name);
-                if(mappedDocumentInternal != null){
-                    throw new SObjectAlreadyExistsException("A document already exists with name "+name+" and process instance id "+processInstanceId);
+                if (mappedDocumentInternal != null) {
+                    throw new SObjectAlreadyExistsException("A document already exists with name " + name + " and process instance id " + processInstanceId);
                 }
             }
             insertDocument(document);
@@ -544,7 +543,7 @@ public class DocumentServiceImpl implements DocumentService {
     public void deleteContentOfArchivedDocument(long documentId) throws SDocumentNotFoundException, SBonitaReadException, SRecorderException {
         SAMappedDocument archivedDocument = getArchivedDocument(documentId);
         SDocument document = getDocumentWithContent(archivedDocument.getDocumentId());
-        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(document,Collections.singletonMap("content",null));
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(document, Collections.singletonMap("content", null));
         SUpdateEvent updateEvent = null;
         if (eventService.hasHandlers(DOCUMENT, EventActionType.UPDATED)) {
             updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(DOCUMENT).setObject(document)
@@ -554,9 +553,24 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public SMappedDocument updateDocument(long documentId, int index, SDocument sDocument) throws SBonitaReadException, SDocumentNotFoundException, SDocumentMappingException, SRecorderException {
-    SDocumentMapping sDocumentMapping = getMappedDocument(documentId);
-        //TODO update indexes
+    public SMappedDocument updateDocument(long documentId, int index, SDocument sDocument) throws SBonitaReadException, SDocumentNotFoundException,
+            SDocumentMappingException, SRecorderException {
+        SDocumentMapping sDocumentMapping = getMappedDocument(documentId);
         return updateMappedDocument(sDocument, sDocumentMapping.getDescription(), index, sDocumentMapping);
+    }
+
+    @Override
+    public List<SMappedDocument> getDocumentList(String documentName, long processInstanceId, long time) throws SBonitaReadException {
+        List<SAMappedDocument> archivedList = persistenceService.selectList(SelectDescriptorBuilder.getArchivedDocumentList(documentName, processInstanceId, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS), time));
+        List<SMappedDocument> elementsInJournal = persistenceService.selectList(SelectDescriptorBuilder.getDocumentListCreatedBefore(documentName, processInstanceId, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS), time));
+
+        List<SMappedDocument> result = new ArrayList<SMappedDocument>(archivedList.size()+elementsInJournal.size());
+        for (SAMappedDocument mappedDocument : archivedList) {
+            result.add(mappedDocument);
+        }
+        for (SMappedDocument mappedDocument : elementsInJournal) {
+            result.add(mappedDocument);
+        }
+        return result;
     }
 }

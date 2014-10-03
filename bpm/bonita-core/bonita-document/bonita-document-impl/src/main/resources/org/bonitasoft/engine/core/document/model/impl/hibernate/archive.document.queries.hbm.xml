@@ -23,6 +23,16 @@
         ORDER BY mappeddoc.archiveDate ASC
     </query>
 
+    <query name="getArchivedDocumentList">
+        SELECT mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl AS mappeddoc
+        WHERE mappeddoc.processInstanceId = :processInstanceId
+        AND mappeddoc.name = :name
+        AND mappeddoc.archiveDate >= :time
+        ORDER BY mappeddoc.index ASC
+    </query>
+
+
     <query name="getArchivedVersionOfDocument">
         SELECT mappeddoc
         FROM org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl AS mappeddoc

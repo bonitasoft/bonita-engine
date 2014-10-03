@@ -398,6 +398,24 @@ public interface DocumentService {
     List<SMappedDocument> getDocumentList(String documentName, long processInstanceId, int fromIndex, int numberOfResult) throws SBonitaReadException;
 
     /**
+     * Get a list of document at a given time. if there is no document in the list returns an empty list.
+     * <p>
+     *     elements are taken from archive and from non archived mapping if the process is still running
+     * </p>
+     *
+     * @param documentName
+     *        the name of the document list
+     * @param processInstanceId
+     *        the id of the process instance that contains the list
+     * @param time
+     *        time when the list was like that
+     * @return
+     *         the list of document
+     * @since 6.4.0
+     */
+    List<SMappedDocument> getDocumentList(String documentName, long processInstanceId, long time) throws SBonitaReadException;
+
+    /**
      * Remove the content of an archived document while keeping it's metadata.
      * <p>
      * After calling this method you will not be able to retrieve the content of the document since it will be erased from the database.

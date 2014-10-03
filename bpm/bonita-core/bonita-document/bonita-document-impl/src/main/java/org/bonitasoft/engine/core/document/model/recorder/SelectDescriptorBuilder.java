@@ -90,4 +90,22 @@ public class SelectDescriptorBuilder {
         return new SelectListDescriptor<SMappedDocument>("getDocumentList", parameters, SMappedDocument.class,
                 queryOptions);
     }
+
+    public static SelectListDescriptor<SAMappedDocument> getArchivedDocumentList(String name, long processInstanceId, QueryOptions queryOptions, long time) {
+        final Map<String, Object> parameters = new HashMap<String, Object>(3);
+        parameters.put("processInstanceId", processInstanceId);
+        parameters.put("name", name);
+        parameters.put("time", time);
+        return new SelectListDescriptor<SAMappedDocument>("getArchivedDocumentList", parameters, SAMappedDocument.class,
+                queryOptions);
+    }
+
+    public static SelectListDescriptor<SMappedDocument> getDocumentListCreatedBefore(String name, long processInstanceId, QueryOptions queryOptions, long time) {
+        final Map<String, Object> parameters = new HashMap<String, Object>(3);
+        parameters.put("processInstanceId", processInstanceId);
+        parameters.put("name", name);
+        parameters.put("time", time);
+        return new SelectListDescriptor<SMappedDocument>("getDocumentCreatedBeforeList", parameters, SMappedDocument.class,
+                queryOptions);
+    }
 }

@@ -77,7 +77,7 @@ public class DocumentValue implements Serializable {
 
     /**
      * Represent an existing document that did not changed.
-     * It is used to update document list.
+     * It is used only in operations to update document list.
      *
      * @param documentId
      *        the id of the existing document (mapping)
@@ -90,7 +90,7 @@ public class DocumentValue implements Serializable {
 
     /**
      * Represent an existing document that changed with the content and metadata in parameters.
-     * It is used in document list to add a new version of this document.
+     * It is used only in operations to update document list.
      * 
      * @param documentId
      *        the id of the existing document (mapping)
@@ -113,7 +113,7 @@ public class DocumentValue implements Serializable {
 
     /**
      * Represent an existing document that changed to an external document.
-     * It is used in document list to add a new version of this document.
+     * It is used only in operations to update document list.
      *
      * @param documentId
      *        the id of the existing document (mapping)

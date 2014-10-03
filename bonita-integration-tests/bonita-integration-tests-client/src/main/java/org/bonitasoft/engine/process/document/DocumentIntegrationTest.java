@@ -1570,7 +1570,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
                 List.class.getName()));
         //process with list2 without initial value
         builder.addDocumentListDefinition("list2");
-        builder.addActor("actor").addUserTask("step1", "actor");
+        builder.addActor("actor").addUserTask("step1", "actor").addUserTask("step2","actor");
         ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "actor", user);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -1585,6 +1585,10 @@ public class DocumentIntegrationTest extends CommonAPITest {
         }
         //add doc1_2 to list1 with good index
         getProcessAPI().addDocument(processInstance.getId(), "list1", "doc list", new DocumentValue("doc1_2").setIndex(0));
+
+        HumanTaskInstance step1 = waitForUserTask("step1");
+        assignAndExecuteStep(step1,user.getId());
+        HumanTaskInstance step2 = waitForUserTask("step2");
         //add doc1_3 to list1 at the end
         getProcessAPI().addDocument(processInstance.getId(), "list1", "doc list", new DocumentValue("doc1_3"));
         //add doc2 to list2
@@ -1598,6 +1602,22 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertThat(list1.get(6).getUrl()).isEqualTo("doc1_3");
         assertThat(list2).hasSize(1);
         assertThat(list2.get(0).getUrl()).isEqualTo("doc2");
+
+
+        Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
+        expressions.put(new ExpressionBuilder().createDocumentListExpression("list1"), Collections.<String, Serializable>emptyMap());
+        List<Document> initialList1 = (List<Document>) getProcessAPI().evaluateExpressionsAtProcessInstanciation(processInstance.getId(), expressions).get("list1");
+        assertThat(initialList1).hasSize(4);
+        assertThat(initialList1.get(0).getUrl()).isEqualTo("http://www.myrul.com/mydoc.txt");
+        assertThat(new String(getProcessAPI().getDocumentContent(initialList1.get(1).getContentStorageId()))).isEqualTo("hello1");
+        assertThat(new String(getProcessAPI().getDocumentContent(initialList1.get(2).getContentStorageId()))).isEqualTo("hello2");
+        assertThat(new String(getProcessAPI().getDocumentContent(initialList1.get(3).getContentStorageId()))).isEqualTo("hello3");
+
+        assignAndExecuteStep(step2,user.getId());
+        waitForProcessToFinish(processInstance.getId());
+
+        List<Document> finalList1 = (List<Document>) getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions).get("list1");
+        assertThat(finalList1).hasSize(7);
 
         disableAndDeleteProcess(processDefinition);
     }

@@ -28,7 +28,6 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
-import org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
@@ -81,7 +80,7 @@ public class DocumentListReferenceExpressionExecutorStrategyTest {
         initDefinition("theList");
 
         //when
-        List<Document> theList = documentListReferenceExpressionExecutorStrategy.getDocument(45l, "theList");
+        List<Document> theList = documentListReferenceExpressionExecutorStrategy.getDocumentList(45l, "theList", null);
 
         assertThat(theList).isEmpty();
 
@@ -94,7 +93,7 @@ public class DocumentListReferenceExpressionExecutorStrategyTest {
         initDefinition("notTheList");
 
         //when
-        List<Document> theList = documentListReferenceExpressionExecutorStrategy.getDocument(45l, "theList");
+        List<Document> theList = documentListReferenceExpressionExecutorStrategy.getDocumentList(45l, "theList",null);
 
         assertThat(theList).isNull();
     }
@@ -106,7 +105,7 @@ public class DocumentListReferenceExpressionExecutorStrategyTest {
         doReturn(toBeReturned).when(documentService).getDocumentList("theList",45l,0,100);
 
         //when
-        List<Document> theList = documentListReferenceExpressionExecutorStrategy.getDocument(45l, "theList");
+        List<Document> theList = documentListReferenceExpressionExecutorStrategy.getDocumentList(45l, "theList", null);
 
         assertThat(theList).hasSize(1);
     }
