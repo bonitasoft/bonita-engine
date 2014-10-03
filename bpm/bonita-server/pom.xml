@@ -466,19 +466,37 @@
       <groupId>org.bonitasoft.engine.core.document</groupId>
       <artifactId>bonita-document-impl</artifactId>
       <version>${project.version}</version>
+        <exclusions>
+            <exclusion>
+                <groupId>org.bonitasoft.engine.api</groupId>
+                <artifactId>bonita-common-api</artifactId>
+            </exclusion>
+        </exclusions>
     </dependency>
-    <!-- Process Instance -->
-    <dependency>
-      <groupId>com.bonitasoft.engine.core.process.instance</groupId>
-            <artifactId>bonita-process-instance-impl-sp</artifactId>
-      <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.bonitasoft.engine.api</groupId>
-                    <artifactId>bonita-common-api</artifactId>
-                </exclusion>
-            </exclusions>
-    </dependency>
+      <!-- Process Instance -->
+      <dependency>
+          <groupId>com.bonitasoft.engine.core.process.instance</groupId>
+          <artifactId>bonita-process-instance-impl-sp</artifactId>
+          <version>${project.version}</version>
+          <exclusions>
+              <exclusion>
+                  <groupId>org.bonitasoft.engine.api</groupId>
+                  <artifactId>bonita-common-api</artifactId>
+              </exclusion>
+          </exclusions>
+      </dependency>
+      <!-- Process Instance -->
+      <dependency>
+          <groupId>org.bonitasoft.engine.core.process.instance</groupId>
+          <artifactId>bonita-process-instance-impl</artifactId>
+          <version>${project.version}</version>
+          <exclusions>
+              <exclusion>
+                  <groupId>org.bonitasoft.engine.api</groupId>
+                  <artifactId>bonita-common-api</artifactId>
+              </exclusion>
+          </exclusions>
+      </dependency>
 
     <!-- Recorder -->
     <dependency>
