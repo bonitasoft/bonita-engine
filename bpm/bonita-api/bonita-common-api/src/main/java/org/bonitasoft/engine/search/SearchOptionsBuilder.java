@@ -61,7 +61,8 @@ public class SearchOptionsBuilder {
      * Filter the results to the specific value for the specific field (equality)
      * 
      * @param field
-     *            the field name to filter
+     *            the field name to filter. According the perimeter of search, access the different xxxSearchDescriptor to have acceptable field name.
+     *            For example, HumanTaskInstanceSearchDescriptor.NAME or HumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID are correct fields. 
      * @param value
      *            the single value to filter on that field name
      * @return this builder itself
@@ -80,6 +81,7 @@ public class SearchOptionsBuilder {
      * @param value
      *            the value to compare.
      * @return this builder itself
+     * @see SearchOptionsBuilder.filter() for field values
      */
     public SearchOptionsBuilder greaterThan(final String field, final Serializable value) {
         options.addGreaterThanFilter(field, value);
@@ -90,6 +92,7 @@ public class SearchOptionsBuilder {
      * @param field
      * @param value
      * @return this builder itself
+     * @see SearchOptionsBuilder.filter() for field values
      */
     public SearchOptionsBuilder greaterOrEquals(final String field, final Serializable value) {
         options.addGreaterOrEqualsFilter(field, value);
@@ -100,6 +103,7 @@ public class SearchOptionsBuilder {
      * @param field
      * @param value
      * @return this builder itself
+     * @see SearchOptionsBuilder.filter() for field values
      */
     public SearchOptionsBuilder lessThan(final String field, final Serializable value) {
         options.addLessThanFilter(field, value);
@@ -110,6 +114,7 @@ public class SearchOptionsBuilder {
      * @param field
      * @param value
      * @return this builder itself
+     * @see SearchOptionsBuilder.filter() for field values
      */
     public SearchOptionsBuilder lessOrEquals(final String field, final Serializable value) {
         options.addLessOrEqualsFilter(field, value);
@@ -121,6 +126,7 @@ public class SearchOptionsBuilder {
      * @param from
      * @param to
      * @return this builder itself
+     * @see SearchOptionsBuilder.filter() for field values
      */
     public SearchOptionsBuilder between(final String field, final Serializable from, final Serializable to) {
         options.addBetweenFilter(field, from, to);
@@ -131,6 +137,7 @@ public class SearchOptionsBuilder {
      * @param field
      * @param value
      * @return this builder itself
+     * @see SearchOptionsBuilder.filter() for field values
      */
     public SearchOptionsBuilder differentFrom(final String field, final Serializable value) {
         options.addDifferentFromFilter(field, value);
