@@ -54,7 +54,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<includes>
-						<include>com/bonitasoft/engine/bar/test/BusinessArchiveTestSuite.java</include>
+						<include>com/bonitasoft/engine/bar/BusinessArchiveTestSuite.java</include>
 					</includes>
 				</configuration>
 			</plugin>
