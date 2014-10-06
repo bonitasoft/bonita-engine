@@ -61,7 +61,7 @@ public class SearchOptionsBuilder {
      * Filter the results to the specific value for the specific field (equality)
      * 
      * @param field
-     *            the field name to filter. According the perimeter of search, access the different xxxSearchDescriptor to have acceptable field name.
+     *            the field name to filter. According to the perimeter of the search, access the different xxxSearchDescriptor to have acceptable field name.
      *            For example, HumanTaskInstanceSearchDescriptor.NAME or HumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID are correct fields. 
      * @param value
      *            the single value to filter on that field name
