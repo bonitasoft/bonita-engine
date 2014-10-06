@@ -33,11 +33,18 @@ import java.util.Set;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
+import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementations;
+import org.bonitasoft.engine.bpm.connector.ConnectorCriterion;
+import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.impl.IntegerDataInstanceImpl;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.connector.exception.SConnectorException;
+import org.bonitasoft.engine.core.connector.parser.JarDependencies;
+import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
@@ -70,6 +77,7 @@ import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.persistence.OrderAndField;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -85,7 +93,13 @@ import com.google.common.collect.Lists;
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessAPIImplTest {
 
-    final long tenantId = 1;
+    private static final ConnectorCriterion CONNECTOR_CRITERION_DEFINITION_ID_ASC = ConnectorCriterion.DEFINITION_ID_ASC;
+
+    private static final int MAX_RESULT = 10;
+
+    private static final int START_INDEX = 0;
+
+    private static final long TENANT_ID = 1;
 
     private static final long ACTOR_ID = 100;
 
@@ -119,11 +133,17 @@ public class ProcessAPIImplTest {
 
     private ProcessAPIImpl processAPI;
 
+    @Mock
+    private ConnectorService connectorService;
+
+    @Mock
+    private GetConnectorImplementations getConnectorImplementation;
+
     @Before
     public void setup() {
         processAPI = spy(new ProcessAPIImpl());
         doReturn(tenantAccessor).when(processAPI).getTenantAccessor();
-        when(tenantAccessor.getTenantId()).thenReturn(tenantId);
+        when(tenantAccessor.getTenantId()).thenReturn(TENANT_ID);
         when(tenantAccessor.getTransientDataService()).thenReturn(transientDataService);
         when(tenantAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
         when(tenantAccessor.getClassLoaderService()).thenReturn(classLoaderService);
@@ -131,6 +151,8 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getDataInstanceService()).thenReturn(dataInstanceService);
         when(tenantAccessor.getOperationService()).thenReturn(operationService);
         when(tenantAccessor.getActorMappingService()).thenReturn(actorMappingService);
+
+        when(tenantAccessor.getConnectorService()).thenReturn(connectorService);
     }
 
     @Test
@@ -150,8 +172,8 @@ public class ProcessAPIImplTest {
             processAPI.cancelProcessInstance(processInstanceId);
             fail("The process instance does not exists");
         } catch (final ProcessInstanceNotFoundException pinfe) {
-            verify(lockService).lock(processInstanceId, SFlowElementsContainerType.PROCESS.name(), tenantId);
-            verify(lockService).unlock(any(BonitaLock.class), eq(tenantId));
+            verify(lockService).lock(processInstanceId, SFlowElementsContainerType.PROCESS.name(), TENANT_ID);
+            verify(lockService).unlock(any(BonitaLock.class), eq(TENANT_ID));
         }
     }
 
@@ -496,6 +518,72 @@ public class ProcessAPIImplTest {
         verify(processDefinitionService).getProcessDefinitionIds(0, Integer.MAX_VALUE);
         verify(actorMappingService).getActors(anySet(), eq(userId));
         verify(activityInstanceService).getPendingTasks(eq(userId), anySet(), eq(0), eq(100), eq(orderAndField.getField()), eq(orderAndField.getOrder()));
+    }
+
+    @Test(expected = RetrieveException.class)
+    public void getConnectorsImplementations_should_throw__exception() throws Exception {
+        //given
+        final SConnectorException sConnectorException = new SConnectorException("message");
+        doThrow(sConnectorException).when(connectorService).getConnectorImplementations(anyLong(), anyLong(),
+                anyInt(), anyInt(), anyString(),
+                any(OrderByType.class));
+
+        //when then exception
+        processAPI.getConnectorImplementations(PROCESS_DEFINITION_ID, START_INDEX, MAX_RESULT, CONNECTOR_CRITERION_DEFINITION_ID_ASC);
+
+    }
+
+    @Test(expected = RetrieveException.class)
+    public void getNumberOfConnectorImplementations_should_throw__exception() throws Exception {
+        //given
+        final SConnectorException sConnectorException = new SConnectorException("message");
+        doThrow(sConnectorException).when(connectorService).getNumberOfConnectorImplementations(anyLong(), anyLong());
+
+        //when then exception
+        processAPI.getNumberOfConnectorImplementations(PROCESS_DEFINITION_ID);
+
+    }
+
+    @Test
+    public void getConnectorsImplementations_should_return_list() throws Exception {
+        //given
+        final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = createConnectorList();
+
+        doReturn(sConnectorImplementationDescriptors).when(connectorService).getConnectorImplementations(anyLong(), anyLong(),
+                anyInt(), anyInt(), anyString(),
+                any(OrderByType.class));
+
+        //when
+        final List<ConnectorImplementationDescriptor> connectorImplementations = processAPI.getConnectorImplementations(PROCESS_DEFINITION_ID, START_INDEX,
+                MAX_RESULT, CONNECTOR_CRITERION_DEFINITION_ID_ASC);
+
+        //then
+        assertThat(connectorImplementations).as("should return connectore implementation").hasSameSizeAs(sConnectorImplementationDescriptors);
+    }
+
+    @Test
+    public void getNumberOfConnectorImplementations_should_return_count() throws Exception {
+        //given
+        final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = createConnectorList();
+
+        doReturn((long) sConnectorImplementationDescriptors.size()).when(connectorService)
+                .getNumberOfConnectorImplementations(PROCESS_DEFINITION_ID, TENANT_ID);
+
+        //when
+        final long numberOfConnectorImplementations = processAPI.getNumberOfConnectorImplementations(PROCESS_DEFINITION_ID);
+
+        //then
+        assertThat(numberOfConnectorImplementations).as("should return count").isEqualTo(sConnectorImplementationDescriptors.size());
+    }
+
+    private List<SConnectorImplementationDescriptor> createConnectorList() {
+        final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = new ArrayList<SConnectorImplementationDescriptor>();
+        final SConnectorImplementationDescriptor sConnectorImplementationDescriptor = new SConnectorImplementationDescriptor("className", "id", "version",
+                "definitionId", "definitionVersion", new JarDependencies(Arrays.asList("dep1", "dep2")));
+        sConnectorImplementationDescriptors.add(sConnectorImplementationDescriptor);
+        sConnectorImplementationDescriptors.add(sConnectorImplementationDescriptor);
+        sConnectorImplementationDescriptors.add(sConnectorImplementationDescriptor);
+        return sConnectorImplementationDescriptors;
     }
 
 }
