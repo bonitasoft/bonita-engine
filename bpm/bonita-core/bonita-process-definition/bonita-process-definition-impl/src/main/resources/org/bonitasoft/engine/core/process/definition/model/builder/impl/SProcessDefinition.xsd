@@ -174,7 +174,7 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="documentListDefinitions">
+            <xs:element name="documentListDefinitions" minOccurs="0">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element type="definition:SDocumentListDefinition" name="documentListDefinition" minOccurs="0"
