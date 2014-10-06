@@ -22,11 +22,12 @@ import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import com.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
-import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
+import com.bonitasoft.engine.business.application.ApplicationRoute;
+import com.bonitasoft.engine.business.application.ApplicationRouteCreator;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.exception.InvalidDisplayNameException;
-import com.bonitasoft.engine.exception.InvalidNameException;
+import com.bonitasoft.engine.exception.InvalidTokenException;
 import com.bonitasoft.engine.page.Page;
 
 /**
@@ -45,10 +46,10 @@ public interface ApplicationAPI {
      * @return the created {@link Application}
      * @throws AlreadyExistsException if an application already exists with the same name
      * @throws CreationException if an error occurs during the creation
-     * @throws InvalidNameException if the name is empty
+     * @throws InvalidTokenException if the name is empty
      * @throws InvalidDisplayNameException if the display name is empty
      */
-    Application createApplication(ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException, InvalidNameException,
+    Application createApplication(ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException, InvalidTokenException,
     InvalidDisplayNameException;
 
     /**
@@ -77,13 +78,13 @@ public interface ApplicationAPI {
      * @throws ApplicationNotFoundException if no <code>Applicaton</code> is found with the given id
      * @throws UpdateException if an error occurs during the update
      * @throws AlreadyExistsException if update with an already existing Name
-     * @throws InvalidNameException if the name is empty
+     * @throws InvalidTokenException if the name is empty
      * @throws InvalidDisplayNameException if the display name is empty
      * @see Application
      * @see ApplicationUpdater
      */
     Application updateApplication(long applicationId, ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException, AlreadyExistsException,
-    InvalidNameException,
+    InvalidTokenException,
     InvalidDisplayNameException;
 
     /**
@@ -96,43 +97,49 @@ public interface ApplicationAPI {
     SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Creates an {@link ApplicationPage} (association between a {@link Page} and an {@link Application}).
+     * Creates an {@link ApplicationRoute} (association between a {@link Page} and an {@link Application}).
      *
      * @param applicationId the identifier of the application where the page will be associated
      * @param pagedId the identifier of page to be associated to the application
      * @param name the name that this page will take in this application. The name must be unique for a given application.
-     * @return the created {@link ApplicationPage}
+     * @return the created {@link ApplicationRoute}
      * @throws AlreadyExistsException if the name is already used for another page on this application
      * @throws CreationException if an error occurs during the creation
      */
-    ApplicationPage createApplicationPage(long applicationId, long pagedId, String name) throws AlreadyExistsException, CreationException, InvalidNameException;
+    ApplicationRoute createApplicationPage(long applicationId, long pagedId, String name) throws AlreadyExistsException, CreationException, InvalidTokenException;
+
+    ApplicationRoute createApplicationRoute(ApplicationRouteCreator creator) throws AlreadyExistsException, CreationException, InvalidTokenException;
 
     /**
-     * Retrieves the {@link ApplicationPage} for the given application name and application page name
+     * Retrieves the {@link ApplicationRoute} for the given application name and application page name
      *
      * @param applicationName the application name
      * @param applicationPageName the application page name
-     * @return the {@link ApplicationPage} for the given application name and application page name
-     * @throws ApplicationPageNotFoundException if no {@link ApplicationPage} is found for the given application name and application page name
+     * @return the {@link ApplicationRoute} for the given application name and application page name
+     * @throws ApplicationPageNotFoundException if no {@link ApplicationRoute} is found for the given application name and application page name
      */
-    ApplicationPage getApplicationPage(String applicationName, String applicationPageName) throws ApplicationPageNotFoundException;
+    ApplicationRoute getApplicationPage(String applicationName, String applicationPageName) throws ApplicationPageNotFoundException;
+
+    ApplicationRoute getApplicationRoute(String applicationName, String token) throws ApplicationPageNotFoundException;
+
+    ApplicationRoute getApplicationRoute(String applicationName, String token, String parentToken) throws ApplicationPageNotFoundException;
 
     /**
-     * Retrieves the {@link ApplicationPage} from its identifier
+     * Retrieves the {@link ApplicationRoute} from its identifier
      *
-     * @param applicationPageId the application page identifier
-     * @return the {@link ApplicationPage} from its identifier
-     * @throws ApplicationPageNotFoundException if no {@link ApplicationPage} is found for the given identifier
+     * @param applicationRouteId the application page identifier
+     * @return the {@link ApplicationRoute} from its identifier
+     * @throws ApplicationPageNotFoundException if no {@link ApplicationRoute} is found for the given identifier
      */
-    ApplicationPage getApplicationPage(long applicationPageId) throws ApplicationPageNotFoundException;
+    ApplicationRoute getApplicationRoute(long applicationRouteId) throws ApplicationPageNotFoundException;
 
     /**
-     * Deletes an {@link ApplicationPage} by its identifier
+     * Deletes an {@link ApplicationRoute} by its identifier
      *
-     * @param applicationpPageId the {@link ApplicationPage} identifier
+     * @param applicationRouteId the {@link ApplicationRoute} identifier
      * @throws DeletionException if an error occurs during the deletion
      */
-    void deleteApplicationPage(long applicationpPageId) throws DeletionException;
+    void deleteApplicationRoute(long applicationRouteId) throws DeletionException;
 
     /**
      * Searches for application pages with specific search criteria.
@@ -141,20 +148,20 @@ public interface ApplicationAPI {
      * @return a {@link SearchResult} containing the number and the list of application pages matching the search criteria.
      * @throws SearchException if an error occurs during search
      */
-    SearchResult<ApplicationPage> searchApplicationPages(final SearchOptions searchOptions) throws SearchException;
+    SearchResult<ApplicationRoute> searchApplicationRoutes(final SearchOptions searchOptions) throws SearchException;
 
     /**
      * Defines the home page for the application
      *
      * @param applicationId the {@link Application} identifier
-     * @param applicationPageId the identifier of the {@link ApplicationPage} to be used as home page
+     * @param applicationPageId the identifier of the {@link ApplicationRoute} to be used as home page
      * @throws ApplicationNotFoundException if no <code>Applicaton</code> is found with the given id
      * @throws UpdateException if an error occurs during the update
      * @throws AlreadyExistsException if update with an already existing Name
-     * @throws InvalidNameException if the name is empty
+     * @throws InvalidTokenException if the name is empty
      * @throws InvalidDisplayNameException if the display name is empty
      */
-    void setApplicationHomePage(long applicationId, long applicationPageId) throws UpdateException, InvalidNameException,
+    void setApplicationHomePage(long applicationId, long applicationPageId) throws UpdateException, InvalidTokenException,
     InvalidDisplayNameException, AlreadyExistsException, ApplicationNotFoundException;
 
     /**
@@ -164,7 +171,7 @@ public interface ApplicationAPI {
      * @return the application home page
      * @throws ApplicationPageNotFoundException if no home page is found for the given application
      */
-    ApplicationPage getApplicationHomePage(long applicationId) throws ApplicationPageNotFoundException;
+    ApplicationRoute getApplicationHomePage(long applicationId) throws ApplicationPageNotFoundException;
 
     /**
      * Creates a new {@link ApplicationMenu} based on the supplied {@link ApplicationMenuCreator}

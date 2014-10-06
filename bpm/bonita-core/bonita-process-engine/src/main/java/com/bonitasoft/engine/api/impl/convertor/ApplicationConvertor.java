@@ -24,7 +24,7 @@ import com.bonitasoft.engine.business.application.ApplicationField;
 import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator.ApplicationMenuField;
-import com.bonitasoft.engine.business.application.ApplicationPage;
+import com.bonitasoft.engine.business.application.ApplicationRoute;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import com.bonitasoft.engine.business.application.impl.ApplicationMenuImpl;
@@ -133,15 +133,15 @@ public class ApplicationConvertor {
         return builder.done();
     }
 
-    public ApplicationPage toApplicationPage(final SApplicationPage sApplicationPage) {
+    public ApplicationRoute toApplicationPage(final SApplicationPage sApplicationPage) {
         final ApplicationPageImpl appPage = new ApplicationPageImpl(sApplicationPage.getApplicationId(), sApplicationPage.getPageId(),
                 sApplicationPage.getName());
         appPage.setId(sApplicationPage.getId());
         return appPage;
     }
 
-    public List<ApplicationPage> toApplicationPage(final List<SApplicationPage> sApplicationPages) {
-        final List<ApplicationPage> appPages = new ArrayList<ApplicationPage>(sApplicationPages.size());
+    public List<ApplicationRoute> toApplicationPage(final List<SApplicationPage> sApplicationPages) {
+        final List<ApplicationRoute> appPages = new ArrayList<ApplicationRoute>(sApplicationPages.size());
         for (final SApplicationPage sApplicationPage : sApplicationPages) {
             appPages.add(toApplicationPage(sApplicationPage));
         }

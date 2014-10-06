@@ -38,7 +38,7 @@ import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationState;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
-import com.bonitasoft.engine.exception.InvalidNameException;
+import com.bonitasoft.engine.exception.InvalidTokenException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -134,7 +134,7 @@ public class ApplicationAPIDelegateTest {
         //then exception
     }
 
-    @Test(expected = InvalidNameException.class)
+    @Test(expected = InvalidTokenException.class)
     public void createApplication_should_throw_InvalidNameException_when_applicationService_throws_SInvalidNameException() throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION, PATH);

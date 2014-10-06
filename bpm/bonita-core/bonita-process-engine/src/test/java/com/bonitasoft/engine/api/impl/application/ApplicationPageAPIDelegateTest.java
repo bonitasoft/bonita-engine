@@ -29,14 +29,14 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
-import com.bonitasoft.engine.business.application.ApplicationPage;
+import com.bonitasoft.engine.business.application.ApplicationRoute;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.SInvalidNameException;
 import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
 import com.bonitasoft.engine.business.application.impl.SApplicationFields;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
-import com.bonitasoft.engine.exception.InvalidNameException;
+import com.bonitasoft.engine.exception.InvalidTokenException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -55,7 +55,7 @@ public class ApplicationPageAPIDelegateTest {
     private ApplicationService applicationService;
 
     @Mock
-    private SearchResult<ApplicationPage> appPageSearchResult;
+    private SearchResult<ApplicationRoute> appPageSearchResult;
 
     private ApplicationPageAPIDelegate delegate;
 
@@ -106,7 +106,7 @@ public class ApplicationPageAPIDelegateTest {
         given(applicationService.createApplicationPage(sAppPage)).willReturn(sAppPage);
 
         //when
-        final ApplicationPage createdAppPage = delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        final ApplicationRoute createdAppPage = delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
 
         //then
         assertThat(createdAppPage).isEqualTo(appPage);
@@ -136,7 +136,7 @@ public class ApplicationPageAPIDelegateTest {
         //then exception
     }
 
-    @Test(expected = InvalidNameException.class)
+    @Test(expected = InvalidTokenException.class)
     public void createApplicationPage_should_throw_InvalidNameException_when_applicationService_throws_SInvalidNameException() throws Exception {
         //given
         final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
@@ -157,7 +157,7 @@ public class ApplicationPageAPIDelegateTest {
         given(convertor.toApplicationPage(sAppPage)).willReturn(appPage);
 
         //when
-        final ApplicationPage retrievedAppPage = delegate.getApplicationPage(APP_NAME, APP_PAGE_NAME);
+        final ApplicationRoute retrievedAppPage = delegate.getApplicationPage(APP_NAME, APP_PAGE_NAME);
 
         //then
         assertThat(retrievedAppPage).isEqualTo(appPage);
@@ -195,7 +195,7 @@ public class ApplicationPageAPIDelegateTest {
         given(convertor.toApplicationPage(sAppPage)).willReturn(appPage);
 
         //when
-        final ApplicationPage retrievedAppPage = delegate.getApplicationPage(APPLICATION_PAGE_ID);
+        final ApplicationRoute retrievedAppPage = delegate.getApplicationPage(APPLICATION_PAGE_ID);
 
         //then
         assertThat(retrievedAppPage).isEqualTo(appPage);
@@ -262,7 +262,7 @@ public class ApplicationPageAPIDelegateTest {
         given(convertor.toApplicationPage(sAppPage)).willReturn(appPage);
 
         //when
-        final ApplicationPage retrievedAppPage = delegate.getApplicationHomePage(APPLICATION_ID);
+        final ApplicationRoute retrievedAppPage = delegate.getApplicationHomePage(APPLICATION_ID);
 
         //then
         assertThat(retrievedAppPage).isEqualTo(appPage);
@@ -296,7 +296,7 @@ public class ApplicationPageAPIDelegateTest {
         given(searchApplicationPages.getResult()).willReturn(appPageSearchResult);
 
         //when
-        final SearchResult<ApplicationPage> retrievedSearchResult = delegate.searchApplicationPages();
+        final SearchResult<ApplicationRoute> retrievedSearchResult = delegate.searchApplicationPages();
 
         //then
         assertThat(retrievedSearchResult).isEqualTo(appPageSearchResult);
