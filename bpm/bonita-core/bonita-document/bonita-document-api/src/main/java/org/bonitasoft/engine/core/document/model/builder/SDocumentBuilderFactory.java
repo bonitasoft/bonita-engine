@@ -45,4 +45,6 @@ public interface SDocumentBuilderFactory {
     String getDescriptionKey();
 
     String getVersionKey();
+
+    String getIndexKey();
 }

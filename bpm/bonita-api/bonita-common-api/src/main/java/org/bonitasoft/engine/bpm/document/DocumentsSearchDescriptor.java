@@ -40,4 +40,6 @@ public final class DocumentsSearchDescriptor {
 
     public static final String DOCUMENT_URL = "documentURL";
 
+    public static final String LIST_INDEX = "index";
+
 }

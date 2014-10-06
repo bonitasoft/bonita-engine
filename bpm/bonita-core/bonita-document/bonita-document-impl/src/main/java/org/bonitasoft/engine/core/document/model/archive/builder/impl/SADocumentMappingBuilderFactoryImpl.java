@@ -53,6 +53,8 @@ public class SADocumentMappingBuilderFactoryImpl implements SADocumentMappingBui
 
     static final String VERSION = "version";
 
+    static final String INDEX = "index";
+
     @Override
     public SADocumentMappingBuilder createNewInstance() {
         final SADocumentMappingImpl documentMapping = new SADocumentMappingImpl();
@@ -133,5 +135,10 @@ public class SADocumentMappingBuilderFactoryImpl implements SADocumentMappingBui
     @Override
     public String getVersionKey() {
         return VERSION;
+    }
+
+    @Override
+    public String getIndexKey() {
+        return INDEX;
     }
 }

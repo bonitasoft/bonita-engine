@@ -53,4 +53,6 @@ public interface SADocumentMappingBuilderFactory {
     String getDescriptionKey();
 
     String getVersionKey();
+
+    String getIndexKey();
 }

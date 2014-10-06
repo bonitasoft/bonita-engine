@@ -53,12 +53,12 @@ public class SearchDocumentDescriptor extends SearchEntityDescriptor {
         searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_NAME, new FieldDescriptor(SMappedDocument.class, fact.getNameKey()));
         searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_DESCRIPTION, new FieldDescriptor(SMappedDocument.class, fact.getDescriptionKey()));
         searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_VERSION, new FieldDescriptor(SMappedDocument.class, fact.getVersionKey()));
+        searchEntityKeys.put(DocumentsSearchDescriptor.LIST_INDEX, new FieldDescriptor(SMappedDocument.class, fact.getIndexKey()));
         searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_URL, new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + fact.getURLKey()));
         searchEntityKeys.put(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, new FieldDescriptor(SMappedDocument.class, "processInstanceId"));
 
         documentAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> documentFields = new HashSet<String>(8);
-        //        documentFields.add(fact.geContentStorageIdKey());
         documentFields.add(DOCUMENT_PREFIX + fact.getFileNameKey());
         documentFields.add(DOCUMENT_PREFIX + fact.getMimeTypeKey());
         documentFields.add(fact.getNameKey());

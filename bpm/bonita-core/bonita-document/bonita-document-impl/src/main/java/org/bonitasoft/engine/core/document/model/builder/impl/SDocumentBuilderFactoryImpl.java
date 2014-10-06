@@ -1,5 +1,4 @@
 /*
- *
  * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -12,7 +11,6 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.bonitasoft.engine.core.document.model.builder.impl;
 
@@ -23,7 +21,7 @@ import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory
 /**
  * @author Baptiste Mesta
  */
-public class SDocumentBuilderFactoryImpl  implements SDocumentBuilderFactory {
+public class SDocumentBuilderFactoryImpl implements SDocumentBuilderFactory {
 
     static final String ID = "id";
 
@@ -45,11 +43,13 @@ public class SDocumentBuilderFactoryImpl  implements SDocumentBuilderFactory {
 
     static final String DESCRIPTION = "description";
 
+    static final String INDEX = "index";
 
     @Override
     public String getIdKey() {
         return ID;
     }
+
     @Override
     public String getNameKey() {
         return NAME;
@@ -103,5 +103,10 @@ public class SDocumentBuilderFactoryImpl  implements SDocumentBuilderFactory {
     @Override
     public String getVersionKey() {
         return VERSION;
+    }
+
+    @Override
+    public String getIndexKey() {
+        return INDEX;
     }
 }

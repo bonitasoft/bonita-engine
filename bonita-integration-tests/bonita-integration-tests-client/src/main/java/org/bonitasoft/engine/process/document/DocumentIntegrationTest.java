@@ -1445,9 +1445,9 @@ public class DocumentIntegrationTest extends CommonAPITest {
                 Arrays.asList(new DocumentValue("anUrl3"), new DocumentValue("anUrl4")));
 
         SearchResult<ArchivedDocument> searchAllVersions = getProcessAPI().searchArchivedDocuments(new SearchOptionsBuilder(0, 100)
-                .filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId())
-                .sort(DocumentsSearchDescriptor.DOCUMENT_NAME, Order.ASC)
-                .sort(DocumentsSearchDescriptor.DOCUMENT_VERSION, Order.ASC).done());
+                .filter(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId())
+                .sort(ArchivedDocumentsSearchDescriptor.DOCUMENT_NAME, Order.ASC)
+                .sort(ArchivedDocumentsSearchDescriptor.DOCUMENT_VERSION, Order.ASC).done());
 
         assertThat(searchAllVersions.getCount()).isEqualTo(8);
         List<ArchivedDocument> result = searchAllVersions.getResult();
@@ -1597,6 +1597,11 @@ public class DocumentIntegrationTest extends CommonAPITest {
         //check added
         List<Document> list1 = getProcessAPI().getDocumentList(processInstance.getId(), "list1", 0, 100);
         List<Document> list2 = getProcessAPI().getDocumentList(processInstance.getId(), "list2", 0, 100);
+        SearchResult<Document> list1_search = getProcessAPI().searchDocuments(new SearchOptionsBuilder(0, 100).filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId())
+                .filter(DocumentsSearchDescriptor.DOCUMENT_NAME, "list1").sort(DocumentsSearchDescriptor.LIST_INDEX, Order.DESC).done());
+        ArrayList<Document> reversedList1 = new ArrayList<Document>(list1);
+        Collections.reverse(reversedList1);
+        assertThat(list1_search.getResult()).isEqualTo(reversedList1);
         assertThat(list1).hasSize(7);
         assertThat(list1.get(0).getUrl()).isEqualTo("doc1_2");
         assertThat(list1.get(5).getUrl()).isEqualTo("doc1_1");
