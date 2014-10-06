@@ -24,6 +24,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventIn
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceDeletionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceReadException;
@@ -35,6 +36,10 @@ import org.bonitasoft.engine.core.process.instance.impl.FlowNodeInstancesService
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SMessageInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowErrorEventTriggerInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowMessageEventTriggerInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowSignalEventTriggerInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.STimerEventTriggerInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
@@ -44,6 +49,9 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowSignalEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventActionType;
@@ -297,10 +305,11 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     }
 
     @Override
-    public SEventTriggerInstance getEventTriggerInstance(final long eventTriggerInstanceId) throws SEventTriggerInstanceReadException {
+    public <T extends SEventTriggerInstance> T getEventTriggerInstance(final Class<T> entityClass, final long eventTriggerInstanceId)
+            throws SEventTriggerInstanceReadException {
         try {
             return getPersistenceService().selectById(
-                    SelectDescriptorBuilder.getElementById(SEventTriggerInstance.class, "EventTriggerInstance", eventTriggerInstanceId));
+                    SelectDescriptorBuilder.getElementById(entityClass, entityClass.getSimpleName(), eventTriggerInstanceId));
         } catch (final SBonitaReadException e) {
             throw new SEventTriggerInstanceReadException(e);
         }
@@ -478,6 +487,45 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
         } catch (final SRecorderException e) {
             throw new SWaitingEventModificationException(e);
         }
+    }
+
+    @Override
+    public void updateEventTriggerInstance(final SEventTriggerInstance sEventTriggerInstance, final EntityUpdateDescriptor descriptor)
+            throws SEventTriggerInstanceModificationException {
+        try {
+            final SEventTriggerInstance oldEventTriggerInstance = buildOldEventTriggerInstance(sEventTriggerInstance);
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sEventTriggerInstance, descriptor);
+            SUpdateEvent updateEvent = null;
+            if (eventService.hasHandlers(EVENT_TRIGGER_INSTANCE, EventActionType.UPDATED)) {
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(EVENT_TRIGGER_INSTANCE)
+                        .setObject(sEventTriggerInstance).done();
+                updateEvent.setOldObject(oldEventTriggerInstance);
+            }
+            getRecorder().recordUpdate(updateRecord, updateEvent);
+        } catch (final SRecorderException e) {
+            throw new SEventTriggerInstanceModificationException(e);
+        }
+    }
+
+    private SEventTriggerInstance buildOldEventTriggerInstance(final SEventTriggerInstance sEventTriggerInstance) {
+        SEventTriggerInstance oldEventTriggerInstance = null;
+
+        if (sEventTriggerInstance != null) {
+            if (sEventTriggerInstance instanceof STimerEventTriggerInstance) {
+                oldEventTriggerInstance = BuilderFactory.get(STimerEventTriggerInstanceBuilderFactory.class)
+                        .createNewInstance((STimerEventTriggerInstance) sEventTriggerInstance).done();
+            } else if (sEventTriggerInstance instanceof SThrowSignalEventTriggerInstance) {
+                oldEventTriggerInstance = BuilderFactory.get(SThrowSignalEventTriggerInstanceBuilderFactory.class)
+                        .createNewInstance((SThrowSignalEventTriggerInstance) sEventTriggerInstance).done();
+            } else if (sEventTriggerInstance instanceof SThrowErrorEventTriggerInstance) {
+                oldEventTriggerInstance = BuilderFactory.get(SThrowErrorEventTriggerInstanceBuilderFactory.class)
+                        .createNewInstance((SThrowErrorEventTriggerInstance) sEventTriggerInstance).done();
+            } else if (sEventTriggerInstance instanceof SThrowMessageEventTriggerInstance) {
+                oldEventTriggerInstance = BuilderFactory.get(SThrowMessageEventTriggerInstanceBuilderFactory.class)
+                        .createNewInstance((SThrowMessageEventTriggerInstance) sEventTriggerInstance).done();
+            }
+        }
+        return oldEventTriggerInstance;
     }
 
 }

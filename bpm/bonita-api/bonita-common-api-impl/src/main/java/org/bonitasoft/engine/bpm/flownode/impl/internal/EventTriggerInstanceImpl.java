@@ -28,8 +28,9 @@ public class EventTriggerInstanceImpl extends BaseElementImpl implements EventTr
 
     private long eventInstanceId;
 
-    public EventTriggerInstanceImpl(final long eventInstanceId) {
+    public EventTriggerInstanceImpl(final long id, final long eventInstanceId) {
         super();
+        setId(id);
         this.eventInstanceId = eventInstanceId;
     }
 

@@ -181,6 +181,7 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.SendEventException;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
+import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
@@ -291,7 +292,9 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProce
 import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.STimerEventTriggerInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
@@ -4846,6 +4849,33 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new SearchException(e);
         }
         return transaction.getResult();
+    }
+
+    @Override
+    public Date updateExecutionDateOfTimerEventTriggerInstance(final long timerEventTriggerInstanceId, final Date executionDate)
+            throws TimerEventTriggerInstanceNotFoundException, UpdateException {
+        if (executionDate == null) {
+            throw new UpdateException("The date must be not null !!");
+        }
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
+        final SchedulerService schedulerService = tenantAccessor.getSchedulerService();
+
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(STimerEventTriggerInstanceBuilder.EXECUTION_DATE, executionDate.getTime());
+
+        try {
+            final STimerEventTriggerInstance sTimerEventTriggerInstance = eventInstanceService.getEventTriggerInstance(STimerEventTriggerInstance.class,
+                    timerEventTriggerInstanceId);
+            if (sTimerEventTriggerInstance == null) {
+                throw new TimerEventTriggerInstanceNotFoundException(timerEventTriggerInstanceId);
+            }
+            eventInstanceService.updateEventTriggerInstance(sTimerEventTriggerInstance, descriptor);
+            return schedulerService
+                    .rescheduleJob(sTimerEventTriggerInstance.getJobTriggerName(), String.valueOf(getTenantAccessor().getTenantId()), executionDate);
+        } catch (final SBonitaException sbe) {
+            throw new UpdateException(sbe);
+        }
     }
 
     @Override

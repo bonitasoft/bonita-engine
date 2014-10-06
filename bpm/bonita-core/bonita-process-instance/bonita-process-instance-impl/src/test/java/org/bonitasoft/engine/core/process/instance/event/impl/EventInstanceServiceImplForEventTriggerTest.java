@@ -31,14 +31,20 @@ import java.util.Map;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceDeletionException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -49,7 +55,9 @@ import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -194,11 +202,11 @@ public class EventInstanceServiceImplForEventTriggerTest {
         final long eventTriggerInstanceId = 63L;
         final STimerEventTriggerInstanceImpl eventTriggerInstance = new STimerEventTriggerInstanceImpl();
         final SelectByIdDescriptor<SEventTriggerInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(SEventTriggerInstance.class,
-                "EventTriggerInstance", eventTriggerInstanceId);
+                SEventTriggerInstance.class.getSimpleName(), eventTriggerInstanceId);
         doReturn(eventTriggerInstance).when(persistenceService).selectById(selectByIdDescriptor);
 
         // When
-        final SEventTriggerInstance result = eventInstanceServiceImpl.getEventTriggerInstance(eventTriggerInstanceId);
+        final SEventTriggerInstance result = eventInstanceServiceImpl.getEventTriggerInstance(SEventTriggerInstance.class, eventTriggerInstanceId);
 
         // Then
         assertEquals("Should return the result of the mock.", eventTriggerInstance, result);
@@ -208,12 +216,12 @@ public class EventInstanceServiceImplForEventTriggerTest {
     public final void getEventTriggerInstance_should_return_null_if_doesnt_exist() throws Exception {
         // Given
         final long eventTriggerInstanceId = 63L;
-        final SelectByIdDescriptor<SEventTriggerInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(SEventTriggerInstance.class,
-                "EventTriggerInstance", eventTriggerInstanceId);
+        final SelectByIdDescriptor<STimerEventTriggerInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(STimerEventTriggerInstance.class,
+                STimerEventTriggerInstance.class.getSimpleName(), eventTriggerInstanceId);
         doReturn(null).when(persistenceService).selectById(selectByIdDescriptor);
 
         // When
-        final SEventTriggerInstance result = eventInstanceServiceImpl.getEventTriggerInstance(eventTriggerInstanceId);
+        final SEventTriggerInstance result = eventInstanceServiceImpl.getEventTriggerInstance(STimerEventTriggerInstance.class, eventTriggerInstanceId);
 
         // Then
         assertNull("Should return the result of the mock.", result);
@@ -223,12 +231,13 @@ public class EventInstanceServiceImplForEventTriggerTest {
     public final void getEventTriggerInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final long eventTriggerInstanceId = 63L;
-        final SelectByIdDescriptor<SEventTriggerInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(SEventTriggerInstance.class,
-                "EventTriggerInstance", eventTriggerInstanceId);
+        final SelectByIdDescriptor<SThrowErrorEventTriggerInstance> selectByIdDescriptor = SelectDescriptorBuilder.getElementById(
+                SThrowErrorEventTriggerInstance.class,
+                SThrowErrorEventTriggerInstance.class.getSimpleName(), eventTriggerInstanceId);
         doThrow(new SBonitaReadException("")).when(persistenceService).selectById(selectByIdDescriptor);
 
         // When
-        eventInstanceServiceImpl.getEventTriggerInstance(eventTriggerInstanceId);
+        eventInstanceServiceImpl.getEventTriggerInstance(SThrowErrorEventTriggerInstance.class, eventTriggerInstanceId);
     }
 
     /**
@@ -402,4 +411,61 @@ public class EventInstanceServiceImplForEventTriggerTest {
         eventInstanceServiceImpl.searchTimerEventTriggerInstances(processInstanceId, queryOptions);
     }
 
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.core.process.instance.event.impl.EventInstanceServiceImpl#updateEventTriggerInstance(SEventTriggerInstance, EntityUpdateDescriptor)}
+     * .
+     */
+    @Test
+    public final void updateEventTriggerInstance_should_update_timer_event_trigger_instance() throws Exception {
+        // Given
+        final STimerEventTriggerInstanceImpl sTimerEventTriggerInstanceImpl = new STimerEventTriggerInstanceImpl();
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sTimerEventTriggerInstanceImpl, descriptor);
+
+        // When
+        eventInstanceServiceImpl.updateEventTriggerInstance(sTimerEventTriggerInstanceImpl, descriptor);
+
+        // Then
+        verify(recorder).recordUpdate(eq(updateRecord), any(SUpdateEvent.class));
+    }
+
+    @Test
+    public final void updateEventTriggerInstance_should_update_throw_message_event_trigger_instance() throws Exception {
+        // Given
+        final SThrowMessageEventTriggerInstanceImpl sThrowMessageEventTriggerInstanceImpl = new SThrowMessageEventTriggerInstanceImpl();
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sThrowMessageEventTriggerInstanceImpl, descriptor);
+
+        // When
+        eventInstanceServiceImpl.updateEventTriggerInstance(sThrowMessageEventTriggerInstanceImpl, descriptor);
+
+        // Then
+        verify(recorder).recordUpdate(eq(updateRecord), any(SUpdateEvent.class));
+    }
+
+    @Test
+    public final void updateEventTriggerInstance_should_update_throw_error_event_trigger_instance() throws Exception {
+        // Given
+        final SThrowErrorEventTriggerInstanceImpl sThrowErrorEventTriggerInstanceImpl = new SThrowErrorEventTriggerInstanceImpl();
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sThrowErrorEventTriggerInstanceImpl, descriptor);
+
+        // When
+        eventInstanceServiceImpl.updateEventTriggerInstance(sThrowErrorEventTriggerInstanceImpl, descriptor);
+
+        // Then
+        verify(recorder).recordUpdate(eq(updateRecord), any(SUpdateEvent.class));
+    }
+
+    @Test(expected = SEventTriggerInstanceModificationException.class)
+    public final void updateEventTriggerInstance_should_throw_exception_when_there_is_error() throws Exception {
+        // Given
+        final SThrowSignalEventTriggerInstanceImpl sThrowSignalEventTriggerInstanceImpl = new SThrowSignalEventTriggerInstanceImpl();
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+
+        // When
+        eventInstanceServiceImpl.updateEventTriggerInstance(sThrowSignalEventTriggerInstanceImpl, descriptor);
+    }
 }

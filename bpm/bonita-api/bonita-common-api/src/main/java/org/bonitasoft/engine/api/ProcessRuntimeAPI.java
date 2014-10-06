@@ -58,6 +58,7 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.SendEventException;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
+import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
@@ -2366,7 +2367,7 @@ public interface ProcessRuntimeAPI {
      *        The search criterion. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
      * @return The list of process definitions
      * @throws SearchException
-     *         if an exception occurs when getting the process deployment information.
+     *             If an exception occurs when getting the process deployment information.
      * @since 6.3.3
      */
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(SearchOptions searchOptions) throws SearchException;
@@ -2382,5 +2383,22 @@ public interface ProcessRuntimeAPI {
      * @since 6.4.0
      */
     SearchResult<TimerEventTriggerInstance> searchTimerEventTriggerInstances(long processInstanceId, SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Change the date of the execution of a specific {@link TimerEventTriggerInstance}.
+     * 
+     * @param timerEventTriggerInstanceId
+     *            The identifier of the {@link TimerEventTriggerInstance} to update
+     * @param executionDate
+     *            The new date of the execution of the {@link TimerEventTriggerInstance}
+     * @return The first fire time of the newly scheduled trigger is returned
+     * @throws TimerEventTriggerInstanceNotFoundException
+     *             If the {@link TimerEventTriggerInstance} doesn't exist
+     * @throws UpdateException
+     *             If an exception occurs when updating the {@link TimerEventTriggerInstance}
+     * @since 6.4.0
+     */
+    Date updateExecutionDateOfTimerEventTriggerInstance(long timerEventTriggerInstanceId, Date executionDate)
+            throws TimerEventTriggerInstanceNotFoundException, UpdateException;
 
 }

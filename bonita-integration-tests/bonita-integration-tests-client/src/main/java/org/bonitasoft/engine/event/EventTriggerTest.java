@@ -16,10 +16,12 @@ package org.bonitasoft.engine.event;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.flownode.EventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
+import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -54,15 +56,9 @@ public class EventTriggerTest extends AbstractEventTest {
         waitForUserTask("step1", processInstance4);
 
         // Return only timer event trigger
-        final SearchOptions options = new SearchOptionsBuilder(0, 10).done();
-        SearchResult<TimerEventTriggerInstance> searchTimerEventTriggerInstances = getProcessAPI().searchTimerEventTriggerInstances(
-                processInstance2.getId(), options);
-        assertEquals(1, searchTimerEventTriggerInstances.getCount());
-        final List<TimerEventTriggerInstance> result = searchTimerEventTriggerInstances.getResult();
-        assertEquals(1, result.size());
-        assertEquals("timer", result.get(0).getEventInstanceName());
-
-        searchTimerEventTriggerInstances = getProcessAPI().searchTimerEventTriggerInstances(processInstance3.getId(), options);
+        SearchOptions options = new SearchOptionsBuilder(0, 10).done();
+        SearchResult<TimerEventTriggerInstance> searchTimerEventTriggerInstances = getProcessAPI().searchTimerEventTriggerInstances(processInstance3.getId(),
+                options);
         assertEquals(0, searchTimerEventTriggerInstances.getCount());
         assertTrue(searchTimerEventTriggerInstances.getResult().isEmpty());
 
@@ -70,6 +66,32 @@ public class EventTriggerTest extends AbstractEventTest {
         assertEquals(0, searchTimerEventTriggerInstances.getCount());
         assertTrue(searchTimerEventTriggerInstances.getResult().isEmpty());
 
+        options = new SearchOptionsBuilder(0, 10).filter(TimerEventTriggerInstanceSearchDescriptor.EVENT_INSTANCE_NAME, "timer").done();
+        searchTimerEventTriggerInstances = getProcessAPI().searchTimerEventTriggerInstances(processInstance2.getId(), options);
+        assertEquals(1, searchTimerEventTriggerInstances.getCount());
+        final List<TimerEventTriggerInstance> result = searchTimerEventTriggerInstances.getResult();
+        assertEquals(1, result.size());
+        assertEquals("timer", result.get(0).getEventInstanceName());
+
         disableAndDeleteProcess(process2, process1, process3, process4);
+    }
+
+    @Cover(classes = { EventTriggerInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "event trigger instance", "update" }, jira = "BS-10439")
+    @Test
+    public void updateTimerEventTriggerInstance() throws Exception {
+        final ProcessDefinition process1 = deployAndEnableSimpleProcess("Toto", "moi");
+        final ProcessDefinition process2 = deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(90000, true, "Toto");
+        final ProcessInstance processInstance2 = getProcessAPI().startProcess(process2.getId());
+        waitForFlowNodeInState(processInstance2, "timer", TestStates.WAITING, true);
+
+        final SearchOptions options = new SearchOptionsBuilder(0, 10).done();
+        final List<TimerEventTriggerInstance> result = getProcessAPI().searchTimerEventTriggerInstances(processInstance2.getId(), options).getResult();
+        assertEquals(1, result.size());
+
+        final Date date = new Date();
+        final Date newDate = getProcessAPI().updateExecutionDateOfTimerEventTriggerInstance(result.get(0).getId(), date);
+        assertTrue(newDate.equals(date) || newDate.after(date));
+
+        disableAndDeleteProcess(process2, process1);
     }
 }

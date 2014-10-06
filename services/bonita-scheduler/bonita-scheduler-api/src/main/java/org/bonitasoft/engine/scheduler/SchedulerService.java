@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.scheduler;
 
+import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
@@ -162,5 +163,26 @@ public interface SchedulerService extends PlatformLifecycleService {
      * @throws SSchedulerException
      */
     void resumeJobs(long tenantId) throws SSchedulerException;
+
+    /**
+     * Remove (delete) the <code>Trigger</code> with the
+     * given key, and store the new given one - which must be associated
+     * with the same job (the new trigger must have the job name & group specified)
+     * - however, the new trigger need not have the same name as the old trigger.
+     * 
+     * @param triggerName
+     *            The name of the trigger to replace
+     * @param groupName
+     *            The group name of the trigger to replace
+     * @param triggerStartTime
+     *            The start date of the new trigger
+     * @return <code>null</code> if a <code>Trigger</code> with the given
+     *         name & group was not found and removed from the store (and the
+     *         new trigger is therefore not stored), otherwise
+     *         the first fire time of the newly scheduled trigger is returned.
+     * @throws SSchedulerException
+     * @since 6.4.0
+     */
+    Date rescheduleJob(String triggerName, String groupName, Date triggerStartTime) throws SSchedulerException;
 
 }

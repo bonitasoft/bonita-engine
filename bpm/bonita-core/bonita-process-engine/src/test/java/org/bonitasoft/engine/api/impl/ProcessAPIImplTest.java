@@ -37,6 +37,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,7 @@ import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.impl.IntegerDataInstanceImpl;
+import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
@@ -62,11 +64,14 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceModificationException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
@@ -92,6 +97,7 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -690,5 +696,53 @@ public class ProcessAPIImplTest {
 
         // When
         processAPI.searchTimerEventTriggerInstances(processInstanceId, searchOptions);
+    }
+
+    @Test(expected = UpdateException.class)
+    public void updateTimerEventTriggerInstance_should_throw_exception_when_new_execution_date_is_null() throws Exception {
+        processAPI.updateExecutionDateOfTimerEventTriggerInstance(6, null);
+    }
+
+    @Test(expected = TimerEventTriggerInstanceNotFoundException.class)
+    public void updateTimerEventTriggerInstance_should_throw_exception_when_timer_event_trigger_not_exist() throws Exception {
+        processAPI.updateExecutionDateOfTimerEventTriggerInstance(6, new Date());
+    }
+
+    @Test(expected = UpdateException.class)
+    public void updateTimerEventTriggerInstance_should_throw_exception_when_cant_get_timer_event_trigger() throws Exception {
+        // Given
+        final int timerEventTriggerInstanceId = 6;
+        doThrow(new SEventTriggerInstanceReadException(new Exception(""))).when(eventInstanceService).getEventTriggerInstance(STimerEventTriggerInstance.class,
+                timerEventTriggerInstanceId);
+
+        // When
+        processAPI.updateExecutionDateOfTimerEventTriggerInstance(timerEventTriggerInstanceId, new Date());
+    }
+
+    @Test(expected = UpdateException.class)
+    public void updateTimerEventTriggerInstance_should_throw_exception_when_cant_update_timer_event_trigger() throws Exception {
+        // Given
+        final int timerEventTriggerInstanceId = 6;
+        final STimerEventTriggerInstance sTimerEventTriggerInstance = mock(STimerEventTriggerInstance.class);
+        doReturn(sTimerEventTriggerInstance).when(eventInstanceService).getEventTriggerInstance(STimerEventTriggerInstance.class, timerEventTriggerInstanceId);
+        doThrow(new SEventTriggerInstanceModificationException(new Exception(""))).when(eventInstanceService).updateEventTriggerInstance(
+                eq(sTimerEventTriggerInstance), any(EntityUpdateDescriptor.class));
+
+        // When
+        processAPI.updateExecutionDateOfTimerEventTriggerInstance(timerEventTriggerInstanceId, new Date());
+    }
+
+    @Test(expected = UpdateException.class)
+    public void updateTimerEventTriggerInstance_should_throw_exception_when_cant_reschedule_job() throws Exception {
+        // Given
+        final int timerEventTriggerInstanceId = 6;
+        final Date date = new Date();
+        final STimerEventTriggerInstance sTimerEventTriggerInstance = mock(STimerEventTriggerInstance.class);
+        doReturn(sTimerEventTriggerInstance).when(eventInstanceService).getEventTriggerInstance(STimerEventTriggerInstance.class, timerEventTriggerInstanceId);
+
+        doThrow(new SSchedulerException(new Exception(""))).when(schedulerService).rescheduleJob(anyString(), anyString(), eq(date));
+
+        // When
+        processAPI.updateExecutionDateOfTimerEventTriggerInstance(timerEventTriggerInstanceId, new Date());
     }
 }

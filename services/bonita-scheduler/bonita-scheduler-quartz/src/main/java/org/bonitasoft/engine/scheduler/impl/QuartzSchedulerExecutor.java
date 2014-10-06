@@ -18,6 +18,7 @@ import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -391,4 +392,15 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         }
     }
 
+    @Override
+    public Date rescheduleJob(final String triggerName, final String groupName, final Date triggerStartTime) throws SSchedulerException {
+        final TriggerKey triggerKey = new TriggerKey(triggerName, groupName);
+        try {
+            final org.quartz.Trigger oldTrigger = scheduler.getTrigger(triggerKey);
+            final org.quartz.Trigger newTrigger = oldTrigger.getTriggerBuilder().startAt(triggerStartTime).build();
+            return scheduler.rescheduleJob(triggerKey, newTrigger);
+        } catch (final SchedulerException e) {
+            throw new SSchedulerException("Can't get the trigger " + triggerKey, e);
+        }
+    }
 }

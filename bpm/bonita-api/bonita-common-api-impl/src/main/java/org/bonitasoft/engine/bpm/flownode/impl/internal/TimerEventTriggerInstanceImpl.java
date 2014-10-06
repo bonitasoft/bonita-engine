@@ -31,8 +31,8 @@ public class TimerEventTriggerInstanceImpl extends EventTriggerInstanceImpl impl
 
     private final String eventInstanceName;
 
-    public TimerEventTriggerInstanceImpl(final long eventInstanceId, final String eventInstanceName, final Date executionDate) {
-        super(eventInstanceId);
+    public TimerEventTriggerInstanceImpl(final long id, final long eventInstanceId, final String eventInstanceName, final Date executionDate) {
+        super(id, eventInstanceId);
         this.eventInstanceName = eventInstanceName;
         this.setExecutionDate(executionDate);
     }

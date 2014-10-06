@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012, 2014 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,19 +11,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.process.instance.model.builder.event.trigger;
-
-import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
+package org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger;
 
 /**
- * @author Elias Ricken de Medeiros
  * @author Celine Souchet
+ * @version 6.4.0
+ * @since 6.4.0
  */
-public interface STimerEventTriggerInstanceBuilderFactory extends SEventTriggerInstanceBuilderFactory {
+public class SEventTriggerInstanceModificationException extends SEventTriggerInstanceException {
 
-    STimerEventTriggerInstanceBuilder createNewTimerEventTriggerInstance(long eventInstanceId, String eventInstanceName, long executionDate,
-            String jobTriggerName);
+    private static final long serialVersionUID = -2488805930392940258L;
 
-    STimerEventTriggerInstanceBuilder createNewInstance(STimerEventTriggerInstance sEventTriggerInstance);
+    public SEventTriggerInstanceModificationException(String message) {
+        super(message);
+    }
+
+    public SEventTriggerInstanceModificationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public SEventTriggerInstanceModificationException(Throwable cause) {
+        super(cause);
+    }
 
 }

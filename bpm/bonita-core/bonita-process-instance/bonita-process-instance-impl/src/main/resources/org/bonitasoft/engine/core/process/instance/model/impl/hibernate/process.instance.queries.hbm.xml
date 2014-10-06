@@ -598,6 +598,24 @@
 		AND e.deleted = FALSE
 	</query>	
 	
+	<query name="getNumberOfSTimerEventTriggerInstancewithSEventInstanceByProcessInstance">
+		SELECT COUNT(t)
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl AS t,
+			 org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
+		WHERE t.eventInstanceId = e.id 
+		AND e.logicalGroup4 = :processInstanceId
+		AND e.deleted = FALSE
+	</query>
+	
+	<query name="searchSTimerEventTriggerInstancewithSEventInstanceByProcessInstance">
+		SELECT t
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl AS t,
+			 org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
+		WHERE t.eventInstanceId = e.id 
+		AND e.logicalGroup4 = :processInstanceId
+		AND e.deleted = FALSE
+	</query>	
+	
 	<query name="getNumberOfSTimerEventTriggerInstance">
 		SELECT COUNT(t)
 		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl AS t

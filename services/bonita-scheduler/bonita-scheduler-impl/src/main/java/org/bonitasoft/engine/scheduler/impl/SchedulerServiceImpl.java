@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -230,7 +231,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
         return tenantId;
     }
-    
+
     private String getTenantIdAsString() throws SSchedulerException {
         return String.valueOf(getTenantId());
     }
@@ -260,7 +261,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public void start() throws SSchedulerException, SFireEventException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "start");
-        logger.log(getClass(),TechnicalLogSeverity.INFO,"Start scheduler");
+        logger.log(getClass(), TechnicalLogSeverity.INFO, "Start scheduler");
         schedulerExecutor.start();
         eventService.fireEvent(schedulStarted);
         logAfterMethod(TechnicalLogSeverity.TRACE, "start");
@@ -365,7 +366,7 @@ public class SchedulerServiceImpl implements SchedulerService {
             for (final SJobParameter sJobParameterImpl : parameters) {
                 parameterMap.put(sJobParameterImpl.getKey(), sJobParameterImpl.getValue());
             }
-            parameterMap.put(StatelessJob.JOB_DESCRIPTOR_ID,jobIdentifier.getId());
+            parameterMap.put(StatelessJob.JOB_DESCRIPTOR_ID, jobIdentifier.getId());
             parameterMap.put(JobParameter.BATCH_SIZE.name(), batchSize);
             statelessJob.setAttributes(parameterMap);
             if (servicesResolver != null) {
@@ -406,6 +407,11 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public void rescheduleErroneousTriggers() throws SSchedulerException {
         schedulerExecutor.rescheduleErroneousTriggers();
+    }
+
+    @Override
+    public Date rescheduleJob(final String triggerName, final String groupName, final Date triggerStartTime) throws SSchedulerException {
+        return schedulerExecutor.rescheduleJob(triggerName, groupName, triggerStartTime);
     }
 
 }

@@ -1142,7 +1142,7 @@ public class ModelConvertor {
     }
 
     public static TimerEventTriggerInstance toTimerEventTriggerInstance(final STimerEventTriggerInstance sTimerEventTriggerInstance) {
-        return new TimerEventTriggerInstanceImpl(sTimerEventTriggerInstance.getEventInstanceId(),
+        return new TimerEventTriggerInstanceImpl(sTimerEventTriggerInstance.getId(), sTimerEventTriggerInstance.getEventInstanceId(),
                 sTimerEventTriggerInstance.getEventInstanceName(), new Date(sTimerEventTriggerInstance.getExecutionDate()));
     }
 

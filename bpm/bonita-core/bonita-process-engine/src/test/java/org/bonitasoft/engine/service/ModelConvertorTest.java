@@ -198,6 +198,7 @@ public class ModelConvertorTest {
     public void toTimerEventTriggerInstance_can_convert() {
         // Given
         final STimerEventTriggerInstance sTimerEventTriggerInstance = new STimerEventTriggerInstanceImpl(2, "eventInstanceName", 69, "jobTriggerName");
+        sTimerEventTriggerInstance.setId(9);
 
         // Then
         final TimerEventTriggerInstance eventTriggerInstance = ModelConvertor.toTimerEventTriggerInstance(sTimerEventTriggerInstance);

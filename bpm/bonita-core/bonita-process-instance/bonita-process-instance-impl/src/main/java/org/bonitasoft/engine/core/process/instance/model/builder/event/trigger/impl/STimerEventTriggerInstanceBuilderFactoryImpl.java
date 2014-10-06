@@ -15,6 +15,7 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.
 
 import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.STimerEventTriggerInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.STimerEventTriggerInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl;
 
 /**
@@ -30,4 +31,12 @@ public class STimerEventTriggerInstanceBuilderFactoryImpl extends SEventTriggerI
         return new STimerEventTriggerInstanceBuilderImpl(entity);
     }
 
+    @Override
+    public STimerEventTriggerInstanceBuilder createNewInstance(final STimerEventTriggerInstance sTimerEventTriggerInstance) {
+        final STimerEventTriggerInstanceImpl entity = new STimerEventTriggerInstanceImpl(sTimerEventTriggerInstance.getEventInstanceId(),
+                sTimerEventTriggerInstance.getEventInstanceName(), sTimerEventTriggerInstance.getExecutionDate(),
+                sTimerEventTriggerInstance.getJobTriggerName());
+        entity.setId(sTimerEventTriggerInstance.getId());
+        return new STimerEventTriggerInstanceBuilderImpl(entity);
+    }
 }
