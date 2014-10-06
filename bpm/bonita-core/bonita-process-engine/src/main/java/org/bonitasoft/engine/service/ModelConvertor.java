@@ -1373,6 +1373,11 @@ public class ModelConvertor {
         }else{
             documentImpl.setId(mappedDocument.getId());
         }
+        setDocumentFields(mappedDocument, documentService, documentImpl);
+        return documentImpl;
+    }
+
+    private static void setDocumentFields(SMappedDocument mappedDocument, DocumentService documentService, DocumentImpl documentImpl) {
         documentImpl.setProcessInstanceId(mappedDocument.getProcessInstanceId());
         documentImpl.setName(mappedDocument.getName());
         documentImpl.setDescription(mappedDocument.getDescription());
@@ -1383,37 +1388,29 @@ public class ModelConvertor {
         documentImpl.setContentMimeType(mappedDocument.getMimeType());
         documentImpl.setFileName(mappedDocument.getFileName());
         documentImpl.setContentStorageId(String.valueOf(mappedDocument.getDocumentId()));
+        documentImpl.setIndex(mappedDocument.getIndex());
         if(mappedDocument.hasContent()){
             documentImpl.setUrl(documentService.generateDocumentURL(mappedDocument.getFileName(),String.valueOf(mappedDocument.getDocumentId())));
         }else{
             documentImpl.setUrl(mappedDocument.getUrl());
         }
-        return documentImpl;
     }
 
-    public static List<ArchivedDocument> toArchivedDocuments(final Collection<SAMappedDocument> mappedDocuments) {
+    public static List<ArchivedDocument> toArchivedDocuments(final Collection<SAMappedDocument> mappedDocuments, DocumentService documentService) {
         final List<ArchivedDocument> documents = new ArrayList<ArchivedDocument>();
         for (final SAMappedDocument mappedDocument : mappedDocuments) {
-            final ArchivedDocument document = toArchivedDocument(mappedDocument);
+            final ArchivedDocument document = toArchivedDocument(mappedDocument, documentService);
             documents.add(document);
         }
         return documents;
     }
 
-    public static ArchivedDocument toArchivedDocument(final SAMappedDocument mappedDocument) {
+    public static ArchivedDocument toArchivedDocument(final SAMappedDocument mappedDocument, DocumentService documentService) {
         final ArchivedDocumentImpl documentImpl = new ArchivedDocumentImpl(mappedDocument.getName());
         documentImpl.setId(mappedDocument.getId());
-        documentImpl.setProcessInstanceId(mappedDocument.getProcessInstanceId());
+        setDocumentFields(mappedDocument, documentService, documentImpl);
         documentImpl.setArchiveDate(new Date(mappedDocument.getArchiveDate()));
-        documentImpl.setContentStorageId(String.valueOf(mappedDocument.getDocumentId()));
-        documentImpl.setDocumentAuthor(mappedDocument.getAuthor());
-        documentImpl.setDocumentContentFileName(mappedDocument.getFileName());
-        documentImpl.setDocumentContentMimeType(mappedDocument.getMimeType());
-        documentImpl.setDocumentCreationDate(new Date(mappedDocument.getCreationDate()));
-        documentImpl.setDocumentHasContent(mappedDocument.hasContent());
-        documentImpl.setDocumentURL(mappedDocument.getUrl());
         documentImpl.setSourceObjectId(mappedDocument.getSourceObjectId());
-        documentImpl.setVersion(mappedDocument.getVersion());
         return documentImpl;
     }
 

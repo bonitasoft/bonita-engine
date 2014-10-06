@@ -35,7 +35,7 @@ public class SearchArchivedDocumentsSupervisedBy extends AbstractArchivedDocumen
 
     public SearchArchivedDocumentsSupervisedBy(final long userId, final DocumentService documentService,
             final SearchArchivedDocumentDescriptor searchDescriptor, final SearchOptions options) {
-        super(searchDescriptor, options);
+        super(searchDescriptor, options, documentService);
         this.userId = userId;
         this.documentService = documentService;
     }

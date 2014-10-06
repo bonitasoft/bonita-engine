@@ -23,24 +23,48 @@ import org.bonitasoft.engine.bpm.NamedElement;
  * @author Zhang Bole
  * @author Matthieu Chaffotte
  */
-public interface ArchivedDocument extends NamedElement, BaseElement, ArchivedElement {
+public interface ArchivedDocument extends NamedElement, BaseElement, ArchivedElement, Document {
 
-    long getProcessInstanceId();
-
+    /**
+     * @return
+     * @deprecated 6.4.0 use {@link Document#getUrl()}
+     */
+    @Deprecated
     String getDocumentURL();
 
+    /**
+     * @return
+     * @deprecated 6.4.0 use {@link Document#hasContent()}
+     */
+    @Deprecated
     boolean getDocumentHasContent();
 
+    /**
+     * @return
+     * @deprecated 6.4.0 use {@link Document#getAuthor()}
+     */
+    @Deprecated
     long getDocumentAuthor();
 
+    /**
+     * @return
+     * @deprecated 6.4.0 use {@link org.bonitasoft.engine.bpm.document.Document#getContentMimeType()}
+     */
+    @Deprecated
     String getDocumentContentMimeType();
 
+    /**
+     * @return
+     * @deprecated 6.4.0 use {@link org.bonitasoft.engine.bpm.document.Document#getContentFileName()}
+     */
+    @Deprecated
     String getDocumentContentFileName();
 
+    /**
+     * @return
+     * @deprecated 6.4.0 use {@link org.bonitasoft.engine.bpm.document.Document#getCreationDate()}
+     */
+    @Deprecated
     Date getDocumentCreationDate();
-
-    String getContentStorageId();
-
-    String getVersion();
 
 }

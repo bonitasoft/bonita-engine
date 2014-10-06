@@ -47,6 +47,7 @@ public class DocumentImpl implements Document {
     private String description;
 
     private String version;
+    private int index;
 
     public DocumentImpl() {
         super();
@@ -164,6 +165,17 @@ public class DocumentImpl implements Document {
         this.description = description;
     }
 
+
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    @Override
+    public int getIndex() {
+        return index;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -174,6 +186,7 @@ public class DocumentImpl implements Document {
         if (author != document.author) return false;
         if (hasContent != document.hasContent) return false;
         if (id != document.id) return false;
+        if (index != document.index) return false;
         if (processInstanceId != document.processInstanceId) return false;
         if (contentMimeType != null ? !contentMimeType.equals(document.contentMimeType) : document.contentMimeType != null)
             return false;
@@ -205,6 +218,7 @@ public class DocumentImpl implements Document {
         result = 31 * result + (url != null ? url.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + index;
         return result;
     }
 
@@ -223,6 +237,7 @@ public class DocumentImpl implements Document {
                 ", url='" + url + '\'' +
                 ", description='" + description + '\'' +
                 ", version='" + version + '\'' +
+                ", index=" + index +
                 '}';
     }
 }

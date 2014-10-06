@@ -33,7 +33,7 @@ public class SearchArchivedDocuments extends AbstractArchivedDocumentSearchEntit
 
     public SearchArchivedDocuments(final DocumentService documentService, final SearchArchivedDocumentDescriptor searchDescriptor,
             final SearchOptions options) {
-        super(searchDescriptor, options);
+        super(searchDescriptor, options, documentService);
         this.documentService = documentService;
     }
 

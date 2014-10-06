@@ -37,7 +37,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.exception.SDocumentCreationException;
-import org.bonitasoft.engine.core.document.exception.SDocumentDeletionException;
 import org.bonitasoft.engine.core.document.exception.SDocumentException;
 import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
 import org.bonitasoft.engine.core.document.model.SDocument;
@@ -423,7 +422,7 @@ public class DocumentAPIImpl implements DocumentAPI {
         final DocumentService documentService = tenantAccessor.getDocumentService();
 
         try {
-            return ModelConvertor.toArchivedDocument(documentService.getArchivedVersionOfProcessDocument(sourceObjectId));
+            return ModelConvertor.toArchivedDocument(documentService.getArchivedVersionOfProcessDocument(sourceObjectId), documentService);
         } catch (SDocumentNotFoundException e) {
             throw new ArchivedDocumentNotFoundException(e);
         }
@@ -434,7 +433,7 @@ public class DocumentAPIImpl implements DocumentAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DocumentService documentService = tenantAccessor.getDocumentService();
         try {
-            return ModelConvertor.toArchivedDocument(documentService.getArchivedDocument(archivedProcessDocumentId));
+            return ModelConvertor.toArchivedDocument(documentService.getArchivedDocument(archivedProcessDocumentId), documentService);
         } catch (final SDocumentNotFoundException e) {
             throw new ArchivedDocumentNotFoundException(e);
         }

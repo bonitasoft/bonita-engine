@@ -81,4 +81,5 @@ public interface Document extends NamedElement, BaseElement {
      */
     String getVersion();
 
+    int getIndex();
 }
