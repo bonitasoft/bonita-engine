@@ -1395,7 +1395,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         invoices1 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices", 0, 100);
         assertThat(invoices1).hasSize(3);
         Document movedFileDocument = invoices1.get(0);
-        assertThat(movedFileDocument.getIndex()).isEqualTo(1);// was in index 2, now in index 1
+        assertThat(movedFileDocument.getIndex()).isEqualTo(0);// was in index 2, now in index 1
         assertThat(movedFileDocument.getId()).isEqualTo(fileDocument.getId());
 
         Document emptyListDoc = invoices1.get(1);

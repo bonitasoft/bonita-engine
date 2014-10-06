@@ -522,8 +522,9 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public void archive(final SDocumentMapping docMapping, final long archiveDate) throws SDocumentMappingException {
         if (archiveService.isArchivable(SDocumentMapping.class)) {
-            final SADocumentMapping saDocumentMapping = new SADocumentMappingImpl(docMapping.getDocumentId(), docMapping.getProcessInstanceId(), archiveDate,
+            final SADocumentMappingImpl saDocumentMapping = new SADocumentMappingImpl(docMapping.getDocumentId(), docMapping.getProcessInstanceId(), archiveDate,
                     docMapping.getId(), docMapping.getName(), docMapping.getDescription(), docMapping.getVersion());
+            saDocumentMapping.setIndex(docMapping.getIndex());
             final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saDocumentMapping);
             try {
                 archiveService.recordInsert(archiveDate, insertRecord);
