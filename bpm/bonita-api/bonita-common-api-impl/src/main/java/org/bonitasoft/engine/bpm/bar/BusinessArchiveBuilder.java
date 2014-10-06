@@ -191,7 +191,7 @@ public class BusinessArchiveBuilder {
         }
         final ArrayList<String> errors = new ArrayList<String>();
         for (final DocumentDefinition document : entity.getProcessDefinition().getProcessContainer().getDocumentDefinitions()) {
-            if (document.getFile() != null) {
+            if (document.getFile() != null && !document.getFile().isEmpty()) {
                 final byte[] resources = entity.getResource("documents/" + document.getFile());
                 if (resources == null) {
                     errors.add("missing document in the business archive that is present in the process definition " + document.getFile());

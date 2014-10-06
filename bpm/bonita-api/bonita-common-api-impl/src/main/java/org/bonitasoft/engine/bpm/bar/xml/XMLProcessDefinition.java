@@ -472,7 +472,7 @@ public class XMLProcessDefinition {
         for (final DocumentListDefinition documentList : containerDefinition.getDocumentListDefinitions()) {
             final XMLNode documentListDefinitionNode = new XMLNode(DOCUMENT_LIST_DEFINITION_NODE);
             fillDocumentListDefinitionNode(documentListDefinitionNode, documentList);
-            documentDefinitionsNode.addChild(documentListDefinitionNode);
+            documentListDefinitionsNode.addChild(documentListDefinitionNode);
         }
 
         createAndFillFlowNodes(containerDefinition, flowElements);
