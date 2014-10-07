@@ -1559,21 +1559,8 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
     @Test
     public void add_and_update_a_list_of_document() throws Exception {
-        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithDocToUpdate", "1.0");
-        //process with list1 with init value
-        String script = "[new org.bonitasoft.engine.bpm.document.DocumentValue(\"http://www.myrul.com/mydoc.txt\"), " +
-                "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello1\".getBytes(),\"plain/text\",\"file.txt\")," +
-                "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello2\".getBytes(),\"plain/text\",\"file.txt\")," +
-                "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello3\".getBytes(),\"plain/text\",\"file.txt\")" +
-                "]";
-        builder.addDocumentListDefinition("list1").addInitialValue(new ExpressionBuilder().createGroovyScriptExpression("initialDocs",
-                script,
-                List.class.getName()));
-        //process with list2 without initial value
-        builder.addDocumentListDefinition("list2");
-        builder.addActor("actor").addUserTask("step1", "actor").addUserTask("step2","actor");
-        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "actor", user);
-        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        ProcessInstance processInstance = deployProcessWithList();
+
 
         //add doc1_1 to list1
         getProcessAPI().addDocument(processInstance.getId(), "list1", "doc list", new DocumentValue("doc1_1"));
@@ -1593,7 +1580,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         //add doc1_3 to list1 at the end
         getProcessAPI().addDocument(processInstance.getId(), "list1", "doc list", new DocumentValue("doc1_3"));
         //add doc2 to list2
-        getProcessAPI().addDocument(processInstance.getId(), "list2", "doc list", new DocumentValue("doc2"));
+        Document document = getProcessAPI().addDocument(processInstance.getId(), "list2", "doc list", new DocumentValue("doc2"));
         //check added
         List<Document> list1 = getProcessAPI().getDocumentList(processInstance.getId(), "list1", 0, 100);
         List<Document> list2 = getProcessAPI().getDocumentList(processInstance.getId(), "list2", 0, 100);
@@ -1608,6 +1595,10 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertThat(list1.get(6).getUrl()).isEqualTo("doc1_3");
         assertThat(list2).hasSize(1);
         assertThat(list2.get(0).getUrl()).isEqualTo("doc2");
+
+        Document updated = getProcessAPI().updateDocument(document.getId(), new DocumentValue("The new value"));
+        assertThat(updated.getIndex()).isEqualTo(document.getIndex());
+        assertThat(updated.getUrl()).isEqualTo("The new value");
 
 
         Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
@@ -1625,7 +1616,43 @@ public class DocumentIntegrationTest extends CommonAPITest {
         List<Document> finalList1 = (List<Document>) getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions).get("list1");
         assertThat(finalList1).hasSize(7);
 
-        disableAndDeleteProcess(processDefinition);
+        disableAndDeleteProcess(processInstance.getProcessDefinitionId());
+    }
+
+    @Test
+    public void removeDocumentFromList() throws BonitaException {
+        ProcessInstance processInstance = deployProcessWithList();
+        List<Document> list1 = getProcessAPI().getDocumentList(processInstance.getId(), "list1", 0, 100);
+        Document document = getProcessAPI().removeDocument(list1.get(1).getId());
+        assertThat(document).isEqualTo(list1.get(1));
+        list1.remove(1);
+        List<Document> updatedList = getProcessAPI().getDocumentList(processInstance.getId(), "list1", 0, 100);
+        assertThat(updatedList.get(0).getIndex()).isEqualTo(0);
+        assertThat(updatedList.get(1).getIndex()).isEqualTo(1);
+        assertThat(updatedList.get(2).getIndex()).isEqualTo(2);
+        assertThat(updatedList.get(0).getId()).isEqualTo(list1.get(0).getId());
+        assertThat(updatedList.get(1).getId()).isEqualTo(list1.get(1).getId());
+        assertThat(updatedList.get(2).getId()).isEqualTo(list1.get(2).getId());
+
+        disableAndDeleteProcess(processInstance.getProcessDefinitionId());
+    }
+
+    private ProcessInstance deployProcessWithList() throws BonitaException {
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithDocToUpdate", "1.0");
+        //process with list1 with init value
+        String script = "[new org.bonitasoft.engine.bpm.document.DocumentValue(\"http://www.myrul.com/mydoc.txt\"), " +
+                "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello1\".getBytes(),\"plain/text\",\"file1.txt\")," +
+                "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello2\".getBytes(),\"plain/text\",\"file2.txt\")," +
+                "new org.bonitasoft.engine.bpm.document.DocumentValue(\"hello3\".getBytes(),\"plain/text\",\"file3.txt\")" +
+                "]";
+        builder.addDocumentListDefinition("list1").addInitialValue(new ExpressionBuilder().createGroovyScriptExpression("initialDocs",
+                script,
+                List.class.getName()));
+        //process with list2 without initial value
+        builder.addDocumentListDefinition("list2");
+        builder.addActor("actor").addUserTask("step1", "actor").addUserTask("step2","actor");
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "actor", user);
+        return getProcessAPI().startProcess(processDefinition.getId());
     }
 
 }

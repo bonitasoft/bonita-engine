@@ -554,10 +554,10 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public SMappedDocument updateDocument(long documentId, int index, SDocument sDocument) throws SBonitaReadException, SDocumentNotFoundException,
+    public SMappedDocument updateDocument(long documentId, SDocument sDocument) throws SBonitaReadException, SDocumentNotFoundException,
             SDocumentMappingException, SRecorderException {
         SDocumentMapping sDocumentMapping = getMappedDocument(documentId);
-        return updateMappedDocument(sDocument, sDocumentMapping.getDescription(), index, sDocumentMapping);
+        return updateMappedDocument(sDocument, sDocumentMapping.getDescription(), sDocumentMapping.getIndex(), sDocumentMapping);
     }
 
     @Override

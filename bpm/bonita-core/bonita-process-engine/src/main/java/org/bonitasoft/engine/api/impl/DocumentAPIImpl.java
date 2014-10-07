@@ -143,7 +143,7 @@ public class DocumentAPIImpl implements DocumentAPI {
         TenantServiceAccessor tenantAccessor = getTenantAccessor();
         DocumentService documentService = tenantAccessor.getDocumentService();
         try{
-            SMappedDocument document = documentService.updateDocument(documentId,documentValue.getIndex(),buildSDocument(documentValue));
+            SMappedDocument document = documentService.updateDocument(documentId,buildSDocument(documentValue));
             return ModelConvertor.toDocument(document,documentService);
         }catch(SBonitaException e){
             throw new DocumentAttachmentException(e);
@@ -445,6 +445,16 @@ public class DocumentAPIImpl implements DocumentAPI {
         final DocumentService documentService = tenantAccessor.getDocumentService();
         try {
             SMappedDocument document = documentService.getMappedDocument(documentId);
+            int index = document.getIndex();
+            if(index != -1){
+                //document is in list
+                List<SMappedDocument> allDocumentOfTheList = DocumentListLeftOperandHandler.getAllDocumentOfTheList(document.getProcessInstanceId(), document.getName(), documentService);
+
+                    for (int i = index+1; i < allDocumentOfTheList.size() ; i++) {
+                        documentService.updateDocumentIndex(allDocumentOfTheList.get(i),i-1);
+
+                }
+            }
             documentService.removeCurrentVersion(document);
             return ModelConvertor.toDocument(document, documentService);
         } catch (final SDocumentNotFoundException e) {
@@ -452,6 +462,8 @@ public class DocumentAPIImpl implements DocumentAPI {
         } catch (SBonitaReadException e) {
             throw new DeletionException("Unable to delete the document " + documentId, e);
         } catch (SObjectModificationException e) {
+            throw new DeletionException("Unable to delete the document " + documentId, e);
+        } catch (SDocumentCreationException e) {
             throw new DeletionException("Unable to delete the document " + documentId, e);
         }
     }

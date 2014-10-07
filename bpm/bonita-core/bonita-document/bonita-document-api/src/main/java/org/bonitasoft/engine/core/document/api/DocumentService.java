@@ -431,14 +431,10 @@ public interface DocumentService {
 
     /**
      * update the document having the documentId with this new version
-     * 
-     * @param documentId
+     *  @param documentId
      *        the id of the document to update
-     * @param index
-     *        the index in the list of document
      * @param sDocument
      *        the new version of the document @return
-     *        the resulting document
      */
-    SMappedDocument updateDocument(long documentId, int index, SDocument sDocument) throws SBonitaReadException, SDocumentNotFoundException, SDocumentMappingException, SRecorderException;
+    SMappedDocument updateDocument(long documentId, SDocument sDocument) throws SBonitaReadException, SDocumentNotFoundException, SDocumentMappingException, SRecorderException;
 }
