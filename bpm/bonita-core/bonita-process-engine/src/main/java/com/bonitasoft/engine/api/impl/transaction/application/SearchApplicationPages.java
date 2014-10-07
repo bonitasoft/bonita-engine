@@ -18,7 +18,7 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
-import com.bonitasoft.engine.business.application.ApplicationRoute;
+import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
 
@@ -27,7 +27,7 @@ import com.bonitasoft.engine.business.application.model.SApplicationPage;
  * @author Elias Ricken de Medeiros
  *
  */
-public class SearchApplicationPages extends AbstractSearchEntity<ApplicationRoute, SApplicationPage> {
+public class SearchApplicationPages extends AbstractSearchEntity<ApplicationPage, SApplicationPage> {
 
     private final ApplicationService applicationService;
     private final ApplicationConvertor convertor;
@@ -54,7 +54,7 @@ public class SearchApplicationPages extends AbstractSearchEntity<ApplicationRout
     }
 
     @Override
-    public List<ApplicationRoute> convertToClientObjects(final List<SApplicationPage> serverObjects) {
+    public List<ApplicationPage> convertToClientObjects(final List<SApplicationPage> serverObjects) {
         return convertor.toApplicationPage(serverObjects);
     }
 

@@ -33,13 +33,12 @@ import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import com.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
+import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
-import com.bonitasoft.engine.business.application.ApplicationRoute;
-import com.bonitasoft.engine.business.application.ApplicationRouteCreator;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.exception.InvalidDisplayNameException;
-import com.bonitasoft.engine.exception.InvalidTokenException;
+import com.bonitasoft.engine.exception.InvalidNameException;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationMenuDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationPageDescriptor;
@@ -115,7 +114,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws AlreadyExistsException, UpdateException,
-    ApplicationNotFoundException, InvalidTokenException, InvalidDisplayNameException {
+    ApplicationNotFoundException, InvalidNameException, InvalidDisplayNameException {
         return getApplicationAPIDelegate().updateApplication(applicationId, updater);
     }
 
@@ -135,39 +134,39 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public ApplicationRoute createApplicationPage(final long applicationId, final long pagedId, final String name) throws AlreadyExistsException,
-    CreationException, InvalidTokenException, InvalidDisplayNameException {
+    public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String name) throws AlreadyExistsException,
+    CreationException, InvalidNameException, InvalidDisplayNameException {
         return getApplicationPageAPIDelegate().createApplicationPage(applicationId, pagedId, name);
     }
 
     @Override
-    public ApplicationRoute getApplicationPage(final String applicationName, final String applicationPageName) throws ApplicationPageNotFoundException {
+    public ApplicationPage getApplicationPage(final String applicationName, final String applicationPageName) throws ApplicationPageNotFoundException {
         return getApplicationPageAPIDelegate().getApplicationPage(applicationName, applicationPageName);
     }
 
     @Override
-    public SearchResult<ApplicationRoute> searchApplicationRoutes(final SearchOptions searchOptions) throws SearchException {
+    public SearchResult<ApplicationPage> searchApplicationPages(final SearchOptions searchOptions) throws SearchException {
         return getApplicationPageAPIDelegate(searchOptions).searchApplicationPages();
     }
 
     @Override
-    public ApplicationRoute getApplicationRoute(final long applicationPageId) throws ApplicationPageNotFoundException {
+    public ApplicationPage getApplicationPage(final long applicationPageId) throws ApplicationPageNotFoundException {
         return getApplicationPageAPIDelegate().getApplicationPage(applicationPageId);
     }
 
     @Override
-    public void deleteApplicationRoute(final long applicationRouteId) throws DeletionException {
-        getApplicationPageAPIDelegate().deleteApplicationPage(applicationRouteId);
+    public void deleteApplicationPage(final long applicationpPageId) throws DeletionException {
+        getApplicationPageAPIDelegate().deleteApplicationPage(applicationpPageId);
     }
 
     @Override
-    public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException, InvalidTokenException,
+    public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException, InvalidNameException,
             InvalidDisplayNameException, AlreadyExistsException, ApplicationNotFoundException {
         getApplicationPageAPIDelegate().setApplicationHomePage(applicationId, applicationPageId);
     }
 
     @Override
-    public ApplicationRoute getApplicationHomePage(final long applicationId) throws ApplicationPageNotFoundException {
+    public ApplicationPage getApplicationHomePage(final long applicationId) throws ApplicationPageNotFoundException {
         return getApplicationPageAPIDelegate().getApplicationHomePage(applicationId);
     }
 
@@ -189,26 +188,6 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions) throws SearchException {
         return getApplicationMenuAPIDelegate(searchOptions).searchApplicationMenus();
-    }
-
-    @Override
-    public ApplicationRoute createApplicationRoute(final ApplicationRouteCreator creator) throws AlreadyExistsException, CreationException,
-            InvalidTokenException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public ApplicationRoute getApplicationRoute(final String applicationName, final String token) throws ApplicationPageNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public ApplicationRoute getApplicationRoute(final String applicationName, final String token, final String parentToken)
-            throws ApplicationPageNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }

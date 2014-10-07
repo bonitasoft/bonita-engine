@@ -18,7 +18,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.search.descriptor.FieldDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
-import com.bonitasoft.engine.business.application.ApplicationRouteSearchDescriptor;
+import com.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilderFactory;
 
@@ -35,10 +35,10 @@ public class SearchApplicationPageDescriptor extends SearchEntityDescriptor {
     SearchApplicationPageDescriptor() {
         final SApplicationPageBuilderFactory keyProvider = BuilderFactory.get(SApplicationPageBuilderFactory.class);
         keys = new HashMap<String, FieldDescriptor>(4);
-        keys.put(ApplicationRouteSearchDescriptor.ID, new FieldDescriptor(SApplicationPage.class, keyProvider.getIdKey()));
-        keys.put(ApplicationRouteSearchDescriptor.TOKEN, new FieldDescriptor(SApplicationPage.class, keyProvider.getNameKey()));
-        keys.put(ApplicationRouteSearchDescriptor.APPLICATION_ID, new FieldDescriptor(SApplicationPage.class, keyProvider.getApplicationIdKey()));
-        keys.put(ApplicationRouteSearchDescriptor.PAGE_ID, new FieldDescriptor(SApplicationPage.class, keyProvider.getPageIdKey()));
+        keys.put(ApplicationPageSearchDescriptor.ID, new FieldDescriptor(SApplicationPage.class, keyProvider.getIdKey()));
+        keys.put(ApplicationPageSearchDescriptor.NAME, new FieldDescriptor(SApplicationPage.class, keyProvider.getNameKey()));
+        keys.put(ApplicationPageSearchDescriptor.APPLICATION_ID, new FieldDescriptor(SApplicationPage.class, keyProvider.getApplicationIdKey()));
+        keys.put(ApplicationPageSearchDescriptor.PAGE_ID, new FieldDescriptor(SApplicationPage.class, keyProvider.getPageIdKey()));
 
         allFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
 

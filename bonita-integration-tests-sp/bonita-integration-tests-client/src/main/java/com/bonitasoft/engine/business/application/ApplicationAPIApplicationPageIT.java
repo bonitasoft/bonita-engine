@@ -37,13 +37,13 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
         final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
 
         //when
-        final ApplicationRoute appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
+        final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
 
         //then
         assertThat(appPage.getId()).isGreaterThan(0);
         assertThat(appPage.getApplicationId()).isEqualTo(application.getId());
         assertThat(appPage.getPageId()).isEqualTo(getPage().getId());
-        assertThat(appPage.getToken()).isEqualTo("firstPage");
+        assertThat(appPage.getName()).isEqualTo("firstPage");
 
         getApplicationAPI().deleteApplication(application.getId());
 
@@ -55,7 +55,7 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     public void setApplicationHomePage_should_update_the_application_homePage() throws Exception {
         //given
         final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
-        final ApplicationRoute appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
+        final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
 
         //when
         getApplicationAPI().setApplicationHomePage(application.getId(), appPage.getId());
@@ -74,10 +74,10 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     public void getApplicationPage_byNameAndAppName_returns_the_applicationPage_corresponding_to_the_given_parameters() throws Exception {
         //given
         final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
-        final ApplicationRoute appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
+        final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
 
         //when
-        final ApplicationRoute retrievedAppPage = getApplicationAPI().getApplicationPage(application.getName(), appPage.getToken());
+        final ApplicationPage retrievedAppPage = getApplicationAPI().getApplicationPage(application.getName(), appPage.getName());
 
         //then
         assertThat(retrievedAppPage).isEqualTo(appPage);
@@ -90,10 +90,10 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     public void getApplicationPage_byId_returns_the_applicationPage_corresponding_to_the_given_Id() throws Exception {
         //given
         final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
-        final ApplicationRoute appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
+        final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
 
         //when
-        final ApplicationRoute retrievedAppPage = getApplicationAPI().getApplicationRoute(appPage.getId());
+        final ApplicationPage retrievedAppPage = getApplicationAPI().getApplicationPage(appPage.getId());
 
         //then
         assertThat(retrievedAppPage).isEqualTo(appPage);
@@ -106,14 +106,14 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     public void deleteApplication_should_also_delete_related_applicationPage() throws Exception {
         //given
         final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
-        final ApplicationRoute appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
+        final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
 
         //when
         getApplicationAPI().deleteApplication(application.getId());
 
         //then
         try {
-            getApplicationAPI().getApplicationRoute(appPage.getId());
+            getApplicationAPI().getApplicationPage(appPage.getId());
             fail("Not found expected");
         } catch (final ApplicationPageNotFoundException e) {
             //OK
@@ -126,14 +126,14 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     public void deleteApplicationPage_should_delete_applicationPage_with_the_given_id() throws Exception {
         //given
         final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
-        final ApplicationRoute appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
+        final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
 
         //when
-        getApplicationAPI().deleteApplicationRoute(appPage.getId());
+        getApplicationAPI().deleteApplicationPage(appPage.getId());
 
         //then
         try {
-            getApplicationAPI().getApplicationRoute(appPage.getId());
+            getApplicationAPI().getApplicationPage(appPage.getId());
             fail("Not found expected");
         } catch (final ApplicationPageNotFoundException e) {
             //OK
@@ -146,11 +146,11 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     public void getApplicationHomePage_should_return_application_homePage() throws Exception {
         //given
         final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
-        final ApplicationRoute appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
+        final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
         getApplicationAPI().setApplicationHomePage(application.getId(), appPage.getId());
 
         //when
-        final ApplicationRoute homePage = getApplicationAPI().getApplicationHomePage(application.getId());
+        final ApplicationPage homePage = getApplicationAPI().getApplicationHomePage(application.getId());
 
         //then
         assertThat(homePage).isEqualTo(appPage);
@@ -165,13 +165,13 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     public void searchApplicationPages_without_filters_and_search_term_should_return_all_applicationPages_pagged() throws Exception {
         //given
         final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
-        final ApplicationRoute appPage1 = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
-        final ApplicationRoute appPage2 = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "secondPage");
-        final ApplicationRoute appPage3 = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "thirdPage");
+        final ApplicationPage appPage1 = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
+        final ApplicationPage appPage2 = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "secondPage");
+        final ApplicationPage appPage3 = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "thirdPage");
 
         //when
-        final SearchResult<ApplicationRoute> searchResultPage1 = getApplicationAPI().searchApplicationRoutes(buildSearchOptions(0, 2));
-        final SearchResult<ApplicationRoute> searchResultPage2 = getApplicationAPI().searchApplicationRoutes(buildSearchOptions(2, 2));
+        final SearchResult<ApplicationPage> searchResultPage1 = getApplicationAPI().searchApplicationPages(buildSearchOptions(0, 2));
+        final SearchResult<ApplicationPage> searchResultPage2 = getApplicationAPI().searchApplicationPages(buildSearchOptions(2, 2));
 
         //then
         assertThat(searchResultPage1).isNotNull();
@@ -192,13 +192,13 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
         //given
         final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
         getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
-        final ApplicationRoute appPage2 = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "secondPage");
+        final ApplicationPage appPage2 = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "secondPage");
         getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "thirdPage");
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
-        builder.filter(ApplicationRouteSearchDescriptor.TOKEN, "secondPage");
-        final SearchResult<ApplicationRoute> searchResult = getApplicationAPI().searchApplicationRoutes(builder.done());
+        builder.filter(ApplicationPageSearchDescriptor.NAME, "secondPage");
+        final SearchResult<ApplicationPage> searchResult = getApplicationAPI().searchApplicationPages(builder.done());
 
         //then
         assertThat(searchResult).isNotNull();
@@ -215,14 +215,14 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
         //given
         final Application application1 = getApplicationAPI().createApplication(new ApplicationCreator("app1", "My app 1", "1.0", "/app1"));
         final Application application2 = getApplicationAPI().createApplication(new ApplicationCreator("app2", "My app 2", "1.0", "/app2"));
-        final ApplicationRoute appPage1 = getApplicationAPI().createApplicationPage(application1.getId(), getPage().getId(), "firstPage");
+        final ApplicationPage appPage1 = getApplicationAPI().createApplicationPage(application1.getId(), getPage().getId(), "firstPage");
         getApplicationAPI().createApplicationPage(application2.getId(), getPage().getId(), "secondPage");
-        final ApplicationRoute appPage3 = getApplicationAPI().createApplicationPage(application1.getId(), getPage().getId(), "thirdPage");
+        final ApplicationPage appPage3 = getApplicationAPI().createApplicationPage(application1.getId(), getPage().getId(), "thirdPage");
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
-        builder.filter(ApplicationRouteSearchDescriptor.APPLICATION_ID, application1.getId());
-        final SearchResult<ApplicationRoute> searchResult = getApplicationAPI().searchApplicationRoutes(builder.done());
+        builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, application1.getId());
+        final SearchResult<ApplicationPage> searchResult = getApplicationAPI().searchApplicationPages(builder.done());
 
         //then
         assertThat(searchResult).isNotNull();
@@ -240,13 +240,13 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
         final Page page2 = createPage("custompage_MyPage2");
         final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
         getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
-        final ApplicationRoute appPage2 = getApplicationAPI().createApplicationPage(application.getId(), page2.getId(), "secondPage");
-        final ApplicationRoute appPage3 = getApplicationAPI().createApplicationPage(application.getId(), page2.getId(), "thirdPage");
+        final ApplicationPage appPage2 = getApplicationAPI().createApplicationPage(application.getId(), page2.getId(), "secondPage");
+        final ApplicationPage appPage3 = getApplicationAPI().createApplicationPage(application.getId(), page2.getId(), "thirdPage");
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
-        builder.filter(ApplicationRouteSearchDescriptor.PAGE_ID, page2.getId());
-        final SearchResult<ApplicationRoute> searchResult = getApplicationAPI().searchApplicationRoutes(builder.done());
+        builder.filter(ApplicationPageSearchDescriptor.PAGE_ID, page2.getId());
+        final SearchResult<ApplicationPage> searchResult = getApplicationAPI().searchApplicationPages(builder.done());
 
         //then
         assertThat(searchResult).isNotNull();
@@ -263,13 +263,13 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
         //given
         final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
         getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
-        final ApplicationRoute appPage2 = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "secondPage");
+        final ApplicationPage appPage2 = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "secondPage");
         getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "thirdPage");
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
-        builder.filter(ApplicationRouteSearchDescriptor.ID, appPage2.getId());
-        final SearchResult<ApplicationRoute> searchResult = getApplicationAPI().searchApplicationRoutes(builder.done());
+        builder.filter(ApplicationPageSearchDescriptor.ID, appPage2.getId());
+        final SearchResult<ApplicationPage> searchResult = getApplicationAPI().searchApplicationPages(builder.done());
 
         //then
         assertThat(searchResult).isNotNull();
@@ -287,7 +287,7 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
 
     private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
-        builder.sort(ApplicationRouteSearchDescriptor.TOKEN, Order.ASC);
+        builder.sort(ApplicationPageSearchDescriptor.NAME, Order.ASC);
         return builder;
     }
 

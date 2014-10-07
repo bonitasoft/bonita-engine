@@ -15,22 +15,17 @@ package com.bonitasoft.engine.business.application.impl;
 
 import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 
-import com.bonitasoft.engine.business.application.ApplicationRoute;
+import com.bonitasoft.engine.business.application.ApplicationPage;
 
 /**
  * @author Elias Ricken de Medeiros
  *
  */
-public class ApplicationPageImpl extends NamedElementImpl implements ApplicationRoute {
+public class ApplicationPageImpl extends NamedElementImpl implements ApplicationPage {
 
     private static final long serialVersionUID = -8043272410231723583L;
     private final long applicationId;
     private final long pageId;
-    private String token;
-    private Long parentRouteId;
-    private String menuName;
-    private int menuIndex;
-    private boolean menuVisibility;
 
     public ApplicationPageImpl(final long applicationId, final long pageId, final String name) {
         super(name);
@@ -46,31 +41,6 @@ public class ApplicationPageImpl extends NamedElementImpl implements Application
     @Override
     public long getPageId() {
         return pageId;
-    }
-
-    @Override
-    public String getToken() {
-        return token;
-    }
-
-    @Override
-    public Long getParentRouteId() {
-        return parentRouteId;
-    }
-
-    @Override
-    public String getMenuName() {
-        return menuName;
-    }
-
-    @Override
-    public int getMenuIndex() {
-        return menuIndex;
-    }
-
-    @Override
-    public boolean getMenuVisibility() {
-        return menuVisibility;
     }
 
 }

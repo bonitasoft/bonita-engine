@@ -8,25 +8,21 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.application;
 
+import org.bonitasoft.engine.bpm.BaseElement;
+
+import com.bonitasoft.engine.page.Page;
+
 /**
+ * Associates the given {@link Page} to the given {@link Application}
+ *
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationRouteSearchDescriptor {
+public interface ApplicationPage extends BaseElement {
 
-    public static final String ID = "id";
+    long getApplicationId();
 
-    public static final String APPLICATION_ID = "applicationId";
+    long getPageId();
 
-    public static final String TOKEN = "token";
-
-    public static final String MENU_INDEX = "menuIndex";
-
-    public static final String MENU_NAME = "menuName";
-
-    public static final String MENU_VISIBILITY = "menuVisibility";
-
-    public static final String PARENT_ROUTE_ID = "parentRouteId";
-
-    public static final String PAGE_ID = "pageId";
+    String getName();
 
 }

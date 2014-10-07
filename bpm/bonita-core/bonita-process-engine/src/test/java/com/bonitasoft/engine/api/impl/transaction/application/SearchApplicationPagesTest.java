@@ -26,7 +26,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
-import com.bonitasoft.engine.business.application.ApplicationRoute;
+import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
 
@@ -90,12 +90,12 @@ public class SearchApplicationPagesTest {
     public void convetToClientObjects_should_return_result_of_convertor_toApplicationPage() throws Exception {
         //given
         final SApplicationPage sAppPage = mock(SApplicationPage.class);
-        final ApplicationRoute appPage = mock(ApplicationRoute.class);
+        final ApplicationPage appPage = mock(ApplicationPage.class);
         final List<SApplicationPage> sApplicationPages = Arrays.asList(sAppPage);
         given(convertor.toApplicationPage(sApplicationPages)).willReturn(Arrays.asList(appPage));
 
         //when
-        final List<ApplicationRoute> applicationPages = search.convertToClientObjects(sApplicationPages);
+        final List<ApplicationPage> applicationPages = search.convertToClientObjects(sApplicationPages);
 
         //then
         assertThat(applicationPages).containsExactly(appPage);
