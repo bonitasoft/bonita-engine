@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<hibernate-mapping auto-import="false" default-access="field" package="com.bonitasoft.engine.business.application.impl">
+<hibernate-mapping auto-import="false" default-access="field" package="com.bonitasoft.engine.business.application.model.impl">
 
 	<filter-def name="tenantFilter" condition=":tenantId = tenantId">
 		<filter-param name="tenantId" type="long" />
@@ -23,6 +23,7 @@
 		<property name="updatedBy" column="updatedBy" />
 		<property name="state" column="state" />  
 		<property name="homePageId" column="homePageId" />
+		<property name="profileId" column="profileId" />
 		<filter name="tenantFilter" />
 	</class>
 
@@ -34,6 +35,18 @@
 		<property name="applicationId" column="applicationId" />
 		<property name="pageId" column="pageId" />
 		<property name="name" column="name" />
+		<filter name="tenantFilter" />
+	</class>
+
+	<class name="SApplicationMenuImpl" table="business_app_menu">
+		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+			<key-property name="tenantId" column="tenantId" type="long" />
+			<key-property name="id" column="id" type="long" />
+		</composite-id>
+		<property name="displayName" column="displayName" />
+		<property name="applicationPageId" column="applicationPageId" />
+		<property name="parentId" column="parentId" />
+		<property name="index" column="index_" />
 		<filter name="tenantFilter" />
 	</class>
 

@@ -27,6 +27,8 @@ public final class SearchEntitiesDescriptor extends org.bonitasoft.engine.search
 
     private final SearchApplicationPageDescriptor searchApplicationPageDescriptor;
 
+    private final SearchApplicationMenuDescriptor searchApplicationMenuDescriptor;
+
     public SearchEntitiesDescriptor() {
         super();
         searchLogDescriptor = new SearchLogDescriptor();
@@ -35,6 +37,7 @@ public final class SearchEntitiesDescriptor extends org.bonitasoft.engine.search
         searchPageDescriptor = new SearchPageDescriptor();
         searchApplicationDescriptor = new SearchApplicationDescriptor();
         searchApplicationPageDescriptor = new SearchApplicationPageDescriptor();
+        searchApplicationMenuDescriptor = new SearchApplicationMenuDescriptor();
 
     }
 
@@ -66,6 +69,10 @@ public final class SearchEntitiesDescriptor extends org.bonitasoft.engine.search
 
     public SearchApplicationPageDescriptor getSearchApplicationPageDescriptor() {
         return searchApplicationPageDescriptor;
+    }
+
+    public SearchApplicationMenuDescriptor getSearchApplicationMenuDescriptor() {
+        return searchApplicationMenuDescriptor;
     }
 
 }
