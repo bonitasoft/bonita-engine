@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.0
  */
 package org.bonitasoft.engine.api;
@@ -46,24 +46,29 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoUpdater;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessExportException;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
+import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.identity.UserSearchDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * This API deals with definition objects such as {@link ProcessDefinition}, {@link ProcessDeploymentInfo}, {@link Category}, ...
  * It enables interaction with the lifecycle of the process definition.
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
@@ -78,7 +83,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Deploys a {@link BusinessArchive} which contains a {@link DesignProcessDefinition} and its dependencies.
-     * 
+     *
      * @param businessArchive
      *            the archive to deploy.
      * @return the process definition.
@@ -93,7 +98,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Deploys a simple {@link DesignProcessDefinition} (without any dependencies).
-     * 
+     *
      * @param designProcessDefinition
      *            the description of a process definition.
      * @return the process definition corresponding of the description.
@@ -108,7 +113,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Enables the process definition.
-     * 
+     *
      * @param processDefinitionId
      *            the process definition identifier.
      * @throws ProcessDefinitionNotFoundException
@@ -121,7 +126,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Disables the process definition by giving its identifier. A process can only be disabled if it is enabled.
-     * 
+     *
      * @param processDefinitionId
      *            the process definition identifier.
      * @throws ProcessDefinitionNotFoundException
@@ -135,7 +140,7 @@ public interface ProcessManagementAPI {
     /**
      * Returns the process definition by giving its identifier.
      * If the identifier is null, a ProcessDefinitionNotFoundException is thrown.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @return the process definition referenced by the identifier.
@@ -149,7 +154,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Deletes a process definition by giving its identifier. A process can only be deleted if it is disabled.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @throws DeletionException
@@ -167,7 +172,7 @@ public interface ProcessManagementAPI {
      * Deletes process definitions by giving their identifiers. If any speciofied identifier does not refer to a real process definition, or if an exception
      * occurs, no
      * process definition is deleted.
-     * 
+     *
      * @param processDefinitionIds
      *            the list of identifiers of process definitions.
      * @throws DeletionException
@@ -183,7 +188,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Deletes a process definition by giving its identifier. A process can only be deleted if it is disabled and it has no more existing process instances.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @throws DeletionException
@@ -195,7 +200,7 @@ public interface ProcessManagementAPI {
     /**
      * Deletes process definitions by giving their identifiers. If any speciofied identifier does not refer to a real process definition, or if an exception
      * occurs, no process definition is deleted. All instances of given processes must be deleted prior to calling this operation.
-     * 
+     *
      * @param processDefinitionIds
      *            the list of identifiers of process definitions.
      * @throws DeletionException
@@ -207,7 +212,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Deploys, enables and returns a process.
-     * 
+     *
      * @param designProcessDefinition
      *            the description of a process definition.
      * @return ProcessDefinition the process definition corresponding of the description.
@@ -228,7 +233,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Deploys and enables a process by giving a {@link BusinessArchive}.
-     * 
+     *
      * @param businessArchive
      *            the archive ready to deploy.
      * @return ProcessDefinition Process definition by given a business archive.
@@ -243,7 +248,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns a list of problems if the process is configured incorrectly or the configuration is incomplete.
-     * 
+     *
      * @param processDefinitionId
      *            the process definition identifier.
      * @return a list of problems or an empty list.
@@ -257,7 +262,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Disables and deletes the process.
-     * 
+     *
      * @param processDefinitionId
      *            the process definition identifier.
      * @throws ProcessDefinitionNotFoundException
@@ -276,7 +281,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Gets the current number of process definitions in all states.
-     * 
+     *
      * @return The number of process definitions.
      * @throws RetrieveException
      *             if an exception occurs when getting the number of the process definitions.
@@ -286,7 +291,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Gets the deployment information of a process definition by giving the process definition identifier.
-     * 
+     *
      * @param processDefinitionId
      *            the process definition identifier.
      * @return the deployment information of the process definition.
@@ -300,7 +305,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Updates the process deployment information for a specified process.
-     * 
+     *
      * @param processDefinitionId
      *            the process definition identifier.
      * @param processDeploymentInfoUpdater
@@ -316,7 +321,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns a paged list of process deployment information for a number of processes.
-     * 
+     *
      * @param startIndex
      *            the index of the first result (starting from 0).
      * @param maxResults
@@ -332,7 +337,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns the number of actors in a process definition.
-     * 
+     *
      * @param processDefinitionId
      *            the process definition identifier.
      * @return the number of actors in the process.
@@ -344,7 +349,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns the actor.
-     * 
+     *
      * @param actorId
      *            the identifier of the actor.
      * @return the actor.
@@ -356,7 +361,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns a paged list of actors in a process.
-     * 
+     *
      * @param processDefinitionId
      *            the process definition identifier.
      * @param startIndex
@@ -375,7 +380,7 @@ public interface ProcessManagementAPI {
      * An actor member can be a user, a role, a group, or a membership. An actor member is created when a user, role, group, or membership is mapped to the
      * actor.
      * No ordering must be assumed on the list of results.
-     * 
+     *
      * @param actorId
      *            the identifier of the actor.
      * @param startIndex
@@ -392,7 +397,7 @@ public interface ProcessManagementAPI {
      * An actor member can be a user,
      * a role, a group, or a membership. An actor member is created when a
      * user, role, group, or membership is mapped to the actor.
-     * 
+     *
      * @param actorId
      *            the identifier of the actor.
      * @return the number of actors members of the actor
@@ -402,7 +407,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Counts the number of users mapped to the actor.
-     * 
+     *
      * @param actorId
      *            the identifier of the actor.
      * @return the number of users mapped to the actor.
@@ -412,7 +417,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Counts the number of roles mapped to the actor.
-     * 
+     *
      * @param actorId
      *            the identifier of the actor.
      * @return the number of roles mapped to the actor.
@@ -422,7 +427,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Counts the number of groups mapped to the actor.
-     * 
+     *
      * @param actorId
      *            the identifier of the actor.
      * @return the number of groups mapped to the actor.
@@ -432,7 +437,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Counts the number of memberships mapped to the actor.
-     * 
+     *
      * @param actorId
      *            the identifier of the actor.
      * @return the total number of user memberships mapped to an actor
@@ -442,7 +447,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Updates the actor.
-     * 
+     *
      * @param actorId
      *            the identifier of the actor.
      * @param actorUpdater
@@ -458,7 +463,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Maps the user to the actor. The user will be mapped to the actor as an {@link ActorMember}.
-     * 
+     *
      * @param actorId
      *            the identifier of the actor.
      * @param userId
@@ -475,7 +480,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Maps a user to the actor of the process definition. The user will be mapped to the actor as an {@link ActorMember}.
-     * 
+     *
      * @param actorName
      *            the name of the actor.
      * @param processDefinition
@@ -497,7 +502,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Maps the group to the actor.
-     * 
+     *
      * @param actorId
      *            the identifier of the actor.
      * @param groupId
@@ -514,7 +519,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Maps the group to the actor of the process definition.
-     * 
+     *
      * @param actorName
      *            the name of the actor.
      * @param groupId
@@ -535,7 +540,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Maps the role to the actor.
-     * 
+     *
      * @param actorId
      *            the identifier of the actor.
      * @param roleId
@@ -549,7 +554,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Maps the role to the actor of the process definition.
-     * 
+     *
      * @param actorName
      *            the name of the actor.
      * @param processDefinition
@@ -567,7 +572,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Maps the role and the group to the actor.
-     * 
+     *
      * @param actorId
      *            the identifier of the actor.
      * @param roleId
@@ -583,7 +588,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Maps the role and the group to the actor of the process definition.
-     * 
+     *
      * @param actorName
      *            the name of the actor.
      * @param processDefinition
@@ -605,7 +610,7 @@ public interface ProcessManagementAPI {
     /**
      * Deletes the actor member. This removes the mapping between the user, group, role, or membership and the actor.
      * The user, group, role, or membership is not removed from the organization.
-     * 
+     *
      * @param actorMemberId
      *            the identifier of the actor member
      * @throws DeletionException
@@ -616,7 +621,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Imports into the process definition an actor mapping in XML format.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process.
      * @param xmlContent
@@ -629,7 +634,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Imports to the process definition, the actor mapping in XML format as a byte array.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process.
      * @param actorMappingXML
@@ -642,7 +647,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Exports the actor mapping of the process definition. The result contains the mapping in XML format.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process.
      * @return the XML content of the mapping.
@@ -658,7 +663,7 @@ public interface ProcessManagementAPI {
      * to identify sets of related processes. For example, you could have
      * a category called hr to identify all HR processes, or a category called
      * finance to identify all processes used in the purchasing and accounts departments.
-     * 
+     *
      * @param name
      *            The name of the category.
      * @param description
@@ -674,7 +679,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Counts the number of categories.
-     * 
+     *
      * @return the number of categories.
      * @since 6.0
      */
@@ -682,7 +687,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns a paged list of categories.
-     * 
+     *
      * @param startIndex
      *            the index of the first result (starting from 0).
      * @param maxResults
@@ -696,7 +701,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns the category.
-     * 
+     *
      * @param categoryId
      *            the identifier of the category.
      * @return the category.
@@ -708,7 +713,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Associates the process definition with the category.
-     * 
+     *
      * @param categoryId
      *            the identifier of the category.
      * @param processDefinitionId
@@ -723,7 +728,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Associates a list of process definitions with the category.
-     * 
+     *
      * @param categoryId
      *            the identifier of the category.
      * @param processDefinitionIds
@@ -738,7 +743,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Counts the number of categories of the process definition, that is, the number of categories to which the process belongs.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @return the number of categories of the process.
@@ -749,7 +754,7 @@ public interface ProcessManagementAPI {
     /**
      * Counts the number of process deployment information entries of the category.
      * This is the number of deployed processes in the specified category.
-     * 
+     *
      * @param categoryId
      *            the identifier of the category.
      * @return the number of process deployment informations of the category.
@@ -759,7 +764,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns the paged list of process deployment information items for the category.
-     * 
+     *
      * @param categoryId
      *            the identifier of the category.
      * @param startIndex
@@ -775,7 +780,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Get categories from process definition
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @param startIndex
@@ -791,7 +796,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Updates the category according to the updater values.
-     * 
+     *
      * @param categoryId
      *            the identifier of the category.
      * @param updater
@@ -806,7 +811,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Deletes a category and its associations. It does not delete the associated process definitions.
-     * 
+     *
      * @param categoryId
      *            the identifier of the category.
      * @throws DeletionException
@@ -818,7 +823,7 @@ public interface ProcessManagementAPI {
     /**
      * Deletes the associations of all the process definitions related to the category.
      * It does not delete the associated process definitions.
-     * 
+     *
      * @param categoryId
      *            the identifier of the category.
      * @throws DeletionException
@@ -832,7 +837,7 @@ public interface ProcessManagementAPI {
     /**
      * Deletes the associations of all the process definitions related to the category given as input parameter respecting the pagination parameters.
      * It does not delete the associated process definitions.
-     * 
+     *
      * @param categoryId
      *            the identifier of the category.
      * @param startIndex
@@ -850,7 +855,7 @@ public interface ProcessManagementAPI {
      * Deletes the associations of all categories related the process definition.
      * The process definition and categories are not deleted, but there is no longer an
      * association between them.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @throws DeletionException
@@ -864,7 +869,7 @@ public interface ProcessManagementAPI {
     /**
      * Deletes the associations of categories related the process definition given as input parameter respecting the pagination parameters.
      * The process definition and categories are not deleted, but there is no longer an association between them.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @param startIndex
@@ -880,7 +885,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Counts the number of process definitions which have no category.
-     * 
+     *
      * @return the number of process definitions which have no category.
      * @since 6.0
      */
@@ -888,7 +893,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns the paged list of process deployment information items which have no category.
-     * 
+     *
      * @param startIndex
      *            the number of the page (the first page number is 0).
      * @param maxResults
@@ -902,7 +907,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns the paged list of data definitions of the activity of the process definition.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @param activityName
@@ -923,7 +928,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Counts the number of data definitions of the activity of the process definition.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @param activityName
@@ -940,7 +945,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns the paged list of data definitions of the process definition.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @param startIndex
@@ -956,7 +961,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Counts the number of data definitions of the process definition.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @return the number of data definitions of the process definition.
@@ -970,7 +975,7 @@ public interface ProcessManagementAPI {
      * Returns the resources of the process according to the file names pattern. The pattern format must be relative to the root of the business archive,
      * without starting with a '^'
      * or '/' character. The pattern can contain forward slashes after the first character.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @param filenamesPattern
@@ -986,7 +991,7 @@ public interface ProcessManagementAPI {
      * Returns the identifier of the most recently deployed process definition with the given name. This method does not take into consideration the process
      * version,
      * but only its deployment date.
-     * 
+     *
      * @param processName
      *            the process definition name.
      * @return the identifier of the most recently deployed process definition with the given name.
@@ -998,7 +1003,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns the states of the flow node type. Flow nodes are activities, gateways, or events.
-     * 
+     *
      * @param nodeType
      *            the flow node type.
      * @return the set of the states of the flow node type.
@@ -1008,7 +1013,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns the identifier of the process definition with the specified name and version.
-     * 
+     *
      * @param name
      *            the name of the process definition.
      * @param version
@@ -1022,7 +1027,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns the paged list of process deployment information items that the actors can start.
-     * 
+     *
      * @param actorIds
      *            the identifiers of the actors.
      * @param startIndex
@@ -1039,7 +1044,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Checks whether the actors are allowed to start the process definition.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @param actorIds
@@ -1051,7 +1056,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns the actor initiator of the process definition.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @return the actor initiator of the process definition.
@@ -1065,28 +1070,28 @@ public interface ProcessManagementAPI {
 
     /**
      * Searches for the number and the list of processes which have been recently started by the user.
-     * 
+     *
      * @param userId
-     *            the identifier of the user.
+     *        the identifier of the user.
      * @param searchOptions
-     *            the search criteria.
+     *        the search criteria. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
      * @return the number and the list of processes which have been recently started by the user.
      * @throws SearchException
-     *             if an exception occurs when getting the processes.
+     *         if an exception occurs when getting the processes.
      * @since 6.0
      */
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosStartedBy(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
      * Searches for the number and the list of processes that the user can start.
-     * 
+     *
      * @param userId
-     *            the identifier of the user.
+     *        the identifier of the user.
      * @param searchOptions
-     *            the search criteria.
+     *        the search criteria. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
      * @return the number and the list of processes that the user can start.
      * @throws SearchException
-     *             if an exception occurs when getting the processes.
+     *         if an exception occurs when getting the processes.
      * @since 6.0
      * @deprecated since 6.3.3
      * @see {@link ProcessManagementAPI#searchProcessDeploymentInfosCanBeStartedBy(long, SearchOptions)}
@@ -1096,33 +1101,33 @@ public interface ProcessManagementAPI {
 
     /**
      * Searches for the number and the list of processes that the user can start.
-     * 
+     *
      * @param userId
-     *            the identifier of the user.
+     *        the identifier of the user.
      * @param searchOptions
-     *            the search criteria.
+     *        the search criteria. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
      * @return the number and the list of processes that the user can start.
      * @throws SearchException
-     *             if an exception occurs when getting the processes.
+     *         if an exception occurs when getting the processes.
      * @since 6.3.3
      */
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosCanBeStartedBy(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
      * Searches for the number and the list of process definitions.
-     * 
+     *
      * @param searchOptions
-     *            The criterion used to search ProcessDeploymentInfo.
+     *        The criterion used to search ProcessDeploymentInfo. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
      * @return matching process deployment information results.
      * @throws SearchException
-     *             if an exception occurs when getting the processes.
+     *         if an exception occurs when getting the processes.
      * @since 6.0
      */
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfos(SearchOptions searchOptions) throws SearchException;
 
     /**
      * Associates the categories to the process definition.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @param categoryIds
@@ -1137,7 +1142,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Dissociates the categories from the process definition. The process definition itself is unchanged.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @param categoryIds
@@ -1150,26 +1155,26 @@ public interface ProcessManagementAPI {
 
     /**
      * Searches for the number and the list of uncategorized processes.
-     * 
+     *
      * @param searchOptions
-     *            the search criteria.
+     *        the search criteria. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
      * @return the number and the list of uncategorized processes.
      * @throws SearchException
-     *             if an exception occurs when searching the process deployment information.
+     *         if an exception occurs when searching the process deployment information.
      * @since 6.0
      */
     SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfos(SearchOptions searchOptions) throws SearchException;
 
     /**
      * Searches for the number and the list of uncategorized processes supervised by the user.
-     * 
+     *
      * @param userId
-     *            the identifier of the user.
+     *        the identifier of the user.
      * @param searchOptions
-     *            the search criteria.
+     *        the search criteria. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
      * @return the number and the list of uncategorized processes.
      * @throws SearchException
-     *             if an exception occurs when searching the process deployment information.
+     *         if an exception occurs when searching the process deployment information.
      * @since 6.0
      */
     SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfosSupervisedBy(long userId, SearchOptions searchOptions) throws SearchException;
@@ -1177,11 +1182,11 @@ public interface ProcessManagementAPI {
     @Deprecated
     /**
      * Searches the number and the list of processes that the user can start which have no category.
-     * 
+     *
      * @param userId
      *            the identifier of the user.
      * @param searchOptions
-     *            the search criteria.
+     *            the search criteria. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
      * @return the number and the list of uncategorized processes that the user can start.
      * @throws SearchException
      *             if an exception occurs when searching the process deployment information.
@@ -1192,14 +1197,14 @@ public interface ProcessManagementAPI {
 
     /**
      * Searches the number and the list of processes that the user can start which have no category.
-     * 
+     *
      * @param userId
-     *            the identifier of the user.
+     *        the identifier of the user.
      * @param searchOptions
-     *            the search criteria.
+     *        the search criteria. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
      * @return the number and the list of uncategorized processes that the user can start.
      * @throws SearchException
-     *             if an exception occurs when searching the process deployment information.
+     *         if an exception occurs when searching the process deployment information.
      * @since 6.3.3
      */
     SearchResult<ProcessDeploymentInfo> searchUncategorizedProcessDeploymentInfosCanBeStartedBy(long userId, SearchOptions searchOptions)
@@ -1207,7 +1212,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns the process deployment information of the process definitions.
-     * 
+     *
      * @param processDefinitionIds
      *            the identifiers of the process definitions.
      * @return The process deployment information of the process definitions, order by name ascending.
@@ -1217,7 +1222,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns the implementation of a connector of the process definition.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @param connectorName
@@ -1234,7 +1239,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns a paged list of connector implementation descriptors for the process definition.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @param startIndex
@@ -1251,7 +1256,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns the number of connector implementations of the process definition.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @return the number of connector implementation of the process definition.
@@ -1261,7 +1266,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns the actor instances.
-     * 
+     *
      * @param actorIds
      *            the identifiers of the actors.
      * @return the actor instances. (key=actorID, value=actor instance)
@@ -1274,7 +1279,7 @@ public interface ProcessManagementAPI {
      * This is be called before deleting a group from the organization, to make sure that
      * there are no processes that would become unresolved as a result of removing the group.
      * A process that has no actor mapping is unresolved and cannot be started.
-     * 
+     *
      * @param groupId
      *            the identifier of the group.
      * @param startIndex
@@ -1294,7 +1299,7 @@ public interface ProcessManagementAPI {
      * This is be called before deleting a group from the organization, to make sure that
      * there are no processes that would become unresolved as a result of removing one of the listed groups.
      * A process that has no actor mapping is unresolved and cannot be started.
-     * 
+     *
      * @param groupIds
      *            the identifiers of the groups.
      * @param startIndex
@@ -1314,7 +1319,7 @@ public interface ProcessManagementAPI {
      * This is be called before deleting a role from the organization, to make sure that
      * there are no processes that would become unresolved as a result of removing the role.
      * A process that has no actor mapping is unresolved and cannot be started.
-     * 
+     *
      * @param roleId
      *            the identifier of the role.
      * @param startIndex
@@ -1334,7 +1339,7 @@ public interface ProcessManagementAPI {
      * This is be called before deleting a role from the organization, to make sure that
      * there are no processes that would become unresolved as a result of removing one of the listed roles.
      * A process that has no actor mapping is unresolved and cannot be started.
-     * 
+     *
      * @param roleIds
      *            the identifiers of the roles.
      * @param startIndex
@@ -1354,7 +1359,7 @@ public interface ProcessManagementAPI {
      * This is be called before deleting a user from the organization, to make sure that
      * there are no processes that would become unresolved as a result of removing the user.
      * A process that has no actor mapping is unresolved and cannot be started.
-     * 
+     *
      * @param userId
      *            the identifier of the user.
      * @param startIndex
@@ -1372,7 +1377,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns the processes for which one of the listed users is the only mapped actor.
-     * 
+     *
      * @param userIds
      *            the identifiers of the users.
      * @param startIndex
@@ -1390,7 +1395,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns a specific process definition that include informations such as tasks definition, actors...
-     * 
+     *
      * @param processDefinitionId
      *            Identifier of process definition
      * @return The corresponding process definition with informations.
@@ -1402,31 +1407,31 @@ public interface ProcessManagementAPI {
 
     /**
      * Searches the number and the list of processes supervised by the user.
-     * 
+     *
      * @param userId
-     *            the identifier of the user.
+     *        the identifier of the user.
      * @param searchOptions
-     *            the search criterion.
+     *        the search criterion. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
      * @return the number and the list of processes supervised by the user.
      * @throws SearchException
-     *             if an exception occurs when getting the process deployment information.
+     *         if an exception occurs when getting the process deployment information.
      */
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosSupervisedBy(long userId, SearchOptions searchOptions) throws SearchException;
 
     /**
      * Search for all process definitions that can be started by users who report to the specified manager.
-     * 
+     *
      * @param managerUserId
-     *            the identifier of the manager.
+     *        the identifier of the manager.
      * @param searchOptions
-     *            the search crtierion.
+     *        the search crtierion. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
      * @return
      *         the list of process definitions that have at least one initiator who is mapped to a user to who reports to the specified manager.
      * @throws SearchException
-     *             if an exception occurs when getting the process deployment information.
+     *         if an exception occurs when getting the process deployment information.
      * @since 6.0
      * @deprecated 6.3.3
-     * @see {@link ProcessManagementAPI#searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(long, SearchOptions)}
+     * @see ProcessManagementAPI#searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(long, SearchOptions)
      */
     @Deprecated
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosUsersManagedByCanStart(long managerUserId, SearchOptions searchOptions)
@@ -1435,15 +1440,15 @@ public interface ProcessManagementAPI {
     /**
      * TODO do not understand the behaviour of this
      * Search for all process definitions that can be started by users managed by a specific user.
-     * 
+     *
      * @param managerUserId
-     *            the identifier of the manager.
+     *        the identifier of the manager.
      * @param searchOptions
-     *            the search crtierion.
+     *        the search crtierion. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
      * @return
      *         the list of process definitions that have at least one initiator who is mapped to a user to who reports to the specified manager.
      * @throws SearchException
-     *             if an exception occurs when getting the process deployment information.
+     *         if an exception occurs when getting the process deployment information.
      * @since 6.3.3
      */
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(long managerUserId, SearchOptions searchOptions)
@@ -1456,7 +1461,7 @@ public interface ProcessManagementAPI {
      * object as a mapping of users, groups, or roles to the process supervisor (similar to actor mapping).
      * A process has one ProcessSupervisor; however, as this can be mapped to several users, either explicitly or by
      * mapping groups or roles, the process can be supervised by several people.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @param userId
@@ -1477,7 +1482,7 @@ public interface ProcessManagementAPI {
      * object as a mapping of users, groups, or roles to the process supervisor (similar to actor mapping).
      * A process has one ProcessSupervisor; however, as this can be mapped to several users, either explicitly or by
      * mapping groups or roles, the process can be supervised by several people.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @param roleId
@@ -1498,7 +1503,7 @@ public interface ProcessManagementAPI {
      * object as a mapping of users, groups, or roles to the process supervisor (similar to actor mapping).
      * A process has one ProcessSupervisor; however, as this can be mapped to several users, either explicitly or by
      * mapping groups or roles, the process can be supervised by several people.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @param groupId
@@ -1519,7 +1524,7 @@ public interface ProcessManagementAPI {
      * object as a mapping of users, groups, or roles to the process supervisor (similar to actor mapping).
      * A process has one ProcessSupervisor; however, as this can be mapped to several users, either explicitly or by
      * mapping groups or roles, the process can be supervised by several people.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @param groupId
@@ -1538,7 +1543,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Checks whether the user is the process supervisor.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @param userId
@@ -1550,7 +1555,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Deletes a process supervisor.
-     * 
+     *
      * @param supervisorId
      *            the identifier of the {@link ProcessSupervisor}.
      * @throws DeletionException
@@ -1566,7 +1571,7 @@ public interface ProcessManagementAPI {
      * <p>
      * be careful if the user is supervisor because he is in e.g. a group of super visor calling this method with the userId will do nothing, you must find the
      * {@link ProcessSupervisor} that link the user to the process
-     * 
+     *
      * @param processDefinitionId
      *            the Identifier of the process definition to delete the supervisor for.
      * @param userId
@@ -1583,19 +1588,19 @@ public interface ProcessManagementAPI {
 
     /**
      * Searches for the number and the list of processes supervisors.
-     * 
+     *
      * @param searchOptions
-     *            the search criteria.
+     *        the search criteria. See {@link ProcessSupervisorSearchDescriptor} for valid fields for searching and sorting.
      * @return the number and the list of processes supervisors.
      * @throws SearchException
-     *             if an exception occurs when getting the processes supervisors.
+     *         if an exception occurs when getting the processes supervisors.
      * @since 6.0
      */
     SearchResult<ProcessSupervisor> searchProcessSupervisors(SearchOptions searchOptions) throws SearchException;
 
     /**
      * Returns a paged list of categories that are not associated with the process definition.
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of the process definition.
      * @param startIndex
@@ -1610,7 +1615,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Counts the number of process definitions that do not belong to the category.
-     * 
+     *
      * @param categoryId
      *            the identifier of the category.
      * @return the number of process definitions that have not the category.
@@ -1619,7 +1624,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Returns the paginated list of process deployment information items of the category.
-     * 
+     *
      * @param categoryId
      *            the identifier of the category.
      * @param startIndex
@@ -1637,21 +1642,21 @@ public interface ProcessManagementAPI {
     /**
      * Searches for the number and the list of users who can start the process.
      * Note: managerUserId is a possible filter.
-     * 
+     *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param searchOptions
-     *            the search criteria.
+     *        the search criteria. See {@link UserSearchDescriptor} for valid fields for searching and sorting.
      * @return the number and the list of users who can start the process.
      * @throws SearchException
-     *             if an exception occurs when getting the users.
+     *         if an exception occurs when getting the users.
      * @since 6.0
      */
     SearchResult<User> searchUsersWhoCanStartProcessDefinition(long processDefinitionId, SearchOptions searchOptions) throws SearchException;
 
     /**
      * Get process deployment information from a list of processInstance id
-     * 
+     *
      * @param processInstanceIds
      *            Identifier of the processInstance
      * @return A map of <processInstantsIds,ProcessDeploymentInfos>, ordered by the name of the process ascending
@@ -1661,7 +1666,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Get process deployment information from a list of archived processInstance ids
-     * 
+     *
      * @param archivedProcessInstantsIds
      *            Identifier of the archived process instance
      * @return A map of <archivedProcessInstantsIds,ProcessDeploymentInfos>
@@ -1671,7 +1676,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Export processes of bar under home by a processDefinition id
-     * 
+     *
      * @param processDefinitionId
      *            Identifier of the processDefinition
      * @return An array of byte
@@ -1683,7 +1688,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Disables and deletes the process.
-     * 
+     *
      * @param processDefinitionId
      *            the process definition identifier.
      * @throws ProcessDefinitionNotFoundException
@@ -1706,7 +1711,7 @@ public interface ProcessManagementAPI {
      * An empty list is returned if:
      * - the task or the process does not exist
      * - the flow node is not a human task
-     * 
+     *
      * @param processDefinitionId
      *            the identifier of process definition
      * @param humanTaskName
@@ -1726,7 +1731,7 @@ public interface ProcessManagementAPI {
 
     /**
      * Retrieves the list of user identifiers for the given actor and process.
-     * 
+     *
      * @param processDefinitionId
      *            The process definition identifier
      * @param actorName
