@@ -24,6 +24,8 @@ import com.bonitasoft.engine.api.impl.application.ApplicationAPIDelegate;
 import com.bonitasoft.engine.api.impl.application.ApplicationMenuAPIDelegate;
 import com.bonitasoft.engine.api.impl.application.ApplicationPageAPIDelegate;
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
+import com.bonitasoft.engine.api.impl.convertor.ApplicationMenuConvertor;
+import com.bonitasoft.engine.api.impl.convertor.ApplicationPageConvertor;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
@@ -80,7 +82,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     private ApplicationPageAPIDelegate getApplicationPageAPIDelegate(final SearchOptions searchOptions) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final SearchApplicationPageDescriptor appPageSearchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationPageDescriptor();
-        final ApplicationConvertor convertor = new ApplicationConvertor();
+        final ApplicationPageConvertor convertor = new ApplicationPageConvertor();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
         final SearchApplicationPages searchApplicationPages = new SearchApplicationPages(applicationService, convertor, appPageSearchDescriptor,
                 searchOptions);
@@ -94,9 +96,9 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     private ApplicationMenuAPIDelegate getApplicationMenuAPIDelegate(final SearchOptions searchOptions) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ApplicationConvertor convertor = new ApplicationConvertor();
-        final SearchApplicationMenuDescriptor searchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationMenuDescriptor();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
+        final ApplicationMenuConvertor convertor = new ApplicationMenuConvertor(applicationService);
+        final SearchApplicationMenuDescriptor searchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationMenuDescriptor();
         final SearchApplicationMenus searchApplicationMenus = new SearchApplicationMenus(applicationService, convertor, searchDescriptor, searchOptions);
         final ApplicationMenuAPIDelegate delegate = new ApplicationMenuAPIDelegate(tenantAccessor, convertor, searchApplicationMenus);
         return delegate;

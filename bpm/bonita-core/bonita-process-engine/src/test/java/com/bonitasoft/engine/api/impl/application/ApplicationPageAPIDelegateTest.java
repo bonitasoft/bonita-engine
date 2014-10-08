@@ -27,7 +27,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
+import com.bonitasoft.engine.api.impl.convertor.ApplicationPageConvertor;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
@@ -46,7 +46,7 @@ public class ApplicationPageAPIDelegateTest {
     private TenantServiceAccessor accessor;
 
     @Mock
-    private ApplicationConvertor convertor;
+    private ApplicationPageConvertor convertor;
 
     @Mock
     private SearchApplicationPages searchApplicationPages;

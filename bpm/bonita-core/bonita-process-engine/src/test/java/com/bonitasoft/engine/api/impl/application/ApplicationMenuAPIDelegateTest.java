@@ -21,7 +21,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
+import com.bonitasoft.engine.api.impl.convertor.ApplicationMenuConvertor;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
 import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
@@ -38,7 +38,7 @@ public class ApplicationMenuAPIDelegateTest {
     private TenantServiceAccessor accessor;
 
     @Mock
-    private ApplicationConvertor convertor;
+    private ApplicationMenuConvertor convertor;
 
     @Mock
     private SearchApplicationMenus searchApplicatonMenus;

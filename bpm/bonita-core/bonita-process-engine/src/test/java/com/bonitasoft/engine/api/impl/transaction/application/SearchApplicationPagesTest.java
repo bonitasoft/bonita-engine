@@ -25,7 +25,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
+import com.bonitasoft.engine.api.impl.convertor.ApplicationPageConvertor;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
@@ -41,7 +41,7 @@ public class SearchApplicationPagesTest {
     private ApplicationService applicationService;
 
     @Mock
-    private ApplicationConvertor convertor;
+    private ApplicationPageConvertor convertor;
 
     @InjectMocks
     private SearchApplicationPages search;

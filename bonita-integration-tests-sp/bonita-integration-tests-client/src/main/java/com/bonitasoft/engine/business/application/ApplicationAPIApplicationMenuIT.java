@@ -64,6 +64,7 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
         assertThat(createdAppMenu.getApplicationPageId()).isEqualTo(appPage.getId());
         assertThat(createdAppMenu.getIndex()).isEqualTo(1);
         assertThat(createdAppMenu.getParentId()).isNull();
+        assertThat(createdAppMenu.getApplicationId()).isEqualTo(application.getId());
         assertThat(createdAppMenu.getId()).isGreaterThan(0);
 
     }

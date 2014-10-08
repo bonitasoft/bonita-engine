@@ -21,21 +21,11 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationField;
-import com.bonitasoft.engine.business.application.ApplicationMenu;
-import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
-import com.bonitasoft.engine.business.application.ApplicationMenuCreator.ApplicationMenuField;
-import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
-import com.bonitasoft.engine.business.application.impl.ApplicationMenuImpl;
-import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
 import com.bonitasoft.engine.business.application.model.SApplication;
-import com.bonitasoft.engine.business.application.model.SApplicationMenu;
-import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationBuilderFactory;
-import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilder;
-import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilderFactory;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
 
@@ -131,52 +121,6 @@ public class ApplicationConvertor {
         }
 
         return builder.done();
-    }
-
-    public ApplicationPage toApplicationPage(final SApplicationPage sApplicationPage) {
-        final ApplicationPageImpl appPage = new ApplicationPageImpl(sApplicationPage.getApplicationId(), sApplicationPage.getPageId(),
-                sApplicationPage.getName());
-        appPage.setId(sApplicationPage.getId());
-        return appPage;
-    }
-
-    public List<ApplicationPage> toApplicationPage(final List<SApplicationPage> sApplicationPages) {
-        final List<ApplicationPage> appPages = new ArrayList<ApplicationPage>(sApplicationPages.size());
-        for (final SApplicationPage sApplicationPage : sApplicationPages) {
-            appPages.add(toApplicationPage(sApplicationPage));
-        }
-        return appPages;
-    }
-
-    public SApplicationMenu buildSApplicationMenu(final ApplicationMenuCreator creator) {
-        final Map<ApplicationMenuField, Serializable> fields = creator.getFields();
-        final String displayName = (String) fields.get(ApplicationMenuField.DISPLAY_NAME);
-        final long applicationPageId = (Long) fields.get(ApplicationMenuField.APPLICATION_PAGE_ID);
-        final int index = (Integer) fields.get(ApplicationMenuField.INDEX);
-        final Long parentId = (Long) fields.get(ApplicationMenuField.PARENT_ID);
-
-        final SApplicationMenuBuilder builder = BuilderFactory.get(SApplicationMenuBuilderFactory.class).createNewInstance(displayName, applicationPageId,
-                index);
-        if (parentId != null) {
-            builder.setParentId(parentId);
-        }
-        return builder.done();
-    }
-
-    public ApplicationMenu toApplicationMenu(final SApplicationMenu sApplicationMenu) {
-        final ApplicationMenuImpl menu = new ApplicationMenuImpl(sApplicationMenu.getDisplayName(), sApplicationMenu.getApplicationPageId(),
-                sApplicationMenu.getIndex());
-        menu.setId(sApplicationMenu.getId());
-        menu.setParentId(sApplicationMenu.getParentId());
-        return menu;
-    }
-
-    public List<ApplicationMenu> toApplicationMenu(final List<SApplicationMenu> sApplicationMenus) {
-        final List<ApplicationMenu> menus = new ArrayList<ApplicationMenu>(sApplicationMenus.size());
-        for (final SApplicationMenu sMenu : sApplicationMenus) {
-            menus.add(toApplicationMenu(sMenu));
-        }
-        return menus;
     }
 
 }

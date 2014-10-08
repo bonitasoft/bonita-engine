@@ -27,6 +27,7 @@ public class ApplicationMenuImpl extends BaseElementImpl implements ApplicationM
     private static final long serialVersionUID = 5080525289831930498L;
     private final String displayName;
     private final long applicationPageId;
+    private long applicationId;
     private Long parentId;
     private final int index;
 
@@ -61,50 +62,18 @@ public class ApplicationMenuImpl extends BaseElementImpl implements ApplicationM
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (applicationPageId ^ applicationPageId >>> 32);
-        result = prime * result + (displayName == null ? 0 : displayName.hashCode());
-        result = prime * result + index;
-        result = prime * result + (parentId == null ? 0 : parentId.hashCode());
-        return result;
+    public long getApplicationId() {
+        return applicationId;
+    }
+
+    public void setApplicationId(final long applicationId) {
+        this.applicationId = applicationId;
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ApplicationMenuImpl other = (ApplicationMenuImpl) obj;
-        if (applicationPageId != other.applicationPageId) {
-            return false;
-        }
-        if (displayName == null) {
-            if (other.displayName != null) {
-                return false;
-            }
-        } else if (!displayName.equals(other.displayName)) {
-            return false;
-        }
-        if (index != other.index) {
-            return false;
-        }
-        if (parentId == null) {
-            if (other.parentId != null) {
-                return false;
-            }
-        } else if (!parentId.equals(other.parentId)) {
-            return false;
-        }
-        return true;
+    public String toString() {
+        return "ApplicationMenuImpl [displayName=" + displayName + ", applicationPageId=" + applicationPageId + ", applicationId=" + applicationId
+                + ", parentId=" + parentId + ", index=" + index + "]";
     }
-
 
 }

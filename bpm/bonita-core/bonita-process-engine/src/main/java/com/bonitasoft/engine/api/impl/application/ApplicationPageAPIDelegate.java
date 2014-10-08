@@ -23,7 +23,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchResult;
 
-import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
+import com.bonitasoft.engine.api.impl.convertor.ApplicationPageConvertor;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
@@ -46,11 +46,11 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
  */
 public class ApplicationPageAPIDelegate {
 
-    private final ApplicationConvertor convertor;
+    private final ApplicationPageConvertor convertor;
     private final ApplicationService applicationService;
     private final SearchApplicationPages searchApplicationPages;
 
-    public ApplicationPageAPIDelegate(final TenantServiceAccessor accessor, final ApplicationConvertor convertor,
+    public ApplicationPageAPIDelegate(final TenantServiceAccessor accessor, final ApplicationPageConvertor convertor,
             final SearchApplicationPages searchApplicationPages) {
         this.searchApplicationPages = searchApplicationPages;
         applicationService = accessor.getApplicationService();
