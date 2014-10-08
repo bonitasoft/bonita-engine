@@ -32,7 +32,7 @@ import org.bonitasoft.engine.search.impl.SearchResultImpl;
 
 /**
  * Abstract class to allow to search server object and convert them to client object
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Baptiste Mesta
  * @author Celine Souchet
@@ -106,7 +106,7 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
 
     /**
      * Execute the count here
-     * 
+     *
      * @param queryOptions
      *            The query options to execute the count with
      * @return The number of result on the server
@@ -116,7 +116,7 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
 
     /**
      * Execute the search here
-     * 
+     *
      * @param queryOptions
      *            The query options to execute the search with
      * @return The list of searched server objects
@@ -126,12 +126,12 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
 
     /**
      * Must convert server objects in client objects here
-     * 
+     *
      * @param serverObjects
      *            The server object to convert
      * @return The list of the client objects corresponding to the server objects
      */
-    public abstract List<C> convertToClientObjects(List<S> serverObjects);
+    public abstract List<C> convertToClientObjects(List<S> serverObjects) throws SBonitaException;
 
     @Override
     public SearchResult<C> getResult() {
