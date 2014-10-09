@@ -17,8 +17,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.model.SDocument;
-import org.bonitasoft.engine.core.document.model.SLightDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -28,7 +26,7 @@ import org.bonitasoft.engine.service.ModelConvertor;
  */
 public abstract class AbstractDocumentSearchEntity extends AbstractSearchEntity<Document, SMappedDocument> {
 
-    private DocumentService documentService;
+    private final DocumentService documentService;
 
     public AbstractDocumentSearchEntity(final SearchEntityDescriptor searchDescriptor, final SearchOptions options, DocumentService documentService) {
         super(searchDescriptor, options);

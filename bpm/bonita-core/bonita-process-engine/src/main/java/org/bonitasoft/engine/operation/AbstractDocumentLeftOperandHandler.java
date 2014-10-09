@@ -14,11 +14,8 @@
  */
 package org.bonitasoft.engine.operation;
 
-import java.util.List;
-
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -36,9 +33,9 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
  */
 public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandHandler {
 
-    private ActivityInstanceService activityInstanceService;
-    private SessionAccessor sessionAccessor;
-    private SessionService sessionService;
+    private final ActivityInstanceService activityInstanceService;
+    private final SessionAccessor sessionAccessor;
+    private final SessionService sessionService;
 
     public AbstractDocumentLeftOperandHandler(ActivityInstanceService activityInstanceService, SessionAccessor sessionAccessor, SessionService sessionService,
             DocumentService documentService) {

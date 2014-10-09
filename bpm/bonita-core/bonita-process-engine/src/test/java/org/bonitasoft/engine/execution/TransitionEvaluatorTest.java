@@ -111,7 +111,7 @@ public class TransitionEvaluatorTest {
         thrown.expect(SActivityExecutionException.class);
         thrown.expect(new BaseMatcher<Object>() {
 
-            long expectedProcessInstanceID = 42L;
+            final long expectedProcessInstanceID = 42L;
 
             @Override
             public boolean matches(Object item) {

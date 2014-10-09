@@ -31,7 +31,7 @@ import org.bonitasoft.engine.service.ModelConvertor;
 public abstract class AbstractArchivedDocumentSearchEntity extends AbstractSearchEntity<ArchivedDocument, SAMappedDocument> {
 
 
-    private DocumentService documentService;
+    private final DocumentService documentService;
 
     public AbstractArchivedDocumentSearchEntity(final SearchEntityDescriptor searchDescriptor, final SearchOptions options, DocumentService documentService) {
         super(searchDescriptor, options);

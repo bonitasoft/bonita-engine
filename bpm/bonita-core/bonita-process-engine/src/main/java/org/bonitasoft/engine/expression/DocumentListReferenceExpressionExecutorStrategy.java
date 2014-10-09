@@ -51,8 +51,8 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
 
     private final ActivityInstanceService flowNodeInstanceService;
     private final DocumentHelper documentHelper;
-    private ProcessInstanceService processInstanceService;
-    private ProcessDefinitionService processDefinitionService;
+    private final ProcessInstanceService processInstanceService;
+    private final ProcessDefinitionService processDefinitionService;
 
     public DocumentListReferenceExpressionExecutorStrategy(final DocumentService documentService,
             final ActivityInstanceService flowNodeInstanceService, ProcessDefinitionService processDefinitionService,

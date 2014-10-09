@@ -37,7 +37,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandler {
 
     private final DocumentHelper documentHelper;
-    DocumentService documentService;
+    final DocumentService documentService;
 
     public DocumentLeftOperandHandler(final DocumentService documentService, final ActivityInstanceService activityInstanceService,
             final SessionAccessor sessionAccessor, final SessionService sessionService) {

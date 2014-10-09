@@ -38,7 +38,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class TransitionEvaluator {
-    private ExpressionResolverService expressionResolverService;
+    private final ExpressionResolverService expressionResolverService;
     public TransitionEvaluator(ExpressionResolverService expressionResolverService) {
         this.expressionResolverService = expressionResolverService;
     }

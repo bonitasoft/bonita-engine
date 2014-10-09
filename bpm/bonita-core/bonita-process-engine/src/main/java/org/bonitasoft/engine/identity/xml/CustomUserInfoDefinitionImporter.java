@@ -36,8 +36,8 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 public class CustomUserInfoDefinitionImporter {
     
     
-    private IdentityService identityService;
-    private ImportOrganizationStrategy strategy;
+    private final IdentityService identityService;
+    private final ImportOrganizationStrategy strategy;
 
     public CustomUserInfoDefinitionImporter(TenantServiceAccessor serviceAccessor, final ImportOrganizationStrategy strategy) {
         this.strategy = strategy;

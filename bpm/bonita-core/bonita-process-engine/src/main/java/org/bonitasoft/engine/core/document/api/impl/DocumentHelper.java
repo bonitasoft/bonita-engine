@@ -53,9 +53,9 @@ import java.util.List;
  */
 public class DocumentHelper {
 
-    private DocumentService documentService;
-    private ProcessDefinitionService processDefinitionService;
-    private ProcessInstanceService processInstanceService;
+    private final DocumentService documentService;
+    private final ProcessDefinitionService processDefinitionService;
+    private final ProcessInstanceService processInstanceService;
 
     public DocumentHelper(DocumentService documentService, ProcessDefinitionService processDefinitionService, ProcessInstanceService processInstanceService) {
         this.documentService = documentService;

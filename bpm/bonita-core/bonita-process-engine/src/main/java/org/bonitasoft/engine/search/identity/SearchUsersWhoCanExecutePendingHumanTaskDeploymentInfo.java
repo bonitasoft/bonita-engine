@@ -34,7 +34,7 @@ public class SearchUsersWhoCanExecutePendingHumanTaskDeploymentInfo extends Abst
 
     private final ActivityInstanceService activityInstanceService;
 
-    private long humanTaskInstanceId;
+    private final long humanTaskInstanceId;
 
     public SearchUsersWhoCanExecutePendingHumanTaskDeploymentInfo(long humanTaskInstanceId, final ActivityInstanceService activityInstanceService,
             final SearchUserDescriptor searchDescriptor, final SearchOptions options) {

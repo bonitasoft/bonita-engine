@@ -883,36 +883,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final LockService lockService = tenantAccessor.getLockService();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        final TransactionContent transactionContent = new TransactionContent() {
-
-            @Override
-            public void execute() throws SBonitaException {
-                final SSession session = SessionInfos.getSession();
-                if (session != null) {
-                    final long executerSubstituteUserId = session.getUserId();
-                    final long executerUserId;
-                    if (userId == 0) {
-                        executerUserId = executerSubstituteUserId;
-                    } else {
-                        executerUserId = userId;
-                    }
-
-                    final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
-                    final boolean isFirstState = flowNodeInstance.getStateId() == 0;
-                    // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
-                    processExecutor
-                            .executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), executerUserId,
-                                    executerSubstituteUserId);
-                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
-                        final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance, session.getUserName(), executerUserId,
-                                executerSubstituteUserId);
-                        logger.log(getClass(), TechnicalLogSeverity.INFO, message);
-                    }
-
-                    addSystemCommentOnProcessInstanceWhenExecutingTaskFor(flowNodeInstance, executerUserId, executerSubstituteUserId);
-                }
-            }
-        };
+        final TransactionContent transactionContent = new ExecuteFlowNode(userId, activityInstanceService, flownodeInstanceId, processExecutor, logger);
 
         final GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(activityInstanceService, flownodeInstanceId);
         executeTransactionContent(tenantAccessor, getFlowNodeInstance, wrapInTransaction);
@@ -5713,5 +5684,50 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public Document updateDocument(long documentId, DocumentValue documentValue) throws ProcessInstanceNotFoundException, DocumentAttachmentException, AlreadyExistsException {
         return documentAPIImpl.updateDocument(documentId, documentValue);
+    }
+
+    private class ExecuteFlowNode implements TransactionContent {
+
+        private final long userId;
+        private final ActivityInstanceService activityInstanceService;
+        private final long flownodeInstanceId;
+        private final ProcessExecutor processExecutor;
+        private final TechnicalLoggerService logger;
+
+        public ExecuteFlowNode(long userId, ActivityInstanceService activityInstanceService, long flownodeInstanceId, ProcessExecutor processExecutor, TechnicalLoggerService logger) {
+            this.userId = userId;
+            this.activityInstanceService = activityInstanceService;
+            this.flownodeInstanceId = flownodeInstanceId;
+            this.processExecutor = processExecutor;
+            this.logger = logger;
+        }
+
+        @Override
+        public void execute() throws SBonitaException {
+            final SSession session = SessionInfos.getSession();
+            if (session != null) {
+                final long executerSubstituteUserId = session.getUserId();
+                final long executerUserId;
+                if (userId == 0) {
+                    executerUserId = executerSubstituteUserId;
+                } else {
+                    executerUserId = userId;
+                }
+
+                final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
+                final boolean isFirstState = flowNodeInstance.getStateId() == 0;
+                // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
+                processExecutor
+                        .executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), executerUserId,
+                                executerSubstituteUserId);
+                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
+                    final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance, session.getUserName(), executerUserId,
+                            executerSubstituteUserId);
+                    logger.log(getClass(), TechnicalLogSeverity.INFO, message);
+                }
+
+                addSystemCommentOnProcessInstanceWhenExecutingTaskFor(flowNodeInstance, executerUserId, executerSubstituteUserId);
+            }
+        }
     }
 }
