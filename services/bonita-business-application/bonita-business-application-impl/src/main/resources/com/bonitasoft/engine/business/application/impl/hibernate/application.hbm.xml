@@ -34,7 +34,7 @@
 		</composite-id>
 		<property name="applicationId" column="applicationId" />
 		<property name="pageId" column="pageId" />
-		<property name="name" column="name" />
+		<property name="token" column="token" />
 		<filter name="tenantFilter" />
 	</class>
 

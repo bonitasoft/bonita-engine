@@ -24,7 +24,7 @@ public class ApplicationPageConvertor {
 
     public ApplicationPage toApplicationPage(final SApplicationPage sApplicationPage) {
         final ApplicationPageImpl appPage = new ApplicationPageImpl(sApplicationPage.getApplicationId(), sApplicationPage.getPageId(),
-                sApplicationPage.getName());
+                sApplicationPage.getToken());
         appPage.setId(sApplicationPage.getId());
         return appPage;
     }

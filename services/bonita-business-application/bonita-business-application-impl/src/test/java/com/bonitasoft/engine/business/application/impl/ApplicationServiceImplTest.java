@@ -51,7 +51,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.SInvalidDisplayNameException;
-import com.bonitasoft.engine.business.application.SInvalidNameException;
+import com.bonitasoft.engine.business.application.SInvalidTokenException;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
@@ -141,7 +141,7 @@ public class ApplicationServiceImplTest {
         //then exception
     }
 
-    @Test(expected = SInvalidNameException.class)
+    @Test(expected = SInvalidTokenException.class)
     public void createApplication_should_throw_SInvalidApplicationName_when_name_is_invalid() throws Exception {
         //when
         applicationServiceActive.createApplication(buildApplication("name with spaces", APPLICATION_DISP_NAME));
@@ -379,7 +379,7 @@ public class ApplicationServiceImplTest {
         //then exception
     }
 
-    @Test(expected = SInvalidNameException.class)
+    @Test(expected = SInvalidTokenException.class)
     public void createApplicationPage_should_throw_SInvalidApplicationName_when_name_is_invalid() throws Exception {
         //given
         final SApplicationPage applicationPage = buildApplicationPage(5, 15, "name with spaces");
@@ -398,8 +398,8 @@ public class ApplicationServiceImplTest {
         final SApplicationPage applicationPage = buildApplicationPage(5, 15, "mainDashBoard");
         final Map<String, Object> inputParameters = new HashMap<String, Object>(2);
         inputParameters.put("applicationId", 5);
-        inputParameters.put("applicationPageName", "mainDashBoard");
-        given(persistenceService.selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationPageByNameAndApplicationId", inputParameters,
+        inputParameters.put("applicationPageToken", "mainDashBoard");
+        given(persistenceService.selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationPageByTokenAndApplicationId", inputParameters,
                 SApplicationPage.class
                 ))).willReturn(applicationPage);
 
@@ -439,8 +439,8 @@ public class ApplicationServiceImplTest {
         final SApplicationPage applicationPage = buildApplicationPage(10, 20, "myPage");
         final Map<String, Object> inputParameters = new HashMap<String, Object>(2);
         inputParameters.put("applicationName", "app");
-        inputParameters.put("applicationPageName", "firstPage");
-        given(persistenceService.selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationPageByNameAndApplicationName", inputParameters,
+        inputParameters.put("applicationPageToken", "firstPage");
+        given(persistenceService.selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationPageByTokenAndApplicationName", inputParameters,
                 SApplicationPage.class
                 ))).willReturn(applicationPage);
 

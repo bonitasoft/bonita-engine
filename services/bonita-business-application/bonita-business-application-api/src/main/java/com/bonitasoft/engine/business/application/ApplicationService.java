@@ -36,14 +36,14 @@ public interface ApplicationService {
 
     String APPLICATION_MENU = "APPLICATION_MENU";
 
-    SApplication createApplication(SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException, SInvalidNameException,
+    SApplication createApplication(SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException, SInvalidTokenException,
     SInvalidDisplayNameException;
 
     SApplication getApplication(long applicationId) throws SBonitaReadException, SObjectNotFoundException;
 
     void deleteApplication(long applicationId) throws SObjectModificationException, SObjectNotFoundException;
 
-    SApplication updateApplication(long applicationId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException, SInvalidNameException,
+    SApplication updateApplication(long applicationId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException, SInvalidTokenException,
     SInvalidDisplayNameException, SBonitaReadException, SObjectAlreadyExistsException, SObjectNotFoundException;
 
     long getNumberOfApplications(QueryOptions options) throws SBonitaReadException;
@@ -51,9 +51,9 @@ public interface ApplicationService {
     List<SApplication> searchApplications(QueryOptions options) throws SBonitaSearchException;
 
     SApplicationPage createApplicationPage(SApplicationPage applicationPage) throws SObjectCreationException, SObjectAlreadyExistsException,
-    SInvalidNameException, SInvalidDisplayNameException;
+    SInvalidTokenException, SInvalidDisplayNameException;
 
-    SApplicationPage getApplicationPage(String applicationName, String applicationPageName) throws SBonitaReadException, SObjectNotFoundException;
+    SApplicationPage getApplicationPage(String applicationName, String applicationPageToken) throws SBonitaReadException, SObjectNotFoundException;
 
     SApplicationPage getApplicationPage(long applicationPageId) throws SBonitaReadException, SObjectNotFoundException;
 

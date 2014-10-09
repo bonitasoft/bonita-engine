@@ -23,7 +23,7 @@ public class ApplicationPageBuilder extends PersistentObjectBuilder<SApplication
 
     private long applicationId;
     private long pageId;
-    private String name;
+    private String token;
 
     public static ApplicationPageBuilder anApplicationPage() {
         return new ApplicationPageBuilder();
@@ -31,7 +31,7 @@ public class ApplicationPageBuilder extends PersistentObjectBuilder<SApplication
 
     @Override
     SApplicationPageImpl _build() {
-        return new SApplicationPageImpl(applicationId, pageId, name);
+        return new SApplicationPageImpl(applicationId, pageId, token);
     }
 
     public ApplicationPageBuilder withApplicationId(final long applicationId) {
@@ -44,8 +44,8 @@ public class ApplicationPageBuilder extends PersistentObjectBuilder<SApplication
         return this;
     }
 
-    public ApplicationPageBuilder withName(final String name) {
-        this.name = name;
+    public ApplicationPageBuilder withToken(final String token) {
+        this.token = token;
         return this;
     }
 

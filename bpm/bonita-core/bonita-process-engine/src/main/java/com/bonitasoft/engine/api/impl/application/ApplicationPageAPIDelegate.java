@@ -30,14 +30,14 @@ import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.SInvalidDisplayNameException;
-import com.bonitasoft.engine.business.application.SInvalidNameException;
+import com.bonitasoft.engine.business.application.SInvalidTokenException;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilderFactory;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
 import com.bonitasoft.engine.exception.InvalidDisplayNameException;
-import com.bonitasoft.engine.exception.InvalidNameException;
+import com.bonitasoft.engine.exception.InvalidTokenException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -57,7 +57,7 @@ public class ApplicationPageAPIDelegate {
         this.convertor = convertor;
     }
 
-    public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException, InvalidNameException,
+    public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException, InvalidTokenException,
             InvalidDisplayNameException, AlreadyExistsException, ApplicationNotFoundException {
         final SApplicationUpdateBuilder updateBuilder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance();
         updateBuilder.updateHomePageId(applicationPageId);
@@ -66,8 +66,8 @@ public class ApplicationPageAPIDelegate {
 
         } catch (final SObjectModificationException e) {
             throw new UpdateException(e);
-        } catch (final SInvalidNameException e) {
-            throw new InvalidNameException(e.getMessage());
+        } catch (final SInvalidTokenException e) {
+            throw new InvalidTokenException(e.getMessage());
         } catch (final SInvalidDisplayNameException e) {
             throw new InvalidDisplayNameException(e.getMessage());
         } catch (final SBonitaReadException e) {
@@ -80,7 +80,7 @@ public class ApplicationPageAPIDelegate {
     }
 
     public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String name) throws AlreadyExistsException,
-    CreationException, InvalidNameException, InvalidDisplayNameException {
+    CreationException, InvalidTokenException, InvalidDisplayNameException {
         final SApplicationPageBuilderFactory factory = BuilderFactory.get(SApplicationPageBuilderFactory.class);
         final SApplicationPageBuilder builder = factory.createNewInstance(applicationId, pagedId, name);
         SApplicationPage sAppPage;
@@ -91,16 +91,16 @@ public class ApplicationPageAPIDelegate {
             throw new CreationException(e);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
-        } catch (final SInvalidNameException e) {
-            throw new InvalidNameException(e.getMessage());
+        } catch (final SInvalidTokenException e) {
+            throw new InvalidTokenException(e.getMessage());
         } catch (final SInvalidDisplayNameException e) {
             throw new InvalidDisplayNameException(e.getMessage());
         }
     }
 
-    public ApplicationPage getApplicationPage(final String applicationName, final String applicationPageName) throws ApplicationPageNotFoundException {
+    public ApplicationPage getApplicationPage(final String applicationName, final String applicationPageToken) throws ApplicationPageNotFoundException {
         try {
-            final SApplicationPage sAppPage = applicationService.getApplicationPage(applicationName, applicationPageName);
+            final SApplicationPage sAppPage = applicationService.getApplicationPage(applicationName, applicationPageToken);
             return convertor.toApplicationPage(sAppPage);
         } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);

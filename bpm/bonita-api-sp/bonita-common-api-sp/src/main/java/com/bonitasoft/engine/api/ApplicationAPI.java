@@ -26,7 +26,7 @@ import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.exception.InvalidDisplayNameException;
-import com.bonitasoft.engine.exception.InvalidNameException;
+import com.bonitasoft.engine.exception.InvalidTokenException;
 import com.bonitasoft.engine.page.Page;
 
 /**
@@ -45,10 +45,10 @@ public interface ApplicationAPI {
      * @return the created {@link Application}
      * @throws AlreadyExistsException if an application already exists with the same name
      * @throws CreationException if an error occurs during the creation
-     * @throws InvalidNameException if the name is empty
+     * @throws InvalidTokenException if the name is empty
      * @throws InvalidDisplayNameException if the display name is empty
      */
-    Application createApplication(ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException, InvalidNameException,
+    Application createApplication(ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException, InvalidTokenException,
     InvalidDisplayNameException;
 
     /**
@@ -77,13 +77,13 @@ public interface ApplicationAPI {
      * @throws ApplicationNotFoundException if no <code>Applicaton</code> is found with the given id
      * @throws UpdateException if an error occurs during the update
      * @throws AlreadyExistsException if update with an already existing Name
-     * @throws InvalidNameException if the name is empty
+     * @throws InvalidTokenException if the name is empty
      * @throws InvalidDisplayNameException if the display name is empty
      * @see Application
      * @see ApplicationUpdater
      */
     Application updateApplication(long applicationId, ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException, AlreadyExistsException,
-    InvalidNameException,
+    InvalidTokenException,
     InvalidDisplayNameException;
 
     /**
@@ -100,22 +100,23 @@ public interface ApplicationAPI {
      *
      * @param applicationId the identifier of the application where the page will be associated
      * @param pagedId the identifier of page to be associated to the application
-     * @param name the name that this page will take in this application. The name must be unique for a given application.
+     * @param token the token that this page will take in this application. The token must be unique for a given application.
      * @return the created {@link ApplicationPage}
      * @throws AlreadyExistsException if the name is already used for another page on this application
      * @throws CreationException if an error occurs during the creation
      */
-    ApplicationPage createApplicationPage(long applicationId, long pagedId, String name) throws AlreadyExistsException, CreationException, InvalidNameException;
+    ApplicationPage createApplicationPage(long applicationId, long pagedId, String token) throws AlreadyExistsException, CreationException, InvalidTokenException;
 
     /**
-     * Retrieves the {@link ApplicationPage} for the given application name and application page name
+     * Retrieves the {@link ApplicationPage} for the given <code>Application</code> name and <code>ApplicationPage</code> token
      *
-     * @param applicationName the application name
-     * @param applicationPageName the application page name
+     * @param applicationName the <code>Application</code> name
+     * @param applicationPageToken the <code>ApplicationPage</code> token
      * @return the {@link ApplicationPage} for the given application name and application page name
-     * @throws ApplicationPageNotFoundException if no {@link ApplicationPage} is found for the given application name and application page name
+     * @throws ApplicationPageNotFoundException if no {@link ApplicationPage} is found for the given <code>Application</code> name and
+     *         <code>ApplicationPage</code> token
      */
-    ApplicationPage getApplicationPage(String applicationName, String applicationPageName) throws ApplicationPageNotFoundException;
+    ApplicationPage getApplicationPage(String applicationName, String applicationPageToken) throws ApplicationPageNotFoundException;
 
     /**
      * Retrieves the {@link ApplicationPage} from its identifier
@@ -151,10 +152,10 @@ public interface ApplicationAPI {
      * @throws ApplicationNotFoundException if no <code>Applicaton</code> is found with the given id
      * @throws UpdateException if an error occurs during the update
      * @throws AlreadyExistsException if update with an already existing Name
-     * @throws InvalidNameException if the name is empty
+     * @throws InvalidTokenException if the name is empty
      * @throws InvalidDisplayNameException if the display name is empty
      */
-    void setApplicationHomePage(long applicationId, long applicationPageId) throws UpdateException, InvalidNameException,
+    void setApplicationHomePage(long applicationId, long applicationPageId) throws UpdateException, InvalidTokenException,
     InvalidDisplayNameException, AlreadyExistsException, ApplicationNotFoundException;
 
     /**

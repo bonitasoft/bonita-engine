@@ -37,7 +37,7 @@ public class ApplicationPageConvertorTest {
         assertThat(appPage.getId()).isEqualTo(ID);
         assertThat(appPage.getApplicationId()).isEqualTo(APPLICATION_ID);
         assertThat(appPage.getPageId()).isEqualTo(PAGE_ID);
-        assertThat(appPage.getName()).isEqualTo(APP_PAGE_NAME);
+        assertThat(appPage.getToken()).isEqualTo(APP_PAGE_NAME);
     }
 
     @Test

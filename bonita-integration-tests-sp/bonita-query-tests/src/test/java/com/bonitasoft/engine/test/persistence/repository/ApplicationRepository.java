@@ -49,17 +49,17 @@ public class ApplicationRepository extends TestRepository {
         return (SApplicationPage) namedQuery.uniqueResult();
     }
 
-    public SApplicationPage getApplicationPageByNameAndApplicationName(final String applicationName, final String applicationPageName) {
-        final Query namedQuery = getNamedQuery("getApplicationPageByNameAndApplicationName");
+    public SApplicationPage getApplicationPageByTokenAndApplicationName(final String applicationName, final String applicationPageToken) {
+        final Query namedQuery = getNamedQuery("getApplicationPageByTokenAndApplicationName");
         namedQuery.setParameter("applicationName", applicationName);
-        namedQuery.setParameter("applicationPageName", applicationPageName);
+        namedQuery.setParameter("applicationPageToken", applicationPageToken);
         return (SApplicationPage) namedQuery.uniqueResult();
     }
 
-    public SApplicationPage getApplicationPageByNameAndApplicationId(final long applicationId, final String applicationPageName) {
-        final Query namedQuery = getNamedQuery("getApplicationPageByNameAndApplicationId");
+    public SApplicationPage getApplicationPageByTokenAndApplicationId(final long applicationId, final String applicationPageToken) {
+        final Query namedQuery = getNamedQuery("getApplicationPageByTokenAndApplicationId");
         namedQuery.setParameter("applicationId", applicationId);
-        namedQuery.setParameter("applicationPageName", applicationPageName);
+        namedQuery.setParameter("applicationPageToken", applicationPageToken);
         return (SApplicationPage) namedQuery.uniqueResult();
     }
 

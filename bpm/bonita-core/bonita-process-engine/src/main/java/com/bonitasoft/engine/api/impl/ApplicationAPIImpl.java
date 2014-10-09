@@ -40,7 +40,7 @@ import com.bonitasoft.engine.business.application.ApplicationPageNotFoundExcepti
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.exception.InvalidDisplayNameException;
-import com.bonitasoft.engine.exception.InvalidNameException;
+import com.bonitasoft.engine.exception.InvalidTokenException;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationMenuDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationPageDescriptor;
@@ -116,7 +116,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws AlreadyExistsException, UpdateException,
-    ApplicationNotFoundException, InvalidNameException, InvalidDisplayNameException {
+    ApplicationNotFoundException, InvalidTokenException, InvalidDisplayNameException {
         return getApplicationAPIDelegate().updateApplication(applicationId, updater);
     }
 
@@ -136,14 +136,14 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String name) throws AlreadyExistsException,
-    CreationException, InvalidNameException, InvalidDisplayNameException {
-        return getApplicationPageAPIDelegate().createApplicationPage(applicationId, pagedId, name);
+    public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String token) throws AlreadyExistsException,
+    CreationException, InvalidTokenException, InvalidDisplayNameException {
+        return getApplicationPageAPIDelegate().createApplicationPage(applicationId, pagedId, token);
     }
 
     @Override
-    public ApplicationPage getApplicationPage(final String applicationName, final String applicationPageName) throws ApplicationPageNotFoundException {
-        return getApplicationPageAPIDelegate().getApplicationPage(applicationName, applicationPageName);
+    public ApplicationPage getApplicationPage(final String applicationName, final String applicationPageToken) throws ApplicationPageNotFoundException {
+        return getApplicationPageAPIDelegate().getApplicationPage(applicationName, applicationPageToken);
     }
 
     @Override
@@ -162,7 +162,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException, InvalidNameException,
+    public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException, InvalidTokenException,
             InvalidDisplayNameException, AlreadyExistsException, ApplicationNotFoundException {
         getApplicationPageAPIDelegate().setApplicationHomePage(applicationId, applicationPageId);
     }

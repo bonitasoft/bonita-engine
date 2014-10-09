@@ -43,7 +43,7 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
         assertThat(appPage.getId()).isGreaterThan(0);
         assertThat(appPage.getApplicationId()).isEqualTo(application.getId());
         assertThat(appPage.getPageId()).isEqualTo(getPage().getId());
-        assertThat(appPage.getName()).isEqualTo("firstPage");
+        assertThat(appPage.getToken()).isEqualTo("firstPage");
 
         getApplicationAPI().deleteApplication(application.getId());
 
@@ -77,7 +77,7 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
         final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
 
         //when
-        final ApplicationPage retrievedAppPage = getApplicationAPI().getApplicationPage(application.getName(), appPage.getName());
+        final ApplicationPage retrievedAppPage = getApplicationAPI().getApplicationPage(application.getName(), appPage.getToken());
 
         //then
         assertThat(retrievedAppPage).isEqualTo(appPage);
@@ -197,7 +197,7 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
-        builder.filter(ApplicationPageSearchDescriptor.NAME, "secondPage");
+        builder.filter(ApplicationPageSearchDescriptor.TOKEN, "secondPage");
         final SearchResult<ApplicationPage> searchResult = getApplicationAPI().searchApplicationPages(builder.done());
 
         //then
@@ -287,7 +287,7 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
 
     private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
-        builder.sort(ApplicationPageSearchDescriptor.NAME, Order.ASC);
+        builder.sort(ApplicationPageSearchDescriptor.TOKEN, Order.ASC);
         return builder;
     }
 

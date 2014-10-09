@@ -32,11 +32,11 @@ import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationP
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.SInvalidNameException;
+import com.bonitasoft.engine.business.application.SInvalidTokenException;
 import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
 import com.bonitasoft.engine.business.application.impl.SApplicationFields;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
-import com.bonitasoft.engine.exception.InvalidNameException;
+import com.bonitasoft.engine.exception.InvalidTokenException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -67,7 +67,7 @@ public class ApplicationPageAPIDelegateTest {
 
     private static final String APP_NAME = "app";
 
-    private static final String APP_PAGE_NAME = "firstPage";
+    private static final String APP_PAGE_TOKEN = "firstPage";
 
     @Before
     public void setUp() throws Exception {
@@ -100,13 +100,13 @@ public class ApplicationPageAPIDelegateTest {
     @Test
     public void createApplicationPage_should_call_applicationService_createApplicationPage_and_return_created_applicationPage() throws Exception {
         //given
-        final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
-        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
+        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         given(convertor.toApplicationPage(sAppPage)).willReturn(appPage);
         given(applicationService.createApplicationPage(sAppPage)).willReturn(sAppPage);
 
         //when
-        final ApplicationPage createdAppPage = delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        final ApplicationPage createdAppPage = delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
 
         //then
         assertThat(createdAppPage).isEqualTo(appPage);
@@ -115,11 +115,11 @@ public class ApplicationPageAPIDelegateTest {
     @Test(expected = CreationException.class)
     public void createApplicationPage_should_throw_CreationException_when_applicationService_throws_SObjectCreationException() throws Exception {
         //given
-        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         given(applicationService.createApplicationPage(sAppPage)).willThrow(new SObjectCreationException());
 
         //when
-        delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
 
         //then exception
     }
@@ -127,23 +127,23 @@ public class ApplicationPageAPIDelegateTest {
     @Test(expected = AlreadyExistsException.class)
     public void createApplicationPage_should_throw_AlreadyExistsException_when_applicationService_throws_SObjectAlreadyExistsException() throws Exception {
         //given
-        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         given(applicationService.createApplicationPage(sAppPage)).willThrow(new SObjectAlreadyExistsException());
 
         //when
-        delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
 
         //then exception
     }
 
-    @Test(expected = InvalidNameException.class)
+    @Test(expected = InvalidTokenException.class)
     public void createApplicationPage_should_throw_InvalidNameException_when_applicationService_throws_SInvalidNameException() throws Exception {
         //given
-        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
-        given(applicationService.createApplicationPage(sAppPage)).willThrow(new SInvalidNameException(""));
+        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
+        given(applicationService.createApplicationPage(sAppPage)).willThrow(new SInvalidTokenException(""));
 
         //when
-        delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
 
         //then exception
     }
@@ -151,13 +151,13 @@ public class ApplicationPageAPIDelegateTest {
     @Test
     public void getApplicationPage_byNameAndAppName_should_return_the_result_of_applicationService_getApplicationPage() throws Exception {
         //given
-        final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
-        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
-        given(applicationService.getApplicationPage(APP_NAME, APP_PAGE_NAME)).willReturn(sAppPage);
+        final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
+        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
+        given(applicationService.getApplicationPage(APP_NAME, APP_PAGE_TOKEN)).willReturn(sAppPage);
         given(convertor.toApplicationPage(sAppPage)).willReturn(appPage);
 
         //when
-        final ApplicationPage retrievedAppPage = delegate.getApplicationPage(APP_NAME, APP_PAGE_NAME);
+        final ApplicationPage retrievedAppPage = delegate.getApplicationPage(APP_NAME, APP_PAGE_TOKEN);
 
         //then
         assertThat(retrievedAppPage).isEqualTo(appPage);
@@ -166,10 +166,10 @@ public class ApplicationPageAPIDelegateTest {
     @Test(expected = RetrieveException.class)
     public void getApplicationPage_byNameAndAppName_should_throw_RetrieveException_when_applicationService_throws_SBonitaReadException() throws Exception {
         //given
-        given(applicationService.getApplicationPage(APP_NAME, APP_PAGE_NAME)).willThrow(new SBonitaReadException(""));
+        given(applicationService.getApplicationPage(APP_NAME, APP_PAGE_TOKEN)).willThrow(new SBonitaReadException(""));
 
         //when
-        delegate.getApplicationPage(APP_NAME, APP_PAGE_NAME);
+        delegate.getApplicationPage(APP_NAME, APP_PAGE_TOKEN);
 
         //then exception
     }
@@ -178,10 +178,10 @@ public class ApplicationPageAPIDelegateTest {
     public void getApplicationPage_byNameAndAppName_should_throw_SObjectNotFoundException_when_applicationService_throws_SObjectNotFoundException()
             throws Exception {
         //given
-        given(applicationService.getApplicationPage(APP_NAME, APP_PAGE_NAME)).willThrow(new SObjectNotFoundException());
+        given(applicationService.getApplicationPage(APP_NAME, APP_PAGE_TOKEN)).willThrow(new SObjectNotFoundException());
 
         //when
-        delegate.getApplicationPage(APP_NAME, APP_PAGE_NAME);
+        delegate.getApplicationPage(APP_NAME, APP_PAGE_TOKEN);
 
         //then exception
     }
@@ -189,8 +189,8 @@ public class ApplicationPageAPIDelegateTest {
     @Test
     public void getApplicationPage_byId_should_return_the_result_of_applicationService_getApplicationPage_byId() throws Exception {
         //given
-        final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
-        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
+        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         given(applicationService.getApplicationPage(APPLICATION_PAGE_ID)).willReturn(sAppPage);
         given(convertor.toApplicationPage(sAppPage)).willReturn(appPage);
 
@@ -256,8 +256,8 @@ public class ApplicationPageAPIDelegateTest {
     @Test
     public void getApplicationHomePage_should_return_the_result_of_applicationService_getApplicationHomePage() throws Exception {
         //given
-        final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
-        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_NAME);
+        final ApplicationPageImpl appPage = new ApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
+        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
         given(applicationService.getApplicationHomePage(APPLICATION_ID)).willReturn(sAppPage);
         given(convertor.toApplicationPage(sAppPage)).willReturn(appPage);
 

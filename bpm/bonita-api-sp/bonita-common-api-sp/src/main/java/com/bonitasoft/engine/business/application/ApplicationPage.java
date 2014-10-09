@@ -23,6 +23,6 @@ public interface ApplicationPage extends BaseElement {
 
     long getPageId();
 
-    String getName();
+    String getToken();
 
 }

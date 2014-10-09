@@ -25,16 +25,16 @@ public class SApplicationPageImpl extends PersistentObjectId implements SApplica
 
     private long pageId;
 
-    private String name;
+    private String token;
 
     public SApplicationPageImpl() {
     }
 
-    public SApplicationPageImpl(final long applicationId, final long pageId, final String name) {
+    public SApplicationPageImpl(final long applicationId, final long pageId, final String token) {
         super();
         this.applicationId = applicationId;
         this.pageId = pageId;
-        this.name = name;
+        this.token = token;
     }
 
     @Override
@@ -53,8 +53,8 @@ public class SApplicationPageImpl extends PersistentObjectId implements SApplica
     }
 
     @Override
-    public String getName() {
-        return name;
+    public String getToken() {
+        return token;
     }
 
     @Override
@@ -62,7 +62,7 @@ public class SApplicationPageImpl extends PersistentObjectId implements SApplica
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (int) (applicationId ^ applicationId >>> 32);
-        result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + (token == null ? 0 : token.hashCode());
         result = prime * result + (int) (pageId ^ pageId >>> 32);
         return result;
     }
@@ -82,11 +82,11 @@ public class SApplicationPageImpl extends PersistentObjectId implements SApplica
         if (applicationId != other.applicationId) {
             return false;
         }
-        if (name == null) {
-            if (other.name != null) {
+        if (token == null) {
+            if (other.token != null) {
                 return false;
             }
-        } else if (!name.equals(other.name)) {
+        } else if (!token.equals(other.token)) {
             return false;
         }
         if (pageId != other.pageId) {
@@ -97,7 +97,7 @@ public class SApplicationPageImpl extends PersistentObjectId implements SApplica
 
     @Override
     public String toString() {
-        return "SApplicationPageImpl [applicationId=" + applicationId + ", pageId=" + pageId + ", name=" + name + ", getId()=" + getId() + ", getTenantId()="
+        return "SApplicationPageImpl [applicationId=" + applicationId + ", pageId=" + pageId + ", token=" + token + ", getId()=" + getId() + ", getTenantId()="
                 + getTenantId() + "]";
     }
 

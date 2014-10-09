@@ -15,7 +15,7 @@ package com.bonitasoft.engine.business.application.model.builder;
  */
 public interface SApplicationPageBuilderFactory {
 
-    SApplicationPageBuilder createNewInstance(long applicationId, long pageId, String name);
+    SApplicationPageBuilder createNewInstance(long applicationId, long pageId, String token);
 
     String getIdKey();
 
@@ -23,6 +23,6 @@ public interface SApplicationPageBuilderFactory {
 
     String getApplicationIdKey();
 
-    String getNameKey();
+    String getTokenKey();
 
 }
