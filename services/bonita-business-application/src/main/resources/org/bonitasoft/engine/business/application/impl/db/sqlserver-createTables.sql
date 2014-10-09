@@ -30,16 +30,16 @@ CREATE TABLE business_app_page (
   id NUMERIC(19, 0) NOT NULL,
   applicationId NUMERIC(19, 0) NOT NULL,
   pageId NUMERIC(19, 0) NOT NULL,
-  name NVARCHAR(255) NOT NULL
+  token NVARCHAR(255) NOT NULL
 )
 GO
 
 ALTER TABLE business_app_page ADD CONSTRAINT pk_business_app_page PRIMARY KEY (tenantid, id)
 GO
-ALTER TABLE business_app_page ADD CONSTRAINT uk_app_page_appId_name UNIQUE (tenantId, applicationId, name)
+ALTER TABLE business_app_page ADD CONSTRAINT uk_app_page_appId_token UNIQUE (tenantId, applicationId, token)
 GO
 
-CREATE INDEX idx_app_page_name ON business_app_page (applicationId, name, tenantid)
+CREATE INDEX idx_app_page_token ON business_app_page (applicationId, token, tenantid)
 GO
 CREATE INDEX idx_app_page_pageId ON business_app_page (pageId, tenantid)
 GO
