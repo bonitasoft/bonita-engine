@@ -109,6 +109,7 @@ Page -> 10120
 
 SBusinessApplication -> 10200
 SBusinessApplicationPage -> 10201
+SBusinessApplicationMenu -> 10202
 
 =Archived objects==
 
