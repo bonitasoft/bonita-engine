@@ -81,7 +81,7 @@ public class DocumentServiceImpl implements DocumentService {
     private ReadPersistenceService definitiveArchiveReadPersistenceService;
 
     public DocumentServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
-            final SDocumentDownloadURLProvider urlProvider, EventService eventService, TechnicalLoggerService technicalLogger, ArchiveService archiveService) {
+                               final SDocumentDownloadURLProvider urlProvider, EventService eventService, TechnicalLoggerService technicalLogger, ArchiveService archiveService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.urlProvider = urlProvider;
@@ -118,52 +118,21 @@ public class DocumentServiceImpl implements DocumentService {
             return new SMappedDocumentImpl(documentMapping, document);
         } catch (SObjectAlreadyExistsException e) {
             throw new SObjectAlreadyExistsException(e);
-        } catch (SRecorderException e) {
-            throw new SDocumentCreationException(e);
-        } catch (SBonitaReadException e) {
+        } catch (SBonitaException e) {
             throw new SDocumentCreationException(e);
         }
     }
 
     @Override
-    public SMappedDocument updateDocumentOfProcessInstance(final SDocument document, final long processInstanceId, String name, String description)
-            throws SDocumentCreationException {
-        try {
-            SDocumentMapping sDocumentMapping = getMappedDocument(processInstanceId, name);
-            return updateMappedDocument(document, description, -1, sDocumentMapping);
-        } catch (final SBonitaException e) {
-            throw new SDocumentCreationException(e.getMessage(), e);
-        }
-    }
-
-    private SMappedDocument updateMappedDocument(SDocument document, String description, int index, SDocumentMapping sDocumentMapping)
-            throws SRecorderException, SDocumentMappingException {
-        //insert new document
-        insertDocument(document);
-        //update mapping
-        archive(sDocumentMapping, System.currentTimeMillis());
-        updateMapping(document.getId(), sDocumentMapping, description, index);
-        return new SMappedDocumentImpl(sDocumentMapping, document);
+    public void updateDocumentOfList(final SMappedDocument mappedDocument, final SDocument document, int index) throws SDocumentMappingException, SRecorderException {
+        updateDocument(mappedDocument, document, index);
     }
 
     @Override
-    public void updateDocumentOfList(final SMappedDocument mappedDocument, final SDocument document, int index) throws SDocumentCreationException {
-        try {
-            updateMappedDocument(document, null, index, mappedDocument);
-        } catch (final SBonitaException e) {
-            throw new SDocumentCreationException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void updateDocumentIndex(final SMappedDocument mappedDocument, int index) throws SDocumentCreationException {
-        try {
-            Map<String, Object> params = new HashMap<String, Object>(2);
-            params.put("index", index);
-            updateFields(mappedDocument, params);
-        } catch (SRecorderException e) {
-            throw new SDocumentCreationException(e);
-        }
+    public void updateDocumentIndex(final SMappedDocument mappedDocument, int index) throws SRecorderException {
+        Map<String, Object> params = new HashMap<String, Object>(2);
+        params.put("index", index);
+        updateFields(mappedDocument, params);
     }
 
     private void updateFields(SDocumentMapping mappedDocument, Map<String, Object> params) throws SRecorderException {
@@ -324,7 +293,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<SMappedDocument> getDocumentsOfProcessInstance(final long processInstanceId, final int fromIndex, final int numberPerPage, final String field,
-            final OrderByType order) throws SDocumentException {
+                                                               final OrderByType order) throws SDocumentException {
         try {
             return persistenceService.selectList(SelectDescriptorBuilder.getDocumentMappingsForProcessInstance(
                     processInstanceId, fromIndex, numberPerPage, field, order));
@@ -557,7 +526,21 @@ public class DocumentServiceImpl implements DocumentService {
     public SMappedDocument updateDocument(long documentId, SDocument sDocument) throws SBonitaReadException, SDocumentNotFoundException,
             SDocumentMappingException, SRecorderException {
         SDocumentMapping sDocumentMapping = getMappedDocument(documentId);
-        return updateMappedDocument(sDocument, sDocumentMapping.getDescription(), sDocumentMapping.getIndex(), sDocumentMapping);
+        return updateDocument(sDocumentMapping, sDocument);
+    }
+
+    @Override
+    public SMappedDocument updateDocument(SDocumentMapping documentToUpdate, SDocument sDocument) throws SRecorderException, SDocumentMappingException {
+        return updateDocument(documentToUpdate, sDocument, documentToUpdate.getIndex());
+    }
+
+    private SMappedDocument updateDocument(SDocumentMapping documentToUpdate, SDocument sDocument, int index) throws SRecorderException, SDocumentMappingException {
+        //insert new document
+        insertDocument(sDocument);
+        //update mapping
+        archive(documentToUpdate, System.currentTimeMillis());
+        updateMapping(sDocument.getId(), documentToUpdate, documentToUpdate.getDescription(), index);
+        return new SMappedDocumentImpl(documentToUpdate, sDocument);
     }
 
     @Override
@@ -565,7 +548,7 @@ public class DocumentServiceImpl implements DocumentService {
         List<SAMappedDocument> archivedList = persistenceService.selectList(SelectDescriptorBuilder.getArchivedDocumentList(documentName, processInstanceId, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS), time));
         List<SMappedDocument> elementsInJournal = persistenceService.selectList(SelectDescriptorBuilder.getDocumentListCreatedBefore(documentName, processInstanceId, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS), time));
 
-        List<SMappedDocument> result = new ArrayList<SMappedDocument>(archivedList.size()+elementsInJournal.size());
+        List<SMappedDocument> result = new ArrayList<SMappedDocument>(archivedList.size() + elementsInJournal.size());
         for (SAMappedDocument mappedDocument : archivedList) {
             result.add(mappedDocument);
         }

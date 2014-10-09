@@ -47,10 +47,7 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
-import org.bonitasoft.engine.exception.AlreadyExistsException;
-import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.RetrieveException;
-import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.*;
 import org.bonitasoft.engine.operation.DocumentListLeftOperandHandler;
 import org.bonitasoft.engine.persistence.OrderAndField;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -75,15 +72,13 @@ public class DocumentAPIImpl implements DocumentAPI {
     @Override
     public Document attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType, final String url)
             throws DocumentAttachmentException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final DocumentService documentService = tenantAccessor.getDocumentService();
-        final long author = getUserId();
+        DocumentValue documentValue = new DocumentValue(url);
+        documentValue.setFileName(fileName);
+        documentValue.setMimeType(mimeType);
         try {
-            final SDocument attachment = buildExternalProcessDocumentReference(fileName, mimeType, author, url);
-            final SMappedDocument document = documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, null);
-            return ModelConvertor.toDocument(document, documentService);
-        } catch (final SBonitaException sbe) {
-            throw new DocumentAttachmentException(sbe);
+            return addDocument(processInstanceId, documentName, null, documentValue);
+        } catch (BonitaException e) {
+            throw new DocumentAttachmentException(e);
         }
     }
 
@@ -122,13 +117,9 @@ public class DocumentAPIImpl implements DocumentAPI {
             SMappedDocument mappedDocument = documentService.attachDocumentToProcessInstance(sDocument, processInstanceId, documentName, description, index);
             return ModelConvertor.toDocument(mappedDocument,documentService);
 
-        } catch (SDocumentCreationException e) {
-            throw new DocumentAttachmentException(e);
         } catch (SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
-        } catch (SObjectNotFoundException e) {
-            throw new DocumentAttachmentException(e);
-        } catch (SBonitaReadException e) {
+        } catch (SBonitaException e) {
             throw new DocumentAttachmentException(e);
         }
 
@@ -191,15 +182,11 @@ public class DocumentAPIImpl implements DocumentAPI {
     @Override
     public Document attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
             final byte[] documentContent) throws DocumentAttachmentException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final DocumentService documentService = tenantAccessor.getDocumentService();
-        final long authorId = getUserId();
+        DocumentValue documentValue = new DocumentValue(documentContent,mimeType,fileName);
         try {
-            final SMappedDocument mappedDocument = attachDocument(processInstanceId, documentName, fileName, mimeType, documentContent, documentService,
-                    authorId, null);
-            return ModelConvertor.toDocument(mappedDocument, documentService);
-        } catch (final SBonitaException sbe) {
-            throw new DocumentAttachmentException(sbe);
+            return addDocument(processInstanceId, documentName, null, documentValue);
+        } catch (BonitaException e) {
+            throw new DocumentAttachmentException(e);
         }
     }
 
@@ -207,25 +194,15 @@ public class DocumentAPIImpl implements DocumentAPI {
         return APIUtils.getTenantAccessor();
     }
 
-    protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
-            final byte[] documentContent, final DocumentService documentService, final long authorId, String description) throws SBonitaException {
-        final SDocument attachment = buildProcessDocument(fileName, mimeType, authorId, documentContent);
-        return documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, description);
-    }
 
     @Override
     public Document attachNewDocumentVersion(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
             final String url) throws DocumentAttachmentException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final DocumentService documentService = tenantAccessor.getDocumentService();
-        final long authorId = getUserId();
+        DocumentService documentService = getTenantAccessor().getDocumentService();
         try {
-            final SDocument attachment = buildExternalProcessDocumentReference(fileName, mimeType, authorId, url);
-
-            return ModelConvertor.toDocument(documentService.updateDocumentOfProcessInstance(attachment, processInstanceId, documentName, null),
-                    documentService);
-        } catch (final SBonitaException sbe) {
-            throw new DocumentAttachmentException(sbe);
+            return ModelConvertor.toDocument(documentService.updateDocument(documentService.getMappedDocument(processInstanceId,documentName), buildExternalProcessDocumentReference(fileName,mimeType,getUserId(),url)),documentService);
+        } catch (Exception e) {
+            throw new DocumentAttachmentException(e);
         }
     }
 
@@ -233,15 +210,11 @@ public class DocumentAPIImpl implements DocumentAPI {
     @Override
     public Document attachNewDocumentVersion(final long processInstanceId, final String documentName, final String contentFileName,
             final String contentMimeType, final byte[] documentContent) throws DocumentAttachmentException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final DocumentService documentService = tenantAccessor.getDocumentService();
-        final long authorId = getUserId();
+        DocumentService documentService = getTenantAccessor().getDocumentService();
         try {
-            final SDocument attachment = buildProcessDocument(contentFileName, contentMimeType, authorId, documentContent);
-            return ModelConvertor.toDocument(documentService.updateDocumentOfProcessInstance(attachment, processInstanceId, documentName, null),
-                    documentService);
-        } catch (final SDocumentCreationException sbe) {
-            throw new DocumentAttachmentException(sbe);
+            return ModelConvertor.toDocument(documentService.updateDocument(documentService.getMappedDocument(processInstanceId,documentName), buildProcessDocument(contentFileName,contentMimeType,getUserId(),documentContent)),documentService);
+        } catch (Exception e) {
+            throw new DocumentAttachmentException(e);
         }
     }
 
@@ -459,11 +432,7 @@ public class DocumentAPIImpl implements DocumentAPI {
             return ModelConvertor.toDocument(document, documentService);
         } catch (final SDocumentNotFoundException e) {
             throw new DocumentNotFoundException("Unable to delete the document " + documentId + " because it does not exists", e);
-        } catch (SBonitaReadException e) {
-            throw new DeletionException("Unable to delete the document " + documentId, e);
-        } catch (SObjectModificationException e) {
-            throw new DeletionException("Unable to delete the document " + documentId, e);
-        } catch (SDocumentCreationException e) {
+        } catch (SBonitaException e) {
             throw new DeletionException("Unable to delete the document " + documentId, e);
         }
     }

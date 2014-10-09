@@ -16,6 +16,7 @@ package org.bonitasoft.engine.operation;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.exception.SDocumentMappingException;
 import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
 import org.bonitasoft.engine.core.document.exception.SDocumentCreationException;
 import org.bonitasoft.engine.core.document.model.SDocument;
@@ -25,6 +26,7 @@ import org.bonitasoft.engine.core.operation.exception.SOperationExecutionExcepti
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -75,13 +77,13 @@ public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandl
     }
 
     private void createOrUpdateDocument(DocumentValue newValue, String documentName, long processInstanceId) throws SSessionNotFoundException,
-            SBonitaReadException, SDocumentCreationException {
+            SBonitaReadException, SDocumentCreationException, SDocumentMappingException, SRecorderException {
         final SDocument document = createDocumentObject(newValue);
         try {
             // Let's check if the document already exists:
             SMappedDocument mappedDocument = documentService.getMappedDocument(processInstanceId, documentName);
             // a document exist, update it with the new values
-            documentService.updateDocumentOfProcessInstance(document, processInstanceId, documentName, mappedDocument.getDescription());
+            documentService.updateDocument(mappedDocument, document);
         } catch (final SDocumentNotFoundException e) {
             documentService.attachDocumentToProcessInstance(document, processInstanceId, documentName, null);
         }

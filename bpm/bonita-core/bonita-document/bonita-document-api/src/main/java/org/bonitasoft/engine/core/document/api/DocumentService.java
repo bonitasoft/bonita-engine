@@ -50,15 +50,12 @@ public interface DocumentService {
     /**
      * Save a document
      *
-     * @param document
-     *        the document to store
-     * @param processInstanceId
-     *        the process instance id to attach the document to
+     * @param document          the document to store
+     * @param processInstanceId the process instance id to attach the document to
      * @param name
      * @param description
      * @return The document image from database
-     * @throws org.bonitasoft.engine.core.document.exception.SDocumentCreationException
-     *         when the storage has failed
+     * @throws org.bonitasoft.engine.core.document.exception.SDocumentCreationException when the storage has failed
      */
     SMappedDocument attachDocumentToProcessInstance(SDocument document, long processInstanceId, String name, String description)
             throws SDocumentCreationException;
@@ -66,36 +63,16 @@ public interface DocumentService {
     /**
      * Save a document
      *
-     * @param document
-     *        the document to store
-     * @param processInstanceId
-     *        the process instance id to attach the document to
+     * @param document          the document to store
+     * @param processInstanceId the process instance id to attach the document to
      * @param name
      * @param description
-     * @param index
-     *        the index in the list of document
+     * @param index             the index in the list of document
      * @return The document image from database
-     * @throws org.bonitasoft.engine.core.document.exception.SDocumentCreationException
-     *         when the storage has failed
+     * @throws org.bonitasoft.engine.core.document.exception.SDocumentCreationException when the storage has failed
      */
     SMappedDocument attachDocumentToProcessInstance(SDocument document, long processInstanceId, String name, String description, int index)
             throws SDocumentCreationException, SObjectAlreadyExistsException;
-
-    /**
-     * Modify document information
-     *
-     * @param document
-     *        the document will be updated to
-     * @param name
-     *        name of the document
-     * @param description
-     *        description of the document
-     * @return the updated SDocumentMapping object
-     * @throws SDocumentCreationException
-     *         when the update has failed
-     */
-    SMappedDocument updateDocumentOfProcessInstance(SDocument document, long processInstanceId, String name, String description)
-            throws SDocumentCreationException;
 
     /**
      * Remove this document.
@@ -104,8 +81,7 @@ public interface DocumentService {
      * {@link #deleteContentOfArchivedDocument(long)} to delete the content
      * </p>
      *
-     * @param document
-     *        the document mapping to remove
+     * @param document the document mapping to remove
      * @throws SDocumentNotFoundException
      * @throws SObjectModificationException
      */
@@ -117,10 +93,9 @@ public interface DocumentService {
      * this archive and delete mapping on the process, i.e. the content of the document itself will be kept in database, use
      * {@link #deleteContentOfArchivedDocument(long)} to delete the content
      * </p>
-     * @param processInstanceId
-     *        id of the process having the document
-     * @param documentName
-     *        name of the document
+     *
+     * @param processInstanceId id of the process having the document
+     * @param documentName      name of the document
      * @throws SDocumentNotFoundException
      * @throws SObjectModificationException
      */
@@ -129,8 +104,7 @@ public interface DocumentService {
     /**
      * Get document content by document id
      *
-     * @param documentId
-     *        identifier of the document
+     * @param documentId identifier of the document
      * @return document content
      * @throws SDocumentNotFoundException
      */
@@ -139,8 +113,7 @@ public interface DocumentService {
     /**
      * Get document with mapping by its mapping id
      *
-     * @param mappingId
-     *        identifier of the mapping of the document
+     * @param mappingId identifier of the mapping of the document
      * @return an SDocumentMapping object with id corresponding to the parameter
      * @throws SDocumentNotFoundException
      */
@@ -149,8 +122,7 @@ public interface DocumentService {
     /**
      * Get document by its id
      *
-     * @param documentId
-     *        identifier of document
+     * @param documentId identifier of document
      * @return an SDocumentMapping object with id corresponding to the parameter
      * @throws SDocumentNotFoundException
      */
@@ -159,10 +131,8 @@ public interface DocumentService {
     /**
      * Get document with mapping by its name in the specific process instance
      *
-     * @param processInstanceId
-     *        identifier of process instance
-     * @param documentName
-     *        name of process document
+     * @param processInstanceId identifier of process instance
+     * @param documentName      name of process document
      * @return the corresponding SDocumentMapping object
      * @throws SDocumentNotFoundException
      */
@@ -171,12 +141,9 @@ public interface DocumentService {
     /**
      * Get a list of documents for specific process instance, this can be used for pagination
      *
-     * @param processInstanceId
-     *        identifier of process instance
-     * @param fromIndex
-     *        Index of the record to be retrieved from. First record has index 0
-     * @param numberPerPage
-     *        Number of result we want to get. Maximum number of result returned
+     * @param processInstanceId identifier of process instance
+     * @param fromIndex         Index of the record to be retrieved from. First record has index 0
+     * @param numberPerPage     Number of result we want to get. Maximum number of result returned
      * @param order
      * @param field
      * @return a list of SDocumentMapping objects
@@ -188,10 +155,8 @@ public interface DocumentService {
     /**
      * Get total number of documents in the specific process instance
      *
-     * @param processInstanceId
-     *        identifier of process instance
-     * @return
-     *         number of documents in the process instance
+     * @param processInstanceId identifier of process instance
+     * @return number of documents in the process instance
      * @throws SDocumentException
      */
     long getNumberOfDocumentsOfProcessInstance(long processInstanceId) throws SDocumentException;
@@ -199,12 +164,9 @@ public interface DocumentService {
     /**
      * Get name specified document archived in a certain time in the process instance
      *
-     * @param processInstanceId
-     *        identifier of process instance
-     * @param documentName
-     *        name of document
-     * @param time
-     *        the archived time of document
+     * @param processInstanceId identifier of process instance
+     * @param documentName      name of document
+     * @param time              the archived time of document
      * @return an SDocumentMapping object archived in the specific time or not archived
      * @throws SDocumentNotFoundException
      */
@@ -213,8 +175,7 @@ public interface DocumentService {
     /**
      * Get total number of document according to the query criteria
      *
-     * @param queryOptions
-     *        a QueryOptions object containing some query conditions
+     * @param queryOptions a QueryOptions object containing some query conditions
      * @return number of document satisfied to the query criteria
      * @throws SBonitaSearchException
      */
@@ -223,8 +184,7 @@ public interface DocumentService {
     /**
      * Search all documents according to the query criteria
      *
-     * @param queryOptions
-     *        a QueryOptions object containing some query conditions
+     * @param queryOptions a QueryOptions object containing some query conditions
      * @return a list of SDocumentMapping objects
      * @throws SBonitaSearchException
      */
@@ -233,10 +193,8 @@ public interface DocumentService {
     /**
      * Get total number of documents for the specific supervisor
      *
-     * @param userId
-     *        identifier of supervisor user
-     * @param queryOptions
-     *        a QueryOptions object containing some query conditions
+     * @param userId       identifier of supervisor user
+     * @param queryOptions a QueryOptions object containing some query conditions
      * @return number of documents for the specific supervisor
      * @throws SBonitaSearchException
      */
@@ -245,10 +203,8 @@ public interface DocumentService {
     /**
      * Search all documents for the specific supervisor
      *
-     * @param userId
-     *        identifier of supervisor user
-     * @param queryOptions
-     *        a QueryOptions object containing some query conditions
+     * @param userId       identifier of supervisor user
+     * @param queryOptions a QueryOptions object containing some query conditions
      * @return a list of SDocumentMapping objects
      * @throws SBonitaSearchException
      */
@@ -257,8 +213,7 @@ public interface DocumentService {
     /**
      * Get total number of archived documents according to the query criteria
      *
-     * @param queryOptions
-     *        a QueryOptions object containing some query conditions
+     * @param queryOptions a QueryOptions object containing some query conditions
      * @return number of archived documents
      * @throws SBonitaSearchException
      */
@@ -269,8 +224,7 @@ public interface DocumentService {
     /**
      * Search all archived documents according to the query criteria.
      *
-     * @param queryOptions
-     *        a QueryOptions object containing some query conditions
+     * @param queryOptions a QueryOptions object containing some query conditions
      * @return a list of SADocumentMapping objects
      * @throws SBonitaSearchException
      */
@@ -279,10 +233,8 @@ public interface DocumentService {
     /**
      * Get total number of archived documents for the specific supervisor
      *
-     * @param userId
-     *        identifier of supervisor user
-     * @param queryOptions
-     *        a QueryOptions object containing some query conditions
+     * @param userId       identifier of supervisor user
+     * @param queryOptions a QueryOptions object containing some query conditions
      * @return number of archived documents for the specific supervisor
      * @throws SBonitaSearchException
      */
@@ -291,10 +243,8 @@ public interface DocumentService {
     /**
      * Search all archived documents for the specific supervisor
      *
-     * @param userId
-     *        identifier of supervisor user
-     * @param queryOptions
-     *        a QueryOptions object containing some query conditions
+     * @param userId       identifier of supervisor user
+     * @param queryOptions a QueryOptions object containing some query conditions
      * @return a list of SADocumentMapping objects
      * @throws SBonitaSearchException
      */
@@ -303,11 +253,9 @@ public interface DocumentService {
     /**
      * Get the archived version corresponding to a document
      *
-     * @param documentId
-     *        identifier of process document
+     * @param documentId identifier of process document
      * @return the archive of the corresponding document
-     * @throws SDocumentNotFoundException
-     *         when the document does not exist
+     * @throws SDocumentNotFoundException when the document does not exist
      */
     SAMappedDocument getArchivedVersionOfProcessDocument(long documentId) throws SDocumentNotFoundException;
 
@@ -316,11 +264,9 @@ public interface DocumentService {
     /**
      * Retrieve an archived document
      *
-     * @param archivedProcessDocumentId
-     *        the id of the archived document
+     * @param archivedProcessDocumentId the id of the archived document
      * @return the corresponding archive
-     * @throws SDocumentNotFoundException
-     *         when the archive does not exist
+     * @throws SDocumentNotFoundException when the archive does not exist
      */
     SAMappedDocument getArchivedDocument(long archivedProcessDocumentId) throws SDocumentNotFoundException;
 
@@ -347,70 +293,64 @@ public interface DocumentService {
     /**
      * archive the specific document mapping in the archive date
      *
-     * @param documentMapping
-     *        document mapping will be archived
-     * @param archiveDate
-     *        the archive time
+     * @param documentMapping document mapping will be archived
+     * @param archiveDate     the archive time
      * @throws org.bonitasoft.engine.core.document.exception.SDocumentMappingException
      * @since 6.4.0
      */
     void archive(SDocumentMapping documentMapping, long archiveDate) throws SDocumentMappingException;
 
     /**
-     * @param mappedDocument
-     *        the document to update
-     * @param document
-     *        the new content
-     * @param index
-     *        the new index
-     * @throws SDocumentCreationException
+     * @param mappedDocument the document to update
+     * @param document       the new content
+     * @param index          the new index
+     * @throws SDocumentMappingException
+     * @throws SRecorderException
      * @since 6.4.0
      */
-    void updateDocumentOfList(final SMappedDocument mappedDocument, final SDocument document, int index) throws SDocumentCreationException;
+    void updateDocumentOfList(final SMappedDocument mappedDocument, final SDocument document, int index) throws SDocumentMappingException, SRecorderException;
 
     /**
      * update the index of a document inside the list
      *
-     * @param mappedDocument
-     *        the document to update
-     * @param index
-     *        the new index
-     * @throws SDocumentCreationException
+     * @param mappedDocument the document to update
+     * @param index          the new index
+     * @throws SRecorderException
      * @since 6.4.0
      */
-    void updateDocumentIndex(final SMappedDocument mappedDocument, int index) throws SDocumentCreationException;
+    void updateDocumentIndex(final SMappedDocument mappedDocument, int index) throws SRecorderException;
 
     /**
      * Get a list of document. if there is no document in the list returns an empty list
      *
-     * @param documentName
-     *        the name of the document list
-     * @param processInstanceId
-     *        the id of the process instance that contains the list
-     * @param fromIndex
-     *        pagination parameter
-     * @param numberOfResult
-     *        pagination parameter
-     * @return
-     *         the list of document
+     * @param documentName      the name of the document list
+     * @param processInstanceId the id of the process instance that contains the list
+     * @param fromIndex         pagination parameter
+     * @param numberOfResult    pagination parameter
+     * @return the list of document
      * @since 6.4.0
      */
     List<SMappedDocument> getDocumentList(String documentName, long processInstanceId, int fromIndex, int numberOfResult) throws SBonitaReadException;
 
     /**
+     * @param documentToUpdate the document mapping to udpate
+     * @param sDocument        the value to set th emapping with
+     * @return the updated document mapping
+     * @throws SRecorderException
+     * @throws SDocumentMappingException
+     */
+    SMappedDocument updateDocument(SDocumentMapping documentToUpdate, SDocument sDocument) throws SRecorderException, SDocumentMappingException;
+
+    /**
      * Get a list of document at a given time. if there is no document in the list returns an empty list.
      * <p>
-     *     elements are taken from archive and from non archived mapping if the process is still running
+     * elements are taken from archive and from non archived mapping if the process is still running
      * </p>
      *
-     * @param documentName
-     *        the name of the document list
-     * @param processInstanceId
-     *        the id of the process instance that contains the list
-     * @param time
-     *        time when the list was like that
-     * @return
-     *         the list of document
+     * @param documentName      the name of the document list
+     * @param processInstanceId the id of the process instance that contains the list
+     * @param time              time when the list was like that
+     * @return the list of document
      * @since 6.4.0
      */
     List<SMappedDocument> getDocumentList(String documentName, long processInstanceId, long time) throws SBonitaReadException;
@@ -422,8 +362,7 @@ public interface DocumentService {
      * This method can be useful for keeping history of a document without overloading the database.
      * </p>
      *
-     * @param documentId
-     *        the id of the archived document to remove content on
+     * @param documentId the id of the archived document to remove content on
      * @throws SDocumentNotFoundException
      * @since 6.4.0
      */
@@ -431,10 +370,9 @@ public interface DocumentService {
 
     /**
      * update the document having the documentId with this new version
-     *  @param documentId
-     *        the id of the document to update
-     * @param sDocument
-     *        the new version of the document @return
+     *
+     * @param documentId the id of the document to update
+     * @param sDocument  the new version of the document @return
      */
     SMappedDocument updateDocument(long documentId, SDocument sDocument) throws SBonitaReadException, SDocumentNotFoundException, SDocumentMappingException, SRecorderException;
 }

@@ -25,6 +25,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.exception.SDocumentCreationException;
+import org.bonitasoft.engine.core.document.exception.SDocumentMappingException;
 import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -42,6 +43,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -88,7 +90,7 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
 
     public void setDocumentList(List<DocumentValue> documentList, String documentName, long processInstanceId) throws SBonitaReadException,
             SObjectNotFoundException, SOperationExecutionException, SDocumentCreationException, SSessionNotFoundException, SDocumentNotFoundException,
-            SObjectModificationException, SObjectAlreadyExistsException {
+            SObjectModificationException, SObjectAlreadyExistsException, SRecorderException, SDocumentMappingException {
         // get the list having the name
         List<SMappedDocument> currentList = getExistingDocumentList(documentName, processInstanceId);
         // iterate on elements
@@ -139,7 +141,7 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     }
 
     private void processDocumentOnIndex(List<DocumentValue> documentList, String documentName, long processInstanceId, List<SMappedDocument> currentList,
-            int index) throws SDocumentCreationException, SSessionNotFoundException, SOperationExecutionException, SObjectAlreadyExistsException {
+            int index) throws SDocumentCreationException, SSessionNotFoundException, SOperationExecutionException, SObjectAlreadyExistsException, SRecorderException, SDocumentMappingException {
         DocumentValue documentValue = documentList.get(index);
 
         if (documentValue.getDocumentId() != null) {
@@ -154,7 +156,7 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     }
 
     private void updateExistingDocument(SMappedDocument documentToUpdate, int index, DocumentValue documentValue) throws SDocumentCreationException,
-            SSessionNotFoundException, SOperationExecutionException {
+            SSessionNotFoundException, SOperationExecutionException, SRecorderException, SDocumentMappingException {
         if (documentValue.hasChanged()) {
             documentService.updateDocumentOfList(documentToUpdate, createDocumentObject(documentValue), index);
         } else {

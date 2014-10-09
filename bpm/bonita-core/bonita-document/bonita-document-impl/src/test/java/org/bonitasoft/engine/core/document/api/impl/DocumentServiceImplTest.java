@@ -24,11 +24,17 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
+import org.bonitasoft.engine.core.document.model.SLightDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
+import org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl;
 import org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl;
+import org.bonitasoft.engine.core.document.model.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Before;
@@ -127,5 +133,28 @@ public class DocumentServiceImplTest {
         //then
         assertThat(theList).isEmpty();
     }
+
+    @Test
+    public void should_getDocumentList_at_give_time_get_archived() throws Exception {
+        //given
+        List<SMappedDocumentImpl> sMappedDocuments = Arrays.asList(new SMappedDocumentImpl(), new SMappedDocumentImpl());
+        List<SAMappedDocumentImpl> saMappedDocuments= Arrays.asList(new SAMappedDocumentImpl(), new SAMappedDocumentImpl());
+        doReturn(saMappedDocuments).when(persistenceService).selectList(SelectDescriptorBuilder.getArchivedDocumentList("theList", 45l, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS), 123456789l));
+        doReturn(sMappedDocuments).when(persistenceService).selectList(SelectDescriptorBuilder.getDocumentListCreatedBefore("theList", 45l, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS), 123456789l));
+        //when
+        List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l, 123456789l);
+        //then
+        ArrayList<SMappedDocument> expected = new ArrayList<SMappedDocument>(saMappedDocuments);
+        expected.addAll(sMappedDocuments);
+        assertThat(theList).isEqualTo(expected);
+    }
+
+    @Test(expected = SDocumentNotFoundException.class)
+    public void should_get_throw_not_found_exceptions() throws Exception {
+        //when
+        documentService.getDocument(123456l);
+        //then exception
+    }
+
 
 }
