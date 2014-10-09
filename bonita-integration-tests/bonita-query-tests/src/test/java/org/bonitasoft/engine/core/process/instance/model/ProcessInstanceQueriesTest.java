@@ -468,13 +468,13 @@ public class ProcessInstanceQueriesTest {
     }
 
     @Test
-    public void getArchivedProcessInstances_should_return_archived_process_instances_when_exist() {
+    public void getArchivedProcessInstancesInAllStates_should_return_archived_process_instances_when_exist() {
         // Given
         final SAProcessInstance saProcessInstance1 = repository.add(buildSAProcessInstance(1L));
         final SAProcessInstance saProcessInstance2 = repository.add(buildSAProcessInstance(2L));
 
         // When
-        final List<SAProcessInstance> archivedProcessInstances = repository.getArchivedProcessInstances(Arrays.asList(1L, 2L));
+        final List<SAProcessInstance> archivedProcessInstances = repository.getArchivedProcessInstancesInAllStates(Arrays.asList(1L, 2L));
 
         // Then
         assertFalse("The list of archived process instance must not be empty !!", archivedProcessInstances.isEmpty());
@@ -483,11 +483,11 @@ public class ProcessInstanceQueriesTest {
     }
 
     @Test
-    public void getArchivedProcessInstances_should_return_empty_list_when_no_archived_process_instances_with_ids() {
+    public void getArchivedProcessInstancesInAllStates_should_return_empty_list_when_no_archived_process_instances_with_ids() {
         // Given
 
         // When
-        final List<SAProcessInstance> archivedProcessInstances = repository.getArchivedProcessInstances(Arrays.asList(1L, 2L));
+        final List<SAProcessInstance> archivedProcessInstances = repository.getArchivedProcessInstancesInAllStates(Arrays.asList(1L, 2L));
 
         // Then
         assertTrue("The list of archived process instance must be empty !!", archivedProcessInstances.isEmpty());
@@ -496,6 +496,7 @@ public class ProcessInstanceQueriesTest {
     private SAProcessInstanceImpl buildSAProcessInstance(final long id) {
         final SAProcessInstanceImpl saProcessInstanceImpl = new SAProcessInstanceImpl();
         saProcessInstanceImpl.setId(id);
+        saProcessInstanceImpl.setSourceObjectId(id);
         saProcessInstanceImpl.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
         saProcessInstanceImpl.setName("process" + id);
         return saProcessInstanceImpl;

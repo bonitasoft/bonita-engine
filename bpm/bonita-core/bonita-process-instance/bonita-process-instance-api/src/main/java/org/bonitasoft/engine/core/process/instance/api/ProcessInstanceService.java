@@ -256,7 +256,7 @@ public interface ProcessInstanceService {
      * @throws SProcessInstanceReadException
      * @since 6.4.0
      */
-    List<SAProcessInstance> getArchivedProcessInstances(List<Long> archivedProcessInstanceIds) throws SProcessInstanceReadException;
+    List<SAProcessInstance> getArchivedProcessInstancesInAllStates(List<Long> processInstanceIds) throws SProcessInstanceReadException;
 
     /**
      * Get total number of archived process instances according to specific criteria

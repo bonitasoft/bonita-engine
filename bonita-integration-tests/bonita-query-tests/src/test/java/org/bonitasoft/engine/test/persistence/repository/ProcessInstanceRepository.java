@@ -54,10 +54,10 @@ public class ProcessInstanceRepository extends TestRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public List<SAProcessInstance> getArchivedProcessInstances(final List<Long> archivedProcessInstanceIds) {
+    public List<SAProcessInstance> getArchivedProcessInstancesInAllStates(final List<Long> sourceProcessInstanceIds) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
-        final Query namedQuery = getNamedQuery("getArchivedProcessInstances");
-        namedQuery.setParameterList("ids", archivedProcessInstanceIds);
+        final Query namedQuery = getNamedQuery("getArchivedProcessInstancesInAllStates");
+        namedQuery.setParameterList("sourceObjectIds", sourceProcessInstanceIds);
         return namedQuery.list();
     }
 

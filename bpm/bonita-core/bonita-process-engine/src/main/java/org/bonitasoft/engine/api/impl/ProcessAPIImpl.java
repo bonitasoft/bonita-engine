@@ -3678,16 +3678,15 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public long deleteArchivedProcessInstances(final Long... archivedProcessInstanceIds) throws DeletionException {
-        if (archivedProcessInstanceIds == null || archivedProcessInstanceIds.length == 0) {
+    public long deleteArchivedProcessInstancesInAllStates(final List<Long> sourceProcessInstanceIds) throws DeletionException {
+        if (sourceProcessInstanceIds == null || sourceProcessInstanceIds.size() == 0) {
             throw new IllegalArgumentException("The identifier of the archived process instances to deleted are missing !!");
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
 
-        final List<Long> archivedProcessInstanceIdsList = Arrays.asList(archivedProcessInstanceIds);
         try {
-            final List<SAProcessInstance> saProcessInstances = processInstanceService.getArchivedProcessInstances(archivedProcessInstanceIdsList);
+            final List<SAProcessInstance> saProcessInstances = processInstanceService.getArchivedProcessInstancesInAllStates(sourceProcessInstanceIds);
             if (!saProcessInstances.isEmpty()) {
                 return processInstanceService.deleteParentArchivedProcessInstancesAndElements(saProcessInstances);
             }
@@ -3700,20 +3699,8 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public void deleteArchivedProcessInstance(final long archivedProcessInstanceId) throws DeletionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
-
-        try {
-            final SAProcessInstance saProcessInstance = processInstanceService.getArchivedProcessInstance(archivedProcessInstanceId);
-            if (saProcessInstance != null) {
-                processInstanceService.deleteParentArchivedProcessInstanceAndElements(saProcessInstance);
-            }
-        } catch (final SProcessInstanceHierarchicalDeletionException e) {
-            throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
-        } catch (final SBonitaException e) {
-            throw new DeletionException(e);
-        }
+    public long deleteArchivedProcessInstancesInAllStates(final long sourceProcessInstanceId) throws DeletionException {
+        return deleteArchivedProcessInstancesInAllStates(Collections.singletonList(sourceProcessInstanceId));
     }
 
     private List<SAProcessInstance> searchArchivedProcessInstancesFromProcessDefinition(final ProcessInstanceService processInstanceService,

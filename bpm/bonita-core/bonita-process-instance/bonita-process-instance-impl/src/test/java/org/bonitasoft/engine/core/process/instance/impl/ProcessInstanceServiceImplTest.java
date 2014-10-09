@@ -269,17 +269,17 @@ public class ProcessInstanceServiceImplTest {
     }
 
     @Test
-    public void getArchivedProcessInstances_should_return_list_of_archived_process_instance() throws Exception {
+    public void getArchivedProcessInstancesInAllStates_should_return_list_of_archived_process_instance() throws Exception {
         // Given
         final List<Long> archivedProcessInstanceIds = Arrays.asList(41L);
-        final Map<String, Object> parameters = Collections.singletonMap("ids", (Object) archivedProcessInstanceIds);
+        final Map<String, Object> parameters = Collections.singletonMap("sourceObjectIds", (Object) archivedProcessInstanceIds);
         final SelectListDescriptor<SAProcessInstance> selectListDescriptor = new SelectListDescriptor<SAProcessInstance>(
-                "getArchivedProcessInstances", parameters, SAProcessInstance.class, new QueryOptions(0, archivedProcessInstanceIds.size()));
+                "getArchivedProcessInstancesInAllStates", parameters, SAProcessInstance.class, new QueryOptions(0, archivedProcessInstanceIds.size()));
         final List<SAProcessInstance> saProcessInstances = Arrays.asList(mock(SAProcessInstance.class));
         doReturn(saProcessInstances).when(readPersistenceService).selectList(selectListDescriptor);
 
         // When
-        final List<SAProcessInstance> archivedProcessInstances = processInstanceService.getArchivedProcessInstances(archivedProcessInstanceIds);
+        final List<SAProcessInstance> archivedProcessInstances = processInstanceService.getArchivedProcessInstancesInAllStates(archivedProcessInstanceIds);
 
         // Then
         assertEquals("The result should be equals to the list returned by the mock.", saProcessInstances, archivedProcessInstances);
@@ -287,16 +287,16 @@ public class ProcessInstanceServiceImplTest {
     }
 
     @Test(expected = SProcessInstanceReadException.class)
-    public void getArchivedProcessInstances_should_throw_exception_when_there_is_problem() throws Exception {
+    public void getArchivedProcessInstancesInAllStates_should_throw_exception_when_there_is_problem() throws Exception {
         // Given
         final List<Long> archivedProcessInstanceIds = Arrays.asList(41L);
-        final Map<String, Object> parameters = Collections.singletonMap("ids", (Object) archivedProcessInstanceIds);
+        final Map<String, Object> parameters = Collections.singletonMap("sourceObjectIds", (Object) archivedProcessInstanceIds);
         final SelectListDescriptor<SAProcessInstance> selectListDescriptor = new SelectListDescriptor<SAProcessInstance>(
-                "getArchivedProcessInstances", parameters, SAProcessInstance.class, new QueryOptions(0, archivedProcessInstanceIds.size()));
+                "getArchivedProcessInstancesInAllStates", parameters, SAProcessInstance.class, new QueryOptions(0, archivedProcessInstanceIds.size()));
         doThrow(new SBonitaReadException("plop")).when(readPersistenceService).selectList(selectListDescriptor);
 
         // When
-        processInstanceService.getArchivedProcessInstances(archivedProcessInstanceIds);
+        processInstanceService.getArchivedProcessInstancesInAllStates(archivedProcessInstanceIds);
     }
 
     @Test

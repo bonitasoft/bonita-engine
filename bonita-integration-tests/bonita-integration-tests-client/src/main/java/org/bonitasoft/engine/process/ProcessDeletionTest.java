@@ -20,6 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.CommonAPITest;
@@ -142,7 +143,7 @@ public class ProcessDeletionTest extends CommonAPITest {
 
     @Test
     @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete", "Process instance" }, jira = "BS-10374")
-    public void deleteArchivedProcessInstanceByIdsAlsoDeleteArchivedElements() throws Exception {
+    public void deleteArchivedProcessInstancesInAllStatesByIdsAlsoDeleteArchivedElements() throws Exception {
         final ProcessDefinition processDefinition = deployProcessWithSeveralOutGoingTransitions();
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance processInstance1 = startAndFinishProcess(processDefinition);
@@ -152,7 +153,8 @@ public class ProcessDeletionTest extends CommonAPITest {
         searchOptionsBuilder.sort(ProcessInstanceSearchDescriptor.NAME, Order.ASC);
         final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().searchArchivedProcessInstancesInAllStates(searchOptionsBuilder.done())
                 .getResult();
-        getProcessAPI().deleteArchivedProcessInstances(archivedProcessInstances.get(0).getId(), archivedProcessInstances.get(2).getId());
+        getProcessAPI().deleteArchivedProcessInstancesInAllStates(
+                Arrays.asList(archivedProcessInstances.get(0).getSourceObjectId(), archivedProcessInstances.get(2).getSourceObjectId()));
 
         final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(processInstance1.getId(), 0, 100,
                 ActivityInstanceCriterion.DEFAULT);
@@ -164,7 +166,7 @@ public class ProcessDeletionTest extends CommonAPITest {
 
     @Test
     @Cover(classes = { ProcessManagementAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Delete", "Process instance" }, jira = "BS-10375")
-    public void deleteArchivedProcessInstanceByIdAlsoDeleteArchivedElements() throws Exception {
+    public void deleteArchivedProcessInstancesInAllStatesByIdAlsoDeleteArchivedElements() throws Exception {
         final ProcessDefinition processDefinition = deployProcessWithSeveralOutGoingTransitions();
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance processInstance = startAndFinishProcess(processDefinition);
@@ -173,14 +175,14 @@ public class ProcessDeletionTest extends CommonAPITest {
         searchOptionsBuilder.sort(ProcessInstanceSearchDescriptor.NAME, Order.ASC);
         final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().searchArchivedProcessInstancesInAllStates(searchOptionsBuilder.done())
                 .getResult();
-        getProcessAPI().deleteArchivedProcessInstances(archivedProcessInstances.get(0).getId(), archivedProcessInstances.get(2).getId());
+        getProcessAPI().deleteArchivedProcessInstancesInAllStates(archivedProcessInstances.get(0).getSourceObjectId());
 
         final List<ArchivedActivityInstance> taskInstances = getProcessAPI().getArchivedActivityInstances(processInstance.getId(), 0, 100,
                 ActivityInstanceCriterion.DEFAULT);
         assertEquals(0, taskInstances.size());
         final long numberOfArchivedProcessInstancesAfterDelete = getProcessAPI().searchArchivedProcessInstancesInAllStates(searchOptionsBuilder.done())
                 .getCount();
-        assertEquals(archivedProcessInstances.size() - 2, numberOfArchivedProcessInstancesAfterDelete);
+        assertEquals(archivedProcessInstances.size() - 1, numberOfArchivedProcessInstancesAfterDelete);
     }
 
     private ProcessInstance startAndFinishProcess(final ProcessDefinition processDefinition) throws ProcessDefinitionNotFoundException,

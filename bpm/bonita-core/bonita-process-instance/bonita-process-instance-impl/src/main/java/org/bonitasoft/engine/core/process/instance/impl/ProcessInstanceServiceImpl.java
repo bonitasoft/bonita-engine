@@ -908,12 +908,12 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
-    public List<SAProcessInstance> getArchivedProcessInstances(final List<Long> archivedProcessInstanceIds) throws SProcessInstanceReadException {
+    public List<SAProcessInstance> getArchivedProcessInstancesInAllStates(final List<Long> processInstanceIds) throws SProcessInstanceReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
-            final Map<String, Object> parameters = Collections.singletonMap("ids", (Object) archivedProcessInstanceIds);
+            final Map<String, Object> parameters = Collections.singletonMap("sourceObjectIds", (Object) processInstanceIds);
             final SelectListDescriptor<SAProcessInstance> saProcessInstances = new SelectListDescriptor<SAProcessInstance>(
-                    "getArchivedProcessInstances", parameters, SAProcessInstance.class, new QueryOptions(0, archivedProcessInstanceIds.size()));
+                    "getArchivedProcessInstancesInAllStates", parameters, SAProcessInstance.class, new QueryOptions(0, processInstanceIds.size()));
             return persistenceService.selectList(saProcessInstances);
         } catch (final SBonitaReadException e) {
             throw new SProcessInstanceReadException(e);
