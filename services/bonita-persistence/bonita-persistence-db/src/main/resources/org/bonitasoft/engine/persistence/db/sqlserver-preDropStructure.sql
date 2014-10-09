@@ -90,13 +90,21 @@ ALTER TABLE profileentry DROP CONSTRAINT fk_profileentry_profileId
 GO
 
 -- business application
-ALTER TABLE business_app DROP CONSTRAINT fk_app_tenantId
+ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_tenantId
+GO
+ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_pageId
+GO
+ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_parentId
 GO
 ALTER TABLE business_app_page DROP CONSTRAINT fk_app_page_tenantId
 GO
 ALTER TABLE business_app_page DROP CONSTRAINT fk_bus_app_id
 GO
 ALTER TABLE business_app_page DROP CONSTRAINT fk_page_id
+GO
+ALTER TABLE business_app DROP CONSTRAINT fk_app_profileId
+GO
+ALTER TABLE business_app DROP CONSTRAINT fk_app_tenantId
 GO
 
 
