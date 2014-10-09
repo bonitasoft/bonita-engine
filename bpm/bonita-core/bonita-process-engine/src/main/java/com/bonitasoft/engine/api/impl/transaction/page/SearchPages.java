@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
@@ -35,16 +35,16 @@ public class SearchPages extends AbstractSearchEntity<Page, SPage> {
     }
 
     @Override
-    public long executeCount(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions queryOptions) throws SBonitaReadException {
         try {
             return pageService.getNumberOfPages(queryOptions);
         } catch (SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
+            throw new SBonitaReadException(e);
         }
     }
 
     @Override
-    public List<SPage> executeSearch(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SPage> executeSearch(final QueryOptions queryOptions) throws SBonitaReadException {
         return pageService.searchPages(queryOptions);
     }
 

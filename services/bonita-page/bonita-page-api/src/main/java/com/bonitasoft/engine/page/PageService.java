@@ -18,7 +18,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -60,7 +60,7 @@ public interface PageService extends TenantLifecycleService {
 
     byte[] getPageContent(long pageId) throws SBonitaReadException, SObjectNotFoundException;
 
-    List<SPage> searchPages(QueryOptions options) throws SBonitaSearchException;
+    List<SPage> searchPages(QueryOptions options) throws SBonitaReadException;
 
     SPage updatePage(long pageId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException,
             SObjectAlreadyExistsException, SInvalidPageTokenException;
