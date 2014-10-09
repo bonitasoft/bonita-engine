@@ -5,7 +5,7 @@ import org.bonitasoft.engine.accessors.TenantAccessorTest;
 import org.bonitasoft.engine.activity.CallActivityTest;
 import org.bonitasoft.engine.activity.LoopTest;
 import org.bonitasoft.engine.activity.MultiInstanceTest;
-import org.bonitasoft.engine.activity.UserTaskContractTest;
+import org.bonitasoft.engine.activity.UserTaskContractITest;
 import org.bonitasoft.engine.command.AdvancedStartProcessCommandIT;
 import org.bonitasoft.engine.command.CommandTest;
 import org.bonitasoft.engine.command.web.ExternalCommandsTest;
@@ -43,7 +43,7 @@ import org.junit.runners.Suite.SuiteClasses;
         CallActivityTest.class,
         LoopTest.class,
         MultiInstanceTest.class,
-        UserTaskContractTest.class,
+        UserTaskContractITest.class,
         TenantAccessorTest.class,
         MultiThreadCallsTest.class,
         AdvancedStartProcessCommandIT.class

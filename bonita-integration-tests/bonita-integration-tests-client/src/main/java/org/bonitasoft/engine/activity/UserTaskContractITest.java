@@ -41,7 +41,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class UserTaskContractTest extends CommonAPITest {
+public class UserTaskContractITest extends CommonAPITest {
 
     private static final String TASK2 = "task2";
     private static final String TASK1 = "task1";

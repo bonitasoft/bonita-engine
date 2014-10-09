@@ -12,37 +12,48 @@ public class SComplexInputDefinitionBuilder {
 
     private String name = "aName";
     private String description = "a description";
-    private List<SSimpleInputDefinition> inputDefinitions = new ArrayList<SSimpleInputDefinition>();
-    private List<SComplexInputDefinition> complexDefinitions = new ArrayList<SComplexInputDefinition>();
+    private boolean multiple = false;
+    private final List<SSimpleInputDefinition> inputDefinitions = new ArrayList<SSimpleInputDefinition>();
+    private final List<SComplexInputDefinition> complexDefinitions = new ArrayList<SComplexInputDefinition>();
 
     public static SComplexInputDefinitionBuilder aComplexInput() {
         return new SComplexInputDefinitionBuilder();
     }
 
     public SComplexInputDefinition build() {
-        return new SComplexInputDefinitionImpl(name, description, false, inputDefinitions, complexDefinitions);
+        return new SComplexInputDefinitionImpl(name, description, multiple, inputDefinitions, complexDefinitions);
     }
 
-    public SComplexInputDefinitionBuilder withInput(SSimpleInputDefinitionBuilder... definitions) {
-        for (SSimpleInputDefinitionBuilder definition : definitions) {
-                inputDefinitions.add(definition.build());
+    public SComplexInputDefinitionBuilder withInput(final SSimpleInputDefinitionBuilder... definitions) {
+        for (final SSimpleInputDefinitionBuilder definition : definitions) {
+            inputDefinitions.add(definition.build());
         }
         return this;
     }
-    
-    public SComplexInputDefinitionBuilder withInput(SInputDefinition... definitions) {
-        for (SInputDefinition definition : definitions) {
+
+    public SComplexInputDefinitionBuilder withInput(final SInputDefinition... definitions) {
+        for (final SInputDefinition definition : definitions) {
             if (definition instanceof SSimpleInputDefinition) {
                 inputDefinitions.add((SSimpleInputDefinition) definition);
             } else if (definition instanceof SComplexInputDefinition) {
-                complexDefinitions.add((SComplexInputDefinition) definition); 
+                complexDefinitions.add((SComplexInputDefinition) definition);
             }
         }
         return this;
     }
-    
-    public SComplexInputDefinitionBuilder withName(String name) {
+
+    public SComplexInputDefinitionBuilder withName(final String name) {
         this.name = name;
+        return this;
+    }
+
+    public SComplexInputDefinitionBuilder withDescription(final String description) {
+        this.description = description;
+        return this;
+    }
+
+    public SComplexInputDefinitionBuilder withMultiple(final boolean multiple) {
+        this.multiple = multiple;
         return this;
     }
 }
