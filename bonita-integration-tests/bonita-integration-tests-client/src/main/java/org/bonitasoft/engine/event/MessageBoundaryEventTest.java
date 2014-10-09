@@ -67,23 +67,24 @@ public class MessageBoundaryEventTest extends AbstractEventTest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnCallActivity();
         final ProcessDefinition calledProcessDefinition = deployAndEnableSimpleProcess("calledProcess", "calledTask");
 
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance calledStep = waitForUserTask("calledStep", processInstance.getId());
-        final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
+        try {
+            final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+            final ActivityInstance calledStep = waitForUserTask("calledTask", processInstance.getId());
+            final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
 
-        getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
-                new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
+            getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
+                    new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
 
-        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, donaBenta);
-        waitForProcessToFinish(calledProcessInstance, TestStates.ABORTED);
-        waitForProcessToFinish(processInstance);
+            waitForUserTaskAndExecuteIt("exceptionStep", processInstance, donaBenta);
+            waitForProcessToFinish(calledProcessInstance, TestStates.ABORTED);
+            waitForProcessToFinish(processInstance);
 
-        waitForArchivedActivity(calledStep.getId(), TestStates.ABORTED);
+            waitForArchivedActivity(calledStep.getId(), TestStates.ABORTED);
 
-        checkWasntExecuted(processInstance, "step2");
-
-        disableAndDeleteProcess(processDefinition);
-        disableAndDeleteProcess(calledProcessDefinition);
+            checkWasntExecuted(processInstance, "step2");
+        } finally {
+            disableAndDeleteProcess(processDefinition, calledProcessDefinition);
+        }
     }
 
     @Test
@@ -93,24 +94,25 @@ public class MessageBoundaryEventTest extends AbstractEventTest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnCallActivity();
         final ProcessDefinition calledProcessDefinition = deployAndEnableSimpleProcess("calledProcess", "calledTask");
 
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance calledStep = waitForUserTask("calledStep", processInstance.getId());
-        final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
-        assignAndExecuteStep(calledStep, donaBenta.getId());
+        try {
+            final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+            final ActivityInstance calledStep = waitForUserTask("calledTask", processInstance.getId());
+            final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
+            assignAndExecuteStep(calledStep, donaBenta.getId());
 
-        final ActivityInstance step2 = waitForUserTask("step2", processInstance.getId());
+            final ActivityInstance step2 = waitForUserTask("step2", processInstance.getId());
 
-        getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
-                new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
+            getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
+                    new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
 
-        waitForProcessToFinish(calledProcessInstance);
-        assignAndExecuteStep(step2, donaBenta.getId());
-        waitForProcessToFinish(processInstance);
+            waitForProcessToFinish(calledProcessInstance);
+            assignAndExecuteStep(step2, donaBenta.getId());
+            waitForProcessToFinish(processInstance);
 
-        checkWasntExecuted(processInstance, "exceptionStep");
-
-        disableAndDeleteProcess(processDefinition);
-        disableAndDeleteProcess(calledProcessDefinition);
+            checkWasntExecuted(processInstance, "exceptionStep");
+        } finally {
+            disableAndDeleteProcess(processDefinition, calledProcessDefinition);
+        }
     }
 
     @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message",
