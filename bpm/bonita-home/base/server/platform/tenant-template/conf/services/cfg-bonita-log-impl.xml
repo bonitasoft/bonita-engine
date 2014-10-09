@@ -13,6 +13,9 @@
                 <entry key="APPLICATION_PAGE_CREATED:INTERNAL" value="true" />
                 <entry key="APPLICATION_PAGE_DELETED:INTERNAL" value="true" />
                 <entry key="APPLICATION_PAGE_UPDATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_MENU_CREATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_MENU_DELETED:INTERNAL" value="true" />
+                <entry key="APPLICATION_MENU_UPDATED:INTERNAL" value="true" />
         		<entry key="BREAKPOINT_CREATED:INTERNAL" value="true" />
         		<entry key="BREAKPOINT_DELETED:INTERNAL" value="true" />
         		<entry key="CATEGORY_CREATED:INTERNAL" value="true" />

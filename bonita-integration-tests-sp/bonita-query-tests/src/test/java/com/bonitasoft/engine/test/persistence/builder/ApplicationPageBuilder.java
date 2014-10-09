@@ -13,7 +13,7 @@
  **/
 package com.bonitasoft.engine.test.persistence.builder;
 
-import com.bonitasoft.engine.business.application.impl.SApplicationPageImpl;
+import com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
 
 /**
  * @author Elias Ricken de Medeiros

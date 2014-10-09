@@ -28,7 +28,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.SApplicationPage;
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SearchApplicationPagesTest {
