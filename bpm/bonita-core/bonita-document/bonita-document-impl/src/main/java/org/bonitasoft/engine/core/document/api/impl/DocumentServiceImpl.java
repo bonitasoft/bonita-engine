@@ -45,7 +45,7 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -296,31 +296,19 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public long getNumberOfArchivedDocuments(final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            return definitiveArchiveReadPersistenceService.getNumberOfEntities(SAMappedDocument.class, queryOptions, null);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+    public long getNumberOfArchivedDocuments(final QueryOptions queryOptions) throws SBonitaReadException {
+        return definitiveArchiveReadPersistenceService.getNumberOfEntities(SAMappedDocument.class, queryOptions, null);
     }
 
     @Override
-    public long getNumberOfArchivedDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
+    public long getNumberOfArchivedDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
-        try {
-            return definitiveArchiveReadPersistenceService.getNumberOfEntities(SAMappedDocument.class, SUPERVISED_BY, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+        return definitiveArchiveReadPersistenceService.getNumberOfEntities(SAMappedDocument.class, SUPERVISED_BY, queryOptions, parameters);
     }
 
     @Override
-    public long getNumberOfDocuments(final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            return persistenceService.getNumberOfEntities(SMappedDocument.class, queryOptions, null);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+    public long getNumberOfDocuments(final QueryOptions queryOptions) throws SBonitaReadException {
+        return persistenceService.getNumberOfEntities(SMappedDocument.class, queryOptions, null);
     }
 
     @Override
@@ -329,13 +317,9 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public long getNumberOfDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
+    public long getNumberOfDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
-        try {
-            return persistenceService.getNumberOfEntities(SMappedDocument.class, SUPERVISED_BY, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+        return persistenceService.getNumberOfEntities(SMappedDocument.class, SUPERVISED_BY, queryOptions, parameters);
     }
 
     public void removeCurrentVersion(SMappedDocument document) throws SObjectNotFoundException, SObjectModificationException {
@@ -399,42 +383,34 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<SAMappedDocument> searchArchivedDocuments(final QueryOptions queryOptions)
-            throws SBonitaSearchException {
+            throws SBonitaReadException {
         final ReadPersistenceService persistenceService1 = archiveService.getDefinitiveArchiveReadPersistenceService();
-        try {
-            return persistenceService1.searchEntity(SAMappedDocument.class, queryOptions, null);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+        return persistenceService1.searchEntity(SAMappedDocument.class, queryOptions, null);
     }
 
     @Override
-    public List<SAMappedDocument> searchArchivedDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SAMappedDocument> searchArchivedDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
         final ReadPersistenceService persistenceService1 = archiveService.getDefinitiveArchiveReadPersistenceService();
-        try {
-            final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
-            return persistenceService1.searchEntity(SAMappedDocument.class, SUPERVISED_BY, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+        final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
+        return persistenceService1.searchEntity(SAMappedDocument.class, SUPERVISED_BY, queryOptions, parameters);
     }
 
     @Override
-    public List<SMappedDocument> searchDocuments(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SMappedDocument> searchDocuments(final QueryOptions queryOptions) throws SBonitaReadException {
         try {
             return persistenceService.searchEntity(SMappedDocument.class, queryOptions, null);
         } catch (SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
+            throw new SBonitaReadException(e);
         }
     }
 
     @Override
-    public List<SMappedDocument> searchDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SMappedDocument> searchDocumentsSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
         try {
             final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
             return persistenceService.searchEntity(SMappedDocument.class, SUPERVISED_BY, queryOptions, parameters);
         } catch (SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
+            throw new SBonitaReadException(e);
         }
     }
 

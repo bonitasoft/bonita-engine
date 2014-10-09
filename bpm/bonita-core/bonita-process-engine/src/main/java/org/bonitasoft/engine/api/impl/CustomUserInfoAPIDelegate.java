@@ -29,7 +29,7 @@ import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
 
 /**
@@ -43,7 +43,7 @@ public class CustomUserInfoAPIDelegate {
         this.service = service;
     }
 
-    public List<CustomUserInfo> list(final long userId, final int startIndex, final int maxResult) throws SIdentityException, SBonitaSearchException {
+    public List<CustomUserInfo> list(final long userId, final int startIndex, final int maxResult) throws SIdentityException, SBonitaReadException {
         List<SCustomUserInfoDefinition> definitions = service.getCustomUserInfoDefinitions(startIndex, maxResult);
         if (definitions.size() == 0) {
             return Collections.emptyList();
@@ -65,7 +65,7 @@ public class CustomUserInfoAPIDelegate {
     }
 
     private List<SCustomUserInfoValue> searchCorrespondingValues(final long userId, final List<SCustomUserInfoDefinition> definitions)
-            throws SBonitaSearchException {
+            throws SBonitaReadException {
         return service.searchCustomUserInfoValue(new QueryOptions(
                 0,
                 definitions.size(),

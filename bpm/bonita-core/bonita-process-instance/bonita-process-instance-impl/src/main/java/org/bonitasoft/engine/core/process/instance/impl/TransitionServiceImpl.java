@@ -30,7 +30,7 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
@@ -58,30 +58,14 @@ public class TransitionServiceImpl implements TransitionService {
         this.archiveService = archiveService;
     }
 
-    private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
-    }
-
-    private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
-        logBuilder.setActionType(actionType);
+    @Override
+    public long getNumberOfArchivedTransitionInstances(final QueryOptions countOptions) throws SBonitaReadException {
+        return this.persistenceRead.getNumberOfEntities(SATransitionInstance.class, countOptions, null);
     }
 
     @Override
-    public long getNumberOfArchivedTransitionInstances(final QueryOptions countOptions) throws SBonitaSearchException {
-        try {
-            return this.persistenceRead.getNumberOfEntities(SATransitionInstance.class, countOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
-    }
-
-    @Override
-    public List<SATransitionInstance> searchArchivedTransitionInstances(final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            return this.persistenceRead.searchEntity(SATransitionInstance.class, queryOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+    public List<SATransitionInstance> searchArchivedTransitionInstances(final QueryOptions queryOptions) throws SBonitaReadException {
+        return this.persistenceRead.searchEntity(SATransitionInstance.class, queryOptions, null);
     }
 
     @Override
@@ -114,7 +98,7 @@ public class TransitionServiceImpl implements TransitionService {
     }
 
     @Override
-    public void deleteArchivedTransitionsOfProcessInstance(final long processInstanceId) throws STransitionDeletionException, SBonitaSearchException {
+    public void deleteArchivedTransitionsOfProcessInstance(final long processInstanceId) throws STransitionDeletionException, SBonitaReadException {
         final SATransitionInstanceBuilderFactory saTransitionInstanceBuilder = BuilderFactory.get(SATransitionInstanceBuilderFactory.class);
         final String rootContainerIdKey = saTransitionInstanceBuilder.getRootContainerIdKey();
         final String idKey = saTransitionInstanceBuilder.getIdKey();

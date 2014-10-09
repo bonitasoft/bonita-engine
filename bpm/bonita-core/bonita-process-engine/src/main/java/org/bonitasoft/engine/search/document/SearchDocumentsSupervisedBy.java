@@ -20,7 +20,7 @@ import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SLightDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractDocumentSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchDocumentDescriptor;
@@ -42,12 +42,12 @@ public class SearchDocumentsSupervisedBy extends AbstractDocumentSearchEntity {
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return documentService.getNumberOfDocumentsSupervisedBy(userId, searchOptions);
     }
 
     @Override
-    public List<SMappedDocument> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SMappedDocument> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return documentService.searchDocumentsSupervisedBy(userId, searchOptions);
     }
 

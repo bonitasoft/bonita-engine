@@ -32,7 +32,7 @@ import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNotFoundException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
@@ -93,7 +93,7 @@ public class JDBCJobListenerTest {
     @Test
     public void jobWasExecuted_shouldCallIncidentServiceIfExceptionOccurs() throws Exception {
         final IncidentService incidentService = mock(IncidentService.class);
-        doThrow(SBonitaSearchException.class).when(jobService).searchJobLogs(any(QueryOptions.class));
+        doThrow(SBonitaReadException.class).when(jobService).searchJobLogs(any(QueryOptions.class));
         doReturn("13651444").when(wrappedMap).get("tenantId");
 
         final JDBCJobListener jobListener = new JDBCJobListener(jobService, incidentService, logger);

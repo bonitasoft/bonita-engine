@@ -36,7 +36,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -363,7 +363,7 @@ public class ThemeServiceImplTest {
         assertEquals(1L, themeServiceImpl.getNumberOfThemes(options));
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfThemesWithOptionsThrowException() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistenceService.getNumberOfEntities(STheme.class, options, Collections.<String, Object> emptyMap())).thenThrow(new SBonitaReadException(""));
@@ -382,7 +382,7 @@ public class ThemeServiceImplTest {
         assertNotNull(themeServiceImpl.searchThemes(options));
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchThemesWithOptionsThrowException() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistenceService.searchEntity(STheme.class, options, Collections.<String, Object> emptyMap())).thenThrow(new SBonitaReadException(""));

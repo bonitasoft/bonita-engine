@@ -26,7 +26,7 @@ import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
 
 import java.util.List;
@@ -172,18 +172,18 @@ public interface DocumentService {
      *
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return number of document satisfied to the query criteria
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfDocuments(QueryOptions queryOptions) throws SBonitaSearchException;
+    long getNumberOfDocuments(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Search all documents according to the query criteria
      *
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return a list of SDocumentMapping objects
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<SMappedDocument> searchDocuments(QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SMappedDocument> searchDocuments(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Get total number of documents for the specific supervisor
@@ -191,9 +191,9 @@ public interface DocumentService {
      * @param userId       identifier of supervisor user
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return number of documents for the specific supervisor
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
+    long getNumberOfDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Search all documents for the specific supervisor
@@ -201,18 +201,18 @@ public interface DocumentService {
      * @param userId       identifier of supervisor user
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return a list of SDocumentMapping objects
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<SMappedDocument> searchDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SMappedDocument> searchDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Get total number of archived documents according to the query criteria
      *
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return number of archived documents
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfArchivedDocuments(QueryOptions queryOptions) throws SBonitaSearchException;
+    long getNumberOfArchivedDocuments(QueryOptions queryOptions) throws SBonitaReadException;
 
     void removeDocument(SMappedDocument mappedDocument) throws SObjectModificationException;
 
@@ -221,9 +221,9 @@ public interface DocumentService {
      *
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return a list of SADocumentMapping objects
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<SAMappedDocument> searchArchivedDocuments(QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SAMappedDocument> searchArchivedDocuments(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Get total number of archived documents for the specific supervisor
@@ -231,9 +231,9 @@ public interface DocumentService {
      * @param userId       identifier of supervisor user
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return number of archived documents for the specific supervisor
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfArchivedDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
+    long getNumberOfArchivedDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Search all archived documents for the specific supervisor
@@ -241,9 +241,9 @@ public interface DocumentService {
      * @param userId       identifier of supervisor user
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return a list of SADocumentMapping objects
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<SAMappedDocument> searchArchivedDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SAMappedDocument> searchArchivedDocumentsSupervisedBy(long userId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Get the archived version corresponding to a document

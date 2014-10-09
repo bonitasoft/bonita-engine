@@ -18,7 +18,7 @@ import java.util.List;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractArchivedDocumentSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchArchivedDocumentDescriptor;
@@ -38,12 +38,12 @@ public class SearchArchivedDocuments extends AbstractArchivedDocumentSearchEntit
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return documentService.getNumberOfArchivedDocuments(searchOptions);
     }
 
     @Override
-    public List<SAMappedDocument> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SAMappedDocument> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return documentService.searchArchivedDocuments(searchOptions);
     }
 

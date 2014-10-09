@@ -62,7 +62,7 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -245,7 +245,7 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
                 queryOptions = new QueryOptions(0, 10, Collections.singletonList(orderByOption), filters, null);
                 waitingEvents = searchWaitingEvents(SWaitingEvent.class, queryOptions);
             } while (waitingEvents.size() > 0);
-        } catch (final SBonitaSearchException e) {
+        } catch (final SBonitaReadException e) {
             throw new SFlowNodeReadException(e); // To change body of catch statement use File | Settings | File Templates.
         }
     }
@@ -402,31 +402,19 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
 
     @Override
     public long getNumberOfEventTriggerInstances(final Class<? extends SEventTriggerInstance> entityClass, final QueryOptions countOptions)
-            throws SBonitaSearchException {
-        try {
-            return getPersistenceService().getNumberOfEntities(entityClass, countOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+            throws SBonitaReadException {
+        return getPersistenceService().getNumberOfEntities(entityClass, countOptions, null);
     }
 
     @Override
-    public long getNumberOfWaitingEvents(final Class<? extends SWaitingEvent> entityClass, final QueryOptions countOptions) throws SBonitaSearchException {
-        try {
-            return getPersistenceService().getNumberOfEntities(entityClass, countOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+    public long getNumberOfWaitingEvents(final Class<? extends SWaitingEvent> entityClass, final QueryOptions countOptions) throws SBonitaReadException {
+        return getPersistenceService().getNumberOfEntities(entityClass, countOptions, null);
     }
 
     @Override
-    public List<SWaitingEvent> searchStartWaitingEvents(final long processDefinitionId, final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SWaitingEvent> searchStartWaitingEvents(final long processDefinitionId, final QueryOptions queryOptions) throws SBonitaReadException {
         final SelectListDescriptor<SWaitingEvent> descriptor = SelectDescriptorBuilder.getStartWaitingEvents(processDefinitionId, queryOptions);
-        try {
-            return getPersistenceService().selectList(descriptor);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+        return getPersistenceService().selectList(descriptor);
     }
 
     @Override
@@ -471,21 +459,13 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
 
     @Override
     public <T extends SEventTriggerInstance> List<T> searchEventTriggerInstances(final Class<T> entityClass, final QueryOptions searchOptions)
-            throws SBonitaSearchException {
-        try {
-            return getPersistenceService().searchEntity(entityClass, searchOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+            throws SBonitaReadException {
+        return getPersistenceService().searchEntity(entityClass, searchOptions, null);
     }
 
     @Override
-    public <T extends SWaitingEvent> List<T> searchWaitingEvents(final Class<T> entityClass, final QueryOptions searchOptions) throws SBonitaSearchException {
-        try {
-            return getPersistenceService().searchEntity(entityClass, searchOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+    public <T extends SWaitingEvent> List<T> searchWaitingEvents(final Class<T> entityClass, final QueryOptions searchOptions) throws SBonitaReadException {
+        return getPersistenceService().searchEntity(entityClass, searchOptions, null);
     }
 
     @Override

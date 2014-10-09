@@ -339,7 +339,7 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -2826,7 +2826,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    private void checkIfProcessInstanceExistsWhenNoHumanTask(final long processInstanceId) throws SBonitaSearchException, SProcessInstanceReadException,
+    private void checkIfProcessInstanceExistsWhenNoHumanTask(final long processInstanceId) throws SBonitaReadException, SProcessInstanceReadException,
             ProcessInstanceNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -3582,7 +3582,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final List<SProcessInstance> sProcessInstances = userTxService.executeInTransaction(new Callable<List<SProcessInstance>>() {
 
                 @Override
-                public List<SProcessInstance> call() throws SBonitaSearchException {
+                public List<SProcessInstance> call() throws SBonitaReadException {
                     return searchProcessInstancesFromProcessDefinition(processInstanceService, processDefinitionId, startIndex, maxResults);
                 }
             });
@@ -3615,7 +3615,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private List<SProcessInstance> searchProcessInstancesFromProcessDefinition(final ProcessInstanceService processInstanceService,
-            final long processDefinitionId, final int startIndex, final int maxResults) throws SBonitaSearchException {
+            final long processDefinitionId, final int startIndex, final int maxResults) throws SBonitaReadException {
         final SProcessInstanceBuilderFactory keyProvider = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         final FilterOption filterOption = new FilterOption(SProcessInstance.class, keyProvider.getProcessDefinitionIdKey(), processDefinitionId);
         final OrderByOption order2 = new OrderByOption(SProcessInstance.class, keyProvider.getIdKey(), OrderByType.ASC);
@@ -3646,7 +3646,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private List<SAProcessInstance> searchArchivedProcessInstancesFromProcessDefinition(final ProcessInstanceService processInstanceService,
-            final long processDefinitionId, final int startIndex, final int maxResults) throws SBonitaSearchException {
+            final long processDefinitionId, final int startIndex, final int maxResults) throws SBonitaReadException {
         final SAProcessInstanceBuilderFactory keyProvider = BuilderFactory.get(SAProcessInstanceBuilderFactory.class);
         final FilterOption filterOption = new FilterOption(SAProcessInstance.class, keyProvider.getProcessDefinitionIdKey(), processDefinitionId);
         final OrderByOption order = new OrderByOption(SAProcessInstance.class, keyProvider.getIdKey(), OrderByType.ASC);
@@ -4051,13 +4051,13 @@ public class ProcessAPIImpl implements ProcessAPI {
                 throw new AlreadyExistsException("This supervisor already exists for process definition id = <" + processDefinitionId + ">, user id = <"
                         + userId + ">, group id = <" + groupId + ">, role id = <" + roleId + ">");
             }
-        } catch (final SBonitaSearchException e1) {
+        } catch (final SBonitaReadException e1) {
             // Nothing to do
         }
     }
 
     protected List<SProcessSupervisor> searchSProcessSupervisors(final Long processDefinitionId, final Long userId, final Long groupId, final Long roleId)
-            throws SBonitaSearchException {
+            throws SBonitaReadException {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final SupervisorMappingService supervisorService = serviceAccessor.getSupervisorService();
         final SProcessSupervisorBuilderFactory sProcessSupervisorBuilderFactory = BuilderFactory.get(SProcessSupervisorBuilderFactory.class);

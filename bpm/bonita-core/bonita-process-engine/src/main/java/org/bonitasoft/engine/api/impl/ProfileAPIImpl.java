@@ -37,7 +37,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.MemberType;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.Profile;
 import org.bonitasoft.engine.profile.ProfileCriterion;
 import org.bonitasoft.engine.profile.ProfileEntry;
@@ -195,7 +195,7 @@ public class ProfileAPIImpl implements ProfileAPI {
     }
 
     private SearchEntityDescriptor getProfileMemberDescriptor(final SearchEntitiesDescriptor searchEntitiesDescriptor, final String memberType)
-            throws SBonitaSearchException {
+            throws SBonitaReadException {
         if (ProfileMemberUtils.USER_TYPE.equals(memberType)) {
             return searchEntitiesDescriptor.getSearchProfileMemberUserDescriptor();
         } else if (ProfileMemberUtils.GROUP_TYPE.equals(memberType)) {
@@ -205,11 +205,11 @@ public class ProfileAPIImpl implements ProfileAPI {
         } else if (ProfileMemberUtils.ROLE_AND_GROUP_TYPE.equals(memberType)) {
             return searchEntitiesDescriptor.getSearchProfileMemberRoleAndGroupDescriptor();
         } else {
-            throw new SBonitaSearchException("Member type must be equalse to user,group,role or roleAndGroup.");
+            throw new SBonitaReadException("Member type must be equalse to user,group,role or roleAndGroup.");
         }
     }
 
-    private String getProfileMemberQuerySuffix(final String memberType) throws SBonitaSearchException {
+    private String getProfileMemberQuerySuffix(final String memberType) throws SBonitaReadException {
         if (ProfileMemberUtils.USER_TYPE.equals(memberType)) {
             return ProfileMemberUtils.USER_SUFFIX;
         } else if (ProfileMemberUtils.GROUP_TYPE.equals(memberType)) {
@@ -219,7 +219,7 @@ public class ProfileAPIImpl implements ProfileAPI {
         } else if (ProfileMemberUtils.ROLE_AND_GROUP_TYPE.equals(memberType)) {
             return ProfileMemberUtils.ROLE_AND_GROUP_SUFFIX;
         } else {
-            throw new SBonitaSearchException("Member type must be equalse to user,group,role or roleAndGroup.");
+            throw new SBonitaReadException("Member type must be equalse to user,group,role or roleAndGroup.");
         }
     }
 

@@ -208,7 +208,7 @@ public class DocumentHelperTest {
         //when
         documentHelper.deleteDocument("myDoc", PROCESS_INSTANCE_ID);
     }
-
+/*
     @Test
     public void should_createOrUpdate_update_if_found() throws SObjectModificationException, SObjectNotFoundException,  SObjectCreationException, SSessionNotFoundException, SBonitaReadException {
         //given
@@ -230,6 +230,6 @@ public class DocumentHelperTest {
         documentHelper.createOrUpdateDocument(docValue, "myDoc", PROCESS_INSTANCE_ID, AUTHOR_ID);
         //then
         verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(PROCESS_INSTANCE_ID), eq("myDoc"),anyString());
-    }
+    }*/
 
 }

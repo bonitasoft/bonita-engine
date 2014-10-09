@@ -75,7 +75,7 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -338,7 +338,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         } while (!childrenProcessInstanceIds.isEmpty());
     }
 
-    protected void deleteArchivedFlowNodeInstances(final long processInstanceId) throws SFlowNodeReadException, SBonitaSearchException,
+    protected void deleteArchivedFlowNodeInstances(final long processInstanceId) throws SFlowNodeReadException, SBonitaReadException,
             SConnectorInstanceDeletionException, SFlowNodeDeletionException, SDataInstanceException {
         List<SAFlowNodeInstance> activityInstances;
         do {
@@ -358,7 +358,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         } while (!activityInstances.isEmpty());
     }
 
-    private void deleteArchivedFlowNodeInstanceElements(final SAFlowNodeInstance activityInstance) throws SFlowNodeReadException, SBonitaSearchException,
+    private void deleteArchivedFlowNodeInstanceElements(final SAFlowNodeInstance activityInstance) throws SFlowNodeReadException, SBonitaReadException,
             SConnectorInstanceDeletionException, SDataInstanceException {
         if (activityInstance instanceof SAActivityInstance) {
             dataInstanceService.deleteLocalArchivedDataInstances(activityInstance.getSourceObjectId(), DataInstanceContainer.ACTIVITY_INSTANCE.toString());
@@ -676,7 +676,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
-    public SProcessInstance getChildOfActivity(final long activityInstId) throws SProcessInstanceNotFoundException, SBonitaSearchException {
+    public SProcessInstance getChildOfActivity(final long activityInstId) throws SProcessInstanceNotFoundException, SBonitaReadException {
         try {
             final SProcessInstanceBuilderFactory processInstanceBuilderFact = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
             final FilterOption filterOption = new FilterOption(SProcessInstance.class, processInstanceBuilderFact.getCallerIdKey(), activityInstId);
@@ -697,172 +697,128 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
-    public long getNumberOfProcessInstances(final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            return persistenceRead.getNumberOfEntities(SProcessInstance.class, queryOptions, Collections.<String, Object> emptyMap());
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+    public long getNumberOfProcessInstances(final QueryOptions queryOptions) throws SBonitaReadException {
+        return persistenceRead.getNumberOfEntities(SProcessInstance.class, queryOptions, Collections.<String, Object> emptyMap());
     }
 
     @Override
-    public List<SProcessInstance> searchProcessInstances(final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            return persistenceRead.searchEntity(SProcessInstance.class, queryOptions, Collections.<String, Object> emptyMap());
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+    public List<SProcessInstance> searchProcessInstances(final QueryOptions queryOptions) throws SBonitaReadException {
+        return persistenceRead.searchEntity(SProcessInstance.class, queryOptions, Collections.<String, Object> emptyMap());
     }
 
     @Override
-    public long getNumberOfOpenProcessInstancesSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
+    public long getNumberOfOpenProcessInstancesSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
         try {
             final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
             return persistenceRead.getNumberOfEntities(SProcessInstance.class, SUPERVISED_BY, queryOptions, parameters);
         } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
+            throw new SBonitaReadException(e);
         }
     }
 
     @Override
-    public List<SProcessInstance> searchOpenProcessInstancesSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SProcessInstance> searchOpenProcessInstancesSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
         try {
             final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
             return persistenceRead.searchEntity(SProcessInstance.class, SUPERVISED_BY, queryOptions, parameters);
         } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
+            throw new SBonitaReadException(e);
         }
     }
 
     @Override
-    public long getNumberOfOpenProcessInstancesInvolvingUser(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
+    public long getNumberOfOpenProcessInstancesInvolvingUser(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
         try {
             final Map<String, Object> parameters = new HashMap<String, Object>(1);
             parameters.put(USER_ID, userId);
             return persistenceRead.getNumberOfEntities(SProcessInstance.class, INVOLVING_USER, queryOptions, parameters);
         } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
+            throw new SBonitaReadException(e);
         }
     }
 
     @Override
-    public List<SProcessInstance> searchOpenProcessInstancesInvolvingUser(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            final Map<String, Object> parameters = new HashMap<String, Object>(1);
-            parameters.put(USER_ID, userId);
-            return persistenceRead.searchEntity(SProcessInstance.class, INVOLVING_USER, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+    public List<SProcessInstance> searchOpenProcessInstancesInvolvingUser(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
+        final Map<String, Object> parameters = new HashMap<String, Object>(1);
+        parameters.put(USER_ID, userId);
+        return persistenceRead.searchEntity(SProcessInstance.class, INVOLVING_USER, queryOptions, parameters);
     }
 
     @Override
-    public long getNumberOfOpenProcessInstancesInvolvingUsersManagedBy(final long managerUserId, final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            final Map<String, Object> parameters = new HashMap<String, Object>(1);
-            parameters.put(MANAGER_USER_ID, managerUserId);
-            return persistenceRead.getNumberOfEntities(SProcessInstance.class, INVOLVING_USER + "s" + MANAGED_BY, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+    public long getNumberOfOpenProcessInstancesInvolvingUsersManagedBy(final long managerUserId, final QueryOptions queryOptions) throws SBonitaReadException {
+        final Map<String, Object> parameters = new HashMap<String, Object>(1);
+        parameters.put(MANAGER_USER_ID, managerUserId);
+        return persistenceRead.getNumberOfEntities(SProcessInstance.class, INVOLVING_USER + "s" + MANAGED_BY, queryOptions, parameters);
     }
 
     @Override
     public List<SProcessInstance> searchOpenProcessInstancesInvolvingUsersManagedBy(final long managerUserId, final QueryOptions queryOptions)
-            throws SBonitaSearchException {
-        try {
-            final Map<String, Object> parameters = new HashMap<String, Object>(1);
-            parameters.put(MANAGER_USER_ID, managerUserId);
-            return persistenceRead.searchEntity(SProcessInstance.class, INVOLVING_USER + "s" + MANAGED_BY, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+            throws SBonitaReadException {
+        final Map<String, Object> parameters = new HashMap<String, Object>(1);
+        parameters.put(MANAGER_USER_ID, managerUserId);
+        return persistenceRead.searchEntity(SProcessInstance.class, INVOLVING_USER + "s" + MANAGED_BY, queryOptions, parameters);
     }
 
     @Override
-    public long getNumberOfArchivedProcessInstancesWithoutSubProcess(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public long getNumberOfArchivedProcessInstancesWithoutSubProcess(final QueryOptions queryOptions) throws SBonitaReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-        try {
-            return persistenceService.getNumberOfEntities(SAProcessInstance.class, "WithoutSubProcess", queryOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+        return persistenceService.getNumberOfEntities(SAProcessInstance.class, "WithoutSubProcess", queryOptions, null);
     }
 
     @Override
-    public List<SAProcessInstance> searchArchivedProcessInstancesWithoutSubProcess(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SAProcessInstance> searchArchivedProcessInstancesWithoutSubProcess(final QueryOptions queryOptions) throws SBonitaReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-        try {
-            return persistenceService.searchEntity(SAProcessInstance.class, "WithoutSubProcess", queryOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+        return persistenceService.searchEntity(SAProcessInstance.class, "WithoutSubProcess", queryOptions, null);
     }
 
     @Override
-    public List<SAProcessInstance> searchArchivedProcessInstancesSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SAProcessInstance> searchArchivedProcessInstancesSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
-        try {
-            return persistenceService.searchEntity(SAProcessInstance.class, SUPERVISED_BY, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+        return persistenceService.searchEntity(SAProcessInstance.class, SUPERVISED_BY, queryOptions, parameters);
     }
 
     @Override
-    public long getNumberOfArchivedProcessInstancesSupervisedBy(final long userId, final QueryOptions countOptions) throws SBonitaSearchException {
+    public long getNumberOfArchivedProcessInstancesSupervisedBy(final long userId, final QueryOptions countOptions) throws SBonitaReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
-        try {
-            return persistenceService.getNumberOfEntities(SAProcessInstance.class, SUPERVISED_BY, countOptions, parameters);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+        return persistenceService.getNumberOfEntities(SAProcessInstance.class, SUPERVISED_BY, countOptions, parameters);
     }
 
     @Override
-    public long getNumberOfArchivedProcessInstancesInvolvingUser(final long userId, final QueryOptions countOptions) throws SBonitaSearchException {
+    public long getNumberOfArchivedProcessInstancesInvolvingUser(final long userId, final QueryOptions countOptions) throws SBonitaReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             final Map<String, Object> parameters = new HashMap<String, Object>(2);
             parameters.put(USER_ID, userId);
             return persistenceService.getNumberOfEntities(SAProcessInstance.class, INVOLVING_USER, countOptions, parameters);
         } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
+            throw new SBonitaReadException(bre);
         }
     }
 
     @Override
-    public long getNumberOfArchivedProcessInstances(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public long getNumberOfArchivedProcessInstances(final QueryOptions queryOptions) throws SBonitaReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-        try {
-            return persistenceService.getNumberOfEntities(SAProcessInstance.class, queryOptions, null);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+        return persistenceService.getNumberOfEntities(SAProcessInstance.class, queryOptions, null);
     }
 
     @Override
-    public List<SAProcessInstance> searchArchivedProcessInstances(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SAProcessInstance> searchArchivedProcessInstances(final QueryOptions queryOptions) throws SBonitaReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-        try {
-            return persistenceService.searchEntity(SAProcessInstance.class, queryOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+        return persistenceService.searchEntity(SAProcessInstance.class, queryOptions, null);
     }
 
     @Override
     public List<SAProcessInstance> searchArchivedProcessInstancesInvolvingUser(final long userId, final QueryOptions queryOptions)
-            throws SBonitaSearchException {
+            throws SBonitaReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             final Map<String, Object> parameters = new HashMap<String, Object>(1);
             parameters.put(USER_ID, userId);
             return persistenceService.searchEntity(SAProcessInstance.class, INVOLVING_USER, queryOptions, parameters);
         } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
+            throw new SBonitaReadException(e);
         }
     }
 
@@ -950,7 +906,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
-    public SAProcessInstance getLastArchivedProcessInstance(long processInstanceId) throws SBonitaSearchException {
+    public SAProcessInstance getLastArchivedProcessInstance(long processInstanceId) throws SBonitaReadException {
         final SAProcessInstanceBuilderFactory processInstanceBuilderFact = BuilderFactory.get(SAProcessInstanceBuilderFactory.class);
         final FilterOption filterOption = new FilterOption(SAProcessInstance.class, processInstanceBuilderFact.getSourceObjectIdKey(), processInstanceId);
         final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>();

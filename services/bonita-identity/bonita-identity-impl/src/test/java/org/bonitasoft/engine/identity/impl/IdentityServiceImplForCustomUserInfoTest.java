@@ -38,7 +38,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -242,8 +242,8 @@ public class IdentityServiceImplForCustomUserInfoTest {
 
     @Test(
     // then
-    expected = SBonitaSearchException.class)
-    public void searchCustomUserInfoValues_should_throw_exception_SBonitaSearchException_when_persistence_service_throws_SBonitaReadException()
+    expected = SBonitaReadException.class)
+    public void searchCustomUserInfoValues_should_throw_exception_SBonitaReadException_when_persistence_service_throws_SBonitaReadException()
             throws Exception {
         // given
         QueryOptions queryOptions = new QueryOptions(0, 10);
