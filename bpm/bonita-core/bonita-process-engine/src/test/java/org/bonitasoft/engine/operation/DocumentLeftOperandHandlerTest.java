@@ -11,8 +11,8 @@ import java.util.HashMap;
 
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
@@ -91,7 +91,7 @@ public class DocumentLeftOperandHandlerTest {
     @Test
     public void should_update_create_doc_if_not_exists() throws Exception {
         //given
-        doThrow(new SDocumentNotFoundException("myDoc")).when(documentService).getMappedDocument(45l, "myDoc");
+        doThrow(new SObjectNotFoundException("myDoc")).when(documentService).getMappedDocument(45l, "myDoc");
         //when
         handler.update(createLeftOperand("myDoc"), new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 45l, "PROCESS_INSTANCE");
         //then

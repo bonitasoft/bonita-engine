@@ -17,13 +17,8 @@ package org.bonitasoft.engine.operation;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.document.DocumentValue;
-import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
-import org.bonitasoft.engine.core.document.model.SDocument;
-import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilder;
-import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
+import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -44,14 +39,12 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
     private ActivityInstanceService activityInstanceService;
     private SessionAccessor sessionAccessor;
     private SessionService sessionService;
-    private DocumentService documentService;
 
     public AbstractDocumentLeftOperandHandler(ActivityInstanceService activityInstanceService, SessionAccessor sessionAccessor, SessionService sessionService,
             DocumentService documentService) {
         this.activityInstanceService = activityInstanceService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
-        this.documentService = documentService;
     }
 
     protected long getProcessInstanceId(long containerId, String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException {
@@ -65,19 +58,6 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
         return processInstanceId;
     }
 
-    @SuppressWarnings("unchecked")
-    protected List<DocumentValue> toCheckedList(Object newValue) throws SOperationExecutionException {
-        if (!(newValue instanceof List)) {
-            throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
-        }
-        for (Object item : ((List) newValue)) {
-            if (!(item instanceof DocumentValue)) {
-                throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
-            }
-        }
-        return (List<DocumentValue>) newValue;
-    }
-
     protected DocumentValue toCheckedDocumentValue(Object newValue) throws SOperationExecutionException {
         final boolean isDocumentWithContent = newValue instanceof DocumentValue;
         if (!isDocumentWithContent && newValue != null) {
@@ -85,18 +65,6 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
                     + newValue.getClass().getName());
         }
         return (DocumentValue) newValue;
-    }
-
-    protected SDocument createDocumentObject(final DocumentValue documentValue) throws SSessionNotFoundException {
-        final SDocumentBuilder processDocumentBuilder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance();
-        processDocumentBuilder.setFileName(documentValue.getFileName());
-        processDocumentBuilder.setMimeType(documentValue.getMimeType());
-        processDocumentBuilder.setAuthor(getAuthorId());
-        processDocumentBuilder.setCreationDate(System.currentTimeMillis());
-        processDocumentBuilder.setHasContent(documentValue.hasContent());
-        processDocumentBuilder.setURL(documentValue.getUrl());
-        processDocumentBuilder.setContent(documentValue.getContent());
-        return processDocumentBuilder.done();
     }
 
     protected long getAuthorId() throws SSessionNotFoundException {
@@ -110,11 +78,4 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
         return authorId;
     }
 
-    protected void deleteDocument(String documentName, long processInstanceId) throws SObjectModificationException {
-        try {
-            documentService.removeCurrentVersion(processInstanceId, documentName);
-        } catch (final SDocumentNotFoundException e) {
-            // nothing to do
-        }
-    }
 }

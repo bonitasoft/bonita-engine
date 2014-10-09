@@ -14,16 +14,10 @@
  */
 package org.bonitasoft.engine.core.document.api;
 
-import java.util.List;
-
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
+import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
-import org.bonitasoft.engine.core.document.exception.SDocumentCreationException;
-import org.bonitasoft.engine.core.document.exception.SDocumentDeletionException;
-import org.bonitasoft.engine.core.document.exception.SDocumentException;
-import org.bonitasoft.engine.core.document.exception.SDocumentMappingDeletionException;
-import org.bonitasoft.engine.core.document.exception.SDocumentMappingException;
-import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 import org.bonitasoft.engine.core.document.model.SLightDocument;
@@ -34,6 +28,8 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.recorder.SRecorderException;
+
+import java.util.List;
 
 /**
  * @author Nicolas Chabanoles
@@ -55,10 +51,10 @@ public interface DocumentService {
      * @param name
      * @param description
      * @return The document image from database
-     * @throws org.bonitasoft.engine.core.document.exception.SDocumentCreationException when the storage has failed
+     * @throws SObjectCreationException when the storage has failed
      */
     SMappedDocument attachDocumentToProcessInstance(SDocument document, long processInstanceId, String name, String description)
-            throws SDocumentCreationException;
+            throws SObjectCreationException;
 
     /**
      * Save a document
@@ -69,10 +65,10 @@ public interface DocumentService {
      * @param description
      * @param index             the index in the list of document
      * @return The document image from database
-     * @throws org.bonitasoft.engine.core.document.exception.SDocumentCreationException when the storage has failed
+     * @throws SObjectCreationException when the storage has failed
      */
     SMappedDocument attachDocumentToProcessInstance(SDocument document, long processInstanceId, String name, String description, int index)
-            throws SDocumentCreationException, SObjectAlreadyExistsException;
+            throws SObjectCreationException, SObjectAlreadyExistsException;
 
     /**
      * Remove this document.
@@ -82,10 +78,10 @@ public interface DocumentService {
      * </p>
      *
      * @param document the document mapping to remove
-     * @throws SDocumentNotFoundException
+     * @throws SObjectNotFoundException
      * @throws SObjectModificationException
      */
-    void removeCurrentVersion(SMappedDocument document) throws SDocumentNotFoundException, SObjectModificationException;
+    void removeCurrentVersion(SMappedDocument document) throws SObjectNotFoundException, SObjectModificationException;
 
     /**
      * Remove the document with the specified process instance and name
@@ -96,37 +92,37 @@ public interface DocumentService {
      *
      * @param processInstanceId id of the process having the document
      * @param documentName      name of the document
-     * @throws SDocumentNotFoundException
+     * @throws SObjectNotFoundException
      * @throws SObjectModificationException
      */
-    void removeCurrentVersion(long processInstanceId, String documentName) throws SDocumentNotFoundException, SObjectModificationException;
+    void removeCurrentVersion(long processInstanceId, String documentName) throws SObjectNotFoundException, SObjectModificationException;
 
     /**
      * Get document content by document id
      *
      * @param documentId identifier of the document
      * @return document content
-     * @throws SDocumentNotFoundException
+     * @throws SObjectNotFoundException
      */
-    byte[] getDocumentContent(String documentId) throws SDocumentNotFoundException;
+    byte[] getDocumentContent(String documentId) throws SObjectNotFoundException;
 
     /**
      * Get document with mapping by its mapping id
      *
      * @param mappingId identifier of the mapping of the document
      * @return an SDocumentMapping object with id corresponding to the parameter
-     * @throws SDocumentNotFoundException
+     * @throws SObjectNotFoundException
      */
-    SMappedDocument getMappedDocument(long mappingId) throws SDocumentNotFoundException, SBonitaReadException;
+    SMappedDocument getMappedDocument(long mappingId) throws SObjectNotFoundException, SBonitaReadException;
 
     /**
      * Get document by its id
      *
      * @param documentId identifier of document
      * @return an SDocumentMapping object with id corresponding to the parameter
-     * @throws SDocumentNotFoundException
+     * @throws SObjectNotFoundException
      */
-    SLightDocument getDocument(long documentId) throws SDocumentNotFoundException, SBonitaReadException;
+    SLightDocument getDocument(long documentId) throws SObjectNotFoundException, SBonitaReadException;
 
     /**
      * Get document with mapping by its name in the specific process instance
@@ -134,9 +130,9 @@ public interface DocumentService {
      * @param processInstanceId identifier of process instance
      * @param documentName      name of process document
      * @return the corresponding SDocumentMapping object
-     * @throws SDocumentNotFoundException
+     * @throws SObjectNotFoundException
      */
-    SMappedDocument getMappedDocument(long processInstanceId, String documentName) throws SDocumentNotFoundException, SBonitaReadException;
+    SMappedDocument getMappedDocument(long processInstanceId, String documentName) throws SObjectNotFoundException, SBonitaReadException;
 
     /**
      * Get a list of documents for specific process instance, this can be used for pagination
@@ -147,19 +143,18 @@ public interface DocumentService {
      * @param order
      * @param field
      * @return a list of SDocumentMapping objects
-     * @throws SDocumentException
      */
     List<SMappedDocument> getDocumentsOfProcessInstance(long processInstanceId, int fromIndex, int numberPerPage, String field, OrderByType order)
-            throws SDocumentException;
+            throws SBonitaReadException;
 
     /**
      * Get total number of documents in the specific process instance
      *
      * @param processInstanceId identifier of process instance
      * @return number of documents in the process instance
-     * @throws SDocumentException
+     * @throws org.bonitasoft.engine.persistence.SBonitaReadException
      */
-    long getNumberOfDocumentsOfProcessInstance(long processInstanceId) throws SDocumentException;
+    long getNumberOfDocumentsOfProcessInstance(long processInstanceId) throws SBonitaReadException;
 
     /**
      * Get name specified document archived in a certain time in the process instance
@@ -168,9 +163,9 @@ public interface DocumentService {
      * @param documentName      name of document
      * @param time              the archived time of document
      * @return an SDocumentMapping object archived in the specific time or not archived
-     * @throws SDocumentNotFoundException
+     * @throws SObjectNotFoundException
      */
-    SMappedDocument getMappedDocument(long processInstanceId, String documentName, long time) throws SDocumentNotFoundException, SBonitaReadException;
+    SMappedDocument getMappedDocument(long processInstanceId, String documentName, long time) throws SObjectNotFoundException, SBonitaReadException;
 
     /**
      * Get total number of document according to the query criteria
@@ -219,7 +214,7 @@ public interface DocumentService {
      */
     long getNumberOfArchivedDocuments(QueryOptions queryOptions) throws SBonitaSearchException;
 
-    void removeDocument(SMappedDocument mappedDocument) throws SDocumentDeletionException;
+    void removeDocument(SMappedDocument mappedDocument) throws SObjectModificationException;
 
     /**
      * Search all archived documents according to the query criteria.
@@ -255,9 +250,9 @@ public interface DocumentService {
      *
      * @param documentId identifier of process document
      * @return the archive of the corresponding document
-     * @throws SDocumentNotFoundException when the document does not exist
+     * @throws SObjectNotFoundException when the document does not exist
      */
-    SAMappedDocument getArchivedVersionOfProcessDocument(long documentId) throws SDocumentNotFoundException;
+    SAMappedDocument getArchivedVersionOfProcessDocument(long documentId) throws SObjectNotFoundException;
 
     String generateDocumentURL(String name, String contentStorageId);
 
@@ -266,59 +261,58 @@ public interface DocumentService {
      *
      * @param archivedProcessDocumentId the id of the archived document
      * @return the corresponding archive
-     * @throws SDocumentNotFoundException when the archive does not exist
+     * @throws SObjectNotFoundException when the archive does not exist
      */
-    SAMappedDocument getArchivedDocument(long archivedProcessDocumentId) throws SDocumentNotFoundException;
+    SAMappedDocument getArchivedDocument(long archivedProcessDocumentId) throws SObjectNotFoundException;
 
-    void deleteDocument(SLightDocument document) throws SDocumentDeletionException;
+    void deleteDocument(SLightDocument document) throws SObjectModificationException;
 
 
     /**
      * Delete documents from a specified process instance
      *
      * @param processInstanceId
-     * @throws SDocumentException
-     * @throws SDocumentDeletionException
+     * @throws org.bonitasoft.engine.commons.exceptions.SObjectModificationException
+     * @throws SBonitaReadException
      * @since 6.1
      */
-    void deleteDocumentsFromProcessInstance(final Long processInstanceId) throws SDocumentException, SDocumentDeletionException, SBonitaReadException;
+    void deleteDocumentsFromProcessInstance(final Long processInstanceId) throws SBonitaReadException, SObjectModificationException;
 
     /**
      * @param instanceId
-     * @throws SDocumentMappingDeletionException
+     * @throws SObjectModificationException
      * @since 6.0
      */
-    void deleteArchivedDocuments(long instanceId) throws SDocumentMappingDeletionException;
+    void deleteArchivedDocuments(long instanceId) throws SObjectModificationException;
 
     /**
      * archive the specific document mapping in the archive date
      *
      * @param documentMapping document mapping will be archived
      * @param archiveDate     the archive time
-     * @throws org.bonitasoft.engine.core.document.exception.SDocumentMappingException
+     * @throws org.bonitasoft.engine.commons.exceptions.SObjectModificationException
      * @since 6.4.0
      */
-    void archive(SDocumentMapping documentMapping, long archiveDate) throws SDocumentMappingException;
+    void archive(SDocumentMapping documentMapping, long archiveDate) throws SObjectModificationException;
 
     /**
      * @param mappedDocument the document to update
      * @param document       the new content
      * @param index          the new index
-     * @throws SDocumentMappingException
-     * @throws SRecorderException
+     * @throws org.bonitasoft.engine.commons.exceptions.SObjectModificationException
      * @since 6.4.0
      */
-    void updateDocumentOfList(final SMappedDocument mappedDocument, final SDocument document, int index) throws SDocumentMappingException, SRecorderException;
+    void updateDocumentOfList(final SMappedDocument mappedDocument, final SDocument document, int index) throws SObjectModificationException;
 
     /**
      * update the index of a document inside the list
      *
      * @param mappedDocument the document to update
      * @param index          the new index
-     * @throws SRecorderException
+     * @throws org.bonitasoft.engine.commons.exceptions.SObjectModificationException
      * @since 6.4.0
      */
-    void updateDocumentIndex(final SMappedDocument mappedDocument, int index) throws SRecorderException;
+    void updateDocumentIndex(final SMappedDocument mappedDocument, int index) throws SObjectModificationException;
 
     /**
      * Get a list of document. if there is no document in the list returns an empty list
@@ -337,9 +331,9 @@ public interface DocumentService {
      * @param sDocument        the value to set th emapping with
      * @return the updated document mapping
      * @throws SRecorderException
-     * @throws SDocumentMappingException
+     * @throws org.bonitasoft.engine.commons.exceptions.SObjectModificationException
      */
-    SMappedDocument updateDocument(SDocumentMapping documentToUpdate, SDocument sDocument) throws SRecorderException, SDocumentMappingException;
+    SMappedDocument updateDocument(SDocumentMapping documentToUpdate, SDocument sDocument) throws SObjectModificationException;
 
     /**
      * Get a list of document at a given time. if there is no document in the list returns an empty list.
@@ -363,16 +357,15 @@ public interface DocumentService {
      * </p>
      *
      * @param documentId the id of the archived document to remove content on
-     * @throws SDocumentNotFoundException
+     * @throws SObjectNotFoundException
      * @since 6.4.0
      */
-    void deleteContentOfArchivedDocument(long documentId) throws SDocumentNotFoundException, SBonitaReadException, SRecorderException;
+    void deleteContentOfArchivedDocument(long documentId) throws SObjectNotFoundException, SBonitaReadException, SRecorderException;
 
     /**
      * update the document having the documentId with this new version
-     *
-     * @param documentId the id of the document to update
+     *  @param documentId the id of the document to update
      * @param sDocument  the new version of the document @return
      */
-    SMappedDocument updateDocument(long documentId, SDocument sDocument) throws SBonitaReadException, SDocumentNotFoundException, SDocumentMappingException, SRecorderException;
+    SMappedDocument updateDocument(long documentId, SDocument sDocument) throws SObjectNotFoundException, SObjectModificationException, SBonitaReadException;
 }

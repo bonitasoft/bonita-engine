@@ -13,18 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.impl;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.archive.SDefinitiveArchiveNotFound;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -34,6 +24,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceDeletionException;
 import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadException;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -41,7 +32,6 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
@@ -94,6 +84,15 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -653,14 +652,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             archiveService.recordInsert(System.currentTimeMillis(), insertRecord);
         } catch (final SRecorderException e) {
             throw new SProcessInstanceModificationException(e);
-        } catch (final SDefinitiveArchiveNotFound e) {
-            e.setProcessInstanceIdOnContext(processInstance.getId());
-            e.setRootProcessInstanceIdOnContext(processInstance.getRootProcessInstanceId());
-            e.setProcessDefinitionIdOnContext(processInstance.getProcessDefinitionId());
-            e.setProcessDefinitionNameOnContext(processInstance.getName());
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.ERROR)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "The process instance was not archived.", e);
-            }
         }
     }
 

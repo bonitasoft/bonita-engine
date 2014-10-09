@@ -18,6 +18,7 @@ package org.bonitasoft.engine.operation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +28,7 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -80,6 +82,9 @@ public class DocumentListLeftOperandHandlerTest {
     private SProcessDefinition processDefinition;
     @Mock
     private SFlowElementContainerDefinition flowElementContainerDefinition;
+    @Mock
+    private DocumentHelper documentHelper;
+
 
     @InjectMocks
     private DocumentListLeftOperandHandler handler;
@@ -103,81 +108,29 @@ public class DocumentListLeftOperandHandlerTest {
     }
 
     @Test
-    public void should_update_check_it_is_a_documentValue_list() throws Exception {
+    public void should_toCheckedList_check_null() throws Exception {
         exception.expect(SOperationExecutionException.class);
         exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
-        handler.update(createLeftOperand("myDoc"), Arrays.asList(new DocumentValue("theUrl"), new Object()), 45l, "container");
-
+        handler.toCheckedList(null);
     }
-
     @Test
-    public void should_isDefinedInDefinition_return_false_id_not_in_def() throws Exception {
-        //given
-        initDefinition("list1", "list2");
-        //when then
-        assertThat(DocumentListLeftOperandHandler.isListDefinedInDefinition("theList", 45l, processDefinitionService, processInstanceService)).isFalse();
+    public void should_toCheckedList_check_not_list() throws Exception {
+        exception.expect(SOperationExecutionException.class);
+        exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
+        handler.toCheckedList(new Object());
     }
-
     @Test
-    public void should_isDefinedInDefinition_throw_not_found_when_not_existing_instance() throws Exception {
-        //given
-        initDefinition("list1", "list2");
-        doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService).getProcessInstance(45l);
-        exception.expect(SObjectNotFoundException.class);
-        exception.expectMessage("Unable to find the list theList, nothing in database and the process instance 45 is not found");
-        //when
-        DocumentListLeftOperandHandler.isListDefinedInDefinition("theList", 45l, processDefinitionService, processInstanceService);
-        //then exception
+    public void should_toCheckedList_check_not_all_doc() throws Exception {
+        exception.expect(SOperationExecutionException.class);
+        exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
+        handler.toCheckedList(Arrays.asList(new DocumentValue("theUrl"), new Object()));
     }
-
     @Test
-    public void should_isDefinedInDefinition_throw_not_found_when_not_existing_definition() throws Exception {
-        initDefinition("list1", "list2");
-        doThrow(SProcessDefinitionNotFoundException.class).when(processDefinitionService).getProcessDefinition(154l);
-        exception.expect(SObjectNotFoundException.class);
-        exception.expectMessage("Unable to find the list theList on process instance 45, nothing in database and the process definition is not found");
-        //when
-        DocumentListLeftOperandHandler.isListDefinedInDefinition("theList", 45l, processDefinitionService, processInstanceService);
+    public void should_toCheckedList_returns_the_list_if_ok() throws Exception {
+        List<DocumentValue> inputList = Arrays.asList(new DocumentValue("theUrl"));
+        List<DocumentValue> result = handler.toCheckedList(inputList);
+        assertThat(result).isEqualTo(inputList);
     }
 
-    @Test
-    public void should_isDefinedInDefinition_throw_read_ex_when_not_existing_instance() throws Exception {
-        initDefinition("list1", "list2");
-        doThrow(SProcessInstanceReadException.class).when(processInstanceService).getProcessInstance(45l);
-        exception.expect(SBonitaReadException.class);
-        DocumentListLeftOperandHandler.isListDefinedInDefinition("theList", 45l, processDefinitionService, processInstanceService);
-    }
 
-    @Test
-    public void should_isDefinedInDefinition_throw_read_ex_when_not_existing_definition() throws Exception {
-        initDefinition("list1", "list2");
-        doThrow(SProcessDefinitionReadException.class).when(processDefinitionService).getProcessDefinition(154l);
-        exception.expect(SBonitaReadException.class);
-        DocumentListLeftOperandHandler.isListDefinedInDefinition("theList", 45, processDefinitionService, processInstanceService);
-    }
-
-    @Test
-    public void should_isDefinedInDefinition_return_true_if_in_def() throws Exception {
-        //given
-        initDefinition("list1", "list2", "theList");
-        //when then
-        assertThat(DocumentListLeftOperandHandler.isListDefinedInDefinition("theList", 45l, processDefinitionService, processInstanceService)).isTrue();
-    }
-
-    private void initDefinition(String... names) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SProcessDefinitionNotFoundException,
-            SProcessDefinitionReadException {
-        doReturn(processInstance).when(processInstanceService).getProcessInstance(45l);
-        doReturn(154l).when(processInstance).getProcessDefinitionId();
-        doReturn(processDefinition).when(processDefinitionService).getProcessDefinition(154l);
-        doReturn(flowElementContainerDefinition).when(processDefinition).getProcessContainer();
-        doReturn(createListOfDocumentListDefinition(names)).when(flowElementContainerDefinition).getDocumentListDefinitions();
-    }
-
-    private List<SDocumentListDefinition> createListOfDocumentListDefinition(String... names) {
-        List<SDocumentListDefinition> list = new ArrayList<SDocumentListDefinition>();
-        for (String name : names) {
-            list.add(new SDocumentListDefinitionImpl(name));
-        }
-        return list;
-    }
 }

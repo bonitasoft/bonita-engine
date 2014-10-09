@@ -20,13 +20,13 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
@@ -92,7 +92,7 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
                 document = documentService.getMappedDocument(processInstanceId, expression.getContent());
             }
             return ModelConvertor.toDocument(document, documentService);
-        } catch (final SDocumentNotFoundException e) {
+        } catch (final SObjectNotFoundException e) {
             return null;
         }
     }

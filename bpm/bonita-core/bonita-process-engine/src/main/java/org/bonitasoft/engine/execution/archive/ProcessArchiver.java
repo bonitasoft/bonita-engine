@@ -13,18 +13,13 @@
  **/
 package org.bonitasoft.engine.execution.archive;
 
-import java.text.MessageFormat;
-import java.util.List;
-
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.archive.SDefinitiveArchiveNotFound;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.exception.SDocumentException;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
@@ -34,8 +29,6 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.document.exception.SDocumentMappingException;
-import org.bonitasoft.engine.core.document.exception.SPageOutOfRangeException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -52,7 +45,8 @@ import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.*;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SACallActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAGatewayInstanceBuilderFactory;
@@ -73,6 +67,9 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
+
+import java.text.MessageFormat;
+import java.util.List;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -165,11 +162,6 @@ public class ProcessArchiver {
         } catch (final SRecorderException e) {
             setExceptionContext(processDefinition, processInstance, e);
             throw new SArchivingException("Unable to archive the process instance.", e);
-        } catch (final SDefinitiveArchiveNotFound e) {
-            setExceptionContext(processDefinition, processInstance, e);
-            if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
-                logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "The process instance was not archived.", e);
-            }
         }
     }
 
@@ -183,9 +175,6 @@ public class ProcessArchiver {
                     documentService.archive(mappedDocument, archiveDate);
                 }
             } while (mappedDocuments.size() == BATCH_SIZE);
-        } catch (final SPageOutOfRangeException e) {
-            setExceptionContext(processDefinition, processInstance, e);
-            throw new SArchivingException("Unable to archive the process instance.", e);
         } catch (final SBonitaException e) {
             setExceptionContext(processDefinition, processInstance, e);
             throw new SArchivingException("Unable to archive the process instance.", e);
@@ -225,11 +214,6 @@ public class ProcessArchiver {
             } catch (final SRecorderException e) {
                 setExceptionContext(processDefinition, processInstance, e);
                 throw new SArchivingException("Unable to archive the process instance comments.", e);
-            } catch (final SDefinitiveArchiveNotFound e) {
-                setExceptionContext(processDefinition, processInstance, e);
-                if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
-                    logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "The process instance was not archived.", e);
-                }
             }
         }
     }

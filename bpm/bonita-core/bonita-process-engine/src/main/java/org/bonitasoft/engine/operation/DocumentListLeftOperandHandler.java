@@ -15,18 +15,13 @@
 package org.bonitasoft.engine.operation;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
-import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.exception.SDocumentCreationException;
-import org.bonitasoft.engine.core.document.exception.SDocumentMappingException;
-import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
+import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
@@ -43,8 +38,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.recorder.SRecorderException;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
@@ -56,17 +49,21 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandHandler {
 
+    public final DocumentHelper documentHelper;
     DocumentService documentService;
-    private ProcessDefinitionService processDefinitionService;
-    private ProcessInstanceService processInstanceService;
 
     public DocumentListLeftOperandHandler(final DocumentService documentService, final ActivityInstanceService activityInstanceService,
             final SessionAccessor sessionAccessor, final SessionService sessionService, ProcessDefinitionService processDefinitionService,
             ProcessInstanceService processInstanceService) {
         super(activityInstanceService, sessionAccessor, sessionService, documentService);
         this.documentService = documentService;
-        this.processDefinitionService = processDefinitionService;
-        this.processInstanceService = processInstanceService;
+        documentHelper = new DocumentHelper(documentService,processDefinitionService,processInstanceService);
+    }
+
+    public DocumentListLeftOperandHandler(ActivityInstanceService activityInstanceService, SessionAccessor sessionAccessor, SessionService sessionService, DocumentService documentService, DocumentHelper documentHelper, DocumentService documentService1) {
+        super(activityInstanceService, sessionAccessor, sessionService, documentService);
+        this.documentHelper = documentHelper;
+        this.documentService = documentService;
     }
 
     @Override
@@ -74,112 +71,30 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
             throws SOperationExecutionException {
         List<DocumentValue> documentList = toCheckedList(newValue);
         final String documentName = sLeftOperand.getName();
-
         try {
             long processInstanceId = getProcessInstanceId(containerId, containerType);
-            setDocumentList(documentList, documentName, processInstanceId);
-
+            documentHelper.setDocumentList(documentList, documentName, processInstanceId, getAuthorId());
             return documentList;
-        } catch (final SOperationExecutionException e) {
-            throw e;
         } catch (final SBonitaException e) {
-            throw new SOperationExecutionException(e);
+            throw new SOperationExecutionException(e.getMessage(),e);
         }
 
     }
 
-    public void setDocumentList(List<DocumentValue> documentList, String documentName, long processInstanceId) throws SBonitaReadException,
-            SObjectNotFoundException, SOperationExecutionException, SDocumentCreationException, SSessionNotFoundException, SDocumentNotFoundException,
-            SObjectModificationException, SObjectAlreadyExistsException, SRecorderException, SDocumentMappingException {
-        // get the list having the name
-        List<SMappedDocument> currentList = getExistingDocumentList(documentName, processInstanceId);
-        // iterate on elements
-        int index;
-        for (index = 0; index < documentList.size(); index++) {
-            processDocumentOnIndex(documentList, documentName, processInstanceId, currentList, index);
+
+    @SuppressWarnings("unchecked")
+    public List<DocumentValue> toCheckedList(Object newValue) throws SOperationExecutionException {
+        if (!(newValue instanceof List)) {
+            throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
         }
-
-        // when no more elements in documentList remove elements above
-        removeOthersDocuments(currentList);
-    }
-
-    private List<SMappedDocument> getExistingDocumentList(String documentName, long processInstanceId) throws SBonitaReadException, SObjectNotFoundException,
-            SOperationExecutionException {
-        List<SMappedDocument> currentList;
-        currentList = getAllDocumentOfTheList(processInstanceId, documentName, documentService);
-        // if it's not a list it throws an exception
-        if (currentList.isEmpty() && !isListDefinedInDefinition(documentName, processInstanceId, processDefinitionService, processInstanceService)) {
-            //            try {
-            //                documentService.getMappedDocument(processInstanceId,documentName);
-            //            } catch (SDocumentNotFoundException e) {
-            //                throw new SOperationExecutionException("Unable to find the list " + documentName + " on process instance " + processInstanceId
-            //                        + ", nothing in database and nothing declared in the definition");
-            //            }
-            throw new SOperationExecutionException("Unable to find the list " + documentName + " on process instance " + processInstanceId
-                    + ", nothing in database and nothing declared in the definition");
-        }
-        return currentList;
-    }
-
-    public static List<SMappedDocument> getAllDocumentOfTheList(long processInstanceId, String name, DocumentService documentService) throws SBonitaReadException {
-        QueryOptions queryOptions = new QueryOptions(0, 100);
-        List<SMappedDocument> mappedDocuments;
-        List<SMappedDocument> result = new ArrayList<SMappedDocument>();
-        do {
-            mappedDocuments = documentService.getDocumentList(name, processInstanceId, queryOptions.getFromIndex(), queryOptions.getNumberOfResults());
-            result.addAll(mappedDocuments);
-            queryOptions = QueryOptions.getNextPage(queryOptions);
-        } while (mappedDocuments.size() == 100);
-        return result;
-    }
-
-    private void removeOthersDocuments(List<SMappedDocument> currentList) throws SDocumentNotFoundException, SObjectModificationException {
-        for (SMappedDocument mappedDocument : currentList) {
-            documentService.removeCurrentVersion(mappedDocument);
-        }
-
-    }
-
-    private void processDocumentOnIndex(List<DocumentValue> documentList, String documentName, long processInstanceId, List<SMappedDocument> currentList,
-            int index) throws SDocumentCreationException, SSessionNotFoundException, SOperationExecutionException, SObjectAlreadyExistsException, SRecorderException, SDocumentMappingException {
-        DocumentValue documentValue = documentList.get(index);
-
-        if (documentValue.getDocumentId() != null) {
-            // if hasChanged update
-            SMappedDocument documentToUpdate = getDocumentHavingDocumentIdAndRemoveFromList(currentList, documentValue.getDocumentId(), documentName,
-                    processInstanceId);
-            updateExistingDocument(documentToUpdate, index, documentValue);
-        } else {
-            // create new element
-            documentService.attachDocumentToProcessInstance(createDocumentObject(documentValue), processInstanceId, documentName, null, index);
-        }
-    }
-
-    private void updateExistingDocument(SMappedDocument documentToUpdate, int index, DocumentValue documentValue) throws SDocumentCreationException,
-            SSessionNotFoundException, SOperationExecutionException, SRecorderException, SDocumentMappingException {
-        if (documentValue.hasChanged()) {
-            documentService.updateDocumentOfList(documentToUpdate, createDocumentObject(documentValue), index);
-        } else {
-            //  update the index if needed
-            if (documentToUpdate.getIndex() != index) {
-                documentService.updateDocumentIndex(documentToUpdate, index);
+        for (Object item : ((List) newValue)) {
+            if (!(item instanceof DocumentValue)) {
+                throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
             }
         }
+        return (List<DocumentValue>) newValue;
     }
 
-    private SMappedDocument getDocumentHavingDocumentIdAndRemoveFromList(List<SMappedDocument> currentList, Long documentId, String documentName,
-            Long processInstanceId) throws SOperationExecutionException {
-        Iterator<SMappedDocument> iterator = currentList.iterator();
-        while (iterator.hasNext()) {
-            SMappedDocument next = iterator.next();
-            if (next.getId() == documentId) {
-                iterator.remove();
-                return next;
-            }
-        }
-        throw new SOperationExecutionException("The document with id " + documentId + " was not in the list " + documentName + " of process instance "
-                + processInstanceId);
-    }
 
     @Override
     public String getType() {
@@ -199,31 +114,6 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     @Override
     public boolean supportBatchUpdate() {
         return true;
-    }
-
-    public static boolean isListDefinedInDefinition(String documentName, long processInstanceId, ProcessDefinitionService processDefinitionService,
-            ProcessInstanceService processInstanceService) throws SObjectNotFoundException, SBonitaReadException {
-        try {
-            SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
-            SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
-            List<SDocumentListDefinition> documentDefinitions = processDefinition.getProcessContainer().getDocumentListDefinitions();
-            for (SDocumentListDefinition documentDefinition : documentDefinitions) {
-                if (documentName.equals(documentDefinition.getName())) {
-                    return true;
-                }
-            }
-        } catch (SProcessInstanceNotFoundException e) {
-            throw new SObjectNotFoundException("Unable to find the list " + documentName + ", nothing in database and the process instance "
-                    + processInstanceId + " is not found", e);
-        } catch (SProcessInstanceReadException e) {
-            throw new SBonitaReadException(e);
-        } catch (SProcessDefinitionNotFoundException e) {
-            throw new SObjectNotFoundException("Unable to find the list " + documentName + " on process instance " + processInstanceId
-                    + ", nothing in database and the process definition is not found", e);
-        } catch (SProcessDefinitionReadException e) {
-            throw new SBonitaReadException(e);
-        }
-        return false;
     }
 
 }
