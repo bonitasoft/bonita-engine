@@ -32,7 +32,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplication;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SearchApplicationsTest {

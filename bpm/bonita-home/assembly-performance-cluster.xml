@@ -10,6 +10,10 @@
 	<fileSets>
 		<fileSet>
 			<outputDirectory>home</outputDirectory>
+			<directory>editions/performance</directory>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>home</outputDirectory>
 			<directory>editions/performance-cluster</directory>
 		</fileSet>
 		<fileSet>

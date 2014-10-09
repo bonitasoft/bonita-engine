@@ -13,8 +13,8 @@
  **/
 package com.bonitasoft.engine.test.persistence.builder;
 
-import com.bonitasoft.engine.business.application.SApplicationState;
-import com.bonitasoft.engine.business.application.impl.SApplicationImpl;
+import com.bonitasoft.engine.business.application.model.SApplicationState;
+import com.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
 
 
 /**
