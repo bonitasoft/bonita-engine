@@ -11,12 +11,13 @@ package com.bonitasoft.engine.business.application;
 import java.util.Date;
 
 import org.bonitasoft.engine.bpm.BaseElement;
+import org.bonitasoft.engine.profile.Profile;
 
 /**
  * Contains the meta information of a Bonita Living Application.
  *
  * @author Elias Ricken de Medeiros
- * @since 6.4
+ * @since 6.4.0
  */
 public interface Application extends BaseElement {
 
@@ -103,5 +104,12 @@ public interface Application extends BaseElement {
      * @return the identifier of the {@link ApplicationPage} defined as home page for this application
      */
     long getHomePageId();
+
+    /**
+     * Retrieves the identifier of the associated {@link Profile} or null if there is no profile is associated to this application.
+     *
+     * @return the identifier of the associated {@link Profile} or null if there is no profile is associated to this application.
+     */
+    Long getProfileId();
 
 }

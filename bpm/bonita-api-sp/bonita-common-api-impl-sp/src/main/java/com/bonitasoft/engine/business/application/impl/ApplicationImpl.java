@@ -32,6 +32,7 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
     private String state;
     private long homePageId;
     private String displayName;
+    private Long profileId;
 
     public ApplicationImpl(final String name, final String version, final String path, final String description) {
         super(name, description);
@@ -122,15 +123,26 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
     }
 
     @Override
+    public Long getProfileId() {
+        return profileId;
+    }
+
+    public void setProfileId(final Long profileId) {
+        this.profileId = profileId;
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + (int) (createdBy ^ createdBy >>> 32);
         result = prime * result + (creationDate == null ? 0 : creationDate.hashCode());
+        result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + (int) (homePageId ^ homePageId >>> 32);
         result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
         result = prime * result + (lastUpdateDate == null ? 0 : lastUpdateDate.hashCode());
         result = prime * result + (path == null ? 0 : path.hashCode());
+        result = prime * result + (profileId == null ? 0 : profileId.hashCode());
         result = prime * result + (state == null ? 0 : state.hashCode());
         result = prime * result + (int) (updatedBy ^ updatedBy >>> 32);
         result = prime * result + (version == null ? 0 : version.hashCode());
@@ -159,6 +171,13 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
         } else if (!creationDate.equals(other.creationDate)) {
             return false;
         }
+        if (displayName == null) {
+            if (other.displayName != null) {
+                return false;
+            }
+        } else if (!displayName.equals(other.displayName)) {
+            return false;
+        }
         if (homePageId != other.homePageId) {
             return false;
         }
@@ -181,6 +200,13 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
                 return false;
             }
         } else if (!path.equals(other.path)) {
+            return false;
+        }
+        if (profileId == null) {
+            if (other.profileId != null) {
+                return false;
+            }
+        } else if (!profileId.equals(other.profileId)) {
             return false;
         }
         if (state == null) {
