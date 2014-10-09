@@ -19,8 +19,8 @@ import org.bonitasoft.engine.search.descriptor.FieldDescriptor;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
 import com.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor;
-import com.bonitasoft.engine.business.application.SApplicationPage;
-import com.bonitasoft.engine.business.application.SApplicationPageBuilderFactory;
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilderFactory;
 
 /**
  * @author Elias Ricken de Medeiros
