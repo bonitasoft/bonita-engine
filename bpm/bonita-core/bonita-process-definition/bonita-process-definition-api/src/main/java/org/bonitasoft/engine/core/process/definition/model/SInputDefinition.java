@@ -20,4 +20,6 @@ public interface SInputDefinition extends SNamedElement {
 
     String getDescription();
 
+    boolean isMultiple();
+
 }

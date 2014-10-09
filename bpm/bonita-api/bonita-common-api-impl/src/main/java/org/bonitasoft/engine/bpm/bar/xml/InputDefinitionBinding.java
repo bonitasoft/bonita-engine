@@ -15,35 +15,18 @@ package org.bonitasoft.engine.bpm.bar.xml;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
-
 /**
  * @author Matthieu Chaffotte
  */
-public class ComplexInputDefinitionBinding extends InputDefinitionBinding {
+public abstract class InputDefinitionBinding extends NamedElementBinding {
+
+    protected boolean multiple;
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
+        multiple = Boolean.parseBoolean(attributes.get(XMLProcessDefinition.MULTIPLE));
     }
 
-    @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
-    }
-
-    @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
-    }
-
-    @Override
-    public Object getObject() {
-        return new ComplexInputDefinitionImpl(name, description, multiple);
-    }
-
-    @Override
-    public String getElementTag() {
-        return XMLProcessDefinition.CONTRACT_COMPLEX_INPUT_NODE;
-    }
 
 }

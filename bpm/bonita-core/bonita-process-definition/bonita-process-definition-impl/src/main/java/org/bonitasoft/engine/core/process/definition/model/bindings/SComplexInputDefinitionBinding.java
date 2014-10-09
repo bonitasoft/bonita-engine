@@ -25,7 +25,7 @@ import org.bonitasoft.engine.xml.SXMLParseException;
 /**
  * @author Laurent Leseigneur
  */
-public class SComplexInputDefinitionBinding extends SNamedElementBinding {
+public class SComplexInputDefinitionBinding extends SInputDefinitionBinding {
 
     List<SSimpleInputDefinition> simpleInputDefinitions = new ArrayList<SSimpleInputDefinition>();
     List<SComplexInputDefinition> complexInputDefinitions = new ArrayList<SComplexInputDefinition>();
@@ -46,11 +46,7 @@ public class SComplexInputDefinitionBinding extends SNamedElementBinding {
 
     @Override
     public Object getObject() {
-        final SComplexInputDefinitionImpl input = new SComplexInputDefinitionImpl(name);
-        input.setDescription(description);
-        input.getSimpleInputDefinitions().addAll(simpleInputDefinitions);
-        input.getComplexInputDefinitions().addAll(complexInputDefinitions);
-        return input;
+        return new SComplexInputDefinitionImpl(name,description,multiple,simpleInputDefinitions,complexInputDefinitions);
     }
 
     @Override

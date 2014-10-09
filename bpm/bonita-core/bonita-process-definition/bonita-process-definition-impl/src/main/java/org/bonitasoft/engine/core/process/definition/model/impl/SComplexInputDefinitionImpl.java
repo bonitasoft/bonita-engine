@@ -32,18 +32,25 @@ public class SComplexInputDefinitionImpl extends SInputDefinitionImpl implements
 
     private final List<SComplexInputDefinition> complexInputDefinitions;
 
-    public SComplexInputDefinitionImpl(final String name, final String description, final List<SSimpleInputDefinition> inputDefinitions,
-            final List<SComplexInputDefinition> complexDefinitions) {
-        super(name);
-        simpleInputDefinitions = inputDefinitions;
-        complexInputDefinitions = complexDefinitions;
-
-        setDescription(description);
+    public SComplexInputDefinitionImpl(final String name, final String description, final boolean multiple,
+            final List<SSimpleInputDefinition> inputDefinitions, final List<SComplexInputDefinition> complexDefinitions) {
+        super(name, description, multiple);
+        simpleInputDefinitions = new ArrayList<SSimpleInputDefinition>();
+        complexInputDefinitions = new ArrayList<SComplexInputDefinition>();
+        if (inputDefinitions != null) {
+            simpleInputDefinitions.addAll(inputDefinitions);
+        }
+        if (complexDefinitions != null) {
+            complexInputDefinitions.addAll(complexDefinitions);
+        }
     }
 
     public SComplexInputDefinitionImpl(final ComplexInputDefinition input) {
-        this(input.getName());
-        setDescription(input.getDescription());
+        this(input.getName(), input.getDescription(), input.isMultiple(), null, null);
+        convertAndAddInputDefinitions(input);
+    }
+
+    private void convertAndAddInputDefinitions(final ComplexInputDefinition input) {
         for (final SimpleInputDefinition simpleInputDefinition : input.getSimpleInputs()) {
             simpleInputDefinitions.add(new SSimpleInputDefinitionImpl(simpleInputDefinition));
         }
@@ -53,9 +60,7 @@ public class SComplexInputDefinitionImpl extends SInputDefinitionImpl implements
     }
 
     public SComplexInputDefinitionImpl(final String name) {
-        super(name);
-        simpleInputDefinitions = new ArrayList<SSimpleInputDefinition>();
-        complexInputDefinitions = new ArrayList<SComplexInputDefinition>();
+        this(name, null, false, null, null);
     }
 
     @Override

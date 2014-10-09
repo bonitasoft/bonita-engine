@@ -353,6 +353,8 @@ public class XMLProcessDefinition {
 
     public static final String TYPE = "type";
 
+    public static final String MULTIPLE = "multiple";
+
     public static final String CONTRACT_CONSTRAINTS_NODE = "constraintDefinitions";
 
     public static final String CONTRACT_CONSTRAINT_NODE = "constraintDefinition";
@@ -584,6 +586,7 @@ public class XMLProcessDefinition {
     private XMLNode createComplexInputNode(final ComplexInputDefinition input) {
         final XMLNode inputNode = new XMLNode(CONTRACT_COMPLEX_INPUT_NODE);
         inputNode.addAttribute(NAME, input.getName());
+        inputNode.addAttribute(MULTIPLE, String.valueOf(input.isMultiple()));
         inputNode.addAttribute(DESCRIPTION, input.getDescription());
         for (final SimpleInputDefinition inputDefinition : input.getSimpleInputs()) {
             inputNode.addChild(createSimpleInputNode(inputDefinition));
@@ -597,8 +600,9 @@ public class XMLProcessDefinition {
     private XMLNode createSimpleInputNode(final SimpleInputDefinition input) {
         final XMLNode inputNode = new XMLNode(CONTRACT_SIMPLE_INPUT_NODE);
         inputNode.addAttribute(NAME, input.getName());
-        inputNode.addAttribute(TYPE, input.getType().toString());
+        inputNode.addAttribute(MULTIPLE, String.valueOf(input.isMultiple()));
         inputNode.addAttribute(DESCRIPTION, input.getDescription());
+        inputNode.addAttribute(TYPE, input.getType().toString());
         return inputNode;
     }
 

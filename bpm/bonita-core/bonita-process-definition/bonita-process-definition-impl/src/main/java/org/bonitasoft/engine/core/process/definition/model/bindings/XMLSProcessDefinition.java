@@ -171,6 +171,8 @@ public class XMLSProcessDefinition {
 
     public static final String NAME = "name";
 
+    public static final String MULTIPLE = "multiple";
+
     public static final String ID = "id";
 
     public static final String IDREF = "idref";
@@ -608,6 +610,7 @@ public class XMLSProcessDefinition {
     private XMLNode createSimpleInputNode(final SSimpleInputDefinition input) {
         final XMLNode inputNode = new XMLNode(CONTRACT_SIMPLE_INPUT_NODE);
         inputNode.addAttribute(NAME, input.getName());
+        inputNode.addAttribute(MULTIPLE, input.isMultiple());
         inputNode.addAttribute(TYPE, input.getType().toString());
         inputNode.addAttribute(DESCRIPTION, input.getDescription());
         return inputNode;
@@ -616,6 +619,7 @@ public class XMLSProcessDefinition {
     private XMLNode createComplexInputNode(final SComplexInputDefinition input) {
         final XMLNode inputNode = new XMLNode(CONTRACT_COMPLEX_INPUT_NODE);
         inputNode.addAttribute(NAME, input.getName());
+        inputNode.addAttribute(MULTIPLE, input.isMultiple());
         inputNode.addAttribute(DESCRIPTION, input.getDescription());
         for (final SSimpleInputDefinition sInputDefinition : input.getSimpleInputDefinitions()) {
             inputNode.addChild(createSimpleInputNode(sInputDefinition));

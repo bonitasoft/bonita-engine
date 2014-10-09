@@ -15,6 +15,7 @@ package org.bonitasoft.engine.core.process.definition.model.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.junit.Test;
 
 /**
@@ -47,7 +48,7 @@ public class SUserTaskDefinitionImplTest {
     @Test
     public void aUserTaskWithAContractReturnsThatOne() throws Exception {
         final SContractDefinitionImpl contract = new SContractDefinitionImpl();
-        contract.addSimpleInput(new SSimpleInputDefinitionImpl("valid"));
+        contract.addSimpleInput(new SSimpleInputDefinitionImpl("valid", SType.TEXT, "descripti"));
         final SUserTaskDefinitionImpl userTask = new SUserTaskDefinitionImpl(5, "name", "actorName");
         userTask.setContract(contract);
 

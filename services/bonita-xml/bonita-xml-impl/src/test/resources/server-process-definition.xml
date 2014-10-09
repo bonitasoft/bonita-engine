@@ -28,19 +28,19 @@
 				<boundaryEvents />
 				<contract>
 					<inputDefinitions>
-						<inputDefinition description="user name" name="userName" type="TEXT" />
-						<inputDefinition description="start date" name="startDate" type="DATE" />
-						<inputDefinition description="end date" name="endDate" type="DATE" />
-						<inputDefinition description="request is approved" name="isValid" type="BOOLEAN" />
-						<inputDefinition description="comment" name="comment" type="TEXT" />
-						<complexInputDefinition description="expense line" name="expense">
-							<inputDefinition description="expense type" name="type" type="TEXT" />
-							<inputDefinition description="expense comment" name="comment" type="TEXT" />
-							<inputDefinition description="expense comment" name="comment" type="DATE" />
-							<complexInputDefinition description="expense line" name="expense">
-								<inputDefinition description="complex in complex" name="comment" type="TEXT" />
+						<inputDefinition description="user name" name="userName" type="TEXT" multiple="false" />
+						<inputDefinition description="start date" name="startDate" type="DATE" multiple="false" />
+						<inputDefinition description="end date" name="endDate" type="DATE" multiple="false" />
+						<inputDefinition description="request is approved" name="isValid" type="BOOLEAN" multiple="false"/>
+						<inputDefinition description="comment" name="comment" type="TEXT" multiple="false"/>
+						<complexInputDefinition description="expense line" name="expense" multiple="false">
+							<inputDefinition description="expense type" name="type" type="TEXT" multiple="false"/>
+							<inputDefinition description="expense comment" name="comment" type="TEXT" multiple="false"/>
+							<inputDefinition description="expense comment" name="comment" type="DATE" multiple="false"/>
+							<complexInputDefinition description="expense line" name="expense" multiple="false">
+								<inputDefinition description="complex in complex" name="comment" type="TEXT" multiple="false" />
 							</complexInputDefinition>
-							<inputDefinition description="expense comment" name="comment" type="DECIMAL" />
+							<inputDefinition description="expense comment" name="comment" type="DECIMAL" multiple="true"/>
 						</complexInputDefinition>
 					</inputDefinitions>
 					<constraintDefinitions>

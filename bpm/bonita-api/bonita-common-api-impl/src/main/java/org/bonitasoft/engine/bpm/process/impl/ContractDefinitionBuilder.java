@@ -41,14 +41,24 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
     }
 
     public ContractDefinitionBuilder addSimpleInput(final String name, final Type type, final String description) {
-        final SimpleInputDefinition input = new SimpleInputDefinitionImpl(name, type, description);
+        return addSimpleInput(name, type, description, false);
+    }
+
+    public ContractDefinitionBuilder addSimpleInput(final String name, final Type type, final String description, final boolean multiple) {
+        final SimpleInputDefinition input = new SimpleInputDefinitionImpl(name, type, description, multiple);
         contract.addSimpleInput(input);
         return this;
     }
 
     public ContractDefinitionBuilder addComplexInput(final String name, final String description, final List<SimpleInputDefinition> simpleInputs,
             final List<ComplexInputDefinition> complexInputs) {
-        final ComplexInputDefinitionImpl input = new ComplexInputDefinitionImpl(name, description, simpleInputs, complexInputs);
+        return addComplexInput(name, description, false, simpleInputs, complexInputs);
+    }
+
+    public ContractDefinitionBuilder addComplexInput(final String name, final String description, final boolean multiple,
+            final List<SimpleInputDefinition> simpleInputs,
+            final List<ComplexInputDefinition> complexInputs) {
+        final ComplexInputDefinitionImpl input = new ComplexInputDefinitionImpl(name, description, multiple, simpleInputs, complexInputs);
         contract.addComplexInput(input);
         return this;
     }

@@ -23,7 +23,7 @@ import org.bonitasoft.engine.xml.SXMLParseException;
 /**
  * @author Matthieu Chaffotte
  */
-public class SSimpleInputDefinitionBinding extends SNamedElementBinding {
+public class SSimpleInputDefinitionBinding extends SInputDefinitionBinding {
 
     private SType type;
 
@@ -43,10 +43,7 @@ public class SSimpleInputDefinitionBinding extends SNamedElementBinding {
 
     @Override
     public Object getObject() {
-        final SSimpleInputDefinitionImpl input = new SSimpleInputDefinitionImpl(name);
-        input.setType(type);
-        input.setDescription(description);
-        return input;
+        return new SSimpleInputDefinitionImpl(name,type,description,multiple);
     }
 
     @Override

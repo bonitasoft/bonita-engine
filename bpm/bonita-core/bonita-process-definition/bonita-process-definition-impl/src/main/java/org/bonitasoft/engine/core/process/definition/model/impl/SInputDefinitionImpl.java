@@ -21,15 +21,21 @@ import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 public class SInputDefinitionImpl extends SNamedElementImpl implements SInputDefinition {
 
     private static final long serialVersionUID = -5021740296501498639L;
-    private String description;
+    private final String description;
+    private final boolean multiple;
 
     public SInputDefinitionImpl(final String name) {
-        super(name);
+        this(name, null, false);
     }
-    
-    public SInputDefinitionImpl(String name, String description) {
+
+    public SInputDefinitionImpl(final String name, final String description) {
+        this(name, description, false);
+    }
+
+    public SInputDefinitionImpl(final String name, final String description, final boolean multiple) {
         super(name);
         this.description = description;
+        this.multiple = multiple;
     }
 
     @Override
@@ -37,8 +43,9 @@ public class SInputDefinitionImpl extends SNamedElementImpl implements SInputDef
         return description;
     }
 
-    public void setDescription(final String description) {
-        this.description = description;
+    @Override
+    public boolean isMultiple() {
+        return multiple;
     }
 
 }

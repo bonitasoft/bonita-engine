@@ -20,7 +20,7 @@ public class SComplexInputDefinitionBuilder {
     }
 
     public SComplexInputDefinition build() {
-        return new SComplexInputDefinitionImpl(name, description, inputDefinitions, complexDefinitions);
+        return new SComplexInputDefinitionImpl(name, description, false, inputDefinitions, complexDefinitions);
     }
 
     public SComplexInputDefinitionBuilder withInput(SSimpleInputDefinitionBuilder... definitions) {

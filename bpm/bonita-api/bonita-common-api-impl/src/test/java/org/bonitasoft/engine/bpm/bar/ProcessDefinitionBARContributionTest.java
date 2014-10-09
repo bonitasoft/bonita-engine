@@ -16,9 +16,15 @@ package org.bonitasoft.engine.bpm.bar;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
+import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
+import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
+import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
+import org.bonitasoft.engine.bpm.contract.impl.SimpleInputDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
@@ -49,8 +55,75 @@ public class ProcessDefinitionBARContributionTest {
 
     @Test
     public final void serializeDeserializeProcessDefinition() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = createDesignProcessDefinition();
+        checkSerializeDeserializeProcessDefinition(createDesignProcessDefinition());
+    }
 
+    @Test
+    public final void serializeDeserializeProcessDefinitionWithContract() throws Exception {
+        final ProcessDefinitionBuilder processBuilder = createProcessBuilderDefinition();
+        processBuilder.addUserTask("taskWithInput", ACTOR_NAME).addContract();
+        processBuilder.addUserTask("taskWithConstraint", ACTOR_NAME).addContract().addSimpleInput("simpleInput", Type.INTEGER, DESCRIPTION)
+                .addConstraint("Mandatory", "in != null", "in must be set", "in");
+        processBuilder.addUserTask("taskWithComplexInput", ACTOR_NAME).addContract()
+                .addComplexInput("complexInput", DESCRIPTION,
+                        Arrays.asList((SimpleInputDefinition) new SimpleInputDefinitionImpl("simple", Type.TEXT, DESCRIPTION)), null);
+        processBuilder
+                .addUserTask("taskWithComplexComplexInput", ACTOR_NAME)
+                .addContract()
+                .addComplexInput("complexInput", DESCRIPTION,
+                        Arrays.asList((SimpleInputDefinition) new SimpleInputDefinitionImpl("simple", Type.TEXT, DESCRIPTION)),
+                        Arrays.asList(createComplexInputs()));
+
+        checkSerializeDeserializeProcessDefinition(processBuilder.done());
+    }
+
+    private ComplexInputDefinition createComplexInputs() {
+        final SimpleInputDefinition name = new SimpleInputDefinitionImpl("name", Type.TEXT, DESCRIPTION);
+        final SimpleInputDefinition amount = new SimpleInputDefinitionImpl("amount", Type.DECIMAL, DESCRIPTION);
+        final SimpleInputDefinition date = new SimpleInputDefinitionImpl("date", Type.DATE, DESCRIPTION);
+
+        final SimpleInputDefinition city = new SimpleInputDefinitionImpl("city", Type.TEXT, DESCRIPTION);
+        final SimpleInputDefinition zip = new SimpleInputDefinitionImpl("zip", Type.INTEGER, DESCRIPTION);
+
+        final ComplexInputDefinition adress = new ComplexInputDefinitionImpl("adress", DESCRIPTION, Arrays.asList(city, zip), null);
+
+        final ComplexInputDefinition expense = new ComplexInputDefinitionImpl("expense", DESCRIPTION, Arrays.asList(name, amount, date), Arrays.asList(adress));
+        return expense;
+    }
+
+    @Test
+    public void should_deserializeProcessDefinition_of_old_process_throw_exception() throws Exception {
+        exception.expect(InvalidBusinessArchiveFormatException.class);
+        exception.expectMessage("Wrong version");
+        final String allContentFrom = IOUtil.read(getClass().getResourceAsStream("/old-process.xml"));
+        final File createTempFile = IOUtil.createTempFileInDefaultTempDirectory("old", "process.xml");
+
+        try {
+            IOUtil.writeContentToFile(allContentFrom, createTempFile);
+            new ProcessDefinitionBARContribution().deserializeProcessDefinition(createTempFile);
+        } finally {
+            createTempFile.delete();
+        }
+    }
+
+    @Test
+    public void should_checkVersion_with_old_content_thrown_exception() throws Exception {
+        exception.expect(InvalidBusinessArchiveFormatException.class);
+        exception.expectMessage("6.0 namespace is not compatible with your current version");
+
+        new ProcessDefinitionBARContribution().checkVersion(IOUtil.read(getClass().getResourceAsStream("/old-process.xml")));
+    }
+
+    @Test
+    public void should_checkVersion_with_bad_content_thrown_exception() throws Exception {
+        exception.expect(InvalidBusinessArchiveFormatException.class);
+        exception.expectMessage("There is no bonitasoft process namespace declaration");
+
+        new ProcessDefinitionBARContribution().checkVersion("invalid");
+    }
+
+    private void checkSerializeDeserializeProcessDefinition(final DesignProcessDefinition designProcessDefinition) throws IOException,
+            InvalidBusinessArchiveFormatException {
         // Serialize designProcessDefinition
         final File processDesignFolder = File.createTempFile("serializeDeserialize", "ProcessDefinition");
         processDesignFolder.delete();
@@ -75,6 +148,11 @@ public class ProcessDefinitionBARContributionTest {
     }
 
     private DesignProcessDefinition createDesignProcessDefinition() throws InvalidExpressionException, InvalidProcessDefinitionException {
+        final ProcessDefinitionBuilder processBuilder = createProcessBuilderDefinition();
+        return processBuilder.done();
+    }
+
+    private ProcessDefinitionBuilder createProcessBuilderDefinition() throws InvalidExpressionException {
         final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_NAME);
         final Expression targetProcessVersionExpr = new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION);
 
@@ -95,40 +173,7 @@ public class ProcessDefinitionBARContributionTest {
         processBuilder.addReceiveTask("ReceiveTask", "messageName");
         processBuilder.addSendTask("SendTask", "messageName", targetProcessNameExpr);
         processBuilder.addTransition("BoundaryEvent", "ManualTask");
-        processBuilder.addUserTask("task", ACTOR_NAME).addContract().addSimpleInput("in", Type.INTEGER, null)
-        .addConstraint("Mandatory", "in != null", "in must be set", "in");
-        return processBuilder.done();
-    }
-
-    @Test
-    public void should_deserializeProcessDefinition_of_old_process_throw_exception() throws Exception {
-        exception.expect(InvalidBusinessArchiveFormatException.class);
-        exception.expectMessage("Wrong version");
-        final String allContentFrom = IOUtil.read(getClass().getResourceAsStream("/old-process.xml"));
-        final File createTempFile = IOUtil.createTempFileInDefaultTempDirectory("old", "process.xml");
-
-        try {
-        IOUtil.writeContentToFile(allContentFrom, createTempFile);
-            new ProcessDefinitionBARContribution().deserializeProcessDefinition(createTempFile);
-        } finally {
-            createTempFile.delete();
-        }
-    }
-
-    @Test
-    public void should_checkVersion_with_old_content_thrown_exception() throws Exception {
-        exception.expect(InvalidBusinessArchiveFormatException.class);
-        exception.expectMessage("6.0 namespace is not compatible with your current version");
-
-        new ProcessDefinitionBARContribution().checkVersion(IOUtil.read(getClass().getResourceAsStream("/old-process.xml")));
-    }
-
-    @Test
-    public void should_checkVersion_with_bad_content_thrown_exception() throws Exception {
-        exception.expect(InvalidBusinessArchiveFormatException.class);
-        exception.expectMessage("There is no bonitasoft process namespace declaration");
-
-        new ProcessDefinitionBARContribution().checkVersion("invalid");
+        return processBuilder;
     }
 
 }

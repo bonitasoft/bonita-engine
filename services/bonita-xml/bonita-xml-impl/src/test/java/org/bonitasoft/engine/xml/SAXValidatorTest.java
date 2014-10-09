@@ -41,11 +41,9 @@ public class SAXValidatorTest {
         final InputStream xsdStream = this.getClass().getResourceAsStream(xsdResource);
         final StreamSource source = new StreamSource(xsdStream);
 
-        //when
+        //when then no SValidationException
         validator.setSchema(source);
         validator.validate(xslStream);
-
-        //then no SValidationException
     }
 
 

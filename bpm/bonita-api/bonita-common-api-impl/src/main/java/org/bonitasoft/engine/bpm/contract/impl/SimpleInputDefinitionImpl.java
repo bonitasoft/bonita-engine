@@ -26,8 +26,14 @@ public class SimpleInputDefinitionImpl extends InputDefinitionImpl implements Si
 
     private final Type type;
 
+    public SimpleInputDefinitionImpl(final String name, final Type type, final String description, final boolean multiple) {
+        super(name, description, multiple);
+        this.type = type;
+
+    }
+
     public SimpleInputDefinitionImpl(final String name, final Type type, final String description) {
-        super(name, description);
+        super(name, description, false);
         this.type = type;
 
     }
@@ -65,7 +71,9 @@ public class SimpleInputDefinitionImpl extends InputDefinitionImpl implements Si
 
     @Override
     public String toString() {
-        return "SimpleInputDefinitionImpl [type=" + type + ", getDescription()=" + getDescription() + ", getName()=" + getName() + "]";
+        return "SimpleInputDefinitionImpl [type=" + type + ", getDescription()=" + getDescription() + ", getName()=" + getName() + ", isMultiple()="
+                + isMultiple() + ", toString()=" + super.toString() + "]";
     }
+
 
 }

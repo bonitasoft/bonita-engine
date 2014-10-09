@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.process.definition.model.impl;
 
 import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
+import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
 
@@ -24,25 +25,29 @@ public class SSimpleInputDefinitionImpl extends SNamedElementImpl implements SSi
 
     private static final long serialVersionUID = -4947430801791009535L;
 
-    private String description;
+    private final String description;
 
-    private SType type;
+    private final SType type;
 
-    public SSimpleInputDefinitionImpl(final String name) {
-        super(name);
+    private final boolean multiple;
+
+    public SSimpleInputDefinitionImpl(final String name, final SType type, final String description) {
+        this(name, type, description, false);
     }
 
-    public SSimpleInputDefinitionImpl(String name, SType type, String description) {
+    public SSimpleInputDefinitionImpl(final String name, final SType type, final String description, final boolean multiple) {
         super(name);
-        this.description = description;
         this.type = type;
+        this.description = description;
+        this.multiple = multiple;
     }
-
 
     public SSimpleInputDefinitionImpl(final SimpleInputDefinition input) {
-        this(input.getName());
-        description = input.getDescription();
-        type = SType.valueOf(input.getType().toString());
+        this(input.getName(), convertTypeToSType(input.getType()), input.getDescription(), input.isMultiple());
+    }
+
+    private static SType convertTypeToSType(final Type type2) {
+        return SType.valueOf(type2.toString());
     }
 
     @Override
@@ -50,17 +55,9 @@ public class SSimpleInputDefinitionImpl extends SNamedElementImpl implements SSi
         return description;
     }
 
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
     @Override
     public SType getType() {
         return type;
-    }
-
-    public void setType(final SType type) {
-        this.type = type;
     }
 
     @Override
@@ -101,5 +98,9 @@ public class SSimpleInputDefinitionImpl extends SNamedElementImpl implements SSi
         return true;
     }
 
+    @Override
+    public boolean isMultiple() {
+        return multiple;
+    }
 
 }

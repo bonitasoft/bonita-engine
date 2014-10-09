@@ -20,11 +20,22 @@ import org.bonitasoft.engine.bpm.contract.InputDefinition;
  */
 public class InputDefinitionImpl implements InputDefinition {
 
+
+
+    private static final long serialVersionUID = 2836592506382887928L;
+
+    private final String description;
+
+    private final String name;
+
+    private final boolean multiple;
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + (description == null ? 0 : description.hashCode());
+        result = prime * result + (multiple ? 1231 : 1237);
         result = prime * result + (name == null ? 0 : name.hashCode());
         return result;
     }
@@ -48,6 +59,9 @@ public class InputDefinitionImpl implements InputDefinition {
         } else if (!description.equals(other.description)) {
             return false;
         }
+        if (multiple != other.multiple) {
+            return false;
+        }
         if (name == null) {
             if (other.name != null) {
                 return false;
@@ -58,15 +72,10 @@ public class InputDefinitionImpl implements InputDefinition {
         return true;
     }
 
-    private static final long serialVersionUID = 2836592506382887928L;
-
-    private final String description;
-
-    private final String name;
-
-    protected InputDefinitionImpl(final String name, final String description) {
+    protected InputDefinitionImpl(final String name, final String description, final boolean multiple) {
         this.description = description;
         this.name = name;
+        this.multiple = multiple;
     }
 
     @Override
@@ -77,6 +86,11 @@ public class InputDefinitionImpl implements InputDefinition {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean isMultiple() {
+        return multiple;
     }
 
 }

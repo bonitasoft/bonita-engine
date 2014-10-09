@@ -418,7 +418,7 @@
 
 	<xs:complexType name="SInputDefinition">
 		<xs:complexContent>
-			<xs:extension base="definition:SNamedElement">
+			<xs:extension base="definition:SInputElement">
 				<xs:attribute name="type">
 					<xs:simpleType>
 						<xs:restriction base="xs:string">
@@ -435,7 +435,7 @@
 	</xs:complexType>
 	<xs:complexType name="SComplexInputDefinition">
 		<xs:complexContent>
-			<xs:extension base="definition:SNamedElement">
+			<xs:extension base="definition:SInputElement">
 				<xs:sequence minOccurs="1" maxOccurs="unbounded">
 					<xs:choice>
 						<xs:element name="inputDefinition" type="definition:SInputDefinition" />
@@ -881,6 +881,14 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
+
+    <xs:complexType name="SInputElement">
+        <xs:complexContent>
+            <xs:extension base="definition:SNamedElement">
+                <xs:attribute name="multiple" type="xs:boolean" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
 	<xs:complexType name="SBaseElement">
 		<xs:attribute name="id" type="xs:long" />

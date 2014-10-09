@@ -60,6 +60,29 @@ public class ContractDefinitionBuilderTest {
         final ContractDefinitionBuilder builder = contractDefinitionBuilder.addSimpleInput(name, type, description);
 
         //then
+        assertThat(activity.getContract().getSimpleInputs()).as("should get 1 input").hasSize(1);
+        assertThat(activity.getContract().getSimpleInputs().get(0).isMultiple()).as("should not be multiple").isFalse();
+        checkBuilder(builder);
+
+    }
+
+    @Test
+    public void addMultipleInputTest() throws Exception {
+        //when
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addSimpleInput(name, type, description, true);
+
+        //then
+        assertThat(activity.getContract().getSimpleInputs().get(0).isMultiple()).as("should be multiple").isTrue();
+        checkBuilder(builder);
+
+    }
+
+    @Test
+    public void addMultipleSimpleInputTest() throws Exception {
+        //when
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addSimpleInput(name, type, description);
+
+        //then
         assertThat(activity.getContract().getSimpleInputs()).hasSize(1);
         checkBuilder(builder);
 
@@ -72,6 +95,20 @@ public class ContractDefinitionBuilderTest {
 
         //then
         assertThat(activity.getContract().getComplexInputs()).hasSize(1);
+        assertThat(activity.getContract().getComplexInputs().get(0).isMultiple()).as("should not be multiple").isFalse();
+        checkBuilder(builder);
+
+    }
+
+    @Test
+    public void addMultipleComplexInputTest() throws Exception {
+        //when
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addComplexInput(name, description, true, new ArrayList<SimpleInputDefinition>(),
+                null);
+
+        //then
+        assertThat(activity.getContract().getComplexInputs()).hasSize(1);
+        assertThat(activity.getContract().getComplexInputs().get(0).isMultiple()).as("should be multiple").isTrue();
         checkBuilder(builder);
 
     }
@@ -94,7 +131,7 @@ public class ContractDefinitionBuilderTest {
 
         //then
         assertThat(activity.getContract().getConstraints()).hasSize(1);
-        ConstraintDefinition definition = activity.getContract().getConstraints().get(0);
+        final ConstraintDefinition definition = activity.getContract().getConstraints().get(0);
         assertThat(definition.getInputNames()).containsExactly("inputName");
         assertThat(definition.getExplanation()).as("bad explanation").isEqualTo("input inputName is mandatory");
         checkBuilder(builder);
@@ -103,7 +140,7 @@ public class ContractDefinitionBuilderTest {
     @Test
     public void addMandatoryConstraint_should_fail() throws Exception {
         //given
-        List<Object> failingValues = new ArrayList<Object>();
+        final List<Object> failingValues = new ArrayList<Object>();
         failingValues.add(null);
         failingValues.add("");
 
@@ -114,7 +151,7 @@ public class ContractDefinitionBuilderTest {
     @Test
     public void addMandatoryConstraint_should_success() throws Exception {
         //given
-        List<Object> successValues = new ArrayList<Object>();
+        final List<Object> successValues = new ArrayList<Object>();
         successValues.add("not null value");
         successValues.add(0);
         successValues.add(new Date());
@@ -123,9 +160,9 @@ public class ContractDefinitionBuilderTest {
         checkConstraintShouldGiveExpectedResult(successValues, true);
     }
 
-    private void checkConstraintShouldGiveExpectedResult(List<Object> values, Boolean expectedResult) {
-        for (Object failingValue : values) {
-            Map<String, Object> variables = new HashMap<String, Object>();
+    private void checkConstraintShouldGiveExpectedResult(final List<Object> values, final Boolean expectedResult) {
+        for (final Object failingValue : values) {
+            final Map<String, Object> variables = new HashMap<String, Object>();
             variables.put("inputName", failingValue);
 
             //when
@@ -136,7 +173,7 @@ public class ContractDefinitionBuilderTest {
         }
     }
 
-    private void checkConstraintGivesExpectedResult(Map<String, Object> variables, Boolean expectedResult) {
+    private void checkConstraintGivesExpectedResult(final Map<String, Object> variables, final Boolean expectedResult) {
         final Boolean result = MVEL.evalToBoolean(activity.getContract().getConstraints().get(0).getExpression(), variables);
         assertThat(result).as("mandatory rule failure with value:" + variables.toString()).isEqualTo(expectedResult);
     }

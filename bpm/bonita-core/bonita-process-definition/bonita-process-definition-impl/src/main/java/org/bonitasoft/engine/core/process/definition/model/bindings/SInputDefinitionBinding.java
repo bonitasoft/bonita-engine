@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2012 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,39 +11,25 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.bpm.bar.xml;
+package org.bonitasoft.engine.core.process.definition.model.bindings;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
-import org.bonitasoft.engine.io.xml.XMLParseException;
+import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Baptiste Mesta
+ * @author Celine Souchet
  */
-public class ComplexInputDefinitionBinding extends InputDefinitionBinding {
+public abstract class SInputDefinitionBinding extends SNamedElementBinding {
+
+    protected boolean multiple;
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {
         super.setAttributes(attributes);
+        multiple = Boolean.parseBoolean(attributes.get(XMLProcessDefinition.MULTIPLE));
     }
 
-    @Override
-    public void setChildElement(final String name, final String value, final Map<String, String> attributes) throws XMLParseException {
-    }
-
-    @Override
-    public void setChildObject(final String name, final Object value) throws XMLParseException {
-    }
-
-    @Override
-    public Object getObject() {
-        return new ComplexInputDefinitionImpl(name, description, multiple);
-    }
-
-    @Override
-    public String getElementTag() {
-        return XMLProcessDefinition.CONTRACT_COMPLEX_INPUT_NODE;
-    }
 
 }

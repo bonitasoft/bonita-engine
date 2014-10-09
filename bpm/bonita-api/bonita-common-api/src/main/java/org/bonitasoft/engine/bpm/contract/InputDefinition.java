@@ -23,5 +23,6 @@ import org.bonitasoft.engine.bpm.DescriptionElement;
  */
 public interface InputDefinition extends DescriptionElement {
 
+    boolean isMultiple();
 
 }

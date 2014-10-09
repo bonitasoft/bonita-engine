@@ -24,19 +24,36 @@ import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
  */
 public class ComplexInputDefinitionImpl extends InputDefinitionImpl implements ComplexInputDefinition {
 
+    @Override
+    public String toString() {
+        return "ComplexInputDefinitionImpl [simpleInputDefinitions=" + simpleInputDefinitions + ", complexInputDefinitions=" + complexInputDefinitions
+                + ", getSimpleInputs()=" + getSimpleInputs() + ", getComplexInputs()=" + getComplexInputs() + ", getDescription()=" + getDescription()
+                + ", getName()=" + getName() + ", isMultiple()=" + isMultiple() + "]";
+    }
+
     private static final long serialVersionUID = 2836592506382887928L;
     private final List<SimpleInputDefinition> simpleInputDefinitions;
     private final List<ComplexInputDefinition> complexInputDefinitions;
 
     public ComplexInputDefinitionImpl(final String name, final String description) {
-        super(name, description);
-        simpleInputDefinitions = new ArrayList<SimpleInputDefinition>();
-        complexInputDefinitions = new ArrayList<ComplexInputDefinition>();
+        this(name, description, false, null, null);
+    }
+
+    public ComplexInputDefinitionImpl(final String name, final String description, final boolean multiple) {
+        this(name, description, multiple, null, null);
     }
 
     public ComplexInputDefinitionImpl(final String name, final String description, final List<SimpleInputDefinition> simpleInputDefinitions,
             final List<ComplexInputDefinition> complexInputDefinitions) {
-        this(name, description);
+        this(name, description, false, simpleInputDefinitions, complexInputDefinitions);
+    }
+
+    public ComplexInputDefinitionImpl(final String name, final String description, final boolean multiple,
+            final List<SimpleInputDefinition> simpleInputDefinitions,
+            final List<ComplexInputDefinition> complexInputDefinitions) {
+        super(name, description, multiple);
+        this.simpleInputDefinitions = new ArrayList<SimpleInputDefinition>();
+        this.complexInputDefinitions = new ArrayList<ComplexInputDefinition>();
         if (simpleInputDefinitions != null) {
             for (final SimpleInputDefinition simpleInputDefinition : simpleInputDefinitions) {
                 this.simpleInputDefinitions.add(simpleInputDefinition);

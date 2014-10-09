@@ -22,7 +22,7 @@ import org.bonitasoft.engine.io.xml.XMLParseException;
 /**
  * @author Matthieu Chaffotte
  */
-public class SimpleInputDefinitionBinding extends NamedElementBinding {
+public class SimpleInputDefinitionBinding extends InputDefinitionBinding{
 
     private Type type;
 
@@ -42,7 +42,7 @@ public class SimpleInputDefinitionBinding extends NamedElementBinding {
 
     @Override
     public Object getObject() {
-        return new SimpleInputDefinitionImpl(name, type, description);
+        return new SimpleInputDefinitionImpl(name, type, description,multiple);
     }
 
     @Override
