@@ -13,12 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.impl;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.archive.SDefinitiveArchiveNotFound;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.TransitionState;
@@ -28,8 +24,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.STransitionDel
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SATransitionInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.STransitionInstanceLogBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.STransitionInstanceLogBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -44,6 +38,9 @@ import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Zhao Na
@@ -97,23 +94,13 @@ public class TransitionServiceImpl implements TransitionService {
             archiveTransitionInstanceInsertRecord(saTransitionInstance, archiveDate);
         } catch (final SRecorderException e) {
             throw new STransitionCreationException(e);
-        } catch (final SDefinitiveArchiveNotFound e) {
-            throw new STransitionCreationException(e);
         }
 
     }
 
-    private void archiveTransitionInstanceInsertRecord(final SATransitionInstance saTransitionInstance, final long archiveDate) throws SRecorderException,
-            SDefinitiveArchiveNotFound {
+    private void archiveTransitionInstanceInsertRecord(final SATransitionInstance saTransitionInstance, final long archiveDate) throws SRecorderException {
         final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saTransitionInstance);
         this.archiveService.recordInsert(archiveDate, insertRecord);
-    }
-
-    protected STransitionInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message) {
-        final STransitionInstanceLogBuilder logBuilder = BuilderFactory.get(STransitionInstanceLogBuilderFactory.class).createNewInstance();
-        this.initializeLogBuilder(logBuilder, message);
-        this.updateLog(actionType, logBuilder);
-        return logBuilder;
     }
 
     @Override

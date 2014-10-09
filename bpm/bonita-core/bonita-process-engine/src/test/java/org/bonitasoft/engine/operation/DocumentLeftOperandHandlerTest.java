@@ -11,8 +11,8 @@ import java.util.HashMap;
 
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
@@ -91,7 +91,7 @@ public class DocumentLeftOperandHandlerTest {
     @Test
     public void should_update_create_doc_if_not_exists() throws Exception {
         //given
-        doThrow(new SDocumentNotFoundException("myDoc")).when(documentService).getMappedDocument(45l, "myDoc");
+        doThrow(new SObjectNotFoundException("myDoc")).when(documentService).getMappedDocument(45l, "myDoc");
         //when
         handler.update(createLeftOperand("myDoc"), new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 45l, "PROCESS_INSTANCE");
         //then
@@ -101,11 +101,12 @@ public class DocumentLeftOperandHandlerTest {
     @Test
     public void should_update_update_doc_if_exists() throws Exception {
         //given
-        doReturn(mock(SMappedDocument.class)).when(documentService).getMappedDocument(45l, "myDoc");
+        SMappedDocument sMappedDocument = mock(SMappedDocument.class);
+        doReturn(sMappedDocument).when(documentService).getMappedDocument(45l, "myDoc");
         //when
         handler.update(createLeftOperand("myDoc"), new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 45l, "PROCESS_INSTANCE");
         //then
-        verify(documentService).updateDocumentOfProcessInstance(any(SDocument.class), eq(45l), eq("myDoc"), isNull(String.class));
+        verify(documentService).updateDocument(eq(sMappedDocument),any(SDocument.class));
     }
 
     public void should_update_find_process_id() throws Exception {
@@ -113,10 +114,12 @@ public class DocumentLeftOperandHandlerTest {
         FlowNodeInstance flowNodeInstance = mock(FlowNodeInstance.class);
         doReturn(45l).when(flowNodeInstance).getParentProcessInstanceId();
         doReturn(flowNodeInstance).when(activityInstanceService).getFlowNodeInstance(12l);
+        SMappedDocument sMappedDocument = mock(SMappedDocument.class);
+        doReturn(sMappedDocument).when(documentService).getMappedDocument(45l, "myDoc");
         //when
         handler.update(createLeftOperand("myDoc"), new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 12l, "notProcess");
         //then
-        verify(documentService).updateDocumentOfProcessInstance(any(SDocument.class), eq(45l), eq("myDoc"), isNull(String.class));
+        verify(documentService).updateDocument(eq(sMappedDocument),any(SDocument.class));
 
     }
 
@@ -129,7 +132,7 @@ public class DocumentLeftOperandHandlerTest {
         //when
         handler.update(createLeftOperand("myDoc"), new DocumentValue(123l), 45l, "PROCESS_INSTANCE");
         //then
-        verify(documentService,times(0)).updateDocumentOfProcessInstance(any(SDocument.class), eq(45l), eq("myDoc"), isNull(String.class));
+        verify(documentService,times(0)).updateDocument(any(SMappedDocument.class),any(SDocument.class));
     }
 
 }

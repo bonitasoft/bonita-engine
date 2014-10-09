@@ -24,8 +24,8 @@ import java.util.List;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilder;
@@ -346,7 +346,7 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
                 final SMappedDocument result = documentService.getMappedDocument(sProcessDocument.getId());
 
                 assertNull(result);
-            } catch (final SDocumentNotFoundException e) {
+            } catch (final SObjectNotFoundException e) {
                 transactionService.setRollbackOnly();
             } finally {
                 transactionService.complete();

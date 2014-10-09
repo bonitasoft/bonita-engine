@@ -16,16 +16,11 @@ package org.bonitasoft.engine.operation;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
-import org.bonitasoft.engine.core.document.exception.SDocumentNotFoundException;
-import org.bonitasoft.engine.core.document.exception.SDocumentCreationException;
-import org.bonitasoft.engine.core.document.model.SDocument;
-import org.bonitasoft.engine.core.document.model.SMappedDocument;
+import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
@@ -41,12 +36,14 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandler {
 
+    private final DocumentHelper documentHelper;
     DocumentService documentService;
 
     public DocumentLeftOperandHandler(final DocumentService documentService, final ActivityInstanceService activityInstanceService,
             final SessionAccessor sessionAccessor, final SessionService sessionService) {
         super(activityInstanceService, sessionAccessor, sessionService, documentService);
         this.documentService = documentService;
+        this.documentHelper = new DocumentHelper(documentService,null,null);
     }
 
     @Override
@@ -59,32 +56,19 @@ public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandl
             processInstanceId = getProcessInstanceId(containerId, containerType);
             if (newValue == null) {
                 // we just delete the current version
-                deleteDocument(documentName, processInstanceId);
+                documentHelper.deleteDocument(documentName, processInstanceId);
             } else {
                 if(documentValue.getDocumentId() != null && !documentValue.hasChanged()){
                     //do not update if the document value say it did not changed
                     return newValue;
                 }
-                createOrUpdateDocument(documentValue, documentName, processInstanceId);
+                documentHelper.createOrUpdateDocument(documentValue, documentName, processInstanceId, getAuthorId());
             }
             return newValue;
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
         }
 
-    }
-
-    private void createOrUpdateDocument(DocumentValue newValue, String documentName, long processInstanceId) throws SSessionNotFoundException,
-            SBonitaReadException, SDocumentCreationException {
-        final SDocument document = createDocumentObject(newValue);
-        try {
-            // Let's check if the document already exists:
-            SMappedDocument mappedDocument = documentService.getMappedDocument(processInstanceId, documentName);
-            // a document exist, update it with the new values
-            documentService.updateDocumentOfProcessInstance(document, processInstanceId, documentName, mappedDocument.getDescription());
-        } catch (final SDocumentNotFoundException e) {
-            documentService.attachDocumentToProcessInstance(document, processInstanceId, documentName, null);
-        }
     }
 
     @Override

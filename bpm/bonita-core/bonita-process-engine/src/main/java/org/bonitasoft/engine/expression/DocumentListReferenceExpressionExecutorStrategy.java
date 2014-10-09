@@ -23,10 +23,10 @@ import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
@@ -36,7 +36,6 @@ import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingEx
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.operation.DocumentListLeftOperandHandler;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
@@ -51,6 +50,7 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
     private final DocumentService documentService;
 
     private final ActivityInstanceService flowNodeInstanceService;
+    private final DocumentHelper documentHelper;
     private ProcessInstanceService processInstanceService;
     private ProcessDefinitionService processDefinitionService;
 
@@ -61,6 +61,7 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
         this.flowNodeInstanceService = flowNodeInstanceService;
         this.processDefinitionService = processDefinitionService;
         this.processInstanceService = processInstanceService;
+        documentHelper = new DocumentHelper(documentService, processDefinitionService, processInstanceService);
     }
 
     @Override
@@ -99,7 +100,7 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
         List<SMappedDocument> documentList = getAllDocumentOfTheList(processInstanceId, name, time);
         try {
             if (documentList.isEmpty()
-                    && !DocumentListLeftOperandHandler.isListDefinedInDefinition(name, processInstanceId, processDefinitionService, processInstanceService)) {
+                    && !documentHelper.isListDefinedInDefinition(name, processInstanceId)) {
                 return null;
             }
         } catch (SObjectNotFoundException e) {
