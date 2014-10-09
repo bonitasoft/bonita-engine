@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2014 Bonitasoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -10,12 +10,21 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
+ **/
+package org.bonitasoft.engine.scheduler.model;
+
+
+/**
+ * @author Celine Souchet
+ * @version 6.4.0
+ * @since 6.4.0
  */
-package org.bonitasoft.engine.scheduler.impl;
+public interface SJobData {
 
-import org.quartz.DisallowConcurrentExecution;
+    String getKey();
 
-@DisallowConcurrentExecution
-public class NonConcurrentQuartzJob extends AbstractQuartzJob {
+    Object getValue();
+
+    String getClassOfValue();
 
 }

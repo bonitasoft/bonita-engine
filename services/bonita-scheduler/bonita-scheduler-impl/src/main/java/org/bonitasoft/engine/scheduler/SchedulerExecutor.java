@@ -30,8 +30,22 @@ public interface SchedulerExecutor {
 
     boolean isShutdown() throws SSchedulerException;
 
+    /**
+     * Note that once a scheduler is shutdown, it cannot be restarted without being re-instantiated.
+     * 
+     * @throws SSchedulerException
+     * @see {@link #initializeScheduler()}
+     * @since 6.4.0
+     */
     void start() throws SSchedulerException;
 
+    /**
+     * Note that once a scheduler is shutdown, it cannot be restarted without being re-instantiated.
+     * 
+     * @throws SSchedulerException
+     * @see {@link #initializeScheduler()}
+     * @since 6.4.0
+     */
     void shutdown() throws SSchedulerException;
 
     void rescheduleErroneousTriggers() throws SSchedulerException;
@@ -59,8 +73,7 @@ public interface SchedulerExecutor {
     void resumeJobs(String groupName) throws SSchedulerException;
 
     /**
-     * Remove (delete) the <code>{@link org.quartz.Trigger}</code> with the
-     * given key, and store the new given one - which must be associated
+     * Remove (delete) the <code>{@link org.quartz.Trigger}</code> with the given key, and store the new given one - which must be associated
      * with the same job (the new trigger must have the job name & group specified)
      * - however, the new trigger need not have the same name as the old trigger.
      * 
@@ -78,5 +91,36 @@ public interface SchedulerExecutor {
      * @since 6.4.0
      */
     Date rescheduleJob(String triggerName, String groupName, Date triggerStartTime) throws SSchedulerException;
+
+    /**
+     * Add the given <code>{@link AbstractBonitaTenantJobListener}s</code> to the <code>Scheduler</code>, and register it to receive events for Jobs that are
+     * matched by the group name.
+     * 
+     * @param jobListeners
+     *            The job listeners to add to the scheduler
+     * @param groupName
+     *            The group name to filter
+     * @throws SSchedulerException
+     * @since 6.4.0
+     */
+    void addJobListener(List<AbstractBonitaTenantJobListener> jobListeners, String groupName) throws SSchedulerException;
+
+    /**
+     * Add the given <code>{@link AbstractBonitaPlatormJobListener}s</code> to the <code>Scheduler</code>, and register it to receive events for all Jobs.
+     * 
+     * @param jobListeners
+     *            The job listeners to add to the scheduler
+     * @throws SSchedulerException
+     * @since 6.4.0
+     */
+    void addJobListener(List<AbstractBonitaPlatormJobListener> jobListeners) throws SSchedulerException;
+
+    /**
+     * Initialize the scheduler if this method has not be previously called (after shutdown); otherwise, do nothing.
+     * 
+     * @throws SSchedulerException
+     * @since 6.4.0
+     */
+    void initializeScheduler() throws SSchedulerException;
 
 }

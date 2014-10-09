@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,10 +16,12 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.incident.Incident;
@@ -31,7 +33,10 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
 import org.bonitasoft.engine.scheduler.JobService;
+import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNotFoundException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorReadException;
@@ -40,17 +45,15 @@ import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogDeletionException
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
-import org.quartz.Job;
-import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 
 /**
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  */
-public class JDBCJobListener extends AbstractJobListener {
+public class JDBCJobListener extends AbstractBonitaPlatormJobListener {
+
+    private static final long serialVersionUID = -5060516371371295271L;
 
     private final JobService jobService;
 
@@ -58,8 +61,12 @@ public class JDBCJobListener extends AbstractJobListener {
 
     private final TechnicalLoggerService logger;
 
-    public JDBCJobListener(final JobService jobService, final IncidentService incidentService, final TechnicalLoggerService logger) {
+    private final SchedulerService schedulerService;
+
+    public JDBCJobListener(final SchedulerService schedulerService, final JobService jobService, final IncidentService incidentService,
+            final TechnicalLoggerService logger) {
         super();
+        this.schedulerService = schedulerService;
         this.jobService = jobService;
         this.incidentService = incidentService;
         this.logger = logger;
@@ -71,23 +78,24 @@ public class JDBCJobListener extends AbstractJobListener {
     }
 
     @Override
-    public void jobToBeExecuted(final JobExecutionContext context) {
+    public void jobToBeExecuted(final Map<String, Serializable> context) {
         // nothing to do
     }
 
     @Override
-    public void jobExecutionVetoed(final JobExecutionContext context) {
+    public void jobExecutionVetoed(final Map<String, Serializable> context) {
         // nothing to do
     }
 
     @Override
-    public void jobWasExecuted(final JobExecutionContext context, final JobExecutionException jobException) {
-        final JobDetail jobDetail = context.getJobDetail();
-
-        if (isEmptyJob(context)) {
+    public void jobWasExecuted(final Map<String, Serializable> context, final SSchedulerException jobException) {
+        final StatelessJob bosJob = (StatelessJob) context.get(BOS_JOB);
+        if (bosJob == null) {
             return;
         }
-        final Long jobDescriptorId = Long.valueOf((String) jobDetail.getJobDataMap().getWrappedMap().get("jobId"));
+
+        final Long jobDescriptorId = (Long) context.get(JOB_DESCRIPTOR_ID);
+        final Long tenantId = (Long) context.get(TENANT_ID);
         try {
             if (jobException != null) {
                 final List<SJobLog> jobLogs = getJobLogs(jobDescriptorId);
@@ -101,25 +109,13 @@ public class JDBCJobListener extends AbstractJobListener {
                 deleteJobIfNotScheduledAnyMore(jobDescriptorId);
             }
         } catch (final SBonitaException sbe) {
-            final Long tenantId = Long.valueOf((String) jobDetail.getJobDataMap().getWrappedMap().get("tenantId"));
             final Incident incident = new Incident("An exception occurs during the job execution of the job descriptor" + jobDescriptorId, "", jobException,
                     sbe);
             incidentService.report(tenantId, incident);
         }
     }
 
-    private boolean isEmptyJob(final JobExecutionContext context) {
-        final Job instance = context.getJobInstance();
-        if (instance != null && instance instanceof QuartzJob) {
-            final QuartzJob job = (QuartzJob) instance;
-            if (job.getBosJob() == null) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void createJobLog(final JobExecutionException jobException, final Long jobDescriptorId) throws SJobLogCreationException {
+    private void createJobLog(final Exception jobException, final Long jobDescriptorId) throws SJobLogCreationException {
         final SJobLogImpl jobLog = new SJobLogImpl(jobDescriptorId);
         jobLog.setLastMessage(getStackTrace(jobException));
         jobLog.setRetryNumber(Long.valueOf(0));
@@ -127,7 +123,7 @@ public class JDBCJobListener extends AbstractJobListener {
         jobService.createJobLog(jobLog);
     }
 
-    private void updateJobLog(final JobExecutionException jobException, final List<SJobLog> jobLogs) {
+    private void updateJobLog(final Exception jobException, final List<SJobLog> jobLogs) {
         final SJobLogImpl jobLog = (SJobLogImpl) jobLogs.get(0);
         jobLog.setLastMessage(getStackTrace(jobException));
         jobLog.setLastUpdateDate(System.currentTimeMillis());
@@ -135,11 +131,11 @@ public class JDBCJobListener extends AbstractJobListener {
     }
 
     private void deleteJobIfNotScheduledAnyMore(final Long jobDescriptorId) throws SJobDescriptorNotFoundException, SJobDescriptorReadException,
-    SSchedulerException {
+            SSchedulerException {
         try {
             final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
-            if (!getSchedulerService().isStillScheduled(jobDescriptor)) {
-                getSchedulerService().delete(jobDescriptor.getJobName());
+            if (!schedulerService.isStillScheduled(jobDescriptor)) {
+                schedulerService.delete(jobDescriptor.getJobName());
             }
         } catch (final SJobDescriptorNotFoundException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -167,7 +163,7 @@ public class JDBCJobListener extends AbstractJobListener {
         return jobService.searchJobLogs(options);
     }
 
-    private String getStackTrace(final JobExecutionException jobException) {
+    private String getStackTrace(final Exception jobException) {
         final StringWriter exceptionWriter = new StringWriter();
         jobException.printStackTrace(new PrintWriter(exceptionWriter));
         return exceptionWriter.toString();

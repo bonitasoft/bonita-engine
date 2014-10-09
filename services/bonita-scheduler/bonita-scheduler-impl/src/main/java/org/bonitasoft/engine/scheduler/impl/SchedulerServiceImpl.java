@@ -40,6 +40,8 @@ import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
+import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.InjectedService;
 import org.bonitasoft.engine.scheduler.JobIdentifier;
 import org.bonitasoft.engine.scheduler.JobParameter;
@@ -113,8 +115,8 @@ public class SchedulerServiceImpl implements SchedulerService {
         this.eventService = eventService;
         this.transactionService = transactionService;
         this.sessionAccessor = sessionAccessor;
-        schedulerExecutor.setBOSSchedulerService(this);
         this.batchSize = batchSize;
+        schedulerExecutor.setBOSSchedulerService(this);
     }
 
     private void logBeforeMethod(final TechnicalLogSeverity technicalLogSeverity, final String methodName) {
@@ -412,6 +414,21 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public Date rescheduleJob(final String triggerName, final String groupName, final Date triggerStartTime) throws SSchedulerException {
         return schedulerExecutor.rescheduleJob(triggerName, groupName, triggerStartTime);
+    }
+
+    @Override
+    public void addJobListener(final List<AbstractBonitaTenantJobListener> jobListeners, final String groupName) throws SSchedulerException {
+        schedulerExecutor.addJobListener(jobListeners, groupName);
+    }
+
+    @Override
+    public void addJobListener(List<AbstractBonitaPlatormJobListener> jobListeners) throws SSchedulerException {
+        schedulerExecutor.addJobListener(jobListeners);
+    }
+
+    @Override
+    public void initializeScheduler() throws SSchedulerException {
+        schedulerExecutor.initializeScheduler();
     }
 
 }

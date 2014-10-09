@@ -67,15 +67,16 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
     }
 
     @Test
-    public void testCanRestartTheSchedulerAfterShutdown() throws Exception {
+    public void canRestartTheSchedulerAfterShutdown() throws Exception {
         schedulerService.stop();
         assertTrue(schedulerService.isStopped());
+        schedulerService.initializeScheduler();
         schedulerService.start();
         assertTrue(schedulerService.isStarted());
     }
 
     @Test
-    public void testDoNotExecuteAFutureJob() throws Exception {
+    public void doNotExecuteAFutureJob() throws Exception {
         final Date future = new Date(System.currentTimeMillis() + 10000000);
         final String variableName = "myVar";
         final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
@@ -93,7 +94,7 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
     }
 
     @Test
-    public void testExecuteAJobInACron() throws Exception {
+    public void executeAJobInACron() throws Exception {
         // given
         final String jobName = "IncrementItselfJob";
         IncrementItselfJob.reset();
@@ -104,13 +105,13 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
         final Date now = new Date();
         final Trigger trigger = new UnixCronTrigger("events", now, 10, "0/1 * * * * ?");
 
-        //when
+        // when
         getTransactionService().begin();
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();
         Thread.sleep(2500);
 
-        //then
+        // then
         final List<Date> executionDates = IncrementItselfJob.getExecutionDates();
         assertThat(executionDates).as("should have triggered job").isNotEmpty();
         Date previousDate = null;
@@ -123,7 +124,7 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
     }
 
     @Test
-    public void testDoNotThrowAnExceptionWhenDeletingAnUnknownJob() throws Exception {
+    public void doNotThrowAnExceptionWhenDeletingAnUnknownJob() throws Exception {
         getTransactionService().begin();
         final boolean deleted = schedulerService.delete("MyJob");
         getTransactionService().complete();

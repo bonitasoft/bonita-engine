@@ -1,7 +1,8 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -18,6 +19,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -29,6 +31,8 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
+import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.InjectedService;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
@@ -111,9 +115,9 @@ public class SchedulerServiceImplTest {
 
         final SQueriableLog sQueriableLog = mock(SQueriableLog.class);
         when(jobLogBuilder.done()).thenReturn(sQueriableLog);
-        
+
         given(sessionAccessor.getTenantId()).willReturn(TENANT_ID);
-        
+
         servicesResolver = mock(ServicesResolver.class);
         schedulerService = new SchedulerServiceImpl(schedulerExecutor, jobService, logger, eventService, transactionService, sessionAccessor, servicesResolver);
     }
@@ -249,7 +253,7 @@ public class SchedulerServiceImplTest {
     @Test
     public void schedule_should_store_jobDescriptor_store_parameters_and_call_executor_schedule_using_tenantId()
             throws Exception {
-        //given
+        // given
         final long jogDescriptorId = 7L;
         final String jobName = "myJob";
         final boolean disallowConcurrency = true;
@@ -261,10 +265,10 @@ public class SchedulerServiceImplTest {
         final Trigger trigger = mock(Trigger.class);
         final List<SJobParameter> parameters = Collections.singletonList(mock(SJobParameter.class));
 
-        //when
+        // when
         schedulerService.schedule(jobDescriptor, parameters, trigger);
 
-        //then
+        // then
         verify(jobService, times(1)).createJobDescriptor(jobDescriptor, TENANT_ID);
         verify(jobService, times(1)).createJobParameters(parameters, TENANT_ID, jogDescriptorId);
         verify(schedulerExecutor, times(1)).schedule(jogDescriptorId, String.valueOf(TENANT_ID), jobName, trigger, disallowConcurrency);
@@ -273,15 +277,15 @@ public class SchedulerServiceImplTest {
     @Test
     public void executeNow_should_use_tenantId_on_jobDescriptor_jobParameters_and_call_executor_executeNow()
             throws Exception {
-        //given
+        // given
         final SJobDescriptor jobDescriptor = mock(SJobDescriptor.class);
         given(jobService.createJobDescriptor(jobDescriptor, TENANT_ID)).willReturn(jobDescriptor);
         final List<SJobParameter> parameters = Collections.singletonList(mock(SJobParameter.class));
 
-        //when
+        // when
         schedulerService.executeNow(jobDescriptor, parameters);
 
-        //then
+        // then
         verify(jobService, times(1)).createJobDescriptor(jobDescriptor, TENANT_ID);
         verify(jobService, times(1)).createJobParameters(Matchers.<List<SJobParameter>> any(), eq(TENANT_ID), anyLong());
         verify(schedulerExecutor, times(1)).executeNow(anyLong(), eq(String.valueOf(TENANT_ID)), anyString(), anyBoolean());
@@ -327,5 +331,53 @@ public class SchedulerServiceImplTest {
         @Override
         public void setAttributes(final Map<String, Serializable> attributes) {
         }
+    }
+
+    @Test
+    public void rescheduleJob_should_call_rescheduleJob() throws Exception {
+        // Given
+        final String triggerName = "triggerName";
+        final String groupName = "groupName";
+        final Date triggerStartTime = new Date();
+
+        // When
+        schedulerService.rescheduleJob(triggerName, groupName, triggerStartTime);
+
+        // Then
+        verify(schedulerExecutor).rescheduleJob(triggerName, groupName, triggerStartTime);
+    }
+
+    @Test
+    public void addJobListener_for_TenantJobListener_should_call_addJobListener_for_TenantJobListener() throws SSchedulerException {
+        // Given
+        final String groupName = "groupName";
+        final List<AbstractBonitaTenantJobListener> jobListeners = Collections.emptyList();
+
+        // When
+        schedulerService.addJobListener(jobListeners, groupName);
+
+        // Then
+        verify(schedulerExecutor).addJobListener(jobListeners, groupName);
+    }
+
+    @Test
+    public void addJobListener_for_PlatormJobListener_should_call_addJobListener_for_PlatormJobListener() throws SSchedulerException {
+        // Given
+        final List<AbstractBonitaPlatormJobListener> jobListeners = Collections.emptyList();
+
+        // When
+        schedulerService.addJobListener(jobListeners);
+
+        // Then
+        verify(schedulerExecutor).addJobListener(jobListeners);
+    }
+
+    @Test
+    public void initializeScheduler_should_call_initializeScheduler() throws Exception {
+        // When
+        schedulerService.initializeScheduler();
+
+        // Then
+        verify(schedulerExecutor).initializeScheduler();
     }
 }

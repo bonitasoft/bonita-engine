@@ -63,7 +63,7 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
 
     PlatformCommandService getPlatformCommandService();
 
-    NodeConfiguration getPlaformConfiguration();
+    NodeConfiguration getPlatformConfiguration();
 
     PlatformCacheService getPlatformCacheService();
 

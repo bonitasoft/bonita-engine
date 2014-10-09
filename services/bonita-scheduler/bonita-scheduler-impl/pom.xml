@@ -35,6 +35,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.bonitasoft.engine.incident</groupId>
+			<artifactId>bonita-incident-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.bonitasoft.engine.recorder</groupId>
 			<artifactId>bonita-recorder-api</artifactId>
 			<version>${project.version}</version>

@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
@@ -184,5 +185,56 @@ public interface SchedulerService extends PlatformLifecycleService {
      * @since 6.4.0
      */
     Date rescheduleJob(String triggerName, String groupName, Date triggerStartTime) throws SSchedulerException;
+
+    /**
+     * Add the given <code>{@link AbstractBonitaTenantJobListener}s</code> to the <code>Scheduler</code>,
+     * and register it to receive events for Jobs that are matched by the group name.
+     * 
+     * @param jobListeners
+     *            The job listeners to add to the scheduler
+     * @param groupName
+     *            The group name to filter
+     * @throws SSchedulerException
+     * @since 6.4.0
+     */
+    void addJobListener(List<AbstractBonitaTenantJobListener> jobListeners, String groupName) throws SSchedulerException;
+
+    /**
+     * Add the given <code>{@link AbstractBonitaPlatormJobListener}s</code> to the <code>Scheduler</code>, and register it to receive events for all Jobs.
+     * 
+     * @param jobListeners
+     *            The job listeners to add to the scheduler
+     * @throws SSchedulerException
+     * @since 6.4.0
+     */
+    void addJobListener(List<AbstractBonitaPlatormJobListener> jobListeners) throws SSchedulerException;
+
+    /**
+     * Initialize the scheduler if this method has not be previously called (after shutdown); otherwise, do nothing.
+     * 
+     * @throws SSchedulerException
+     * @since 6.4.0
+     */
+    void initializeScheduler() throws SSchedulerException;
+
+    /**
+     * Note that once a scheduler is shutdown, it cannot be restarted without being re-instantiated.
+     * 
+     * @throws SSchedulerException
+     * @see {@link #initializeScheduler()}
+     * @since 6.4.0
+     */
+    @Override
+    void start() throws SBonitaException;
+
+    /**
+     * Note that once a scheduler is shutdown, it cannot be restarted without being re-instantiated.
+     * 
+     * @throws SSchedulerException
+     * @see {@link #initializeScheduler()}
+     * @since 6.4.0
+     */
+    @Override
+    void stop() throws SBonitaException;
 
 }

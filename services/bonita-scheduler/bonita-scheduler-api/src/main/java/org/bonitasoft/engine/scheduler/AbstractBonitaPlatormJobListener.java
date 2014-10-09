@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,23 +11,13 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.scheduler.impl;
-
-import org.quartz.JobListener;
+package org.bonitasoft.engine.scheduler;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
-public abstract class AbstractJobListener implements JobListener {
+public abstract class AbstractBonitaPlatormJobListener extends AbstractBonitaJobListener {
 
-    private SchedulerServiceImpl schedulerService;
-
-    public void setBOSSchedulerService(final SchedulerServiceImpl schedulerService) {
-        this.schedulerService = schedulerService;
-    }
-
-    public SchedulerServiceImpl getSchedulerService() {
-        return schedulerService;
-    }
+    private static final long serialVersionUID = 4115044015337726803L;
 
 }

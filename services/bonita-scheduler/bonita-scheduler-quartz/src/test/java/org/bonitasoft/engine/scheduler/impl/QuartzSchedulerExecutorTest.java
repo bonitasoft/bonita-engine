@@ -19,11 +19,13 @@ import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
 import static org.quartz.impl.matchers.GroupMatcher.jobGroupStartsWith;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
 import org.bonitasoft.engine.scheduler.trigger.RepeatTrigger;
@@ -43,6 +45,8 @@ import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
+import org.quartz.JobListener;
+import org.quartz.ListenerManager;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger.TriggerState;
@@ -71,8 +75,6 @@ public class QuartzSchedulerExecutorTest {
     @Mock
     private Scheduler scheduler;
 
-    private QuartzSchedulerExecutor quartzSchedulerExecutor;
-
     @Mock
     private JobDetail jobDetail;
 
@@ -82,17 +84,19 @@ public class QuartzSchedulerExecutorTest {
     @Mock
     private GroupMatcher<TriggerKey> groupMatcher;
 
+    private QuartzSchedulerExecutor quartzSchedulerExecutor;
+
     @Before
     public void before() throws Exception {
         when(schedulerFactory.getScheduler()).thenReturn(scheduler);
+        when(scheduler.getListenerManager()).thenReturn(mock(ListenerManager.class));
 
         quartzSchedulerExecutor = initQuartzScheduler(false);
     }
 
     private QuartzSchedulerExecutor initQuartzScheduler(final boolean useOptimization) throws SSchedulerException {
-        final QuartzSchedulerExecutor quartz = new QuartzSchedulerExecutor(schedulerFactory, new ArrayList<AbstractJobListener>(), transactionService,
-                useOptimization);
-        quartz.setBOSSchedulerService(schedulerService);
+        final QuartzSchedulerExecutor quartz = new QuartzSchedulerExecutor(schedulerFactory, transactionService, useOptimization);
+        quartz.initializeScheduler();
         quartz.start();
         return quartz;
     }
@@ -369,7 +373,6 @@ public class QuartzSchedulerExecutorTest {
 
     private void scheduleJob(final QuartzSchedulerExecutor executor, final boolean disallowConcurrentExecution, final int expectedOptimizationCall)
             throws Exception {
-
         // when
         executor.schedule(1l, "2", JOB_NAME, new OneShotTrigger("oneShot", new Date(System.currentTimeMillis())), disallowConcurrentExecution);
 
@@ -687,5 +690,27 @@ public class QuartzSchedulerExecutorTest {
 
         // When
         quartzSchedulerExecutor.rescheduleJob("triggerName", "groupName", new Date());
+    }
+
+    @Test(expected = SSchedulerException.class)
+    public void addJobListener_should_throw_exception_when_addJobListener_failed() throws Exception {
+        // Given
+        final List<AbstractBonitaTenantJobListener> jobListeners = Collections.emptyList();
+        final String groupName = "groupName";
+        final ListenerManager listenerManager = mock(ListenerManager.class);
+        doReturn(listenerManager).when(scheduler).getListenerManager();
+        doThrow(SchedulerException.class).when(listenerManager).addJobListener(any(JobListener.class), eq(GroupMatcher.<JobKey> groupEquals(groupName)));
+
+        // When
+        quartzSchedulerExecutor.addJobListener(jobListeners, groupName);
+    }
+
+    @Test(expected = SSchedulerException.class)
+    public void initializeScheduler_should_throw_exception_when_getJobListener_failed() throws Exception {
+        // Given
+        doThrow(SchedulerException.class).when(schedulerFactory).getScheduler();
+
+        // When
+        quartzSchedulerExecutor.initializeScheduler();
     }
 }

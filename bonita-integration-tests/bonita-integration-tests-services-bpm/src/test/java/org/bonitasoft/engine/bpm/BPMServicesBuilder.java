@@ -480,7 +480,7 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
-    public NodeConfiguration getPlaformConfiguration() {
+    public NodeConfiguration getPlatformConfiguration() {
         return getInstanceOf(NodeConfiguration.class);
     }
 
