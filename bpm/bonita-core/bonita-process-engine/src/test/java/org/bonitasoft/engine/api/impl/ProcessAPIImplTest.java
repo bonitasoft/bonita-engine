@@ -19,6 +19,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -130,15 +131,6 @@ public class ProcessAPIImplTest {
 
     private ProcessAPIImpl processAPI;
 
-    @Mock
-    private TransactionExecutor transactionExecutor;
-
-    @Mock
-    private ContractValidator contractValidator;
-
-    @Mock
-    private LockService lockService;
-
     @Before
     public void setup() {
         processAPI = spy(new ProcessAPIImpl());
@@ -172,6 +164,48 @@ public class ProcessAPIImplTest {
             verify(lockService).lock(processInstanceId, SFlowElementsContainerType.PROCESS.name(), tenantId);
             verify(lockService).unlock(any(BonitaLock.class), eq(tenantId));
         }
+    }
+
+    @Test
+    public void generateRelativeResourcePathShouldHandleBackslashOS() throws Exception {
+        // given:
+        String pathname = "C:\\hello\\hi\\folder";
+        final String resourceRelativePath = "resource/toto.lst";
+
+        // when:
+        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
+                + resourceRelativePath));
+
+        // then:
+        assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
+    }
+
+    @Test
+    public void generateRelativeResourcePathShouldNotContainFirstSlash() throws Exception {
+        // given:
+        String pathname = "/home/target/some_folder/";
+        final String resourceRelativePath = "resource/toto.lst";
+
+        // when:
+        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
+                + resourceRelativePath));
+
+        // then:
+        assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
+    }
+
+    @Test
+    public void generateRelativeResourcePathShouldWorkWithRelativeInitialPath() throws Exception {
+        // given:
+        String pathname = "target/nuns";
+        final String resourceRelativePath = "resource/toto.lst";
+
+        // when:
+        final String generatedRelativeResourcePath = processAPI.generateRelativeResourcePath(new File(pathname), new File(pathname + File.separator
+                + resourceRelativePath));
+
+        // then:
+        assertThat(generatedRelativeResourcePath).isEqualTo(resourceRelativePath);
     }
 
     @Test
@@ -493,157 +527,6 @@ public class ProcessAPIImplTest {
         processAPI.updateActivityInstanceVariables(operations, 2, null);
 
         verify(classLoaderService).getLocalClassLoader(anyString(), anyLong());
-    }
-
-    public void getUserTaskContract_should_return_contract_associated_to_a_given_task() throws Exception {
-        final long userTaskInstanceId = 786454L;
-        final long processDefinitionId = 464684354L;
-        final long userTaskDefinitionId = 786454L;
-        final SUserTaskInstance instance = mock(SUserTaskInstance.class);
-        final ActivityInstanceService activityInstanceService = mock(ActivityInstanceService.class);
-        when(tenantAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
-        when(activityInstanceService.getUserTaskInstance(userTaskInstanceId)).thenReturn(instance);
-        when(instance.getProcessDefinitionId()).thenReturn(processDefinitionId);
-        when(instance.getFlowNodeDefinitionId()).thenReturn(userTaskDefinitionId);
-        final ProcessDefinitionService processDefinitionService = mock(ProcessDefinitionService.class);
-        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
-        final SFlowElementContainerDefinition container = mock(SFlowElementContainerDefinition.class);
-        final SUserTaskDefinition definition = mock(SUserTaskDefinition.class);
-        when(tenantAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
-        when(processDefinitionService.getProcessDefinition(processDefinitionId)).thenReturn(processDefinition);
-        when(processDefinition.getProcessContainer()).thenReturn(container);
-        when(container.getFlowNode(userTaskDefinitionId)).thenReturn(definition);
-        final SContractDefinitionImpl contractDefinitionImpl = new SContractDefinitionImpl();
-        final SimpleInputDefinitionImpl input = new SimpleInputDefinitionImpl("name", Type.TEXT, "aDescription");
-        contractDefinitionImpl.addSimpleInput(new SSimpleInputDefinitionImpl(input));
-        when(definition.getContract()).thenReturn(contractDefinitionImpl);
-        final ContractDefinitionImpl contractDefinition = new ContractDefinitionImpl();
-        contractDefinition.addSimpleInput(input);
-
-        final ContractDefinition contract = processAPI.getUserTaskContract(userTaskInstanceId);
-
-        assertThat(contract).isEqualTo(contractDefinition);
-    }
-
-    @Test(expected = UserTaskNotFoundException.class)
-    public void getUserTaskContractThrowsAExceptionWhenTheIdDoesNotReferToAnExistingTask() throws Exception {
-        final long userTaskInstanceId = 786454L;
-        final ActivityInstanceService activityInstanceService = mock(ActivityInstanceService.class);
-        when(tenantAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
-        when(activityInstanceService.getUserTaskInstance(userTaskInstanceId)).thenThrow(new SActivityInstanceNotFoundException(786454L));
-
-        processAPI.getUserTaskContract(userTaskInstanceId);
-    }
-
-    @Test(expected = RetrieveException.class)
-    public void getUserTaskContractThrowsAExceptionWhenAnExceptionOccursWhenGettingTheActivity() throws Exception {
-        final long userTaskInstanceId = 786454L;
-        final ActivityInstanceService activityInstanceService = mock(ActivityInstanceService.class);
-        when(tenantAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
-        when(activityInstanceService.getUserTaskInstance(userTaskInstanceId)).thenThrow(new SActivityReadException("ouch !"));
-
-        processAPI.getUserTaskContract(userTaskInstanceId);
-    }
-
-    @Test(expected = UserTaskNotFoundException.class)
-    public void getUserTaskContractThrowsAExceptionWhenTheIdDoesNotReferToAnExistingProcess() throws Exception {
-        final long userTaskInstanceId = 786454L;
-        final long processDefinitionId = 464684354L;
-        final SUserTaskInstance instance = mock(SUserTaskInstance.class);
-        final ActivityInstanceService activityInstanceService = mock(ActivityInstanceService.class);
-        when(tenantAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
-        when(activityInstanceService.getUserTaskInstance(userTaskInstanceId)).thenReturn(instance);
-        when(instance.getProcessDefinitionId()).thenReturn(processDefinitionId);
-
-        final ProcessDefinitionService processDefinitionService = mock(ProcessDefinitionService.class);
-        when(tenantAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
-        when(processDefinitionService.getProcessDefinition(processDefinitionId)).thenThrow(new SProcessDefinitionNotFoundException("proc"));
-
-        processAPI.getUserTaskContract(userTaskInstanceId);
-    }
-
-    @Test(expected = RetrieveException.class)
-    public void getUserTaskContractThrowsAExceptionWhenAnExceptionOccursWhenGettingTheProcess() throws Exception {
-        final long userTaskInstanceId = 786454L;
-        final long processDefinitionId = 464684354L;
-        final SUserTaskInstance instance = mock(SUserTaskInstance.class);
-        final ActivityInstanceService activityInstanceService = mock(ActivityInstanceService.class);
-        when(tenantAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
-        when(activityInstanceService.getUserTaskInstance(userTaskInstanceId)).thenReturn(instance);
-        when(instance.getProcessDefinitionId()).thenReturn(processDefinitionId);
-
-        final ProcessDefinitionService processDefinitionService = mock(ProcessDefinitionService.class);
-        when(tenantAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
-        when(processDefinitionService.getProcessDefinition(processDefinitionId)).thenThrow(new SProcessDefinitionReadException("proc"));
-
-        processAPI.getUserTaskContract(userTaskInstanceId);
-    }
-
-    //    @CustomTransactions
-    //    @Override
-    //    public void executeUserTask(final long flownodeInstanceId, final List<Input> inputs) throws FlowNodeExecutionException, ContractViolationException, UserTaskNotFoundException {
-    //        executeUserTask(0, flownodeInstanceId, inputs);
-    //    }
-    //
-    //
-
-    @Test(expected = FlowNodeExecutionException.class)
-    public void executeUserTask_should_throw_FlowNodeExecutionException() throws Exception {
-        final long userId = 1l;
-        final long flownodeInstanceId = 2l;
-        final HashMap inputs = new HashMap<String, Object>();
-        final SBonitaException sBonitaException = new SBonitaException() {
-
-            @Override
-            public synchronized Throwable getCause() {
-                return new Exception("message");
-            }
-        };
-        //given
-        doThrow(sBonitaException).when(processAPI).executeFlowNode(userId, flownodeInstanceId, true, inputs);
-
-        //when
-        processAPI.executeUserTask(userId, flownodeInstanceId, inputs);
-
-        //then exception
-    }
-
-    @Test(expected = ContractViolationException.class)
-    public void executeUserTask_should_throw_ContractViolationException() throws Exception {
-        final long userId = 1l;
-        final long flownodeInstanceId = 2l;
-        final HashMap inputs = new HashMap<String, Object>();
-        final SBonitaException sBonitaException = new SBonitaException() {
-
-            @Override
-            public synchronized Throwable getCause() {
-                return new Exception("message");
-            }
-        };
-        //given
-        doThrow(ContractViolationException.class).when(processAPI).executeFlowNode(userId, flownodeInstanceId, true, inputs);
-
-        //when
-        processAPI.executeUserTask(userId, flownodeInstanceId, inputs);
-
-        //then exception
-    }
-
-    @Test(expected = UserTaskNotFoundException.class)
-    public void executeUserTask_should_throw_UserTaskNotFoundException() throws Exception {
-        final long userId = 1l;
-        final long flownodeInstanceId = 2l;
-        final HashMap inputs = new HashMap<String, Object>();
-        final SFlowNodeNotFoundException sFlowNodeNotFoundException = new SFlowNodeNotFoundException(flownodeInstanceId);
-
-        //given
-        doThrow(sFlowNodeNotFoundException).when(processAPI).executeFlowNode(userId, flownodeInstanceId, true, inputs);
-
-        //when
-        processAPI.executeUserTask(userId, flownodeInstanceId, inputs);
-
-        //then exception
-
     }
 
 }

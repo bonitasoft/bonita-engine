@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.net.URL;
 import java.nio.MappedByteBuffer;
@@ -54,6 +55,8 @@ public class IOUtil {
     private static final int BUFFER_SIZE = 100000;
 
     public static final String FILE_ENCODING = "UTF-8";
+
+    private static final String JVM_NAME = ManagementFactory.getRuntimeMXBean().getName();
 
     public static byte[] generateJar(final Class<?>... classes) throws IOException {
         return generateJar(getResources(classes));
@@ -128,7 +131,7 @@ public class IOUtil {
      * Return the whole underlying stream content into a single String.
      * Warning: the whole content of stream will be kept in memory!! Use with
      * care!
-     * 
+     *
      * @param in
      *        the stream to read
      * @return the whole content of the stream in a single String.
@@ -168,7 +171,7 @@ public class IOUtil {
     /**
      * Equivalent to {@link #getAllContentFrom(InputStream) getAllContentFrom(new
      * FileInputStream(file))};
-     * 
+     *
      * @param file
      *        the file to read
      * @return the whole content of the file in a single String.
@@ -191,7 +194,7 @@ public class IOUtil {
      * Return the whole underlying stream content into a single String.
      * Warning: the whole content of stream will be kept in memory!! Use with
      * care!
-     * 
+     *
      * @param url
      *        the URL to read
      * @return the whole content of the stream in a single String.
@@ -208,8 +211,9 @@ public class IOUtil {
     }
 
     public static File createTempDirectoryInDefaultTempDirectory(final String directoryName) {
-        createTempDirectory(new File(TMP_DIRECTORY, directoryName +"_"+ UUID.randomUUID().toString()));
-        return new File(TMP_DIRECTORY, directoryName +"_"+ UUID.randomUUID().toString());
+        final File tmpDir = new File(TMP_DIRECTORY, directoryName + "_" + JVM_NAME + "_" + String.valueOf(System.currentTimeMillis()));
+        createTempDirectory(tmpDir);
+        return tmpDir;
     }
 
     public static File createTempDirectory(final URI directoryPath) {
@@ -356,7 +360,7 @@ public class IOUtil {
     /**
      * Create a structured zip archive recursively.
      * The string must be OS specific String to represent path.
-     * 
+     *
      * @param dir2zip
      * @param zos
      * @param root
@@ -402,7 +406,7 @@ public class IOUtil {
 
     /**
      * Read the contents from the given FileInputStream. Return the result as a String.
-     * 
+     *
      * @param inputStream
      *        the stream to read from
      * @return the content read from the inputStream, as a String

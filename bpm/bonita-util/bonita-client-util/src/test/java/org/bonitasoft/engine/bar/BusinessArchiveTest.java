@@ -22,7 +22,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -78,6 +77,7 @@ import org.junit.Test;
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
+ * @author Emmanuel Duchastenier
  */
 public class BusinessArchiveTest {
 
@@ -89,10 +89,11 @@ public class BusinessArchiveTest {
 
     @Before
     public void before() throws IOException {
-        final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
-        tempFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("barFolder_" + jvmName);
+        final String barFolderName = "tmpBar";
+        tempFolder = IOUtil.createTempDirectoryInDefaultTempDirectory(barFolderName);
+        deleteDirOnExit(tempFolder);
         IOUtil.deleteDir(tempFolder);
-        barFile = IOUtil.createTempFileInDefaultTempDirectory("businessArchive", ".bar");
+        barFile = IOUtil.createTempFileInDefaultTempDirectory(barFolderName, ".bar");
         IOUtil.deleteFile(barFile, 2, 3);
     }
 
@@ -1015,7 +1016,6 @@ public class BusinessArchiveTest {
         file.delete();
         createNewFile(file);
         IOUtil.writeContentToFile(fileContent, file);
-        deleteDirOnExit();
         BusinessArchiveFactory.readBusinessArchive(tempFolder);
     }
 
@@ -1043,7 +1043,6 @@ public class BusinessArchiveTest {
         file.delete();
         createNewFile(file);
         IOUtil.writeContentToFile(fileContent, file);
-        deleteDirOnExit();
         BusinessArchiveFactory.readBusinessArchive(tempFolder);
     }
 
@@ -1060,14 +1059,14 @@ public class BusinessArchiveTest {
         });
     }
 
-    private void deleteDirOnExit() {
+    private void deleteDirOnExit(final File directory) {
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
             @Override
             public void run() {
-                if (tempFolder != null) {
+                if (directory != null) {
                     try {
-                        IOUtil.deleteDir(tempFolder);
+                        IOUtil.deleteDir(directory);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

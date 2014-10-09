@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-deployment-structure>
+  <deployment>
+    <resources>
+      <resource-root path="bonita-jboss-h2-mbean.jar" />
+      <resource-root path="h2.jar" />
+    </resources>
+  </deployment>
+</jboss-deployment-structure>
