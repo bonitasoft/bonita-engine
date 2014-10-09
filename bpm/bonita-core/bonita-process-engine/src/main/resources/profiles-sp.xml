@@ -50,9 +50,16 @@
 						<type>link</type>
 						<page>caselistingadmin</page>
 					</profileEntry>
-					<profileEntry name="Apps" isCustom="false">
+					<profileEntry name="CasesAdmin" isCustom="false">
 						<parentName>BPM</parentName>
 						<index>4</index>
+						<description>All cases with Iframe</description>
+						<type>link</type>
+						<page>ng-caselistingadmin</page>
+					</profileEntry>
+					<profileEntry name="Apps" isCustom="false">
+						<parentName>BPM</parentName>
+						<index>6</index>
 						<description>All processes</description>
 						<type>link</type>
 						<page>processlistingadmin</page>
