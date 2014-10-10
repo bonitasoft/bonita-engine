@@ -140,7 +140,7 @@ public class DocumentHelper {
         // iterate on elements
         int index;
         for (index = 0; index < documentList.size(); index++) {
-            processDocumentOnIndex(documentList, documentName, processInstanceId, currentList, index, authorId);
+            processDocumentOnIndex(documentList.get(index), documentName, processInstanceId, currentList, index, authorId);
         }
 
         // when no more elements in documentList remove elements above
@@ -175,7 +175,7 @@ public class DocumentHelper {
 
 
 
-    private List<SMappedDocument> getExistingDocumentList(String documentName, long processInstanceId) throws SBonitaReadException, org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException {
+    List<SMappedDocument> getExistingDocumentList(String documentName, long processInstanceId) throws SBonitaReadException, org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException {
         List<SMappedDocument> currentList;
         currentList = getAllDocumentOfTheList(processInstanceId, documentName);
         // if it's not a list it throws an exception
@@ -186,17 +186,15 @@ public class DocumentHelper {
         return currentList;
     }
 
-    private void removeOthersDocuments(List<SMappedDocument> currentList) throws SObjectNotFoundException, SObjectModificationException {
+    void removeOthersDocuments(List<SMappedDocument> currentList) throws SObjectNotFoundException, SObjectModificationException {
         for (SMappedDocument mappedDocument : currentList) {
             documentService.removeCurrentVersion(mappedDocument);
         }
 
     }
 
-    private void processDocumentOnIndex(List<DocumentValue> documentList, String documentName, long processInstanceId, List<SMappedDocument> currentList,
+    void processDocumentOnIndex(DocumentValue documentValue, String documentName, long processInstanceId, List<SMappedDocument> currentList,
                                         int index, long authorId) throws SObjectCreationException, SSessionNotFoundException, SObjectAlreadyExistsException, SObjectNotFoundException, SObjectModificationException {
-        DocumentValue documentValue = documentList.get(index);
-
         if (documentValue.getDocumentId() != null) {
             // if hasChanged update
             SMappedDocument documentToUpdate = getDocumentHavingDocumentIdAndRemoveFromList(currentList, documentValue.getDocumentId(), documentName,

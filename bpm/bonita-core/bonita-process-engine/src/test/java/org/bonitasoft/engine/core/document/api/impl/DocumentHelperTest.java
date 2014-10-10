@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.document.DocumentValue;
@@ -206,21 +207,22 @@ public class DocumentHelperTest {
         //when
         documentHelper.deleteDocument("myDoc", PROCESS_INSTANCE_ID);
     }
-/*
+
     @Test
-    public void should_createOrUpdate_update_if_found() throws SObjectModificationException, SObjectNotFoundException,  SObjectCreationException, SSessionNotFoundException, SBonitaReadException {
+    public void should_createOrUpdate_update_if_found() throws Exception {
         //given
         SMappedDocumentImpl docToUpdate = new SMappedDocumentImpl();
+        docToUpdate.setId(145);
         doReturn(docToUpdate).when(documentService).getMappedDocument(PROCESS_INSTANCE_ID,"myDoc");
         //when
         DocumentValue docValue = new DocumentValue("myUrl");
         documentHelper.createOrUpdateDocument(docValue, "myDoc", PROCESS_INSTANCE_ID, AUTHOR_ID);
         //then
-        verify(documentService).updateDocument(docToUpdate,documentHelper.createDocumentObject(docValue,AUTHOR_ID));
+        verify(documentService).updateDocument(eq(docToUpdate), any(SDocument.class));
     }
 
     @Test
-    public void should_createOrUpdate_create_if_not_found_if_found() throws SObjectModificationException, SObjectNotFoundException, SObjectCreationException, SSessionNotFoundException, SBonitaReadException {
+    public void should_createOrUpdate_create_if_not_found_if_found() throws Exception {
         //given
         doThrow(SObjectNotFoundException.class).when(documentService).getMappedDocument(PROCESS_INSTANCE_ID, "myDoc");
         //when
@@ -228,6 +230,21 @@ public class DocumentHelperTest {
         documentHelper.createOrUpdateDocument(docValue, "myDoc", PROCESS_INSTANCE_ID, AUTHOR_ID);
         //then
         verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(PROCESS_INSTANCE_ID), eq("myDoc"),anyString());
-    }*/
+    }
+
+    @Test
+    public void should_setDocumentList_set_the_list() throws Exception {
+        DocumentHelper documentHelperSpy = spy(documentHelper);
+        List<SMappedDocument> existingList = Arrays.<SMappedDocument>asList(new SMappedDocumentImpl());
+        doReturn(existingList).when(documentHelperSpy).getExistingDocumentList("theList",PROCESS_INSTANCE_ID);
+
+        DocumentValue docValue1 = new DocumentValue("url1");
+        DocumentValue docValue2 = new DocumentValue("url2");
+        documentHelperSpy.setDocumentList(Arrays.asList(docValue1, docValue2),"theList",PROCESS_INSTANCE_ID,AUTHOR_ID);
+
+        verify(documentHelperSpy).processDocumentOnIndex(docValue1,"theList",PROCESS_INSTANCE_ID,existingList,0,AUTHOR_ID);
+        verify(documentHelperSpy).processDocumentOnIndex(docValue2,"theList",PROCESS_INSTANCE_ID,existingList,1,AUTHOR_ID);
+        verify(documentHelperSpy).removeOthersDocuments(existingList);
+    }
 
 }
