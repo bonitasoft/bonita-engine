@@ -92,7 +92,7 @@ public class MessageEventSubProcessTest extends WaitingEventTest {
         final ProcessDefinition process = deployAndEnableProcessWithMessageEventSubProcess();
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
         final ActivityInstance step1 = waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance);
-        List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
+        final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
         assertEquals(1, activities.size());
         checkNumberOfWaitingEvents(SUB_PROCESS_START_NAME, 1);
 
@@ -160,8 +160,7 @@ public class MessageEventSubProcessTest extends WaitingEventTest {
         checkNumberOfWaitingEventsInProcess(receiverProcessName, 2);
         assignAndExecuteStep(step1.getId(), donaBenta.getId());
         waitForProcessToFinish(processInstance);
-        // the parent process instance is supposed to finished, so no more waiting events are expected
-        checkNumberOfWaitingEvents(startName, 1);
+        checkNumberOfWaitingEvents("The parent process instance is supposed to finished, so no more waiting events are expected.", startName, 1);
 
         // Execute the Receiver process
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
@@ -281,24 +280,26 @@ public class MessageEventSubProcessTest extends WaitingEventTest {
         final ProcessDefinition targetProcess = deployAndEnableProcessWithMessageEventSubProcess();
         final ProcessDefinition callerProcess = deployAndEnableProcessWithCallActivity(targetProcess.getName(), targetProcess.getVersion());
         final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcess.getId());
-        final ActivityInstance step1 = waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance);
+        try {
+            final ActivityInstance step1 = waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance);
 
-        getProcessAPI().sendMessage(MESSAGE_NAME, new ExpressionBuilder().createConstantStringExpression(targetProcess.getName()),
-                new ExpressionBuilder().createConstantStringExpression(SUB_PROCESS_START_NAME), null);
+            getProcessAPI().sendMessage(MESSAGE_NAME, new ExpressionBuilder().createConstantStringExpression(targetProcess.getName()),
+                    new ExpressionBuilder().createConstantStringExpression(SUB_PROCESS_START_NAME), null);
 
-        final ActivityInstance subStep = waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance);
-        final ProcessInstance calledProcInst = getProcessAPI().getProcessInstance(step1.getParentProcessInstanceId());
-        final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
+            final ActivityInstance subStep = waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance);
+            final ProcessInstance calledProcInst = getProcessAPI().getProcessInstance(step1.getParentProcessInstanceId());
+            final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
-        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
-        assignAndExecuteStep(subStep, donaBenta.getId());
-        waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(calledProcInst, TestStates.ABORTED);
+            waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
+            assignAndExecuteStep(subStep, donaBenta.getId());
+            waitForProcessToFinish(subProcInst);
+            waitForProcessToFinish(calledProcInst, TestStates.ABORTED);
 
-        waitForUserTaskAndExecuteIt("step2", processInstance, donaBenta);
-        waitForProcessToFinish(processInstance);
-
-        disableAndDeleteProcess(callerProcess);
-        disableAndDeleteProcess(targetProcess);
+            waitForUserTaskAndExecuteIt("step2", processInstance, donaBenta);
+            waitForProcessToFinish(processInstance);
+        } finally {
+            disableAndDeleteProcess(callerProcess);
+            disableAndDeleteProcess(targetProcess);
+        }
     }
 }

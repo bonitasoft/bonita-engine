@@ -207,7 +207,7 @@ public class ProcessAPIImplTest {
     @Test
     public void generateRelativeResourcePathShouldHandleBackslashOS() {
         // given:
-        String pathname = "C:\\hello\\hi\\folder";
+        final String pathname = "C:\\hello\\hi\\folder";
         final String resourceRelativePath = "resource/toto.lst";
 
         // when:
@@ -221,7 +221,7 @@ public class ProcessAPIImplTest {
     @Test
     public void generateRelativeResourcePathShouldNotContainFirstSlash() {
         // given:
-        String pathname = "/home/target/some_folder/";
+        final String pathname = "/home/target/some_folder/";
         final String resourceRelativePath = "resource/toto.lst";
 
         // when:
@@ -235,7 +235,7 @@ public class ProcessAPIImplTest {
     @Test
     public void generateRelativeResourcePathShouldWorkWithRelativeInitialPath() {
         // given:
-        String pathname = "target/nuns";
+        final String pathname = "target/nuns";
         final String resourceRelativePath = "resource/toto.lst";
 
         // when:
@@ -746,6 +746,6 @@ public class ProcessAPIImplTest {
         doThrow(new SSchedulerException(new Exception(""))).when(schedulerService).rescheduleJob(anyString(), anyString(), eq(date));
 
         // When
-        processAPI.updateExecutionDateOfTimerEventTriggerInstance(timerEventTriggerInstanceId, new Date());
+        processAPI.updateExecutionDateOfTimerEventTriggerInstance(timerEventTriggerInstanceId, date);
     }
 }
