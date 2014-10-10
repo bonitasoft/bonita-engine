@@ -111,11 +111,12 @@ public class TechnicalLoggerJobListener extends AbstractBonitaPlatormJobListener
         final Integer refireCount = (Integer) context.get(REFIRE_COUNT);
         final List<SJobData> jobDataValueAndTypes = (List<SJobData>) context.get(JOB_DATAS);
 
-        if (jobException != null) {
+        final Throwable cause = jobException.getCause();
+        if (cause != null) {
             if (warning) {
                 final Object[] args = new Object[] { jobName, jobGroup, new java.util.Date(), jobException.getMessage(), jobType, jobDataValueAndTypes,
                         triggerName, triggerGroup, triggerPreviousFireTime, triggerNextFireTime, refireCount };
-                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, MessageFormat.format(jobFailedMessage, args), jobException.getCause());
+                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, MessageFormat.format(jobFailedMessage, args), cause);
             }
         } else {
             if (trace) {
