@@ -92,9 +92,11 @@ public interface Application extends BaseElement {
     long getUpdatedBy();
 
     /**
-     * Retrieves the <code>Application</code> status
+     * Retrieves the <code>Application</code> state. The possible values are {@link ApplicationState#ACTIVATED#name()} and {@link ApplicationState#DEACTIVATED
+     * #name()}
      *
-     * @return the <code>Application</code> status
+     * @return the <code>Application</code> state
+     * @see ApplicationState
      */
     String getState();
 
@@ -102,6 +104,7 @@ public interface Application extends BaseElement {
      * Retrieves the identifier of the {@link ApplicationPage} defined as home page for this application
      *
      * @return the identifier of the {@link ApplicationPage} defined as home page for this application
+     * @see ApplicationPage
      */
     long getHomePageId();
 
@@ -109,6 +112,7 @@ public interface Application extends BaseElement {
      * Retrieves the identifier of the associated {@link Profile} or null if there is no profile is associated to this application.
      *
      * @return the identifier of the associated {@link Profile} or null if there is no profile is associated to this application.
+     * @see Profile
      */
     Long getProfileId();
 

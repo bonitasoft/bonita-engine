@@ -24,13 +24,14 @@ import com.bonitasoft.engine.business.application.ApplicationMenuNotFoundExcepti
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
+import com.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.exception.InvalidDisplayNameException;
 import com.bonitasoft.engine.exception.InvalidTokenException;
 import com.bonitasoft.engine.page.Page;
 
 /**
- * This API allows to list and manage Bonita Living Applications.
+ * This API allows to list and manage Bonita Living Applications ({@link Application}).
  *
  * @author Elias Ricken de Medeiros
  * @see Application
@@ -42,11 +43,14 @@ public interface ApplicationAPI {
      * Creates a new {@link Application} based on the supplied {@link ApplicationCreator}
      *
      * @param applicationCreator creator describing characteristics of application to be created
-     * @return the created {@link Application}
+     * @return the created <code>Application</code>
      * @throws AlreadyExistsException if an application already exists with the same name
      * @throws CreationException if an error occurs during the creation
-     * @throws InvalidTokenException if the name is empty
-     * @throws InvalidDisplayNameException if the display name is empty
+     * @throws InvalidTokenException if the name is empty or null or contains invalid characters. The name should contain only alpha numeric characters and
+     *         the following special characters '-', '.', '_' or '~'.
+     * @throws InvalidDisplayNameException if the display name is empty or null
+     * @see Application
+     * @see ApplicationCreator
      */
     Application createApplication(ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException, InvalidTokenException,
     InvalidDisplayNameException;
@@ -55,16 +59,18 @@ public interface ApplicationAPI {
      * Retrieves an {@link Application} from its identifier.
      *
      * @param applicationId the application identifier
-     * @return an {@link Application} from its identifier.
+     * @return an <code>Application</code> from its identifier.
      * @throws ApplicationNotFoundException if no application is found for the given identifier
+     * @see Application
      */
     Application getApplication(final long applicationId) throws ApplicationNotFoundException;
 
     /**
-     * Deletes an application by its identifier
+     * Deletes an {@link Application} by its identifier
      *
-     * @param applicationId the page identifier
+     * @param applicationId the <code>Application</code> identifier
      * @throws DeletionException if an error occurs during the deletion
+     * @see Application
      */
     void deleteApplication(long applicationId) throws DeletionException;
 
@@ -74,11 +80,12 @@ public interface ApplicationAPI {
      * @param applicationId a long representing the application identifier
      * @param updater an <code>ApplicationUpdater</code> describing the fields to be updated.
      * @return the <code>Application</code> as it is after the update.
-     * @throws ApplicationNotFoundException if no <code>Applicaton</code> is found with the given id
-     * @throws UpdateException if an error occurs during the update
-     * @throws AlreadyExistsException if update with an already existing Name
-     * @throws InvalidTokenException if the name is empty
+     * @throws ApplicationNotFoundException if no <code>Application</code> is found for the given id
+     * @throws AlreadyExistsException if another <code>Application</code> already exists with the new name value
+     * @throws InvalidTokenException if the name is empty or null or contains invalid characters. The name should contain only alpha numeric characters and
+     *         the following special characters '-', '.', '_' or '~'.
      * @throws InvalidDisplayNameException if the display name is empty
+     * @throws UpdateException if an error occurs during the update
      * @see Application
      * @see ApplicationUpdater
      */
@@ -87,23 +94,31 @@ public interface ApplicationAPI {
     InvalidDisplayNameException;
 
     /**
-     * Searches for applications with specific search criteria.
+     * Searches for {@link Application}s with specific search criteria. Use {@link ApplicationSearchDescriptor} to know the available filters.
      *
-     * @param searchOptions the search options. See {@link SearchOptions} for details.
+     * @param searchOptions the search criteria. See {@link SearchOptions} for details.
      * @return a {@link SearchResult} containing the number and the list of applications matching the search criteria.
      * @throws SearchException if an error occurs during search
+     * @see Application
+     * @see ApplicationSearchDescriptor
+     * @see SearchOptions
+     * @see SearchResult
      */
     SearchResult<Application> searchApplications(final SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Creates an {@link ApplicationPage} (association between a {@link Page} and an {@link Application}).
+     * Creates an {@link ApplicationPage}
      *
-     * @param applicationId the identifier of the application where the page will be associated
-     * @param pagedId the identifier of page to be associated to the application
-     * @param token the token that this page will take in this application. The token must be unique for a given application.
+     * @param applicationId the identifier of the {@link Application} to which the {@link Page} will be associated
+     * @param pagedId the identifier of <code>Page</code> to be associated to the <code>Application</code>
+     * @param token the token that this <code>Page</code> will take in this <code>ApplicationPage</code>. The token must be unique for a given application and
+     *        should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'.
      * @return the created {@link ApplicationPage}
-     * @throws AlreadyExistsException if the name is already used for another page on this application
+     * @throws AlreadyExistsException if the token is already used by another <code>ApplicationPage</code> on this <code>Application</code>
      * @throws CreationException if an error occurs during the creation
+     * @see ApplicationPage
+     * @see Application
+     * @see Page
      */
     ApplicationPage createApplicationPage(long applicationId, long pagedId, String token) throws AlreadyExistsException, CreationException, InvalidTokenException;
 

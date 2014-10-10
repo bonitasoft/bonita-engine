@@ -13,16 +13,33 @@ import org.bonitasoft.engine.bpm.BaseElement;
 import com.bonitasoft.engine.page.Page;
 
 /**
- * Associates the given {@link Page} to the given {@link Application}
+ * Represents the association between a {@link Page} to an {@link Application}
  *
  * @author Elias Ricken de Medeiros
  */
 public interface ApplicationPage extends BaseElement {
 
+    /**
+     * Retrieves the {@link Application} identifier
+     *
+     * @return the <code>Application<code> identifier
+     * @see Application
+     */
     long getApplicationId();
 
+    /**
+     * Retrieves the {@link Page} identifier
+     *
+     * @return the <code>Page</code> identifier
+     * @see Page
+     */
     long getPageId();
 
+    /**
+     * Retrieves the <code>ApplicationPage</code> token
+     *
+     * @return the <code>ApplicationPage</code> token
+     */
     String getToken();
 
 }

@@ -136,7 +136,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             throw new SInvalidTokenException(
                     "Invalid application name '"
                             + applicationName
-                            + "': the name can not be null or empty and should contains only alpha numeric characters and the following special characters '-', '.', '_' or '~'");
+                            + "': the name can not be null or empty and should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'");
         }
         if (hasApplicationWithName(applicationName)) {
             throw new SObjectAlreadyExistsException("An application already exists with name '" + applicationName + "'.");
@@ -318,7 +318,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             throw new SInvalidTokenException(
                     "Invalid application page token'"
                             + applicationPageToken
-                            + "': the token can not be null or empty and should contains only alpha numeric characters and the following special characters '-', '.', '_' or '~'");
+                            + "': the token can not be null or empty and should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'");
         }
         if (hasApplicationPage(applicationPage.getApplicationId(), applicationPageToken)) {
             final StringBuilder stb = new StringBuilder();
