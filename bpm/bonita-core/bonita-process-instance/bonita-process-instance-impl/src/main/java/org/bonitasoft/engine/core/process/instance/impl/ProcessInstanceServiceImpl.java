@@ -231,7 +231,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     protected void deleteParentProcessInstanceAndElements(final SProcessInstance sProcessInstance) throws SFlowNodeReadException,
             SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
-
         checkIfCallerIsNotActive(sProcessInstance.getCallerId());
 
         try {
@@ -242,9 +241,9 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 getProcessInstance(sProcessInstance.getId());
                 // process is still here, that's not normal. The problem must be raised:
                 throw e;
-            } catch (SProcessInstanceReadException e1) {
+            } catch (final SProcessInstanceReadException e1) {
                 logProcessInstanceNotFound(e);
-            } catch (SProcessInstanceNotFoundException e1) {
+            } catch (final SProcessInstanceNotFoundException e1) {
                 logProcessInstanceNotFound(e);
             }
         }
@@ -529,7 +528,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     private void deleteFlowNodeInstanceElements(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition) throws SBonitaException {
-        if (flowNodeInstance.getType().equals(SFlowNodeType.INTERMEDIATE_CATCH_EVENT)) {
+        if (flowNodeInstance.getType().equals(SFlowNodeType.INTERMEDIATE_CATCH_EVENT) || flowNodeInstance.getType().equals(SFlowNodeType.START_EVENT)) {
             bpmEventInstanceService.deleteWaitingEvents(flowNodeInstance);
         }
         if (flowNodeInstance instanceof SEventInstance) {
@@ -596,7 +595,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     public void setState(final SProcessInstance processInstance, final ProcessInstanceState state) throws SProcessInstanceModificationException {
         // Let's archive the process instance before changing the state (to keep a track of state change):
         archiveProcessInstance(processInstance);
-        int previousStateId = processInstance.getStateId();
+        final int previousStateId = processInstance.getStateId();
         setProcessState(processInstance, state);
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
             logger.log(getClass(), TechnicalLogSeverity.DEBUG, MessageFormat.format("[{0} with id {1}]{2}->{3}(new={4})", processInstance.getClass()
@@ -923,7 +922,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     @Override
     public List<SProcessInstance> getProcessInstancesInStates(final QueryOptions queryOptions, final ProcessInstanceState... states)
             throws SProcessInstanceReadException {
-        Set<Integer> stateIds = getStateIdsFromStates(states);
+        final Set<Integer> stateIds = getStateIdsFromStates(states);
         final Map<String, Object> inputParameters = new HashMap<String, Object>(1);
         inputParameters.put("stateIds", stateIds);
         final SelectListDescriptor<SProcessInstance> selectProcessInstancesInStates = new SelectListDescriptor<SProcessInstance>("getProcessInstancesInStates",
@@ -939,7 +938,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         if (states.length < 1) {
             throw new IllegalArgumentException("ProcessInstanceServiceImpl.getProcessInstancesInStates() must have at least one state as parameter");
         }
-        Set<Integer> stateIds = new HashSet<Integer>(states.length);
+        final Set<Integer> stateIds = new HashSet<Integer>(states.length);
         for (int i = 0; i < states.length; i++) {
             stateIds.add(states[i].getId());
         }
@@ -972,7 +971,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
-    public SAProcessInstance getLastArchivedProcessInstance(long processInstanceId) throws SBonitaSearchException {
+    public SAProcessInstance getLastArchivedProcessInstance(final long processInstanceId) throws SBonitaSearchException {
         final SAProcessInstanceBuilderFactory processInstanceBuilderFact = BuilderFactory.get(SAProcessInstanceBuilderFactory.class);
         final FilterOption filterOption = new FilterOption(SAProcessInstance.class, processInstanceBuilderFact.getSourceObjectIdKey(), processInstanceId);
         final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>();
