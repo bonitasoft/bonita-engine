@@ -61,13 +61,12 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
             final BreakpointService breakpointService, final EventsHandler eventsHandler, final UserFilterService userFilterService,
             final ActorMappingService actorMappingService, final WorkService workService, final TokenService tokenService,
             final IdentityService identityService, final RefBusinessDataService refBusinessDataService) {
-        super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, classLoaderService,
-                expressionResolverService, schedulerService, dataInstanceService, eventInstanceService,
-                operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentMappingService, commentService,
-                eventsHandler, userFilterService, actorMappingService, workService, tokenService, identityService, new StateBehaviorsExt(bpmInstancesCreator,
-                        eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService, connectorInstanceService,
-                        expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService, containerRegistry,
-                        eventInstanceService, schedulerService, commentService, identityService, logger, tokenService, refBusinessDataService));
+        super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, expressionResolverService,
+                dataInstanceService, operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentMappingService, commentService,
+                new StateBehaviorsExt(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService,
+                        connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService,
+                        containerRegistry, eventInstanceService, schedulerService, commentService, identityService, logger, tokenService,
+                        refBusinessDataService));
         this.breakpointService = breakpointService;
     }
 
