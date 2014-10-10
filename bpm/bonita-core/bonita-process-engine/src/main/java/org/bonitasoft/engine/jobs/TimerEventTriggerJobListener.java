@@ -26,12 +26,11 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.StatelessJob;
-import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 
 /**
  * This listener allows to delete the {@link org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance} in the table
  * <code>event_trigger_instance</code> after the execution of the job/trigger, if the trigger is not a cycle/cron.
- * 
+ *
  * @author Celine Souchet
  * @version 6.4.0
  * @since 6.4.0
@@ -65,7 +64,7 @@ public class TimerEventTriggerJobListener extends AbstractBonitaTenantJobListene
     }
 
     @Override
-    public void jobWasExecuted(final Map<String, Serializable> context, final SSchedulerException jobException) {
+    public void jobWasExecuted(final Map<String, Serializable> context, final Exception jobException) {
         final StatelessJob bosJob = (StatelessJob) context.get(BOS_JOB);
         if (bosJob == null) {
             return;

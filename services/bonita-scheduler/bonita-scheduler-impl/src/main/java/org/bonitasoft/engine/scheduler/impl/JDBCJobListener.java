@@ -88,7 +88,7 @@ public class JDBCJobListener extends AbstractBonitaPlatormJobListener {
     }
 
     @Override
-    public void jobWasExecuted(final Map<String, Serializable> context, final SSchedulerException jobException) {
+    public void jobWasExecuted(final Map<String, Serializable> context, final Exception jobException) {
         final StatelessJob bosJob = (StatelessJob) context.get(BOS_JOB);
         if (bosJob == null) {
             return;

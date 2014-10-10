@@ -16,8 +16,6 @@ package org.bonitasoft.engine.scheduler;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
-
 /**
  * @author Celine Souchet
  */
@@ -57,6 +55,6 @@ public abstract class AbstractBonitaJobListener implements Serializable {
 
     public abstract void jobExecutionVetoed(Map<String, Serializable> Context);
 
-    public abstract void jobWasExecuted(Map<String, Serializable> context, SSchedulerException jobException);
+    public abstract void jobWasExecuted(Map<String, Serializable> context, Exception jobException);
 
 }

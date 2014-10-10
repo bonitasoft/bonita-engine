@@ -98,7 +98,6 @@ public class JDBCJobListenerTest {
 
     @Test
     public void create_jobLog_on_exception_if_no_previous_joblog() throws Exception {
-
         final List<SJobLog> jobLogs = Collections.emptyList();
 
         doReturn(jobLogs).when(jobService).searchJobLogs(any(QueryOptions.class));

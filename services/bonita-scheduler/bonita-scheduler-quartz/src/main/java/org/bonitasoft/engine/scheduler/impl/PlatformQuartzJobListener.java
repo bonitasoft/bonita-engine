@@ -20,7 +20,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.scheduler.AbstractBonitaJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
-import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -121,7 +120,7 @@ public class PlatformQuartzJobListener extends AbstractQuartzJobListener {
         mapContext.put(AbstractBonitaJobListener.JOB_RESULT, String.valueOf(context.getResult()));
 
         for (final AbstractBonitaJobListener abstractBonitaJobListener : bonitaJobListeners) {
-            abstractBonitaJobListener.jobWasExecuted(mapContext, new SSchedulerException(jobException));
+            abstractBonitaJobListener.jobWasExecuted(mapContext, jobException);
         }
     }
 

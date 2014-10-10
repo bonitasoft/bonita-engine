@@ -24,7 +24,6 @@ import java.util.Map;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
-import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobData;
 
 /**
@@ -99,7 +98,7 @@ public class TechnicalLoggerJobListener extends AbstractBonitaPlatormJobListener
     }
 
     @Override
-    public void jobWasExecuted(final Map<String, Serializable> context, final SSchedulerException jobException) {
+    public void jobWasExecuted(final Map<String, Serializable> context, final Exception jobException) {
         final String jobName = (String) context.get(JOB_NAME);
         final String jobGroup = (String) context.get(JOB_GROUP);
         final String triggerName = (String) context.get(TRIGGER_NAME);
@@ -111,12 +110,11 @@ public class TechnicalLoggerJobListener extends AbstractBonitaPlatormJobListener
         final Integer refireCount = (Integer) context.get(REFIRE_COUNT);
         final List<SJobData> jobDataValueAndTypes = (List<SJobData>) context.get(JOB_DATAS);
 
-        final Throwable cause = jobException.getCause();
-        if (cause != null) {
+        if (jobException != null) {
             if (warning) {
                 final Object[] args = new Object[] { jobName, jobGroup, new java.util.Date(), jobException.getMessage(), jobType, jobDataValueAndTypes,
                         triggerName, triggerGroup, triggerPreviousFireTime, triggerNextFireTime, refireCount };
-                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, MessageFormat.format(jobFailedMessage, args), cause);
+                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, MessageFormat.format(jobFailedMessage, args), jobException);
             }
         } else {
             if (trace) {
