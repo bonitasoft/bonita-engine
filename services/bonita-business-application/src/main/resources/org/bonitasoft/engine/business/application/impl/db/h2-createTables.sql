@@ -3,7 +3,6 @@ CREATE TABLE business_app (
   id BIGINT NOT NULL,
   name VARCHAR(50) NOT NULL,
   version VARCHAR(50) NOT NULL,
-  path VARCHAR(255) NOT NULL,
   description LONGVARCHAR,
   iconPath VARCHAR(255),
   creationDate BIGINT NOT NULL,
