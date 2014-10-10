@@ -1,7 +1,7 @@
 CREATE TABLE business_app (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
-  name NVARCHAR(50) NOT NULL,
+  token NVARCHAR(50) NOT NULL,
   version NVARCHAR(50) NOT NULL,
   description NVARCHAR(MAX),
   iconPath NVARCHAR(255),
@@ -18,10 +18,10 @@ GO
 
 ALTER TABLE business_app ADD CONSTRAINT pk_business_app PRIMARY KEY (tenantid, id)
 GO
-ALTER TABLE business_app ADD CONSTRAINT uk_app_name_version UNIQUE (tenantId, name, version)
+ALTER TABLE business_app ADD CONSTRAINT uk_app_token_version UNIQUE (tenantId, token, version)
 GO
 
-CREATE INDEX idx_app_name ON business_app (name, tenantid)
+CREATE INDEX idx_app_token ON business_app (token, tenantid)
 GO
 
 CREATE TABLE business_app_page (
