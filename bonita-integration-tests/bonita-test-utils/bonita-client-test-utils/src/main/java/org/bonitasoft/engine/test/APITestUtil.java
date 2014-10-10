@@ -1373,7 +1373,9 @@ public class APITestUtil extends PlatformTestUtil {
         if (waitingEvents.size() > 0) {
             final StringBuilder messageBuilder = new StringBuilder("Waiting Event are still present: ");
             for (final WaitingEvent waitingEvent : waitingEvents) {
-                messageBuilder.append(waitingEvent.getFlowNodeInstanceId()).append(", ");
+                messageBuilder.append(
+                        "[process instance:" + waitingEvent.getProcessName() + ", flow node instance:" + waitingEvent.getFlowNodeInstanceId() + "]").append(
+                        ", ");
             }
             messages.add(messageBuilder.toString());
         }

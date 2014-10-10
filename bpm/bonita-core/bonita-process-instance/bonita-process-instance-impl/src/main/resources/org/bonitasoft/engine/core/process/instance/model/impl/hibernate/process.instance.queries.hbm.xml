@@ -503,7 +503,7 @@
 		SELECT s
 		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl AS s
 		WHERE s.processDefinitionId = :processDefinitionId
-		AND s.eventType = 'START_EVENT'
+		AND (s.eventType = 'START_EVENT' OR s.eventType = 'EVENT_SUB_PROCESS')
 	</query>
 
 	<query name="resetProgressMessageInstances">

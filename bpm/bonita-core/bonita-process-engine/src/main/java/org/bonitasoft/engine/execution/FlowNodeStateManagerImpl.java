@@ -192,27 +192,22 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
             final TechnicalLoggerService logger, final DocumentMappingService documentMappingService, final SCommentService commentService,
             final EventsHandler eventsHandler, final UserFilterService userFilterService, final ActorMappingService actorMappingService,
             final WorkService workService, final TokenService tokenService, final IdentityService identityService) {
-        this(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, classLoaderService,
-                expressionResolverService, schedulerService, dataInstanceService, eventInstanceService, operationService, bpmInstancesCreator,
-                containerRegistry, archiveService, logger, documentMappingService, commentService, eventsHandler, userFilterService, actorMappingService,
-                workService, tokenService, identityService, new StateBehaviors(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService,
-                        classLoaderService, actorMappingService, connectorInstanceService, expressionResolverService, processDefinitionService,
-                        dataInstanceService, operationService, workService, containerRegistry, eventInstanceService, schedulerService, commentService,
-                        identityService, logger, tokenService));
+        this(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, expressionResolverService,
+                dataInstanceService, operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentMappingService, commentService,
+                new StateBehaviors(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService,
+                        connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService,
+                        containerRegistry, eventInstanceService, schedulerService, commentService, identityService, logger, tokenService));
     }
 
     protected FlowNodeStateManagerImpl(final ProcessDefinitionService processDefinitionService, final ProcessInstanceService processInstanceService,
             final ActivityInstanceService activityInstanceService, final ConnectorInstanceService connectorInstanceService,
-            final ClassLoaderService classLoaderService, final ExpressionResolverService expressionResolverService, final SchedulerService schedulerService,
-            final DataInstanceService dataInstanceService, final EventInstanceService eventInstanceService, final OperationService operationService,
+            final ExpressionResolverService expressionResolverService, final DataInstanceService dataInstanceService, final OperationService operationService,
             final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
             final TechnicalLoggerService logger, final DocumentMappingService documentMappingService, final SCommentService commentService,
-            final EventsHandler eventsHandler, final UserFilterService userFilterService, final ActorMappingService actorMappingService,
-            final WorkService workService, final TokenService tokenService, final IdentityService identityService, final StateBehaviors stateBehaviors) {
-        initStates(connectorInstanceService, classLoaderService, expressionResolverService, schedulerService, dataInstanceService, eventInstanceService,
-                operationService, activityInstanceService, bpmInstancesCreator, containerRegistry, processDefinitionService, processInstanceService,
-                archiveService, logger, documentMappingService, commentService, eventsHandler, userFilterService, actorMappingService, workService,
-                tokenService, identityService, stateBehaviors);
+            final StateBehaviors stateBehaviors) {
+        initStates(connectorInstanceService, expressionResolverService, dataInstanceService, operationService, activityInstanceService, bpmInstancesCreator,
+                containerRegistry, processDefinitionService, processInstanceService,
+                archiveService, logger, documentMappingService, commentService, stateBehaviors);
         defineTransitionsForAllNodesType();
         initializeFirstStatesIdsOnBPMInstanceCreator(bpmInstancesCreator);
     }
@@ -351,16 +346,13 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
         defineCancelTransitionForFlowNode(SFlowNodeType.MULTI_INSTANCE_ACTIVITY, cancellingActivityWithBoundary, cancellingContainer, cancelled);
     }
 
-    private void initStates(final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService,
-            final ExpressionResolverService expressionResolverService, final SchedulerService schedulerService, final DataInstanceService dataInstanceService,
-            final EventInstanceService eventInstanceService, final OperationService operationService, final ActivityInstanceService activityInstanceService,
+    private void initStates(final ConnectorInstanceService connectorInstanceService, final ExpressionResolverService expressionResolverService,
+            final DataInstanceService dataInstanceService, final OperationService operationService, final ActivityInstanceService activityInstanceService,
             final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry, final ProcessDefinitionService processDefinitionService,
             final ProcessInstanceService processInstanceService, final ArchiveService archiveService, final TechnicalLoggerService logger,
-            final DocumentMappingService documentMappingService, final SCommentService commentService, final EventsHandler eventsHandler,
-            final UserFilterService userFilterService, final ActorMappingService actorMappingService, final WorkService workService,
-            final TokenService tokenService, final IdentityService identityService, final StateBehaviors stateBehaviors) {
+            final DocumentMappingService documentMappingService, final SCommentService commentService, final StateBehaviors stateBehaviors) {
         this.stateBehaviors = stateBehaviors;
-        failed = new FailedActivityStateImpl();
+        failed = new FailedActivityStateImpl(stateBehaviors);
         initializing = new InitializingActivityStateImpl(stateBehaviors);
         initializingActivityWithBoundary = new InitializingActivityWithBoundaryEventsStateImpl(stateBehaviors);
         initializingBoundaryEvent = new InitializingBoundaryEventStateImpl(stateBehaviors);

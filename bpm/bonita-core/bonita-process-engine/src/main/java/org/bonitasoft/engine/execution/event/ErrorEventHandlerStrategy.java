@@ -327,9 +327,8 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
                 final long rootProcessInstanceId = eventInstance.getLogicalGroup(eventInstanceKeyProvider.getRootProcessInstanceIndex());
                 final long parentProcessInstanceId = eventInstance.getLogicalGroup(eventInstanceKeyProvider.getParentProcessInstanceIndex());
                 final SWaitingErrorEventBuilder builder = builderFact.createNewWaitingErrorBoundaryEventInstance(processDefinition.getId(),
-                        rootProcessInstanceId, parentProcessInstanceId,
-                        eventInstance.getId(), errorEventTriggerDefinition.getErrorCode(), processDefinition.getName(),
-                        eventInstance.getFlowNodeDefinitionId(), eventInstance.getName(), boundary.getActivityInstanceId());
+                        rootProcessInstanceId, parentProcessInstanceId, eventInstance.getId(), errorEventTriggerDefinition.getErrorCode(),
+                        processDefinition.getName(), eventInstance.getFlowNodeDefinitionId(), eventInstance.getName(), boundary.getActivityInstanceId());
                 final SWaitingErrorEvent errorEvent = builder.done();
                 getEventInstanceService().createWaitingEvent(errorEvent);
                 break;

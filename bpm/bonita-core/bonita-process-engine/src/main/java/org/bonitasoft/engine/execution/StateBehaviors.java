@@ -81,15 +81,6 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
-import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
-import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
@@ -391,15 +382,15 @@ public class StateBehaviors {
 
     /**
      * Return the phases and connectors to execute, as a couple of (phase, couple of (connector instance, connector definition))
-     * 
+     *
      * @param processDefinition
-     *            the process where the connectors are defined.
+     *        the process where the connectors are defined.
      * @param flowNodeInstance
-     *            the instance of the flow node to execute possible connectors on.
+     *        the instance of the flow node to execute possible connectors on.
      * @param executeConnectorsOnEnter
-     *            do we want to consider the connectors ON_ENTER or ignore them?
+     *        do we want to consider the connectors ON_ENTER or ignore them?
      * @param executeConnectorsOnFinish
-     *            do we want to consider the connectors ON_FINISH or ignore them?
+     *        do we want to consider the connectors ON_FINISH or ignore them?
      * @return the phases and connectors to execute
      * @throws SActivityStateExecutionException
      */
@@ -861,8 +852,11 @@ public class StateBehaviors {
         }
     }
 
-    public void interrupWaitinEvents(final SReceiveTaskInstance receiveTaskInstance) throws SBonitaException {
-        interruptWaitingEvents(receiveTaskInstance.getId(), SWaitingEvent.class);
+    public void interrupWaitinEvents(final SFlowNodeInstance receiveTaskInstance) throws SBonitaException {
+        if (receiveTaskInstance instanceof SReceiveTaskInstance || receiveTaskInstance instanceof SIntermediateCatchEventInstance
+                || receiveTaskInstance instanceof SBoundaryEventInstance) {
+            interruptWaitingEvents(receiveTaskInstance.getId(), SWaitingEvent.class);
+        }
     }
 
     private QueryOptions getWaitingEventsCountOptions(final long instanceId, final Class<? extends SWaitingEvent> waitingEventClass) {
@@ -920,13 +914,13 @@ public class StateBehaviors {
         }
     }
 
-    public void addAssignmentSystemCommentIfTaskWasAutoAssign(SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+    public void addAssignmentSystemCommentIfTaskWasAutoAssign(final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
         if (SFlowNodeType.USER_TASK.equals(flowNodeInstance.getType()) || SFlowNodeType.MANUAL_TASK.equals(flowNodeInstance.getType())) {
-            long userId = ((SHumanTaskInstance) flowNodeInstance).getAssigneeId();
+            final long userId = ((SHumanTaskInstance) flowNodeInstance).getAssigneeId();
             if (userId > 0) {
                 try {
                     addAssignmentSystemComment(flowNodeInstance, userId);
-                } catch (SBonitaException e) {
+                } catch (final SBonitaException e) {
                     throw new SActivityStateExecutionException("error while updating display name and description", e);
                 }
             }
