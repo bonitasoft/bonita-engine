@@ -104,8 +104,7 @@ public class MessageEventSubProcessTest extends WaitingEventTest {
         final ActivityInstance subStep = waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance);
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
-        // the parent process instance is supposed to be aborted, so no more waiting events are expected
-        checkNumberOfWaitingEvents(SUB_PROCESS_START_NAME, 0);
+        checkNumberOfWaitingEvents("The parent process instance is supposed to be aborted, so no more waiting events are expected.", SUB_PROCESS_START_NAME, 0);
 
         waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
         assignAndExecuteStep(subStep, donaBenta.getId());
