@@ -22,11 +22,11 @@ import org.bonitasoft.engine.profile.Profile;
 public interface Application extends BaseElement {
 
     /**
-     * Retrieves the <code>Application</code> name
+     * Retrieves the <code>Application</code> token
      *
-     * @return the <code>Application</code> name
+     * @return the <code>Application</code> token
      */
-    String getName();
+    String getToken();
 
     /**
      * Retrieves the <code>Application</code> display name

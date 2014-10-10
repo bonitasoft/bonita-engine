@@ -37,7 +37,7 @@ public class ApplicationBuilder extends PersistentObjectBuilder<SApplicationImpl
         return new SApplicationImpl(name, displayName, version, System.currentTimeMillis(), 21, SApplicationState.DEACTIVATED.name());
     }
 
-    public ApplicationBuilder withName(final String name) {
+    public ApplicationBuilder withToken(final String name) {
         this.name = name;
         return this;
     }

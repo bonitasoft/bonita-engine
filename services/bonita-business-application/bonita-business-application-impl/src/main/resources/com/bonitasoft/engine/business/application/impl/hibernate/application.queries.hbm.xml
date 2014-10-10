@@ -8,10 +8,10 @@
         WHERE id = :id
     </query>
 
-    <query name="getApplicationByName">
+    <query name="getApplicationByToken">
         SELECT application
         FROM com.bonitasoft.engine.business.application.model.impl.SApplicationImpl AS application
-        WHERE name = :name
+        WHERE token = :token
     </query>
 
     <query name="getNumberOfSApplication">
@@ -30,12 +30,12 @@
         WHERE id = :id
     </query>
 
-    <query name="getApplicationPageByTokenAndApplicationName">
+    <query name="getApplicationPageByTokenAndApplicationToken">
         SELECT applicationPage
         FROM com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl as applicationPage, com.bonitasoft.engine.business.application.model.impl.SApplicationImpl as application
         WHERE applicationPage.applicationId = application.id
         AND applicationPage.token = :applicationPageToken
-        AND application.name = :applicationName
+        AND application.token = :applicationToken
     </query>
 
     <query name="getApplicationPageByTokenAndApplicationId">

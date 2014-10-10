@@ -74,7 +74,7 @@ public class ApplicationServiceImplTest {
 
     private static final int CREATED_BY = 10;
 
-    private static final String APPLICATION_NAME = "app";
+    private static final String APPLICATION_TOKEN = "app";
 
     private static final String APPLICATION_DISP_NAME = "My app";
 
@@ -107,7 +107,7 @@ public class ApplicationServiceImplTest {
         applicationServiceDisabled = new ApplicationServiceImpl(managerDisabledFeature, recorder, persistenceService, queriableLogService);
 
         when(queriableLogService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(true);
-        application = buildApplication(APPLICATION_NAME, APPLICATION_DISP_NAME);
+        application = buildApplication(APPLICATION_TOKEN, APPLICATION_DISP_NAME);
         application.setId(10L);
     }
 
@@ -152,7 +152,7 @@ public class ApplicationServiceImplTest {
     @Test(expected = SInvalidDisplayNameException.class)
     public void createApplication_should_throw_SInvalidDisplayNameException_when_display_name_is_empty() throws Exception {
         //when
-        applicationServiceActive.createApplication(buildApplication(APPLICATION_NAME, ""));
+        applicationServiceActive.createApplication(buildApplication(APPLICATION_TOKEN, ""));
 
         //then exception
     }
@@ -160,7 +160,7 @@ public class ApplicationServiceImplTest {
     @Test(expected = SInvalidDisplayNameException.class)
     public void createApplication_should_throw_SInvalidDisplayNameException_when_displayname_is_null() throws Exception {
         //when
-        applicationServiceActive.createApplication(buildApplication(APPLICATION_NAME, null));
+        applicationServiceActive.createApplication(buildApplication(APPLICATION_TOKEN, null));
 
         //then exception
     }
@@ -168,7 +168,7 @@ public class ApplicationServiceImplTest {
     @Test(expected = SInvalidDisplayNameException.class)
     public void createApplication_should_throw_SInvalidDisplayNameException_when_displayname_is_empty_after_trim() throws Exception {
         //when
-        applicationServiceActive.createApplication(buildApplication(APPLICATION_NAME, " "));
+        applicationServiceActive.createApplication(buildApplication(APPLICATION_TOKEN, " "));
 
         //then exception
     }
@@ -176,7 +176,7 @@ public class ApplicationServiceImplTest {
     @Test(expected = IllegalStateException.class)
     public void createApplication_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
         //when
-        applicationServiceDisabled.createApplication(buildApplication(APPLICATION_NAME, APPLICATION_DISP_NAME));
+        applicationServiceDisabled.createApplication(buildApplication(APPLICATION_TOKEN, APPLICATION_DISP_NAME));
 
         //then exception
     }
@@ -184,11 +184,11 @@ public class ApplicationServiceImplTest {
     @Test
     public void createApplication_should_throw_SObjectAlreadyExistsException_when_an_application_with_the_same_name_already_exists() throws Exception {
         //given
-        final String name = APPLICATION_NAME;
-        given(persistenceService.selectOne(new SelectOneDescriptor<SApplication>("getApplicationByName", Collections.<String, Object> singletonMap("name",
+        final String name = APPLICATION_TOKEN;
+        given(persistenceService.selectOne(new SelectOneDescriptor<SApplication>("applicationPageToken", Collections.<String, Object> singletonMap("name",
                 name), SApplication.class))).willReturn(application);
 
-        final SApplication newApp = buildApplication(APPLICATION_NAME, APPLICATION_DISP_NAME);
+        final SApplication newApp = buildApplication(APPLICATION_TOKEN, APPLICATION_DISP_NAME);
 
         //when
         try {
@@ -440,7 +440,7 @@ public class ApplicationServiceImplTest {
         final Map<String, Object> inputParameters = new HashMap<String, Object>(2);
         inputParameters.put("applicationName", "app");
         inputParameters.put("applicationPageToken", "firstPage");
-        given(persistenceService.selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationPageByTokenAndApplicationName", inputParameters,
+        given(persistenceService.selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationPageByTokenAndApplicationToken", inputParameters,
                 SApplicationPage.class
                 ))).willReturn(applicationPage);
 
@@ -465,7 +465,7 @@ public class ApplicationServiceImplTest {
     @Test(expected = IllegalStateException.class)
     public void getApplicationPage_by_name_and_appName_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
         //when
-        applicationServiceDisabled.getApplicationPage(APPLICATION_NAME, "myPage");
+        applicationServiceDisabled.getApplicationPage(APPLICATION_TOKEN, "myPage");
 
         //then exception
     }

@@ -46,7 +46,7 @@ public interface ApplicationAPI {
      * @return the created <code>Application</code>
      * @throws AlreadyExistsException if an application already exists with the same name
      * @throws CreationException if an error occurs during the creation
-     * @throws InvalidTokenException if the name is empty or null or contains invalid characters. The name should contain only alpha numeric characters and
+     * @throws InvalidTokenException if the token is empty or null or contains invalid characters. The token should contain only alpha numeric characters and
      *         the following special characters '-', '.', '_' or '~'.
      * @throws InvalidDisplayNameException if the display name is empty or null
      * @see Application
@@ -82,8 +82,8 @@ public interface ApplicationAPI {
      * @return the <code>Application</code> as it is after the update.
      * @throws ApplicationNotFoundException if no <code>Application</code> is found for the given id
      * @throws AlreadyExistsException if another <code>Application</code> already exists with the new name value
-     * @throws InvalidTokenException if the name is empty or null or contains invalid characters. The name should contain only alpha numeric characters and
-     *         the following special characters '-', '.', '_' or '~'.
+     * @throws InvalidTokenException if the new token value is empty or null or contains invalid characters. The token should contain only alpha numeric
+     *         characters and the following special characters '-', '.', '_' or '~'.
      * @throws InvalidDisplayNameException if the display name is empty
      * @throws UpdateException if an error occurs during the update
      * @see Application

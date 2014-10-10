@@ -10,7 +10,7 @@ package com.bonitasoft.engine.business.application.impl;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.bpm.internal.DescriptionElementImpl;
+import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
 
 import com.bonitasoft.engine.business.application.Application;
 
@@ -19,7 +19,7 @@ import com.bonitasoft.engine.business.application.Application;
  * @author Elias Ricken de Medeiros
  *
  */
-public class ApplicationImpl extends DescriptionElementImpl implements Application {
+public class ApplicationImpl extends BaseElementImpl implements Application {
 
     private static final long serialVersionUID = -5393587887795907117L;
     private final String version;
@@ -32,10 +32,18 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
     private long homePageId;
     private String displayName;
     private Long profileId;
+    private final String description;
+    private final String token;
 
-    public ApplicationImpl(final String name, final String version, final String description) {
-        super(name, description);
+    public ApplicationImpl(final String token, final String version, final String description) {
+        this.token = token;
         this.version = version;
+        this.description = description;
+    }
+
+    @Override
+    public String getToken() {
+        return token;
     }
 
     @Override
@@ -45,6 +53,11 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
 
     public void setDisplayName(final String displayName) {
         this.displayName = displayName;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
     }
 
     @Override
@@ -130,12 +143,14 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
         int result = super.hashCode();
         result = prime * result + (int) (createdBy ^ createdBy >>> 32);
         result = prime * result + (creationDate == null ? 0 : creationDate.hashCode());
+        result = prime * result + (description == null ? 0 : description.hashCode());
         result = prime * result + (displayName == null ? 0 : displayName.hashCode());
         result = prime * result + (int) (homePageId ^ homePageId >>> 32);
         result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
         result = prime * result + (lastUpdateDate == null ? 0 : lastUpdateDate.hashCode());
         result = prime * result + (profileId == null ? 0 : profileId.hashCode());
         result = prime * result + (state == null ? 0 : state.hashCode());
+        result = prime * result + (token == null ? 0 : token.hashCode());
         result = prime * result + (int) (updatedBy ^ updatedBy >>> 32);
         result = prime * result + (version == null ? 0 : version.hashCode());
         return result;
@@ -161,6 +176,13 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
                 return false;
             }
         } else if (!creationDate.equals(other.creationDate)) {
+            return false;
+        }
+        if (description == null) {
+            if (other.description != null) {
+                return false;
+            }
+        } else if (!description.equals(other.description)) {
             return false;
         }
         if (displayName == null) {
@@ -201,6 +223,13 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
         } else if (!state.equals(other.state)) {
             return false;
         }
+        if (token == null) {
+            if (other.token != null) {
+                return false;
+            }
+        } else if (!token.equals(other.token)) {
+            return false;
+        }
         if (updatedBy != other.updatedBy) {
             return false;
         }
@@ -216,11 +245,9 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
 
     @Override
     public String toString() {
-        return "ApplicationImpl [id=" + getId() + ", name=" + getName() + ", version=" + version
-                + ", getDescription()=" + getDescription() + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", homePageId="
-                + homePageId + ", iconPath=" + iconPath
-                + ", lastUpdateDate=" + lastUpdateDate + ", state=" + state + ", updatedBy=" + updatedBy + "]";
+        return "ApplicationImpl [version=" + version + ", iconPath=" + iconPath + ", creationDate=" + creationDate + ", createdBy=" + createdBy
+                + ", lastUpdateDate=" + lastUpdateDate + ", updatedBy=" + updatedBy + ", state=" + state + ", homePageId=" + homePageId + ", displayName="
+                + displayName + ", profileId=" + profileId + ", description=" + description + ", token=" + token + ", getId()=" + getId() + "]";
     }
-
 
 }

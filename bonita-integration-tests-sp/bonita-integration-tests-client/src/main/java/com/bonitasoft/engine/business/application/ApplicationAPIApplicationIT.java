@@ -80,7 +80,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
 
         //then
         assertThat(application).isNotNull();
-        assertThat(application.getName()).isEqualTo("My-Application");
+        assertThat(application.getToken()).isEqualTo("My-Application");
         assertThat(application.getDisplayName()).isEqualTo("My application display name");
         assertThat(application.getVersion()).isEqualTo("1.0");
         assertThat(application.getId()).isGreaterThan(0);
@@ -120,7 +120,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         final Application application = applicationAPI.createApplication(creator);
 
         final ApplicationUpdater updater = new ApplicationUpdater();
-        updater.setName("My-updated-app");
+        updater.setToken("My-updated-app");
         updater.setDisplayName("Updated display name");
         updater.setVersion("1.1");
         updater.setDescription("Up description");
@@ -133,7 +133,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
 
         //then
         assertThat(updatedApplication).isNotNull();
-        assertThat(updatedApplication.getName()).isEqualTo("My-updated-app");
+        assertThat(updatedApplication.getToken()).isEqualTo("My-updated-app");
         assertThat(updatedApplication.getDisplayName()).isEqualTo("Updated display name");
         assertThat(updatedApplication.getVersion()).isEqualTo("1.1");
         assertThat(updatedApplication.getDescription()).isEqualTo("Up description");
@@ -231,7 +231,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
-        builder.filter(ApplicationSearchDescriptor.NAME, "Engineering-dashboard");
+        builder.filter(ApplicationSearchDescriptor.TOKEN, "Engineering-dashboard");
 
         final SearchResult<Application> applications = applicationAPI.searchApplications(builder.done());
         assertThat(applications).isNotNull();
@@ -333,7 +333,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
 
     private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
-        builder.sort(ApplicationSearchDescriptor.NAME, Order.ASC);
+        builder.sort(ApplicationSearchDescriptor.TOKEN, Order.ASC);
         return builder;
     }
 

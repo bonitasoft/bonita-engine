@@ -95,7 +95,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     SInvalidTokenException, SInvalidDisplayNameException {
         checkLicense();
         final String methodName = "createApplication";
-        final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.CREATED, "Creating application named " + application.getName());
+        final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.CREATED, "Creating application named " + application.getToken());
         try {
             validateApplication(application);
             final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ApplicationService.APPLICATION)
@@ -125,21 +125,21 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     private void validateApplication(final SApplication application) throws SInvalidTokenException, SBonitaReadException, SObjectAlreadyExistsException,
     SObjectCreationException, SInvalidDisplayNameException {
-        final String applicationName = application.getName();
-        validateApplicationName(applicationName);
+        final String applicationName = application.getToken();
+        validateApplicationToken(applicationName);
         validateApplicationDisplayName(application.getDisplayName());
 
     }
 
-    private void validateApplicationName(final String applicationName) throws SInvalidTokenException, SBonitaReadException, SObjectAlreadyExistsException {
-        if (!URLValidator.isValid(applicationName)) {
+    private void validateApplicationToken(final String applicationToken) throws SInvalidTokenException, SBonitaReadException, SObjectAlreadyExistsException {
+        if (!URLValidator.isValid(applicationToken)) {
             throw new SInvalidTokenException(
-                    "Invalid application name '"
-                            + applicationName
-                            + "': the name can not be null or empty and should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'");
+                    "Invalid application token '"
+                            + applicationToken
+                            + "': the token can not be null or empty and should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'");
         }
-        if (hasApplicationWithName(applicationName)) {
-            throw new SObjectAlreadyExistsException("An application already exists with name '" + applicationName + "'.");
+        if (hasApplicationWithName(applicationToken)) {
+            throw new SObjectAlreadyExistsException("An application already exists with token '" + applicationToken + "'.");
         }
     }
 
@@ -162,8 +162,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     public boolean hasApplicationWithName(final String name) throws SBonitaReadException {
-        final SApplication application = persistenceService.selectOne(new SelectOneDescriptor<SApplication>("getApplicationByName", Collections
-                .<String, Object> singletonMap("name",
+        final SApplication application = persistenceService.selectOne(new SelectOneDescriptor<SApplication>("getApplicationByToken", Collections
+                .<String, Object> singletonMap("token",
                         name), SApplication.class));
         return application != null;
     }
@@ -243,9 +243,9 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         final SApplication application = getApplication(applicationId);
 
-        if (updateDescriptor.getFields().containsKey(SApplicationFields.NAME)
-                && !application.getName().equals(updateDescriptor.getFields().get(SApplicationFields.NAME))) {
-            validateApplicationName((String) updateDescriptor.getFields().get(SApplicationFields.NAME));
+        if (updateDescriptor.getFields().containsKey(SApplicationFields.TOKEN)
+                && !application.getToken().equals(updateDescriptor.getFields().get(SApplicationFields.TOKEN))) {
+            validateApplicationToken((String) updateDescriptor.getFields().get(SApplicationFields.TOKEN));
         }
         if (updateDescriptor.getFields().containsKey(SApplicationFields.DISPLAY_NAME)
                 && !application.getDisplayName().equals(updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME))) {
@@ -346,20 +346,20 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public SApplicationPage getApplicationPage(final String applicationName, final String applicationPageToken) throws SBonitaReadException,
+    public SApplicationPage getApplicationPage(final String applicationToken, final String applicationPageToken) throws SBonitaReadException,
     SObjectNotFoundException {
         checkLicense();
         final Map<String, Object> inputParameters = new HashMap<String, Object>(2);
-        inputParameters.put("applicationName", applicationName);
+        inputParameters.put("applicationToken", applicationToken);
         inputParameters.put("applicationPageToken", applicationPageToken);
         final SApplicationPage applicationPage = persistenceService
-                .selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationPageByTokenAndApplicationName", inputParameters, SApplicationPage.class));
+                .selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationPageByTokenAndApplicationToken", inputParameters, SApplicationPage.class));
         if (applicationPage == null) {
             final StringBuilder stb = new StringBuilder();
             stb.append("No application page found with name '");
             stb.append(applicationPageToken);
-            stb.append("' and application name '");
-            stb.append(applicationName);
+            stb.append("' and application token '");
+            stb.append(applicationToken);
             stb.append("'.");
             throw new SObjectNotFoundException(stb.toString());
         }

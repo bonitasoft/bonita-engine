@@ -220,7 +220,7 @@ public class ApplicationAPIDelegateTest {
         final SApplication sApplication = mock(SApplication.class);
         final Application application = mock(Application.class);
         final ApplicationUpdater updater = new ApplicationUpdater();
-        updater.setName("new name");
+        updater.setToken("new name");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willReturn(sApplication);
@@ -239,7 +239,7 @@ public class ApplicationAPIDelegateTest {
         final SApplication sApplication = mock(SApplication.class);
         final Application application = mock(Application.class);
         final ApplicationUpdater updater = new ApplicationUpdater();
-        updater.setName("new name");
+        updater.setToken("new name");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectModificationException());

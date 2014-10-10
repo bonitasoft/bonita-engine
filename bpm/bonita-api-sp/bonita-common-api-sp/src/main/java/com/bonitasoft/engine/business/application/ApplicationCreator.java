@@ -30,27 +30,27 @@ public class ApplicationCreator implements Serializable {
     /**
      * Creates an instance of <code>ApplicationCreator</code> containing mandatory information
      *
-     * @param name the {@link Application} name. The name cannot be null or empty and should contain only alpha numeric characters and the following special
-     *        characters '-', '.', '_' or '~'.
+     * @param token the {@link Application} token. The token will be part of application URL. It cannot be null or empty and should contain only alpha numeric
+     *        characters and the following special characters '-', '.', '_' or '~'.
      * @param displayName the <code>Application</code> display name
      * @param version the <code>Application</code> version
      * @see Application
      */
-    public ApplicationCreator(final String name, final String displayName, final String version) {
+    public ApplicationCreator(final String token, final String displayName, final String version) {
         fields = new HashMap<ApplicationField, Serializable>(2);
-        fields.put(ApplicationField.NAME, name);
+        fields.put(ApplicationField.TOKEN, token);
         fields.put(ApplicationField.VERSION, version);
         fields.put(ApplicationField.DISPLAY_NAME, displayName);
     }
 
     /**
-     * Retrieves the {@link Application} name
+     * Retrieves the {@link Application} token
      *
-     * @return the <code>Application</code> name
+     * @return the <code>Application</code> token
      * @see Application
      */
-    public String getName() {
-        return fields.get(ApplicationField.NAME).toString();
+    public String getToken() {
+        return fields.get(ApplicationField.TOKEN).toString();
     }
 
     /**

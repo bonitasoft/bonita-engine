@@ -15,7 +15,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  */
 public interface SApplication extends PersistentObject {
 
-    String getName();
+    String getToken();
 
     String getDisplayName();
 

@@ -11,7 +11,7 @@
 			<key-property name="tenantId" column="tenantId" type="long" />
 			<key-property name="id" column="id" type="long" />
 		</composite-id>
-		<property name="name" column="name" />
+		<property name="token" column="token" />
 		<property name="displayName" column="displayName" />
 		<property name="version" column="version" />
 		<property name="description" column="description" />

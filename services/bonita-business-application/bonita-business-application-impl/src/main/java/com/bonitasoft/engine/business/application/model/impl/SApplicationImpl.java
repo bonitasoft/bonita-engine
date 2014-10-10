@@ -21,7 +21,7 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
 
     private static final long serialVersionUID = 4993767054990446857L;
 
-    private String name;
+    private String token;
 
     private String description;
 
@@ -49,9 +49,9 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         super();
     }
 
-    public SApplicationImpl(final String name, final String displayName, final String version, final long creationDate, final long createdBy, final String state) {
+    public SApplicationImpl(final String token, final String displayName, final String version, final long creationDate, final long createdBy, final String state) {
         super();
-        this.name = name;
+        this.token = token;
         this.displayName = displayName;
         this.version = version;
         this.creationDate = creationDate;
@@ -67,8 +67,8 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
     }
 
     @Override
-    public String getName() {
-        return name;
+    public String getToken() {
+        return token;
     }
 
     @Override
@@ -142,8 +142,8 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         this.profileId = profileId;
     }
 
-    public void setName(final String name) {
-        this.name = name;
+    public void setToken(final String token) {
+        this.token = token;
     }
 
     public void setVersion(final String version) {
@@ -177,7 +177,7 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         result = prime * result + (int) (homePageId ^ homePageId >>> 32);
         result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
         result = prime * result + (int) (lastUpdateDate ^ lastUpdateDate >>> 32);
-        result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + (token == null ? 0 : token.hashCode());
         result = prime * result + (profileId == null ? 0 : profileId.hashCode());
         result = prime * result + (state == null ? 0 : state.hashCode());
         result = prime * result + (int) (updatedBy ^ updatedBy >>> 32);
@@ -230,11 +230,11 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         if (lastUpdateDate != other.lastUpdateDate) {
             return false;
         }
-        if (name == null) {
-            if (other.name != null) {
+        if (token == null) {
+            if (other.token != null) {
                 return false;
             }
-        } else if (!name.equals(other.name)) {
+        } else if (!token.equals(other.token)) {
             return false;
         }
         if (profileId == null) {
@@ -266,7 +266,7 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
 
     @Override
     public String toString() {
-        return "SApplicationImpl [name=" + name + ", description=" + description + ", version=" + version + ", iconPath=" + iconPath
+        return "SApplicationImpl [token=" + token + ", description=" + description + ", version=" + version + ", iconPath=" + iconPath
                 + ", creationDate=" + creationDate + ", createdBy=" + createdBy + ", lastUpdateDate=" + lastUpdateDate + ", updatedBy=" + updatedBy
                 + ", state=" + state + ", homePageId=" + homePageId + ", displayName=" + displayName + ", profileId=" + profileId + ", getId()=" + getId()
                 + ", getTenantId()=" + getTenantId() + "]";

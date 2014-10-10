@@ -20,7 +20,7 @@ public interface SApplicationUpdateBuilder {
 
     SApplicationUpdateBuilder updateHomePageId(long applicationPageId);
 
-    public SApplicationUpdateBuilder updateName(final String name);
+    public SApplicationUpdateBuilder updateToken(final String name);
 
     public SApplicationUpdateBuilder updateDisplayName(final String displayName);
 

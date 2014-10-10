@@ -77,7 +77,7 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
         final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
 
         //when
-        final ApplicationPage retrievedAppPage = getApplicationAPI().getApplicationPage(application.getName(), appPage.getToken());
+        final ApplicationPage retrievedAppPage = getApplicationAPI().getApplicationPage(application.getToken(), appPage.getToken());
 
         //then
         assertThat(retrievedAppPage).isEqualTo(appPage);

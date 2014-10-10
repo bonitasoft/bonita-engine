@@ -61,7 +61,7 @@ public class ApplicationConvertorTest {
 
         //then
         assertThat(application).isNotNull();
-        assertThat(application.getName()).isEqualTo(APP_NAME);
+        assertThat(application.getToken()).isEqualTo(APP_NAME);
         assertThat(application.getDisplayName()).isEqualTo(APP_DISPLAY_NAME);
         assertThat(application.getVersion()).isEqualTo(APP_VERSION);
         assertThat(application.getDescription()).isEqualTo(APP_DESC);
@@ -94,7 +94,7 @@ public class ApplicationConvertorTest {
         //then
         assertThat(application).isNotNull();
         assertThat(application.getId()).isEqualTo(ID);
-        assertThat(application.getName()).isEqualTo(APP_NAME);
+        assertThat(application.getToken()).isEqualTo(APP_NAME);
         assertThat(application.getDisplayName()).isEqualTo(APP_DISPLAY_NAME);
         assertThat(application.getVersion()).isEqualTo(APP_VERSION);
         assertThat(application.getDescription()).isEqualTo(APP_DESC);
@@ -130,7 +130,7 @@ public class ApplicationConvertorTest {
     public void toApplicationUpdateDescriptor_should_map_all_fields() throws Exception {
         //given
         final ApplicationUpdater updater = new ApplicationUpdater();
-        updater.setName("My-updated-app");
+        updater.setToken("My-updated-app");
         updater.setDisplayName("Updated display name");
         updater.setVersion("1.1");
         updater.setDescription("Up description");
@@ -146,7 +146,7 @@ public class ApplicationConvertorTest {
         assertThat(updateDescriptor).isNotNull();
         final Map<String, Object> fields = updateDescriptor.getFields();
         assertThat(fields).hasSize(9);
-        assertThat(fields.get(SApplicationFields.NAME)).isEqualTo("My-updated-app");
+        assertThat(fields.get(SApplicationFields.TOKEN)).isEqualTo("My-updated-app");
         assertThat(fields.get(SApplicationFields.DISPLAY_NAME)).isEqualTo("Updated display name");
         assertThat(fields.get(SApplicationFields.VERSION)).isEqualTo("1.1");
         assertThat(fields.get(SApplicationFields.DESCRIPTION)).isEqualTo("Up description");

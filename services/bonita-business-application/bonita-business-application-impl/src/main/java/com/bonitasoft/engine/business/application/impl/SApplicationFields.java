@@ -22,7 +22,7 @@ public class SApplicationFields {
 
     public static String ID = "id";
 
-    public static String NAME = "name";
+    public static String TOKEN = "token";
 
     public static String DISPLAY_NAME = "displayName";
 

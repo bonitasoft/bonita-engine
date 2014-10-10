@@ -47,16 +47,16 @@ public class ApplicationQueriesTest {
     private ApplicationRepository repository;
 
     @Test
-    public void getApplicationByName_returns_the_application_with_the_given_name() throws Exception {
+    public void getApplicationByToken_returns_the_application_with_the_given_token() throws Exception {
         //given
-        repository.add(anApplication().withName("app1").withDispalyName("my app1").withDispalyName("my app1").withVersion("1.0").withPath("app1").build());
-        final SApplication application2 = repository.add(anApplication().withName("app2").withDispalyName("my app2").withDispalyName("my app2")
+        repository.add(anApplication().withToken("app1").withDispalyName("my app1").withDispalyName("my app1").withVersion("1.0").withPath("app1").build());
+        final SApplication application2 = repository.add(anApplication().withToken("app2").withDispalyName("my app2").withDispalyName("my app2")
                 .withDispalyName("my app2").withVersion("1.0").withPath("/app2")
                 .build());
-        repository.add(anApplication().withName("app3").withDispalyName("my app3").withDispalyName("my app3").withVersion("1.0").withPath("app3").build());
+        repository.add(anApplication().withToken("app3").withDispalyName("my app3").withDispalyName("my app3").withVersion("1.0").withPath("app3").build());
 
         //when
-        final SApplication retrievedApp = repository.getApplicationByName("app2");
+        final SApplication retrievedApp = repository.getApplicationByToken("app2");
 
         //then
         assertThat(retrievedApp).isEqualTo(application2);
@@ -65,11 +65,11 @@ public class ApplicationQueriesTest {
     @Test
     public void getApplication_returns_the_application_with_the_given_id() throws Exception {
         //given
-        repository.add(anApplication().withName("app1").withDispalyName("my app1").withDispalyName("my app1").withVersion("1.0").withPath("app1").build());
-        final SApplication application2 = repository.add(anApplication().withName("app2").withDispalyName("my app2").withDispalyName("my app2")
+        repository.add(anApplication().withToken("app1").withDispalyName("my app1").withDispalyName("my app1").withVersion("1.0").withPath("app1").build());
+        final SApplication application2 = repository.add(anApplication().withToken("app2").withDispalyName("my app2").withDispalyName("my app2")
                 .withVersion("1.0").withPath("app1")
                 .build());
-        repository.add(anApplication().withName("app3").withDispalyName("my app3").withDispalyName("my app3").withVersion("1.0").withPath("app1").build());
+        repository.add(anApplication().withToken("app3").withDispalyName("my app3").withDispalyName("my app3").withVersion("1.0").withPath("app1").build());
 
         //when
         final SApplication retrievedApp = repository.getApplication(application2.getId());
@@ -81,7 +81,7 @@ public class ApplicationQueriesTest {
     @Test
     public void getApplicationPageById_should_return_the_applicationPage_identified_by_the_given_id() throws Exception {
         //given
-        final SApplication application1 = repository.add(anApplication().withName("app1").withDispalyName("my app1").withDispalyName("my app")
+        final SApplication application1 = repository.add(anApplication().withToken("app1").withDispalyName("my app1").withDispalyName("my app")
                 .withVersion("1.0").withPath("/app1")
                 .build());
         final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
@@ -100,10 +100,10 @@ public class ApplicationQueriesTest {
     @Test
     public void getApplicationPageByNameAnApplicationName_should_return_the_applicationPage_with_the_given_name_in_the_given_application() throws Exception {
         //given
-        final SApplication application1 = repository.add(anApplication().withName("app1").withDispalyName("my app1").withDispalyName("my app")
+        final SApplication application1 = repository.add(anApplication().withToken("app1").withDispalyName("my app1").withDispalyName("my app")
                 .withVersion("1.0").withPath("/app1")
                 .build());
-        final SApplication application2 = repository.add(anApplication().withName("app2").withDispalyName("my app2").withDispalyName("my app")
+        final SApplication application2 = repository.add(anApplication().withToken("app2").withDispalyName("my app2").withDispalyName("my app")
                 .withVersion("1.0").withPath("/app2")
                 .build());
         final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
@@ -114,7 +114,7 @@ public class ApplicationQueriesTest {
         repository.add(anApplicationPage().withToken("SecondPage").withApplicationId(application2.getId()).withPageId(page.getId()).build());
 
         //when
-        final SApplicationPage retrievedAppPage = repository.getApplicationPageByTokenAndApplicationName("app1", "SecondPage");
+        final SApplicationPage retrievedAppPage = repository.getApplicationPageByTokenAndApplicationToken("app1", "SecondPage");
 
         //then
         assertThat(retrievedAppPage).isEqualTo(secondPageApp1);
@@ -123,10 +123,10 @@ public class ApplicationQueriesTest {
     @Test
     public void getApplicationPageByTokenAndApplicationId_should_return_the_applicationPage_with_the_given_name_in_the_given_application() throws Exception {
         //given
-        final SApplication application1 = repository.add(anApplication().withName("app1").withDispalyName("my app1").withDispalyName("my app")
+        final SApplication application1 = repository.add(anApplication().withToken("app1").withDispalyName("my app1").withDispalyName("my app")
                 .withVersion("1.0").withPath("/app1")
                 .build());
-        final SApplication application2 = repository.add(anApplication().withName("app2").withDispalyName("my app2").withDispalyName("my app")
+        final SApplication application2 = repository.add(anApplication().withToken("app2").withDispalyName("my app2").withDispalyName("my app")
                 .withVersion("1.0").withPath("/app2")
                 .build());
         final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
@@ -146,7 +146,7 @@ public class ApplicationQueriesTest {
     @Test
     public void getApplicationHomePage_should_return_the_applicationPage_set_as_home_page_for_the_given_application() throws Exception {
         //given
-        final SApplication application = repository.add(anApplication().withName("app1").withDispalyName("my app1").withDispalyName("my app")
+        final SApplication application = repository.add(anApplication().withToken("app1").withDispalyName("my app1").withDispalyName("my app")
                 .withVersion("1.0").withPath("/app1")
                 .build());
         final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
@@ -168,7 +168,7 @@ public class ApplicationQueriesTest {
     @Test
     public void getApplicationMenu_by_id_should_return_the_application_menu_identified_by_the_given_id() throws Exception {
         //given
-        final SApplication application = repository.add(anApplication().withName("app1").withDispalyName("my app1").withDispalyName("my app")
+        final SApplication application = repository.add(anApplication().withToken("app1").withDispalyName("my app1").withDispalyName("my app")
                 .withVersion("1.0").withPath("/app1")
                 .build());
         final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());

@@ -38,7 +38,7 @@ public class ApplicationConvertor {
 
     public SApplication buildSApplication(final ApplicationCreator creator, final long creatorUserId) {
         final Map<ApplicationField, Serializable> fields = creator.getFields();
-        final String name = (String) fields.get(ApplicationField.NAME);
+        final String name = (String) fields.get(ApplicationField.TOKEN);
         final String displayName = (String) fields.get(ApplicationField.DISPLAY_NAME);
         final String version = (String) fields.get(ApplicationField.VERSION);
         final String description = (String) fields.get(ApplicationField.DESCRIPTION);
@@ -52,7 +52,7 @@ public class ApplicationConvertor {
     }
 
     public Application toApplication(final SApplication sApplication) {
-        final ApplicationImpl application = new ApplicationImpl(sApplication.getName(), sApplication.getVersion(), sApplication.getDescription());
+        final ApplicationImpl application = new ApplicationImpl(sApplication.getToken(), sApplication.getVersion(), sApplication.getDescription());
         application.setId(sApplication.getId());
         application.setDisplayName(sApplication.getDisplayName());
         application.setCreatedBy(sApplication.getCreatedBy());
@@ -78,8 +78,8 @@ public class ApplicationConvertor {
         final SApplicationUpdateBuilder builder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance();
         for (final Entry<ApplicationField, Serializable> entry : updater.getFields().entrySet()) {
             switch (entry.getKey()) {
-                case NAME:
-                    builder.updateName((String) entry.getValue());
+                case TOKEN:
+                    builder.updateToken((String) entry.getValue());
                     break;
 
                 case DESCRIPTION:

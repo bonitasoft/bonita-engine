@@ -15,7 +15,7 @@ package com.bonitasoft.engine.business.application;
  */
 public enum ApplicationField {
 
-    NAME,
+    TOKEN,
 
     DISPLAY_NAME,
 

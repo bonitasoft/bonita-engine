@@ -29,9 +29,9 @@ public class ApplicationSearchDescriptor {
     public static final String ID = "id";
 
     /**
-     * Used to filter or order by the <code>Application</code> name
+     * Used to filter or order by the <code>Application</code> token
      */
-    public static final String NAME = "name";
+    public static final String TOKEN = "token";
 
     /**
      * Used to filter or order by the <code>Application</code> display name

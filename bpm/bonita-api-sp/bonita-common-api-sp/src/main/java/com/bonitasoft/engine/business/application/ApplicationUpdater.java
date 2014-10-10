@@ -28,8 +28,8 @@ public class ApplicationUpdater implements Serializable {
         return fields;
     }
 
-    public ApplicationUpdater setName(final String name) {
-        fields.put(ApplicationField.NAME, name);
+    public ApplicationUpdater setToken(final String token) {
+        fields.put(ApplicationField.TOKEN, token);
         return this;
     }
 

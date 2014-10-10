@@ -43,8 +43,8 @@ public class SApplicationUpdateBuilderImpl implements SApplicationUpdateBuilder 
     }
 
     @Override
-    public SApplicationUpdateBuilder updateName(final String name) {
-        descriptor.addField(SApplicationFields.NAME, name);
+    public SApplicationUpdateBuilder updateToken(final String token) {
+        descriptor.addField(SApplicationFields.TOKEN, token);
         return this;
     }
 
