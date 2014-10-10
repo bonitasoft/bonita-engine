@@ -115,7 +115,7 @@ public class TechnicalLoggerJobListener extends AbstractBonitaPlatormJobListener
             if (warning) {
                 final Object[] args = new Object[] { jobName, jobGroup, new java.util.Date(), jobException.getMessage(), jobType, jobDataValueAndTypes,
                         triggerName, triggerGroup, triggerPreviousFireTime, triggerNextFireTime, refireCount };
-                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, MessageFormat.format(jobFailedMessage, args), jobException);
+                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, MessageFormat.format(jobFailedMessage, args), jobException.getCause());
             }
         } else {
             if (trace) {

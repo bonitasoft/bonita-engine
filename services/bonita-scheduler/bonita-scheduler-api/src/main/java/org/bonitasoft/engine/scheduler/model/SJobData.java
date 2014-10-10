@@ -13,13 +13,14 @@
  **/
 package org.bonitasoft.engine.scheduler.model;
 
+import java.io.Serializable;
 
 /**
  * @author Celine Souchet
  * @version 6.4.0
  * @since 6.4.0
  */
-public interface SJobData {
+public interface SJobData extends Serializable {
 
     String getKey();
 
