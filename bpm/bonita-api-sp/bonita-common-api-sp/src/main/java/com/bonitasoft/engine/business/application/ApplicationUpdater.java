@@ -43,11 +43,6 @@ public class ApplicationUpdater implements Serializable {
         return this;
     }
 
-    public ApplicationUpdater setPath(final String path) {
-        fields.put(ApplicationField.PATH, path);
-        return this;
-    }
-
     public ApplicationUpdater setDescription(final String description) {
         fields.put(ApplicationField.DESCRIPTION, description);
         return this;

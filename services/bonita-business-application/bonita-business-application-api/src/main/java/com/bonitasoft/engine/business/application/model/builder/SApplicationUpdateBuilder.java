@@ -26,8 +26,6 @@ public interface SApplicationUpdateBuilder {
 
     public SApplicationUpdateBuilder updateVersion(final String version);
 
-    public SApplicationUpdateBuilder updatePath(final String path);
-
     public SApplicationUpdateBuilder updateDescription(final String description);
 
     public SApplicationUpdateBuilder updateIconPath(final String iconPath);

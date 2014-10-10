@@ -14,7 +14,6 @@
 		<property name="name" column="name" />
 		<property name="displayName" column="displayName" />
 		<property name="version" column="version" />
-		<property name="path" column="path" />
 		<property name="description" column="description" />
 		<property name="iconPath" column="iconPath" />
 		<property name="creationDate" column="creationDate" />

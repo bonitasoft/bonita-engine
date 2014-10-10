@@ -21,8 +21,6 @@ public enum ApplicationField {
 
     VERSION,
 
-    PATH,
-
     DESCRIPTION,
 
     ICON_PATH,

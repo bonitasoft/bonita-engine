@@ -22,9 +22,9 @@ import com.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
 public class SApplicationBuilderFactoryImpl implements SApplicationBuilderFactory {
 
     @Override
-    public SApplicationBuilder createNewInstance(final String name, final String displayName, final String version, final String path, final long createdBy) {
+    public SApplicationBuilder createNewInstance(final String name, final String displayName, final String version, final long createdBy) {
         final long currentDate = System.currentTimeMillis();
-        return new SApplicationBuilderImpl(new SApplicationImpl(name, displayName, version, path, currentDate, createdBy, SApplicationState.DEACTIVATED.name()));
+        return new SApplicationBuilderImpl(new SApplicationImpl(name, displayName, version, currentDate, createdBy, SApplicationState.DEACTIVATED.name()));
     }
 
     @Override
@@ -45,11 +45,6 @@ public class SApplicationBuilderFactoryImpl implements SApplicationBuilderFactor
     @Override
     public String getVersionKey() {
         return SApplicationFields.VERSION;
-    }
-
-    @Override
-    public String getPathKey() {
-        return SApplicationFields.PATH;
     }
 
     @Override

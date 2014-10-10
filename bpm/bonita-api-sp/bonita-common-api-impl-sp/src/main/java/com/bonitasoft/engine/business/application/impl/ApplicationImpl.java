@@ -23,7 +23,6 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
 
     private static final long serialVersionUID = -5393587887795907117L;
     private final String version;
-    private final String path;
     private String iconPath;
     private Date creationDate;
     private long createdBy;
@@ -34,10 +33,9 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
     private String displayName;
     private Long profileId;
 
-    public ApplicationImpl(final String name, final String version, final String path, final String description) {
+    public ApplicationImpl(final String name, final String version, final String description) {
         super(name, description);
         this.version = version;
-        this.path = path;
     }
 
     @Override
@@ -52,11 +50,6 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
     @Override
     public String getVersion() {
         return version;
-    }
-
-    @Override
-    public String getPath() {
-        return path;
     }
 
     @Override
@@ -141,7 +134,6 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
         result = prime * result + (int) (homePageId ^ homePageId >>> 32);
         result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
         result = prime * result + (lastUpdateDate == null ? 0 : lastUpdateDate.hashCode());
-        result = prime * result + (path == null ? 0 : path.hashCode());
         result = prime * result + (profileId == null ? 0 : profileId.hashCode());
         result = prime * result + (state == null ? 0 : state.hashCode());
         result = prime * result + (int) (updatedBy ^ updatedBy >>> 32);
@@ -195,13 +187,6 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
         } else if (!lastUpdateDate.equals(other.lastUpdateDate)) {
             return false;
         }
-        if (path == null) {
-            if (other.path != null) {
-                return false;
-            }
-        } else if (!path.equals(other.path)) {
-            return false;
-        }
         if (profileId == null) {
             if (other.profileId != null) {
                 return false;
@@ -232,7 +217,7 @@ public class ApplicationImpl extends DescriptionElementImpl implements Applicati
     @Override
     public String toString() {
         return "ApplicationImpl [id=" + getId() + ", name=" + getName() + ", version=" + version
-                + ", path=" + path + ", getDescription()=" + getDescription() + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", homePageId="
+                + ", getDescription()=" + getDescription() + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", homePageId="
                 + homePageId + ", iconPath=" + iconPath
                 + ", lastUpdateDate=" + lastUpdateDate + ", state=" + state + ", updatedBy=" + updatedBy + "]";
     }

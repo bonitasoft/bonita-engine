@@ -36,7 +36,7 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
+        application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0"));
         appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "myPage");
     }
 
@@ -104,7 +104,7 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
     @Test(expected = ApplicationMenuNotFoundException.class)
     public void deleteApplication_also_deletes_applicationMenu() throws Exception {
         //given
-        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app2", "My secpond app", "1.0", "/app2"));
+        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app2", "My secpond app", "1.0"));
         final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "myPage");
         final ApplicationMenuCreator creator = new ApplicationMenuCreator("Main", appPage.getId(), 1);
         final ApplicationMenu createdAppMenu = getApplicationAPI().createApplicationMenu(creator);
@@ -204,7 +204,7 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
     @Test
     public void searchApplicationMenus_can_filter_on_applicationId() throws Exception {
         //given
-        final Application application2 = getApplicationAPI().createApplication(new ApplicationCreator("app2", "My second app", "1.0", "/app"));
+        final Application application2 = getApplicationAPI().createApplication(new ApplicationCreator("app2", "My second app", "1.0"));
         final ApplicationPage appPage2 = getApplicationAPI().createApplicationPage(application2.getId(), getPage().getId(), "mySecondPage");
 
         final ApplicationMenu menu1 = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator("first", appPage2.getId(), 1));

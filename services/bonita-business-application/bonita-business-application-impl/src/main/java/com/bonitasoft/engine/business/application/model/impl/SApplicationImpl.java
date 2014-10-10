@@ -27,8 +27,6 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
 
     private String version;
 
-    private String path;
-
     private String iconPath;
 
     private long creationDate;
@@ -51,12 +49,11 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         super();
     }
 
-    public SApplicationImpl(final String name, final String displayName, final String version, final String path, final long creationDate, final long createdBy, final String state) {
+    public SApplicationImpl(final String name, final String displayName, final String version, final long creationDate, final long createdBy, final String state) {
         super();
         this.name = name;
         this.displayName = displayName;
         this.version = version;
-        this.path = path;
         this.creationDate = creationDate;
         lastUpdateDate = creationDate; //at instantiation the creation date is the same as last update date
         this.createdBy = createdBy;
@@ -82,11 +79,6 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
     @Override
     public String getVersion() {
         return version;
-    }
-
-    @Override
-    public String getPath() {
-        return path;
     }
 
     @Override
@@ -158,10 +150,6 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         this.version = version;
     }
 
-    public void setPath(final String path) {
-        this.path = path;
-    }
-
     public void setLastUpdateDate(final long lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }
@@ -190,7 +178,6 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
         result = prime * result + (int) (lastUpdateDate ^ lastUpdateDate >>> 32);
         result = prime * result + (name == null ? 0 : name.hashCode());
-        result = prime * result + (path == null ? 0 : path.hashCode());
         result = prime * result + (profileId == null ? 0 : profileId.hashCode());
         result = prime * result + (state == null ? 0 : state.hashCode());
         result = prime * result + (int) (updatedBy ^ updatedBy >>> 32);
@@ -250,13 +237,6 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
         } else if (!name.equals(other.name)) {
             return false;
         }
-        if (path == null) {
-            if (other.path != null) {
-                return false;
-            }
-        } else if (!path.equals(other.path)) {
-            return false;
-        }
         if (profileId == null) {
             if (other.profileId != null) {
                 return false;
@@ -286,7 +266,7 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
 
     @Override
     public String toString() {
-        return "SApplicationImpl [name=" + name + ", description=" + description + ", version=" + version + ", path=" + path + ", iconPath=" + iconPath
+        return "SApplicationImpl [name=" + name + ", description=" + description + ", version=" + version + ", iconPath=" + iconPath
                 + ", creationDate=" + creationDate + ", createdBy=" + createdBy + ", lastUpdateDate=" + lastUpdateDate + ", updatedBy=" + updatedBy
                 + ", state=" + state + ", homePageId=" + homePageId + ", displayName=" + displayName + ", profileId=" + profileId + ", getId()=" + getId()
                 + ", getTenantId()=" + getTenantId() + "]";

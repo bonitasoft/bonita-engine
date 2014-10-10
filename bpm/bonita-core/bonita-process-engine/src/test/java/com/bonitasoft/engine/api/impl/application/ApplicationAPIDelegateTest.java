@@ -84,11 +84,11 @@ public class ApplicationAPIDelegateTest {
     @Test
     public void createApplication_should_call_applicationService_createApplication_and_return_created_application() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION, PATH);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION);
         creator.setDescription(DESCRIPTION);
         final SApplicationImpl sApp = getDefaultApplication();
         sApp.setDescription(DESCRIPTION);
-        final ApplicationImpl application = new ApplicationImpl(APP_NAME, VERSION, PATH, DESCRIPTION);
+        final ApplicationImpl application = new ApplicationImpl(APP_NAME, VERSION, DESCRIPTION);
         given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(convertor.toApplication(sApp)).willReturn(application);
         given(applicationService.createApplication(sApp)).willReturn(sApp);
@@ -101,15 +101,15 @@ public class ApplicationAPIDelegateTest {
     }
 
     private SApplicationImpl getDefaultApplication() {
-        final SApplicationImpl sApp = new SApplicationImpl(APP_NAME, APP_DISP_NAME, VERSION, PATH, System.currentTimeMillis(),
-                LOGGED_USER_ID, SApplicationState.DEACTIVATED.name());
+        final SApplicationImpl sApp = new SApplicationImpl(APP_NAME, APP_DISP_NAME, VERSION, System.currentTimeMillis(), LOGGED_USER_ID,
+                SApplicationState.DEACTIVATED.name());
         return sApp;
     }
 
     @Test(expected = AlreadyExistsException.class)
     public void createApplication_should_throw_AlreadyExistsException_when_applicationService_throws_SObjectAlreadyExistsException() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION, PATH);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION);
         final SApplicationImpl sApp = getDefaultApplication();
         given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(applicationService.createApplication(sApp)).willThrow(new SObjectAlreadyExistsException(""));
@@ -123,7 +123,7 @@ public class ApplicationAPIDelegateTest {
     @Test(expected = CreationException.class)
     public void createApplication_should_throw_CreationException_when_applicationService_throws_SObjectCreationException() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION, PATH);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION);
         final SApplicationImpl sApp = getDefaultApplication();
         given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(applicationService.createApplication(sApp)).willThrow(new SObjectCreationException(""));
@@ -137,7 +137,7 @@ public class ApplicationAPIDelegateTest {
     @Test(expected = InvalidTokenException.class)
     public void createApplication_should_throw_InvalidNameException_when_applicationService_throws_SInvalidNameException() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION, PATH);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION);
         final SApplicationImpl sApp = getDefaultApplication();
         given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(applicationService.createApplication(sApp)).willThrow(new SInvalidTokenException(""));
@@ -180,7 +180,7 @@ public class ApplicationAPIDelegateTest {
     @Test
     public void getApplication_should_return_the_application_returned_by_applicationService_coverted() throws Exception {
         final SApplicationImpl sApp = getDefaultApplication();
-        final ApplicationImpl application = new ApplicationImpl(APP_NAME, VERSION, PATH, null);
+        final ApplicationImpl application = new ApplicationImpl(APP_NAME, VERSION, null);
         given(applicationService.getApplication(APPLICATION_ID)).willReturn(sApp);
         given(convertor.toApplication(sApp)).willReturn(application);
 

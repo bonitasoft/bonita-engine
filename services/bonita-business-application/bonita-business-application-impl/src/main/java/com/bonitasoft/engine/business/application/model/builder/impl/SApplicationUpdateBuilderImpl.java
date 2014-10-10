@@ -61,12 +61,6 @@ public class SApplicationUpdateBuilderImpl implements SApplicationUpdateBuilder 
     }
 
     @Override
-    public SApplicationUpdateBuilder updatePath(final String path) {
-        descriptor.addField(SApplicationFields.PATH, path);
-        return this;
-    }
-
-    @Override
     public SApplicationUpdateBuilder updateDescription(final String description) {
         descriptor.addField(SApplicationFields.DESCRIPTION, description);
         return this;

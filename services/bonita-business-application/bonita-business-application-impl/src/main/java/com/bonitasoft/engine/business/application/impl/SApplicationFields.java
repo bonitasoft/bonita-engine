@@ -28,8 +28,6 @@ public class SApplicationFields {
 
     public static String VERSION = "version";
 
-    public static String PATH = "path";
-
     public static String DESCRIPTION = "description";
 
     public static String ICON_PATH = "iconPath";

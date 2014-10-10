@@ -40,7 +40,6 @@ public class ApplicationConvertorTest {
     private static final long HOME_PAGE_ID = 130;
     private static final long PROFILE_ID = 40;
     private static final String APP_DESC = "app desc";
-    private static final String APP_PATH = "/app";
     private static final String APP_VERSION = "1.0";
     private static final String APP_NAME = "app";
     private static final String APP_DISPLAY_NAME = "My application";
@@ -50,7 +49,7 @@ public class ApplicationConvertorTest {
     @Test
     public void buildSApplication_should_map_all_information_from_creator_and_initialize_mandatory_fields() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, APP_PATH);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISPLAY_NAME, APP_VERSION);
         creator.setDescription(APP_DESC);
         creator.setIconPath(ICON_PATH);
         creator.setProfileId(PROFILE_ID);
@@ -65,7 +64,6 @@ public class ApplicationConvertorTest {
         assertThat(application.getName()).isEqualTo(APP_NAME);
         assertThat(application.getDisplayName()).isEqualTo(APP_DISPLAY_NAME);
         assertThat(application.getVersion()).isEqualTo(APP_VERSION);
-        assertThat(application.getPath()).isEqualTo(APP_PATH);
         assertThat(application.getDescription()).isEqualTo(APP_DESC);
         assertThat(application.getIconPath()).isEqualTo(ICON_PATH);
         assertThat(application.getCreatedBy()).isEqualTo(userId);
@@ -81,8 +79,8 @@ public class ApplicationConvertorTest {
         //given
         final long currentDate = System.currentTimeMillis();
         final String state = SApplicationState.DEACTIVATED.name();
-        final SApplicationImpl sApp = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, APP_PATH, currentDate,
-                CREATOR_ID, state);
+        final SApplicationImpl sApp = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, currentDate, CREATOR_ID,
+                state);
         sApp.setDescription(APP_DESC);
         sApp.setId(ID);
         sApp.setTenantId(TENANT_ID);
@@ -99,7 +97,6 @@ public class ApplicationConvertorTest {
         assertThat(application.getName()).isEqualTo(APP_NAME);
         assertThat(application.getDisplayName()).isEqualTo(APP_DISPLAY_NAME);
         assertThat(application.getVersion()).isEqualTo(APP_VERSION);
-        assertThat(application.getPath()).isEqualTo(APP_PATH);
         assertThat(application.getDescription()).isEqualTo(APP_DESC);
         assertThat(application.getIconPath()).isEqualTo(ICON_PATH);
         assertThat(application.getCreatedBy()).isEqualTo(CREATOR_ID);
@@ -114,12 +111,10 @@ public class ApplicationConvertorTest {
     @Test
     public void toApplicationList_should_call_toApplition_for_each_element_in_the_list_and_return_the_list_of_converted_values() throws Exception {
         //given
-        final SApplicationImpl sApp1 = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, APP_PATH, System.currentTimeMillis(), CREATOR_ID,
-                SApplicationState.DEACTIVATED.name());
-        final SApplicationImpl sApp2 = new SApplicationImpl("app2", " my app2", APP_VERSION, "/app2", System.currentTimeMillis(), CREATOR_ID,
-                SApplicationState.DEACTIVATED.name());
-        final ApplicationImpl app1 = new ApplicationImpl(APP_NAME, APP_VERSION, APP_PATH, APP_DESC);
-        final ApplicationImpl app2 = new ApplicationImpl("app2", APP_VERSION, "/app2", APP_DESC);
+        final SApplicationImpl sApp1 = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, System.currentTimeMillis(), CREATOR_ID, SApplicationState.DEACTIVATED.name());
+        final SApplicationImpl sApp2 = new SApplicationImpl("app2", " my app2", APP_VERSION, System.currentTimeMillis(), CREATOR_ID, SApplicationState.DEACTIVATED.name());
+        final ApplicationImpl app1 = new ApplicationImpl(APP_NAME, APP_VERSION, APP_DESC);
+        final ApplicationImpl app2 = new ApplicationImpl("app2", APP_VERSION, APP_DESC);
         final ApplicationConvertor convertorMock = spy(convertor);
         doReturn(app1).when(convertorMock).toApplication(sApp1);
         doReturn(app2).when(convertorMock).toApplication(sApp2);
@@ -138,7 +133,6 @@ public class ApplicationConvertorTest {
         updater.setName("My-updated-app");
         updater.setDisplayName("Updated display name");
         updater.setVersion("1.1");
-        updater.setPath("/myUpdatedApp");
         updater.setDescription("Up description");
         updater.setIconPath("/newIcon.jpg");
         updater.setProfileId(10L);
@@ -155,7 +149,6 @@ public class ApplicationConvertorTest {
         assertThat(fields.get(SApplicationFields.NAME)).isEqualTo("My-updated-app");
         assertThat(fields.get(SApplicationFields.DISPLAY_NAME)).isEqualTo("Updated display name");
         assertThat(fields.get(SApplicationFields.VERSION)).isEqualTo("1.1");
-        assertThat(fields.get(SApplicationFields.PATH)).isEqualTo("/myUpdatedApp");
         assertThat(fields.get(SApplicationFields.DESCRIPTION)).isEqualTo("Up description");
         assertThat(fields.get(SApplicationFields.ICON_PATH)).isEqualTo("/newIcon.jpg");
         assertThat(fields.get(SApplicationFields.PROFILE_ID)).isEqualTo(10L);

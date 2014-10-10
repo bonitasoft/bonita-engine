@@ -44,11 +44,6 @@ public class ApplicationSearchDescriptor {
     public static final String VERSION = "version";
 
     /**
-     * Used to filter or order by the <code>Application</code> path
-     */
-    public static final String PATH = "path";
-
-    /**
      * Used to filter or order by the <code>Application</code> icon path
      */
     public static final String ICON_PATH = "iconPath";
@@ -77,7 +72,7 @@ public class ApplicationSearchDescriptor {
      * Used to filter or order by the <code>Application</code> state. The possible values are {@link ApplicationState#ACTIVATED#name()} and
      * {@link ApplicationState#DEACTIVATED
      * #name()}
-     * 
+     *
      * @see ApplicationState
      */
     public static final String STATE = "state";

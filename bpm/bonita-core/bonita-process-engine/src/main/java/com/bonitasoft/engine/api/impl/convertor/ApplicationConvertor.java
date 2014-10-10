@@ -42,10 +42,9 @@ public class ApplicationConvertor {
         final String displayName = (String) fields.get(ApplicationField.DISPLAY_NAME);
         final String version = (String) fields.get(ApplicationField.VERSION);
         final String description = (String) fields.get(ApplicationField.DESCRIPTION);
-        final String path = (String) fields.get(ApplicationField.PATH);
         final String iconPath = (String) fields.get(ApplicationField.ICON_PATH);
         final Long profileId = (Long) fields.get(ApplicationField.PROFILE_ID);
-        final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(name, displayName, version, path, creatorUserId);
+        final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(name, displayName, version, creatorUserId);
         builder.setDescription(description);
         builder.setIconPath(iconPath);
         builder.setProfileId(profileId);
@@ -53,8 +52,7 @@ public class ApplicationConvertor {
     }
 
     public Application toApplication(final SApplication sApplication) {
-        final ApplicationImpl application = new ApplicationImpl(sApplication.getName(), sApplication.getVersion(), sApplication.getPath(),
-                sApplication.getDescription());
+        final ApplicationImpl application = new ApplicationImpl(sApplication.getName(), sApplication.getVersion(), sApplication.getDescription());
         application.setId(sApplication.getId());
         application.setDisplayName(sApplication.getDisplayName());
         application.setCreatedBy(sApplication.getCreatedBy());
@@ -94,10 +92,6 @@ public class ApplicationConvertor {
 
                 case ICON_PATH:
                     builder.updateIconPath((String) entry.getValue());
-                    break;
-
-                case PATH:
-                    builder.updatePath((String) entry.getValue());
                     break;
 
                 case PROFILE_ID:

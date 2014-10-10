@@ -43,13 +43,6 @@ public interface Application extends BaseElement {
     String getVersion();
 
     /**
-     * Retrieves the <code>Application</code> path
-     *
-     * @return the <code>Application</code> path
-     */
-    String getPath();
-
-    /**
      * Retrieves the <code>Application</code> description
      *
      * @return the <code>Application</code> description

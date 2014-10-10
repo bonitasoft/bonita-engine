@@ -21,8 +21,6 @@ public interface SApplication extends PersistentObject {
 
     String getVersion();
 
-    String getPath();
-
     String getDescription();
 
     String getIconPath();

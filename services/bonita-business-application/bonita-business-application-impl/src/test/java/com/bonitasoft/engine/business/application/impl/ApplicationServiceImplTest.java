@@ -112,7 +112,7 @@ public class ApplicationServiceImplTest {
     }
 
     private SApplication buildApplication(final String applicationName, final String applicationDisplayName) {
-        return new SApplicationBuilderFactoryImpl().createNewInstance(applicationName, applicationDisplayName, "1.0", "/" + applicationName, CREATED_BY).done();
+        return new SApplicationBuilderFactoryImpl().createNewInstance(applicationName, applicationDisplayName, "1.0", CREATED_BY).done();
     }
 
     @Test

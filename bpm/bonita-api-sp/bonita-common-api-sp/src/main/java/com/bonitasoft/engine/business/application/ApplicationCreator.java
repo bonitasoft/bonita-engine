@@ -34,14 +34,12 @@ public class ApplicationCreator implements Serializable {
      *        characters '-', '.', '_' or '~'.
      * @param displayName the <code>Application</code> display name
      * @param version the <code>Application</code> version
-     * @param path the <code>Application</code> path
      * @see Application
      */
-    public ApplicationCreator(final String name, final String displayName, final String version, final String path) {
+    public ApplicationCreator(final String name, final String displayName, final String version) {
         fields = new HashMap<ApplicationField, Serializable>(2);
         fields.put(ApplicationField.NAME, name);
         fields.put(ApplicationField.VERSION, version);
-        fields.put(ApplicationField.PATH, path);
         fields.put(ApplicationField.DISPLAY_NAME, displayName);
     }
 
