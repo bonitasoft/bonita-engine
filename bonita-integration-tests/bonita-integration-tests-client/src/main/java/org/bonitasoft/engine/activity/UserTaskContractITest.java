@@ -163,8 +163,6 @@ public class UserTaskContractITest extends CommonAPITest {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         final UserTaskDefinitionBuilder userTask = builder.addUserTask(TASK1, ACTOR_NAME);
-
-        final Integer value = 2;
         userTask.addContract().addSimpleInput("decimal", Type.DECIMAL, null);
         userTask.addData("variable", Number.class.getName(), null);
         userTask.addOperation(new OperationBuilder().createSetDataOperation("variable",
