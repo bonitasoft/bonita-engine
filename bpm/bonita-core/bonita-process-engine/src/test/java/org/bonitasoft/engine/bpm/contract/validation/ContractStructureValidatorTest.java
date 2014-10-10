@@ -28,7 +28,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
@@ -59,11 +61,11 @@ public class ContractStructureValidatorTest {
     public void setUp() {
         when(logger.isLoggable(ContractStructureValidator.class, DEBUG)).thenReturn(true);
     }
-    
+
     @Test
     public void should_log_inputs_provided_but_not_in_defined_in_contract() throws Exception {
-        SContractDefinition contract = aContract().withInput(anInput(TEXT).withName("aText")).build();
-        Map<String, Object> taskInputs = aMap()
+        final SContractDefinition contract = aContract().withInput(anInput(TEXT).withName("aText")).build();
+        final Map<String, Object> taskInputs = aMap()
                 .put("aText", "should be provided")
                 .put("someFieldNotDefinedInContract", true)
                 .put("someOtherFieldNotDefinedInContract", "42").build();
@@ -78,25 +80,65 @@ public class ContractStructureValidatorTest {
 
     @Test
     public void should_pass_when_inputs_are_provided_and_valid() throws Exception {
-        SContractDefinition contract = aContract()
+        final SContractDefinition contract = aContract()
                 .withInput(anInput(TEXT).withName("aText"))
                 .withInput(anInput(BOOLEAN).withName("aBoolean")).build();
-        Map<String, Object> taskInputs = aMap()
+        final Map<String, Object> taskInputs = aMap()
                 .put("aText", "hello")
                 .put("aBoolean", true).build();
 
         validator.validate(contract, taskInputs);
-        
+
         // No exception expected
     }
 
     @Test
+    public void should_pass_when_multiple_inputs_are_provided_and_valid() throws Exception {
+        final SContractDefinition contract = aContract()
+                .withInput(anInput(TEXT).withName("aText").withMultiple(true)).build();
+
+        final List<String> values = new ArrayList<String>();
+        values.add("hello");
+        values.add("world");
+
+        final Map<String, Object> taskInputs = aMap()
+                .put("aText", values).build();
+
+        validator.validate(contract, taskInputs);
+
+        // No exception expected
+    }
+
+    @Test
+    public void should_pass_when_multiple_complex_inputs_are_provided_and_valid() throws Exception {
+        //given
+        final SContractDefinition contract = aContract()
+                .withInput(
+                        aComplexInput().withName("complex").withMultiple(true)
+                                .withInput(anInput(TEXT).withName("name").build(), anInput(SType.INTEGER).withName("value").build())).build();
+
+        final List<Map<String, Object>> complexList = new ArrayList<Map<String, Object>>();
+        complexList.add(aMap().put("name", "value1").put("value", 5).build());
+        complexList.add(aMap().put("name", "value2").put("value", 8).build());
+
+        final Map<String, Object> taskInputs = aMap()
+                .put("complex", complexList).build();
+
+        //then no exception expected
+        try {
+            validator.validate(contract, taskInputs);
+        } catch (final ContractViolationException e) {
+            fail(e.getExplanations().toString());
+        }
+    }
+
+    @Test
     public void should_pass_when_complex_inputs_are_provided_and_valid() throws Exception {
-        SContractDefinition contract = aContract()
+        final SContractDefinition contract = aContract()
                 .withInput(anInput(TEXT).withName("aText"))
                 .withInput(anInput(BOOLEAN).withName("aBoolean"))
                 .withInput(aComplexInput().withName("complex").withInput(anInput(SType.TEXT).withName("embedded"))).build();
-        Map<String, Object> taskInputs = aMap()
+        final Map<String, Object> taskInputs = aMap()
                 .put("aText", "hello")
                 .put("aBoolean", true)
                 .put("complex", aMap().put("embedded", "aValue").build())
@@ -107,14 +149,14 @@ public class ContractStructureValidatorTest {
 
     @Test
     public void should_throw_exception_with_explanations_when_inputs_are_missing() throws Exception {
-            SContractDefinition contract = aContract()
-                    .withInput(anInput(TEXT).withName("aText").build())
-                    .withInput(anInput(TEXT).withName("anotherText").build()).build();
+        final SContractDefinition contract = aContract()
+                .withInput(anInput(TEXT).withName("aText").build())
+                .withInput(anInput(TEXT).withName("anotherText").build()).build();
 
         try {
             validator.validate(contract, new HashMap<String, Object>());
             fail("Expected ContractViolationException");
-        } catch (ContractViolationException e) {
+        } catch (final ContractViolationException e) {
             assertThat(e.getExplanations())
                     .containsOnly("Expected input [aText] is missing", "Expected input [anotherText] is missing");
         }
@@ -122,13 +164,13 @@ public class ContractStructureValidatorTest {
 
     @Test
     public void should_throw_exception_with_explanations_when_complex_inputs_are_missing() throws Exception {
-        SContractDefinition contract = aContract()
+        final SContractDefinition contract = aContract()
                 .withInput(aComplexInput().withName("complex").withInput(anInput(SType.TEXT).withName("embedded"))).build();
 
         try {
             validator.validate(contract, new HashMap<String, Object>());
             fail("Expected ContractViolationException");
-        } catch (ContractViolationException e) {
+        } catch (final ContractViolationException e) {
             assertThat(e.getExplanations())
                     .containsOnly("Expected input [complex] is missing");
         }
@@ -136,14 +178,14 @@ public class ContractStructureValidatorTest {
 
     @Test
     public void should_throw_exception_with_explanations_when_complex_inputs_leaf_are_missing() throws Exception {
-        SContractDefinition contract = aContract()
+        final SContractDefinition contract = aContract()
                 .withInput(aComplexInput().withName("complex").withInput(anInput(SType.TEXT).withName("embedded"))).build();
-        Map<String, Object> map = aMap().put("complex", aMap().build()).build();
-        
+        final Map<String, Object> map = aMap().put("complex", aMap().build()).build();
+
         try {
             validator.validate(contract, map);
             fail("expected exception has not been thrown");
-        } catch (ContractViolationException e) {
+        } catch (final ContractViolationException e) {
             assertThat(e.getExplanations())
                     .containsOnly("Expected input [embedded] is missing");
         }
@@ -151,17 +193,17 @@ public class ContractStructureValidatorTest {
 
     @Test
     public void should_throw_exception_with_explanation_when_types_are_not_valid() throws Exception {
-        SContractDefinition contract = aContract()
+        final SContractDefinition contract = aContract()
                 .withInput(anInput(INTEGER).withName("anInteger"))
                 .withInput(aComplexInput().withName("complex").withInput(anInput(SType.TEXT).withName("embedded"))).build();
         doThrow(new InputValidationException("type error explanation"))
                 .when(typeValidator).validate(any(SInputDefinition.class), any(Object.class));
-        Map<String, Object> taskInputs = aMap().put("anInteger", "thisIsNotAnInteger").put("complex", "thisIsNotAComplex").build();
+        final Map<String, Object> taskInputs = aMap().put("anInteger", "thisIsNotAnInteger").put("complex", "thisIsNotAComplex").build();
 
         try {
             validator.validate(contract, taskInputs);
             fail("expected exception has not been thrown");
-        } catch (ContractViolationException e) {
+        } catch (final ContractViolationException e) {
             assertThat(e.getExplanations())
                     .containsOnly("type error explanation", "type error explanation");
         }
