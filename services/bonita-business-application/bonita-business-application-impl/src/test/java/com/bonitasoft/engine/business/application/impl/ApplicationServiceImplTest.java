@@ -185,7 +185,7 @@ public class ApplicationServiceImplTest {
     public void createApplication_should_throw_SObjectAlreadyExistsException_when_an_application_with_the_same_name_already_exists() throws Exception {
         //given
         final String name = APPLICATION_TOKEN;
-        given(persistenceService.selectOne(new SelectOneDescriptor<SApplication>("applicationPageToken", Collections.<String, Object> singletonMap("name",
+        given(persistenceService.selectOne(new SelectOneDescriptor<SApplication>("getApplicationByToken", Collections.<String, Object> singletonMap("name",
                 name), SApplication.class))).willReturn(application);
 
         final SApplication newApp = buildApplication(APPLICATION_TOKEN, APPLICATION_DISP_NAME);
@@ -196,7 +196,7 @@ public class ApplicationServiceImplTest {
             fail("Exception expected");
         } catch (final SObjectAlreadyExistsException e) {
             //then
-            assertThat(e.getMessage()).isEqualTo("An application already exists with name '" + name + "'.");
+            assertThat(e.getMessage()).isEqualTo("An application already exists with token '" + name + "'.");
             verify(recorder, never()).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
         }
 
