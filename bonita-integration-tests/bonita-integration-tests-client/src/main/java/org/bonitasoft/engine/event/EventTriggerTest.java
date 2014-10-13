@@ -82,16 +82,18 @@ public class EventTriggerTest extends AbstractEventTest {
         final ProcessDefinition process1 = deployAndEnableSimpleProcess("Toto", "moi");
         final ProcessDefinition process2 = deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(90000, true, "Toto");
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(process2.getId());
-        waitForFlowNodeInState(processInstance2, "timer", TestStates.WAITING, true);
+        try {
+            waitForFlowNodeInState(processInstance2, "timer", TestStates.WAITING, true);
 
-        final SearchOptions options = new SearchOptionsBuilder(0, 10).done();
-        final List<TimerEventTriggerInstance> result = getProcessAPI().searchTimerEventTriggerInstances(processInstance2.getId(), options).getResult();
-        assertEquals(1, result.size());
+            final SearchOptions options = new SearchOptionsBuilder(0, 10).done();
+            final List<TimerEventTriggerInstance> result = getProcessAPI().searchTimerEventTriggerInstances(processInstance2.getId(), options).getResult();
+            assertEquals(1, result.size());
 
-        final Date date = new Date();
-        final Date newDate = getProcessAPI().updateExecutionDateOfTimerEventTriggerInstance(result.get(0).getId(), date);
-        assertTrue(newDate.equals(date) || newDate.after(date));
-
-        disableAndDeleteProcess(process2, process1);
+            final Date date = new Date();
+            final Date newDate = getProcessAPI().updateExecutionDateOfTimerEventTriggerInstance(result.get(0).getId(), date);
+            assertTrue(newDate.equals(date) || newDate.after(date));
+        } finally {
+            disableAndDeleteProcess(process2, process1);
+        }
     }
 }
