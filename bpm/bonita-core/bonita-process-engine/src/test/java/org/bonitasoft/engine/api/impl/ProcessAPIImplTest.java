@@ -3,6 +3,7 @@ package org.bonitasoft.engine.api.impl;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
@@ -24,6 +25,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -39,6 +41,8 @@ import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.impl.IntegerDataInstanceImpl;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
@@ -584,6 +588,30 @@ public class ProcessAPIImplTest {
         sConnectorImplementationDescriptors.add(sConnectorImplementationDescriptor);
         sConnectorImplementationDescriptors.add(sConnectorImplementationDescriptor);
         return sConnectorImplementationDescriptors;
+    }
+
+    @Test
+    public void evaluateExpressionsOnCompletedActivityInstance_should_call_getLastArchivedProcessInstance_using_parentProcessInstanceId() throws Exception {
+        //given
+        final long processInstanceId = 21L;
+        final long activityInstanceId = 5L;
+        final ArchivedActivityInstance activityInstance = mock(ArchivedActivityInstance.class);
+        given(activityInstance.getProcessInstanceId()).willReturn(processInstanceId);
+        given(activityInstance.getArchiveDate()).willReturn(new Date());
+        doReturn(activityInstance).when(processAPI).getArchivedActivityInstance(activityInstanceId);
+
+        final ArchivedProcessInstance procInst = mock(ArchivedProcessInstance.class);
+        given(procInst.getProcessDefinitionId()).willReturn(1000L);
+        doReturn(procInst).when(processAPI).getLastArchivedProcessInstance(anyLong());
+
+        //when
+        processAPI.evaluateExpressionsOnCompletedActivityInstance(activityInstanceId, new HashMap<Expression, Map<String, Serializable>>());
+
+        //then
+        verify(processAPI).getLastArchivedProcessInstance(processInstanceId);
+        verify(activityInstance, never()).getParentContainerId();
+        verify(activityInstance, never()).getParentActivityInstanceId();
+        verify(activityInstance, never()).getRootContainerId();
     }
 
 }
