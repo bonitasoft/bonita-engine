@@ -145,7 +145,7 @@ public class ApplicationConvertorTest {
         //then
         assertThat(updateDescriptor).isNotNull();
         final Map<String, Object> fields = updateDescriptor.getFields();
-        assertThat(fields).hasSize(9);
+        assertThat(fields).hasSize(8);
         assertThat(fields.get(SApplicationFields.TOKEN)).isEqualTo("My-updated-app");
         assertThat(fields.get(SApplicationFields.DISPLAY_NAME)).isEqualTo("Updated display name");
         assertThat(fields.get(SApplicationFields.VERSION)).isEqualTo("1.1");
