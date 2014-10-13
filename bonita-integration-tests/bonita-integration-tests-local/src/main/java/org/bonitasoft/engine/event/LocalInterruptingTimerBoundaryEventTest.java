@@ -25,7 +25,7 @@ import org.junit.Test;
 
 public class LocalInterruptingTimerBoundaryEventTest extends AbstractEventTest {
 
-    private static final String TIMER_EVENT_PREFIX = "Timer_Boundary_Ev_";
+    private static final String TIMER_EVENT_PREFIX = "Timer_Ev_";
 
     protected PlatformServiceAccessor getPlatformAccessor() {
         try {
