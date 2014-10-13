@@ -147,7 +147,7 @@ public class DocumentHelper {
         removeOthersDocuments(currentList);
     }
 
-    private void updateExistingDocument(SMappedDocument documentToUpdate, int index, DocumentValue documentValue, long authorId) throws SObjectCreationException,
+    void updateExistingDocument(SMappedDocument documentToUpdate, int index, DocumentValue documentValue, long authorId) throws SObjectCreationException,
             SSessionNotFoundException, SObjectModificationException {
         if (documentValue.hasChanged()) {
             documentService.updateDocumentOfList(documentToUpdate, createDocumentObject(documentValue, authorId), index);
@@ -159,8 +159,8 @@ public class DocumentHelper {
         }
     }
 
-    private SMappedDocument getDocumentHavingDocumentIdAndRemoveFromList(List<SMappedDocument> currentList, Long documentId, String documentName,
-                                                                         Long processInstanceId) throws org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException {
+    SMappedDocument getDocumentHavingDocumentIdAndRemoveFromList(List<SMappedDocument> currentList, Long documentId, String documentName,
+                                                                         Long processInstanceId) throws SObjectNotFoundException {
         Iterator<SMappedDocument> iterator = currentList.iterator();
         while (iterator.hasNext()) {
             SMappedDocument next = iterator.next();
@@ -169,18 +169,18 @@ public class DocumentHelper {
                 return next;
             }
         }
-        throw new org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException("The document with id " + documentId + " was not in the list " + documentName + " of process instance "
+        throw new SObjectNotFoundException("The document with id " + documentId + " was not in the list " + documentName + " of process instance "
                 + processInstanceId);
     }
 
 
 
-    List<SMappedDocument> getExistingDocumentList(String documentName, long processInstanceId) throws SBonitaReadException, org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException {
+    List<SMappedDocument> getExistingDocumentList(String documentName, long processInstanceId) throws SBonitaReadException, SObjectNotFoundException {
         List<SMappedDocument> currentList;
         currentList = getAllDocumentOfTheList(processInstanceId, documentName);
         // if it's not a list it throws an exception
         if (currentList.isEmpty() && !isListDefinedInDefinition(documentName, processInstanceId)) {
-            throw new org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException("Unable to find the list " + documentName + " on process instance " + processInstanceId
+            throw new SObjectNotFoundException("Unable to find the list " + documentName + " on process instance " + processInstanceId
                     + ", nothing in database and nothing declared in the definition");
         }
         return currentList;
