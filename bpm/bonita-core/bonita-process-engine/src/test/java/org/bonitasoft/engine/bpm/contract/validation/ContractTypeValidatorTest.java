@@ -14,7 +14,7 @@
 package org.bonitasoft.engine.bpm.contract.validation;
 
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SComplexInputDefinitionBuilder.aComplexInput;
-import static org.bonitasoft.engine.bpm.contract.validation.builder.SSimpleInputDefinitionBuilder.anInput;
+import static org.bonitasoft.engine.bpm.contract.validation.builder.SSimpleInputDefinitionBuilder.aSimpleInput;
 import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
 import static org.bonitasoft.engine.core.process.definition.model.SType.DECIMAL;
 
@@ -44,7 +44,7 @@ public class ContractTypeValidatorTest {
 
     @Test(expected = InputValidationException.class)
     public void should_delegate_simple_type_validation_to_associated_enum() throws Exception {
-        final SInputDefinition definition = anInput(BOOLEAN).build();
+        final SInputDefinition definition = aSimpleInput(BOOLEAN).build();
 
         contractTypeValidator.validate(definition, "not a boolean");
     }
@@ -52,7 +52,7 @@ public class ContractTypeValidatorTest {
     @Test
     public void should_decimal_validation_accept_integer() throws Exception {
         //given
-        final SInputDefinition definition = anInput(DECIMAL).build();
+        final SInputDefinition definition = aSimpleInput(DECIMAL).build();
 
         //when
         contractTypeValidator.validate(definition, 2);

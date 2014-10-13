@@ -15,11 +15,11 @@ public class SSimpleInputDefinitionBuilder {
         this.type = type;
     }
 
-    public static SSimpleInputDefinitionBuilder anInput(final SType type) {
+    public static SSimpleInputDefinitionBuilder aSimpleInput(final SType type) {
         return new SSimpleInputDefinitionBuilder(type);
     }
 
-    public static SSimpleInputDefinitionBuilder anInput() {
+    public static SSimpleInputDefinitionBuilder aSimpleInput() {
         return new SSimpleInputDefinitionBuilder(SType.TEXT);
     }
 

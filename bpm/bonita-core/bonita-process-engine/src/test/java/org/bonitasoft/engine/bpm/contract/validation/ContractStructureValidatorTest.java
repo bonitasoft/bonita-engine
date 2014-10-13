@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.aMap;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SComplexInputDefinitionBuilder.aComplexInput;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDefinitionBuilder.aContract;
-import static org.bonitasoft.engine.bpm.contract.validation.builder.SSimpleInputDefinitionBuilder.anInput;
+import static org.bonitasoft.engine.bpm.contract.validation.builder.SSimpleInputDefinitionBuilder.aSimpleInput;
 import static org.bonitasoft.engine.core.process.definition.model.SType.BOOLEAN;
 import static org.bonitasoft.engine.core.process.definition.model.SType.INTEGER;
 import static org.bonitasoft.engine.core.process.definition.model.SType.TEXT;
@@ -64,7 +64,7 @@ public class ContractStructureValidatorTest {
 
     @Test
     public void should_log_inputs_provided_but_not_in_defined_in_contract() throws Exception {
-        final SContractDefinition contract = aContract().withInput(anInput(TEXT).withName("aText")).build();
+        final SContractDefinition contract = aContract().withInput(aSimpleInput(TEXT).withName("aText")).build();
         final Map<String, Object> taskInputs = aMap()
                 .put("aText", "should be provided")
                 .put("someFieldNotDefinedInContract", true)
@@ -81,8 +81,8 @@ public class ContractStructureValidatorTest {
     @Test
     public void should_pass_when_inputs_are_provided_and_valid() throws Exception {
         final SContractDefinition contract = aContract()
-                .withInput(anInput(TEXT).withName("aText"))
-                .withInput(anInput(BOOLEAN).withName("aBoolean")).build();
+                .withInput(aSimpleInput(TEXT).withName("aText"))
+                .withInput(aSimpleInput(BOOLEAN).withName("aBoolean")).build();
         final Map<String, Object> taskInputs = aMap()
                 .put("aText", "hello")
                 .put("aBoolean", true).build();
@@ -95,7 +95,7 @@ public class ContractStructureValidatorTest {
     @Test
     public void should_pass_when_multiple_inputs_are_provided_and_valid() throws Exception {
         final SContractDefinition contract = aContract()
-                .withInput(anInput(TEXT).withName("aText").withMultiple(true)).build();
+                .withInput(aSimpleInput(TEXT).withName("aText").withMultiple(true)).build();
 
         final List<String> values = new ArrayList<String>();
         values.add("hello");
@@ -115,7 +115,7 @@ public class ContractStructureValidatorTest {
         final SContractDefinition contract = aContract()
                 .withInput(
                         aComplexInput().withName("complex").withMultiple(true)
-                                .withInput(anInput(TEXT).withName("name").build(), anInput(SType.INTEGER).withName("value").build())).build();
+                                .withInput(aSimpleInput(TEXT).withName("name").build(), aSimpleInput(SType.INTEGER).withName("value").build())).build();
 
         final List<Map<String, Object>> complexList = new ArrayList<Map<String, Object>>();
         complexList.add(aMap().put("name", "value1").put("value", 5).build());
@@ -135,9 +135,9 @@ public class ContractStructureValidatorTest {
     @Test
     public void should_pass_when_complex_inputs_are_provided_and_valid() throws Exception {
         final SContractDefinition contract = aContract()
-                .withInput(anInput(TEXT).withName("aText"))
-                .withInput(anInput(BOOLEAN).withName("aBoolean"))
-                .withInput(aComplexInput().withName("complex").withInput(anInput(SType.TEXT).withName("embedded"))).build();
+                .withInput(aSimpleInput(TEXT).withName("aText"))
+                .withInput(aSimpleInput(BOOLEAN).withName("aBoolean"))
+                .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded"))).build();
         final Map<String, Object> taskInputs = aMap()
                 .put("aText", "hello")
                 .put("aBoolean", true)
@@ -150,8 +150,8 @@ public class ContractStructureValidatorTest {
     @Test
     public void should_throw_exception_with_explanations_when_inputs_are_missing() throws Exception {
         final SContractDefinition contract = aContract()
-                .withInput(anInput(TEXT).withName("aText").build())
-                .withInput(anInput(TEXT).withName("anotherText").build()).build();
+                .withInput(aSimpleInput(TEXT).withName("aText").build())
+                .withInput(aSimpleInput(TEXT).withName("anotherText").build()).build();
 
         try {
             validator.validate(contract, new HashMap<String, Object>());
@@ -165,7 +165,7 @@ public class ContractStructureValidatorTest {
     @Test
     public void should_throw_exception_with_explanations_when_complex_inputs_are_missing() throws Exception {
         final SContractDefinition contract = aContract()
-                .withInput(aComplexInput().withName("complex").withInput(anInput(SType.TEXT).withName("embedded"))).build();
+                .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded"))).build();
 
         try {
             validator.validate(contract, new HashMap<String, Object>());
@@ -179,7 +179,7 @@ public class ContractStructureValidatorTest {
     @Test
     public void should_throw_exception_with_explanations_when_complex_inputs_leaf_are_missing() throws Exception {
         final SContractDefinition contract = aContract()
-                .withInput(aComplexInput().withName("complex").withInput(anInput(SType.TEXT).withName("embedded"))).build();
+                .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded"))).build();
         final Map<String, Object> map = aMap().put("complex", aMap().build()).build();
 
         try {
@@ -194,8 +194,8 @@ public class ContractStructureValidatorTest {
     @Test
     public void should_throw_exception_with_explanation_when_types_are_not_valid() throws Exception {
         final SContractDefinition contract = aContract()
-                .withInput(anInput(INTEGER).withName("anInteger"))
-                .withInput(aComplexInput().withName("complex").withInput(anInput(SType.TEXT).withName("embedded"))).build();
+                .withInput(aSimpleInput(INTEGER).withName("anInteger"))
+                .withInput(aComplexInput().withName("complex").withInput(aSimpleInput(SType.TEXT).withName("embedded"))).build();
         doThrow(new InputValidationException("type error explanation"))
                 .when(typeValidator).validate(any(SInputDefinition.class), any(Object.class));
         final Map<String, Object> taskInputs = aMap().put("anInteger", "thisIsNotAnInteger").put("complex", "thisIsNotAComplex").build();

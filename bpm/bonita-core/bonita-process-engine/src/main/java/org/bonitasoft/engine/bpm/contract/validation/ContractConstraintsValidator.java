@@ -14,8 +14,10 @@
 package org.bonitasoft.engine.bpm.contract.validation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
@@ -37,7 +39,7 @@ public class ContractConstraintsValidator {
             log(TechnicalLogSeverity.DEBUG, "Evaluating constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames());
             Boolean valid;
             try {
-                valid = MVEL.evalToBoolean(constraint.getExpression(), variables);
+                valid = evaluateContraintExpression(variables, constraint);
             } catch (final Exception e) {
                 valid = Boolean.FALSE;
             }
@@ -48,8 +50,42 @@ public class ContractConstraintsValidator {
         }
 
         if (!comments.isEmpty()) {
-            throw new ContractViolationException("Error while validating rules", comments);
+            throw new ContractViolationException("Error while validating constraints", comments);
         }
+    }
+
+    private Boolean evaluateContraintExpression(final Map<String, Object> variables, final SConstraintDefinition constraint) {
+        final Map<String, Object> injectVariables = injectVariables(constraint, variables);
+        return MVEL.evalToBoolean(constraint.getExpression(), injectVariables);
+    }
+
+    private Map<String, Object> injectVariables(final SConstraintDefinition constraint, final Map<String, Object> variables) {
+        final Map<String, Object> constraintValues = new HashMap<String, Object>();
+        for (final String inputName : constraint.getInputNames()) {
+            injectVariable(variables, constraintValues, inputName);
+        }
+        return constraintValues;
+    }
+
+    private void injectVariable(final Map<String, Object> variables, final Map<String, Object> constraintValues, final String inputName) {
+        if (variables.containsKey(inputName)) {
+            constraintValues.put(inputName, variables.get(inputName));
+        } else {
+            injectFromComplexInput(variables, constraintValues, inputName);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void injectFromComplexInput(final Map<String, Object> variables, final Map<String, Object> values, final String inputName) {
+        for (final Entry<String, Object> variableEntry : variables.entrySet()) {
+            final Object variableValue = variableEntry.getValue();
+            if (variableValue instanceof Map<?, ?>) {
+                final Map<String, Object> complexObject = new HashMap<String, Object>();
+                complexObject.put(variableEntry.getKey(), variableEntry.getValue());
+                injectVariable((Map<String, Object>) variableValue, values, inputName);
+            }
+        }
+
     }
 
     private void log(final TechnicalLogSeverity severity, final String message) {
