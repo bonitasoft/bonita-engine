@@ -8,25 +8,66 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.application;
 
+import org.bonitasoft.engine.profile.Profile;
+
 
 /**
- * @author Elias Ricken de Medeiros
+ * Contains fields that can be used by {@link ApplicationCreator} and {@link ApplicationUpdater}
  *
+ * @author Elias Ricken de Medeiros
+ * @see ApplicationCreator
+ * @see ApplicationUpdater
  */
 public enum ApplicationField {
 
+    /**
+     * References the {@link Application} token
+     *
+     * @see Application
+     */
     TOKEN,
 
+    /**
+     * References the {@link Application} display name
+     *
+     * @see Application
+     */
     DISPLAY_NAME,
 
+    /**
+     * References the {@link Application} version
+     *
+     * @see Application
+     */
     VERSION,
 
+    /**
+     * References the {@link Application} description
+     *
+     * @see Application
+     */
     DESCRIPTION,
 
+    /**
+     * References the {@link Application} icon path
+     *
+     * @see Application
+     */
     ICON_PATH,
 
+    /**
+     * References the {@link Application} state
+     *
+     * @see Application
+     */
     STATE,
 
+    /**
+     * References the identifier of the {@link Profile} associated to the {@link Application}
+     *
+     * @see Application
+     * @see Profile
+     */
     PROFILE_ID;
 
 }

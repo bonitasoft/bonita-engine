@@ -162,8 +162,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException, InvalidTokenException,
-            InvalidDisplayNameException, AlreadyExistsException, ApplicationNotFoundException {
+    public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException, ApplicationNotFoundException {
         getApplicationPageAPIDelegate().setApplicationHomePage(applicationId, applicationPageId);
     }
 

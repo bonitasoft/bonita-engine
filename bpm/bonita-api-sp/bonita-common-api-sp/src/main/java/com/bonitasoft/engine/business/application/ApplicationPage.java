@@ -13,7 +13,7 @@ import org.bonitasoft.engine.bpm.BaseElement;
 import com.bonitasoft.engine.page.Page;
 
 /**
- * Represents the association between a {@link Page} to an {@link Application}
+ * Represents the association between a {@link Page} and an {@link Application}
  *
  * @author Elias Ricken de Medeiros
  */

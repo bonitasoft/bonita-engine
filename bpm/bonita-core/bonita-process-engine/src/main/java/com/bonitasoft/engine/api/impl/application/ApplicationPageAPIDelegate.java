@@ -12,7 +12,6 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
-import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -57,25 +56,16 @@ public class ApplicationPageAPIDelegate {
         this.convertor = convertor;
     }
 
-    public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException, InvalidTokenException,
-            InvalidDisplayNameException, AlreadyExistsException, ApplicationNotFoundException {
+    public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException, ApplicationNotFoundException {
         final SApplicationUpdateBuilder updateBuilder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance();
         updateBuilder.updateHomePageId(applicationPageId);
         try {
             applicationService.updateApplication(applicationId, updateBuilder.done());
 
-        } catch (final SObjectModificationException e) {
-            throw new UpdateException(e);
-        } catch (final SInvalidTokenException e) {
-            throw new InvalidTokenException(e.getMessage());
-        } catch (final SInvalidDisplayNameException e) {
-            throw new InvalidDisplayNameException(e.getMessage());
-        } catch (final SBonitaReadException e) {
-            throw new UpdateException(e.getMessage());
-        } catch (final SObjectAlreadyExistsException e) {
-            throw new AlreadyExistsException(e.getMessage());
         } catch (final SObjectNotFoundException e) {
             throw new ApplicationNotFoundException(applicationId);
+        } catch (final SBonitaException e) {
+            throw new UpdateException(e);
         }
     }
 

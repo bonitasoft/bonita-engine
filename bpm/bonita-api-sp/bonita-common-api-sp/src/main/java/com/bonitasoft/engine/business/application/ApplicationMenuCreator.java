@@ -13,19 +13,62 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author Elias Ricken de Medeiros
+ * Describes the information about an {@link ApplicationMenu} to be created
  *
+ * @author Elias Ricken de Medeiros
+ * @since 6.4
+ * @see ApplicationMenu
  */
 public class ApplicationMenuCreator implements Serializable {
 
     private static final long serialVersionUID = 5253969343647340983L;
 
+    /**
+     * Contains fields that can be used by {@code ApplicationMenuCreator}
+     */
     public enum ApplicationMenuField {
-        DISPLAY_NAME, APPLICATION_PAGE_ID, PARENT_ID, INDEX;
+
+        /**
+         * References the {@link ApplicationMenu} display name
+         *
+         * @see ApplicationMenu
+         */
+        DISPLAY_NAME,
+
+        /**
+         * References the the identifier of {@link ApplicationPage} related to the {@link ApplicationMenu}
+         *
+         * @see ApplicationMenu
+         * @see ApplicationPage
+         */
+        APPLICATION_PAGE_ID,
+
+        /**
+         * References the identifier of parent {@link ApplicationMenu}
+         *
+         * @see ApplicationMenu
+         */
+        PARENT_ID,
+
+        /**
+         * References the {@link ApplicationMenu} index
+         *
+         * @see ApplicationMenu
+         */
+        INDEX;
+
     }
 
     private final Map<ApplicationMenuField, Serializable> fields;
 
+    /**
+     * Creates an instance of {@code ApplicationMenuCreator}
+     *
+     * @param displayName the {@link ApplicationMenu} display name
+     * @param applicationPageId the identifier of related {@link ApplicationPage}
+     * @param index the index indicating the menu position
+     * @see ApplicationMenu
+     */
     public ApplicationMenuCreator(final String displayName, final long applicationPageId, final int index) {
         fields = new HashMap<ApplicationMenuField, Serializable>(2);
         fields.put(ApplicationMenuField.DISPLAY_NAME, displayName);
@@ -33,11 +76,22 @@ public class ApplicationMenuCreator implements Serializable {
         fields.put(ApplicationMenuField.INDEX, index);
     }
 
+    /**
+     * Defines the identifier of parent {@link ApplicationMenu}
+     *
+     * @param parentId the identifier of parent {@code ApplicationMenu}
+     * @return
+     */
     public ApplicationMenuCreator setParentId(final long parentId) {
         fields.put(ApplicationMenuField.PARENT_ID, parentId);
         return this;
     }
 
+    /**
+     * Retrieves all fields defined in this {@code ApplicationMenuCreator}
+     *
+     * @return a {@link Map}<{@link ApplicationMenuField}, {@link Serializable}> containing all fields defined in this {@code ApplicationMenuCreator}
+     */
     public Map<ApplicationMenuField, Serializable> getFields() {
         return fields;
     }

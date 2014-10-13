@@ -21,9 +21,11 @@ import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import com.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
+import com.bonitasoft.engine.business.application.ApplicationMenuSearchDescriptor;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
+import com.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor;
 import com.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.exception.InvalidDisplayNameException;
@@ -123,97 +125,114 @@ public interface ApplicationAPI {
     ApplicationPage createApplicationPage(long applicationId, long pagedId, String token) throws AlreadyExistsException, CreationException, InvalidTokenException;
 
     /**
-     * Retrieves the {@link ApplicationPage} for the given <code>Application</code> name and <code>ApplicationPage</code> token
+     * Retrieves the {@link ApplicationPage} for the given {@code Application} token and {@code ApplicationPage} token
      *
-     * @param applicationName the <code>Application</code> name
+     * @param applicationToken the <code>Application</code> name
      * @param applicationPageToken the <code>ApplicationPage</code> token
-     * @return the {@link ApplicationPage} for the given application name and application page name
-     * @throws ApplicationPageNotFoundException if no {@link ApplicationPage} is found for the given <code>Application</code> name and
+     * @return the {@link ApplicationPage} for the given {@code Application} token and {@code ApplicationPage} token
+     * @throws ApplicationPageNotFoundException if no {@link ApplicationPage} is found for the given <code>Application</code> token and
      *         <code>ApplicationPage</code> token
+     * @see ApplicationPage
      */
-    ApplicationPage getApplicationPage(String applicationName, String applicationPageToken) throws ApplicationPageNotFoundException;
+    ApplicationPage getApplicationPage(String applicationToken, String applicationPageToken) throws ApplicationPageNotFoundException;
 
     /**
      * Retrieves the {@link ApplicationPage} from its identifier
      *
-     * @param applicationPageId the application page identifier
+     * @param applicationPageId the {@code ApplicationPage} identifier
      * @return the {@link ApplicationPage} from its identifier
      * @throws ApplicationPageNotFoundException if no {@link ApplicationPage} is found for the given identifier
+     * @see ApplicationPage
      */
     ApplicationPage getApplicationPage(long applicationPageId) throws ApplicationPageNotFoundException;
 
     /**
      * Deletes an {@link ApplicationPage} by its identifier
      *
-     * @param applicationpPageId the {@link ApplicationPage} identifier
+     * @param applicationpPageId the {@code ApplicationPage} identifier
      * @throws DeletionException if an error occurs during the deletion
+     * @see ApplicationPage
      */
     void deleteApplicationPage(long applicationpPageId) throws DeletionException;
 
     /**
-     * Searches for application pages with specific search criteria.
+     * Searches for {@link ApplicationPage}s with specific search criteria.
      *
-     * @param searchOptions the search options. See {@link SearchOptions} for details.
-     * @return a {@link SearchResult} containing the number and the list of application pages matching the search criteria.
-     * @throws SearchException if an error occurs during search
+     * @param searchOptions the search criteria. See {@link SearchOptions} for details. Use {@link ApplicationPageSearchDescriptor} to know the available
+     *        filters.
+     * @return a {@link SearchResult} containing the number and the list of {@code ApplicationPageSearchDescriptor}s matching the search criteria.
+     * @throws SearchException if an error occurs during the search execution
+     * @see ApplicationPage
+     * @see ApplicationPageSearchDescriptor
+     * @see SearchOptions
+     * @see SearchResult
      */
     SearchResult<ApplicationPage> searchApplicationPages(final SearchOptions searchOptions) throws SearchException;
 
     /**
-     * Defines the home page for the application
+     * Defines which {@link ApplicationPage} will represent the {@link Application} home page
      *
-     * @param applicationId the {@link Application} identifier
-     * @param applicationPageId the identifier of the {@link ApplicationPage} to be used as home page
-     * @throws ApplicationNotFoundException if no <code>Applicaton</code> is found with the given id
+     * @param applicationId the {@code Application} identifier
+     * @param applicationPageId the identifier of the {@code ApplicationPage} to be used as home page
      * @throws UpdateException if an error occurs during the update
-     * @throws AlreadyExistsException if update with an already existing Name
-     * @throws InvalidTokenException if the name is empty
-     * @throws InvalidDisplayNameException if the display name is empty
+     * @throws ApplicationNotFoundException if no {@code Application} is found with the given id
+     * @see Application
+     * @see ApplicationPage
      */
-    void setApplicationHomePage(long applicationId, long applicationPageId) throws UpdateException, InvalidTokenException,
-    InvalidDisplayNameException, AlreadyExistsException, ApplicationNotFoundException;
+    void setApplicationHomePage(long applicationId, long applicationPageId) throws UpdateException, ApplicationNotFoundException;
 
     /**
-     * Retrieves the application home page
+     * Retrieves the {@link ApplicationPage} defined as the {@link Application} home page
      *
-     * @param applicationId the {@link Application} identifier
-     * @return the application home page
+     * @param applicationId the {@code Application} identifier
+     * @return the t{@code ApplicationPage} defined as {@code Application} home page
      * @throws ApplicationPageNotFoundException if no home page is found for the given application
+     * @see Application
+     * @see ApplicationPage
      */
     ApplicationPage getApplicationHomePage(long applicationId) throws ApplicationPageNotFoundException;
 
     /**
-     * Creates a new {@link ApplicationMenu} based on the supplied {@link ApplicationMenuCreator}
+     * Creates a {@link ApplicationMenu} based on the supplied {@link ApplicationMenuCreator}
      *
-     * @param applicationMenuCreator creator describing characteristics of application menu to be created
-     * @return the created {@link ApplicationMenu}
+     * @param applicationMenuCreator creator describing the characteristics of the {@code ApplicationMenu} to be created
+     * @return the created {@code ApplicationMenu}
      * @throws CreationException if an error occurs during the creation
+     * @see ApplicationMenu
+     * @see ApplicationMenuCreator
      */
     ApplicationMenu createApplicationMenu(ApplicationMenuCreator applicationMenuCreator) throws CreationException;
 
     /**
      * Retrieves the {@link ApplicationMenu} from its identifier
      *
-     * @param applicationMenuId the application menu identifier
-     * @return the {@link ApplicationMenu} from its identifier
-     * @throws ApplicationMenuNotFoundException if no {@link ApplicationMenu} is found for the given identifier
+     * @param applicationMenuId the {@code ApplicationMenu} menu identifier
+     * @return the {@code ApplicationMenu} from its identifier
+     * @throws ApplicationMenuNotFoundException if no {@code ApplicationMenu} is found for the given identifier
+     * @see ApplicationMenu
      */
     ApplicationMenu getApplicationMenu(long applicationMenuId) throws ApplicationMenuNotFoundException;
 
     /**
      * Deletes an {@link ApplicationMenu} by its identifier
      *
-     * @param applicationMenuId the {@link ApplicationMenu} identifier
+     * @param applicationMenuId the {@code ApplicationMenu} identifier
      * @throws DeletionException if an error occurs during the deletion
+     * @see ApplicationMenu
      */
     void deleteApplicationMenu(long applicationMenuId) throws DeletionException;
 
     /**
-     * Searches for application menus with specific search criteria.
+     * Searches for {@link ApplicationMenu}s with specific search criteria.
      *
-     * @param searchOptions the search options. See {@link SearchOptions} for details.
-     * @return a {@link SearchResult} containing the number and the list of application menus matching the search criteria.
+     * @param searchOptions the search criteria. See {@link SearchOptions} for details. Use {@link ApplicationMenuSearchDescriptor} to know the available
+     *        filters
+     * @return a {@link SearchResult} containing the number and the list of {@code ApplicationMenu}s matching the search criteria.
      * @throws SearchException if an error occurs during search
+     * @see ApplicationMenu
+     * @see SearchOptions
+     * @see ApplicationMenuSearchDescriptor
+     * @see SearchResult
      */
     SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions) throws SearchException;
 

@@ -8,17 +8,50 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.application;
 
+import org.bonitasoft.engine.search.SearchOptions;
+
+import com.bonitasoft.engine.api.ApplicationAPI;
+import com.bonitasoft.engine.page.Page;
+
 /**
+ * Defines the fields that can be used in the {@link SearchOptions} when searching for {@link ApplicationPage}s
+ *
  * @author Elias Ricken de Medeiros
+ * @since 6.4
+ * @see ApplicationPage
+ * @see SearchOptions
+ * @see ApplicationAPI#searchApplicationPages(SearchOptions)
  */
 public class ApplicationPageSearchDescriptor {
 
+    /**
+     * Used to filter or order by {@link ApplicationPage} identifier
+     *
+     * @see ApplicationPage
+     */
     public static final String ID = "id";
 
+    /**
+     * Used to filter or order by {@link ApplicationPage} token
+     *
+     * @see ApplicationPage
+     */
     public static final String TOKEN = "token";
 
+    /**
+     * Used to filter or order by the identifier of {@link Application} associated to the {@link ApplicationPage}
+     *
+     * @see ApplicationPage
+     * @see Application
+     */
     public static final String APPLICATION_ID = "applicationId";
 
+    /**
+     * Used to filter or order by the identifier of {@link Page} referenced by the {@link ApplicationPage}
+     *
+     * @see ApplicationPage
+     * @see Page
+     */
     public static final String PAGE_ID = "pageId";
 
 }
