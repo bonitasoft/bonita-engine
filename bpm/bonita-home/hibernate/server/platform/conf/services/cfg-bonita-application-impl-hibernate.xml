@@ -10,8 +10,9 @@
         </property>
         <property name="classAliasMappings">
             <map>
-                <entry key="com.bonitasoft.engine.business.application.SApplication" value="application" />
-                <entry key="com.bonitasoft.engine.business.application.SApplicationPage" value="applicationPage" />
+                <entry key="com.bonitasoft.engine.business.application.model.SApplication" value="application" />
+                <entry key="com.bonitasoft.engine.business.application.model.SApplicationPage" value="applicationPage" />
+                <entry key="com.bonitasoft.engine.business.application.model.SApplicationMenu" value="applicationMenu" />
             </map>
         </property>
     </bean>

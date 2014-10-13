@@ -16,8 +16,9 @@ package com.bonitasoft.engine.test.persistence.repository;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 
-import com.bonitasoft.engine.business.application.SApplication;
-import com.bonitasoft.engine.business.application.SApplicationPage;
+import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplicationMenu;
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
 
 
 /**
@@ -66,6 +67,12 @@ public class ApplicationRepository extends TestRepository {
         final Query namedQuery = getNamedQuery("getApplicationHomePage");
         namedQuery.setParameter("applicationId", applicationId);
         return (SApplicationPage) namedQuery.uniqueResult();
+    }
+
+    public SApplicationMenu getApplicationMenu(final long applicationMenuId) {
+        final Query namedQuery = getNamedQuery("getApplicationMenuById");
+        namedQuery.setParameter("id", applicationMenuId);
+        return (SApplicationMenu) namedQuery.uniqueResult();
     }
 
 }
