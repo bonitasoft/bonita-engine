@@ -22,6 +22,23 @@
                 <ref bean="localCacheService" />
             </list>
         </property>
+		<property name="jobListeners">
+			<list>
+				<ref bean="loggerJobListener" />
+				<ref bean="jdbcJobListener" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
+		<constructor-arg name="schedulerService" ref="scheduler" />
+		<constructor-arg name="jobService" ref="jobService" />
+		<constructor-arg name="incidentService" ref="incidentService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+	</bean>
+
+	<bean id="loggerJobListener" class="org.bonitasoft.engine.scheduler.impl.TechnicalLoggerJobListener">
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
 </beans>
