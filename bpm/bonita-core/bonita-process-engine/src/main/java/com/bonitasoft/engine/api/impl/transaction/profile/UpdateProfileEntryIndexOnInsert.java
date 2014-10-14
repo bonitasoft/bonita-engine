@@ -17,7 +17,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
@@ -80,7 +80,7 @@ public class UpdateProfileEntryIndexOnInsert implements TransactionContent {
         } while (!profileEntryList.isEmpty());
     }
 
-    private List<SProfileEntry> searchProfileEntriesForParentIdAndProfileId(final long fromIndex) throws SBonitaSearchException {
+    private List<SProfileEntry> searchProfileEntriesForParentIdAndProfileId(final long fromIndex) throws SBonitaReadException {
         Long profileId = null;
         Long parentId = null;
         if (insertedProfileEntry != null) {

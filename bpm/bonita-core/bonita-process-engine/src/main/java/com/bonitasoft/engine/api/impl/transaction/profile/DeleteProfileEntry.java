@@ -18,7 +18,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileEntrySearchDescriptor;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
@@ -58,7 +58,7 @@ public class DeleteProfileEntry implements TransactionContent {
         }
     }
 
-    private void deleteProfileEntryChildren() throws SBonitaSearchException, SProfileEntryDeletionException {
+    private void deleteProfileEntryChildren() throws SBonitaReadException, SProfileEntryDeletionException {
         List<SProfileEntry> sProfileEntries;
         do {
             sProfileEntries = searchProfileEntriesChildren();
@@ -68,7 +68,7 @@ public class DeleteProfileEntry implements TransactionContent {
         } while (!sProfileEntries.isEmpty());
     }
 
-    private List<SProfileEntry> searchProfileEntriesChildren() throws SBonitaSearchException {
+    private List<SProfileEntry> searchProfileEntriesChildren() throws SBonitaReadException {
         final List<FilterOption> filters = new ArrayList<FilterOption>(2);
         filters.add(new FilterOption(SProfileEntry.class, ProfileEntrySearchDescriptor.PROFILE_ID, sDeletedProfileEntry.getProfileId()));
         filters.add(new FilterOption(SProfileEntry.class, ProfileEntrySearchDescriptor.PARENT_ID, sDeletedProfileEntry.getId()));
@@ -100,7 +100,7 @@ public class DeleteProfileEntry implements TransactionContent {
         profileService.updateProfileEntry(profileEntry, entityUpdateDescriptor);
     }
 
-    private List<SProfileEntry> searchProfileEntriesWithSameParentAndInSameProfile(final int fromIndex) throws SBonitaSearchException {
+    private List<SProfileEntry> searchProfileEntriesWithSameParentAndInSameProfile(final int fromIndex) throws SBonitaReadException {
         final List<FilterOption> filters = new ArrayList<FilterOption>(2);
         filters.add(new FilterOption(SProfileEntry.class, ProfileEntrySearchDescriptor.PROFILE_ID, sDeletedProfileEntry.getProfileId()));
         filters.add(new FilterOption(SProfileEntry.class, ProfileEntrySearchDescriptor.PARENT_ID, sDeletedProfileEntry.getParentId()));

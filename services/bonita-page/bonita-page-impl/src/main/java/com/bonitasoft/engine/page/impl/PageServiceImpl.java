@@ -39,7 +39,7 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.profile.ProfileService;
@@ -310,13 +310,9 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    public List<SPage> searchPages(final QueryOptions options) throws SBonitaSearchException {
+    public List<SPage> searchPages(final QueryOptions options) throws SBonitaReadException {
         check();
-        try {
-            return persistenceService.searchEntity(SPage.class, options, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+        return persistenceService.searchEntity(SPage.class, options, null);
     }
 
     @Override
@@ -342,7 +338,7 @@ public class PageServiceImpl implements PageService {
         } catch (final SRecorderException re) {
             initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
             throw new SObjectModificationException(re);
-        } catch (final SBonitaSearchException e) {
+        } catch (final SBonitaReadException e) {
             initiateLogBuilder(sPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, METHOD_DELETE_PAGE);
             throw new SObjectModificationException(e);
         } catch (final SProfileEntryNotFoundException e) {
@@ -354,7 +350,7 @@ public class PageServiceImpl implements PageService {
         }
     }
 
-    private void deleteProfileEntry(final SPage sPage) throws SBonitaSearchException, SProfileEntryNotFoundException, SProfileEntryDeletionException {
+    private void deleteProfileEntry(final SPage sPage) throws SBonitaReadException, SProfileEntryNotFoundException, SProfileEntryDeletionException {
         final List<OrderByOption> orderByOptions = Collections
                 .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC));
         final List<FilterOption> filters = new ArrayList<FilterOption>();
@@ -372,7 +368,7 @@ public class PageServiceImpl implements PageService {
         }
     }
 
-    private void deleteParentIfNoMoreChildren(final SProfileEntry sProfileEntry) throws SBonitaSearchException, SProfileEntryNotFoundException,
+    private void deleteParentIfNoMoreChildren(final SProfileEntry sProfileEntry) throws SBonitaReadException, SProfileEntryNotFoundException,
     SProfileEntryDeletionException {
         final List<OrderByOption> orderByOptions = Collections
                 .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC));
@@ -493,9 +489,6 @@ public class PageServiceImpl implements PageService {
         } catch (final SBonitaReadException e) {
             initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
             throw new SObjectModificationException(e);
-        } catch (final SBonitaSearchException e) {
-            initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
-            throw new SObjectModificationException(e);
         } catch (final SProfileEntryUpdateException e) {
             initiateLogBuilder(pageId, SQueriableLog.STATUS_FAIL, logBuilder, logMethodName);
             throw new SObjectModificationException(e);
@@ -503,7 +496,7 @@ public class PageServiceImpl implements PageService {
 
     }
 
-    private void updateProfileEntry(final String oldPageName, final String newPageName) throws SBonitaSearchException, SProfileEntryUpdateException {
+    private void updateProfileEntry(final String oldPageName, final String newPageName) throws SBonitaReadException, SProfileEntryUpdateException {
         if (newPageName.equals(oldPageName))
         {
             return;

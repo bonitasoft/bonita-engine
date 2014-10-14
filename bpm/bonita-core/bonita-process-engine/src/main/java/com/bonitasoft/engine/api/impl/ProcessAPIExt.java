@@ -120,7 +120,7 @@ import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
@@ -165,8 +165,8 @@ import com.bonitasoft.manager.Features;
  */
 public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
-    @Override
-    protected TenantServiceAccessor getTenantAccessor() {
+
+    protected static TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
@@ -1124,7 +1124,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final QueryOptions countOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, null, filterOptions, null);
         try {
             return supervisorService.getNumberOfProcessSupervisors(countOptions);
-        } catch (final SBonitaSearchException e) {
+        } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
         }
     }

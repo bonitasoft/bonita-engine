@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
@@ -40,16 +40,12 @@ public class SearchApplicationMenus extends AbstractSearchEntity<ApplicationMenu
     }
 
     @Override
-    public long executeCount(final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            return applicationService.getNumberOfApplicationMenus(queryOptions);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+    public long executeCount(final QueryOptions queryOptions) throws SBonitaReadException {
+        return applicationService.getNumberOfApplicationMenus(queryOptions);
     }
 
     @Override
-    public List<SApplicationMenu> executeSearch(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SApplicationMenu> executeSearch(final QueryOptions queryOptions) throws SBonitaReadException {
         return applicationService.searchApplicationMenus(queryOptions);
     }
 
