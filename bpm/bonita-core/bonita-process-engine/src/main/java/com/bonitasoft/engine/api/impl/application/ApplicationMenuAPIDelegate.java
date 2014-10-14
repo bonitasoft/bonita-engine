@@ -18,6 +18,7 @@ import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.api.impl.convertor.ApplicationMenuConvertor;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
+import com.bonitasoft.engine.api.impl.validator.ApplicationMenuCreatorValidator;
 import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import com.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
@@ -34,16 +35,21 @@ public class ApplicationMenuAPIDelegate {
     private final ApplicationMenuConvertor convertor;
     private final ApplicationService applicationService;
     private final SearchApplicationMenus searchApplicationMenus;
+    private final ApplicationMenuCreatorValidator validator;
 
     public ApplicationMenuAPIDelegate(final TenantServiceAccessor accessor, final ApplicationMenuConvertor convertor,
-            final SearchApplicationMenus searchApplicationMenus) {
+            final SearchApplicationMenus searchApplicationMenus, final ApplicationMenuCreatorValidator validator) {
         this.searchApplicationMenus = searchApplicationMenus;
+        this.validator = validator;
         applicationService = accessor.getApplicationService();
         this.convertor = convertor;
     }
 
     public ApplicationMenu createApplicationMenu(final ApplicationMenuCreator applicationMenuCreator) throws CreationException {
         try {
+            if(!validator.isValid(applicationMenuCreator)) {
+                throw new CreationException("The ApplicationMenuCreator is invalid. Problems: " + validator.getProblems());
+            }
             final SApplicationMenu sApplicationMenu = applicationService.createApplicationMenu(convertor.buildSApplicationMenu(applicationMenuCreator));
             return convertor.toApplicationMenu(sApplicationMenu);
         } catch (final SBonitaException e) {

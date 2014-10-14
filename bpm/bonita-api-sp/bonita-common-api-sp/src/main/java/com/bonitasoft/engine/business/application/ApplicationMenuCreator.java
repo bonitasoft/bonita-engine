@@ -78,7 +78,7 @@ public class ApplicationMenuCreator implements Serializable {
      * @param index the index indicating the menu position
      * @see ApplicationMenu
      */
-    public ApplicationMenuCreator(final long applicationId, final String displayName, final long applicationPageId, final int index) {
+    public ApplicationMenuCreator(final Long applicationId, final String displayName, final Long applicationPageId, final int index) {
         this(applicationId, displayName, index);
         fields.put(ApplicationMenuField.APPLICATION_PAGE_ID, applicationPageId);
     }
@@ -91,7 +91,7 @@ public class ApplicationMenuCreator implements Serializable {
      * @param index the index indicating the menu position
      * @see ApplicationMenu
      */
-    public ApplicationMenuCreator(final long applicationId, final String displayName, final int index) {
+    public ApplicationMenuCreator(final Long applicationId, final String displayName, final int index) {
         fields = new HashMap<ApplicationMenuField, Serializable>(4);
         fields.put(ApplicationMenuField.DISPLAY_NAME, displayName);
         fields.put(ApplicationMenuField.APPLICATION_ID, applicationId);

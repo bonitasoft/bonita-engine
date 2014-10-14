@@ -32,7 +32,7 @@ public class ApplicationMenuConvertorTest {
     @Test
     public void buildSApplicationMenu_should_map_all_creator_fields() throws Exception {
         //given
-        final ApplicationMenuCreator creator = new ApplicationMenuCreator(4, "main", 20, 1);
+        final ApplicationMenuCreator creator = new ApplicationMenuCreator(4L, "main", 20L, 1);
         creator.setParentId(11);
 
         //when
@@ -50,7 +50,7 @@ public class ApplicationMenuConvertorTest {
     @Test
     public void buildSApplicationMenu_should_have_null_parentId_when_not_set_on_creator() throws Exception {
         //given
-        final ApplicationMenuCreator creator = new ApplicationMenuCreator(4, "main", 20, 1);
+        final ApplicationMenuCreator creator = new ApplicationMenuCreator(4L, "main", 20L, 1);
 
         //when
         final SApplicationMenu menu = convertor.buildSApplicationMenu(creator);
@@ -64,7 +64,7 @@ public class ApplicationMenuConvertorTest {
     public void toApplicationMenu_should_map_all_server_object_fields_and_set_application_id() throws Exception {
         //given
         final long appPageId = 15;
-        long applicationId = 18;
+        final long applicationId = 18;
         final SApplicationMenuImpl sMenu = new SApplicationMenuImpl("main", applicationId, appPageId, 1);
         sMenu.setId(3);
         sMenu.setParentId(21L);
