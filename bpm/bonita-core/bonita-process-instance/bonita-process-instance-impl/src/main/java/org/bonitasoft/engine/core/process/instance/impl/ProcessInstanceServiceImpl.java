@@ -459,7 +459,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
     }
 
-    private void deleteConnectorInstancesIfNecessary(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition)
+    void deleteConnectorInstancesIfNecessary(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition)
             throws SConnectorInstanceReadException, SConnectorInstanceDeletionException {
         if (hasConnectors(flowNodeInstance, processDefinition)) {
             connectorInstanceService.deleteConnectors(flowNodeInstance.getId(), SConnectorInstance.FLOWNODE_TYPE);
@@ -529,9 +529,9 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
     }
 
-    private void deleteFlowNodeInstanceElements(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition) throws SBonitaException {
+    void deleteFlowNodeInstanceElements(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition) throws SBonitaException {
         if (flowNodeInstance.getType().equals(SFlowNodeType.INTERMEDIATE_CATCH_EVENT) || flowNodeInstance.getType().equals(SFlowNodeType.BOUNDARY_EVENT)
-                || flowNodeInstance.getType().equals(SFlowNodeType.RECEIVE_TASK)) {
+                || flowNodeInstance.getType().equals(SFlowNodeType.RECEIVE_TASK) || flowNodeInstance.getType().equals(SFlowNodeType.START_EVENT)) {
             bpmEventInstanceService.deleteWaitingEvents(flowNodeInstance);
         }
         if (flowNodeInstance instanceof SEventInstance) {
@@ -550,8 +550,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             } else if (SFlowNodeType.CALL_ACTIVITY.equals(flowNodeInstance.getType()) || SFlowNodeType.SUB_PROCESS.equals(flowNodeInstance.getType())) {
                 // in the case of a call activity or subprocess activity delete the child process instance
                 try {
-                    // For the start event on the sub process
-                    bpmEventInstanceService.deleteWaitingEvents(flowNodeInstance);
                     deleteProcessInstance(getChildOfActivity(flowNodeInstance.getId()));
                 } catch (final SProcessInstanceNotFoundException e) {
                     setExceptionContext(processDefinition, flowNodeInstance, e);
@@ -583,7 +581,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         e.setFlowNodeNameOnContext(flowNodeInstance.getName());
     }
 
-    private void deleteDataInstancesIfNecessary(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition)
+    void deleteDataInstancesIfNecessary(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition)
             throws SDataInstanceException {
         boolean dataPresent = true;
         if (processDefinition != null) {

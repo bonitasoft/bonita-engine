@@ -43,7 +43,7 @@ public class EventTriggerTest extends AbstractEventTest {
     @Test
     public void searchTimerEventTriggerInstances() throws Exception {
         final ProcessDefinition process1 = deployAndEnableSimpleProcess("Toto", "moi");
-        final ProcessDefinition process2 = deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(90000, true, "Toto");
+        final ProcessDefinition process2 = deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(7200000L, false, "Toto");
         final ProcessDefinition process3 = deployAndEnableProcessWithMessageEventSubProcess();
         final ProcessDefinition process4 = deployAndEnableProcessWithBoundarySignalEvent("signal");
 
@@ -79,8 +79,8 @@ public class EventTriggerTest extends AbstractEventTest {
     @Cover(classes = { EventTriggerInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "event trigger instance", "update" }, jira = "BS-10439")
     @Test
     public void updateTimerEventTriggerInstance() throws Exception {
-        final ProcessDefinition process1 = deployAndEnableSimpleProcess("Toto", "moi");
-        final ProcessDefinition process2 = deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(90000, true, "Toto");
+        final ProcessDefinition process1 = deployAndEnableSimpleProcess("Toto2", "moi");
+        final ProcessDefinition process2 = deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(7200000L, false, "Toto2");
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(process2.getId());
         try {
             waitForFlowNodeInState(processInstance2, "timer", TestStates.WAITING, true);
@@ -92,6 +92,8 @@ public class EventTriggerTest extends AbstractEventTest {
             final Date date = new Date();
             final Date newDate = getProcessAPI().updateExecutionDateOfTimerEventTriggerInstance(result.get(0).getId(), date);
             assertTrue(newDate.equals(date) || newDate.after(date));
+
+            waitForUserTask(EXCEPTION_STEP, processInstance2);
         } finally {
             disableAndDeleteProcess(process2, process1);
         }

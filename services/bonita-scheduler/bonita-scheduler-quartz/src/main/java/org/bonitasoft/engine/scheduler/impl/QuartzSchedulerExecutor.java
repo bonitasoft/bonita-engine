@@ -287,6 +287,17 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
+    public boolean isExistingJob(final String jobName, final String groupName) throws SSchedulerException {
+        try {
+            checkSchedulerState();
+            final JobKey jobKey = jobKey(jobName, groupName);
+            return scheduler.getJobDetail(jobKey) != null;
+        } catch (final SchedulerException e) {
+            throw new SSchedulerException(e);
+        }
+    }
+
+    @Override
     public void deleteJobs(final String groupName) throws SSchedulerException {
         try {
             checkSchedulerState();

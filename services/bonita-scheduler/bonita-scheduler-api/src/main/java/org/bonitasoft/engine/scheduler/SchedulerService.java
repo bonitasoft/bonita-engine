@@ -49,16 +49,16 @@ public interface SchedulerService extends PlatformLifecycleService {
 
     /**
      * Checks whether the service is started.
-     * 
+     *
      * @return true if the service is started; false otherwise.
      * @throws SSchedulerException
-     *             if an exception occurs.
+     *         if an exception occurs.
      */
     boolean isStarted() throws SSchedulerException;
 
     /**
      * Checks whether the service is shutdown.
-     * 
+     *
      * @return true if the service is shutdown; false otherwise.
      * @throws SSchedulerException
      */
@@ -66,22 +66,22 @@ public interface SchedulerService extends PlatformLifecycleService {
 
     /**
      * Schedules a job.
-     * 
+     *
      * @param jobDescriptor
      * @param trigger
      * @throws SSchedulerException
-     *             if an exception occurs.
+     *         if an exception occurs.
      */
     void schedule(SJobDescriptor jobDescriptor, Trigger trigger) throws SSchedulerException;
 
     /**
      * Schedules a job.
-     * 
+     *
      * @param jobDescriptor
      * @param jobParameters
      * @param trigger
      * @throws SSchedulerException
-     *             if an exception occurs.
+     *         if an exception occurs.
      */
     void schedule(SJobDescriptor jobDescriptor, List<SJobParameter> parameters, Trigger trigger) throws SSchedulerException;
 
@@ -89,59 +89,59 @@ public interface SchedulerService extends PlatformLifecycleService {
 
     /**
      * Schedules a job.
-     * 
+     *
      * @param jobDescriptorId
      * @param jobParameters
      * @throws SSchedulerException
-     *             if an exception occurs.
+     *         if an exception occurs.
      */
     void executeAgain(long jobDescriptorId, List<SJobParameter> parameters) throws SSchedulerException;
 
     /**
      * execute a job.
-     * 
+     *
      * @param jobDescriptor
      * @param jobParameters
      * @throws SSchedulerException
-     *             if an exception occurs.
+     *         if an exception occurs.
      */
     void executeNow(SJobDescriptor jobDescriptor, List<SJobParameter> parameters) throws SSchedulerException;
 
     /**
      * Deletes a job according to its name.
-     * 
+     *
      * @param jobName
-     *            the job name
+     *        the job name
      * @return true if delete a job, otherwise return false.
      * @throws SSchedulerException
-     *             if an exception occurs.
+     *         if an exception occurs.
      */
     boolean delete(String jobName) throws SSchedulerException;
 
     /**
      * Deletes all jobs.
-     * 
+     *
      * @throws SSchedulerException
-     *             if an exception occurs.
+     *         if an exception occurs.
      */
     void deleteJobs() throws SSchedulerException;
 
     /**
      * Get all jobs on the current tenant
-     * 
+     *
      * @return all jobs on the current tenant
      * @throws SSchedulerException
-     *             if an exception occurs.
+     *         if an exception occurs.
      */
     List<String> getJobs() throws SSchedulerException;
 
     /**
      * Get all jobs on all tenants
      * \/!\Must be replaced by a platform scheduler/!\
-     * 
+     *
      * @return all jobs on the current tenant
      * @throws SSchedulerException
-     *             if an exception occurs.
+     *         if an exception occurs.
      */
     List<String> getAllJobs() throws SSchedulerException;
 
@@ -151,7 +151,7 @@ public interface SchedulerService extends PlatformLifecycleService {
 
     /**
      * Pause all jobs running on the tenant
-     * 
+     *
      * @param tenantId
      * @throws SSchedulerException
      */
@@ -159,7 +159,7 @@ public interface SchedulerService extends PlatformLifecycleService {
 
     /**
      * Resume all jobs paused on the tenant
-     * 
+     *
      * @param tenantId
      * @throws SSchedulerException
      */
@@ -170,13 +170,13 @@ public interface SchedulerService extends PlatformLifecycleService {
      * given key, and store the new given one - which must be associated
      * with the same job (the new trigger must have the job name & group specified)
      * - however, the new trigger need not have the same name as the old trigger.
-     * 
+     *
      * @param triggerName
-     *            The name of the trigger to replace
+     *        The name of the trigger to replace
      * @param groupName
-     *            The group name of the trigger to replace
+     *        The group name of the trigger to replace
      * @param triggerStartTime
-     *            The start date of the new trigger
+     *        The start date of the new trigger
      * @return <code>null</code> if a <code>Trigger</code> with the given
      *         name & group was not found and removed from the store (and the
      *         new trigger is therefore not stored), otherwise
@@ -189,11 +189,11 @@ public interface SchedulerService extends PlatformLifecycleService {
     /**
      * Add the given <code>{@link AbstractBonitaTenantJobListener}s</code> to the <code>Scheduler</code>,
      * and register it to receive events for Jobs that are matched by the group name.
-     * 
+     *
      * @param jobListeners
-     *            The job listeners to add to the scheduler
+     *        The job listeners to add to the scheduler
      * @param groupName
-     *            The group name to filter
+     *        The group name to filter
      * @throws SSchedulerException
      * @since 6.4.0
      */
@@ -201,9 +201,9 @@ public interface SchedulerService extends PlatformLifecycleService {
 
     /**
      * Add the given <code>{@link AbstractBonitaPlatormJobListener}s</code> to the <code>Scheduler</code>, and register it to receive events for all Jobs.
-     * 
+     *
      * @param jobListeners
-     *            The job listeners to add to the scheduler
+     *        The job listeners to add to the scheduler
      * @throws SSchedulerException
      * @since 6.4.0
      */
@@ -211,7 +211,7 @@ public interface SchedulerService extends PlatformLifecycleService {
 
     /**
      * Initialize the scheduler if this method has not be previously called (after shutdown); otherwise, do nothing.
-     * 
+     *
      * @throws SSchedulerException
      * @since 6.4.0
      */
@@ -219,7 +219,7 @@ public interface SchedulerService extends PlatformLifecycleService {
 
     /**
      * Note that once a scheduler is shutdown, it cannot be restarted without being re-instantiated.
-     * 
+     *
      * @throws SSchedulerException
      * @see {@link #initializeScheduler()}
      * @since 6.4.0
@@ -229,12 +229,23 @@ public interface SchedulerService extends PlatformLifecycleService {
 
     /**
      * Note that once a scheduler is shutdown, it cannot be restarted without being re-instantiated.
-     * 
+     *
      * @throws SSchedulerException
      * @see {@link #initializeScheduler()}
      * @since 6.4.0
      */
     @Override
     void stop() throws SBonitaException;
+
+    /**
+     * Check if a job exists.
+     *
+     * @param jobName
+     *        The name of the job
+     * @return True if the job exists, else False.
+     * @throws SSchedulerException
+     * @since 6.4.0
+     */
+    boolean isExistingJob(String jobName) throws SSchedulerException;
 
 }

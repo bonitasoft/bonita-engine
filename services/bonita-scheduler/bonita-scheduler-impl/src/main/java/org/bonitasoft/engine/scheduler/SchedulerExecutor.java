@@ -32,7 +32,7 @@ public interface SchedulerExecutor {
 
     /**
      * Note that once a scheduler is shutdown, it cannot be restarted without being re-instantiated.
-     * 
+     *
      * @throws SSchedulerException
      * @see {@link #initializeScheduler()}
      * @since 6.4.0
@@ -41,7 +41,7 @@ public interface SchedulerExecutor {
 
     /**
      * Note that once a scheduler is shutdown, it cannot be restarted without being re-instantiated.
-     * 
+     *
      * @throws SSchedulerException
      * @see {@link #initializeScheduler()}
      * @since 6.4.0
@@ -76,13 +76,13 @@ public interface SchedulerExecutor {
      * Remove (delete) the <code>{@link org.quartz.Trigger}</code> with the given key, and store the new given one - which must be associated
      * with the same job (the new trigger must have the job name & group specified)
      * - however, the new trigger need not have the same name as the old trigger.
-     * 
+     *
      * @param triggerName
-     *            The name of the trigger to replace
+     *        The name of the trigger to replace
      * @param groupName
-     *            The group name of the trigger to replace
+     *        The group name of the trigger to replace
      * @param triggerStartTime
-     *            The start date of the new trigger
+     *        The start date of the new trigger
      * @return <code>null</code> if a <code>Trigger</code> with the given
      *         name & group was not found and removed from the store (and the
      *         new trigger is therefore not stored), otherwise
@@ -95,11 +95,11 @@ public interface SchedulerExecutor {
     /**
      * Add the given <code>{@link AbstractBonitaTenantJobListener}s</code> to the <code>Scheduler</code>, and register it to receive events for Jobs that are
      * matched by the group name.
-     * 
+     *
      * @param jobListeners
-     *            The job listeners to add to the scheduler
+     *        The job listeners to add to the scheduler
      * @param groupName
-     *            The group name to filter
+     *        The group name to filter
      * @throws SSchedulerException
      * @since 6.4.0
      */
@@ -107,9 +107,9 @@ public interface SchedulerExecutor {
 
     /**
      * Add the given <code>{@link AbstractBonitaPlatormJobListener}s</code> to the <code>Scheduler</code>, and register it to receive events for all Jobs.
-     * 
+     *
      * @param jobListeners
-     *            The job listeners to add to the scheduler
+     *        The job listeners to add to the scheduler
      * @throws SSchedulerException
      * @since 6.4.0
      */
@@ -117,10 +117,23 @@ public interface SchedulerExecutor {
 
     /**
      * Initialize the scheduler if this method has not be previously called (after shutdown); otherwise, do nothing.
-     * 
+     *
      * @throws SSchedulerException
      * @since 6.4.0
      */
     void initializeScheduler() throws SSchedulerException;
+
+    /**
+     * Check if a job exists.
+     *
+     * @param jobName
+     *        The name of the job
+     * @param groupName
+     *        The group of the job
+     * @return True if the job exists, else False.
+     * @throws SSchedulerException
+     * @since 6.4.0
+     */
+    boolean isExistingJob(String jobName, String groupName) throws SSchedulerException;
 
 }

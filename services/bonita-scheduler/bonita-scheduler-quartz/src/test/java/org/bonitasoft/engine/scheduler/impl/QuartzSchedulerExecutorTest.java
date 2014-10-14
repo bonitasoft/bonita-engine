@@ -3,6 +3,8 @@ package org.bonitasoft.engine.scheduler.impl;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -25,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
@@ -695,8 +698,22 @@ public class QuartzSchedulerExecutorTest {
         quartzSchedulerExecutor.rescheduleJob("triggerName", "groupName", new Date());
     }
 
+    @Test
+    public void rescheduleJob_should_rescheduleJob() throws Exception {
+        // Given
+        final org.quartz.Trigger trigger = mock(org.quartz.Trigger.class);
+        doReturn(TriggerBuilder.newTrigger()).when(trigger).getTriggerBuilder();
+        doReturn(trigger).when(scheduler).getTrigger(any(TriggerKey.class));
+
+        // When
+        quartzSchedulerExecutor.rescheduleJob("triggerName", "groupName", new Date());
+
+        // Then
+        verify(scheduler).rescheduleJob(any(TriggerKey.class), any(org.quartz.Trigger.class));
+    }
+
     @Test(expected = SSchedulerException.class)
-    public void addJobListener_should_throw_exception_when_addJobListener_failed() throws Exception {
+    public void addJobListener_should_throw_exception_when_addJobListener_failed_for_tenant() throws Exception {
         // Given
         final List<AbstractBonitaTenantJobListener> jobListeners = Collections.emptyList();
         final String groupName = "groupName";
@@ -708,6 +725,47 @@ public class QuartzSchedulerExecutorTest {
         quartzSchedulerExecutor.addJobListener(jobListeners, groupName);
     }
 
+    @Test
+    public void addJobListener_should_addJobListener_for_tenant() throws Exception {
+        // Given
+        final List<AbstractBonitaTenantJobListener> jobListeners = Collections.emptyList();
+        final String groupName = "groupName";
+        final ListenerManager listenerManager = mock(ListenerManager.class);
+        doReturn(listenerManager).when(scheduler).getListenerManager();
+
+        // When
+        quartzSchedulerExecutor.addJobListener(jobListeners, groupName);
+
+        // Then
+        verify(listenerManager).addJobListener(any(JobListener.class), eq(GroupMatcher.<JobKey> groupEquals(groupName)));
+    }
+
+    @Test(expected = SSchedulerException.class)
+    public void addJobListener_should_throw_exception_when_addJobListener_failed_for_platform() throws Exception {
+        // Given
+        final List<AbstractBonitaPlatormJobListener> jobListeners = Collections.emptyList();
+        final ListenerManager listenerManager = mock(ListenerManager.class);
+        doReturn(listenerManager).when(scheduler).getListenerManager();
+        doThrow(SchedulerException.class).when(listenerManager).addJobListener(any(JobListener.class));
+
+        // When
+        quartzSchedulerExecutor.addJobListener(jobListeners);
+    }
+
+    @Test
+    public void addJobListener_should_addJobListener_for_platform() throws Exception {
+        // Given
+        final List<AbstractBonitaPlatormJobListener> jobListeners = Collections.emptyList();
+        final ListenerManager listenerManager = mock(ListenerManager.class);
+        doReturn(listenerManager).when(scheduler).getListenerManager();
+
+        // When
+        quartzSchedulerExecutor.addJobListener(jobListeners);
+
+        // Then
+        verify(listenerManager).addJobListener(any(JobListener.class));
+    }
+
     @Test(expected = SSchedulerException.class)
     public void initializeScheduler_should_throw_exception_when_getJobListener_failed() throws Exception {
         // Given
@@ -715,5 +773,55 @@ public class QuartzSchedulerExecutorTest {
 
         // When
         quartzSchedulerExecutor.initializeScheduler();
+    }
+
+    @Test(expected = SSchedulerException.class)
+    public void isExistingJob_should_throw_exception_when_getJobDetail_failed() throws Exception {
+        // Given
+        doThrow(SchedulerException.class).when(scheduler).getJobDetail(any(JobKey.class));
+
+        // When
+        quartzSchedulerExecutor.isExistingJob("name", "group");
+    }
+
+    @Test(expected = SSchedulerException.class)
+    public void isExistingJob_should_throw_exception_when_scheduler_is_null() throws Exception {
+        // Given
+        quartzSchedulerExecutor.shutdown();
+        when(schedulerFactory.getScheduler()).thenReturn(null);
+        quartzSchedulerExecutor.initializeScheduler();
+
+        try {
+            // When
+            quartzSchedulerExecutor.isExistingJob("name", "group");
+        } finally {
+            when(schedulerFactory.getScheduler()).thenReturn(scheduler);
+            quartzSchedulerExecutor.initializeScheduler();
+            quartzSchedulerExecutor.start();
+        }
+    }
+
+    @Test
+    public void isExistingJob_should_return_false_if_doesnt_exist_in_quartz() throws Exception {
+        // Given
+        doReturn(null).when(scheduler).getJobDetail(any(JobKey.class));
+
+        // When
+        final boolean existingJob = quartzSchedulerExecutor.isExistingJob("name", "group");
+
+        // Then
+        assertFalse(existingJob);
+    }
+
+    @Test
+    public void isExistingJob_should_return_true_if_exists_in_quartz() throws Exception {
+        // Given
+        doReturn(mock(JobDetail.class)).when(scheduler).getJobDetail(any(JobKey.class));
+
+        // When
+        final boolean existingJob = quartzSchedulerExecutor.isExistingJob("name", "group");
+
+        // Then
+        assertTrue(existingJob);
     }
 }

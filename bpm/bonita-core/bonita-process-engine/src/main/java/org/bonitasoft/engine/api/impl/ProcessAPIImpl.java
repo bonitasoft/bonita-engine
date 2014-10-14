@@ -3683,7 +3683,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), sCatchEventDefinition, sProcessInstance.getId(),
                             sSubProcessDefinition.getId());
                     final boolean delete = schedulerService.delete(jobName);
-                    if (!delete) {
+                    if (!delete && schedulerService.isExistingJob(jobName)) {
                         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
                             logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "No job found with name '" + jobName
                                     + "' when interrupting timer catch event named '" + sCatchEventDefinition.getName()
@@ -3757,13 +3757,15 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
 
         try {
-            final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), sCatchEventDefinition, sCatchEventInstance);
-            final boolean delete = schedulerService.delete(jobName);
-            if (!delete) {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "No job found with name '" + jobName
-                            + "' when interrupting timer catch event named '" + sCatchEventDefinition.getName() + "' and id '" + sCatchEventInstance.getId()
-                            + "'. It was probably already triggered.");
+            if (!sCatchEventDefinition.getTimerEventTriggerDefinitions().isEmpty()) {
+                final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), sCatchEventDefinition, sCatchEventInstance);
+                final boolean delete = schedulerService.delete(jobName);
+                if (!delete && schedulerService.isExistingJob(jobName)) {
+                    if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+                        logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
+                                "No job found with name '" + jobName + "' when interrupting timer catch event named '" + sCatchEventDefinition.getName()
+                                        + "' and id '" + sCatchEventInstance.getId() + "'. It was probably already triggered.");
+                    }
                 }
             }
         } catch (final Exception e) {
@@ -3771,7 +3773,6 @@ public class ProcessAPIImpl implements ProcessAPI {
                 logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
             }
         }
-
     }
 
     private List<SProcessInstance> searchProcessInstancesFromProcessDefinition(final ProcessInstanceService processInstanceService,

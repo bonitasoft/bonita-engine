@@ -322,7 +322,7 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     /**
      * get the persisted job from the database It opens a transaction!
-     * 
+     *
      * @param jobIdentifier
      * @return the job
      * @throws SSchedulerException
@@ -422,7 +422,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void addJobListener(List<AbstractBonitaPlatormJobListener> jobListeners) throws SSchedulerException {
+    public void addJobListener(final List<AbstractBonitaPlatormJobListener> jobListeners) throws SSchedulerException {
         schedulerExecutor.addJobListener(jobListeners);
     }
 
@@ -431,4 +431,8 @@ public class SchedulerServiceImpl implements SchedulerService {
         schedulerExecutor.initializeScheduler();
     }
 
+    @Override
+    public boolean isExistingJob(final String jobName) throws SSchedulerException {
+        return schedulerExecutor.isExistingJob(jobName, String.valueOf(getTenantId()));
+    }
 }
