@@ -44,7 +44,7 @@ public final class DisableProcess implements TransactionContent {
 
     private final ProcessDefinitionService processDefinitionService;
     private final EventInstanceService eventInstanceService;
-    private final long processId;
+    private final long processDefinitionId;
     private final SchedulerService scheduler;
     private final TechnicalLoggerService logger;
     private final String username;
@@ -54,7 +54,7 @@ public final class DisableProcess implements TransactionContent {
             final SchedulerService scheduler, final TechnicalLoggerService logger, final String username, final ClassLoaderService classLoaderService) {
         this.processDefinitionService = processDefinitionService;
         this.eventInstanceService = eventInstanceService;
-        this.processId = processId;
+        processDefinitionId = processId;
         this.scheduler = scheduler;
         this.logger = logger;
         this.username = username;
@@ -63,10 +63,10 @@ public final class DisableProcess implements TransactionContent {
 
     @Override
     public void execute() throws SBonitaException {
-        processDefinitionService.disableProcessDeploymentInfo(processId);
-        final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processId);
+        processDefinitionService.disableProcessDeploymentInfo(processDefinitionId);
+        final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         disableStartEvents(processDefinition);
-        classLoaderService.removeLocalClassLoader(ScopeType.PROCESS.name(), processId);
+        classLoaderService.removeLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + username + "> has disabled process <" + processDefinition.getName()
                     + "> in version <" + processDefinition.getVersion() + "> with id <" + processDefinition.getId() + ">");
@@ -83,19 +83,19 @@ public final class DisableProcess implements TransactionContent {
         final List<SStartEventDefinition> startEvents = processDefinition.getProcessContainer().getStartEvents();
         for (final SStartEventDefinition startEvent : startEvents) {
             if (!startEvent.getTimerEventTriggerDefinitions().isEmpty()) {
-                scheduler.delete(JobNameBuilder.getTimerEventJobName(processId, startEvent, null));
+                scheduler.delete(JobNameBuilder.getTimerEventJobName(processDefinitionId, startEvent, null));
             }
         }
     }
 
     private void deleteWaitingEvents() throws SWaitingEventModificationException, SBonitaSearchException {
         final QueryOptions queryOptions = new QueryOptions(0, 100, SWaitingEvent.class, "id", OrderByType.ASC);
-        List<SWaitingEvent> waitingEvents = eventInstanceService.searchStartWaitingEvents(processId, queryOptions);
+        List<SWaitingEvent> waitingEvents = eventInstanceService.searchStartWaitingEvents(processDefinitionId, queryOptions);
         while (!waitingEvents.isEmpty()) {
             for (final SWaitingEvent startEvent : waitingEvents) {
                 eventInstanceService.deleteWaitingEvent(startEvent);
             }
-            waitingEvents = eventInstanceService.searchStartWaitingEvents(processId, queryOptions);
+            waitingEvents = eventInstanceService.searchStartWaitingEvents(processDefinitionId, queryOptions);
         }
     }
 

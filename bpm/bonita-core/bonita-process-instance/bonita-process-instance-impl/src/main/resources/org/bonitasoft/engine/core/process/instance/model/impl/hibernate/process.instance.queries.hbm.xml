@@ -950,6 +950,12 @@
 		WHERE f.deleted = FALSE
 	</query>
 	
+	<query name="searchSCatchEventInstance">
+		SELECT e
+		FROM org.bonitasoft.engine.core.process.instance.model.event.impl.SCatchEventInstanceImpl AS e
+		WHERE e.deleted = FALSE
+	</query>
+	
 	<query name="getNumberOfSFlowNodeInstanceSupervisedBy">
 		SELECT count(DISTINCT f)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f,

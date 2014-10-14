@@ -229,7 +229,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         deleteParentProcessInstanceAndElements(sProcessInstance);
     }
 
-    protected void deleteParentProcessInstanceAndElements(final SProcessInstance sProcessInstance) throws SFlowNodeReadException,
+    @Override
+    public void deleteParentProcessInstanceAndElements(final SProcessInstance sProcessInstance) throws SFlowNodeReadException,
             SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
         checkIfCallerIsNotActive(sProcessInstance.getCallerId());
 
@@ -448,6 +449,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         processDocumentService.deleteDocumentsFromProcessInstance(processInstance.getId());
         deleteConnectorInstancesIfNecessary(processInstance, processDefinition);
         commentService.deleteComments(processInstance.getId());
+
     }
 
     private void deleteConnectorInstancesIfNecessary(final SProcessInstance processInstance, final SProcessDefinition processDefinition)
@@ -548,6 +550,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             } else if (SFlowNodeType.CALL_ACTIVITY.equals(flowNodeInstance.getType()) || SFlowNodeType.SUB_PROCESS.equals(flowNodeInstance.getType())) {
                 // in the case of a call activity or subprocess activity delete the child process instance
                 try {
+                    // For the start event on the sub process
+                    bpmEventInstanceService.deleteWaitingEvents(flowNodeInstance);
                     deleteProcessInstance(getChildOfActivity(flowNodeInstance.getId()));
                 } catch (final SProcessInstanceNotFoundException e) {
                     setExceptionContext(processDefinition, flowNodeInstance, e);

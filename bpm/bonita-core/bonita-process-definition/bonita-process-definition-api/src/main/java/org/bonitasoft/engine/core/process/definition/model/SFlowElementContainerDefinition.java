@@ -81,4 +81,10 @@ public interface SFlowElementContainerDefinition extends SBaseElement {
 
     boolean containsInclusiveGateway();
 
+    /**
+     * @return
+     * @since 6.4.0
+     */
+    Set<SSubProcessDefinition> getSubProcessDefinitions();
+
 }

@@ -274,7 +274,7 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
         SWaitingErrorEvent waitingError = null;
         try {
             final List<SWaitingErrorEvent> selectList = getPersistenceService().selectList(selectDescriptor);
-            if ((selectList != null) && !selectList.isEmpty()) {
+            if (selectList != null && !selectList.isEmpty()) {
                 if (selectList.size() == 1) {
                     waitingError = selectList.get(0);
                 } else {

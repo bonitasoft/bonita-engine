@@ -252,12 +252,17 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SHumanTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SUserFilterDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.SProcessDefinitionDeployInfoBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowMessageEventTriggerDefinitionBuilder;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowMessageEventTriggerDefinitionBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.builder.event.trigger.SThrowSignalEventTriggerDefinitionBuilderFactory;
+import org.bonitasoft.engine.core.process.definition.model.event.SBoundaryEventDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.SCatchEventDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.SIntermediateCatchEventDefinition;
+import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowMessageEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowSignalEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
@@ -293,6 +298,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskI
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.STimerEventTriggerInstanceBuilder;
+import org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
@@ -325,6 +331,7 @@ import org.bonitasoft.engine.execution.SUnreleasableTaskException;
 import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.event.EventsHandler;
+import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.ContainerState;
 import org.bonitasoft.engine.expression.Expression;
@@ -645,8 +652,8 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private void deleteProcessInstance(final ProcessInstanceService processInstanceService, final Long processInstanceId,
             final ActivityInstanceService activityInstanceService) throws SBonitaException, SProcessInstanceHierarchicalDeletionException {
-        final SProcessInstance processInstance = processInstanceService.getProcessInstance(processInstanceId);
-        final long callerId = processInstance.getCallerId();
+        final SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
+        final long callerId = sProcessInstance.getCallerId();
         if (callerId > 0) {
             try {
                 final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(callerId);
@@ -664,9 +671,10 @@ public class ProcessAPIImpl implements ProcessAPI {
                 // ok the activity that called this process do not exists anymore
             }
         }
-        processInstanceService.deleteArchivedProcessInstanceElements(processInstanceId, processInstance.getProcessDefinitionId());
+        deleteJobsOnProcessInstance(sProcessInstance);
+        processInstanceService.deleteArchivedProcessInstanceElements(processInstanceId, sProcessInstance.getProcessDefinitionId());
         processInstanceService.deleteArchivedProcessInstancesOfProcessInstance(processInstanceId);
-        processInstanceService.deleteProcessInstance(processInstance);
+        processInstanceService.deleteProcessInstance(sProcessInstance);
     }
 
     private List<ProcessInstance> searchProcessInstancesFromProcessDefinition(final TenantServiceAccessor tenantAccessor, final long processDefinitionId,
@@ -3593,9 +3601,12 @@ public class ProcessAPIImpl implements ProcessAPI {
 
                 @Override
                 public Void call() throws Exception {
-                    processInstanceService.deleteParentProcessInstanceAndElements(processInstanceId);
+                    final SProcessInstance sProcessInstance = processInstanceService.getProcessInstance(processInstanceId);
+                    deleteJobsOnProcessInstance(sProcessInstance);
+                    processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstance);
                     return null;
                 }
+
             });
         } catch (final SBonitaException e) {
             throw e;
@@ -3632,6 +3643,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
                     @Override
                     public Long call() throws Exception {
+                        deleteJobsOnProcessInstance(processDefinitionId, sProcessInstances);
                         return processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstances);
                     }
                 });
@@ -3644,6 +3656,122 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final Exception e) {
             throw new DeletionException(e);
         }
+    }
+
+    private void deleteJobsOnEventSubProcess(final SProcessDefinition processDefinition, final SProcessInstance sProcessInstance) {
+        final Set<SSubProcessDefinition> sSubProcessDefinitions = processDefinition.getProcessContainer().getSubProcessDefinitions();
+        for (final SSubProcessDefinition sSubProcessDefinition : sSubProcessDefinitions) {
+            final List<SStartEventDefinition> startEventsOfSubProcess = sSubProcessDefinition.getSubProcessContainer().getStartEvents();
+            deleteJobsOnEventSubProcess(processDefinition, sProcessInstance, sSubProcessDefinition, startEventsOfSubProcess);
+
+            final List<SIntermediateCatchEventDefinition> intermediateCatchEvents = sSubProcessDefinition.getSubProcessContainer().getIntermediateCatchEvents();
+            deleteJobsOnEventSubProcess(processDefinition, sProcessInstance, sSubProcessDefinition, intermediateCatchEvents);
+
+            final List<SBoundaryEventDefinition> sEndEventDefinitions = sSubProcessDefinition.getSubProcessContainer().getBoundaryEvents();
+            deleteJobsOnEventSubProcess(processDefinition, sProcessInstance, sSubProcessDefinition, sEndEventDefinitions);
+        }
+    }
+
+    private void deleteJobsOnEventSubProcess(final SProcessDefinition processDefinition, final SProcessInstance sProcessInstance,
+            final SSubProcessDefinition sSubProcessDefinition, final List<? extends SCatchEventDefinition> sCatchEventDefinitions) {
+        final SchedulerService schedulerService = getTenantAccessor().getSchedulerService();
+        final TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
+
+        for (final SCatchEventDefinition sCatchEventDefinition : sCatchEventDefinitions) {
+            try {
+                if (!sCatchEventDefinition.getTimerEventTriggerDefinitions().isEmpty()) {
+                    final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), sCatchEventDefinition, sProcessInstance.getId(),
+                            sSubProcessDefinition.getId());
+                    final boolean delete = schedulerService.delete(jobName);
+                    if (!delete) {
+                        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+                            logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "No job found with name '" + jobName
+                                    + "' when interrupting timer catch event named '" + sCatchEventDefinition.getName()
+                                    + "' on event sub process with the id '" + sSubProcessDefinition.getId() + "'. It was probably already triggered.");
+                        }
+                    }
+                }
+            } catch (final Exception e) {
+                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
+                }
+            }
+        }
+    }
+
+    void deleteJobsOnProcessInstance(final SProcessInstance sProcessInstance) throws SBonitaException {
+        deleteJobsOnProcessInstance(sProcessInstance.getProcessDefinitionId(), Collections.singletonList(sProcessInstance));
+    }
+
+    private void deleteJobsOnProcessInstance(final long processDefinitionId, final List<SProcessInstance> sProcessInstances)
+            throws SBonitaException {
+        final SProcessDefinition processDefinition = getTenantAccessor().getProcessDefinitionService().getProcessDefinition(processDefinitionId);
+
+        for (final SProcessInstance sProcessInstance : sProcessInstances) {
+            deleteJobsOnProcessInstance(processDefinition, sProcessInstance);
+        }
+    }
+
+    private void deleteJobsOnProcessInstance(final SProcessDefinition processDefinition, final SProcessInstance sProcessInstance)
+            throws SBonitaSearchException {
+        final List<SStartEventDefinition> startEventsOfSubProcess = processDefinition.getProcessContainer().getStartEvents();
+        deleteJobsOnProcessInstance(processDefinition, sProcessInstance, startEventsOfSubProcess);
+
+        final List<SIntermediateCatchEventDefinition> intermediateCatchEvents = processDefinition.getProcessContainer().getIntermediateCatchEvents();
+        deleteJobsOnProcessInstance(processDefinition, sProcessInstance, intermediateCatchEvents);
+
+        final List<SBoundaryEventDefinition> sEndEventDefinitions = processDefinition.getProcessContainer().getBoundaryEvents();
+        deleteJobsOnProcessInstance(processDefinition, sProcessInstance, sEndEventDefinitions);
+
+        deleteJobsOnEventSubProcess(processDefinition, sProcessInstance);
+    }
+
+    private void deleteJobsOnProcessInstance(final SProcessDefinition processDefinition, final SProcessInstance sProcessInstance,
+            final List<? extends SCatchEventDefinition> sCatchEventDefinitions) throws SBonitaSearchException {
+        for (final SCatchEventDefinition sCatchEventDefinition : sCatchEventDefinitions) {
+            deleteJobsOnFlowNodeInstances(processDefinition, sCatchEventDefinition, sProcessInstance);
+        }
+    }
+
+    private void deleteJobsOnFlowNodeInstances(final SProcessDefinition processDefinition, final SCatchEventDefinition sCatchEventDefinition,
+            final SProcessInstance sProcessInstance) throws SBonitaSearchException {
+        final ActivityInstanceService activityInstanceService = getTenantAccessor().getActivityInstanceService();
+
+        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SCatchEventInstance.class, "id", OrderByType.ASC));
+        final FilterOption filterOption1 = new FilterOption(SCatchEventInstance.class, "flowNodeDefinitionId", sCatchEventDefinition.getId());
+        final FilterOption filterOption2 = new FilterOption(SCatchEventInstance.class, "logicalGroup4", sProcessInstance.getId());
+        QueryOptions queryOptions = new QueryOptions(0, 100, orderByOptions, Arrays.asList(filterOption1, filterOption2), null);
+        List<SCatchEventInstance> sCatchEventInstances = activityInstanceService.searchFlowNodeInstances(SCatchEventInstance.class, queryOptions);
+        while (!sCatchEventInstances.isEmpty()) {
+            for (final SCatchEventInstance sCatchEventInstance : sCatchEventInstances) {
+                deleteJobsOnFlowNodeInstance(processDefinition, sCatchEventDefinition, sCatchEventInstance);
+            }
+            queryOptions = QueryOptions.getNextPage(queryOptions);
+            sCatchEventInstances = activityInstanceService.searchFlowNodeInstances(SCatchEventInstance.class, queryOptions);
+        }
+    }
+
+    private void deleteJobsOnFlowNodeInstance(final SProcessDefinition processDefinition, final SCatchEventDefinition sCatchEventDefinition,
+            final SCatchEventInstance sCatchEventInstance) {
+        final SchedulerService schedulerService = getTenantAccessor().getSchedulerService();
+        final TechnicalLoggerService logger = getTenantAccessor().getTechnicalLoggerService();
+
+        try {
+            final String jobName = JobNameBuilder.getTimerEventJobName(processDefinition.getId(), sCatchEventDefinition, sCatchEventInstance);
+            final boolean delete = schedulerService.delete(jobName);
+            if (!delete) {
+                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "No job found with name '" + jobName
+                            + "' when interrupting timer catch event named '" + sCatchEventDefinition.getName() + "' and id '" + sCatchEventInstance.getId()
+                            + "'. It was probably already triggered.");
+                }
+            }
+        } catch (final Exception e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
+            }
+        }
+
     }
 
     private List<SProcessInstance> searchProcessInstancesFromProcessDefinition(final ProcessInstanceService processInstanceService,
@@ -4287,7 +4415,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     /**
      * @param orAssignedToUser
-     *            do we also want to retrieve tasks directly assigned to this user ?
+     *        do we also want to retrieve tasks directly assigned to this user ?
      * @throws SearchException
      */
     private SearchResult<HumanTaskInstance> searchTasksForUser(final long userId, final SearchOptions searchOptions, final boolean orAssignedToUser)

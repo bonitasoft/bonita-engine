@@ -279,7 +279,8 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     public boolean delete(final String jobName, final String groupName) throws SSchedulerException {
         try {
             checkSchedulerState();
-            return scheduler.deleteJob(jobKey(jobName, groupName));
+            final JobKey jobKey = jobKey(jobName, groupName);
+            return scheduler.deleteJob(jobKey);
         } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         }

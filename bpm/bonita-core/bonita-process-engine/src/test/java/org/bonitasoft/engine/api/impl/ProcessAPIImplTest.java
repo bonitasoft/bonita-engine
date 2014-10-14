@@ -48,6 +48,7 @@ import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.impl.IntegerDataInstanceImpl;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -85,6 +86,7 @@ import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
+import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.lock.BonitaLock;
@@ -100,9 +102,12 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
+import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import org.bonitasoft.engine.search.descriptor.SearchHumanTaskInstanceDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
@@ -161,6 +166,9 @@ public class ProcessAPIImplTest {
     @Mock
     private EventInstanceService eventInstanceService;
 
+    @Mock
+    private FlowNodeStateManager flowNodeStateManager;
+
     @Spy
     @InjectMocks
     private ProcessAPIImpl processAPI;
@@ -180,6 +188,7 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getSchedulerService()).thenReturn(schedulerService);
         when(tenantAccessor.getSearchEntitiesDescriptor()).thenReturn(searchEntitiesDescriptor);
         when(tenantAccessor.getEventInstanceService()).thenReturn(eventInstanceService);
+        when(tenantAccessor.getFlowNodeStateManager()).thenReturn(flowNodeStateManager);
     }
 
     @Test
@@ -747,5 +756,15 @@ public class ProcessAPIImplTest {
 
         // When
         processAPI.updateExecutionDateOfTimerEventTriggerInstance(timerEventTriggerInstanceId, date);
+    }
+
+    @Test(expected = SearchException.class)
+    public void searchHumanTaskInstancesWithSearchException() throws Exception {
+        // Given
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
+        doReturn(new SearchHumanTaskInstanceDescriptor()).when(searchEntitiesDescriptor).getSearchHumanTaskInstanceDescriptor();
+
+        final SearchResult<HumanTaskInstance> humanTasksSearch = processAPI.searchHumanTaskInstances(searchOptionsBuilder.sort("tyefv", Order.ASC).done());
+        assertEquals(0, humanTasksSearch.getCount());
     }
 }

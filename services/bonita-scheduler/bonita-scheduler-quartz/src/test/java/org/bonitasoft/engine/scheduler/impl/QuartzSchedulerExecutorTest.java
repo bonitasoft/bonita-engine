@@ -168,7 +168,7 @@ public class QuartzSchedulerExecutorTest {
     }
 
     @Test(expected = SSchedulerException.class)
-    public void should_check_RepeatTrigger_with_bad_interval_param() throws Exception {
+    public void schedule_should_check_RepeatTrigger_with_bad_interval_param() throws Exception {
         final int badInterval = -1;
         final RepeatTrigger trigger = new TestRepeatTrigger("triggerName", badInterval, 1);
 
@@ -176,7 +176,7 @@ public class QuartzSchedulerExecutorTest {
     }
 
     @Test(expected = SSchedulerException.class)
-    public void should_check_RepeatTrigger_with_bad_name_param() throws Exception {
+    public void schedule_should_check_RepeatTrigger_with_bad_name_param() throws Exception {
         final String badTriggerName = null;
         final RepeatTrigger trigger = new TestRepeatTrigger(badTriggerName, 1, 1);
 
@@ -184,7 +184,7 @@ public class QuartzSchedulerExecutorTest {
     }
 
     @Test(expected = SSchedulerException.class)
-    public void should_check_RepeatTrigger_with_bad_count_param() throws Exception {
+    public void schedule_should_check_RepeatTrigger_with_bad_count_param() throws Exception {
         final int badCount = -2;
         final RepeatTrigger trigger = new TestRepeatTrigger("triggerName", 1, badCount);
 
@@ -201,7 +201,7 @@ public class QuartzSchedulerExecutorTest {
 
     @SuppressWarnings("unchecked")
     @Test(expected = SSchedulerException.class)
-    public void should_throw_exception_if_error_occurs_when_pausing_jobs() throws Exception {
+    public void pauseJobs_should_throw_exception_if_error_occurs() throws Exception {
         doThrow(SchedulerException.class).when(scheduler).pauseTriggers(any(GroupMatcher.class));
 
         quartzSchedulerExecutor.pauseJobs("123");
@@ -263,12 +263,15 @@ public class QuartzSchedulerExecutorTest {
     }
 
     @Test
-    public void should_delete_job_for_a_given_name_and_group() throws Exception {
-        final JobKey job = jobKey("aName", "aGroup");
+    public void delete_job_should_delete_job_and_interrup_for_a_given_name_and_group() throws Exception {
+        // Given
+        final JobKey jobKey = jobKey("aName", "aGroup");
 
-        quartzSchedulerExecutor.delete(job.getName(), job.getGroup());
+        // When
+        quartzSchedulerExecutor.delete(jobKey.getName(), jobKey.getGroup());
 
-        verify(scheduler).deleteJob(job);
+        // Then
+        verify(scheduler).deleteJob(jobKey);
     }
 
     @Test(expected = SSchedulerException.class)
