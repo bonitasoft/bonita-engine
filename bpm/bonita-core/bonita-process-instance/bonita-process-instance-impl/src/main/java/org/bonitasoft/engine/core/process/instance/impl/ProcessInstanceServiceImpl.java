@@ -915,7 +915,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         try {
             final Map<String, Object> parameters = Collections.singletonMap("sourceObjectIds", (Object) processInstanceIds);
             final SelectListDescriptor<SAProcessInstance> saProcessInstances = new SelectListDescriptor<SAProcessInstance>(
-                    "getArchivedProcessInstancesInAllStates", parameters, SAProcessInstance.class, new QueryOptions(0, processInstanceIds.size()));
+                    "getArchivedProcessInstancesInAllStates", parameters, SAProcessInstance.class, QueryOptions.countQueryOptions());
             return persistenceService.selectList(saProcessInstances);
         } catch (final SBonitaReadException e) {
             throw new SProcessInstanceReadException(e);

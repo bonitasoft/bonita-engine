@@ -148,10 +148,11 @@ public class ProcessDeletionTest extends CommonAPITest {
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance processInstance1 = startAndFinishProcess(processDefinition);
         startAndFinishProcess(processDefinition);
+        startAndFinishProcess(processDefinition);
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.sort(ProcessInstanceSearchDescriptor.NAME, Order.ASC);
-        final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().searchArchivedProcessInstancesInAllStates(searchOptionsBuilder.done())
+        final List<ArchivedProcessInstance> archivedProcessInstances = getProcessAPI().searchArchivedProcessInstances(searchOptionsBuilder.done())
                 .getResult();
         getProcessAPI().deleteArchivedProcessInstancesInAllStates(
                 Arrays.asList(archivedProcessInstances.get(0).getSourceObjectId(), archivedProcessInstances.get(2).getSourceObjectId()));
@@ -161,7 +162,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         assertEquals(0, taskInstances.size());
         final long numberOfArchivedProcessInstancesAfterDelete = getProcessAPI().searchArchivedProcessInstancesInAllStates(searchOptionsBuilder.done())
                 .getCount();
-        assertEquals(archivedProcessInstances.size() - 2, numberOfArchivedProcessInstancesAfterDelete);
+        assertEquals(3, numberOfArchivedProcessInstancesAfterDelete);
     }
 
     @Test
@@ -182,7 +183,7 @@ public class ProcessDeletionTest extends CommonAPITest {
         assertEquals(0, taskInstances.size());
         final long numberOfArchivedProcessInstancesAfterDelete = getProcessAPI().searchArchivedProcessInstancesInAllStates(searchOptionsBuilder.done())
                 .getCount();
-        assertEquals(archivedProcessInstances.size() - 1, numberOfArchivedProcessInstancesAfterDelete);
+        assertEquals(archivedProcessInstances.size() - 3, numberOfArchivedProcessInstancesAfterDelete);
     }
 
     private ProcessInstance startAndFinishProcess(final ProcessDefinition processDefinition) throws ProcessDefinitionNotFoundException,
