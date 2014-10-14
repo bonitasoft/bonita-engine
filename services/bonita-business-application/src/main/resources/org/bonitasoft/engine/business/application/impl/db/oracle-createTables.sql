@@ -38,6 +38,7 @@ CREATE TABLE business_app_menu (
   tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   displayName VARCHAR2(255) NOT NULL,
+  applicationId NUMBER(19, 0) NOT NULL,
   applicationPageId NUMBER(19, 0),
   parentId NUMBER(19, 0),
   index_ NUMBER(19, 0)
@@ -45,6 +46,7 @@ CREATE TABLE business_app_menu (
 
 ALTER TABLE business_app_menu ADD CONSTRAINT pk_business_app_menu PRIMARY KEY (tenantid, id);
 
+CREATE INDEX idx_app_menu_app ON business_app_menu (applicationId, tenantid);
 CREATE INDEX idx_app_menu_page ON business_app_menu (applicationPageId, tenantid);
 CREATE INDEX idx_app_menu_parent ON business_app_menu (parentId, tenantid);
 

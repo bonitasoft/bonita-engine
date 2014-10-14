@@ -38,6 +38,7 @@ CREATE TABLE business_app_menu (
   tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
   displayName VARCHAR(255) NOT NULL,
+  applicationId BIGINT NOT NULL,
   applicationPageId BIGINT,
   parentId BIGINT,
   index_ BIGINT
@@ -45,7 +46,8 @@ CREATE TABLE business_app_menu (
 
 ALTER TABLE business_app_menu ADD CONSTRAINT pk_business_app_menu PRIMARY KEY (tenantid, id);
 
+CREATE INDEX idx_app_menu_app ON business_app_menu (applicationId, tenantid);
 CREATE INDEX idx_app_menu_page ON business_app_menu (applicationPageId, tenantid);
 CREATE INDEX idx_app_menu_parent ON business_app_menu (parentId, tenantid);
 
--- forein keys are create in bonita-persistence-db/postCreateStructure.sql
+-- foreign keys are create in bonita-persistence-db/postCreateStructure.sql

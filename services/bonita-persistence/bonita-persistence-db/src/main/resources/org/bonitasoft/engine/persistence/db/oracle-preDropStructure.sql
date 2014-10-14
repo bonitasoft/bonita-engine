@@ -10,6 +10,7 @@ ALTER TABLE custom_usr_inf_val DROP CONSTRAINT fk_custom_usr_inf_val_tenantId;
 
 -- business application
 ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_tenantId;
+ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_appId;
 ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_pageId;
 ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_parentId;
 ALTER TABLE business_app_page DROP CONSTRAINT fk_app_page_tenantId;
