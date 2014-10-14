@@ -33,20 +33,15 @@ import com.bonitasoft.engine.business.application.model.builder.SApplicationMenu
  */
 public class ApplicationMenuConvertor {
 
-    private final ApplicationService applicationService;
-
-    public ApplicationMenuConvertor(final ApplicationService applicationService) {
-        this.applicationService = applicationService;
-    }
-
     public SApplicationMenu buildSApplicationMenu(final ApplicationMenuCreator creator) {
         final Map<ApplicationMenuField, Serializable> fields = creator.getFields();
         final String displayName = (String) fields.get(ApplicationMenuField.DISPLAY_NAME);
-        final long applicationPageId = (Long) fields.get(ApplicationMenuField.APPLICATION_PAGE_ID);
+        final Long applicationId = (Long) fields.get(ApplicationMenuField.APPLICATION_ID);
+        final Long applicationPageId = (Long) fields.get(ApplicationMenuField.APPLICATION_PAGE_ID);
         final int index = (Integer) fields.get(ApplicationMenuField.INDEX);
         final Long parentId = (Long) fields.get(ApplicationMenuField.PARENT_ID);
 
-        final SApplicationMenuBuilder builder = BuilderFactory.get(SApplicationMenuBuilderFactory.class).createNewInstance(displayName, applicationPageId,
+        final SApplicationMenuBuilder builder = BuilderFactory.get(SApplicationMenuBuilderFactory.class).createNewInstance(displayName, applicationId, applicationPageId,
                 index);
         if (parentId != null) {
             builder.setParentId(parentId);
@@ -55,12 +50,10 @@ public class ApplicationMenuConvertor {
     }
 
     public ApplicationMenu toApplicationMenu(final SApplicationMenu sApplicationMenu) throws SBonitaException {
-        final SApplicationPage applicationPage = applicationService.getApplicationPage(sApplicationMenu.getApplicationPageId());
-        final ApplicationMenuImpl menu = new ApplicationMenuImpl(sApplicationMenu.getDisplayName(), sApplicationMenu.getApplicationPageId(),
+        final ApplicationMenuImpl menu = new ApplicationMenuImpl(sApplicationMenu.getDisplayName(), sApplicationMenu.getApplicationId(), sApplicationMenu.getApplicationPageId(),
                 sApplicationMenu.getIndex());
         menu.setId(sApplicationMenu.getId());
         menu.setParentId(sApplicationMenu.getParentId());
-        menu.setApplicationId(applicationPage.getApplicationId());
         return menu;
     }
 

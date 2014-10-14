@@ -28,12 +28,12 @@ public interface ApplicationMenu extends BaseElement {
     String getDisplayName();
 
     /**
-     * Retrieves the identifier of related {@link ApplicationPage}
+     * Retrieves the identifier of related {@link ApplicationPage}. If the {@code ApplicationMenu} is not related to an {@code ApplicationPage}, this method will return null.
      *
-     * @return the identifier of related {@code ApplicationPage}
+     * @return the identifier of related {@code ApplicationPage} or null if the menu is not related to {@code ApplicationPage}
      * @see ApplicationPage
      */
-    long getApplicationPageId();
+    Long getApplicationPageId();
 
     /**
      * Retrieves the identifier of related {@link Application}

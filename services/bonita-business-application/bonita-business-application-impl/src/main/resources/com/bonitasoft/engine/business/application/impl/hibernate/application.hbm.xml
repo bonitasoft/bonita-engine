@@ -43,6 +43,7 @@
 			<key-property name="id" column="id" type="long" />
 		</composite-id>
 		<property name="displayName" column="displayName" />
+		<property name="applicationId" column="applicationId" />
 		<property name="applicationPageId" column="applicationPageId" />
 		<property name="parentId" column="parentId" />
 		<property name="index" column="index_" />

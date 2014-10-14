@@ -60,4 +60,11 @@ public class ApplicationMenuSearchDescriptor {
      */
     public static final String INDEX = "index";
 
+    /**
+     * Used to filter or order by the identifier of parent {@link ApplicationMenu}
+     *
+     * @see ApplicationMenu
+     */
+    public static final String PARENT_ID = "parentId";
+
 }

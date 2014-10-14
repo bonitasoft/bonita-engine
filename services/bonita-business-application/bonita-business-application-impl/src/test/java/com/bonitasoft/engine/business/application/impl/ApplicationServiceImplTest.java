@@ -676,7 +676,7 @@ public class ApplicationServiceImplTest {
     @Test
     public void createApplicationMenu_should_call_recordInsert_and_return_created_object() throws Exception {
         //given
-        final SApplicationMenu appMenu = buildApplicationMenu("main", 5, 1);
+        final SApplicationMenu appMenu = buildApplicationMenu("main", 5, 1, 12);
         appMenu.setId(15);
 
         //when
@@ -693,8 +693,8 @@ public class ApplicationServiceImplTest {
         assertThat(insertEventCaptor.getValue().getType()).isEqualTo(ApplicationService.APPLICATION_MENU + CREATED_SUFFIX);
     }
 
-    private SApplicationMenu buildApplicationMenu(final String displayName, final long applicationPageId, final int index) {
-        final SApplicationMenuBuilder builder = new SApplicationMenuBuilderFactoryImpl().createNewInstance(displayName, applicationPageId, index);
+    private SApplicationMenu buildApplicationMenu(final String displayName, final long applicationPageId, final int index, long applicationId) {
+        final SApplicationMenuBuilder builder = new SApplicationMenuBuilderFactoryImpl().createNewInstance(displayName, applicationId, applicationPageId, index);
         return builder.done();
     }
 
@@ -704,7 +704,7 @@ public class ApplicationServiceImplTest {
         doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
 
         //when
-        applicationServiceActive.createApplicationMenu(buildApplicationMenu("main", 4, 1));
+        applicationServiceActive.createApplicationMenu(buildApplicationMenu("main", 4, 1, 12));
 
         //then exception
     }
@@ -712,7 +712,7 @@ public class ApplicationServiceImplTest {
     @Test(expected = IllegalStateException.class)
     public void createApplicationMenu_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
         //when
-        applicationServiceDisabled.createApplicationMenu(buildApplicationMenu("main", 5, 1));
+        applicationServiceDisabled.createApplicationMenu(buildApplicationMenu("main", 5, 1, 12));
 
         //then exception
     }
@@ -720,7 +720,7 @@ public class ApplicationServiceImplTest {
     @Test
     public void getApplicationMenu_by_id_should_return_result_of_persitence_service() throws Exception {
         //given
-        final SApplicationMenu applicationMenu = buildApplicationMenu("main", 2, 1);
+        final SApplicationMenu applicationMenu = buildApplicationMenu("main", 2, 1, 12);
         final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById",
                 SApplicationMenu.class, 3);
         given(persistenceService.selectById(selectDescriptor)).willReturn(applicationMenu);
@@ -756,7 +756,7 @@ public class ApplicationServiceImplTest {
     @Test
     public void deleteApplicationMenu_should_delete_application_menu_identified_for_the_given_identifier() throws Exception {
         //given
-        final SApplicationMenu applicationMenu = buildApplicationMenu("main", 2, 1);
+        final SApplicationMenu applicationMenu = buildApplicationMenu("main", 2, 1, 12);
         final int applicationId = 3;
         applicationMenu.setId(applicationId);
         final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById",
@@ -789,7 +789,7 @@ public class ApplicationServiceImplTest {
     @Test(expected = SObjectModificationException.class)
     public void deleteApplicationMenu_should_throw_SObjectObjectModificationException_recorder_throws_exception() throws Exception {
         //given
-        final SApplicationMenu applicationMenu = buildApplicationMenu("main", 1, 1);
+        final SApplicationMenu applicationMenu = buildApplicationMenu("main", 1, 1, 12);
         given(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SApplicationMenu>> any())).willReturn(applicationMenu);
         doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
 

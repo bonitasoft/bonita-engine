@@ -97,7 +97,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     private ApplicationMenuAPIDelegate getApplicationMenuAPIDelegate(final SearchOptions searchOptions) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
-        final ApplicationMenuConvertor convertor = new ApplicationMenuConvertor(applicationService);
+        final ApplicationMenuConvertor convertor = new ApplicationMenuConvertor();
         final SearchApplicationMenuDescriptor searchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationMenuDescriptor();
         final SearchApplicationMenus searchApplicationMenus = new SearchApplicationMenus(applicationService, convertor, searchDescriptor, searchOptions);
         final ApplicationMenuAPIDelegate delegate = new ApplicationMenuAPIDelegate(tenantAccessor, convertor, searchApplicationMenus);

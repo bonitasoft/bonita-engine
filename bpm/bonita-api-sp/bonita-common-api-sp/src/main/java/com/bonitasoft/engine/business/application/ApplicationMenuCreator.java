@@ -36,7 +36,15 @@ public class ApplicationMenuCreator implements Serializable {
         DISPLAY_NAME,
 
         /**
-         * References the the identifier of {@link ApplicationPage} related to the {@link ApplicationMenu}
+         * References the identifier of {@link Application} related to the {@link ApplicationMenu}
+         *
+         * @see ApplicationMenu
+         * @see Application
+         */
+        APPLICATION_ID,
+
+        /**
+         * References the identifier of {@link ApplicationPage} related to the {@link ApplicationMenu}
          *
          * @see ApplicationMenu
          * @see ApplicationPage
@@ -64,15 +72,28 @@ public class ApplicationMenuCreator implements Serializable {
     /**
      * Creates an instance of {@code ApplicationMenuCreator}
      *
+     * @param applicationId the identifier of related {@link Application}
      * @param displayName the {@link ApplicationMenu} display name
      * @param applicationPageId the identifier of related {@link ApplicationPage}
      * @param index the index indicating the menu position
      * @see ApplicationMenu
      */
-    public ApplicationMenuCreator(final String displayName, final long applicationPageId, final int index) {
-        fields = new HashMap<ApplicationMenuField, Serializable>(2);
-        fields.put(ApplicationMenuField.DISPLAY_NAME, displayName);
+    public ApplicationMenuCreator(long applicationId, final String displayName, final long applicationPageId, final int index) {
+        this(applicationId, displayName, index);
         fields.put(ApplicationMenuField.APPLICATION_PAGE_ID, applicationPageId);
+    }
+/**
+     * Creates an instance of {@code ApplicationMenuCreator}
+     *
+     * @param applicationId the identifier of related {@link com.bonitasoft.engine.business.application.Application}
+     * @param displayName the {@link com.bonitasoft.engine.business.application.ApplicationMenu} display name
+     * @param index the index indicating the menu position
+     * @see ApplicationMenu
+     */
+    public ApplicationMenuCreator(long applicationId, final String displayName, final int index) {
+        fields = new HashMap<ApplicationMenuField, Serializable>(4);
+        fields.put(ApplicationMenuField.DISPLAY_NAME, displayName);
+        fields.put(ApplicationMenuField.APPLICATION_ID, applicationId);
         fields.put(ApplicationMenuField.INDEX, index);
     }
 

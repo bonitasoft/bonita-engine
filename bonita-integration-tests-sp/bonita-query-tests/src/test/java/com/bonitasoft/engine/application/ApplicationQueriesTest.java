@@ -174,7 +174,7 @@ public class ApplicationQueriesTest {
         final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
         final SApplicationPage appPage = repository.add(anApplicationPage().withToken("FirstPage").withApplicationId(application.getId())
                 .withPageId(page.getId()).build());
-        final SApplicationMenu menu = repository.add(anApplicationMenu().withApplicationPageId(appPage.getId()).withDisplayName("menu app1").withIndex(1)
+        final SApplicationMenu menu = repository.add(anApplicationMenu().withApplicationId(application.getId()).withApplicationPageId(appPage.getId()).withDisplayName("menu app1").withIndex(1)
                 .build());
 
         //when

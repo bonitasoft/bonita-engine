@@ -27,12 +27,13 @@ public class ApplicationMenuBuilder extends PersistentObjectBuilder<SApplication
     }
 
     private String displayName;
-    private long applicationPageId;
+    private long applicationId;
+    private Long applicationPageId;
     private int index;
 
     @Override
     SApplicationMenuImpl _build() {
-        return new SApplicationMenuImpl(displayName, applicationPageId, index);
+        return new SApplicationMenuImpl(displayName, applicationId, applicationPageId, index);
     }
 
     public ApplicationMenuBuilder withDisplayName(final String displayName) {
@@ -40,7 +41,12 @@ public class ApplicationMenuBuilder extends PersistentObjectBuilder<SApplication
         return this;
     }
 
-    public ApplicationMenuBuilder withApplicationPageId(final long applicationPageId) {
+    public ApplicationMenuBuilder withApplicationId(final Long applicationPageId) {
+        this.applicationPageId = applicationPageId;
+        return this;
+    }
+
+    public ApplicationMenuBuilder withApplicationPageId(final Long applicationPageId) {
         this.applicationPageId = applicationPageId;
         return this;
     }

@@ -26,13 +26,14 @@ public class ApplicationMenuImpl extends BaseElementImpl implements ApplicationM
 
     private static final long serialVersionUID = 5080525289831930498L;
     private final String displayName;
-    private final long applicationPageId;
+    private final Long applicationPageId;
     private long applicationId;
     private Long parentId;
     private final int index;
 
-    public ApplicationMenuImpl(final String displayName, final long applicationPageId, final int index) {
+    public ApplicationMenuImpl(final String displayName, long applicationId, final Long applicationPageId, final int index) {
         this.displayName = displayName;
+        this.applicationId = applicationId;
         this.applicationPageId = applicationPageId;
         this.index = index;
     }
@@ -43,7 +44,7 @@ public class ApplicationMenuImpl extends BaseElementImpl implements ApplicationM
     }
 
     @Override
-    public long getApplicationPageId() {
+    public Long getApplicationPageId() {
         return applicationPageId;
     }
 
@@ -64,10 +65,6 @@ public class ApplicationMenuImpl extends BaseElementImpl implements ApplicationM
     @Override
     public long getApplicationId() {
         return applicationId;
-    }
-
-    public void setApplicationId(final long applicationId) {
-        this.applicationId = applicationId;
     }
 
     @Override
