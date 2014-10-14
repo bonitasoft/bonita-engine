@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.bpm.document;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 /**
  * Class that holds a content + mime type and a name OR the url if it's an external document.
@@ -34,17 +33,23 @@ public class DocumentValue implements Serializable {
 
     private String url;
 
-    private final boolean hasContent;
+    private boolean hasContent;
+
+    private Long documentId;
+
+    private boolean hasChanged;
+
+    private int index = -1;
 
     /**
-     * Represent the value of a document, content, mime type and file name is given
+     * Represent the value of a document. Content, mime type and file name are given
      * 
      * @param content
-     *            content of the document
+     *        content of the document
      * @param mimeType
-     *            mime type of the document
+     *        mime type of the document
      * @param fileName
-     *            file name of the document
+     *        file name of the document
      */
     public DocumentValue(final byte[] content, final String mimeType, final String fileName) {
         super();
@@ -52,18 +57,73 @@ public class DocumentValue implements Serializable {
         this.mimeType = mimeType;
         this.fileName = fileName;
         hasContent = true;
+        hasChanged = false;
+        documentId = null;
     }
 
     /**
      * Represent the value of an external document, only the url is given
-     * 
+     *
      * @param url
-     *            url of the document
+     *        url of the document
      */
     public DocumentValue(final String url) {
         super();
         this.url = url;
         hasContent = false;
+        hasChanged = false;
+        documentId = null;
+    }
+
+    /**
+     * Represent an existing document that did not changed.
+     * It is used only in operations to update document list.
+     *
+     * @param documentId
+     *        the id of the existing document (mapping)
+     */
+    public DocumentValue(final long documentId) {
+        super();
+        hasChanged = false;
+        this.documentId = documentId;
+    }
+
+    /**
+     * Represent an existing document that changed with the content and metadata in parameters.
+     * It is used only in operations to update document list.
+     * 
+     * @param documentId
+     *        the id of the existing document (mapping)
+     * @param content
+     *        content of the document
+     * @param mimeType
+     *        mime type of the document
+     * @param fileName
+     *        file name of the document
+     */
+    public DocumentValue(final long documentId, final byte[] content, final String mimeType, final String fileName) {
+        super();
+        this.content = content;
+        this.mimeType = mimeType;
+        this.fileName = fileName;
+        hasContent = true;
+        hasChanged = true;
+        this.documentId = documentId;
+    }
+
+    /**
+     * Represent an existing document that changed to an external document.
+     * It is used only in operations to update document list.
+     *
+     * @param documentId
+     *        the id of the existing document (mapping)
+     */
+    public DocumentValue(final long documentId, final String url) {
+        super();
+        this.url = url;
+        hasContent = false;
+        hasChanged = true;
+        this.documentId = documentId;
     }
 
     public byte[] getContent() {
@@ -82,68 +142,72 @@ public class DocumentValue implements Serializable {
         return url;
     }
 
+    /**
+     * @return true if the document to create is stored internally or externally with an URL
+     */
     public boolean hasContent() {
         return hasContent;
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.hashCode(content);
-        result = prime * result + (fileName == null ? 0 : fileName.hashCode());
-        result = prime * result + (hasContent ? 1231 : 1237);
-        result = prime * result + (mimeType == null ? 0 : mimeType.hashCode());
-        result = prime * result + (url == null ? 0 : url.hashCode());
-        return result;
+    public void setContent(byte[] content) {
+        this.content = content;
     }
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final DocumentValue other = (DocumentValue) obj;
-        if (!Arrays.equals(content, other.content)) {
-            return false;
-        }
-        if (fileName == null) {
-            if (other.fileName != null) {
-                return false;
-            }
-        } else if (!fileName.equals(other.fileName)) {
-            return false;
-        }
-        if (hasContent != other.hasContent) {
-            return false;
-        }
-        if (mimeType == null) {
-            if (other.mimeType != null) {
-                return false;
-            }
-        } else if (!mimeType.equals(other.mimeType)) {
-            return false;
-        }
-        if (url == null) {
-            if (other.url != null) {
-                return false;
-            }
-        } else if (!url.equals(other.url)) {
-            return false;
-        }
-        return true;
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 
-    @Override
-    public String toString() {
-        return "DocumentValue [content=" + Arrays.toString(content) + ", mimeType=" + mimeType + ", fileName=" + fileName + ", url=" + url + ", hasContent="
-                + hasContent + "]";
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setHasContent(boolean hasContent) {
+        this.hasContent = hasContent;
+    }
+
+    /**
+     * Indicate which document will be updated <br/>
+     * Used only when updating list of document
+     *
+     * @return the id of the document to update
+     */
+    public Long getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(Long documentId) {
+        this.documentId = documentId;
+    }
+
+    /**
+     * If the document value updates an existing document, this getter tels us if the content is modified and should be updated
+     *
+     * @return true if the content of the original document has changed
+     */
+    public boolean hasChanged() {
+        return hasChanged;
+    }
+
+    public void setHasChanged(boolean hasChanged) {
+        this.hasChanged = hasChanged;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    /**
+     * Index of were to put the document inside the list. Only used when using API method attach document.
+     * 
+     * @param index
+     *        index in the list
+     */
+    public DocumentValue setIndex(int index) {
+        this.index = index;
+        return this;
+    }
 }

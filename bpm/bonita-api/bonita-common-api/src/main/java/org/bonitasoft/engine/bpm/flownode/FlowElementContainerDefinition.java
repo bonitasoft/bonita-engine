@@ -21,6 +21,7 @@ import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
+import org.bonitasoft.engine.bpm.document.DocumentListDefinition;
 
 /**
  * @author Matthieu Chaffotte
@@ -77,4 +78,5 @@ public interface FlowElementContainerDefinition extends BaseElement {
 
     BusinessDataDefinition getBusinessDataDefinition(String name);
 
+    List<DocumentListDefinition> getDocumentListDefinitions();
 }

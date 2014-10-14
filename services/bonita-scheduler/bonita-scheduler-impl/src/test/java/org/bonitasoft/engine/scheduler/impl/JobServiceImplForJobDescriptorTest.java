@@ -35,7 +35,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -205,7 +205,7 @@ public class JobServiceImplForJobDescriptorTest {
     }
 
     @Test
-    public void getNumberOfJobDescriptors() throws SBonitaReadException, SBonitaSearchException {
+    public void getNumberOfJobDescriptors() throws SBonitaReadException, SBonitaReadException {
         final QueryOptions options = new QueryOptions(0, 10);
 
         when(readPersistenceService.getNumberOfEntities(SJobDescriptor.class, options, null)).thenReturn(1L);
@@ -214,7 +214,7 @@ public class JobServiceImplForJobDescriptorTest {
         verifyZeroInteractions(recorder);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfJobDescriptorsThrowException() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
 
@@ -223,7 +223,7 @@ public class JobServiceImplForJobDescriptorTest {
     }
 
     @Test
-    public void searchJobDescriptors() throws SBonitaSearchException, SBonitaReadException {
+    public void searchJobDescriptors() throws SBonitaReadException {
         final QueryOptions options = new QueryOptions(0, 10);
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
         when(readPersistenceService.searchEntity(SJobDescriptor.class, options, null)).thenReturn(Collections.singletonList(sJobDescriptor));
@@ -231,8 +231,8 @@ public class JobServiceImplForJobDescriptorTest {
         assertEquals(sJobDescriptor, jobServiceImpl.searchJobDescriptors(options).get(0));
     }
 
-    @Test(expected = SBonitaSearchException.class)
-    public void searchJobDescriptorsThrowException() throws SBonitaSearchException, SBonitaReadException {
+    @Test(expected = SBonitaReadException.class)
+    public void searchJobDescriptorsThrowException() throws SBonitaReadException {
         final QueryOptions options = new QueryOptions(0, 10);
         doThrow(new SBonitaReadException("")).when(readPersistenceService).searchEntity(SJobDescriptor.class, options, null);
 

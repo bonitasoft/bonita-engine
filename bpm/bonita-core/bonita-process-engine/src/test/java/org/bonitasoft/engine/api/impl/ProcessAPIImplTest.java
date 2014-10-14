@@ -345,7 +345,7 @@ public class ProcessAPIImplTest {
         when(sDataInstance.getClassName()).thenReturn(Integer.class.getName());
         final List<SDataInstance> sDataInstances = Lists.newArrayList(sDataInstance);
         when(transientDataService.getDataInstances(activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), startIndex, nbResults))
-                .thenReturn(sDataInstances);
+        .thenReturn(sDataInstances);
         final IntegerDataInstanceImpl dataInstance = mock(IntegerDataInstanceImpl.class);
         doReturn(Lists.newArrayList(dataInstance)).when(processAPI).convertModelToDataInstances(sDataInstances);
 
@@ -475,6 +475,9 @@ public class ProcessAPIImplTest {
 
     }
 
+
+
+
     @Test
     public void updateActivityInstanceVariables_should_load_processDef_classes() throws Exception {
         final String dataInstanceName = "acase";
@@ -509,5 +512,66 @@ public class ProcessAPIImplTest {
 
         verify(classLoaderService).getLocalClassLoader(anyString(), anyLong());
     }
+
+    //    @Test
+    //    public void should_removeDocument_call_the_service() throws Exception {
+    //        //given
+    //        DocumentService documentService = mock(DocumentService.class);
+    //        when(tenantAccessor.getDocumentService()).thenReturn(documentService);
+    //
+    //
+    //        SDocumentImpl sProcessDocument = new SDocumentImpl();
+    //        sProcessDocument.setId(123l);
+    //
+    //        doReturn(sProcessDocument).when(documentService).getDocument(123l);
+    //
+    //        //when
+    //        Document removeDocument = processAPI.removeDocument(123l);
+    //
+    //        //then
+    //        assertThat(ModelConvertor.toDocument(sProcessDocument, processInstanceId, documentService)).isEqualTo(removeDocument);
+    //        verify(documentService, times(1)).removeDocument(sProcessDocument);
+    //
+    //    }
+    //
+    //
+    //    @Test
+    //    public void should_removeDocument_throw_DocumentNotFoundException() throws Exception {
+    //        //given
+    //        DocumentService documentService = mock(DocumentService.class);
+    //        when(tenantAccessor.getDocumentService()).thenReturn(documentService);
+    //        doThrow(SDocumentNotFoundException.class).when(documentService).getDocument(123l);
+    //
+    //        //when
+    //        try {
+    //            processAPI.removeDocument(123l);
+    //            fail("should not succeed if document does not exists");
+    //        } catch (DocumentNotFoundException e) {
+    //            //ok
+    //        }
+    //        //then
+    //        verify(documentService, times(0)).removeDocument(any(SDocument.class));
+    //    }
+    //
+    //
+    //    @Test
+    //    public void should_removeDocument_throw_DeletionException() throws Exception {
+    //        //given
+    //        DocumentService documentService = mock(DocumentService.class);
+    //        when(tenantAccessor.getDocumentService()).thenReturn(documentService);
+    //        SDocumentImpl sProcessDocument = new SDocumentImpl();
+    //        sProcessDocument.setId(123l);
+    //        doReturn(sProcessDocument).when(documentService).getDocument(123l);
+    //        doThrow(SProcessDocumentDeletionException.class).when(documentService).removeDocument(sProcessDocument);
+    //
+    //        //when
+    //        try {
+    //            processAPI.removeDocument(123l);
+    //            fail("should not succeed if document does not exists");
+    //        } catch (DeletionException e) {
+    //            //ok
+    //        }
+    //        //then: exception
+    //    }
 
 }

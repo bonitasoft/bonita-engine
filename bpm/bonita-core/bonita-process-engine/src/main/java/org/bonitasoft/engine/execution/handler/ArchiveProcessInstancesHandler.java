@@ -20,10 +20,10 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
-import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
@@ -66,12 +66,12 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
             final ProcessInstanceService processInstanceService = tenantServiceAccessor.getProcessInstanceService();
             final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
             final DataInstanceService dataInstanceService = tenantServiceAccessor.getDataInstanceService();
-            final DocumentMappingService documentMappingService = tenantServiceAccessor.getDocumentMappingService();
+            final DocumentService documentService = tenantServiceAccessor.getDocumentService();
             final SCommentService commentService = tenantServiceAccessor.getCommentService();
             final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
             final ConnectorInstanceService connectorInstanceService = tenantServiceAccessor.getConnectorInstanceService();
 
-            ProcessArchiver.archiveProcessInstance(processInstance, archiveService, processInstanceService, dataInstanceService, documentMappingService,
+            ProcessArchiver.archiveProcessInstance(processInstance, archiveService, processInstanceService, dataInstanceService, documentService,
                     logger, commentService, processDefinitionService, connectorInstanceService);
         } catch (final SArchivingException e) {
             throw new SHandlerExecutionException(e);
@@ -81,8 +81,7 @@ public class ArchiveProcessInstancesHandler implements SProcessInstanceHandler<S
     }
 
     /**
-     * @param serviceAccessorFactory
-     * @return
+     * @return tenantServiceAccessor
      * @throws SHandlerExecutionException
      */
     private TenantServiceAccessor getTenantServiceAccessor() throws SHandlerExecutionException {

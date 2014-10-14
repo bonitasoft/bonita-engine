@@ -65,4 +65,21 @@ public interface Document extends NamedElement, BaseElement {
      */
     String getContentStorageId();
 
+    /**
+     *
+     * @return the description of the document
+     * @since 6.4.0
+     */
+    String getDescription();
+
+    /**
+     *
+     * The version of the document is starting from 1 and is incremented each time a new version is attached
+     *
+     * @return the version of the document
+     * @since 6.4.0
+     */
+    String getVersion();
+
+    int getIndex();
 }

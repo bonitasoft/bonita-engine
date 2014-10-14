@@ -17,10 +17,10 @@ import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
@@ -36,7 +36,7 @@ import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.TransactionContainedProcessInstanceInterruptor;
 import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -55,7 +55,7 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
 
     private final DataInstanceService dataInstanceService;
 
-    private final DocumentMappingService documentMappingService;
+    private final DocumentService documentService;
 
     private final TechnicalLoggerService logger;
 
@@ -66,7 +66,7 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
     public EndingCallActivityExceptionStateImpl(final ActivityInstanceService activityInstanceService,
             final ProcessInstanceService processInstanceService, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
             final SCommentService commentService, final DataInstanceService dataInstanceService,
-            final DocumentMappingService documentMappingService, final TechnicalLoggerService logger, final ProcessDefinitionService processDefinitionService,
+            final DocumentService documentService, final TechnicalLoggerService logger, final ProcessDefinitionService processDefinitionService,
             final ConnectorInstanceService connectorInstanceService) {
         super();
         this.activityInstanceService = activityInstanceService;
@@ -75,7 +75,7 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
         this.archiveService = archiveService;
         this.commentService = commentService;
         this.dataInstanceService = dataInstanceService;
-        this.documentMappingService = documentMappingService;
+        this.documentService = documentService;
         this.logger = logger;
         this.processDefinitionService = processDefinitionService;
         this.connectorInstanceService = connectorInstanceService;
@@ -112,9 +112,9 @@ public abstract class EndingCallActivityExceptionStateImpl implements FlowNodeSt
     }
 
     protected void archiveChildProcessInstance(final SFlowNodeInstance instance) throws SProcessInstanceNotFoundException, SArchivingException,
-            SBonitaSearchException {
+            SBonitaReadException {
         final SProcessInstance childProcInst = processInstanceService.getChildOfActivity(instance.getId());
-        ProcessArchiver.archiveProcessInstance(childProcInst, archiveService, processInstanceService, dataInstanceService, documentMappingService, logger,
+        ProcessArchiver.archiveProcessInstance(childProcInst, archiveService, processInstanceService, dataInstanceService, documentService, logger,
                 commentService, processDefinitionService, connectorInstanceService);
     }
 

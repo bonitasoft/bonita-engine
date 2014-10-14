@@ -46,7 +46,7 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -399,7 +399,7 @@ public class ProcessDefinitionServiceImplTest {
         assertNotNull(result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchProcessDeploymentInfosStartedByThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -431,7 +431,7 @@ public class ProcessDefinitionServiceImplTest {
         assertEquals(1L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfProcessDeploymentInfosStartedByThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -461,7 +461,7 @@ public class ProcessDefinitionServiceImplTest {
         assertNotNull(result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchProcessDeploymentInfosThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -489,7 +489,7 @@ public class ProcessDefinitionServiceImplTest {
         assertEquals(1L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfProcessDeploymentInfosByOptionsThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -519,7 +519,7 @@ public class ProcessDefinitionServiceImplTest {
         assertNotNull(result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchProcessDeploymentInfosCanBeStartedByThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -551,7 +551,7 @@ public class ProcessDefinitionServiceImplTest {
         assertEquals(1L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfProcessDeploymentInfosCanBeStartedByThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -584,7 +584,7 @@ public class ProcessDefinitionServiceImplTest {
         assertNotNull(result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchProcessDeploymentInfosCanBeStartedByUsersManagedByThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -616,7 +616,7 @@ public class ProcessDefinitionServiceImplTest {
         assertEquals(1L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfProcessDeploymentInfosCanBeStartedByUsersManagedByThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -649,7 +649,7 @@ public class ProcessDefinitionServiceImplTest {
         assertNotNull(result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchProcessDeploymentInfosWithParametersThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -683,7 +683,7 @@ public class ProcessDefinitionServiceImplTest {
         assertEquals(1L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfProcessDeploymentInfosWithParametersThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -715,7 +715,7 @@ public class ProcessDefinitionServiceImplTest {
         assertNotNull(result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchUncategorizedProcessDeploymentInfosThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -743,7 +743,7 @@ public class ProcessDefinitionServiceImplTest {
         assertEquals(1L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfUncategorizedProcessDeploymentInfosThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -774,7 +774,7 @@ public class ProcessDefinitionServiceImplTest {
         assertNotNull(result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchUncategorizedProcessDeploymentInfosSupervisedByThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -806,7 +806,7 @@ public class ProcessDefinitionServiceImplTest {
         assertEquals(1L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfUncategorizedProcessDeploymentInfosSupervisedByThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -838,7 +838,7 @@ public class ProcessDefinitionServiceImplTest {
         assertNotNull(result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchUncategorizedProcessDeploymentInfosCanBeStartedByThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -870,7 +870,7 @@ public class ProcessDefinitionServiceImplTest {
         assertEquals(1L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfUncategorizedProcessDeploymentInfosCanBeStartedByThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -955,7 +955,7 @@ public class ProcessDefinitionServiceImplTest {
         assertEquals(sProcessDefinitionDeployInfos, processDeploymentInfos);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchProcessDeploymentInfosOfCategoryThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -1194,7 +1194,7 @@ public class ProcessDefinitionServiceImplTest {
         assertNotNull(result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchUsersWhoCanStartProcessDeploymentInfoThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -1226,7 +1226,7 @@ public class ProcessDefinitionServiceImplTest {
         assertEquals(1L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfUsersWhoCanStartProcessDeploymentInfoThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -1260,7 +1260,7 @@ public class ProcessDefinitionServiceImplTest {
         assertNotNull(result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -1292,7 +1292,7 @@ public class ProcessDefinitionServiceImplTest {
         assertEquals(1L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksForThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -1326,7 +1326,7 @@ public class ProcessDefinitionServiceImplTest {
         assertNotNull(result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedByThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -1358,7 +1358,7 @@ public class ProcessDefinitionServiceImplTest {
         assertEquals(1L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedByThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -1389,7 +1389,7 @@ public class ProcessDefinitionServiceImplTest {
         assertNotNull(result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchProcessDeploymentInfosWithAssignedOrPendingHumanTasksThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -1418,7 +1418,7 @@ public class ProcessDefinitionServiceImplTest {
         assertEquals(1L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasksThrowException() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);

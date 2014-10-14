@@ -29,7 +29,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
 
 /**
@@ -118,11 +118,11 @@ public abstract class AbstractProcessInstanceInterruptor {
 
     protected abstract List<SFlowNodeInstance> getChildren(final long processInstanceId) throws SBonitaException;
 
-    protected abstract long getNumberOfChildren(final long processInstanceId) throws SBonitaSearchException;
+    protected abstract long getNumberOfChildren(final long processInstanceId) throws SBonitaReadException;
 
     protected abstract List<SFlowNodeInstance> getChildrenExcept(final long processInstanceId, final long exceptionChildId) throws SBonitaException;
 
-    protected abstract long getNumberOfChildrenExcept(final long processInstanceId, final long exceptionChildId) throws SBonitaSearchException;
+    protected abstract long getNumberOfChildrenExcept(final long processInstanceId, final long exceptionChildId) throws SBonitaReadException;
 
     private List<Long> interruptFlowNodeInstances(final List<SFlowNodeInstance> children, final SStateCategory stateCategory) throws SBonitaException {
         final List<Long> childrenToResume = new ArrayList<Long>();

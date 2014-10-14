@@ -18,7 +18,7 @@ import java.util.List;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileCreationException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileDeletionException;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
@@ -358,10 +358,10 @@ public interface ProfileService {
      * @param countOptions
      *            The criterion used to search profileMembers
      * @return the total number of profile members
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @since 6.0
      */
-    long getNumberOfProfileMembers(String querySuffix, final QueryOptions countOptions) throws SBonitaSearchException;
+    long getNumberOfProfileMembers(String querySuffix, final QueryOptions countOptions) throws SBonitaReadException;
 
     /**
      * Get all sProfileMember by profileId and queryOptions
@@ -371,20 +371,20 @@ public interface ProfileService {
      * @param countOptions
      *            The criterion used to search profileMembers
      * @return all sProfileMember by profileId and queryOptions
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @since 6.0
      */
-    List<SProfileMember> searchProfileMembers(String querySuffix, final QueryOptions searchOptions) throws SBonitaSearchException;
+    List<SProfileMember> searchProfileMembers(String querySuffix, final QueryOptions searchOptions) throws SBonitaReadException;
 
     /**
      * Get the total number of sProfileMember by a list contains profileIds
      * 
      * @param profileIds
      * @return A list of <profileId, NumberOfMemberForThatProfile>
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @since 6.0
      */
-    List<SProfileMember> getProfileMembers(List<Long> profileIds) throws SBonitaSearchException;
+    List<SProfileMember> getProfileMembers(List<Long> profileIds) throws SBonitaReadException;
 
     /**
      * Get profile by given name
@@ -433,27 +433,27 @@ public interface ProfileService {
      * @param queryOptions
      * @return
      */
-    long getNumberOfProfiles(QueryOptions queryOptions) throws SBonitaSearchException;
+    long getNumberOfProfiles(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * @param queryOptions
      * @return
      */
-    List<SProfile> searchProfiles(QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SProfile> searchProfiles(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * @param queryOptions
      * @return
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfProfileEntries(QueryOptions queryOptions) throws SBonitaSearchException;
+    long getNumberOfProfileEntries(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * @param queryOptions
      * @return
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<SProfileEntry> searchProfileEntries(QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SProfileEntry> searchProfileEntries(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * @param profile

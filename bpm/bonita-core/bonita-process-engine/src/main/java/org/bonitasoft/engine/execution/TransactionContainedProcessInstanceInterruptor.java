@@ -29,7 +29,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstan
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -84,13 +84,13 @@ public class TransactionContainedProcessInstanceInterruptor extends AbstractProc
     }
 
     @Override
-    protected long getNumberOfChildren(final long processInstanceId) throws SBonitaSearchException {
+    protected long getNumberOfChildren(final long processInstanceId) throws SBonitaReadException {
         final QueryOptions countOptions = new QueryOptions(0, 1, null, getFilterOptions(processInstanceId), null);
         return flowNodeInstanceService.getNumberOfFlowNodeInstances(SFlowNodeInstance.class, countOptions);
     }
 
     @Override
-    protected long getNumberOfChildrenExcept(final long processInstanceId, final long childExceptionId) throws SBonitaSearchException {
+    protected long getNumberOfChildrenExcept(final long processInstanceId, final long childExceptionId) throws SBonitaReadException {
         final QueryOptions countOptions = new QueryOptions(0, 1, null, getFilterOptions(processInstanceId, childExceptionId), null);
         return flowNodeInstanceService.getNumberOfFlowNodeInstances(SFlowNodeInstance.class, countOptions);
     }

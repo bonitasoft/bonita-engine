@@ -27,7 +27,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
@@ -89,7 +89,7 @@ public class ProcessInstanceServiceImplTest {
                 mock(ActivityInstanceService.class), mock(TechnicalLoggerService.class),
                 eventService, mock(DataInstanceService.class),
                 archiveService, mock(TransitionService.class), mock(ProcessDefinitionService.class), mock(ConnectorInstanceService.class),
-                classLoaderService, mock(ProcessDocumentService.class), mock(SCommentService.class), mock(TokenService.class)));
+                classLoaderService, mock(DocumentService.class), mock(SCommentService.class), mock(TokenService.class)));
 
         doCallRealMethod().when(mockedProcessInstanceService).deleteParentProcessInstanceAndElements(anyList());
         doCallRealMethod().when(mockedProcessInstanceService).deleteParentProcessInstanceAndElements(any(SProcessInstance.class));

@@ -28,8 +28,8 @@ import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
  */
 public class CustomUserInfoValueImporter {
     
-    private SCustomUserInfoValueAPI userInfoAPI;
-    private Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions;
+    private final SCustomUserInfoValueAPI userInfoAPI;
+    private final Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions;
     
     public CustomUserInfoValueImporter(SCustomUserInfoValueAPI userInfoAPI, Map<String, SCustomUserInfoDefinition> customUserInfoDefinitions) {
         this.userInfoAPI = userInfoAPI;

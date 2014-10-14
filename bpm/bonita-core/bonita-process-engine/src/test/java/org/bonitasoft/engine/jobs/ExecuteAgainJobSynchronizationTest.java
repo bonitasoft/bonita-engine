@@ -13,7 +13,8 @@ import java.util.List;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
@@ -58,7 +59,7 @@ public class ExecuteAgainJobSynchronizationTest {
 
     @Test
     public void beforeCommitShouldLogWhenAnExceptionOccurs() throws Exception {
-        final SBonitaSearchException exception = new SBonitaSearchException("ouch! ");
+        final SBonitaReadException exception = new SBonitaReadException("ouch! ");
         when(jobService.searchJobDescriptors(any(QueryOptions.class))).thenThrow(exception);
         when(loggerService.isLoggable(ExecuteAgainJobSynchronization.class, TechnicalLogSeverity.WARNING)).thenReturn(true);
 

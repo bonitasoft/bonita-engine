@@ -34,7 +34,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -233,22 +233,22 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public long getNumberOfThemes(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public long getNumberOfThemes(final QueryOptions queryOptions) throws SBonitaReadException {
         try {
             final Map<String, Object> parameters = Collections.emptyMap();
             return persistenceService.getNumberOfEntities(STheme.class, queryOptions, parameters);
         } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
+            throw new SBonitaReadException(e);
         }
     }
 
     @Override
-    public List<STheme> searchThemes(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<STheme> searchThemes(final QueryOptions queryOptions) throws SBonitaReadException {
         try {
             final Map<String, Object> parameters = Collections.emptyMap();
             return persistenceService.searchEntity(STheme.class, queryOptions, parameters);
         } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
+            throw new SBonitaReadException(e);
         }
     }
 

@@ -39,7 +39,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -128,7 +128,7 @@ public class ProfileServiceImplForProfileTest {
         assertEquals(1L, profileServiceImpl.getNumberOfProfiles(options));
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfProfilesWithOptionsThrowException() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistenceService.getNumberOfEntities(SProfile.class, options, Collections.<String, Object> emptyMap())).thenThrow(new SBonitaReadException(""));
@@ -147,7 +147,7 @@ public class ProfileServiceImplForProfileTest {
         assertNotNull(profileServiceImpl.searchProfiles(options));
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchProfilesWithOptionsThrowException() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistenceService.searchEntity(SProfile.class, options, Collections.<String, Object> emptyMap())).thenThrow(new SBonitaReadException(""));

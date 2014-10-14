@@ -36,7 +36,7 @@ import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -296,10 +296,10 @@ public class JobServiceImplForJobParameterTest {
      * Test method for {@link org.bonitasoft.engine.scheduler.impl.JobServiceImpl#searchJobParameters(org.bonitasoft.engine.persistence.QueryOptions)}.
      * 
      * @throws SBonitaReadException
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
     @Test
-    public void searchJobParameters() throws SBonitaSearchException, SBonitaReadException {
+    public void searchJobParameters() throws SBonitaReadException {
         final QueryOptions options = new QueryOptions(0, 10);
         final SJobParameter sJobParameter = mock(SJobParameter.class);
         when(readPersistenceService.searchEntity(SJobParameter.class, options, null)).thenReturn(Collections.singletonList(sJobParameter));
@@ -307,8 +307,8 @@ public class JobServiceImplForJobParameterTest {
         assertEquals(sJobParameter, jobServiceImpl.searchJobParameters(options).get(0));
     }
 
-    @Test(expected = SBonitaSearchException.class)
-    public void searchJobParametersThrowException() throws SBonitaSearchException, SBonitaReadException {
+    @Test(expected = SBonitaReadException.class)
+    public void searchJobParametersThrowException() throws SBonitaReadException {
         final QueryOptions options = new QueryOptions(0, 10);
         doThrow(new SBonitaReadException("")).when(readPersistenceService).searchEntity(SJobParameter.class, options, null);
 
@@ -320,11 +320,11 @@ public class JobServiceImplForJobParameterTest {
      * 
      * @throws SJobParameterCreationException
      * @throws SBonitaReadException
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @throws SRecorderException
      */
     @Test
-    public final void setJobParameters() throws SJobParameterCreationException, SBonitaSearchException, SBonitaReadException, SRecorderException {
+    public final void setJobParameters() throws SJobParameterCreationException, SBonitaReadException, SRecorderException {
         final long tenantId = 12;
         final long jobDescriptorId = 8;
         final SJobParameter sJobParameter = mock(SJobParameter.class);
@@ -343,7 +343,7 @@ public class JobServiceImplForJobParameterTest {
     }
 
     @Test
-    public void setJobParametersWithEmptyList() throws SJobParameterCreationException, SBonitaSearchException, SBonitaReadException {
+    public void setJobParametersWithEmptyList() throws SJobParameterCreationException, SBonitaReadException {
         final long tenantId = 12;
         final long jobDescriptorId = 8;
 
@@ -355,7 +355,7 @@ public class JobServiceImplForJobParameterTest {
     }
 
     @Test
-    public void setJobParametersWithNullList() throws SJobParameterCreationException, SBonitaSearchException, SBonitaReadException {
+    public void setJobParametersWithNullList() throws SJobParameterCreationException, SBonitaReadException {
         final long tenantId = 12;
         final long jobDescriptorId = 8;
 
@@ -368,7 +368,7 @@ public class JobServiceImplForJobParameterTest {
     }
 
     @Test(expected = SJobParameterCreationException.class)
-    public void setJobParametersFailedOnSearch() throws SBonitaSearchException, SBonitaReadException, SJobParameterCreationException {
+    public void setJobParametersFailedOnSearch() throws SBonitaReadException, SJobParameterCreationException {
         final long tenantId = 12;
         final long jobDescriptorId = 8;
         // Build job parameter
@@ -396,7 +396,7 @@ public class JobServiceImplForJobParameterTest {
     }
 
     @Test(expected = SJobParameterCreationException.class)
-    public final void setJobParametersFailedOnCreation() throws SJobParameterCreationException, SRecorderException, SBonitaSearchException,
+    public final void setJobParametersFailedOnCreation() throws SJobParameterCreationException, SRecorderException,
             SBonitaReadException {
         final long tenantId = 12;
         final long jobDescriptorId = 8;
