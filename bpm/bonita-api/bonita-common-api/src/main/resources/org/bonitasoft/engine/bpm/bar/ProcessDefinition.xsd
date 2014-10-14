@@ -406,6 +406,14 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
+                 <xs:attribute name="type" use="required">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="CUSTOM" />
+                            <xs:enumeration value="MANDATORY" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

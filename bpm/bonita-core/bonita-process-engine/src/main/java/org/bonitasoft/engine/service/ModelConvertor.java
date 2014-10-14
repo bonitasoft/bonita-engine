@@ -48,6 +48,7 @@ import org.bonitasoft.engine.bpm.connector.impl.ConnectorDefinitionImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceImpl;
 import org.bonitasoft.engine.bpm.connector.impl.ConnectorInstanceWithFailureInfoImpl;
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
+import org.bonitasoft.engine.bpm.contract.ConstraintType;
 import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
@@ -164,10 +165,10 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
 import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
@@ -1988,19 +1989,19 @@ public class ModelConvertor {
         return new ThemeImpl(sTheme.getContent(), sTheme.getCssContent(), sTheme.isDefault(), type, lastUpdateDate);
     }
 
-    public static CustomUserInfoDefinitionImpl convert(SCustomUserInfoDefinition sDefinition) {
-        CustomUserInfoDefinitionImpl definition = new CustomUserInfoDefinitionImpl();
+    public static CustomUserInfoDefinitionImpl convert(final SCustomUserInfoDefinition sDefinition) {
+        final CustomUserInfoDefinitionImpl definition = new CustomUserInfoDefinitionImpl();
         definition.setId(sDefinition.getId());
         definition.setName(sDefinition.getName());
         definition.setDescription(sDefinition.getDescription());
         return definition;
     }
 
-    public static CustomUserInfoValueImpl convert(SCustomUserInfoValue sValue) {
+    public static CustomUserInfoValueImpl convert(final SCustomUserInfoValue sValue) {
         if (sValue == null) {
             return null;
         }
-        CustomUserInfoValueImpl value = new CustomUserInfoValueImpl();
+        final CustomUserInfoValueImpl value = new CustomUserInfoValueImpl();
         value.setDefinitionId(sValue.getDefinitionId());
         value.setUserId(sValue.getUserId());
         value.setValue(sValue.getValue());
@@ -2016,7 +2017,8 @@ public class ModelConvertor {
             contract.addComplexInput(toComplexInput(input));
         }
         for (final SConstraintDefinition sConstraintDefinition : sContract.getConstraints()) {
-            final ConstraintDefinitionImpl constraint = new ConstraintDefinitionImpl(sConstraintDefinition.getName(), sConstraintDefinition.getExpression(), sConstraintDefinition.getExplanation());
+            final ConstraintDefinitionImpl constraint = new ConstraintDefinitionImpl(sConstraintDefinition.getName(), sConstraintDefinition.getExpression(),
+                    sConstraintDefinition.getExplanation(), ConstraintType.valueOf(sConstraintDefinition.getConstraintType().toString()));
             for (final String inputName : sConstraintDefinition.getInputNames()) {
                 constraint.addInputName(inputName);
             }

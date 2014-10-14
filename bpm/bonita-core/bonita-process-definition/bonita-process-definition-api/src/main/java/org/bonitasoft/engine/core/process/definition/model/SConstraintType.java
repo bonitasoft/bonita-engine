@@ -13,19 +13,11 @@
  **/
 package org.bonitasoft.engine.core.process.definition.model;
 
-import java.util.List;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Laurent Leseigneur
  */
-public interface SConstraintDefinition extends SNamedElement {
-
-    String getExpression();
-
-    String getExplanation();
-
-    List<String> getInputNames();
-
-    SConstraintType getConstraintType();
+public enum SConstraintType {
+    CUSTOM, MANDATORY
 
 }

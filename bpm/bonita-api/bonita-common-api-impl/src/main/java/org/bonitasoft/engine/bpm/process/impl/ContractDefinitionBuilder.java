@@ -16,6 +16,7 @@ package org.bonitasoft.engine.bpm.process.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
+import org.bonitasoft.engine.bpm.contract.ConstraintType;
 import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ComplexInputDefinitionImpl;
@@ -64,7 +65,7 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
     }
 
     public ContractDefinitionBuilder addConstraint(final String name, final String expression, final String explanation, final String... inputNames) {
-        final ConstraintDefinitionImpl constraintDefinition = new ConstraintDefinitionImpl(name, expression, explanation);
+        final ConstraintDefinitionImpl constraintDefinition = new ConstraintDefinitionImpl(name, expression, explanation, ConstraintType.CUSTOM);
         for (final String inputName : inputNames) {
             constraintDefinition.addInputName(inputName);
         }
@@ -79,7 +80,7 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
         expression.append(".toString().isEmpty()");
 
         final ConstraintDefinitionImpl constraint = new ConstraintDefinitionImpl(inputName, expression.toString(), new StringBuilder().append("input ")
-                .append(inputName).append(" is mandatory").toString());
+                .append(inputName).append(" is mandatory").toString(), ConstraintType.MANDATORY);
         constraint.addInputName(inputName);
         contract.addConstraint(constraint);
         return this;

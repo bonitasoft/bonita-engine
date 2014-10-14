@@ -29,32 +29,32 @@
                         <inputDefinition description="request is approved" name="isValid" type="BOOLEAN" multiple="false" />
                         <inputDefinition description="comment" name="comment" type="TEXT" multiple="false" />
                         <complexInputDefinition description="expense line" name="expense" multiple="false">
-                            <inputDefinition description="expense type" name="type" type="TEXT" multiple="false"/>
-                            <inputDefinition description="expense comment" name="comment" type="TEXT" multiple="false"/>
+                            <inputDefinition description="expense type" name="type" type="TEXT" multiple="false" />
+                            <inputDefinition description="expense comment" name="comment" type="TEXT" multiple="false" />
                             <inputDefinition description="expense comment" name="comment" type="DATE" multiple="false" />
                             <complexInputDefinition description="expense line" name="expense" multiple="false">
                                 <inputDefinition description="complex in complex" name="comment" type="TEXT" multiple="false" />
                             </complexInputDefinition>
                             <inputDefinition description="expense comment" name="comment" type="DECIMAL" multiple="false" />
                         </complexInputDefinition>
-                        <inputDefinition description="comment" name="comment" type="TEXT" multiple="false"/>
+                        <inputDefinition description="comment" name="comment" type="TEXT" multiple="false" />
                     </inputDefinitions>
                     <constraintDefinitions>
-                        <constraintDefinition name="username_constraint">
+                        <constraintDefinition name="username_constraint" type="CUSTOM">
                             <conditionalExpression>userName != null</conditionalExpression>
                             <explanation>user name is mandatory</explanation>
                             <inputDefinitionNames>
                                 <inputDefinitionName>userName</inputDefinitionName>
                             </inputDefinitionNames>
                         </constraintDefinition>
-                        <constraintDefinition name="approval_constraint">
+                        <constraintDefinition name="approval_constraint" type="CUSTOM">
                             <conditionalExpression>isValid != null</conditionalExpression>
                             <explanation>approval is mandatory</explanation>
                             <inputDefinitionNames>
                                 <inputDefinitionName>isValid</inputDefinitionName>
                             </inputDefinitionNames>
                         </constraintDefinition>
-                        <constraintDefinition name="date_constraint">
+                        <constraintDefinition name="date_constraint" type="CUSTOM">
                             <conditionalExpression>endDate.after(startDate)</conditionalExpression>
                             <explanation>end date sould be after start date</explanation>
                             <inputDefinitionNames>
@@ -62,7 +62,7 @@
                                 <inputDefinitionName>endDate</inputDefinitionName>
                             </inputDefinitionNames>
                         </constraintDefinition>
-                        <constraintDefinition name="comment_constraint">
+                        <constraintDefinition name="comment_constraint" type="CUSTOM">
                             <conditionalExpression>isValid || (comment != null)</conditionalExpression>
                             <explanation>comment is mandatory</explanation>
                             <inputDefinitionNames>
@@ -70,14 +70,14 @@
                                 <inputDefinitionName>comment</inputDefinitionName>
                             </inputDefinitionNames>
                         </constraintDefinition>
-                        <constraintDefinition name="special char constraint">
+                        <constraintDefinition name="special char constraint" type="CUSTOM">
                             <conditionalExpression>comment.length 	> 5 </conditionalExpression>
                             <explanation>comment should have at min 5 char </explanation>
                             <inputDefinitionNames>
                                 <inputDefinitionName>comment</inputDefinitionName>
                             </inputDefinitionNames>
                         </constraintDefinition>
-                        <constraintDefinition name="special char constraint">
+                        <constraintDefinition name="special char constraint" type="CUSTOM">
                             <conditionalExpression><![CDATA[comment.equals"<comment>"]]></conditionalExpression>
                             <explanation>comment should have at min 5 char </explanation>
                             <inputDefinitionNames>

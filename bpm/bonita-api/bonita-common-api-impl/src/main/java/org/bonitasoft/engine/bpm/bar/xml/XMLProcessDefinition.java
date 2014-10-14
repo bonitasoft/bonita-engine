@@ -353,6 +353,8 @@ public class XMLProcessDefinition {
 
     public static final String TYPE = "type";
 
+    public static final String CONSTRAINT_TYPE = "type";
+
     public static final String MULTIPLE = "multiple";
 
     public static final String CONTRACT_CONSTRAINTS_NODE = "constraintDefinitions";
@@ -573,6 +575,7 @@ public class XMLProcessDefinition {
     private XMLNode createConstraintNode(final ConstraintDefinition constraintDefinition) {
         final XMLNode xmlNode = new XMLNode(CONTRACT_CONSTRAINT_NODE);
         xmlNode.addAttribute(NAME, constraintDefinition.getName());
+        xmlNode.addAttribute(CONSTRAINT_TYPE, constraintDefinition.getConstraintType().toString());
         xmlNode.addChild(CONSTRAINT_EXPRESSION, constraintDefinition.getExpression());
         xmlNode.addChild(CONSTRAINT_EXPLANATION, constraintDefinition.getExplanation());
         final XMLNode namesNode = new XMLNode(INPUT_NAMES);

@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SConstraintType;
 
 /**
  * @author Matthieu Chaffotte
@@ -32,15 +33,18 @@ public class SConstraintDefinitionImpl extends SNamedElementImpl implements SCon
 
     private final List<String> inputNames;
 
-    public SConstraintDefinitionImpl(final String name, final String expression, final String explanation) {
+    private final SConstraintType constraintType;
+
+    public SConstraintDefinitionImpl(final String name, final String expression, final String explanation, final SConstraintType constraintType) {
         super(name);
-        inputNames = new ArrayList<String>();
+        this.constraintType = constraintType;
         this.explanation = explanation;
         this.expression = expression;
+        inputNames = new ArrayList<String>();
     }
 
     public SConstraintDefinitionImpl(final ConstraintDefinition rule) {
-        this(rule.getName(), rule.getExpression(), rule.getExplanation());
+        this(rule.getName(), rule.getExpression(), rule.getExplanation(), SConstraintType.CUSTOM);
         for (final String inputName : rule.getInputNames()) {
             inputNames.add(inputName);
         }
@@ -66,49 +70,8 @@ public class SConstraintDefinitionImpl extends SNamedElementImpl implements SCon
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (explanation == null ? 0 : explanation.hashCode());
-        result = prime * result + (expression == null ? 0 : expression.hashCode());
-        result = prime * result + (inputNames == null ? 0 : inputNames.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SConstraintDefinitionImpl other = (SConstraintDefinitionImpl) obj;
-        if (explanation == null) {
-            if (other.explanation != null) {
-                return false;
-            }
-        } else if (!explanation.equals(other.explanation)) {
-            return false;
-        }
-        if (expression == null) {
-            if (other.expression != null) {
-                return false;
-            }
-        } else if (!expression.equals(other.expression)) {
-            return false;
-        }
-        if (inputNames == null) {
-            if (other.inputNames != null) {
-                return false;
-            }
-        } else if (!inputNames.equals(other.inputNames)) {
-            return false;
-        }
-        return true;
+    public SConstraintType getConstraintType() {
+        return constraintType;
     }
 
 }

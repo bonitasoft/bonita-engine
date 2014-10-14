@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
+import org.bonitasoft.engine.bpm.contract.ConstraintType;
 import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.contract.Type;
 import org.bonitasoft.engine.bpm.contract.impl.ContractDefinitionImpl;
@@ -134,6 +135,8 @@ public class ContractDefinitionBuilderTest {
         final ConstraintDefinition definition = activity.getContract().getConstraints().get(0);
         assertThat(definition.getInputNames()).containsExactly("inputName");
         assertThat(definition.getExplanation()).as("bad explanation").isEqualTo("input inputName is mandatory");
+        assertThat(definition.getConstraintType()).as("constraint should be a MANDATORY one").isEqualTo(ConstraintType.MANDATORY);
+
         checkBuilder(builder);
     }
 

@@ -65,7 +65,7 @@ import org.bonitasoft.engine.core.process.definition.model.bindings.SParameterDe
 import org.bonitasoft.engine.core.process.definition.model.bindings.SProcessDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SReceiveTaskDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SRightOperandBinding;
-import org.bonitasoft.engine.core.process.definition.model.bindings.SRuleDefinitionBinding;
+import org.bonitasoft.engine.core.process.definition.model.bindings.SConstraintDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SSendTaskDefinitionBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SStandardLoopCharacteristicsBinding;
 import org.bonitasoft.engine.core.process.definition.model.bindings.SStartEventDefinitionBinding;
@@ -163,7 +163,7 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
         bindings.add(new SContractDefinitionBinding());
         bindings.add(new SSimpleInputDefinitionBinding());
         bindings.add(new SComplexInputDefinitionBinding());
-        bindings.add(new SRuleDefinitionBinding());
+        bindings.add(new SConstraintDefinitionBinding());
     }
 
     @Override
@@ -374,8 +374,8 @@ public class SProcessElementBindingsFactory implements ElementBindingsFactory {
         if (SComplexInputDefinitionBinding.class.equals(binderClass)) {
             return new SComplexInputDefinitionBinding();
         }
-        if (SRuleDefinitionBinding.class.equals(binderClass)) {
-            return new SRuleDefinitionBinding();
+        if (SConstraintDefinitionBinding.class.equals(binderClass)) {
+            return new SConstraintDefinitionBinding();
         }
         return null;
     }

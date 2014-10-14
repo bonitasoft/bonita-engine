@@ -17,11 +17,70 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
+import org.bonitasoft.engine.bpm.contract.ConstraintType;
 
 /**
  * @author Matthieu Chaffotte
  */
 public class ConstraintDefinitionImpl implements ConstraintDefinition {
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (constraintType == null ? 0 : constraintType.hashCode());
+        result = prime * result + (explanation == null ? 0 : explanation.hashCode());
+        result = prime * result + (expression == null ? 0 : expression.hashCode());
+        result = prime * result + (inputNames == null ? 0 : inputNames.hashCode());
+        result = prime * result + (name == null ? 0 : name.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ConstraintDefinitionImpl other = (ConstraintDefinitionImpl) obj;
+        if (constraintType != other.constraintType) {
+            return false;
+        }
+        if (explanation == null) {
+            if (other.explanation != null) {
+                return false;
+            }
+        } else if (!explanation.equals(other.explanation)) {
+            return false;
+        }
+        if (expression == null) {
+            if (other.expression != null) {
+                return false;
+            }
+        } else if (!expression.equals(other.expression)) {
+            return false;
+        }
+        if (inputNames == null) {
+            if (other.inputNames != null) {
+                return false;
+            }
+        } else if (!inputNames.equals(other.inputNames)) {
+            return false;
+        }
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
+        return true;
+    }
 
     private static final long serialVersionUID = 2793703451225519896L;
 
@@ -29,12 +88,18 @@ public class ConstraintDefinitionImpl implements ConstraintDefinition {
     private final String expression;
     private final String explanation;
     private final List<String> inputNames;
+    private final ConstraintType constraintType;
 
     public ConstraintDefinitionImpl(final String name, final String expression, final String explanation) {
+        this(name, expression, explanation, ConstraintType.CUSTOM);
+    }
+
+    public ConstraintDefinitionImpl(final String name, final String expression, final String explanation, final ConstraintType constraintType) {
         this.name = name;
-        inputNames = new ArrayList<String>();
+        this.constraintType = constraintType;
         this.explanation = explanation;
         this.expression = expression;
+        inputNames = new ArrayList<String>();
     }
 
     @Override
@@ -62,53 +127,8 @@ public class ConstraintDefinitionImpl implements ConstraintDefinition {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (explanation == null ? 0 : explanation.hashCode());
-        result = prime * result + (expression == null ? 0 : expression.hashCode());
-        result = prime * result + (inputNames == null ? 0 : inputNames.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ConstraintDefinitionImpl other = (ConstraintDefinitionImpl) obj;
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (explanation == null) {
-            if (other.explanation != null) {
-                return false;
-            }
-        } else if (!explanation.equals(other.explanation)) {
-            return false;
-        }
-        if (expression == null) {
-            if (other.expression != null) {
-                return false;
-            }
-        } else if (!expression.equals(other.expression)) {
-            return false;
-        }
-        if (inputNames == null) {
-            if (other.inputNames != null) {
-                return false;
-            }
-        } else if (!inputNames.equals(other.inputNames)) {
-            return false;
-        }
-        return true;
+    public ConstraintType getConstraintType() {
+        return constraintType;
     }
 
 }

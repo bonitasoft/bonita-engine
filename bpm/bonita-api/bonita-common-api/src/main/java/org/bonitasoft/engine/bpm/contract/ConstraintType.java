@@ -11,21 +11,13 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.core.process.definition.model;
-
-import java.util.List;
+package org.bonitasoft.engine.bpm.contract;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Laurent Leseigneur
+ * @since 7.0
  */
-public interface SConstraintDefinition extends SNamedElement {
-
-    String getExpression();
-
-    String getExplanation();
-
-    List<String> getInputNames();
-
-    SConstraintType getConstraintType();
+public enum ConstraintType {
+    CUSTOM, MANDATORY
 
 }

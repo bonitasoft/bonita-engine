@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SConstraintType;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
@@ -51,7 +52,7 @@ public class SContractDefinitionBuilder {
         expression.append(".toString().isEmpty()");
 
         final SConstraintDefinition constraint = new SConstraintDefinitionImpl(inputName, expression.toString(), new StringBuilder().append("input ")
-                .append(inputName).append(" is mandatory").toString());
+                .append(inputName).append(" is mandatory").toString(), SConstraintType.MANDATORY);
         constraint.getInputNames().add(inputName);
         constraints.add(constraint);
         return this;

@@ -14,19 +14,20 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
+import org.bonitasoft.engine.core.process.definition.model.SConstraintType;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SType;
 import org.bonitasoft.engine.core.process.definition.model.impl.SConstraintDefinitionImpl;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -70,7 +71,7 @@ public class ContractConstraintsValidatorTest {
         final SContractDefinition contract = buildContractWithInputsAndConstraints();
         final Map<String, Object> variables = aMap().put(IS_VALID, false).put(COMMENT, NICE_COMMENT).build();
 
-        validator.validate(contract.getConstraints(), variables);
+        validator.validate(contract, variables);
 
         //then
         verify(loggerService).log(ContractConstraintsValidator.class, TechnicalLogSeverity.DEBUG, "Evaluating constraint [Mandatory] on input(s) [isValid]");
@@ -87,7 +88,7 @@ public class ContractConstraintsValidatorTest {
         final SContractDefinition contract = buildContractWithInputsAndConstraints();
 
         try {
-            validator.validate(contract.getConstraints(), variables);
+            validator.validate(contract, variables);
             fail("validation should fail");
         } catch (final ContractViolationException e) {
             verify(loggerService).log(ContractConstraintsValidator.class, TechnicalLogSeverity.WARNING,
@@ -102,12 +103,12 @@ public class ContractConstraintsValidatorTest {
         variables.put(IS_VALID, false);
         variables.put(COMMENT, NICE_COMMENT);
         final SContractDefinition contract = buildContractWithInputsAndConstraints();
-        final SConstraintDefinitionImpl badRule = new SConstraintDefinitionImpl("bad rule", "a == b", "failing rule");
+        final SConstraintDefinitionImpl badRule = new SConstraintDefinitionImpl("bad rule", "a == b", "failing rule", SConstraintType.CUSTOM);
         contract.getConstraints().add(badRule);
 
         //when
         try {
-            validator.validate(contract.getConstraints(), variables);
+            validator.validate(contract, variables);
             fail("validation should fail");
         } catch (final ContractViolationException e) {
             assertThat(e.getExplanations()).hasSize(1).containsExactly(badRule.getExplanation());
@@ -135,7 +136,7 @@ public class ContractConstraintsValidatorTest {
 
         //then
         try {
-            validator.validate(contractDefinition.getConstraints(), complex);
+            validator.validate(contractDefinition, complex);
             fail("should not validate contract");
         } catch (final ContractViolationException e) {
             final List<String> explanations = e.getExplanations();
@@ -145,12 +146,11 @@ public class ContractConstraintsValidatorTest {
     }
 
     @Test
-    @Ignore
-    public void mandatory_rule_should_validate_multiple_input() throws Exception {
+    public void mandatory_rule_should_validate_multiple_simple_input() throws Exception {
         //given
         final SContractDefinition contractDefinition = aContract()
                 .withMandatoryConstraint(TEXT_INPUT_NAME)
-                .withInput(aSimpleInput(SType.INTEGER).withName(INTEGER_INPUT_NAME).withMultiple(true).build()).build();
+                .withInput(aSimpleInput(SType.TEXT).withName(TEXT_INPUT_NAME).withMultiple(true).build()).build();
 
         //when
         final Map<String, Object> variables = new HashMap<String, Object>();
@@ -158,7 +158,7 @@ public class ContractConstraintsValidatorTest {
 
         //then
         try {
-            validator.validate(contractDefinition.getConstraints(), variables);
+            validator.validate(contractDefinition, variables);
             fail("should not validate contract");
         } catch (final ContractViolationException e) {
             final List<String> explanations = e.getExplanations();
@@ -167,4 +167,32 @@ public class ContractConstraintsValidatorTest {
         }
     }
 
+    @Test
+    public void mandatory_rule_should_validate_multiple_complex_input() throws Exception {
+        //given
+        final SContractDefinition contractDefinition = aContract()
+                .withMandatoryConstraint(COMPLEX_INPUT_NAME)
+                .withInput(
+                        aComplexInput().withName(COMPLEX_INPUT_NAME).withMultiple(true)
+                                .withInput(aSimpleInput(SType.INTEGER).withName(TEXT_INPUT_NAME).withMultiple(true).build()).build()).build();
+
+        //when
+        final Map<String, Object> goodComplex = new HashMap<String, Object>();
+        final List<Map<String, Object>> complexList = new ArrayList<Map<String, Object>>();
+        final Map<String, Object> variables = new HashMap<String, Object>();
+        goodComplex.put(TEXT_INPUT_NAME, "aa");
+        complexList.add(goodComplex);
+        complexList.add(goodComplex);
+        complexList.add(null);
+        variables.put(COMPLEX_INPUT_NAME, complexList);
+        //then
+        try {
+            validator.validate(contractDefinition, variables);
+            fail("should not validate contract");
+        } catch (final ContractViolationException e) {
+            final List<String> explanations = e.getExplanations();
+            assertThat(explanations).hasSize(1).contains("input " + COMPLEX_INPUT_NAME + " is mandatory");
+
+        }
+    }
 }

@@ -22,6 +22,7 @@ import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
  * A <code>ConstraintDefinition</code> is a constraint when executing the {@link UserTaskInstance}.
  *
  * @author Matthieu Chaffotte
+ * @author Laurent Leseigneur
  * @since 7.0
  */
 public interface ConstraintDefinition extends NamedElement {
@@ -48,5 +49,12 @@ public interface ConstraintDefinition extends NamedElement {
      * @return the input names involved in the validation rule
      */
     List<String> getInputNames();
+
+    /**
+     * Return the type of the of the constraint
+     *
+     * @return the {@link ConstraintType} of the constraint
+     */
+    ConstraintType getConstraintType();
 
 }

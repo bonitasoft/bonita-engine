@@ -17,7 +17,7 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.MapBuilder.aMap;
 import static org.bonitasoft.engine.bpm.contract.validation.builder.SContractDefinitionBuilder.aContract;
-import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -30,7 +30,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -44,23 +43,19 @@ public class ContractValidatorTest {
     private ContractStructureValidator structureValidator;
 
     @Mock
-    private ContractConstraintsValidator rulesValidator;
+    private ContractConstraintsValidator constraintValidator;
 
     @InjectMocks
     private ContractValidator validator;
 
-    private List<SConstraintDefinition> anyRules() {
-        return anyListOf(SConstraintDefinition.class);
-    }
-
-    private Map<String, Object> anyInputs() {
+    private Map<String, Object> anyVariables() {
         return anyMapOf(String.class, Object.class);
     }
 
     @Test
     public void should_have_an_empty_comments_list_if_validation_is_true() throws Exception {
 
-        boolean valid = validator.isValid(aContract().build(), aMap().build());
+        final boolean valid = validator.isValid(aContract().build(), aMap().build());
 
         assertThat(valid).isTrue();
         assertThat(validator.getComments()).isEmpty();
@@ -68,62 +63,62 @@ public class ContractValidatorTest {
 
     @Test
     public void should_not_validate_rules_if_structure_validation_fail() throws Exception {
-        SContractDefinition contract = aContract().build();
-        Map<String, Object> inputs = aMap().build();
+        final SContractDefinition contract = aContract().build();
+        final Map<String, Object> inputs = aMap().build();
         doThrow(new ContractViolationException("bad structure", new ArrayList<String>()))
                 .when(structureValidator).validate(contract, inputs);
 
         validator.isValid(contract, inputs);
 
-        verify(rulesValidator, never()).validate(anyRules(), anyInputs());
+        verify(constraintValidator, never()).validate(any(SContractDefinition.class), anyVariables());
     }
 
     @Test
     public void should_return_false_if_structure_validation_fail() throws Exception {
-        SContractDefinition contract = aContract().build();
-        Map<String, Object> inputs = aMap().build();
+        final SContractDefinition contract = aContract().build();
+        final Map<String, Object> variables = aMap().build();
         doThrow(new ContractViolationException("bad structure", new ArrayList<String>()))
-                .when(structureValidator).validate(contract, inputs);
+                .when(structureValidator).validate(contract, variables);
 
-        boolean valid = validator.isValid(contract, inputs);
+        final boolean valid = validator.isValid(contract, variables);
 
         assertThat(valid).isFalse();
     }
 
     @Test
     public void should_populate_comments_with_validation_problems_when_structure_validation_fail() throws Exception {
-        SContractDefinition contract = aContract().build();
-        Map<String, Object> inputs = aMap().build();
-        List<String> problems = Arrays.asList("There is problems with structure", "Might have issue with types too");
+        final SContractDefinition contract = aContract().build();
+        final Map<String, Object> variables = aMap().build();
+        final List<String> problems = Arrays.asList("There is problems with structure", "Might have issue with types too");
         doThrow(new ContractViolationException("bad structure", problems))
-                .when(structureValidator).validate(contract, inputs);
+                .when(structureValidator).validate(contract, variables);
 
-        validator.isValid(contract, inputs);
+        validator.isValid(contract, variables);
 
         assertThat(validator.getComments()).isEqualTo(problems);
     }
 
     @Test
     public void should_return_false_if_rule_validation_fail() throws Exception {
-        SContractDefinition contract = aContract().build();
-        Map<String, Object> inputs = aMap().build();
+        final SContractDefinition contract = aContract().build();
+        final Map<String, Object> variables = aMap().build();
         doThrow(new ContractViolationException("rule failure", new ArrayList<String>()))
-                .when(rulesValidator).validate(contract.getConstraints(), inputs);
+                .when(constraintValidator).validate(contract, variables);
 
-        boolean valid = validator.isValid(contract, inputs);
+        final boolean valid = validator.isValid(contract, variables);
 
         assertThat(valid).isFalse();
     }
 
     @Test
     public void should_populate_comments_with_validation_problems_when_rule_validation_fail() throws Exception {
-        SContractDefinition contract = aContract().build();
-        Map<String, Object> inputs = aMap().build();
-        List<String> problems = asList("There is problems with a rule", "Might have issue with other rule too");
+        final SContractDefinition contract = aContract().build();
+        final Map<String, Object> variables = aMap().build();
+        final List<String> problems = asList("There is problems with a rule", "Might have issue with other rule too");
         doThrow(new ContractViolationException("rule failure", problems))
-                .when(rulesValidator).validate(contract.getConstraints(), inputs);
+                .when(constraintValidator).validate(contract, variables);
 
-        validator.isValid(contract, inputs);
+        validator.isValid(contract, variables);
 
         assertThat(validator.getComments()).isEqualTo(problems);
     }

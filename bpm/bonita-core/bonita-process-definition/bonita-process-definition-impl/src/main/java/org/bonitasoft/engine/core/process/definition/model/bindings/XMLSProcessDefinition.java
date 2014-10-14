@@ -353,6 +353,8 @@ public class XMLSProcessDefinition {
 
     public static final String TYPE = "type";
 
+    public static final String CONSTRAINT_TYPE = "type";
+
     public static final String CONTRACT_CONSTRAINTS_NODE = "constraintDefinitions";
 
     public static final String CONTRACT_CONSTRAINT_NODE = "constraintDefinition";
@@ -582,29 +584,29 @@ public class XMLSProcessDefinition {
         if (!inputsNode.getChildNodes().isEmpty()) {
             contractNode.addChild(inputsNode);
         }
-        final List<SConstraintDefinition> rules = contract.getConstraints();
-        if (!rules.isEmpty()) {
+        final List<SConstraintDefinition> constraints = contract.getConstraints();
+        if (!constraints.isEmpty()) {
             final XMLNode rulesNode = new XMLNode(CONTRACT_CONSTRAINTS_NODE);
             contractNode.addChild(rulesNode);
-
-            for (final SConstraintDefinition rule : rules) {
-                rulesNode.addChild(createRuleNode(rule));
+            for (final SConstraintDefinition constraint : constraints) {
+                rulesNode.addChild(createContractConstraintNode(constraint));
             }
         }
         return contractNode;
     }
 
-    private XMLNode createRuleNode(final SConstraintDefinition rule) {
-        final XMLNode ruleNode = new XMLNode(CONTRACT_CONSTRAINT_NODE);
-        ruleNode.addAttribute(NAME, rule.getName());
-        ruleNode.addChild(CONSTRAINT_EXPRESSION, rule.getExpression());
-        ruleNode.addChild(CONSTRAINT_EXPLANATION, rule.getExplanation());
+    private XMLNode createContractConstraintNode(final SConstraintDefinition constraintDefinition) {
+        final XMLNode constraintNode = new XMLNode(CONTRACT_CONSTRAINT_NODE);
+        constraintNode.addAttribute(NAME, constraintDefinition.getName());
+        constraintNode.addAttribute(CONSTRAINT_TYPE, constraintDefinition.getConstraintType().toString());
+        constraintNode.addChild(CONSTRAINT_EXPRESSION, constraintDefinition.getExpression());
+        constraintNode.addChild(CONSTRAINT_EXPLANATION, constraintDefinition.getExplanation());
         final XMLNode namesNode = new XMLNode(INPUT_NAMES);
-        ruleNode.addChild(namesNode);
-        for (final String inputName : rule.getInputNames()) {
+        constraintNode.addChild(namesNode);
+        for (final String inputName : constraintDefinition.getInputNames()) {
             namesNode.addChild(INPUT_NAME, inputName);
         }
-        return ruleNode;
+        return constraintNode;
     }
 
     private XMLNode createSimpleInputNode(final SSimpleInputDefinition input) {

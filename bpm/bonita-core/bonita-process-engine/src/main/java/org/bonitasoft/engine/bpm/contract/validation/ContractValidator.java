@@ -22,7 +22,7 @@ import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 
 /**
  * Validate tasks inputs according to given contract
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Colin Puy
  */
@@ -34,16 +34,16 @@ public class ContractValidator {
     private final List<String> comments;
 
     public ContractValidator(final ContractStructureValidator contractStructureValidator, final ContractConstraintsValidator contractRulesValidator) {
-        this.rulesValidator = contractRulesValidator;
-        this.structureValidator = contractStructureValidator;
+        rulesValidator = contractRulesValidator;
+        structureValidator = contractStructureValidator;
         comments = new ArrayList<String>();
     }
 
     public boolean isValid(final SContractDefinition contract, final Map<String, Object> variables) {
         try {
             structureValidator.validate(contract, variables);
-            rulesValidator.validate(contract.getConstraints(), variables);
-        } catch (ContractViolationException e) {
+            rulesValidator.validate(contract, variables);
+        } catch (final ContractViolationException e) {
             comments.addAll(e.getExplanations());
             return false;
         }
