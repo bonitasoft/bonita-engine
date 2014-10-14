@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -23,6 +23,7 @@ import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -37,7 +38,9 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.failedJob.SFailedJobReadException;
@@ -49,6 +52,7 @@ import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogCreationException
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogDeletionException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogNotFoundException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogReadException;
+import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogUpdatingException;
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterDeletionException;
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterNotFoundException;
@@ -75,7 +79,8 @@ public class JobServiceImpl implements JobService {
 
     private final TechnicalLoggerService logger;
 
-    public JobServiceImpl(final EventService eventService, final Recorder recorder, final ReadPersistenceService readPersistenceService, final TechnicalLoggerService logger) {
+    public JobServiceImpl(final EventService eventService, final Recorder recorder, final ReadPersistenceService readPersistenceService,
+            final TechnicalLoggerService logger) {
         this.readPersistenceService = readPersistenceService;
         this.eventService = eventService;
         this.recorder = recorder;
@@ -383,6 +388,21 @@ public class JobServiceImpl implements JobService {
             }
         } catch (final SBonitaSearchException e) {
             throw new SJobDescriptorDeletionException(e);
+        }
+    }
+
+    @Override
+    public void updateJobLog(final SJobLog jobLog, final EntityUpdateDescriptor descriptor) throws SJobLogUpdatingException {
+        try {
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(jobLog, descriptor);
+            SUpdateEvent updateEvent = null;
+            if (eventService.hasHandlers(JOB_LOG, EventActionType.UPDATED)) {
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(JOB_LOG).setObject(jobLog)
+                        .done();
+            }
+            recorder.recordUpdate(updateRecord, updateEvent);
+        } catch (final SRecorderException e) {
+            throw new SJobLogUpdatingException(e);
         }
     }
 

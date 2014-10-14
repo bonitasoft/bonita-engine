@@ -33,6 +33,7 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -42,6 +43,7 @@ import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNot
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorReadException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogDeletionException;
+import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogUpdatingException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
@@ -97,16 +99,20 @@ public class JDBCJobListener extends AbstractBonitaPlatormJobListener {
         final Long jobDescriptorId = (Long) context.get(JOB_DESCRIPTOR_ID);
         final Long tenantId = (Long) context.get(TENANT_ID);
         try {
-            if (jobException != null) {
-                final List<SJobLog> jobLogs = getJobLogs(jobDescriptorId);
-                if (!jobLogs.isEmpty()) {
-                    updateJobLog(jobException, jobLogs);
+            if (jobDescriptorId != null) {
+                if (jobException != null) {
+                    final List<SJobLog> jobLogs = getJobLogs(jobDescriptorId);
+                    if (!jobLogs.isEmpty()) {
+                        updateJobLog(jobException, jobLogs);
+                    } else {
+                        createJobLog(jobException, jobDescriptorId);
+                    }
                 } else {
-                    createJobLog(jobException, jobDescriptorId);
+                    cleanJobLogIfAny(jobDescriptorId);
+                    deleteJobIfNotScheduledAnyMore(jobDescriptorId);
                 }
-            } else {
-                cleanJobLogIfAny(jobDescriptorId);
-                deleteJobIfNotScheduledAnyMore(jobDescriptorId);
+            } else if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                logger.log(getClass(), TechnicalLogSeverity.WARNING, "An exception occurs during the job execution: " + jobException);
             }
         } catch (final SBonitaException sbe) {
             final Incident incident = new Incident("An exception occurs during the job execution of the job descriptor" + jobDescriptorId, "", jobException,
@@ -123,11 +129,13 @@ public class JDBCJobListener extends AbstractBonitaPlatormJobListener {
         jobService.createJobLog(jobLog);
     }
 
-    private void updateJobLog(final Exception jobException, final List<SJobLog> jobLogs) {
-        final SJobLogImpl jobLog = (SJobLogImpl) jobLogs.get(0);
-        jobLog.setLastMessage(getStackTrace(jobException));
-        jobLog.setLastUpdateDate(System.currentTimeMillis());
-        jobLog.setRetryNumber(jobLog.getRetryNumber() + 1);
+    private void updateJobLog(final Exception jobException, final List<SJobLog> jobLogs) throws SJobLogUpdatingException {
+        final SJobLog jobLog = jobLogs.get(0);
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        descriptor.addField("lastMessage", getStackTrace(jobException));
+        descriptor.addField("lastUpdateDate", System.currentTimeMillis());
+        descriptor.addField("retryNumber", jobLog.getRetryNumber() + 1);
+        jobService.updateJobLog(jobLog, descriptor);
     }
 
     private void deleteJobIfNotScheduledAnyMore(final Long jobDescriptorId) throws SJobDescriptorNotFoundException, SJobDescriptorReadException,
@@ -155,7 +163,7 @@ public class JDBCJobListener extends AbstractBonitaPlatormJobListener {
         }
     }
 
-    private List<SJobLog> getJobLogs(final long jobDescriptorId) throws SBonitaSearchException {
+    private List<SJobLog> getJobLogs(final Long jobDescriptorId) throws SBonitaSearchException {
         final List<FilterOption> filters = new ArrayList<FilterOption>(2);
         filters.add(new FilterOption(SJobLog.class, "jobDescriptorId", jobDescriptorId));
         final OrderByOption orderByOption = new OrderByOption(SJobLog.class, "jobDescriptorId", OrderByType.ASC);

@@ -16,7 +16,7 @@ package org.bonitasoft.engine.scheduler.impl;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.contains;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -35,6 +35,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.AbstractBonitaJobListener;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -110,18 +111,19 @@ public class JDBCJobListenerTest {
 
     @Test
     public void update_jobLog_on_exception_if_previous_joblog() throws Exception {
+        // Given
         final SJobLogImpl jobLog = mock(SJobLogImpl.class);
         doReturn(1L).when(jobLog).getRetryNumber();
         final List<SJobLog> jobLogs = Collections.singletonList((SJobLog) jobLog);
 
         doReturn(jobLogs).when(jobService).searchJobLogs(any(QueryOptions.class));
 
+        // When
         final JDBCJobListener jobListener = new JDBCJobListener(schedulerService, jobService, null, logger);
         jobListener.jobWasExecuted(context, exeption1);
 
-        verify(jobLog).setLastUpdateDate(any(Long.class));
-        verify(jobLog).setRetryNumber(2L);
-        verify(jobLog).setLastMessage(contains(exeption1.getClass().getName()));
+        // Then
+        verify(jobService).updateJobLog(eq(jobLog), any(EntityUpdateDescriptor.class));
     }
 
     @Test

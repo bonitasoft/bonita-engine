@@ -40,11 +40,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.recorder</groupId>
-			<artifactId>bonita-recorder-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.bonitasoft.engine.log</groupId>
 			<artifactId>bonita-log-impl</artifactId>
 			<version>${project.version}</version>

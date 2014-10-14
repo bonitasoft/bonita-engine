@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -18,24 +18,24 @@ import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 /**
  * @author Celine Souchet
  */
-public class SJobLogDeletionException extends SSchedulerException {
+public class SJobLogUpdatingException extends SSchedulerException {
 
     private static final long serialVersionUID = -226779259333121029L;
 
-    public SJobLogDeletionException(final String message) {
+    public SJobLogUpdatingException(final String message) {
         super(message);
     }
 
-    public SJobLogDeletionException(final Exception e) {
+    public SJobLogUpdatingException(final Exception e) {
         super(e);
     }
 
-    public SJobLogDeletionException(final String message, final Exception exception) {
+    public SJobLogUpdatingException(final String message, final Exception exception) {
         super(message, exception);
     }
 
-    public SJobLogDeletionException(final long id) {
-        super("Can't delete job log with id = " + id);
+    public SJobLogUpdatingException(final long id) {
+        super("Can't update job log with id = " + id);
     }
 
 }
