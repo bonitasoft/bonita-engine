@@ -90,4 +90,10 @@ public class SApplicationUpdateBuilderImpl implements SApplicationUpdateBuilder 
         return this;
     }
 
+    @Override
+    public SApplicationUpdateBuilder updateHomePageId(final Long homePageId) {
+        descriptor.addField(SApplicationFields.HOME_PAGE_ID, homePageId);
+        return this;
+    }
+
 }

@@ -68,6 +68,13 @@ public enum ApplicationField {
      * @see Application
      * @see Profile
      */
-    PROFILE_ID;
+    PROFILE_ID,
+
+    /**
+     * References the identifier of the {@link ApplicationPage} defined as the {@link Application} home page
+     * @see com.bonitasoft.engine.business.application.ApplicationPage
+     * @see com.bonitasoft.engine.business.application.Application
+     */
+    HOME_PAGE_ID;
 
 }

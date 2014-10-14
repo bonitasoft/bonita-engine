@@ -34,6 +34,8 @@ public interface SApplicationUpdateBuilder {
 
     public SApplicationUpdateBuilder updateProfileId(final Long profileId);
 
+    public SApplicationUpdateBuilder updateHomePageId(final Long homePageId);
+
     public SApplicationUpdateBuilder updateUpdatedBy(final Long updaterUserId);
 
 }

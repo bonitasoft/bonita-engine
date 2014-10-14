@@ -104,9 +104,9 @@ public class ApplicationUpdater implements Serializable {
     }
 
     /**
-     * Defines the new value for the {@link Application} icon path
+     * Defines the new value for the {@link Application} state
      *
-     * @param iconPath the new value for the {@code Application} icon path
+     * @param state the new value for the {@code Application} state
      * @return the current {@code ApplicationUpdater}
      * @see Application
      */
@@ -125,6 +125,19 @@ public class ApplicationUpdater implements Serializable {
      */
     public ApplicationUpdater setProfileId(final Long profileId) {
         fields.put(ApplicationField.PROFILE_ID, profileId);
+        return this;
+    }
+
+    /**
+     * Defines the identifier of the new {@link Profile} associated to the {@link Application}
+     *
+     * @param applicationPageId the identifier of {@code Profile} associated to the {@code Application}
+     * @return the current {@code ApplicationUpdater}
+     * @see Application
+     * @see Profile
+     */
+    public ApplicationUpdater setHomePageId(final Long applicationPageId) {
+        fields.put(ApplicationField.HOME_PAGE_ID, applicationPageId);
         return this;
     }
 

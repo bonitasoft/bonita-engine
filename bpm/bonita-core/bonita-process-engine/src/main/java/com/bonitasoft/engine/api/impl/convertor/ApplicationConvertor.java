@@ -105,6 +105,9 @@ public class ApplicationConvertor {
                 case VERSION:
                     builder.updateVersion((String) entry.getValue());
                     break;
+                case HOME_PAGE_ID:
+                    builder.updateHomePageId((Long) entry.getValue());
+                    break;
                 default:
                     break;
             }

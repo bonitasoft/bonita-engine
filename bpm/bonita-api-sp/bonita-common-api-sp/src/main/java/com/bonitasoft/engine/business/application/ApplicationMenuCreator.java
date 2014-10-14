@@ -78,11 +78,12 @@ public class ApplicationMenuCreator implements Serializable {
      * @param index the index indicating the menu position
      * @see ApplicationMenu
      */
-    public ApplicationMenuCreator(long applicationId, final String displayName, final long applicationPageId, final int index) {
+    public ApplicationMenuCreator(final long applicationId, final String displayName, final long applicationPageId, final int index) {
         this(applicationId, displayName, index);
         fields.put(ApplicationMenuField.APPLICATION_PAGE_ID, applicationPageId);
     }
-/**
+
+    /**
      * Creates an instance of {@code ApplicationMenuCreator}
      *
      * @param applicationId the identifier of related {@link com.bonitasoft.engine.business.application.Application}
@@ -90,7 +91,7 @@ public class ApplicationMenuCreator implements Serializable {
      * @param index the index indicating the menu position
      * @see ApplicationMenu
      */
-    public ApplicationMenuCreator(long applicationId, final String displayName, final int index) {
+    public ApplicationMenuCreator(final long applicationId, final String displayName, final int index) {
         fields = new HashMap<ApplicationMenuField, Serializable>(4);
         fields.put(ApplicationMenuField.DISPLAY_NAME, displayName);
         fields.put(ApplicationMenuField.APPLICATION_ID, applicationId);

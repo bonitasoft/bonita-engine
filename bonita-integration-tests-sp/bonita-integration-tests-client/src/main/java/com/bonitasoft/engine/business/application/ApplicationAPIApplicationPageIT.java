@@ -68,6 +68,27 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
 
     }
 
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application", "update", "home page" })
+    @Test
+    public void updateApplication_should_update_home_page() throws Exception {
+        //given
+        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
+        final Application application = getApplicationAPI().createApplication(creator);
+        final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
+
+        final ApplicationUpdater updater = new ApplicationUpdater();
+        updater.setHomePageId(appPage.getId());
+
+        //when
+        final Application updatedApplication = getApplicationAPI().updateApplication(application.getId(), updater);
+
+        //then
+        assertThat(updatedApplication).isNotNull();
+        assertThat(updatedApplication.getHomePageId()).isEqualTo(appPage.getId());
+
+        getApplicationAPI().deleteApplication(application.getId());
+    }
+
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
     "get by name and application name" })
     @Test
