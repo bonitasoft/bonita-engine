@@ -2028,7 +2028,7 @@ public class ModelConvertor {
     }
 
     private static SimpleInputDefinition toSimpleInput(final SSimpleInputDefinition input) {
-        return new SimpleInputDefinitionImpl(input.getName(), Type.valueOf(input.getType().toString()), input.getDescription());
+        return new SimpleInputDefinitionImpl(input.getName(), Type.valueOf(input.getType().toString()), input.getDescription(), input.isMultiple());
     }
 
     private static ComplexInputDefinition toComplexInput(final SComplexInputDefinition input) {
@@ -2040,7 +2040,7 @@ public class ModelConvertor {
         for (final SComplexInputDefinition sComplexInputDefinition : input.getComplexInputDefinitions()) {
             complexInputDefinitions.add(toComplexInput(sComplexInputDefinition));
         }
-        return new ComplexInputDefinitionImpl(input.getName(), input.getDescription(), simpleInputDefinitions, complexInputDefinitions);
+        return new ComplexInputDefinitionImpl(input.getName(), input.getDescription(), input.isMultiple(), simpleInputDefinitions, complexInputDefinitions);
 
     }
 }

@@ -105,6 +105,7 @@ public class ModelConvertorTest {
 
         assertThat(value).isNull();
     }
+
     @Test
     public void convertSContractDefinition() {
         //given
@@ -114,7 +115,6 @@ public class ModelConvertorTest {
         final ConstraintDefinition expectedRule = new ConstraintDefinitionImpl("name", "expression", "explanation");
         expectedRule.getInputNames().add("input1");
         expectedRule.getInputNames().add("input2");
-
 
         //when
         final SContractDefinition contractDefinition = new SContractDefinitionImpl();
@@ -133,4 +133,36 @@ public class ModelConvertorTest {
         assertThat(contract.getSimpleInputs()).as("should convert simple inputs").containsExactly(expectedSimpleInput);
         assertThat(contract.getComplexInputs()).as("should convert complex inputs").containsExactly(expectedComplexInput);
     }
+
+    @Test
+    public void convertMultipleSContractDefinition() {
+        //given
+        final SimpleInputDefinition expectedSimpleInput = new SimpleInputDefinitionImpl("name", Type.TEXT, "description", true);
+        final ComplexInputDefinition expectedComplexInput = new ComplexInputDefinitionImpl("complex input", "complex description", true,
+                Arrays.asList(expectedSimpleInput), null);
+        final ComplexInputDefinition expectedComplexWithComplexInput = new ComplexInputDefinitionImpl("complex in complext", "complex description", true,
+                null, Arrays.asList(expectedComplexInput));
+
+        final ConstraintDefinition expectedRule = new ConstraintDefinitionImpl("name", "expression", "explanation");
+        expectedRule.getInputNames().add("input1");
+        expectedRule.getInputNames().add("input2");
+
+        //when
+        final SContractDefinition contractDefinition = new SContractDefinitionImpl();
+        final SConstraintDefinition sRule = new SConstraintDefinitionImpl(expectedRule);
+        final SSimpleInputDefinition sSimpleInput = new SSimpleInputDefinitionImpl(expectedSimpleInput);
+        final SComplexInputDefinition sComplexInput = new SComplexInputDefinitionImpl(expectedComplexWithComplexInput);
+
+        contractDefinition.getConstraints().add(sRule);
+        contractDefinition.getSimpleInputs().add(sSimpleInput);
+        contractDefinition.getComplexInputs().add(sComplexInput);
+
+        final ContractDefinition contract = ModelConvertor.toContract(contractDefinition);
+
+        //then
+        assertThat(contract.getConstraints()).as("should convert rules").containsExactly(expectedRule);
+        assertThat(contract.getSimpleInputs()).as("should convert simple inputs").containsExactly(expectedSimpleInput);
+        assertThat(contract.getComplexInputs()).as("should convert complex inputs").containsExactly(expectedComplexWithComplexInput);
+    }
+
 }

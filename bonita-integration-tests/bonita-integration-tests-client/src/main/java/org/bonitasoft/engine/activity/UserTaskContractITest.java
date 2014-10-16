@@ -106,7 +106,7 @@ public class UserTaskContractITest extends CommonAPITest {
         final ComplexInputDefinition complexSubIput = new ComplexInputDefinitionImpl("date", "expense date", Arrays.asList(expenseType), null);
         //given
         builder.addUserTask(TASK1, ACTOR_NAME).addContract()
-                .addComplexInput("expenseLine", "expense report line", Arrays.asList(expenseDate, expenseAmount), Arrays.asList(complexSubIput));
+                .addComplexInput("expenseLine", "expense report line", true, Arrays.asList(expenseDate, expenseAmount), Arrays.asList(complexSubIput));
 
         //when
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
@@ -118,6 +118,7 @@ public class UserTaskContractITest extends CommonAPITest {
         assertThat(contract.getComplexInputs()).hasSize(1);
         final ComplexInputDefinition complexInput = contract.getComplexInputs().get(0);
         assertThat(complexInput.getName()).isEqualTo("expenseLine");
+        assertThat(complexInput.isMultiple()).as("should be multiple").isTrue();
         assertThat(complexInput.getDescription()).isEqualTo("expense report line");
         assertThat(complexInput.getSimpleInputs()).as("should have 2 simples inputs").hasSize(2);
         assertThat(complexInput.getComplexInputs()).as("should have 1 complex input").hasSize(1);
