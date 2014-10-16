@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-page-sp</artifactId>
 		<groupId>com.bonitasoft.engine.page</groupId>
-		<version>6.3.8.RC1</version>
+		<version>6.3.8-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-page-impl</artifactId>
@@ -67,7 +67,7 @@
         <dependency>
         	<groupId>org.bonitasoft.engine.profile</groupId>
         	<artifactId>bonita-profile-api</artifactId>
-        	<version>6.3.8.RC1</version>
+        	<version>6.3.8-SNAPSHOT</version>
         </dependency>
 	</dependencies>
 </project>
