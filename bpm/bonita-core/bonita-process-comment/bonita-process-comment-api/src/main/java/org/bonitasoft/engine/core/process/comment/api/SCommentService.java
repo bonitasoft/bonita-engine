@@ -21,7 +21,7 @@ import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Hongwen Zang
@@ -41,9 +41,9 @@ public interface SCommentService {
      * @param options
      *            a QueryOptions object, containing some query conditions
      * @return a list of SComment objects corresponding to the criteria
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<SComment> searchComments(QueryOptions options) throws SBonitaSearchException;
+    List<SComment> searchComments(QueryOptions options) throws SBonitaReadException;
 
     /**
      * Number of all comments related to the specified query options.
@@ -51,9 +51,9 @@ public interface SCommentService {
      * @param queryOptions
      *            a QueryOptions object, containing some query conditions
      * @return number of all comments corresponding to the criteria.
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfComments(QueryOptions queryOptions) throws SBonitaSearchException;
+    long getNumberOfComments(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Add a comment on process instance
@@ -113,10 +113,10 @@ public interface SCommentService {
      * @param queryOptions
      *            a map of specific parameters of a query
      * @return number of Comment for a specific supervisor
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      *             if a Read exception occurs
      */
-    long getNumberOfCommentsSupervisedBy(long supervisorId, QueryOptions queryOptions) throws SBonitaSearchException;
+    long getNumberOfCommentsSupervisedBy(long supervisorId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Search an Comment for a specific supervisor
@@ -126,10 +126,10 @@ public interface SCommentService {
      * @param queryOptions
      *            a map of specific parameters of a query
      * @return an Comment for a specific supervisor
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      *             if a Read exception occurs
      */
-    List<SComment> searchCommentsSupervisedBy(long supervisorId, QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SComment> searchCommentsSupervisedBy(long supervisorId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Search number of all the comments on process instants that the user can access
@@ -139,9 +139,9 @@ public interface SCommentService {
      * @param searchOptions
      *            a QueryOptions object, containing some query conditions
      * @return number of all the comments on process instants that the user can access
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfCommentsInvolvingUser(long userId, QueryOptions searchOptions) throws SBonitaSearchException;
+    long getNumberOfCommentsInvolvingUser(long userId, QueryOptions searchOptions) throws SBonitaReadException;
 
     /**
      * List all the comments on process instants that the user can access
@@ -151,9 +151,9 @@ public interface SCommentService {
      * @param queryOptions
      *            a QueryOptions object, containing some query conditions
      * @return a list of comments on process instants that the user can access
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<SComment> searchCommentsInvolvingUser(long userId, QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SComment> searchCommentsInvolvingUser(long userId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Search number of the comments visible by delegates of managerUserId
@@ -163,9 +163,9 @@ public interface SCommentService {
      * @param searchOptions
      *            a QueryOptions object, containing some query conditions
      * @return number of the comments visible by delegates of managerUserId
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfCommentsManagedBy(long managerUserId, QueryOptions searchOptions) throws SBonitaSearchException;
+    long getNumberOfCommentsManagedBy(long managerUserId, QueryOptions searchOptions) throws SBonitaReadException;
 
     /**
      * Search comments visible by delegates of managerUserId
@@ -175,17 +175,17 @@ public interface SCommentService {
      * @param searchOptions
      *            a QueryOptions object, containing some query conditions
      * @return a list of comments visible by delegates of managerUserId
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<SComment> searchCommentsManagedBy(long managerUserId, QueryOptions searchOptions) throws SBonitaSearchException;
+    List<SComment> searchCommentsManagedBy(long managerUserId, QueryOptions searchOptions) throws SBonitaReadException;
 
     /**
      * Search number of archived Comments
      * 
      * @param searchOptions
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfArchivedComments(QueryOptions searchOptions) throws SBonitaSearchException;
+    long getNumberOfArchivedComments(QueryOptions searchOptions) throws SBonitaReadException;
 
     /**
      * Search archived Comments
@@ -193,9 +193,9 @@ public interface SCommentService {
      * @param searchOptions
      *            a QueryOptions object, containing some query conditions
      * @return a list with archived Comments
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<SAComment> searchArchivedComments(QueryOptions searchOptions) throws SBonitaSearchException;
+    List<SAComment> searchArchivedComments(QueryOptions searchOptions) throws SBonitaReadException;
 
     /**
      * Returning true if the system comments are enabled for the specific SystemCommentType.

@@ -27,7 +27,7 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -202,7 +202,7 @@ public class ActivityInstanceServiceImplTest {
         assertNotNull(result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchAssignedAndPendingHumanTasksForThrowException() throws Exception {
         // Given
         final long rootProcessDefinitionId = 10;
@@ -241,7 +241,7 @@ public class ActivityInstanceServiceImplTest {
         assertEquals(1L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfAssignedAndPendingHumanTasksForThrowException() throws Exception {
         // Given
         final long rootProcessDefinitionId = 10;
@@ -278,7 +278,7 @@ public class ActivityInstanceServiceImplTest {
         assertNotNull(result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchAssignedAndPendingHumanTasksThrowException() throws Exception {
         // Given
         final long rootProcessDefinitionId = 10;
@@ -311,7 +311,7 @@ public class ActivityInstanceServiceImplTest {
         assertEquals(1L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfAssignedAndPendingHumanTasksThrowException() throws Exception {
         // Given
         final long rootProcessDefinitionId = 10;

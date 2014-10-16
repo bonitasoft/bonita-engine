@@ -21,6 +21,7 @@ import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
+import org.bonitasoft.engine.bpm.document.DocumentListDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayDefinition;
@@ -59,6 +60,8 @@ public class FlowElementBinding extends ElementBinding {
 
     private final List<DocumentDefinition> documentDefinitions = new ArrayList<DocumentDefinition>();
 
+    private final List<DocumentListDefinition> documentListDefinitions = new ArrayList<DocumentListDefinition>();
+
     private final List<ConnectorDefinition> connectors = new ArrayList<ConnectorDefinition>();
 
     @Override
@@ -80,6 +83,8 @@ public class FlowElementBinding extends ElementBinding {
             dataDefinitions.add((DataDefinition) value);
         } else if (XMLProcessDefinition.DOCUMENT_DEFINITION_NODE.equals(name)) {
             documentDefinitions.add((DocumentDefinition) value);
+        } else if (XMLProcessDefinition.DOCUMENT_LIST_DEFINITION_NODE.equals(name)) {
+            documentListDefinitions.add((DocumentListDefinition) value);
         } else if (XMLProcessDefinition.GATEWAY_NODE.equals(name)) {
             gateways.add((GatewayDefinition) value);
         } else if (XMLProcessDefinition.TRANSITION_NODE.equals(name)) {
@@ -119,6 +124,9 @@ public class FlowElementBinding extends ElementBinding {
         }
         for (final DocumentDefinition documentDefinition : documentDefinitions) {
             container.addDocumentDefinition(documentDefinition);
+        }
+        for (final DocumentListDefinition documentListDefinition : documentListDefinitions) {
+            container.addDocumentListDefinition(documentListDefinition);
         }
         for (final StartEventDefinition startEvent : startEvents) {
             container.addStartEvent(startEvent);

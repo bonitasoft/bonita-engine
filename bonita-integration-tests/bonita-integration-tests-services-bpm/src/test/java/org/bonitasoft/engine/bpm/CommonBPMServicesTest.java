@@ -72,7 +72,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.test.util.TestUtil;
@@ -329,7 +329,7 @@ public class CommonBPMServicesTest {
         }
     }
 
-    public List<SProcessInstance> getFirstProcessInstances(final int nb) throws SBonitaSearchException {
+    public List<SProcessInstance> getFirstProcessInstances(final int nb) throws SBonitaReadException {
         // we are already in a transaction context here:
         final OrderByOption orderByOption = new OrderByOption(SProcessInstance.class, BuilderFactory.get(SProcessInstanceBuilderFactory.class)
                 .getLastUpdateKey(), OrderByType.DESC);

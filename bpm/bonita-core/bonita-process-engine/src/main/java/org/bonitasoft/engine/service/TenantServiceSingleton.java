@@ -23,7 +23,7 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
  */
 public final class TenantServiceSingleton {
 
-    private static Map<Long, TenantServiceAccessor> instances = new HashMap<Long, TenantServiceAccessor>();
+    private static final Map<Long, TenantServiceAccessor> instances = new HashMap<Long, TenantServiceAccessor>();
 
     private TenantServiceSingleton() {
         super();

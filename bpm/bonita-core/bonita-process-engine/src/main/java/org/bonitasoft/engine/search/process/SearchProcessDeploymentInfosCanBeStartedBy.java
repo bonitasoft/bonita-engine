@@ -18,7 +18,7 @@ import java.util.List;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractProcessDeploymentInfoSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchProcessDefinitionsDescriptor;
@@ -40,12 +40,12 @@ public class SearchProcessDeploymentInfosCanBeStartedBy extends AbstractProcessD
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return processDefinitionService.getNumberOfProcessDeploymentInfosCanBeStartedBy(userId, searchOptions);
     }
 
     @Override
-    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return processDefinitionService.searchProcessDeploymentInfosCanBeStartedBy(userId, searchOptions);
     }
 
