@@ -8,18 +8,19 @@
  *******************************************************************************/
 package com.bonitasoft.engine.execution;
 
+import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
@@ -30,6 +31,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeStateManagerImpl;
+import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -38,7 +40,6 @@ import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.work.WorkService;
 
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
-import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 
 /**
@@ -51,23 +52,21 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
 
     private final BreakpointService breakpointService;
 
-    public FlowNodeStateManagerExt(final ProcessDefinitionService processDefinitionService, final ProcessInstanceService processInstanceService,
-            final ActivityInstanceService activityInstanceService, final ConnectorInstanceService connectorInstanceService,
-            final ClassLoaderService classLoaderService, final ExpressionResolverService expressionResolverService, final SchedulerService schedulerService,
-            final DataInstanceService dataInstanceService, final EventInstanceService eventInstanceService,
-            final OperationService operationService, final BPMInstancesCreator bpmInstancesCreator,
-            final ContainerRegistry containerRegistry, final ArchiveService archiveService, final TechnicalLoggerService logger,
-            final DocumentMappingService documentMappingService, final SCommentService commentService,
-            final BreakpointService breakpointService, final EventsHandler eventsHandler, final UserFilterService userFilterService,
-            final ActorMappingService actorMappingService, final WorkService workService, final TokenService tokenService,
-            final IdentityService identityService, final RefBusinessDataService refBusinessDataService) {
-        super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, classLoaderService,
-                expressionResolverService, schedulerService, dataInstanceService, eventInstanceService,
-                operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentMappingService, commentService,
-                eventsHandler, userFilterService, actorMappingService, workService, tokenService, identityService, new StateBehaviorsExt(bpmInstancesCreator,
-                        eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService, connectorInstanceService,
-                        expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService, containerRegistry,
-                        eventInstanceService, schedulerService, commentService, identityService, logger, tokenService, refBusinessDataService));
+    public FlowNodeStateManagerExt(ProcessDefinitionService processDefinitionService, ProcessInstanceService processInstanceService,
+            ActivityInstanceService activityInstanceService, ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService,
+            ExpressionResolverService expressionResolverService, SchedulerService schedulerService, DataInstanceService dataInstanceService,
+            EventInstanceService eventInstanceService, OperationService operationService, BPMInstancesCreator bpmInstancesCreator,
+            ContainerRegistry containerRegistry, ArchiveService archiveService, TechnicalLoggerService logger, DocumentService documentService,
+            SCommentService commentService, EventsHandler eventsHandler, UserFilterService userFilterService, ActorMappingService actorMappingService,
+            WorkService workService, TokenService tokenService, IdentityService identityService, BreakpointService breakpointService,
+            final RefBusinessDataService refBusinessDataService) {
+        super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService,
+                expressionResolverService, dataInstanceService, operationService, bpmInstancesCreator,
+                containerRegistry, archiveService, logger, documentService, commentService,
+                new StateBehaviorsExt(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService,
+                        connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService,
+                        containerRegistry, eventInstanceService, schedulerService, commentService, identityService, logger, tokenService,
+                        refBusinessDataService));
         this.breakpointService = breakpointService;
     }
 

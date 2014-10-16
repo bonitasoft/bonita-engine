@@ -11,7 +11,7 @@ package com.bonitasoft.engine.api.impl.transaction.reporting;
 import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
@@ -34,12 +34,12 @@ public class SearchReports extends AbstractSearchEntity<Report, SReport> {
     }
 
     @Override
-    public long executeCount(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions queryOptions) throws SBonitaReadException {
         return reportingService.getNumberOfReports(queryOptions);
     }
 
     @Override
-    public List<SReport> executeSearch(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SReport> executeSearch(final QueryOptions queryOptions) throws SBonitaReadException {
         return reportingService.searchReports(queryOptions);
     }
 
