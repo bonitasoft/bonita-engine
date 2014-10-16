@@ -60,10 +60,8 @@ import com.bonitasoft.engine.business.application.model.builder.impl.SApplicatio
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class ApplicationServiceImpl implements ApplicationService {
 
@@ -92,7 +90,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public SApplication createApplication(final SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException,
-    SInvalidTokenException, SInvalidDisplayNameException {
+            SInvalidTokenException, SInvalidDisplayNameException {
         checkLicense();
         final String methodName = "createApplication";
         final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.CREATED, "Creating application named " + application.getToken());
@@ -124,7 +122,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     private void validateApplication(final SApplication application) throws SInvalidTokenException, SBonitaReadException, SObjectAlreadyExistsException,
-    SObjectCreationException, SInvalidDisplayNameException {
+            SObjectCreationException, SInvalidDisplayNameException {
         final String applicationName = application.getToken();
         validateApplicationToken(applicationName);
         validateApplicationDisplayName(application.getDisplayName());
@@ -149,7 +147,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
     }
 
-    private void handleCreationException(final PersistentObject persitentObject, final SPersistenceLogBuilder logBuilder, final Exception e, final String methodName)
+    private void handleCreationException(final PersistentObject persitentObject, final SPersistenceLogBuilder logBuilder, final Exception e,
+            final String methodName)
             throws SObjectCreationException {
         log(persitentObject.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
         throw new SObjectCreationException(e);
@@ -234,27 +233,26 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public SApplication updateApplication(final long applicationId, final EntityUpdateDescriptor updateDescriptor)
-            throws SObjectModificationException,
-    SInvalidTokenException, SInvalidDisplayNameException, SBonitaReadException, SObjectAlreadyExistsException, SObjectNotFoundException {
+            throws SObjectModificationException, SInvalidTokenException, SInvalidDisplayNameException, SObjectAlreadyExistsException, SObjectNotFoundException {
         checkLicense();
         final String methodName = "updateApplication";
         final long now = System.currentTimeMillis();
         final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.UPDATED, "Updating application with id " + applicationId);
 
-        final SApplication application = getApplication(applicationId);
-
-        if (updateDescriptor.getFields().containsKey(SApplicationFields.TOKEN)
-                && !application.getToken().equals(updateDescriptor.getFields().get(SApplicationFields.TOKEN))) {
-            validateApplicationToken((String) updateDescriptor.getFields().get(SApplicationFields.TOKEN));
-        }
-        if (updateDescriptor.getFields().containsKey(SApplicationFields.DISPLAY_NAME)
-                && !application.getDisplayName().equals(updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME))) {
-            validateApplicationDisplayName((String) updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME));
-        }
-
-        updateDescriptor.addField(applicationKeyProvider.getLastUpdatedDateKey(), now);
-
         try {
+            final SApplication application = getApplication(applicationId);
+
+            if (updateDescriptor.getFields().containsKey(SApplicationFields.TOKEN)
+                    && !application.getToken().equals(updateDescriptor.getFields().get(SApplicationFields.TOKEN))) {
+                validateApplicationToken((String) updateDescriptor.getFields().get(SApplicationFields.TOKEN));
+            }
+            if (updateDescriptor.getFields().containsKey(SApplicationFields.DISPLAY_NAME)
+                    && !application.getDisplayName().equals(updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME))) {
+                validateApplicationDisplayName((String) updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME));
+            }
+
+            updateDescriptor.addField(applicationKeyProvider.getLastUpdatedDateKey(), now);
+
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(application,
                     updateDescriptor);
             final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ApplicationService.APPLICATION)
@@ -263,6 +261,15 @@ public class ApplicationServiceImpl implements ApplicationService {
             log(applicationId, SQueriableLog.STATUS_OK, logBuilder, methodName);
             return application;
 
+        } catch (SObjectNotFoundException e) {
+            log(applicationId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            throw e;
+        } catch (SInvalidTokenException e) {
+            log(applicationId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            throw e;
+        } catch (SInvalidDisplayNameException e) {
+            log(applicationId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            throw e;
         } catch (final SBonitaException e) {
             log(applicationId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SObjectModificationException(e);
@@ -287,7 +294,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public SApplicationPage createApplicationPage(final SApplicationPage applicationPage) throws SObjectCreationException, SObjectAlreadyExistsException,
-    SInvalidTokenException {
+            SInvalidTokenException {
         checkLicense();
         final String methodName = "createApplicationPage";
         final SApplicationPageLogBuilder logBuilder = getApplicationPageLogBuilder(ActionType.CREATED,
@@ -311,8 +318,14 @@ public class ApplicationServiceImpl implements ApplicationService {
         return applicationPage;
     }
 
+    @Override
+    public SApplicationPage updateApplicationPage(long applicationPageId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException,
+            SInvalidTokenException, SObjectAlreadyExistsException, SObjectNotFoundException {
+        return null;
+    }
+
     private void validateApplicationPage(final SApplicationPage applicationPage) throws SInvalidTokenException, SBonitaReadException,
-    SObjectAlreadyExistsException {
+            SObjectAlreadyExistsException {
         final String applicationPageToken = applicationPage.getToken();
         if (!URLValidator.isValid(applicationPageToken)) {
             throw new SInvalidTokenException(
@@ -347,7 +360,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public SApplicationPage getApplicationPage(final String applicationToken, final String applicationPageToken) throws SBonitaReadException,
-    SObjectNotFoundException {
+            SObjectNotFoundException {
         checkLicense();
         final Map<String, Object> inputParameters = new HashMap<String, Object>(2);
         inputParameters.put("applicationToken", applicationToken);

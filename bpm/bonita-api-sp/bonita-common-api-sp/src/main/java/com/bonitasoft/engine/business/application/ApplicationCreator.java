@@ -32,7 +32,7 @@ public class ApplicationCreator implements Serializable {
      *
      * @param token the {@link Application} token. The token will be part of application URL. It cannot be null or empty and should contain only alpha numeric
      *        characters and the following special characters '-', '.', '_' or '~'.
-     * @param displayName the <code>Application</code> display name
+     * @param displayName the <code>Application</code> display name. It cannot be null or empty
      * @param version the <code>Application</code> version
      * @see Application
      */

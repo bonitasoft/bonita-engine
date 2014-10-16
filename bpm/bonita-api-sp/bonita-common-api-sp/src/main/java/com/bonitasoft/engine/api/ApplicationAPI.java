@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
+import com.bonitasoft.engine.business.application.ApplicationMenuUpdater;
+import com.bonitasoft.engine.business.application.ApplicationPageUpdater;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -28,8 +30,6 @@ import com.bonitasoft.engine.business.application.ApplicationPageNotFoundExcepti
 import com.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor;
 import com.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
-import com.bonitasoft.engine.exception.InvalidDisplayNameException;
-import com.bonitasoft.engine.exception.InvalidTokenException;
 import com.bonitasoft.engine.page.Page;
 
 /**
@@ -48,14 +48,10 @@ public interface ApplicationAPI {
      * @return the created <code>Application</code>
      * @throws AlreadyExistsException if an application already exists with the same name
      * @throws CreationException if an error occurs during the creation
-     * @throws InvalidTokenException if the token is empty or null or contains invalid characters. The token should contain only alpha numeric characters and
-     *         the following special characters '-', '.', '_' or '~'.
-     * @throws InvalidDisplayNameException if the display name is empty or null
      * @see Application
      * @see ApplicationCreator
      */
-    Application createApplication(ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException, InvalidTokenException,
-    InvalidDisplayNameException;
+    Application createApplication(ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException;
 
     /**
      * Retrieves an {@link Application} from its identifier.
@@ -68,11 +64,14 @@ public interface ApplicationAPI {
     Application getApplication(final long applicationId) throws ApplicationNotFoundException;
 
     /**
-     * Deletes an {@link Application} by its identifier
+     * Deletes an {@link Application} by its identifier. All related {@link com.bonitasoft.engine.business.application.ApplicationPage}s and
+     * {@link com.bonitasoft.engine.business.application.ApplicationMenu}s will be automatically deleted.
      *
      * @param applicationId the <code>Application</code> identifier
      * @throws DeletionException if an error occurs during the deletion
      * @see Application
+     * @see com.bonitasoft.engine.business.application.ApplicationPage
+     * @see com.bonitasoft.engine.business.application.ApplicationMenu
      */
     void deleteApplication(long applicationId) throws DeletionException;
 
@@ -84,16 +83,11 @@ public interface ApplicationAPI {
      * @return the <code>Application</code> as it is after the update.
      * @throws ApplicationNotFoundException if no <code>Application</code> is found for the given id
      * @throws AlreadyExistsException if another <code>Application</code> already exists with the new name value
-     * @throws InvalidTokenException if the new token value is empty or null or contains invalid characters. The token should contain only alpha numeric
-     *         characters and the following special characters '-', '.', '_' or '~'.
-     * @throws InvalidDisplayNameException if the display name is empty
      * @throws UpdateException if an error occurs during the update
      * @see Application
      * @see ApplicationUpdater
      */
-    Application updateApplication(long applicationId, ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException, AlreadyExistsException,
-    InvalidTokenException,
-    InvalidDisplayNameException;
+    Application updateApplication(long applicationId, ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException, AlreadyExistsException;
 
     /**
      * Searches for {@link Application}s with specific search criteria. Use {@link ApplicationSearchDescriptor} to know the available filters.
@@ -111,7 +105,8 @@ public interface ApplicationAPI {
     /**
      * Creates an {@link ApplicationPage}
      *
-     * @param applicationId the identifier of the {@link Application} to which the {@link Page} will be associated
+     * @param applicationId the identifier of the {@link com.bonitasoft.engine.business.application.Application} to which the
+     *        {@link com.bonitasoft.engine.page.Page} will be associated
      * @param pagedId the identifier of <code>Page</code> to be associated to the <code>Application</code>
      * @param token the token that this <code>Page</code> will take in this <code>ApplicationPage</code>. The token must be unique for a given application and
      *        should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'.
@@ -122,7 +117,7 @@ public interface ApplicationAPI {
      * @see Application
      * @see Page
      */
-    ApplicationPage createApplicationPage(long applicationId, long pagedId, String token) throws AlreadyExistsException, CreationException, InvalidTokenException;
+    ApplicationPage createApplicationPage(long applicationId, long pagedId, String token) throws AlreadyExistsException, CreationException;
 
     /**
      * Retrieves the {@link ApplicationPage} for the given {@code Application} token and {@code ApplicationPage} token
@@ -136,6 +131,8 @@ public interface ApplicationAPI {
      */
     ApplicationPage getApplicationPage(String applicationToken, String applicationPageToken) throws ApplicationPageNotFoundException;
 
+    Application updateApplicationPage(long applicationPageId, ApplicationPageUpdater updater) throws ApplicationPageNotFoundException, UpdateException, AlreadyExistsException;
+
     /**
      * Retrieves the {@link ApplicationPage} from its identifier
      *
@@ -147,11 +144,12 @@ public interface ApplicationAPI {
     ApplicationPage getApplicationPage(long applicationPageId) throws ApplicationPageNotFoundException;
 
     /**
-     * Deletes an {@link ApplicationPage} by its identifier
+     * Deletes an {@link ApplicationPage} by its identifier. All related {@link com.bonitasoft.engine.business.application.ApplicationMenu} will be automatically deleted.
      *
      * @param applicationpPageId the {@code ApplicationPage} identifier
      * @throws DeletionException if an error occurs during the deletion
      * @see ApplicationPage
+     * @see com.bonitasoft.engine.business.application.ApplicationMenu
      */
     void deleteApplicationPage(long applicationpPageId) throws DeletionException;
 
@@ -202,6 +200,8 @@ public interface ApplicationAPI {
      * @see ApplicationMenuCreator
      */
     ApplicationMenu createApplicationMenu(ApplicationMenuCreator applicationMenuCreator) throws CreationException;
+
+    Application updateApplicationMenu(long applicationMenuId, ApplicationMenuUpdater updater) throws ApplicationMenuNotFoundException, UpdateException, AlreadyExistsException;
 
     /**
      * Retrieves the {@link ApplicationMenu} from its identifier

@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
+import com.bonitasoft.engine.business.application.ApplicationMenuUpdater;
+import com.bonitasoft.engine.business.application.ApplicationPageUpdater;
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -40,8 +42,6 @@ import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
-import com.bonitasoft.engine.exception.InvalidDisplayNameException;
-import com.bonitasoft.engine.exception.InvalidTokenException;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationMenuDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationPageDescriptor;
@@ -117,8 +117,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws AlreadyExistsException, UpdateException,
-    ApplicationNotFoundException, InvalidTokenException, InvalidDisplayNameException {
+    public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException, AlreadyExistsException {
         return getApplicationAPIDelegate().updateApplication(applicationId, updater);
     }
 
@@ -138,14 +137,18 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String token) throws AlreadyExistsException,
-    CreationException, InvalidTokenException, InvalidDisplayNameException {
+    public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String token) throws AlreadyExistsException, CreationException {
         return getApplicationPageAPIDelegate().createApplicationPage(applicationId, pagedId, token);
     }
 
     @Override
     public ApplicationPage getApplicationPage(final String applicationName, final String applicationPageToken) throws ApplicationPageNotFoundException {
         return getApplicationPageAPIDelegate().getApplicationPage(applicationName, applicationPageToken);
+    }
+
+    @Override
+    public Application updateApplicationPage(long applicationPageId, ApplicationPageUpdater updater) throws ApplicationPageNotFoundException, UpdateException, AlreadyExistsException {
+        return null;
     }
 
     @Override
@@ -176,6 +179,11 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public ApplicationMenu createApplicationMenu(final ApplicationMenuCreator applicationMenuCreator) throws CreationException {
         return getApplicationMenuAPIDelegate().createApplicationMenu(applicationMenuCreator);
+    }
+
+    @Override
+    public Application updateApplicationMenu(long applicationMenuId, ApplicationMenuUpdater updater) throws ApplicationMenuNotFoundException, UpdateException, AlreadyExistsException {
+        return null;
     }
 
     @Override

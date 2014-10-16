@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
-import com.bonitasoft.engine.business.application.ApplicationMenuCreator.ApplicationMenuField;
+import com.bonitasoft.engine.business.application.ApplicationMenuField;
 
 /**
  * @author Elias Ricken de Medeiros

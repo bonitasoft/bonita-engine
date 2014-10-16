@@ -44,7 +44,8 @@ public class ApplicationUpdater implements Serializable {
     }
 
     /**
-     * Defines the new value for the {@link Application} token
+     * Defines the new value for the {@link Application} token. It cannot be empty or null and should contain only alpha numeric
+     * characters and the following special characters '-', '.', '_' or '~'.
      *
      * @param token the new value for the {@code Application} token
      * @return the current {@code ApplicationUpdater}
@@ -56,7 +57,7 @@ public class ApplicationUpdater implements Serializable {
     }
 
     /**
-     * Defines the new value for the {@link Application} display name
+     * Defines the new value for the {@link Application} display name. It cannot be empty or null.
      *
      * @param displayName the new value for the {@code Application} display name
      * @return the current {@code ApplicationUpdater}

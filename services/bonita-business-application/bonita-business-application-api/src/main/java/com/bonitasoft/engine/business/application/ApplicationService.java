@@ -50,8 +50,11 @@ public interface ApplicationService {
 
     List<SApplication> searchApplications(QueryOptions options) throws SBonitaSearchException;
 
-    SApplicationPage createApplicationPage(SApplicationPage applicationPage) throws SObjectCreationException, SObjectAlreadyExistsException,
-    SInvalidTokenException, SInvalidDisplayNameException;
+    SApplicationPage createApplicationPage(SApplicationPage applicationPage) throws SObjectCreationException, SObjectAlreadyExistsException, SInvalidTokenException;
+
+    SApplicationPage updateApplicationPage(long applicationPageId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException, SInvalidTokenException,
+            SObjectAlreadyExistsException, SObjectNotFoundException;
+
 
     SApplicationPage getApplicationPage(String applicationName, String applicationPageToken) throws SBonitaReadException, SObjectNotFoundException;
 

@@ -36,7 +36,6 @@ import com.bonitasoft.engine.business.application.SInvalidTokenException;
 import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
 import com.bonitasoft.engine.business.application.impl.SApplicationFields;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
-import com.bonitasoft.engine.exception.InvalidTokenException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -136,7 +135,7 @@ public class ApplicationPageAPIDelegateTest {
         //then exception
     }
 
-    @Test(expected = InvalidTokenException.class)
+    @Test(expected = CreationException.class)
     public void createApplicationPage_should_throw_InvalidNameException_when_applicationService_throws_SInvalidNameException() throws Exception {
         //given
         final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);

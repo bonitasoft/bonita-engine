@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.business.application;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,50 +23,6 @@ import java.util.Map;
 public class ApplicationMenuCreator implements Serializable {
 
     private static final long serialVersionUID = 5253969343647340983L;
-
-    /**
-     * Contains fields that can be used by {@code ApplicationMenuCreator}
-     */
-    public enum ApplicationMenuField {
-
-        /**
-         * References the {@link ApplicationMenu} display name
-         *
-         * @see ApplicationMenu
-         */
-        DISPLAY_NAME,
-
-        /**
-         * References the identifier of {@link Application} related to the {@link ApplicationMenu}
-         *
-         * @see ApplicationMenu
-         * @see Application
-         */
-        APPLICATION_ID,
-
-        /**
-         * References the identifier of {@link ApplicationPage} related to the {@link ApplicationMenu}
-         *
-         * @see ApplicationMenu
-         * @see ApplicationPage
-         */
-        APPLICATION_PAGE_ID,
-
-        /**
-         * References the identifier of parent {@link ApplicationMenu}
-         *
-         * @see ApplicationMenu
-         */
-        PARENT_ID,
-
-        /**
-         * References the {@link ApplicationMenu} index
-         *
-         * @see ApplicationMenu
-         */
-        INDEX;
-
-    }
 
     private final Map<ApplicationMenuField, Serializable> fields;
 
@@ -115,7 +72,7 @@ public class ApplicationMenuCreator implements Serializable {
      * @return a {@link Map}<{@link ApplicationMenuField}, {@link Serializable}> containing all fields defined in this {@code ApplicationMenuCreator}
      */
     public Map<ApplicationMenuField, Serializable> getFields() {
-        return fields;
+        return Collections.unmodifiableMap(fields);
     }
 
 }

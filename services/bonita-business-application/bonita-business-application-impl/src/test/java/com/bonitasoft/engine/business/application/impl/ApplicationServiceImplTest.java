@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationUpdateBuilderImpl;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -442,7 +443,7 @@ public class ApplicationServiceImplTest {
         inputParameters.put("applicationPageToken", "firstPage");
         given(persistenceService.selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationPageByTokenAndApplicationToken", inputParameters,
                 SApplicationPage.class
-                ))).willReturn(applicationPage);
+        ))).willReturn(applicationPage);
 
         //when
         final SApplicationPage retrievedAppPage = applicationServiceActive.getApplicationPage("app", "firstPage");
@@ -566,12 +567,44 @@ public class ApplicationServiceImplTest {
         //then exception
     }
 
+    @Test(expected = SInvalidTokenException.class)
+    public void updateApplicationPage_should_throw_SInvalidTokenException_when_token_is_invalid() throws Exception {
+        //given
+        SApplicationUpdateBuilder builder = new SApplicationUpdateBuilderImpl(new EntityUpdateDescriptor());
+        builder.updateToken("token with spaces");
+        final int applicationId = 17;
+
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplication>("getApplicationById", SApplication.class, applicationId))).willReturn(
+                application);
+
+        //when
+        applicationServiceActive.updateApplication(applicationId, builder.done());
+
+        //then exception
+    }
+
     @Test(expected = IllegalStateException.class)
     public void updateApplicationPage_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
         //when
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         updateDescriptor.addField("name", "newName");
         applicationServiceDisabled.updateApplication(10L, updateDescriptor);
+
+        //then exception
+    }
+
+    @Test(expected = SInvalidDisplayNameException.class)
+    public void updateApplicationPage_should_throw_SInvalidDisplayNameException_when_token_is_invalid() throws Exception {
+        //given
+        SApplicationUpdateBuilder builder = new SApplicationUpdateBuilderImpl(new EntityUpdateDescriptor());
+        builder.updateDisplayName(null);
+        final int applicationId = 17;
+
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplication>("getApplicationById", SApplication.class, applicationId))).willReturn(
+                application);
+
+        //when
+        applicationServiceActive.updateApplication(applicationId, builder.done());
 
         //then exception
     }

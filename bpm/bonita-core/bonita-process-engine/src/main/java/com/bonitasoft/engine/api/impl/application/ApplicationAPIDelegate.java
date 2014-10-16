@@ -10,8 +10,6 @@ package com.bonitasoft.engine.api.impl.application;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
-import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
-import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -29,16 +27,11 @@ import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
-import com.bonitasoft.engine.business.application.SInvalidDisplayNameException;
-import com.bonitasoft.engine.business.application.SInvalidTokenException;
 import com.bonitasoft.engine.business.application.model.SApplication;
-import com.bonitasoft.engine.exception.InvalidDisplayNameException;
-import com.bonitasoft.engine.exception.InvalidTokenException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class ApplicationAPIDelegate {
 
@@ -55,18 +48,14 @@ public class ApplicationAPIDelegate {
         this.searchApplications = searchApplications;
     }
 
-    public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException, InvalidTokenException {
+    public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException {
         try {
             final SApplication sApplication = applicationService.createApplication(convertor.buildSApplication(applicationCreator, loggedUserId));
             return convertor.toApplication(sApplication);
-        } catch (final SObjectCreationException e) {
-            throw new CreationException(e);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
-        } catch (final SInvalidTokenException e) {
-            throw new InvalidTokenException(e.getMessage());
-        } catch (final SInvalidDisplayNameException e) {
-            throw new InvalidDisplayNameException(e.getMessage());
+        } catch (final SBonitaException e) {
+            throw new CreationException(e);
         }
     }
 
@@ -99,24 +88,18 @@ public class ApplicationAPIDelegate {
     }
 
     public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws UpdateException,
-    AlreadyExistsException, InvalidTokenException, InvalidDisplayNameException, ApplicationNotFoundException {
+            AlreadyExistsException, ApplicationNotFoundException {
         try {
             SApplication sApplication;
             sApplication = applicationService.updateApplication(applicationId, convertor.toApplicationUpdateDescriptor(updater, loggedUserId));
 
             return convertor.toApplication(sApplication);
-        } catch (final SObjectModificationException e) {
-            throw new UpdateException(e);
-        } catch (final SInvalidTokenException e) {
-            throw new InvalidTokenException(e.getMessage());
-        } catch (final SInvalidDisplayNameException e) {
-            throw new InvalidDisplayNameException(e.getMessage());
-        } catch (final SBonitaReadException e) {
-            throw new UpdateException(e);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
         } catch (final SObjectNotFoundException e) {
             throw new ApplicationNotFoundException(applicationId);
+        } catch (SBonitaException e) {
+            throw new UpdateException(e);
         }
     }
 
