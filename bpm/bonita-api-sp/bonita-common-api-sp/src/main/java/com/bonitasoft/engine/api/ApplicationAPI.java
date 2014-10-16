@@ -131,7 +131,7 @@ public interface ApplicationAPI {
      */
     ApplicationPage getApplicationPage(String applicationToken, String applicationPageToken) throws ApplicationPageNotFoundException;
 
-    Application updateApplicationPage(long applicationPageId, ApplicationPageUpdater updater) throws ApplicationPageNotFoundException, UpdateException, AlreadyExistsException;
+    ApplicationPage updateApplicationPage(long applicationPageId, ApplicationPageUpdater updater) throws ApplicationPageNotFoundException, UpdateException, AlreadyExistsException;
 
     /**
      * Retrieves the {@link ApplicationPage} from its identifier
@@ -201,7 +201,7 @@ public interface ApplicationAPI {
      */
     ApplicationMenu createApplicationMenu(ApplicationMenuCreator applicationMenuCreator) throws CreationException;
 
-    Application updateApplicationMenu(long applicationMenuId, ApplicationMenuUpdater updater) throws ApplicationMenuNotFoundException, UpdateException, AlreadyExistsException;
+    ApplicationMenu updateApplicationMenu(long applicationMenuId, ApplicationMenuUpdater updater) throws ApplicationMenuNotFoundException, UpdateException, AlreadyExistsException;
 
     /**
      * Retrieves the {@link ApplicationMenu} from its identifier

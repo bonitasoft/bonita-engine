@@ -147,7 +147,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public Application updateApplicationPage(long applicationPageId, ApplicationPageUpdater updater) throws ApplicationPageNotFoundException, UpdateException, AlreadyExistsException {
+    public ApplicationPage updateApplicationPage(long applicationPageId, ApplicationPageUpdater updater) throws ApplicationPageNotFoundException, UpdateException, AlreadyExistsException {
         return null;
     }
 
@@ -182,7 +182,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public Application updateApplicationMenu(long applicationMenuId, ApplicationMenuUpdater updater) throws ApplicationMenuNotFoundException, UpdateException, AlreadyExistsException {
+    public ApplicationMenu updateApplicationMenu(long applicationMenuId, ApplicationMenuUpdater updater) throws ApplicationMenuNotFoundException, UpdateException, AlreadyExistsException {
         return null;
     }
 
