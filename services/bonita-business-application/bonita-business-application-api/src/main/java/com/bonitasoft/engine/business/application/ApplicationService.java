@@ -75,4 +75,5 @@ public interface ApplicationService {
 
     List<SApplicationMenu> searchApplicationMenus(QueryOptions options) throws SBonitaSearchException;
 
+    List<String> getAllPagesForProfile(long profileId) throws SBonitaReadException;
 }
