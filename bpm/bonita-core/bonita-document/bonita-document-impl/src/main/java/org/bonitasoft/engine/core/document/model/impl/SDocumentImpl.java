@@ -40,9 +40,6 @@ public class SDocumentImpl extends SLightDocumentImpl implements SDocument {
 
     @Override
     public byte[] getContent() {
-        if(content == null) {
-            return new byte[0];
-        }
         return content;
     }
 
