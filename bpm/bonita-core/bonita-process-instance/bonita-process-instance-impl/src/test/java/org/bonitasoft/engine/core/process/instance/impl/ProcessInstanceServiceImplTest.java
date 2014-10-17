@@ -484,14 +484,9 @@ public class ProcessInstanceServiceImplTest {
         final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
         doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
         doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
-        //        doNothing().when(activityInstanceService).deleteHiddenTasksForActivity(flowNodeInstance.getId());
-        //        doNothing().when(activityInstanceService).deletePendingMappings(flowNodeInstance.getId());
 
         // When
         processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
-
-        // Then
-        //        verify(eventInstanceService).deleteWaitingEvents(flowNodeInstance);
-        //        verify(eventInstanceService).deleteEventTriggerInstances(flowNodeInstance.getId());
     }
+
 }

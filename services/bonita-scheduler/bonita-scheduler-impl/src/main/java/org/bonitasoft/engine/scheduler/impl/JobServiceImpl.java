@@ -46,7 +46,6 @@ import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
 import org.bonitasoft.engine.scheduler.exception.failedJob.SFailedJobReadException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorDeletionException;
-import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNotFoundException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorReadException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogDeletionException;
@@ -109,11 +108,9 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void deleteJobDescriptor(final long id) throws SJobDescriptorNotFoundException, SJobDescriptorReadException, SJobDescriptorDeletionException {
-        try {
-            final SJobDescriptor sJobDescriptor = getJobDescriptor(id);
-            deleteJobDescriptor(sJobDescriptor);
-        } catch (final SJobDescriptorNotFoundException e) {
+    public void deleteJobDescriptor(final long id) throws SJobDescriptorReadException, SJobDescriptorDeletionException {
+        final SJobDescriptor sJobDescriptor = getJobDescriptor(id);
+        if (sJobDescriptor == null) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 final StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append("jobDescriptor with id");
@@ -121,6 +118,8 @@ public class JobServiceImpl implements JobService {
                 stringBuilder.append(" already deleted, ignore it");
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, stringBuilder.toString());
             }
+        } else {
+            deleteJobDescriptor(sJobDescriptor);
         }
     }
 
@@ -137,13 +136,10 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public SJobDescriptor getJobDescriptor(final long id) throws SJobDescriptorNotFoundException, SJobDescriptorReadException {
+    public SJobDescriptor getJobDescriptor(final long id) throws SJobDescriptorReadException {
         try {
             final SJobDescriptor sJobDescriptor = readPersistenceService.selectById(SelectDescriptorBuilder.getElementById(SJobDescriptor.class,
                     "SJobDescriptor", id));
-            if (sJobDescriptor == null) {
-                throw new SJobDescriptorNotFoundException(id);
-            }
             return sJobDescriptor;
         } catch (final SBonitaReadException sbre) {
             throw new SJobDescriptorReadException(sbre);
@@ -291,6 +287,29 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public void deleteJobLogs(final long jobDescriptorId) throws SJobLogDeletionException, SBonitaSearchException {
+        List<SJobLog> jobLogs = getJobLogs(jobDescriptorId, 0, 100);
+        while (!jobLogs.isEmpty()) {
+            deleteJobLogs(jobLogs);
+            jobLogs = getJobLogs(jobDescriptorId, 0, 100);
+        }
+    }
+
+    private void deleteJobLogs(final List<SJobLog> jobLogs) throws SJobLogDeletionException {
+        for (final SJobLog sJobLog : jobLogs) {
+            deleteJobLog(sJobLog);
+        }
+    }
+
+    @Override
+    public List<SJobLog> getJobLogs(final long jobDescriptorId, final int fromIndex, final int maxResults) throws SBonitaSearchException {
+        final FilterOption filter = new FilterOption(SJobLog.class, "jobDescriptorId", jobDescriptorId);
+        final OrderByOption orderByOption = new OrderByOption(SJobLog.class, "jobDescriptorId", OrderByType.ASC);
+        final QueryOptions options = new QueryOptions(fromIndex, maxResults, Arrays.asList(orderByOption), Arrays.asList(filter), null);
+        return searchJobLogs(options);
+    }
+
+    @Override
     public SJobLog getJobLog(final long id) throws SJobLogNotFoundException, SJobLogReadException {
         try {
             final SJobLog sJobLog = readPersistenceService.selectById(SelectDescriptorBuilder.getElementById(SJobLog.class, "SJobLog", id));
@@ -369,8 +388,7 @@ public class JobServiceImpl implements JobService {
         try {
             final List<SJobDescriptor> jobDescriptors = searchJobDescriptors(queryOptions);
             if (!jobDescriptors.isEmpty()) {
-                final SJobDescriptor sJobDescriptor = jobDescriptors.get(0);
-                deleteJobDescriptor(sJobDescriptor);
+                deleteJobDescriptor(jobDescriptors.get(0));
             }
         } catch (final SBonitaSearchException e) {
             throw new SJobDescriptorDeletionException("Job " + jobName + " not found, can't delete corresponding job descriptor");

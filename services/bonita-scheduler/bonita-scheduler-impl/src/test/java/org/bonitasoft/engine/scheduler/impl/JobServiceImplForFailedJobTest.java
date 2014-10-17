@@ -14,8 +14,10 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -58,14 +60,20 @@ public class JobServiceImplForFailedJobTest {
 
     @Test
     public final void getFailedJobs() throws SBonitaReadException, SFailedJobReadException {
+        // Given
         final SFailedJob sFailedJob = mock(SFailedJob.class);
         when(readPersistenceService.selectList(Matchers.<SelectListDescriptor<SFailedJob>> any())).thenReturn(Collections.singletonList(sFailedJob));
 
-        assertEquals(sFailedJob, jobServiceImpl.getFailedJobs(0, 10).get(0));
+        // When
+        final SFailedJob result = jobServiceImpl.getFailedJobs(0, 10).get(0);
+
+        // Then
+        assertEquals(sFailedJob, result);
+        verify(readPersistenceService).selectList(any(SelectListDescriptor.class));
     }
 
     @Test(expected = SFailedJobReadException.class)
-    public void getFailedJobsThrowException() throws SBonitaReadException, SFailedJobReadException {
+    public void getFailedJobs_should_throw_exception_when_persistenceService_failed() throws SBonitaReadException, SFailedJobReadException {
         doThrow(new SBonitaReadException("")).when(readPersistenceService).selectList(Matchers.<SelectListDescriptor<SFailedJob>> any());
 
         jobServiceImpl.getFailedJobs(0, 10);

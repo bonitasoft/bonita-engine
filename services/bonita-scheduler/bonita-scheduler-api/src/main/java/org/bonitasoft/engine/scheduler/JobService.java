@@ -105,12 +105,11 @@ public interface JobService {
      *
      * @param id
      *        Identifier of job descriptor
-     * @return
+     * @return Null if the job descriptor doesn't exist, else the {@link SJobDescriptor} corresponding to the identifier
      * @throws SJobDescriptorReadException
-     * @throws SJobDescriptorNotFoundException
      * @since 6.1
      */
-    SJobDescriptor getJobDescriptor(long id) throws SJobDescriptorNotFoundException, SJobDescriptorReadException;
+    SJobDescriptor getJobDescriptor(long id) throws SJobDescriptorReadException;
 
     /**
      * Get total number of job descriptors
@@ -306,5 +305,31 @@ public interface JobService {
      * @since 6.4.0
      */
     void updateJobLog(SJobLog jobLog, EntityUpdateDescriptor descriptor) throws SJobLogUpdatingException;
+
+    /**
+     * Delete all {@link SJobLog} of a specific {@link SJobDescriptor}
+     *
+     * @param jobDescriptorId
+     *        The identifier of the {@link SJobDescriptor}
+     * @throws SBonitaSearchException
+     * @throws SJobLogDeletionException
+     * @since 6.4.0
+     */
+    void deleteJobLogs(long jobDescriptorId) throws SJobLogDeletionException, SBonitaSearchException;
+
+    /**
+     * Get all {@link SJobLog} of a specific {@link SJobDescriptor}
+     *
+     * @param jobDescriptorId
+     *        The identifier of the {@link SJobDescriptor}
+     * @param fromIndex
+     *        The index of the first element of the list
+     * @param maxResults
+     *        The nulber max of elements of the list
+     * @return A list of {@link SJobLog}
+     * @throws SBonitaSearchException
+     * @since 6.4.0
+     */
+    List<SJobLog> getJobLogs(long jobDescriptorId, int fromIndex, int maxResults) throws SBonitaSearchException;
 
 }
