@@ -191,6 +191,7 @@ public class BuildTestUtil {
         final DocumentBuilder builder = new DocumentBuilder().createNewInstance(documentName, false);
         builder.setFileName(fileName);
         builder.setContentMimeType("plain/text");
+        builder.setDescription("a generated document for tests");
         return builder.done();
     }
 

@@ -29,7 +29,7 @@ import org.bonitasoft.engine.identity.model.builder.SUserMembershipBuilderFactor
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -641,7 +641,7 @@ public interface IdentityService {
      * @return the total number of custom user info value
      * @throws SIdentityException occurs on persistence layer access problem
      */
-    long getNumberOfCustomUserInfoValue(QueryOptions options) throws SBonitaSearchException;
+    long getNumberOfCustomUserInfoValue(QueryOptions options) throws SBonitaReadException;
 
     /**
      * Get a {@link List} of {@link SCustomUserInfoDefinition} of the given identifiers
@@ -699,9 +699,9 @@ public interface IdentityService {
      * @param options
      *        The QueryOptions object containing some query conditions
      * @return a list of SCustomUserInfoValue objects
-     * @throws SBonitaSearchException occurs on persistence layer access problem or if search parameters are not correct
+     * @throws SBonitaReadException occurs on persistence layer access problem or if search parameters are not correct
      */
-    List<SCustomUserInfoValue> searchCustomUserInfoValue(QueryOptions options) throws SBonitaSearchException;
+    List<SCustomUserInfoValue> searchCustomUserInfoValue(QueryOptions options) throws SBonitaReadException;
 
     /**
      * Get {@link SUserMembership} for a specific interval for a given user
@@ -1077,9 +1077,9 @@ public interface IdentityService {
      * @param options
      *        The QueryOptions object containing some query conditions
      * @return the satisfied user number
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfUsers(QueryOptions options) throws SBonitaSearchException;
+    long getNumberOfUsers(QueryOptions options) throws SBonitaReadException;
 
     /**
      * Search users according to specific query options
@@ -1087,9 +1087,9 @@ public interface IdentityService {
      * @param options
      *        The QueryOptions object containing some query conditions
      * @return a list of SUser objects
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<SUser> searchUsers(QueryOptions options) throws SBonitaSearchException;
+    List<SUser> searchUsers(QueryOptions options) throws SBonitaReadException;
 
     /**
      * Get total number of roles according to specific query options
@@ -1097,9 +1097,9 @@ public interface IdentityService {
      * @param options
      *        The QueryOptions object containing some query conditions
      * @return the satisfied role number
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfRoles(QueryOptions options) throws SBonitaSearchException;
+    long getNumberOfRoles(QueryOptions options) throws SBonitaReadException;
 
     /**
      * Search roles according to specific query options
@@ -1107,9 +1107,9 @@ public interface IdentityService {
      * @param options
      *        The QueryOptions object containing some query conditions
      * @return a list of SRole objects
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<SRole> searchRoles(QueryOptions options) throws SBonitaSearchException;
+    List<SRole> searchRoles(QueryOptions options) throws SBonitaReadException;
 
     /**
      * Get total number of groups according to specific query options
@@ -1117,9 +1117,9 @@ public interface IdentityService {
      * @param options
      *        The QueryOptions object containing some query conditions
      * @return the group number
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfGroups(QueryOptions options) throws SBonitaSearchException;
+    long getNumberOfGroups(QueryOptions options) throws SBonitaReadException;
 
     /**
      * Search groups according to specific query options
@@ -1127,9 +1127,9 @@ public interface IdentityService {
      * @param options
      *        The QueryOptions object containing some query conditions
      * @return a list of SGroup objects
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<SGroup> searchGroups(QueryOptions options) throws SBonitaSearchException;
+    List<SGroup> searchGroups(QueryOptions options) throws SBonitaReadException;
 
     /**
      * Get total number of userMemberships contains specific group and role

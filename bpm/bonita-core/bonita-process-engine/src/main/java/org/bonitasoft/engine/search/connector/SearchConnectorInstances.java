@@ -18,7 +18,7 @@ import java.util.List;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractConnectorSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchConnectorInstanceDescriptor;
@@ -37,12 +37,12 @@ public class SearchConnectorInstances extends AbstractConnectorSearchEntity {
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return connectorInstanceService.getNumberOfConnectorInstances(searchOptions);
     }
 
     @Override
-    public List<SConnectorInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SConnectorInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return connectorInstanceService.searchConnectorInstances(searchOptions);
     }
 

@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 
@@ -88,10 +88,10 @@ public interface QueriableLoggerService {
      * @param QueryOptions
      *            The criterion used to search sQueriableLog
      * @return queriable logs number matching to the given searchOptions.
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @since 6.0
      */
-    long getNumberOfLogs(final QueryOptions searchOptions) throws SBonitaSearchException;
+    long getNumberOfLogs(final QueryOptions searchOptions) throws SBonitaReadException;
 
     /**
      * Gets the queriable logs matching to the given searchOptions.
@@ -99,9 +99,9 @@ public interface QueriableLoggerService {
      * @param searchOptions
      *            The criterion used to search sQueriableLog
      * @return logs list matching to the given searchOptions.
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @since 6.0
      */
-    List<SQueriableLog> searchLogs(final QueryOptions searchOptions) throws SBonitaSearchException;
+    List<SQueriableLog> searchLogs(final QueryOptions searchOptions) throws SBonitaReadException;
 
 }

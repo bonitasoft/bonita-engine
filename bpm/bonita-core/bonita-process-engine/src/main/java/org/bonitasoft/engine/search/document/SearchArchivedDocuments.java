@@ -15,10 +15,10 @@ package org.bonitasoft.engine.search.document;
 
 import java.util.List;
 
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
-import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
+import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractArchivedDocumentSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchArchivedDocumentDescriptor;
@@ -29,22 +29,22 @@ import org.bonitasoft.engine.search.descriptor.SearchArchivedDocumentDescriptor;
  */
 public class SearchArchivedDocuments extends AbstractArchivedDocumentSearchEntity {
 
-    private final ProcessDocumentService processDocumentService;
+    private final DocumentService documentService;
 
-    public SearchArchivedDocuments(final ProcessDocumentService processDocumentService, final SearchArchivedDocumentDescriptor searchDescriptor,
+    public SearchArchivedDocuments(final DocumentService documentService, final SearchArchivedDocumentDescriptor searchDescriptor,
             final SearchOptions options) {
-        super(searchDescriptor, options);
-        this.processDocumentService = processDocumentService;
+        super(searchDescriptor, options, documentService);
+        this.documentService = documentService;
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processDocumentService.getNumberOfArchivedDocuments(searchOptions);
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
+        return documentService.getNumberOfArchivedDocuments(searchOptions);
     }
 
     @Override
-    public List<SAProcessDocument> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processDocumentService.searchArchivedDocuments(searchOptions);
+    public List<SAMappedDocument> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
+        return documentService.searchArchivedDocuments(searchOptions);
     }
 
 }

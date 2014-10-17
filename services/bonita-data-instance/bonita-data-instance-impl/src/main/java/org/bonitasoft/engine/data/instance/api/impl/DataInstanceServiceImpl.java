@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.archive.SDefinitiveArchiveNotFound;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
@@ -106,9 +105,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
                 final SADataInstance saDataInstance = BuilderFactory.get(SADataInstanceBuilderFactory.class).createNewInstance(sDataInstance).done();
                 final ArchiveInsertRecord archiveInsertRecord = new ArchiveInsertRecord(saDataInstance);
                 archiveService.recordInsert(archiveDate, archiveInsertRecord);
-            } catch (final SDefinitiveArchiveNotFound e) {
-                logOnExceptionMethod(TechnicalLogSeverity.TRACE, "updateDataInstance", e);
-                throw new SDataInstanceException("Unable to create SADataInstance", e);
             } catch (final SRecorderException e) {
                 logOnExceptionMethod(TechnicalLogSeverity.TRACE, "updateDataInstance", e);
                 throw new SDataInstanceException("Unable to create SADataInstance", e);
@@ -296,9 +292,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         } catch (final SRecorderException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "addChildContainer", e);
             throw new SDataInstanceException(e);
-        } catch (final SDefinitiveArchiveNotFound e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "addChildContainer", e);
-            throw new SDataInstanceException(e);
         }
     }
 
@@ -342,14 +335,11 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         } catch (final SRecorderException e) {
             logOnExceptionMethod(TechnicalLogSeverity.TRACE, "createDataContainer", e);
             throw new SDataInstanceException(e);
-        } catch (final SDefinitiveArchiveNotFound e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "createDataContainer", e);
-            throw new SDataInstanceException(e);
         }
     }
 
     protected List<SDataInstanceVisibilityMapping> insertMappingForLocalElement(final long containerId, final String containerType, boolean shouldArchiveMapping) throws SRecorderException,
-            SDataInstanceException, SDefinitiveArchiveNotFound {
+            SDataInstanceException {
         final int batchSize = 50;
         int currentIndex = 0;
         final long archiveDate = System.currentTimeMillis();
@@ -380,7 +370,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
      * @throws SDefinitiveArchiveNotFound
      */
     protected SDataInstanceVisibilityMapping insertDataInstanceVisibilityMapping(final long containerId, final String containerType, final String dataName,
-            final long dataInstanceId, final long archiveDate, final boolean shouldArchive) throws SRecorderException, SDefinitiveArchiveNotFound {
+            final long dataInstanceId, final long archiveDate, final boolean shouldArchive) throws SRecorderException {
         final SDataInstanceVisibilityMapping mapping = createDataInstanceVisibilityMapping(containerId, containerType, dataName, dataInstanceId);
         final InsertRecord record = new InsertRecord(mapping);
         final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DATA_VISIBILITY_MAPPING).done();

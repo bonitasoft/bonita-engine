@@ -31,7 +31,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -77,7 +77,7 @@ public abstract class CoupleEventHandlerStrategy extends EventHandlerStrategy {
     }
 
     private <T extends SWaitingEvent> void unregisterWaitingEvents(final Class<T> waitingEventClass,
-            final long subProcessId, final SProcessInstance parentProcessInstance) throws SBonitaSearchException, SWaitingEventModificationException {
+            final long subProcessId, final SProcessInstance parentProcessInstance) throws SBonitaReadException, SWaitingEventModificationException {
         final QueryOptions queryOptions = getWaitingEventsQueryOptions(waitingEventClass, subProcessId, parentProcessInstance);
         List<T> waitingEvents;
         do {

@@ -18,7 +18,7 @@ import java.util.List;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractArchivedCommentsSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
@@ -37,12 +37,12 @@ public class SearchArchivedComments extends AbstractArchivedCommentsSearchEntity
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return sCommentService.getNumberOfArchivedComments(searchOptions);
     }
 
     @Override
-    public List<SAComment> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SAComment> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return sCommentService.searchArchivedComments(searchOptions);
     }
 

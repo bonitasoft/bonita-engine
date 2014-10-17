@@ -46,8 +46,7 @@ import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
-import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -163,9 +162,7 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private ConnectorInstanceService connectorInstanceService;
 
-    private ProcessDocumentService processDocumentService;
-
-    private DocumentMappingService documentMappingService;
+    private DocumentService documentService;
 
     private ProfileService profileService;
 
@@ -449,14 +446,6 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
-    public DocumentMappingService getDocumentMappingService() {
-        if (documentMappingService == null) {
-            documentMappingService = beanAccessor.getService(DocumentMappingService.class);
-        }
-        return documentMappingService;
-    }
-
-    @Override
     public long getTenantId() {
         return tenantId;
     }
@@ -502,11 +491,11 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
     }
 
     @Override
-    public ProcessDocumentService getProcessDocumentService() {
-        if (processDocumentService == null) {
-            processDocumentService = beanAccessor.getService(ProcessDocumentService.class);
+    public DocumentService getDocumentService() {
+        if (documentService == null) {
+            documentService = beanAccessor.getService(DocumentService.class);
         }
-        return processDocumentService;
+        return documentService;
     }
 
     @Override

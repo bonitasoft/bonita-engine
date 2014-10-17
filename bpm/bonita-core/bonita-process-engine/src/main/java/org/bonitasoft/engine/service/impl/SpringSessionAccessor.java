@@ -20,7 +20,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
  */
 public class SpringSessionAccessor implements SessionAccessorAccessor {
 
-    private static SessionAccessorAccessor instance = new SpringSessionAccessor();
+    private static final SessionAccessorAccessor instance = new SpringSessionAccessor();
 
     private static SessionAccessor sessionAccessor;
 

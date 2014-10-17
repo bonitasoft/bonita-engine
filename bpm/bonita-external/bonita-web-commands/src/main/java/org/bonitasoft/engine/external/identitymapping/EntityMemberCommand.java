@@ -19,7 +19,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.entitymember.EntityMember;
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
@@ -59,13 +59,13 @@ public abstract class EntityMemberCommand extends ExternalIdentityMappingCommand
         }
 
         @Override
-        public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+        public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
             return serviceAccessor.getExternalIdentityMappingService().getNumberOfExternalIdentityMappingsForUser(kind, userId, externalId, searchOptions,
                     "Involving");
         }
 
         @Override
-        public List<SExternalIdentityMapping> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+        public List<SExternalIdentityMapping> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
             return serviceAccessor.getExternalIdentityMappingService().searchExternalIdentityMappingsForUser(kind, userId, externalId, searchOptions,
                     "Involving");
         }
@@ -83,12 +83,12 @@ public abstract class EntityMemberCommand extends ExternalIdentityMappingCommand
         }
 
         @Override
-        public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+        public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
             return serviceAccessor.getExternalIdentityMappingService().getNumberOfExternalIdentityMappings(kind, searchOptions, querySuffix);
         }
 
         @Override
-        public List<SExternalIdentityMapping> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+        public List<SExternalIdentityMapping> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
             return serviceAccessor.getExternalIdentityMappingService().searchExternalIdentityMappings(kind, searchOptions, querySuffix);
         }
 

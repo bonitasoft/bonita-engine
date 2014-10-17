@@ -20,17 +20,18 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.document.SDocumentNotFoundException;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
 
 /**
@@ -40,13 +41,13 @@ import org.bonitasoft.engine.service.ModelConvertor;
  */
 public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
-    private final ProcessDocumentService processDocumentService;
+    private final DocumentService documentService;
 
     private final FlowNodeInstanceService flowNodeInstanceService;
 
-    public DocumentReferenceExpressionExecutorStrategy(final ProcessDocumentService processDocumentService,
+    public DocumentReferenceExpressionExecutorStrategy(final DocumentService documentService,
             final FlowNodeInstanceService flowNodeInstanceService) {
-        this.processDocumentService = processDocumentService;
+        this.documentService = documentService;
         this.flowNodeInstanceService = flowNodeInstanceService;
     }
 
@@ -82,16 +83,16 @@ public class DocumentReferenceExpressionExecutorStrategy extends NonEmptyContent
         }
     }
 
-    private Document getDocument(final long processInstanceId, final SExpression expression, final Long time) {
+    private Document getDocument(final long processInstanceId, final SExpression expression, final Long time) throws SBonitaReadException {
         try {
-            SProcessDocument document;
+            SMappedDocument document;
             if (time != null) {
-                document = processDocumentService.getDocument(processInstanceId, expression.getContent(), time);
+                document = documentService.getMappedDocument(processInstanceId, expression.getContent(), time);
             } else {
-                document = processDocumentService.getDocument(processInstanceId, expression.getContent());
+                document = documentService.getMappedDocument(processInstanceId, expression.getContent());
             }
-            return ModelConvertor.toDocument(document);
-        } catch (final SDocumentNotFoundException e) {
+            return ModelConvertor.toDocument(document, documentService);
+        } catch (final SObjectNotFoundException e) {
             return null;
         }
     }

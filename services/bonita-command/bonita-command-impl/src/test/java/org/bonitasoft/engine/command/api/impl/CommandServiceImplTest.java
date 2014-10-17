@@ -30,7 +30,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -148,11 +148,11 @@ public class CommandServiceImplTest {
     /**
      * Test method for {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#getNumberOfCommands(org.bonitasoft.engine.persistence.QueryOptions)}.
      * 
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @throws SBonitaReadException
      */
     @Test
-    public final void getNumberOfCommands() throws SBonitaSearchException, SBonitaReadException {
+    public final void getNumberOfCommands() throws SBonitaReadException, SBonitaReadException {
         final long numberOfCommands = 54165L;
         final QueryOptions options = mock(QueryOptions.class);
         when(persistence.getNumberOfEntities(SCommand.class, options, null)).thenReturn(numberOfCommands);
@@ -160,8 +160,8 @@ public class CommandServiceImplTest {
         Assert.assertEquals(numberOfCommands, commandServiceImpl.getNumberOfCommands(options));
     }
 
-    @Test(expected = SBonitaSearchException.class)
-    public final void getNumberOfCommandsThrowException() throws SBonitaSearchException, SBonitaReadException {
+    @Test(expected = SBonitaReadException.class)
+    public final void getNumberOfCommandsThrowException() throws SBonitaReadException, SBonitaReadException {
         final QueryOptions options = mock(QueryOptions.class);
         when(persistence.getNumberOfEntities(SCommand.class, options, null)).thenThrow(new SBonitaReadException(""));
 
@@ -193,11 +193,11 @@ public class CommandServiceImplTest {
     /**
      * Test method for {@link org.bonitasoft.engine.command.api.impl.CommandServiceImpl#searchCommands(org.bonitasoft.engine.persistence.QueryOptions)}.
      * 
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @throws SBonitaReadException
      */
     @Test
-    public final void searchCommands() throws SBonitaSearchException, SBonitaReadException {
+    public final void searchCommands() throws SBonitaReadException {
         final List<SCommand> sCommands = new ArrayList<SCommand>();
         final QueryOptions options = mock(QueryOptions.class);
         when(persistence.searchEntity(SCommand.class, options, null)).thenReturn(sCommands);
@@ -205,8 +205,8 @@ public class CommandServiceImplTest {
         Assert.assertEquals(sCommands, commandServiceImpl.searchCommands(options));
     }
 
-    @Test(expected = SBonitaSearchException.class)
-    public final void searchCommandsThrowException() throws SBonitaSearchException, SBonitaReadException {
+    @Test(expected = SBonitaReadException.class)
+    public final void searchCommandsThrowException() throws SBonitaReadException {
         final QueryOptions options = mock(QueryOptions.class);
         when(persistence.searchEntity(SCommand.class, options, null)).thenThrow(new SBonitaReadException(""));
 

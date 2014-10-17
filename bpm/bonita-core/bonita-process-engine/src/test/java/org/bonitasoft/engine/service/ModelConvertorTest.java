@@ -1,12 +1,11 @@
 package org.bonitasoft.engine.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
 
 import org.bonitasoft.engine.api.impl.DummySCustomUserInfoDefinition;
 import org.bonitasoft.engine.api.impl.DummySCustomUserInfoValue;
@@ -14,6 +13,10 @@ import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
+import org.bonitasoft.engine.bpm.document.Document;
+import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.model.SDocument;
+import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.execution.state.CompletedActivityStateImpl;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
@@ -22,6 +25,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -72,6 +76,20 @@ public class ModelConvertorTest {
         assertThat(testUser.getPassword()).isEmpty();
         verify(sUser, never()).getPassword();
     }
+    private DocumentService createdMockedDocumentService() {
+        DocumentService documentService = mock(DocumentService.class);
+        doReturn("url?fileName=document&contentStorageId=123").when(documentService).generateDocumentURL("document","123");
+        return documentService;
+    }
+
+    private SMappedDocument createMockedDocument() {
+        SMappedDocument documentMapping = mock(SMappedDocument.class);
+        doReturn("document").when(documentMapping).getFileName();
+        doReturn(123l).when(documentMapping).getDocumentId();
+        doReturn("whateverUrl").when(documentMapping).getUrl();
+        return documentMapping;
+    }
+
 
     @Test
     public void toArchivedUserTaskInstance_sould_return_the_right_idenfiers() throws Exception {
@@ -93,6 +111,31 @@ public class ModelConvertorTest {
         assertThat(archivedUserTaskInstance.getParentContainerId()).isEqualTo(2L);
         assertThat(archivedUserTaskInstance.getProcessInstanceId()).isEqualTo(2L);
         assertThat(archivedUserTaskInstance.getParentActivityInstanceId()).isEqualTo(456L);
+    }
+
+    @Test
+    public void getDocument_from_process_instance_and_name_should_return_a_document_with_generated_url_when_it_has_content() throws Exception {
+
+        SMappedDocument documentMapping = createMockedDocument();
+        DocumentService documentService = createdMockedDocumentService();
+        doReturn(true).when(documentMapping).hasContent();
+
+        Document document = ModelConvertor.toDocument(documentMapping, documentService);
+
+        assertEquals("url?fileName=document&contentStorageId=123", document.getUrl());
+    }
+
+
+    @Test
+    public void getDocument_from_process_instance_and_name_should_return_a_document_url_when_is_external_url() throws Exception {
+
+        SMappedDocument documentMapping = createMockedDocument();
+        DocumentService documentService = createdMockedDocumentService();
+        doReturn(false).when(documentMapping).hasContent();
+
+        Document document = ModelConvertor.toDocument(documentMapping, documentService);
+
+        assertEquals("whateverUrl", document.getUrl());
     }
 
     @Test

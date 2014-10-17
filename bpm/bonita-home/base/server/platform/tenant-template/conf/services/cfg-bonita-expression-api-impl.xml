@@ -18,6 +18,7 @@
 				<ref bean="transientDataExpressionExecutorStrategy" />
 				<ref bean="patternExpressionExecutorStrategy" />
 				<ref bean="documentReferenceExpressionExecutorStrategy" />
+				<ref bean="documentListReferenceExpressionExecutorStrategy" />
 				<ref bean="engineConstantExpressionExecutorStrategy" />
 				<ref bean="listExpressionExecutorStrategy" />
 				<ref bean="conditionExpressionExecutorStrategy" />

@@ -21,8 +21,8 @@ import java.util.Set;
 
 import org.bonitasoft.engine.bpm.document.DocumentsSearchDescriptor;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
-import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderFactory;
+import org.bonitasoft.engine.core.document.model.SMappedDocument;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -31,31 +31,40 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  */
 public class SearchDocumentDescriptor extends SearchEntityDescriptor {
 
+    public static final String DOCUMENT_PREFIX = "document.";
     private final Map<String, FieldDescriptor> searchEntityKeys;
 
     private final Map<Class<? extends PersistentObject>, Set<String>> documentAllFields;
 
     SearchDocumentDescriptor() {
-        final SDocumentMappingBuilderFactory fact = BuilderFactory.get(SDocumentMappingBuilderFactory.class);
+        final SDocumentBuilderFactory fact = BuilderFactory.get(SDocumentBuilderFactory.class);
         searchEntityKeys = new HashMap<String, FieldDescriptor>(9);
-        searchEntityKeys.put(DocumentsSearchDescriptor.CONTENT_STORAGE_ID, new FieldDescriptor(SDocumentMapping.class, fact.geContentStorageIdKey()));
-        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_AUTHOR, new FieldDescriptor(SDocumentMapping.class, fact.getDocumentAuthorKey()));
-        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_CONTENT_FILENAME, new FieldDescriptor(SDocumentMapping.class, fact.getDocumentContentFileNameKey()));
-        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_CONTENT_MIMETYPE, new FieldDescriptor(SDocumentMapping.class, fact.getDocumentContentMimeTypeKey()));
-        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_CREATIONDATE, new FieldDescriptor(SDocumentMapping.class, fact.getDocumentCreationDateKey()));
-        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_HAS_CONTENT, new FieldDescriptor(SDocumentMapping.class, fact.getDocumentHasContent()));
-        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_NAME, new FieldDescriptor(SDocumentMapping.class, fact.getDocumentNameKey()));
-        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_URL, new FieldDescriptor(SDocumentMapping.class, fact.getDocumentURLKey()));
-        searchEntityKeys.put(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, new FieldDescriptor(SDocumentMapping.class, fact.getProcessInstanceIdKey()));
+
+        //        searchEntityKeys.put(DocumentsSearchDescriptor.CONTENT_STORAGE_ID, new FieldDescriptor(SDocument.class, fact.geContentStorageIdKey()));
+        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_AUTHOR, new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + fact.getAuthorKey()));
+        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_CONTENT_FILENAME,
+                new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + fact.getFileNameKey()));
+        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_CONTENT_MIMETYPE,
+                new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + fact.getMimeTypeKey()));
+        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_CREATIONDATE,
+                new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + fact.getCreationDateKey()));
+        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_HAS_CONTENT,
+                new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + fact.getHasContentKey()));
+        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_NAME, new FieldDescriptor(SMappedDocument.class, fact.getNameKey()));
+        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_DESCRIPTION, new FieldDescriptor(SMappedDocument.class, fact.getDescriptionKey()));
+        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_VERSION, new FieldDescriptor(SMappedDocument.class, fact.getVersionKey()));
+        searchEntityKeys.put(DocumentsSearchDescriptor.LIST_INDEX, new FieldDescriptor(SMappedDocument.class, fact.getIndexKey()));
+        searchEntityKeys.put(DocumentsSearchDescriptor.DOCUMENT_URL, new FieldDescriptor(SMappedDocument.class, DOCUMENT_PREFIX + fact.getURLKey()));
+        searchEntityKeys.put(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, new FieldDescriptor(SMappedDocument.class, "processInstanceId"));
 
         documentAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
         final Set<String> documentFields = new HashSet<String>(8);
-        documentFields.add(fact.geContentStorageIdKey());
-        documentFields.add(fact.getDocumentContentFileNameKey());
-        documentFields.add(fact.getDocumentContentMimeTypeKey());
-        documentFields.add(fact.getDocumentNameKey());
-        documentFields.add(fact.getDocumentURLKey());
-        documentAllFields.put(SDocumentMapping.class, documentFields);
+        documentFields.add(DOCUMENT_PREFIX + fact.getFileNameKey());
+        documentFields.add(DOCUMENT_PREFIX + fact.getMimeTypeKey());
+        documentFields.add(fact.getNameKey());
+        documentFields.add(fact.getDescriptionKey());
+        documentFields.add(DOCUMENT_PREFIX + fact.getURLKey());
+        documentAllFields.put(SMappedDocument.class, documentFields);
     }
 
     @Override

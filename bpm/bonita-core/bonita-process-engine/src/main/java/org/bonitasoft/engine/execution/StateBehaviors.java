@@ -122,7 +122,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -844,7 +844,7 @@ public class StateBehaviors {
     }
 
     private void interruptWaitingEvents(final long instanceId, final SCatchEventDefinition catchEventDef)
-            throws SBonitaSearchException, SWaitingEventModificationException {
+            throws SBonitaReadException, SWaitingEventModificationException {
         if (!catchEventDef.getEventTriggers().isEmpty()) {
             interruptWaitingEvents(instanceId, SWaitingEvent.class);
         }
@@ -875,7 +875,7 @@ public class StateBehaviors {
     }
 
     private <T extends SWaitingEvent> void interruptWaitingEvents(final long instanceId, final Class<T> waitingEventClass)
-            throws SBonitaSearchException, SWaitingEventModificationException {
+            throws SBonitaReadException, SWaitingEventModificationException {
         final QueryOptions queryOptions = getWaitingEventsQueryOptions(instanceId, waitingEventClass);
         final QueryOptions countOptions = getWaitingEventsCountOptions(instanceId, waitingEventClass);
         long count = 0;

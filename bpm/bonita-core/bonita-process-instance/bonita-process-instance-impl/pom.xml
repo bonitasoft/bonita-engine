@@ -59,13 +59,13 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-            <groupId>org.bonitasoft.engine.core.process.definition</groupId>
-            <artifactId>bonita-process-definition-api</artifactId>
+			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
+			<artifactId>bonita-process-definition-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-            <groupId>org.bonitasoft.engine.core.connector</groupId>
-            <artifactId>bonita-connector-service-api</artifactId>
+			<groupId>org.bonitasoft.engine.core.connector</groupId>
+			<artifactId>bonita-connector-service-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -74,18 +74,13 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-            <groupId>org.bonitasoft.engine.data.instance</groupId>
-            <artifactId>bonita-data-instance-api</artifactId>
+			<groupId>org.bonitasoft.engine.data.instance</groupId>
+			<artifactId>bonita-data-instance-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-            <groupId>org.bonitasoft.engine.classloader</groupId>
-            <artifactId>bonita-classloader-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-            <groupId>org.bonitasoft.engine.core.process.document</groupId>
-            <artifactId>bonita-process-document-api</artifactId>
+			<groupId>org.bonitasoft.engine.classloader</groupId>
+			<artifactId>bonita-classloader-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -94,18 +89,23 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.bonitasoft.engine.core.document</groupId>
+			<artifactId>bonita-document-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+        <dependency>
             <groupId>org.bonitasoft.engine.core.process.comment</groupId>
             <artifactId>bonita-process-comment-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-        <dependency>
-            <groupId>org.bonitasoft.engine.api</groupId>
-            <artifactId>bonita-common-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-        <dependency>
+            <version>${project.version}</version>
+        </dependency>
+		<dependency>
             <groupId>org.bonitasoft.engine.log</groupId>
             <artifactId>bonita-log-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-builder</artifactId>
             <version>${project.version}</version>
         </dependency>
 		<dependency>
