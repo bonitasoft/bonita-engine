@@ -4,7 +4,7 @@
   <parent>
     <artifactId>bpm</artifactId>
     <groupId>com.bonitasoft.engine</groupId>
-        <version>6.4.0-SNAPSHOT</version>
+		<version>6.4.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>bonita-server-sp</artifactId>
@@ -199,25 +199,6 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- Document -->
-    <dependency>
-      <groupId>org.bonitasoft.engine.document</groupId>
-      <artifactId>bonita-document-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <!-- Document Mapping -->
-    <dependency>
-      <groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
-      <artifactId>bonita-process-document-mapping-model-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
-      <artifactId>bonita-process-document-mapping-api-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
     <!-- Event -->
     <dependency>
       <groupId>org.bonitasoft.engine.events</groupId>
@@ -374,6 +355,7 @@
       <artifactId>bonita-page-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
+    
 
     <!-- Parameter -->
     <dependency>
@@ -472,38 +454,50 @@
         <exclusion>
 					<groupId>org.bonitasoft.engine.api</groupId>
 					<artifactId>bonita-common-api</artifactId>
-                </exclusion>
+        </exclusion>
 				<exclusion>
 						<groupId>org.bonitasoft.engine.api</groupId>
 					<artifactId>bonita-common-api-impl</artifactId>
-        </exclusion>
+				</exclusion>
       </exclusions>
     </dependency>
 
     <!-- Process Document -->
     <dependency>
-      <groupId>org.bonitasoft.engine.core.process.document</groupId>
-      <artifactId>bonita-process-document-impl</artifactId>
+      <groupId>org.bonitasoft.engine.core.document</groupId>
+      <artifactId>bonita-document-impl</artifactId>
       <version>${project.version}</version>
+        <exclusions>
+            <exclusion>
+                <groupId>org.bonitasoft.engine.api</groupId>
+                <artifactId>bonita-common-api</artifactId>
+            </exclusion>
+        </exclusions>
     </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.core.process.document</groupId>
-      <artifactId>bonita-process-document-model-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <!-- Process Instance -->
-    <dependency>
-      <groupId>com.bonitasoft.engine.core.process.instance</groupId>
-            <artifactId>bonita-process-instance-impl-sp</artifactId>
-      <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.bonitasoft.engine.api</groupId>
-                    <artifactId>bonita-common-api</artifactId>
-                </exclusion>
-            </exclusions>
-    </dependency>
+      <!-- Process Instance -->
+      <dependency>
+          <groupId>com.bonitasoft.engine.core.process.instance</groupId>
+          <artifactId>bonita-process-instance-impl-sp</artifactId>
+          <version>${project.version}</version>
+          <exclusions>
+              <exclusion>
+                  <groupId>org.bonitasoft.engine.api</groupId>
+                  <artifactId>bonita-common-api</artifactId>
+              </exclusion>
+          </exclusions>
+      </dependency>
+      <!-- Process Instance -->
+      <dependency>
+          <groupId>org.bonitasoft.engine.core.process.instance</groupId>
+          <artifactId>bonita-process-instance-impl</artifactId>
+          <version>${project.version}</version>
+          <exclusions>
+              <exclusion>
+                  <groupId>org.bonitasoft.engine.api</groupId>
+                  <artifactId>bonita-common-api</artifactId>
+              </exclusion>
+          </exclusions>
+      </dependency>
 
     <!-- Recorder -->
     <dependency>
@@ -602,7 +596,7 @@
       <artifactId>bonita-synchro-jms</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    
     <!-- Time Tracker -->
         <dependency>
             <groupId>org.bonitasoft.engine</groupId>
@@ -693,7 +687,7 @@
             <artifactId>bonita-theme-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    
     <!-- Not in shade -->
     <dependency>
       <groupId>com.bonitasoft.engine</groupId>
@@ -769,9 +763,9 @@
                   <!-- Category -->
                   <include>org.bonitasoft.engine.core.category:bonita-category-api</include>
                   <include>org.bonitasoft.engine.core.category:bonita-category-api-impl</include>
-									<include>org.bonitasoft.engine.core.category:bonita-category-model</include>
-									<include>org.bonitasoft.engine.core.category:bonita-category-model-impl</include>
-									<include>org.bonitasoft.engine.core.category:bonita-category-model-impl-hibernate</include>
+                  <include>org.bonitasoft.engine.core.category:bonita-category-model</include>
+                  <include>org.bonitasoft.engine.core.category:bonita-category-model-impl</include>
+                  <include>org.bonitasoft.engine.core.category:bonita-category-model-impl-hibernate</include>
                   <!-- Classloader -->
                   <include>org.bonitasoft.engine.classloader:bonita-classloader-api</include>
                   <include>org.bonitasoft.engine.classloader:bonita-classloader-impl</include>
@@ -799,14 +793,9 @@
                   <!-- Dependency -->
                   <include>org.bonitasoft.engine.dependency:bonita-dependency-api</include>
                   <include>org.bonitasoft.engine.dependency:bonita-dependency-impl</include>
-                  <!-- Document -->
-                  <include>org.bonitasoft.engine.document:bonita-document-api</include>
-                  <include>org.bonitasoft.engine.document:bonita-document-impl</include>
-                  <!-- Document Mapping -->
-                  <include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-model</include>
-                  <include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-model-impl</include>
-                  <include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-api</include>
-                  <include>org.bonitasoft.engine.core.process.document.mapping:bonita-process-document-mapping-api-impl</include>
+                  <!-- Process Document -->
+                  <include>org.bonitasoft.engine.core.document:bonita-document-api</include>
+                  <include>org.bonitasoft.engine.core.document:bonita-document-impl</include>
                   <!-- Event -->
                   <include>org.bonitasoft.engine.events:bonita-events-api</include>
                   <include>org.bonitasoft.engine.events:bonita-events-api-impl</include>
@@ -884,11 +873,6 @@
                   <!-- Process Definition -->
                   <include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-api</include>
                   <include>org.bonitasoft.engine.core.process.definition:bonita-process-definition-impl</include>
-                  <!-- Process Document -->
-                  <include>org.bonitasoft.engine.core.process.document:bonita-process-document-model</include>
-                  <include>org.bonitasoft.engine.core.process.document:bonita-process-document-model-impl</include>
-                  <include>org.bonitasoft.engine.core.process.document:bonita-process-document-api</include>
-                  <include>org.bonitasoft.engine.core.process.document:bonita-process-document-impl</include>
                   <!-- Process Instance -->
                   <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-api</include>
                   <include>org.bonitasoft.engine.core.process.instance:bonita-process-instance-impl</include>
