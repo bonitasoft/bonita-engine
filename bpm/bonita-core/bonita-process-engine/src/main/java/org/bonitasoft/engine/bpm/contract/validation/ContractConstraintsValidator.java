@@ -20,12 +20,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
-import org.bonitasoft.engine.core.process.definition.model.SComplexInputDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintType;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SInputDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SSimpleInputDefinition;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.mvel2.MVEL;
@@ -33,9 +31,11 @@ import org.mvel2.MVEL;
 public class ContractConstraintsValidator {
 
     private final TechnicalLoggerService logger;
+    private final ConstraintsDefinitionHelper constraintsDefinitionHelper;
 
-    public ContractConstraintsValidator(final TechnicalLoggerService logger) {
+    public ContractConstraintsValidator(final TechnicalLoggerService logger, final ConstraintsDefinitionHelper constraintsDefinitionHelper) {
         this.logger = logger;
+        this.constraintsDefinitionHelper = constraintsDefinitionHelper;
     }
 
     public void validate(final SContractDefinition contract, final Map<String, Object> variables) throws ContractViolationException {
@@ -43,7 +43,7 @@ public class ContractConstraintsValidator {
         for (final SConstraintDefinition constraint : contract.getConstraints()) {
             log(TechnicalLogSeverity.DEBUG, "Evaluating constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames());
             if (isMandatoryConstraint(constraint)) {
-                validateMandatoryContraint(comments, getInputDefinition(contract, constraint), constraint, variables);
+                validateMandatoryContraint(comments, constraintsDefinitionHelper.getInputDefinition(contract, constraint.getName()), constraint, variables);
             } else {
                 validateContraint(comments, constraint, variables);
             }
@@ -51,30 +51,6 @@ public class ContractConstraintsValidator {
         if (!comments.isEmpty()) {
             throw new ContractViolationException("Error while validating constraints", comments);
         }
-    }
-
-    private SInputDefinition getInputDefinition(final SContractDefinition contract, final SConstraintDefinition constraint) {
-        final String inputName = constraint.getInputNames().get(0);
-        final List<SSimpleInputDefinition> simpleInputs = contract.getSimpleInputs();
-        final List<SComplexInputDefinition> complexInputs = contract.getComplexInputs();
-        return getInputDefinition(inputName, simpleInputs, complexInputs);
-
-    }
-
-    private SInputDefinition getInputDefinition(final String inputName, final List<SSimpleInputDefinition> simpleInputs,
-            final List<SComplexInputDefinition> complexInputs) {
-        for (final SSimpleInputDefinition sSimpleInputDefinition : simpleInputs) {
-            if (sSimpleInputDefinition.getName().equals(inputName)) {
-                return sSimpleInputDefinition;
-            }
-        }
-        for (final SComplexInputDefinition sComplexInputDefinition : complexInputs) {
-            if (sComplexInputDefinition.getName().equals(inputName)) {
-                return sComplexInputDefinition;
-            }
-            return getInputDefinition(inputName, sComplexInputDefinition.getSimpleInputDefinitions(), sComplexInputDefinition.getComplexInputDefinitions());
-        }
-        return null;
     }
 
     @SuppressWarnings("unchecked")
@@ -106,7 +82,7 @@ public class ContractConstraintsValidator {
     }
 
     private void validateContraint(final List<String> comments, final SConstraintDefinition constraint, final Map<String, Object> variables) {
-        Boolean valid;
+        Boolean valid = Boolean.FALSE;
         try {
             valid = MVEL.evalToBoolean(constraint.getExpression(), variables);
         } catch (final Exception e) {

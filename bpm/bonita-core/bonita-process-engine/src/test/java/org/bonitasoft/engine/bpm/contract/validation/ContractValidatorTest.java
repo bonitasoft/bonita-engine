@@ -46,7 +46,9 @@ public class ContractValidatorTest {
     private ContractConstraintsValidator constraintValidator;
 
     @InjectMocks
-    private ContractValidator validator;
+    private ContractValidator contractValidator;
+
+   
 
     private Map<String, Object> anyVariables() {
         return anyMapOf(String.class, Object.class);
@@ -55,10 +57,10 @@ public class ContractValidatorTest {
     @Test
     public void should_have_an_empty_comments_list_if_validation_is_true() throws Exception {
 
-        final boolean valid = validator.isValid(aContract().build(), aMap().build());
+        final boolean valid = contractValidator.isValid(aContract().build(), aMap().build());
 
         assertThat(valid).isTrue();
-        assertThat(validator.getComments()).isEmpty();
+        assertThat(contractValidator.getComments()).isEmpty();
     }
 
     @Test
@@ -68,7 +70,7 @@ public class ContractValidatorTest {
         doThrow(new ContractViolationException("bad structure", new ArrayList<String>()))
                 .when(structureValidator).validate(contract, inputs);
 
-        validator.isValid(contract, inputs);
+        contractValidator.isValid(contract, inputs);
 
         verify(constraintValidator, never()).validate(any(SContractDefinition.class), anyVariables());
     }
@@ -80,7 +82,7 @@ public class ContractValidatorTest {
         doThrow(new ContractViolationException("bad structure", new ArrayList<String>()))
                 .when(structureValidator).validate(contract, variables);
 
-        final boolean valid = validator.isValid(contract, variables);
+        final boolean valid = contractValidator.isValid(contract, variables);
 
         assertThat(valid).isFalse();
     }
@@ -93,9 +95,9 @@ public class ContractValidatorTest {
         doThrow(new ContractViolationException("bad structure", problems))
                 .when(structureValidator).validate(contract, variables);
 
-        validator.isValid(contract, variables);
+        contractValidator.isValid(contract, variables);
 
-        assertThat(validator.getComments()).isEqualTo(problems);
+        assertThat(contractValidator.getComments()).isEqualTo(problems);
     }
 
     @Test
@@ -105,7 +107,7 @@ public class ContractValidatorTest {
         doThrow(new ContractViolationException("rule failure", new ArrayList<String>()))
                 .when(constraintValidator).validate(contract, variables);
 
-        final boolean valid = validator.isValid(contract, variables);
+        final boolean valid = contractValidator.isValid(contract, variables);
 
         assertThat(valid).isFalse();
     }
@@ -118,8 +120,9 @@ public class ContractValidatorTest {
         doThrow(new ContractViolationException("rule failure", problems))
                 .when(constraintValidator).validate(contract, variables);
 
-        validator.isValid(contract, variables);
+        contractValidator.isValid(contract, variables);
 
-        assertThat(validator.getComments()).isEqualTo(problems);
+        assertThat(contractValidator.getComments()).isEqualTo(problems);
     }
+
 }

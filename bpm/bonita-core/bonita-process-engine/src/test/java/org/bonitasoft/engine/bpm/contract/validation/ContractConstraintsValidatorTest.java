@@ -195,4 +195,53 @@ public class ContractConstraintsValidatorTest {
 
         }
     }
+
+    @Test
+    public void should_validate_contract_rules_with_complex_and_mandatory() throws Exception {
+        final SContractDefinition contract = aContract()
+                .withInput(
+                        aComplexInput().withName("user").withInput(aSimpleInput(SType.TEXT).withName("firstName").build())
+                                .withInput(aSimpleInput(SType.TEXT).withName("lastName").build()))
+                .withInput(
+                        aComplexInput()
+                                .withName("expenseReport")
+                                .withInput(
+                                        aComplexInput().withName("expenseLine").withMultiple(true)
+                                                .withInput(aSimpleInput(SType.TEXT).withName("nature").build())
+                                                .withInput(aSimpleInput(SType.DECIMAL).withName("amount").build())
+                                                .withInput(aSimpleInput(SType.DATE).withName("cate").build())
+                                                .withInput(aSimpleInput(SType.TEXT).withName("comment").build()).build()).build())
+                .withInput(aSimpleInput(SType.TEXT).build())
+                .withMandatoryConstraint("firstName")
+                .withMandatoryConstraint("lastName")
+                .withMandatoryConstraint("nature")
+                .withMandatoryConstraint("amount")
+                .withMandatoryConstraint("date")
+                .withMandatoryConstraint("firstName")
+                .withMandatoryConstraint("firstName")
+                .withMandatoryConstraint("comment")
+                .build();
+
+        //{"user":{"firstName":"john","lastName":"doe"},"expenseReport":{"expenseLine":[{"nature":"taxi","amount":30,"date":"2014-10-16","comment":"comment"}]}}
+        final Map<String, Object> user = aMap().put("firstName", "john").put("lastName", "doe").build();
+        final Map<String, Object> taxiExpenseLine = aMap().put("nature", "taxi").put("amount", 30).put("date", "2014-10-16").put("comment", "slow").build();
+        final Map<String, Object> hotelExpenseLine = aMap().put("nature", "hotel").put("amount", 1000).put("date", "2014-10-16").put("comment", "expensive")
+                .build();
+        final List<Map<String, Object>> expenseLines = new ArrayList<Map<String, Object>>();
+        expenseLines.add(taxiExpenseLine);
+        expenseLines.add(hotelExpenseLine);
+        final Map<String, Object> expenseReport = aMap().put("expenseReport", expenseLines).build();
+
+        final Map<String, Object> variables = aMap().put("user", user).put("expenseReport", expenseReport).build();
+
+        final ContractConstraintsValidator contractRulesValidator = new ContractConstraintsValidator(loggerService, null);
+
+        try {
+            contractRulesValidator.validate(contract, variables);
+        } catch (final ContractViolationException e) {
+            final List<String> explanations = e.getExplanations();
+            assertThat(explanations).isEmpty();
+        }
+
+    }
 }
