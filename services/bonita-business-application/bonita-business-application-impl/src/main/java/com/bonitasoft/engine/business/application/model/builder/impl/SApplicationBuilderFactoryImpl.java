@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.application.model.builder.impl;
 
-import com.bonitasoft.engine.business.application.impl.SApplicationFields;
 import com.bonitasoft.engine.business.application.model.SApplicationState;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationBuilderFactory;

@@ -13,12 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.bonitasoft.engine.business.application.ApplicationMenuField;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuUpdateBuilder;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuUpdateBuilderFactory;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
+import com.bonitasoft.engine.business.application.ApplicationMenuField;
+import com.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import com.bonitasoft.engine.business.application.impl.ApplicationMenuImpl;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilder;
@@ -46,7 +50,7 @@ public class ApplicationMenuConvertor {
         return builder.done();
     }
 
-    public ApplicationMenu toApplicationMenu(final SApplicationMenu sApplicationMenu) throws SBonitaException {
+    public ApplicationMenu toApplicationMenu(final SApplicationMenu sApplicationMenu) {
         final ApplicationMenuImpl menu = new ApplicationMenuImpl(sApplicationMenu.getDisplayName(), sApplicationMenu.getApplicationId(),
                 sApplicationMenu.getApplicationPageId(),
                 sApplicationMenu.getIndex());
@@ -61,6 +65,29 @@ public class ApplicationMenuConvertor {
             menus.add(toApplicationMenu(sMenu));
         }
         return menus;
+    }
+
+    public EntityUpdateDescriptor toApplicationMenuUpdateDescriptor(final ApplicationMenuUpdater updater) {
+        SApplicationMenuUpdateBuilder builder = BuilderFactory.get(SApplicationMenuUpdateBuilderFactory.class).createNewInstance();
+
+        for (Map.Entry<ApplicationMenuField, Serializable> entry : updater.getFields().entrySet()) {
+            switch (entry.getKey()) {
+                case APPLICATION_PAGE_ID:
+                    builder.updateApplicationPageId((Long) entry.getValue());
+                    break;
+                case DISPLAY_NAME:
+                    builder.updateDisplayName((String) entry.getValue());
+                    break;
+                case INDEX:
+                    builder.updateIndex((Integer) entry.getValue());
+                    break;
+                case PARENT_ID:
+                    builder.updateParentId((Long) entry.getValue());
+                    break;
+            }
+        }
+
+        return builder.done();
     }
 
 }

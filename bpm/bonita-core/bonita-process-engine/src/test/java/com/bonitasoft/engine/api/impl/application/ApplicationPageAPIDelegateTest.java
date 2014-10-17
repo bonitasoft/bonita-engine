@@ -34,7 +34,7 @@ import com.bonitasoft.engine.business.application.ApplicationPageNotFoundExcepti
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.SInvalidTokenException;
 import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
-import com.bonitasoft.engine.business.application.impl.SApplicationFields;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 

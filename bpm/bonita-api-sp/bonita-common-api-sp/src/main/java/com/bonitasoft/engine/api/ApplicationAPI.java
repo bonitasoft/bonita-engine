@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
-import com.bonitasoft.engine.business.application.ApplicationMenuUpdater;
-import com.bonitasoft.engine.business.application.ApplicationPageUpdater;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -24,10 +22,12 @@ import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import com.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationMenuSearchDescriptor;
+import com.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor;
+import com.bonitasoft.engine.business.application.ApplicationPageUpdater;
 import com.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.page.Page;
@@ -120,6 +120,20 @@ public interface ApplicationAPI {
     ApplicationPage createApplicationPage(long applicationId, long pagedId, String token) throws AlreadyExistsException, CreationException;
 
     /**
+     * Updates an {@link com.bonitasoft.engine.business.application.ApplicationPage} based on the information supplied by the
+     * {@link com.bonitasoft.engine.business.application.ApplicationPageUpdater}
+     *
+     * @param applicationPageId the {@code ApplicationPage} identifier
+     * @param updater the {@code ApplicationPageUpdater} describing the fields to be updated.
+     * @return the {@code ApplicationPage} up to date
+     * @throws ApplicationPageNotFoundException if no {@code ApplicationPage} is found for the given identifier
+     * @throws UpdateException if an exception occurs during the update
+     * @throws AlreadyExistsException if the token is updated and the new value is already used by another <code>ApplicationPage</code> on this <code>Application</code>
+     */
+    ApplicationPage updateApplicationPage(long applicationPageId, ApplicationPageUpdater updater) throws ApplicationPageNotFoundException, UpdateException,
+            AlreadyExistsException;
+
+    /**
      * Retrieves the {@link ApplicationPage} for the given {@code Application} token and {@code ApplicationPage} token
      *
      * @param applicationToken the <code>Application</code> name
@@ -130,8 +144,6 @@ public interface ApplicationAPI {
      * @see ApplicationPage
      */
     ApplicationPage getApplicationPage(String applicationToken, String applicationPageToken) throws ApplicationPageNotFoundException;
-
-    ApplicationPage updateApplicationPage(long applicationPageId, ApplicationPageUpdater updater) throws ApplicationPageNotFoundException, UpdateException, AlreadyExistsException;
 
     /**
      * Retrieves the {@link ApplicationPage} from its identifier
@@ -144,7 +156,8 @@ public interface ApplicationAPI {
     ApplicationPage getApplicationPage(long applicationPageId) throws ApplicationPageNotFoundException;
 
     /**
-     * Deletes an {@link ApplicationPage} by its identifier. All related {@link com.bonitasoft.engine.business.application.ApplicationMenu} will be automatically deleted.
+     * Deletes an {@link ApplicationPage} by its identifier. All related {@link com.bonitasoft.engine.business.application.ApplicationMenu} will be
+     * automatically deleted.
      *
      * @param applicationpPageId the {@code ApplicationPage} identifier
      * @throws DeletionException if an error occurs during the deletion
@@ -201,7 +214,19 @@ public interface ApplicationAPI {
      */
     ApplicationMenu createApplicationMenu(ApplicationMenuCreator applicationMenuCreator) throws CreationException;
 
-    ApplicationMenu updateApplicationMenu(long applicationMenuId, ApplicationMenuUpdater updater) throws ApplicationMenuNotFoundException, UpdateException, AlreadyExistsException;
+    /**
+     * Updates an {@link com.bonitasoft.engine.business.application.ApplicationMenu} based on the information supplied by the
+     * {@link com.bonitasoft.engine.business.application.ApplicationMenuUpdater}
+     * 
+     * @param applicationMenuId the {@code ApplicationMenu} identifier
+     * @param updater the {@code ApplicationMenuUpdater} describing the fields to be updated.
+     * @return the {@code ApplicationMenu} up to date
+     * @throws ApplicationMenuNotFoundException if no {@code ApplicationMenu} is found for the given identifier
+     * @throws UpdateException if an exception occurs during the update
+     * @see com.bonitasoft.engine.business.application.ApplicationMenu
+     * @see com.bonitasoft.engine.business.application.ApplicationMenuUpdater
+     */
+    ApplicationMenu updateApplicationMenu(long applicationMenuId, ApplicationMenuUpdater updater) throws ApplicationMenuNotFoundException, UpdateException;
 
     /**
      * Retrieves the {@link ApplicationMenu} from its identifier

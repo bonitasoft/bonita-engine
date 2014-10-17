@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationPageUpdater {
+public class ApplicationPageUpdater implements Serializable {
 
     /**
      * Contains fields used by {@code com.bonitasoft.engine.business.application.ApplicationPageUpdater}

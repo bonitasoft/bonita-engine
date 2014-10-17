@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -18,6 +19,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuUpdateBuilder;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderFactoryImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderImpl;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationUpdateBuilderImpl;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -530,7 +534,7 @@ public class ApplicationServiceImplTest {
     }
 
     @Test
-    public void updateApplicationPage_should_call_recorder_recordUpdate_and_return_updated_object() throws Exception {
+    public void updateApplication_should_call_recorder_recordUpdate_and_return_updated_object() throws Exception {
         //given
         final SApplicationUpdateBuilder updateBuilder = new SApplicationUpdateBuilderFactoryImpl().createNewInstance();
         updateBuilder.updateHomePageId(150L);
@@ -553,7 +557,7 @@ public class ApplicationServiceImplTest {
     }
 
     @Test(expected = SObjectNotFoundException.class)
-    public void updateApplicationPage_should_throw_SObjectModificationException_when_recorder_throws_SRecorderException() throws Exception {
+    public void updateApplication_should_throw_SObjectModificationException_when_recorder_throws_SRecorderException() throws Exception {
         //given
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         updateDescriptor.addField("name", "newName");
@@ -568,7 +572,7 @@ public class ApplicationServiceImplTest {
     }
 
     @Test(expected = SInvalidTokenException.class)
-    public void updateApplicationPage_should_throw_SInvalidTokenException_when_token_is_invalid() throws Exception {
+    public void updateApplication_should_throw_SInvalidTokenException_when_token_is_invalid() throws Exception {
         //given
         SApplicationUpdateBuilder builder = new SApplicationUpdateBuilderImpl(new EntityUpdateDescriptor());
         builder.updateToken("token with spaces");
@@ -584,7 +588,7 @@ public class ApplicationServiceImplTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void updateApplicationPage_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+    public void updateApplication_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
         //when
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         updateDescriptor.addField("name", "newName");
@@ -594,7 +598,7 @@ public class ApplicationServiceImplTest {
     }
 
     @Test(expected = SInvalidDisplayNameException.class)
-    public void updateApplicationPage_should_throw_SInvalidDisplayNameException_when_token_is_invalid() throws Exception {
+    public void updateApplication_should_throw_SInvalidDisplayNameException_when_token_is_invalid() throws Exception {
         //given
         SApplicationUpdateBuilder builder = new SApplicationUpdateBuilderImpl(new EntityUpdateDescriptor());
         builder.updateDisplayName(null);
@@ -732,7 +736,7 @@ public class ApplicationServiceImplTest {
     }
 
     @Test(expected = SObjectCreationException.class)
-    public void createApplication_should_throw_SObjectCreationExceptio_when_recorder_throws_Exception() throws Exception {
+    public void createApplicationMenu_should_throw_SObjectCreationException_when_recorder_throws_Exception() throws Exception {
         //given
         doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
 
@@ -746,6 +750,71 @@ public class ApplicationServiceImplTest {
     public void createApplicationMenu_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
         //when
         applicationServiceDisabled.createApplicationMenu(buildApplicationMenu("main", 5, 1, 12));
+
+        //then exception
+    }
+
+    @Test
+    public void updateApplicationMenu_should_call_recorder_recordUpdate_and_return_updated_object() throws Exception {
+        //given
+        final SApplicationMenuUpdateBuilder updateBuilder = new SApplicationMenuUpdateBuilderImpl();
+        updateBuilder.updateDisplayName("new display name");
+        final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
+
+        final SApplicationMenu appMenu = buildApplicationMenu("main", 5, 1, 12);
+        appMenu.setId(17);
+
+        final int applicationMenuId = 17;
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById", SApplicationMenu.class, applicationMenuId))).willReturn(
+                appMenu);
+
+        //when
+        final SApplicationMenu updatedApplicationMenu = applicationServiceActive.updateApplicationMenu(applicationMenuId, updateDescriptor);
+
+        //then
+        final UpdateRecord updateRecord = UpdateRecord.buildSetFields(appMenu,
+                updateDescriptor);
+        final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ApplicationService.APPLICATION_MENU)
+                .setObject(appMenu).done();
+        verify(recorder, times(1)).recordUpdate(updateRecord, updateEvent);
+        assertThat(updatedApplicationMenu).isEqualTo(appMenu);
+    }
+
+
+    @Test(expected = SObjectNotFoundException.class)
+    public void updateApplicationMenu_should_throw_SObjectNotFoundException_when_recorder_returns_null() throws Exception {
+        //given
+        final SApplicationMenuUpdateBuilder updateBuilder = new SApplicationMenuUpdateBuilderImpl();
+        updateBuilder.updateDisplayName("new display name");
+        final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
+
+        final int applicationMenuId = 17;
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById", SApplicationMenu.class, applicationMenuId))).willReturn(
+                null);
+
+        //when
+        applicationServiceActive.updateApplicationMenu(applicationMenuId, updateDescriptor);
+
+        //then exception
+    }
+
+    @Test(expected = SObjectModificationException.class)
+    public void updateApplicationMenu_should_throw_SObjectModificationException_when_recorder_throws_SRecorderException() throws Exception {
+        //given
+        final SApplicationMenuUpdateBuilder updateBuilder = new SApplicationMenuUpdateBuilderFactoryImpl().createNewInstance();
+        updateBuilder.updateDisplayName("new display name");
+        final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
+
+        final SApplicationMenu appMenu = buildApplicationMenu("main", 5, 1, 12);
+        appMenu.setId(17);
+
+        final int applicationMenuId = 17;
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById", SApplicationMenu.class, applicationMenuId))).willReturn(
+                appMenu);
+        doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
+
+        //when
+        applicationServiceActive.updateApplicationMenu(applicationMenuId, updateDescriptor);
 
         //then exception
     }

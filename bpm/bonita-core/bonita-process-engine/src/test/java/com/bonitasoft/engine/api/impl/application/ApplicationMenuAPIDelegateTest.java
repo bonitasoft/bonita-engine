@@ -4,9 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
+import org.bonitasoft.engine.actor.mapping.SActorMemberNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -14,7 +17,9 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchResult;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,8 +33,10 @@ import com.bonitasoft.engine.api.impl.validator.ApplicationMenuCreatorValidator;
 import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import com.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
+import com.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.impl.ApplicationMenuImpl;
+import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -109,6 +116,58 @@ public class ApplicationMenuAPIDelegateTest {
         delegate.createApplicationMenu(creator);
 
         //then exception
+    }
+
+    @Test
+    public void updateApplicationMenu_should_return_result_of_applicationService_updateApplicationMenu_converted_to_client_object() throws Exception {
+        //given
+        ApplicationMenuUpdater updater = mock(ApplicationMenuUpdater.class);
+        EntityUpdateDescriptor updateDescriptor = mock(EntityUpdateDescriptor.class);
+        SApplicationMenu sApplicationMenu = mock(SApplicationMenu.class);
+        ApplicationMenu applicationMenu = mock(ApplicationMenu.class);
+
+        given(convertor.toApplicationMenuUpdateDescriptor(updater)).willReturn(updateDescriptor);
+        given(applicationService.updateApplicationMenu(4, updateDescriptor)).willReturn(sApplicationMenu);
+        given(convertor.toApplicationMenu(sApplicationMenu)).willReturn(applicationMenu);
+
+        //when
+        ApplicationMenu updatedMenu = delegate.updateApplicationMenu(4, updater);
+
+        //then
+        assertThat(updatedMenu).isEqualTo(applicationMenu);
+
+    }
+
+    @Test(expected = ApplicationMenuNotFoundException.class)
+    public void updateApplicationMenu_should_throw_ApplicationNotFoundException_when_applicationService_throws_SObjectNotFoundException() throws Exception {
+        //given
+        ApplicationMenuUpdater updater = mock(ApplicationMenuUpdater.class);
+        EntityUpdateDescriptor updateDescriptor = mock(EntityUpdateDescriptor.class);
+
+        given(convertor.toApplicationMenuUpdateDescriptor(updater)).willReturn(updateDescriptor);
+        given(applicationService.updateApplicationMenu(4, updateDescriptor)).willThrow(new SObjectNotFoundException());
+
+        //when
+         delegate.updateApplicationMenu(4, updater);
+
+        //then exception
+
+    }
+
+    @Test(expected = UpdateException.class)
+    public void updateApplicationMenu_should_throw_UpdateException_when_applicationService_throws_SObjectModificationException() throws Exception {
+        //given
+        ApplicationMenuUpdater updater = mock(ApplicationMenuUpdater.class);
+        EntityUpdateDescriptor updateDescriptor = mock(EntityUpdateDescriptor.class);
+
+        given(convertor.toApplicationMenuUpdateDescriptor(updater)).willReturn(updateDescriptor);
+        given(applicationService.updateApplicationMenu(4, updateDescriptor)).willThrow(new SObjectModificationException());
+
+        //when
+        delegate.updateApplicationMenu(4, updater);
+
+        //then exception
+
     }
 
     @Test

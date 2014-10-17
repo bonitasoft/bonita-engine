@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -459,6 +460,31 @@ public class ApplicationServiceImpl implements ApplicationService {
             handleCreationException(applicationMenu, logBuilder, e, methodName);
         }
         return applicationMenu;
+    }
+
+    @Override
+    public SApplicationMenu updateApplicationMenu(long applicationMenuId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException, SObjectNotFoundException {
+        checkLicense();
+        final String methodName = "updateApplicationMenu";
+        final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.UPDATED, "Updating application menu with id " + applicationMenuId);
+
+        try {
+            final SApplicationMenu applicationMenu = getApplicationMenu(applicationMenuId);
+
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(applicationMenu,
+                    updateDescriptor);
+            final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ApplicationService.APPLICATION_MENU)
+                    .setObject(applicationMenu).done();
+            recorder.recordUpdate(updateRecord, updateEvent);
+            log(applicationMenuId, SQueriableLog.STATUS_OK, logBuilder, methodName);
+            return applicationMenu;
+        } catch (SObjectNotFoundException e) {
+            log(applicationMenuId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            throw e;
+        } catch (final SBonitaException e) {
+            log(applicationMenuId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            throw new SObjectModificationException(e);
+        }
     }
 
     @Override

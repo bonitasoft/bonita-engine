@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationMenuUpdater {
+public class ApplicationMenuUpdater implements Serializable {
 
     private final Map<ApplicationMenuField, Serializable> fields;
 
@@ -25,21 +25,23 @@ public class ApplicationMenuUpdater {
     }
 
     /**
-    * Retrieves all fields to be updated
-    *
-    * @return a {@link Map}<{@link ApplicationMenuField}, {@link Serializable}> containing all fields to be updated
-    * @see ApplicationMenuField
-    */
+     * Retrieves all fields to be updated
+     *
+     * @return a {@link Map}<{@link ApplicationMenuField}, {@link Serializable}> containing all fields to be updated
+     * @see ApplicationMenuField
+     */
     public Map<ApplicationMenuField, Serializable> getFields() {
         return fields;
     }
 
     /**
-     * Defines the new value for the {@link ApplicationPage} id
+     * Defines the identifier of the new {@link ApplicationPage} related to the {@link com.bonitasoft.engine.business.application.ApplicationMenu}. Use
+     * {@code null} to reference no {@code ApplicationPage}.
      *
-     * @param applicationPageId the new value for the {@code ApplicationPage} id
+     * @param applicationPageId the identifier of new related {@code ApplicationPage}
      * @return the current {@code ApplicationMenuUpdater}
-     * @see ApplicationMenuField
+     * @see com.bonitasoft.engine.business.application.ApplicationPage
+     * @see com.bonitasoft.engine.business.application.ApplicationMenu
      */
     public ApplicationMenuUpdater setApplicationPageId(final Long applicationPageId) {
         fields.put(ApplicationMenuField.APPLICATION_PAGE_ID, applicationPageId);
@@ -51,9 +53,9 @@ public class ApplicationMenuUpdater {
      *
      * @param displayName the new value for the {@code ApplicationMenu} display name
      * @return the current {@code ApplicationMenuUpdater}
-     * @see ApplicationMenuField
+     * @see ApplicationMenu
      */
-    public ApplicationMenuUpdater setDispalyName(final String displayName) {
+    public ApplicationMenuUpdater setDisplayName(final String displayName) {
         fields.put(ApplicationMenuField.DISPLAY_NAME, displayName);
         return this;
     }
@@ -63,7 +65,7 @@ public class ApplicationMenuUpdater {
      *
      * @param index the new value for the {@code ApplicationMenu} index
      * @return the current {@code ApplicationMenuUpdater}
-     * @see ApplicationMenuField
+     * @see ApplicationMenu
      */
     public ApplicationMenuUpdater setIndex(final int index) {
         fields.put(ApplicationMenuField.INDEX, index);
@@ -71,11 +73,11 @@ public class ApplicationMenuUpdater {
     }
 
     /**
-     * Defines the new value for the {@link ApplicationMenu} parent
+     * Defines the identifier of the new parent {@link ApplicationMenu}.Use {@code null} to reference no {@code ApplicationMenu}
      *
-     * @param parentId the new value for the {@code ApplicationMenu} parent
+     * @param parentId the identifier of the new parent {@link ApplicationMenu}
      * @return the current {@code ApplicationMenuUpdater}
-     * @see ApplicationMenuField
+     * @see ApplicationMenu
      */
     public ApplicationMenuUpdater setParentId(final Long parentId) {
         fields.put(ApplicationMenuField.PARENT_ID, parentId);

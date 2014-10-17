@@ -103,6 +103,53 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
         assertThat(createdAppMenu.getParentId()).isEqualTo(mainMenu.getId());
     }
 
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu", "update"})
+    @Test
+    public void updateApplicationMenu_should_update_application_menu_based_on_updater() throws Exception {
+        //given
+        final ApplicationMenuCreator parentCreator = new ApplicationMenuCreator(application.getId(), "Main", 1);
+        final ApplicationMenuCreator childCreator = new ApplicationMenuCreator(application.getId(), "Child", 1);
+        final ApplicationMenu parentAppMenu = getApplicationAPI().createApplicationMenu(parentCreator);
+        final ApplicationMenu childCreatedAppMenu = getApplicationAPI().createApplicationMenu(childCreator);
+
+        ApplicationMenuUpdater updater = new ApplicationMenuUpdater();
+        updater.setIndex(10);
+        updater.setApplicationPageId(appPage.getId());
+        updater.setParentId(parentAppMenu.getId());
+        updater.setDisplayName("Updated child");
+
+        //when
+        ApplicationMenu updatedChildMenu = getApplicationAPI().updateApplicationMenu(childCreatedAppMenu.getId(), updater);
+
+        //then
+        assertThat(updatedChildMenu).isNotNull();
+        //updated:
+        assertThat(updatedChildMenu.getDisplayName()).isEqualTo("Updated child");
+        assertThat(updatedChildMenu.getApplicationPageId()).isEqualTo(appPage.getId());
+        assertThat(updatedChildMenu.getIndex()).isEqualTo(10);
+        assertThat(updatedChildMenu.getParentId()).isEqualTo(parentAppMenu.getId());
+        //not changed:
+        assertThat(updatedChildMenu.getApplicationId()).isEqualTo(application.getId());
+
+        //given
+        //check it's possible to clean parent and application page
+        updater = new ApplicationMenuUpdater();
+        updater.setApplicationPageId(null);
+        updater.setParentId(null);
+
+        //when
+        updatedChildMenu = getApplicationAPI().updateApplicationMenu(childCreatedAppMenu.getId(), updater);
+        assertThat(updatedChildMenu).isNotNull();
+        // updated:
+        assertThat(updatedChildMenu.getApplicationPageId()).isNull();
+        assertThat(updatedChildMenu.getParentId()).isNull();
+        //not changed:
+        assertThat(updatedChildMenu.getDisplayName()).isEqualTo("Updated child");
+        assertThat(updatedChildMenu.getIndex()).isEqualTo(10);
+        assertThat(updatedChildMenu.getApplicationId()).isEqualTo(application.getId());
+
+    }
+
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu", "get by id" })
     @Test
     public void getApplicationMenu_should_return_the_applicationMenu_identified_by_the_given_id() throws Exception {

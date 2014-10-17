@@ -55,7 +55,6 @@ public interface ApplicationService {
     SApplicationPage updateApplicationPage(long applicationPageId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException, SInvalidTokenException,
             SObjectAlreadyExistsException, SObjectNotFoundException;
 
-
     SApplicationPage getApplicationPage(String applicationName, String applicationPageToken) throws SBonitaReadException, SObjectNotFoundException;
 
     SApplicationPage getApplicationPage(long applicationPageId) throws SBonitaReadException, SObjectNotFoundException;
@@ -69,6 +68,9 @@ public interface ApplicationService {
     List<SApplicationPage> searchApplicationPages(final QueryOptions options) throws SBonitaSearchException;
 
     SApplicationMenu createApplicationMenu(SApplicationMenu applicationMenu) throws SObjectCreationException;
+
+    SApplicationMenu updateApplicationMenu(long applicationMenuId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException,
+            SObjectNotFoundException;
 
     SApplicationMenu getApplicationMenu(long applicationMenuId) throws SBonitaReadException, SObjectNotFoundException;
 

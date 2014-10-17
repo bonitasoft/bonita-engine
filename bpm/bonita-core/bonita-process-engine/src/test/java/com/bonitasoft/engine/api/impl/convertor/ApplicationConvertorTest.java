@@ -25,7 +25,7 @@ import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationState;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
-import com.bonitasoft.engine.business.application.impl.SApplicationFields;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationState;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationImpl;

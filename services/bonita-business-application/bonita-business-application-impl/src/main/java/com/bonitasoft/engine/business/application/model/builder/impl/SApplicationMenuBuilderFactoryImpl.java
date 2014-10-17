@@ -31,32 +31,32 @@ public class SApplicationMenuBuilderFactoryImpl implements SApplicationMenuBuild
 
     @Override
     public String getIdKey() {
-        return "id";
+        return SApplicationMenuFields.ID;
     }
 
     @Override
     public String getDisplayNameKey() {
-        return "displayName";
+        return SApplicationMenuFields.DISPLAY_NAME;
     }
 
     @Override
     public String getApplicationIdKey() {
-        return "applicationId";
+        return SApplicationMenuFields.APPLICAITON_ID;
     }
 
     @Override
     public String getApplicationPageIdKey() {
-        return "applicationPageId";
+        return SApplicationMenuFields.APPLICATION_PAGE_ID;
     }
 
     @Override
     public String getParentIdKey() {
-        return "parentId";
+        return SApplicationMenuFields.PARENT_ID;
     }
 
     @Override
     public String getIndexKey() {
-        return "index";
+        return SApplicationMenuFields.INDEX;
     }
 
 

@@ -15,7 +15,6 @@ package com.bonitasoft.engine.business.application.model.builder.impl;
 
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
-import com.bonitasoft.engine.business.application.impl.SApplicationFields;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 
 

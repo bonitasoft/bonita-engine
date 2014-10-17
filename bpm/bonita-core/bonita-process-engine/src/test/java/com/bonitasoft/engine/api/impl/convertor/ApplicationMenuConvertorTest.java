@@ -8,6 +8,9 @@ import static org.mockito.Mockito.spy;
 import java.util.Arrays;
 import java.util.List;
 
+import com.bonitasoft.engine.business.application.ApplicationMenuUpdater;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuFields;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -94,10 +97,27 @@ public class ApplicationMenuConvertorTest {
         doReturn(menu2).when(convertorMock).toApplicationMenu(sMenu2);
 
         //when
-        final List<ApplicationMenu> applicationMenus = convertorMock.toApplicationMenu(Arrays.<SApplicationMenu> asList(sMenu1, sMenu2));
+        final List<ApplicationMenu> applicationMenus = convertorMock.toApplicationMenu(Arrays.asList(sMenu1, sMenu2));
 
         //then
         assertThat(applicationMenus).containsExactly(menu1, menu2);
     }
 
+    @Test
+    public void toApplicationMenuUpdateDescriptor_should_map_all_fields() throws Exception {
+        ApplicationMenuUpdater updater = new ApplicationMenuUpdater();
+        updater.setApplicationPageId(1L);
+        updater.setDisplayName("disp");
+        updater.setIndex(2);
+        updater.setParentId(3L);
+
+        EntityUpdateDescriptor updateDescriptor = convertor.toApplicationMenuUpdateDescriptor(updater);
+        assertThat(updateDescriptor).isNotNull();
+        assertThat(updateDescriptor.getFields()).hasSize(4);
+        assertThat(updateDescriptor.getFields().get(SApplicationMenuFields.APPLICATION_PAGE_ID)).isEqualTo(1L);
+        assertThat(updateDescriptor.getFields().get(SApplicationMenuFields.DISPLAY_NAME)).isEqualTo("disp");
+        assertThat(updateDescriptor.getFields().get(SApplicationMenuFields.INDEX)).isEqualTo(2);
+        assertThat(updateDescriptor.getFields().get(SApplicationMenuFields.PARENT_ID)).isEqualTo(3L);
+
+    }
 }
