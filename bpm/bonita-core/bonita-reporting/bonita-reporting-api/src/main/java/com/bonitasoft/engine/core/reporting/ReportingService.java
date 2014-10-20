@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Matthieu Chaffotte
@@ -39,9 +39,9 @@ public interface ReportingService {
      */
     SReport getReportByName(String reportName) throws SBonitaReadException;
 
-    long getNumberOfReports(QueryOptions options) throws SBonitaSearchException;
+    long getNumberOfReports(QueryOptions options) throws SBonitaReadException;
 
-    List<SReport> searchReports(QueryOptions options) throws SBonitaSearchException;
+    List<SReport> searchReports(QueryOptions options) throws SBonitaReadException;
 
     void deleteReport(long reportId) throws SReportDeletionException, SReportNotFoundException;
 

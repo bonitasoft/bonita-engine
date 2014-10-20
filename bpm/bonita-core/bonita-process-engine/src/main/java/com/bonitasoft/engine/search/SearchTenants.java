@@ -11,7 +11,7 @@ package com.bonitasoft.engine.search;
 import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -31,12 +31,12 @@ public class SearchTenants extends AbstractTenantSearchEntity {
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return platformService.getNumberOfTenants(searchOptions);
     }
 
     @Override
-    public List<STenant> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<STenant> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return platformService.searchTenants(searchOptions);
     }
 
