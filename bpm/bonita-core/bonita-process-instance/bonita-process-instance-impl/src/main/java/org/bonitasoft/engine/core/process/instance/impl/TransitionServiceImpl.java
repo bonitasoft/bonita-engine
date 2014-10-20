@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.archive.SDefinitiveArchiveNotFound;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.TransitionState;
@@ -28,20 +27,12 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.STransitionDel
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SATransitionInstanceBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.STransitionInstanceLogBuilder;
-import org.bonitasoft.engine.core.process.instance.model.builder.STransitionInstanceLogBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 
@@ -61,30 +52,14 @@ public class TransitionServiceImpl implements TransitionService {
         this.archiveService = archiveService;
     }
 
-    private <T extends SLogBuilder> void initializeLogBuilder(final T logBuilder, final String message) {
-        logBuilder.actionStatus(SQueriableLog.STATUS_FAIL).severity(SQueriableLogSeverity.INTERNAL).rawMessage(message);
-    }
-
-    private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
-        logBuilder.setActionType(actionType);
+    @Override
+    public long getNumberOfArchivedTransitionInstances(final QueryOptions countOptions) throws SBonitaReadException {
+        return persistenceRead.getNumberOfEntities(SATransitionInstance.class, countOptions, null);
     }
 
     @Override
-    public long getNumberOfArchivedTransitionInstances(final QueryOptions countOptions) throws SBonitaSearchException {
-        try {
-            return this.persistenceRead.getNumberOfEntities(SATransitionInstance.class, countOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
-    }
-
-    @Override
-    public List<SATransitionInstance> searchArchivedTransitionInstances(final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            return this.persistenceRead.searchEntity(SATransitionInstance.class, queryOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+    public List<SATransitionInstance> searchArchivedTransitionInstances(final QueryOptions queryOptions) throws SBonitaReadException {
+        return persistenceRead.searchEntity(SATransitionInstance.class, queryOptions, null);
     }
 
     @Override
@@ -97,37 +72,27 @@ public class TransitionServiceImpl implements TransitionService {
             archiveTransitionInstanceInsertRecord(saTransitionInstance, archiveDate);
         } catch (final SRecorderException e) {
             throw new STransitionCreationException(e);
-        } catch (final SDefinitiveArchiveNotFound e) {
-            throw new STransitionCreationException(e);
         }
 
     }
 
-    private void archiveTransitionInstanceInsertRecord(final SATransitionInstance saTransitionInstance, final long archiveDate) throws SRecorderException,
-            SDefinitiveArchiveNotFound {
+    private void archiveTransitionInstanceInsertRecord(final SATransitionInstance saTransitionInstance, final long archiveDate) throws SRecorderException {
         final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saTransitionInstance);
-        this.archiveService.recordInsert(archiveDate, insertRecord);
-    }
-
-    protected STransitionInstanceLogBuilder getQueriableLog(final ActionType actionType, final String message) {
-        final STransitionInstanceLogBuilder logBuilder = BuilderFactory.get(STransitionInstanceLogBuilderFactory.class).createNewInstance();
-        this.initializeLogBuilder(logBuilder, message);
-        this.updateLog(actionType, logBuilder);
-        return logBuilder;
+        archiveService.recordInsert(archiveDate, insertRecord);
     }
 
     @Override
     public void delete(final SATransitionInstance saTransitionInstance) throws STransitionDeletionException {
         final DeleteRecord deleteRecord = new DeleteRecord(saTransitionInstance);
         try {
-            this.archiveService.recordDelete(deleteRecord);
+            archiveService.recordDelete(deleteRecord);
         } catch (final SRecorderException e) {
             throw new STransitionDeletionException(e);
         }
     }
 
     @Override
-    public void deleteArchivedTransitionsOfProcessInstance(final long processInstanceId) throws STransitionDeletionException, SBonitaSearchException {
+    public void deleteArchivedTransitionsOfProcessInstance(final long processInstanceId) throws STransitionDeletionException, SBonitaReadException {
         final SATransitionInstanceBuilderFactory saTransitionInstanceBuilder = BuilderFactory.get(SATransitionInstanceBuilderFactory.class);
         final String rootContainerIdKey = saTransitionInstanceBuilder.getRootContainerIdKey();
         final String idKey = saTransitionInstanceBuilder.getIdKey();

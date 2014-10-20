@@ -18,7 +18,7 @@ import java.util.List;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractRoleSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchRoleDescriptor;
@@ -36,12 +36,12 @@ public class SearchRoles extends AbstractRoleSearchEntity {
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return identityService.getNumberOfRoles(searchOptions);
     }
 
     @Override
-    public List<SRole> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SRole> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return identityService.searchRoles(searchOptions);
     }
 

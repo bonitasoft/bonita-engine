@@ -37,7 +37,7 @@ import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.AbstractBonitaJobListener;
 import org.bonitasoft.engine.scheduler.JobService;
@@ -114,7 +114,7 @@ public class JDBCJobListenerTest {
     @Test
     public void jobWasExecuted_should_call_incidentServiceIfExceptionOccurs() throws Exception {
         // Given
-        doThrow(SBonitaSearchException.class).when(jobService).getJobLogs(JOB_DESCRIPTOR_ID, 0, 1);
+        doThrow(SBonitaReadException.class).when(jobService).getJobLogs(JOB_DESCRIPTOR_ID, 0, 1);
 
         // When
         jdbcJobListener.jobWasExecuted(context, exeption1);

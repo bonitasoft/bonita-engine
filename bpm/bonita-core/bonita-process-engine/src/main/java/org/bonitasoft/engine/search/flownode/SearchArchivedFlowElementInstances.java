@@ -19,7 +19,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedFlowElementInstance;
 import org.bonitasoft.engine.core.process.instance.api.FlowElementInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowElementInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchArchivedFlowElementInstanceDescriptor;
@@ -39,12 +39,12 @@ public class SearchArchivedFlowElementInstances extends AbstractSearchEntity<Arc
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return flowElementInstanceService.getNumberOfFlowElementInstances(SAFlowElementInstance.class, searchOptions);
     }
 
     @Override
-    public List<SAFlowElementInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SAFlowElementInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return flowElementInstanceService.searchArchivedFlowElementInstances(SAFlowElementInstance.class, searchOptions);
     }
 

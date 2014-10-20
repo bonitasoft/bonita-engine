@@ -15,7 +15,7 @@ public class DummySCustomUserInfoValue implements SCustomUserInfoValue {
 
     private long userId = -1L;
 
-    private long definitionId;
+    private final long definitionId;
 
     private String value = "";
 

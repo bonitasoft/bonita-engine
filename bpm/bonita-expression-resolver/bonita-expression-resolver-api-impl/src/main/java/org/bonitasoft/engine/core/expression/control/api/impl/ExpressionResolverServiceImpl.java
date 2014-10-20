@@ -111,24 +111,30 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
             }
 
             final Map<SExpression, SExpression> dataReplacement = new HashMap<SExpression, SExpression>();
-            // We incrementaly build the Map of already resolved expressions:
+            // We incrementally build the Map of already resolved expressions:
             final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>();
             // Let's evaluate all expressions with no dependencies first:
             resolvedExpressions.putAll(evaluateAllExpressionsWithNoDependencies(dependencyValues, dataReplacement, expressions, newEvaluationContext));
 
             for (final SExpression sExpression : expressions) {
-                // Then evaluate recursively all remaining expressions:
-                resolvedExpressions.putAll(evaluateExpressionWithResolvedDependencies(sExpression, dependencyValues, dataReplacement, resolvedExpressions,
-                        newEvaluationContext.getContainerState()));
+                if(sExpression != null){
+                    // Then evaluate recursively all remaining expressions:
+                    resolvedExpressions.putAll(evaluateExpressionWithResolvedDependencies(sExpression, dependencyValues, dataReplacement, resolvedExpressions,
+                            newEvaluationContext.getContainerState()));
+                }
             }
             final ArrayList<Object> results = new ArrayList<Object>(expressions.size());
             for (final SExpression sExpression : expressions) {
-                final int key = sExpression.getDiscriminant();
-                final Object res = resolvedExpressions.get(key);
-                if (res == null && !resolvedExpressions.containsKey(key)) {
-                    throw new SExpressionEvaluationException("No result found for the expression " + sExpression, sExpression.getName());
+                if(sExpression != null){
+                    final int key = sExpression.getDiscriminant();
+                    final Object res = resolvedExpressions.get(key);
+                    if (res == null && !resolvedExpressions.containsKey(key)) {
+                        throw new SExpressionEvaluationException("No result found for the expression " + sExpression, sExpression.getName());
+                    }
+                    results.add(res);
+                }else{
+                    results.add(null);
                 }
-                results.add(res);
             }
             return results;
         } catch (final SProcessDefinitionNotFoundException e) {
@@ -237,6 +243,9 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
     private Map<ExpressionKind, List<SExpression>> flattenDependencies(final Collection<SExpression> collection) {
         final Map<ExpressionKind, List<SExpression>> expressionMapByKind = new HashMap<ExpressionKind, List<SExpression>>();
         for (final SExpression sExpression : collection) {
+            if(sExpression == null){
+                continue;
+            }
             final ExpressionKind expressionKind = sExpression.getExpressionKind();
             // Get from the map the list of expressions of given ExpressionKind
             List<SExpression> exprList = expressionMapByKind.get(expressionKind);

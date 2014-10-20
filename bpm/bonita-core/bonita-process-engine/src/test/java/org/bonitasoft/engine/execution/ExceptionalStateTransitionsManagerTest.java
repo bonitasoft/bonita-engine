@@ -37,13 +37,13 @@ public class ExceptionalStateTransitionsManagerTest {
 
     private static final long FLOW_NODE_INSTANCE_ID = 100;
 
-    private static int NORMAL_NON_TERMINAL_STATE_ID = 50;
+    private static final int NORMAL_NON_TERMINAL_STATE_ID = 50;
 
-    private static int NORMAL_TERMINAL_STATE_ID = 51;
+    private static final int NORMAL_TERMINAL_STATE_ID = 51;
 
-    private static int ABORTING_NON_TERMINAL_STATE_ID = 52;
+    private static final int ABORTING_NON_TERMINAL_STATE_ID = 52;
 
-    private static int ABORTING_TERMINAL_STATE_ID = 53;
+    private static final int ABORTING_TERMINAL_STATE_ID = 53;
 
     @Mock
     private FlowNodeState normalNonTerminalState;

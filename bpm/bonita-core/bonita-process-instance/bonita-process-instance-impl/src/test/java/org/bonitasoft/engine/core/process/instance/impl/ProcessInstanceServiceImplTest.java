@@ -37,10 +37,10 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
@@ -132,7 +132,7 @@ public class ProcessInstanceServiceImplTest {
     private ConnectorInstanceService connectorInstanceService;
 
     @Mock
-    private ProcessDocumentService processDocumentService;
+    private DocumentService documentService;
 
     @Mock
     private SCommentService sCommentService;

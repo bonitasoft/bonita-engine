@@ -27,6 +27,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
+import org.bonitasoft.engine.bpm.document.DocumentListDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.CallActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
@@ -48,6 +49,7 @@ import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SDocumentListDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
@@ -117,6 +119,8 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
 
     private final List<SDocumentDefinition> sDocumentDefinitions;
 
+    private final List<SDocumentListDefinition> sDocumentListDefinitions;
+
     private SNamedElement elementContainer;
 
     private boolean containsInclusiveGateway = false;
@@ -143,6 +147,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         sDataDefinitions = new ArrayList<SDataDefinition>();
         sBusinessDataDefinitions = new ArrayList<SBusinessDataDefinition>();
         sDocumentDefinitions = new ArrayList<SDocumentDefinition>();
+        sDocumentListDefinitions = new ArrayList<SDocumentListDefinition>();
         sBoundaryEvents = new ArrayList<SBoundaryEventDefinition>();
     }
 
@@ -212,6 +217,12 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
             mDocumentDefinitions.add(new SDocumentDefinitionImpl(documentDefinition));
         }
         sDocumentDefinitions = Collections.unmodifiableList(mDocumentDefinitions);
+        final List<DocumentListDefinition> documentListDefinitions2 = container.getDocumentListDefinitions();
+        final ArrayList<SDocumentListDefinition> mDocumentListDefinitions = new ArrayList<SDocumentListDefinition>(documentListDefinitions2.size());
+        for (final DocumentListDefinition documentListDefinition : documentListDefinitions2) {
+            mDocumentListDefinitions.add(new SDocumentListDefinitionImpl(documentListDefinition));
+        }
+        sDocumentListDefinitions = Collections.unmodifiableList(mDocumentListDefinitions);
 
     }
 
@@ -616,6 +627,19 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
     @Override
     public boolean containsInclusiveGateway() {
         return containsInclusiveGateway;
+    }
+
+    /**
+     * @return the document list definitions
+     * @since 6.4.0
+     */
+    @Override
+    public List<SDocumentListDefinition> getDocumentListDefinitions() {
+        return sDocumentListDefinitions;
+    }
+
+    public void addDocumentListDefinition(final SDocumentListDefinition documentListDefinition) {
+        sDocumentListDefinitions.add(documentListDefinition);
     }
 
 }

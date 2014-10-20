@@ -19,7 +19,7 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractProcessInstanceSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor;
@@ -42,12 +42,12 @@ public class SearchOpenProcessInstancesInvolvingUsersManagedBy extends AbstractP
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return processInstanceService.getNumberOfOpenProcessInstancesInvolvingUsersManagedBy(managerUserId, searchOptions);
     }
 
     @Override
-    public List<SProcessInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SProcessInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return processInstanceService.searchOpenProcessInstancesInvolvingUsersManagedBy(managerUserId, searchOptions);
     }
 }

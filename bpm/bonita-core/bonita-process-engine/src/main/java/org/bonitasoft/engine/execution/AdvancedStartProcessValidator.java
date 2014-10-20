@@ -30,8 +30,8 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 public class AdvancedStartProcessValidator implements Validator<List<String>> {
     
     
-    private ProcessDefinitionService processDefinitionService;
-    private long processDefinitionId;
+    private final ProcessDefinitionService processDefinitionService;
+    private final long processDefinitionId;
 
     public AdvancedStartProcessValidator(ProcessDefinitionService processDefinitionService, long processDefinitionId) {
         this.processDefinitionService = processDefinitionService;

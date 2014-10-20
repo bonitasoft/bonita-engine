@@ -13,9 +13,9 @@ public class DummySCustomUserInfoDefinition implements SCustomUserInfoDefinition
 
     private long id;
 
-    private String name;
+    private final String name;
 
-    private String description;
+    private final String description;
 
     public DummySCustomUserInfoDefinition(long id) {
         this(id, "", "");

@@ -19,7 +19,7 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractArchivedHumanTaskInstanceSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
@@ -38,12 +38,12 @@ public class SearchArchivedHumanTasksSupervisedBy extends AbstractArchivedHumanT
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return activityInstanceService.getNumberOfArchivedHumanTasksSupervisedBy(supervisorId, searchOptions);
     }
 
     @Override
-    public List<SAHumanTaskInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SAHumanTaskInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return activityInstanceService.searchArchivedHumanTasksSupervisedBy(supervisorId, searchOptions);
     }
 

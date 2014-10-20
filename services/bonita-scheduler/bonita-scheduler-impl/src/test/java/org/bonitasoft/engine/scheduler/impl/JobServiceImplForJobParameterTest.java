@@ -38,7 +38,6 @@ import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -346,8 +345,8 @@ public class JobServiceImplForJobParameterTest {
         verify(readPersistenceService).searchEntity(SJobParameter.class, options, null);
     }
 
-    @Test(expected = SBonitaSearchException.class)
-    public void searchJobParameters_should_throw_exception_when_persistenceService_failed() throws SBonitaSearchException, SBonitaReadException {
+    @Test(expected = SBonitaReadException.class)
+    public void searchJobParameters_should_throw_exception_when_persistenceService_failed() throws SBonitaReadException, SBonitaReadException {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         doThrow(new SBonitaReadException("")).when(readPersistenceService).searchEntity(SJobParameter.class, options, null);
@@ -419,7 +418,7 @@ public class JobServiceImplForJobParameterTest {
     }
 
     @Test(expected = SJobParameterCreationException.class)
-    public void setJobParameters_should_throw_exception_when_search_failed() throws SBonitaSearchException, SBonitaReadException,
+    public void setJobParameters_should_throw_exception_when_search_failed() throws SBonitaReadException, SBonitaReadException,
             SJobParameterCreationException {
         // Given
         final long tenantId = 12;

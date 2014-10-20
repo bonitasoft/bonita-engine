@@ -22,7 +22,6 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.persistence.model.Human;
 import org.bonitasoft.engine.platform.model.builder.SPlatformBuilder;
@@ -107,7 +106,7 @@ public class RecorderTest extends CommonServiceTest {
         return Collections.singletonMap(key, value);
     }
 
-    private List<SQueriableLog> getLogs(final long indexValue, final String actionType) throws SBonitaSearchException {
+    private List<SQueriableLog> getLogs(final long indexValue, final String actionType) throws SBonitaReadException {
         final List<FilterOption> filters = new ArrayList<FilterOption>(2);
         filters.add(getActionTypeFilterOption(actionType));
         filters.add(new FilterOption(SQueriableLog.class, getLogModelBuilderFactory().getObjectIdKey(), indexValue));
@@ -119,7 +118,7 @@ public class RecorderTest extends CommonServiceTest {
         return new FilterOption(SQueriableLog.class, getLogModelBuilderFactory().getActionTypeKey(), actionType);
     }
 
-    private List<SQueriableLog> getLogs(final String actionType) throws SBonitaSearchException {
+    private List<SQueriableLog> getLogs(final String actionType) throws SBonitaReadException {
         final List<FilterOption> filters = Arrays.asList(getActionTypeFilterOption(actionType));
         return loggerService.searchLogs(new QueryOptions(0, 10, null, filters, null));
     }
@@ -312,7 +311,8 @@ public class RecorderTest extends CommonServiceTest {
         final Human humanToUpdate = getHumanByFirstName("firstName");
         assertNotNull(humanToUpdate);
         final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(HUMAN).setObject(human).done();
-        recorder.recordUpdate(UpdateRecord.buildSetField(humanToUpdate, "firstName", "firstName", "firstNameUpdate"), updateEvent);
+        final Map<String, Object> stringObjectMap = Collections.<String, Object> singletonMap("firstName", "firstName");
+        recorder.recordUpdate(UpdateRecord.buildSetFields(humanToUpdate, stringObjectMap), updateEvent);
         getTransactionService().setRollbackOnly();
         getTransactionService().complete();
 

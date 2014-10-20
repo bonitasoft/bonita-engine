@@ -33,7 +33,7 @@ public class SProcessInstanceReadException extends SBonitaException {
     private static final String formatMessage(final Throwable cause) {
         String message = null;
         if (cause instanceof SBonitaReadException) {
-            final AbstractSelectDescriptor<?> descriptor = ((SBonitaReadException) cause).getselectDescriptor();
+            final AbstractSelectDescriptor<?> descriptor = ((SBonitaReadException) cause).getSelectDescriptor();
             if (descriptor != null) {
                 message = descriptor.toString();
             }

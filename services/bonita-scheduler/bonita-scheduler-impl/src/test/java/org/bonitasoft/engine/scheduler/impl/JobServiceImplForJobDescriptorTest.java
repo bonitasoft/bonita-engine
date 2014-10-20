@@ -44,7 +44,6 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -230,7 +229,7 @@ public class JobServiceImplForJobDescriptorTest {
     @Test(expected = SJobDescriptorDeletionException.class)
     public void deleteJobDescriptor_by_name_should_throw_exception_when_searchJobDescriptors_failed() throws Exception {
         //Given
-        doThrow(new SBonitaSearchException("toto")).when(jobServiceImpl).searchJobDescriptors(any(QueryOptions.class));
+        doThrow(new SBonitaReadException("toto")).when(jobServiceImpl).searchJobDescriptors(any(QueryOptions.class));
 
         //when
         jobServiceImpl.deleteJobDescriptorByJobName("jobName");
@@ -239,7 +238,7 @@ public class JobServiceImplForJobDescriptorTest {
     @Test(expected = SJobDescriptorDeletionException.class)
     public void deleteAllJobDescriptors_should_throw_exception_when_searchEntity_failed() throws Exception {
         //Given
-        when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class), anyMap())).thenThrow(new SBonitaSearchException("error"));
+        when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class), anyMap())).thenThrow(new SBonitaReadException("error"));
 
         //When
         jobServiceImpl.deleteAllJobDescriptors();
@@ -320,7 +319,7 @@ public class JobServiceImplForJobDescriptorTest {
     }
 
     @Test
-    public void getNumberOfJobDescriptors() throws SBonitaReadException, SBonitaSearchException {
+    public void getNumberOfJobDescriptors() throws SBonitaReadException, SBonitaReadException {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         when(readPersistenceService.getNumberOfEntities(SJobDescriptor.class, options, null)).thenReturn(1L);
@@ -333,7 +332,7 @@ public class JobServiceImplForJobDescriptorTest {
         verifyZeroInteractions(recorder);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfJobDescriptors_should_throw_exception() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -344,7 +343,7 @@ public class JobServiceImplForJobDescriptorTest {
     }
 
     @Test
-    public void searchJobDescriptors() throws SBonitaSearchException, SBonitaReadException {
+    public void searchJobDescriptors() throws SBonitaReadException, SBonitaReadException {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
@@ -358,8 +357,8 @@ public class JobServiceImplForJobDescriptorTest {
         verify(readPersistenceService).searchEntity(SJobDescriptor.class, options, null);
     }
 
-    @Test(expected = SBonitaSearchException.class)
-    public void searchJobDescriptors_should_throw_exception() throws SBonitaSearchException, SBonitaReadException {
+    @Test(expected = SBonitaReadException.class)
+    public void searchJobDescriptors_should_throw_exception() throws SBonitaReadException, SBonitaReadException {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         doThrow(new SBonitaReadException("")).when(readPersistenceService).searchEntity(SJobDescriptor.class, options, null);

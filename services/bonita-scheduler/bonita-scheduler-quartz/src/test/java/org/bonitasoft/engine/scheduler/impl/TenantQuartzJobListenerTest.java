@@ -29,13 +29,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.events.model.SFireEventException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.StatelessJob;
-import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
-import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
@@ -194,13 +191,13 @@ public class TenantQuartzJobListenerTest {
             }
 
             @Override
-            public void execute() throws SJobExecutionException, SFireEventException {
+            public void execute() {
                 // TODO Auto-generated method stub
 
             }
 
             @Override
-            public void setAttributes(final Map<String, Serializable> attributes) throws SJobConfigurationException {
+            public void setAttributes(final Map<String, Serializable> attributes) {
                 // TODO Auto-generated method stub
 
             }

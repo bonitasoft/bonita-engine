@@ -22,7 +22,6 @@ import org.quartz.SchedulerException;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.spi.TriggerFiredBundle;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class TransactionalSimpleJobFactoryTest {
 
@@ -48,7 +47,7 @@ public class TransactionalSimpleJobFactoryTest {
     private StatelessJob job;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         final JobDetailImpl jobDetailImpl = new JobDetailImpl();
         jobDetailImpl.setJobClass(ConcurrentQuartzJob.class);
         jobDetailImpl.setJobDataMap(jobDataMap);

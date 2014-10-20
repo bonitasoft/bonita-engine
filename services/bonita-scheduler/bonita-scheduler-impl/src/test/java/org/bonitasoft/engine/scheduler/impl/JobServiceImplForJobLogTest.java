@@ -37,7 +37,6 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -224,11 +223,11 @@ public class JobServiceImplForJobLogTest {
         jobServiceImpl.deleteJobLogs(jobDescriptorId);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void deleteJobLogs_should_throw_exception_when_getJobLogs_failed() throws Exception {
         // Given
         final long jobDescriptorId = 9L;
-        doThrow(SBonitaSearchException.class).when(jobServiceImpl).getJobLogs(jobDescriptorId, 0, 100);
+        doThrow(SBonitaReadException.class).when(jobServiceImpl).getJobLogs(jobDescriptorId, 0, 100);
 
         // When
         jobServiceImpl.deleteJobLogs(jobDescriptorId);
@@ -284,7 +283,7 @@ public class JobServiceImplForJobLogTest {
     }
 
     @Test
-    public void getNumberOfJobLogs() throws SBonitaReadException, SBonitaSearchException {
+    public void getNumberOfJobLogs() throws SBonitaReadException, SBonitaReadException {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
 
@@ -298,7 +297,7 @@ public class JobServiceImplForJobLogTest {
         verifyZeroInteractions(recorder);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfJobLog_should_throw_exception_when_persistenceService_failed() throws Exception {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
@@ -310,7 +309,7 @@ public class JobServiceImplForJobLogTest {
     }
 
     @Test
-    public void searchJobLogs() throws SBonitaSearchException, SBonitaReadException {
+    public void searchJobLogs() throws SBonitaReadException, SBonitaReadException {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         final SJobLog sJobLog = mock(SJobLog.class);
@@ -324,8 +323,8 @@ public class JobServiceImplForJobLogTest {
         verify(readPersistenceService).searchEntity(any(Class.class), any(QueryOptions.class), anyMap());
     }
 
-    @Test(expected = SBonitaSearchException.class)
-    public void searchJobLog_should_throw_exception_when_persistenceService_failed() throws SBonitaSearchException, SBonitaReadException {
+    @Test(expected = SBonitaReadException.class)
+    public void searchJobLog_should_throw_exception_when_persistenceService_failed() throws SBonitaReadException, SBonitaReadException {
         // Given
         final QueryOptions options = new QueryOptions(0, 10);
         doThrow(new SBonitaReadException("")).when(readPersistenceService).searchEntity(SJobLog.class, options, null);

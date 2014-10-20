@@ -41,7 +41,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTri
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -111,10 +111,10 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      * @param processDefinitionId
      * @param searchOptions
      * @return
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @since 6.3
      */
-    List<SWaitingEvent> searchStartWaitingEvents(long processDefinitionId, QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SWaitingEvent> searchStartWaitingEvents(long processDefinitionId, QueryOptions queryOptions) throws SBonitaReadException;
 
     List<SMessageEventCouple> getMessageEventCouples(int fromIndex, int maxResults) throws SEventTriggerInstanceReadException;
 
@@ -126,13 +126,13 @@ public interface EventInstanceService extends FlowNodeInstanceService {
 
     void updateMessageInstance(SMessageInstance messageInstance, EntityUpdateDescriptor descriptor) throws SMessageModificationException;
 
-    <T extends SWaitingEvent> List<T> searchWaitingEvents(Class<T> entityClass, QueryOptions searchOptions) throws SBonitaSearchException;
+    <T extends SWaitingEvent> List<T> searchWaitingEvents(Class<T> entityClass, QueryOptions searchOptions) throws SBonitaReadException;
 
-    long getNumberOfWaitingEvents(Class<? extends SWaitingEvent> entityClass, QueryOptions countOptions) throws SBonitaSearchException;
+    long getNumberOfWaitingEvents(Class<? extends SWaitingEvent> entityClass, QueryOptions countOptions) throws SBonitaReadException;
 
-    <T extends SEventTriggerInstance> List<T> searchEventTriggerInstances(Class<T> entityClass, QueryOptions searchOptions) throws SBonitaSearchException;
+    <T extends SEventTriggerInstance> List<T> searchEventTriggerInstances(Class<T> entityClass, QueryOptions searchOptions) throws SBonitaReadException;
 
-    long getNumberOfEventTriggerInstances(Class<? extends SEventTriggerInstance> entityClass, QueryOptions countOptions) throws SBonitaSearchException;
+    long getNumberOfEventTriggerInstances(Class<? extends SEventTriggerInstance> entityClass, QueryOptions countOptions) throws SBonitaReadException;
 
     /**
      * @param eventInstanceId
@@ -155,56 +155,56 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      * @throws SFlowNodeReadException
      * @since 6.1
      */
-    void deleteWaitingEvents(SFlowNodeInstance flowNodeInstance) throws SWaitingEventModificationException, SBonitaSearchException;
+    void deleteWaitingEvents(SFlowNodeInstance flowNodeInstance) throws SWaitingEventModificationException, SBonitaReadException;
 
     /**
      * Resets all Message Instances marked as handled, so that they are eligible to match Waiting Events again.
-     * 
+     *
      * @throws SMessageModificationException
-     *             if an error occurs when resetting the 'handled' flag.
+     *         if an error occurs when resetting the 'handled' flag.
      */
     int resetProgressMessageInstances() throws SMessageModificationException;
 
     /**
      * Resets all Waiting Message Events marked as 'in progress", so that they are eligible to match Message Instances again.
-     * 
+     *
      * @return the number of waiting events reset.
      * @throws SWaitingEventModificationException
-     *             if an error occurs when resetting the 'progress' flag.
+     *         if an error occurs when resetting the 'progress' flag.
      */
     int resetInProgressWaitingEvents() throws SWaitingEventModificationException;
 
     /**
      * Get the number of STimerEventTriggerInstance on the specific process instance & corresponding to the criteria
-     * 
+     *
      * @param processInstanceId
-     *            The identifier of the process instance
+     *        The identifier of the process instance
      * @param searchOptions
-     *            Criteria of the search
+     *        Criteria of the search
      * @return The number of STimerEventTriggerInstance on the specific process instance & corresponding to the criteria
      * @since 6.4.0
      */
-    long getNumberOfTimerEventTriggerInstances(long processInstanceId, QueryOptions queryOptions) throws SBonitaSearchException;
+    long getNumberOfTimerEventTriggerInstances(long processInstanceId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Search the list of STimerEventTriggerInstance on the specific process instance & corresponding to the criteria
-     * 
+     *
      * @param processInstanceId
-     *            The identifier of the process instance
+     *        The identifier of the process instance
      * @param searchOptions
-     *            Criteria of the search
+     *        Criteria of the search
      * @return The list of STimerEventTriggerInstance on the specific process instance & corresponding to the criteria
      * @since 6.4.0
      */
-    List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(long processInstanceId, QueryOptions queryOptions) throws SBonitaSearchException;
+    List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(long processInstanceId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Update an event trigger instance.
-     * 
+     *
      * @param sEventTriggerInstance
-     *            The event trigger instance to update
+     *        The event trigger instance to update
      * @param descriptor
-     *            The fields to update
+     *        The fields to update
      * @throws SEventTriggerModificationException
      * @since 6.4.0
      */

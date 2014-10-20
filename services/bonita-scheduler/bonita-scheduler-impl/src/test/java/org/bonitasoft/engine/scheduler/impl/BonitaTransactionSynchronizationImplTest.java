@@ -42,7 +42,7 @@ public class BonitaTransactionSynchronizationImplTest {
      * Test method for {@link org.bonitasoft.engine.scheduler.impl.BonitaTransactionSynchronizationImpl#beforeCommit()}.
      */
     @Test
-    public final void beforeCommit_do_nothing() throws Exception {
+    public final void beforeCommit_do_nothing() {
         // When
         bonitaTransactionSynchronizationImpl.beforeCommit();
 
@@ -56,7 +56,7 @@ public class BonitaTransactionSynchronizationImplTest {
      * {@link org.bonitasoft.engine.scheduler.impl.BonitaTransactionSynchronizationImpl#afterCompletion(org.bonitasoft.engine.transaction.TransactionState)}.
      */
     @Test
-    public final void afterCompletion_should_deleteTenantId_in_session() throws Exception {
+    public final void afterCompletion_should_deleteTenantId_in_session() {
         // When
         bonitaTransactionSynchronizationImpl.afterCompletion(null);
 

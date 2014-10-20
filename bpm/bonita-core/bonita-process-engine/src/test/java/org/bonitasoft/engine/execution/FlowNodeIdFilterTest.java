@@ -21,7 +21,7 @@ public class FlowNodeIdFilterTest {
     @Mock
     private SFlowNodeDefinition flownode;
 
-    FlowNodeIdFilter filter = new FlowNodeIdFilter(3L);
+    final FlowNodeIdFilter filter = new FlowNodeIdFilter(3L);
 
     @Test
     public void select_should_return_false_if_flow_node_id_is_not_the_expected_one() {

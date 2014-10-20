@@ -16,7 +16,7 @@ package org.bonitasoft.engine.search.theme;
 import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchThemeDescriptor;
@@ -38,12 +38,12 @@ public class SearchThemes extends AbstractSearchEntity<Theme, STheme> {
     }
 
     @Override
-    public long executeCount(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions queryOptions) throws SBonitaReadException {
         return themeService.getNumberOfThemes(queryOptions);
     }
 
     @Override
-    public List<STheme> executeSearch(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<STheme> executeSearch(final QueryOptions queryOptions) throws SBonitaReadException {
         return themeService.searchThemes(queryOptions);
     }
 

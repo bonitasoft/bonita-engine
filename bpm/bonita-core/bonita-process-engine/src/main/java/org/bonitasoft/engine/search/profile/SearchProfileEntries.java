@@ -17,7 +17,7 @@ package org.bonitasoft.engine.search.profile;
 import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileEntry;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.model.SProfileEntry;
@@ -39,12 +39,12 @@ public class SearchProfileEntries extends AbstractSearchEntity<ProfileEntry, SPr
     }
 
     @Override
-    public long executeCount(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions queryOptions) throws SBonitaReadException {
         return profileService.getNumberOfProfileEntries(queryOptions);
     }
 
     @Override
-    public List<SProfileEntry> executeSearch(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SProfileEntry> executeSearch(final QueryOptions queryOptions) throws SBonitaReadException {
         return profileService.searchProfileEntries(queryOptions);
     }
 

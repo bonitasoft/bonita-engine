@@ -46,24 +46,19 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
-import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoUpdater;
 import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessExportException;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
-import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.identity.UserSearchDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * This API deals with definition objects such as {@link ProcessDefinition}, {@link ProcessDeploymentInfo}, {@link Category}, ...
@@ -85,12 +80,12 @@ public interface ProcessManagementAPI {
      * Deploys a {@link BusinessArchive} which contains a {@link DesignProcessDefinition} and its dependencies.
      *
      * @param businessArchive
-     *            the archive to deploy.
+     *        the archive to deploy.
      * @return the process definition.
      * @throws AlreadyExistsException
-     *             if a process with same name and version is already deployed.
+     *         if a process with same name and version is already deployed.
      * @throws ProcessDeployException
-     *             if an exception occurs when deploying the archive.
+     *         if an exception occurs when deploying the archive.
      * @see BusinessArchive
      * @since 6.0
      */
@@ -100,12 +95,12 @@ public interface ProcessManagementAPI {
      * Deploys a simple {@link DesignProcessDefinition} (without any dependencies).
      *
      * @param designProcessDefinition
-     *            the description of a process definition.
+     *        the description of a process definition.
      * @return the process definition corresponding of the description.
      * @throws AlreadyExistsException
-     *             if a process with same name and version is already deployed.
+     *         if a process with same name and version is already deployed.
      * @throws ProcessDeployException
-     *             if an exception occurs when deploying the process.
+     *         if an exception occurs when deploying the process.
      * @see #deploy(BusinessArchive)
      * @since 6.0
      */
@@ -115,11 +110,11 @@ public interface ProcessManagementAPI {
      * Enables the process definition.
      *
      * @param processDefinitionId
-     *            the process definition identifier.
+     *        the process definition identifier.
      * @throws ProcessDefinitionNotFoundException
-     *             if the identifier does not refer to an existing process definition.
+     *         if the identifier does not refer to an existing process definition.
      * @throws ProcessEnablementException
-     *             if an exception occurs during the process enablement.
+     *         if an exception occurs during the process enablement.
      * @since 6.0
      */
     void enableProcess(long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessEnablementException;
@@ -128,11 +123,11 @@ public interface ProcessManagementAPI {
      * Disables the process definition by giving its identifier. A process can only be disabled if it is enabled.
      *
      * @param processDefinitionId
-     *            the process definition identifier.
+     *        the process definition identifier.
      * @throws ProcessDefinitionNotFoundException
-     *             if the identifier does not refer to an existing process definition.
+     *         if the identifier does not refer to an existing process definition.
      * @throws ProcessActivationException
-     *             if an exception occurs during the process disablement.
+     *         if an exception occurs during the process disablement.
      * @since 6.0
      */
     void disableProcess(long processDefinitionId) throws ProcessDefinitionNotFoundException, ProcessActivationException;
@@ -142,12 +137,12 @@ public interface ProcessManagementAPI {
      * If the identifier is null, a ProcessDefinitionNotFoundException is thrown.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @return the process definition referenced by the identifier.
      * @throws ProcessDefinitionNotFoundException
-     *             if the identifier does not refer to an existing process definition.
+     *         if the identifier does not refer to an existing process definition.
      * @throws RetrieveException
-     *             if an exception occurs when getting the process definition.
+     *         if an exception occurs when getting the process definition.
      * @since 6.0
      */
     ProcessDefinition getProcessDefinition(long processDefinitionId) throws ProcessDefinitionNotFoundException;
@@ -156,11 +151,11 @@ public interface ProcessManagementAPI {
      * Deletes a process definition by giving its identifier. A process can only be deleted if it is disabled.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @throws DeletionException
-     *             if an exception occurs during process deletion.
+     *         if an exception occurs during process deletion.
      * @throws ProcessInstanceHierarchicalDeletionException
-     *             if a process instance cannot be deleted because of a parent that is still active
+     *         if a process instance cannot be deleted because of a parent that is still active
      * @since 6.0
      * @see #deleteProcessDefinition(long)
      * @deprecated As of release 6.1, replaced by {@link #deleteProcessDefinition(long)}
@@ -174,11 +169,11 @@ public interface ProcessManagementAPI {
      * process definition is deleted.
      *
      * @param processDefinitionIds
-     *            the list of identifiers of process definitions.
+     *        the list of identifiers of process definitions.
      * @throws DeletionException
-     *             if an exception occurs during process deletion.
+     *         if an exception occurs during process deletion.
      * @throws ProcessInstanceHierarchicalDeletionException
-     *             if a process instance cannot be deleted because of a parent that is still active
+     *         if a process instance cannot be deleted because of a parent that is still active
      * @see #deleteProcessDefinitions(List)
      * @since 6.0
      * @deprecated As of release 6.1, replaced by {@link #deleteProcessDefinitions(List)}
@@ -190,9 +185,9 @@ public interface ProcessManagementAPI {
      * Deletes a process definition by giving its identifier. A process can only be deleted if it is disabled and it has no more existing process instances.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @throws DeletionException
-     *             if an exception occurs during process deletion.
+     *         if an exception occurs during process deletion.
      * @since 6.1
      */
     void deleteProcessDefinition(long processDefinitionId) throws DeletionException;
@@ -202,9 +197,9 @@ public interface ProcessManagementAPI {
      * occurs, no process definition is deleted. All instances of given processes must be deleted prior to calling this operation.
      *
      * @param processDefinitionIds
-     *            the list of identifiers of process definitions.
+     *        the list of identifiers of process definitions.
      * @throws DeletionException
-     *             if an exception occurs during process deletion.
+     *         if an exception occurs during process deletion.
      * @see #deleteProcess(long)
      * @since 6.1
      */
@@ -214,16 +209,16 @@ public interface ProcessManagementAPI {
      * Deploys, enables and returns a process.
      *
      * @param designProcessDefinition
-     *            the description of a process definition.
+     *        the description of a process definition.
      * @return ProcessDefinition the process definition corresponding of the description.
      * @throws AlreadyExistsException
-     *             if a process with same name and version was already deployed.
+     *         if a process with same name and version was already deployed.
      * @throws ProcessEnablementException
-     *             if a process cannot be enabled.
+     *         if a process cannot be enabled.
      * @throws InvalidProcessDefinitionException
-     *             if the designProcessDefinition is invalid.
+     *         if the designProcessDefinition is invalid.
      * @throws ProcessDeployException
-     *             if an exception occurs when deploying the process.
+     *         if an exception occurs when deploying the process.
      * @see #deploy(DesignProcessDefinition)
      * @see #enableProcess(long)
      * @since 6.0
@@ -235,14 +230,14 @@ public interface ProcessManagementAPI {
      * Deploys and enables a process by giving a {@link BusinessArchive}.
      *
      * @param businessArchive
-     *            the archive ready to deploy.
+     *        the archive ready to deploy.
      * @return ProcessDefinition Process definition by given a business archive.
      * @throws ProcessDeployException
-     *             if an exception occurs when deploying the archive.
+     *         if an exception occurs when deploying the archive.
      * @throws AlreadyExistsException
-     *             if a process with same name and same version already exists.
+     *         if a process with same name and same version already exists.
      * @throws ProcessEnablementException
-     *             if a process cannot be enabled.
+     *         if a process cannot be enabled.
      */
     ProcessDefinition deployAndEnableProcess(BusinessArchive businessArchive) throws ProcessDeployException, ProcessEnablementException, AlreadyExistsException;
 
@@ -250,12 +245,12 @@ public interface ProcessManagementAPI {
      * Returns a list of problems if the process is configured incorrectly or the configuration is incomplete.
      *
      * @param processDefinitionId
-     *            the process definition identifier.
+     *        the process definition identifier.
      * @return a list of problems or an empty list.
      * @throws ProcessDefinitionNotFoundException
-     *             if the identifier does not refer to an existing process definition.
+     *         if the identifier does not refer to an existing process definition.
      * @throws RetrieveException
-     *             if an exception occurs when getting the problems of the process definition.
+     *         if an exception occurs when getting the problems of the process definition.
      * @since 6.0
      */
     List<Problem> getProcessResolutionProblems(long processDefinitionId) throws ProcessDefinitionNotFoundException;
@@ -264,13 +259,13 @@ public interface ProcessManagementAPI {
      * Disables and deletes the process.
      *
      * @param processDefinitionId
-     *            the process definition identifier.
+     *        the process definition identifier.
      * @throws ProcessDefinitionNotFoundException
-     *             if the identifier does not refer to an existing process definition.
+     *         if the identifier does not refer to an existing process definition.
      * @throws ProcessActivationException
-     *             if an exception occurs while disabling the process.
+     *         if an exception occurs while disabling the process.
      * @throws DeletionException
-     *             if an exception occurs while deleting the process.
+     *         if an exception occurs while deleting the process.
      * @see #disableProcess(long)
      * @see #deleteProcess(long)
      * @deprecated As of release 6.1, replaced by {@link #disableAndDeleteProcessDefinition(long)}
@@ -284,7 +279,7 @@ public interface ProcessManagementAPI {
      *
      * @return The number of process definitions.
      * @throws RetrieveException
-     *             if an exception occurs when getting the number of the process definitions.
+     *         if an exception occurs when getting the number of the process definitions.
      * @since 6.0
      */
     long getNumberOfProcessDeploymentInfos();
@@ -293,12 +288,12 @@ public interface ProcessManagementAPI {
      * Gets the deployment information of a process definition by giving the process definition identifier.
      *
      * @param processDefinitionId
-     *            the process definition identifier.
+     *        the process definition identifier.
      * @return the deployment information of the process definition.
      * @throws ProcessDefinitionNotFoundException
-     *             if the identifier does not refer to an existing process definition.
+     *         if the identifier does not refer to an existing process definition.
      * @throws RetrieveException
-     *             if an exception occurs when getting the process deployment information.
+     *         if an exception occurs when getting the process deployment information.
      * @since 6.0
      */
     ProcessDeploymentInfo getProcessDeploymentInfo(long processDefinitionId) throws ProcessDefinitionNotFoundException;
@@ -307,13 +302,13 @@ public interface ProcessManagementAPI {
      * Updates the process deployment information for a specified process.
      *
      * @param processDefinitionId
-     *            the process definition identifier.
+     *        the process definition identifier.
      * @param processDeploymentInfoUpdater
-     *            the description which describe how to update the process deployment information.
+     *        the description which describe how to update the process deployment information.
      * @throws ProcessDefinitionNotFoundException
-     *             if the identifier does not refer to an existing process definition.
+     *         if the identifier does not refer to an existing process definition.
      * @throws UpdateException
-     *             if an exception occurs when updating the process deployment information.
+     *         if an exception occurs when updating the process deployment information.
      * @since 6.0
      */
     void updateProcessDeploymentInfo(long processDefinitionId, ProcessDeploymentInfoUpdater processDeploymentInfoUpdater)
@@ -323,14 +318,14 @@ public interface ProcessManagementAPI {
      * Returns a paged list of process deployment information for a number of processes.
      *
      * @param startIndex
-     *            the index of the first result (starting from 0).
+     *        the index of the first result (starting from 0).
      * @param maxResults
-     *            the maximum number of process deployment information results per page.
+     *        the maximum number of process deployment information results per page.
      * @param sortCriterion
-     *            the sorting criterion.
+     *        the sorting criterion.
      * @return the ordered list of process deployment informations.
      * @throws RetrieveException
-     *             if an exception occurs when getting the process deployment informations.
+     *         if an exception occurs when getting the process deployment informations.
      * @since 6.0
      */
     List<ProcessDeploymentInfo> getProcessDeploymentInfos(int startIndex, int maxResults, ProcessDeploymentInfoCriterion sortCriterion);
@@ -339,10 +334,10 @@ public interface ProcessManagementAPI {
      * Returns the number of actors in a process definition.
      *
      * @param processDefinitionId
-     *            the process definition identifier.
+     *        the process definition identifier.
      * @return the number of actors in the process.
      * @throws ProcessDefinitionNotFoundException
-     *             if the identifier does not refer to an existing process definition.
+     *         if the identifier does not refer to an existing process definition.
      * @since 6.0
      */
     int getNumberOfActors(long processDefinitionId) throws ProcessDefinitionNotFoundException;
@@ -351,10 +346,10 @@ public interface ProcessManagementAPI {
      * Returns the actor.
      *
      * @param actorId
-     *            the identifier of the actor.
+     *        the identifier of the actor.
      * @return the actor.
      * @throws ActorNotFoundException
-     *             if an identifier does not refer to an existing actor.
+     *         if an identifier does not refer to an existing actor.
      * @since 6.0
      */
     ActorInstance getActor(long actorId) throws ActorNotFoundException;
@@ -363,13 +358,13 @@ public interface ProcessManagementAPI {
      * Returns a paged list of actors in a process.
      *
      * @param processDefinitionId
-     *            the process definition identifier.
+     *        the process definition identifier.
      * @param startIndex
-     *            the index of the first result (starting from 0).
+     *        the index of the first result (starting from 0).
      * @param maxResults
-     *            the maximum number of actors per page.
+     *        the maximum number of actors per page.
      * @param sort
-     *            the sorting criterion.
+     *        the sorting criterion.
      * @return the ordered list of actors.
      * @since 6.0
      */
@@ -382,11 +377,11 @@ public interface ProcessManagementAPI {
      * No ordering must be assumed on the list of results.
      *
      * @param actorId
-     *            the identifier of the actor.
+     *        the identifier of the actor.
      * @param startIndex
-     *            the index of the first result (starting from 0).
+     *        the index of the first result (starting from 0).
      * @param maxResults
-     *            the maximum number of actor members per page.
+     *        the maximum number of actor members per page.
      * @return the list of actor members.
      * @since 6.0
      */
@@ -399,7 +394,7 @@ public interface ProcessManagementAPI {
      * user, role, group, or membership is mapped to the actor.
      *
      * @param actorId
-     *            the identifier of the actor.
+     *        the identifier of the actor.
      * @return the number of actors members of the actor
      * @since 6.0
      */
@@ -409,7 +404,7 @@ public interface ProcessManagementAPI {
      * Counts the number of users mapped to the actor.
      *
      * @param actorId
-     *            the identifier of the actor.
+     *        the identifier of the actor.
      * @return the number of users mapped to the actor.
      * @since 6.0
      */
@@ -419,7 +414,7 @@ public interface ProcessManagementAPI {
      * Counts the number of roles mapped to the actor.
      *
      * @param actorId
-     *            the identifier of the actor.
+     *        the identifier of the actor.
      * @return the number of roles mapped to the actor.
      * @since 6.0
      */
@@ -429,7 +424,7 @@ public interface ProcessManagementAPI {
      * Counts the number of groups mapped to the actor.
      *
      * @param actorId
-     *            the identifier of the actor.
+     *        the identifier of the actor.
      * @return the number of groups mapped to the actor.
      * @since 6.0
      */
@@ -439,7 +434,7 @@ public interface ProcessManagementAPI {
      * Counts the number of memberships mapped to the actor.
      *
      * @param actorId
-     *            the identifier of the actor.
+     *        the identifier of the actor.
      * @return the total number of user memberships mapped to an actor
      * @since 6.0
      */
@@ -449,14 +444,14 @@ public interface ProcessManagementAPI {
      * Updates the actor.
      *
      * @param actorId
-     *            the identifier of the actor.
+     *        the identifier of the actor.
      * @param actorUpdater
-     *            the descriptor which contains the fields to update.
+     *        the descriptor which contains the fields to update.
      * @return the actor.
      * @throws ActorNotFoundException
-     *             if an identifier does not refer to an existing actor.
+     *         if an identifier does not refer to an existing actor.
      * @throws UpdateException
-     *             if an exception occurs when updating the actor.
+     *         if an exception occurs when updating the actor.
      * @since 6.0
      */
     ActorInstance updateActor(long actorId, ActorUpdater actorUpdater) throws ActorNotFoundException, UpdateException;
@@ -465,14 +460,14 @@ public interface ProcessManagementAPI {
      * Maps the user to the actor. The user will be mapped to the actor as an {@link ActorMember}.
      *
      * @param actorId
-     *            the identifier of the actor.
+     *        the identifier of the actor.
      * @param userId
-     *            the identifier of the user.
+     *        the identifier of the user.
      * @return the couple actor/user as an actor member.
      * @throws CreationException
-     *             if an exception occurs when creating the actor mapping.
+     *         if an exception occurs when creating the actor mapping.
      * @throws AlreadyExistsException
-     *             if the association already exists.
+     *         if the association already exists.
      * @see IdentityAPI#getUser(long)
      * @since 6.0
      */
@@ -482,18 +477,18 @@ public interface ProcessManagementAPI {
      * Maps a user to the actor of the process definition. The user will be mapped to the actor as an {@link ActorMember}.
      *
      * @param actorName
-     *            the name of the actor.
+     *        the name of the actor.
      * @param processDefinition
-     *            the process definition.
+     *        the process definition.
      * @param userId
-     *            the identifier of the user.
+     *        the identifier of the user.
      * @return the couple actor/user as an actor member.
      * @throws ActorNotFoundException
-     *             if the name does not refer to an existing actor of the process definition.
+     *         if the name does not refer to an existing actor of the process definition.
      * @throws CreationException
-     *             if an exception occurs when creating the actor mapping.
+     *         if an exception occurs when creating the actor mapping.
      * @throws AlreadyExistsException
-     *             if the association already exists.
+     *         if the association already exists.
      * @see IdentityAPI#getUser(long)
      * @since 6.0
      */
@@ -504,14 +499,14 @@ public interface ProcessManagementAPI {
      * Maps the group to the actor.
      *
      * @param actorId
-     *            the identifier of the actor.
+     *        the identifier of the actor.
      * @param groupId
-     *            the identifier of the group.
+     *        the identifier of the group.
      * @return the couple actor/group as an actor member.
      * @throws CreationException
-     *             if the exception occurs when creating the actor mapping.
+     *         if the exception occurs when creating the actor mapping.
      * @throws AlreadyExistsException
-     *             if the association already exists.
+     *         if the association already exists.
      * @see IdentityAPI#getGroup(long)
      * @since 6.0
      */
@@ -521,18 +516,18 @@ public interface ProcessManagementAPI {
      * Maps the group to the actor of the process definition.
      *
      * @param actorName
-     *            the name of the actor.
+     *        the name of the actor.
      * @param groupId
-     *            the identifier of the group.
+     *        the identifier of the group.
      * @param processDefinition
-     *            the process definition.
+     *        the process definition.
      * @return the couple actor/group as an actor member.
      * @throws ActorNotFoundException
-     *             if the name does not refer to an existing actor of the process definition.
+     *         if the name does not refer to an existing actor of the process definition.
      * @throws CreationException
-     *             if an exception occurs when creating the actor mapping.
+     *         if an exception occurs when creating the actor mapping.
      * @throws AlreadyExistsException
-     *             if the association already exists.
+     *         if the association already exists.
      * @since 6.0
      */
     ActorMember addGroupToActor(String actorName, long groupId, ProcessDefinition processDefinition) throws ActorNotFoundException, CreationException,
@@ -542,12 +537,12 @@ public interface ProcessManagementAPI {
      * Maps the role to the actor.
      *
      * @param actorId
-     *            the identifier of the actor.
+     *        the identifier of the actor.
      * @param roleId
-     *            the identifier of the role.
+     *        the identifier of the role.
      * @return the couple actor/role as an actor member.
      * @throws CreationException
-     *             if an exception occurs when creating the actor mapping.
+     *         if an exception occurs when creating the actor mapping.
      * @since 6.0
      */
     ActorMember addRoleToActor(long actorId, long roleId) throws CreationException;
@@ -556,16 +551,16 @@ public interface ProcessManagementAPI {
      * Maps the role to the actor of the process definition.
      *
      * @param actorName
-     *            the name of the actor.
+     *        the name of the actor.
      * @param processDefinition
-     *            the process definition.
+     *        the process definition.
      * @param roleId
-     *            the identifier of the role.
+     *        the identifier of the role.
      * @return the couple actor/role as an actor member.
      * @throws ActorNotFoundException
-     *             if the name does not refer to an existing actor of the process definition.
+     *         if the name does not refer to an existing actor of the process definition.
      * @throws CreationException
-     *             if an exception occurs when creating the actor mapping.
+     *         if an exception occurs when creating the actor mapping.
      * @since 6.0
      */
     ActorMember addRoleToActor(String actorName, ProcessDefinition processDefinition, long roleId) throws ActorNotFoundException, CreationException;
@@ -574,14 +569,14 @@ public interface ProcessManagementAPI {
      * Maps the role and the group to the actor.
      *
      * @param actorId
-     *            the identifier of the actor.
+     *        the identifier of the actor.
      * @param roleId
-     *            the identifier of the role.
+     *        the identifier of the role.
      * @param groupId
-     *            the identifier of the group.
+     *        the identifier of the group.
      * @return the tuple actor/role/group as an actor member.
      * @throws CreationException
-     *             if an exception occurs when creating the actor mapping.
+     *         if an exception occurs when creating the actor mapping.
      * @since 6.0
      */
     ActorMember addRoleAndGroupToActor(long actorId, long roleId, long groupId) throws CreationException;
@@ -590,18 +585,18 @@ public interface ProcessManagementAPI {
      * Maps the role and the group to the actor of the process definition.
      *
      * @param actorName
-     *            the name of the actor.
+     *        the name of the actor.
      * @param processDefinition
-     *            the process definition.
+     *        the process definition.
      * @param roleId
-     *            the identifier of the role.
+     *        the identifier of the role.
      * @param groupId
-     *            the identifier of the role.
+     *        the identifier of the role.
      * @return the tuple actor/role/group as an actor member.
      * @throws ActorNotFoundException
-     *             if the actor name does not refer to an existing actor in the process definition.
+     *         if the actor name does not refer to an existing actor in the process definition.
      * @throws CreationException
-     *             if an exception occurs when creating the actor mapping.
+     *         if an exception occurs when creating the actor mapping.
      * @since 6.0
      */
     ActorMember addRoleAndGroupToActor(String actorName, ProcessDefinition processDefinition, long roleId, long groupId) throws ActorNotFoundException,
@@ -612,9 +607,9 @@ public interface ProcessManagementAPI {
      * The user, group, role, or membership is not removed from the organization.
      *
      * @param actorMemberId
-     *            the identifier of the actor member
+     *        the identifier of the actor member
      * @throws DeletionException
-     *             if an exception occurs when deleting the actor mapping.
+     *         if an exception occurs when deleting the actor mapping.
      * @since 6.0
      */
     void removeActorMember(long actorMemberId) throws DeletionException;
@@ -623,11 +618,11 @@ public interface ProcessManagementAPI {
      * Imports into the process definition an actor mapping in XML format.
      *
      * @param processDefinitionId
-     *            the identifier of the process.
+     *        the identifier of the process.
      * @param xmlContent
-     *            the XML content of the mapping. If null, nothing is performed.
+     *        the XML content of the mapping. If null, nothing is performed.
      * @throws ActorMappingImportException
-     *             if an exception occurs when importing the actor mapping.
+     *         if an exception occurs when importing the actor mapping.
      * @since 6.0
      */
     void importActorMapping(long processDefinitionId, String xmlContent) throws ActorMappingImportException;
@@ -636,11 +631,11 @@ public interface ProcessManagementAPI {
      * Imports to the process definition, the actor mapping in XML format as a byte array.
      *
      * @param processDefinitionId
-     *            the identifier of the process.
+     *        the identifier of the process.
      * @param actorMappingXML
-     *            the XML content of the mapping as a byte array. If null, nothing is performed.
+     *        the XML content of the mapping as a byte array. If null, nothing is performed.
      * @throws ActorMappingImportException
-     *             if an exception occurs when importing the actor mapping.
+     *         if an exception occurs when importing the actor mapping.
      * @since 6.0
      */
     void importActorMapping(long processDefinitionId, byte[] actorMappingXML) throws ActorMappingImportException;
@@ -649,10 +644,10 @@ public interface ProcessManagementAPI {
      * Exports the actor mapping of the process definition. The result contains the mapping in XML format.
      *
      * @param processDefinitionId
-     *            the identifier of the process.
+     *        the identifier of the process.
      * @return the XML content of the mapping.
      * @throws ActorMappingExportException
-     *             if an exception occurs when exporting the actor mapping.
+     *         if an exception occurs when exporting the actor mapping.
      * @since 6.0
      */
     String exportActorMapping(long processDefinitionId) throws ActorMappingExportException;
@@ -665,14 +660,14 @@ public interface ProcessManagementAPI {
      * finance to identify all processes used in the purchasing and accounts departments.
      *
      * @param name
-     *            The name of the category.
+     *        The name of the category.
      * @param description
-     *            The description of the category.
+     *        The description of the category.
      * @return the category.
      * @throws AlreadyExistsException
-     *             if a category already exists with the given name.
+     *         if a category already exists with the given name.
      * @throws CreationException
-     *             if an exception occurs when creating the category.
+     *         if an exception occurs when creating the category.
      * @since 6.0
      */
     Category createCategory(String name, String description) throws AlreadyExistsException, CreationException;
@@ -689,11 +684,11 @@ public interface ProcessManagementAPI {
      * Returns a paged list of categories.
      *
      * @param startIndex
-     *            the index of the first result (starting from 0).
+     *        the index of the first result (starting from 0).
      * @param maxResults
-     *            the maximum number of categories.
+     *        the maximum number of categories.
      * @param sortCriterion
-     *            the sorting criterion.
+     *        the sorting criterion.
      * @return the ordered list of categories.
      * @since 6.0
      */
@@ -703,10 +698,10 @@ public interface ProcessManagementAPI {
      * Returns the category.
      *
      * @param categoryId
-     *            the identifier of the category.
+     *        the identifier of the category.
      * @return the category.
      * @throws CategoryNotFoundException
-     *             if the identifier does not refer to an existing category.
+     *         if the identifier does not refer to an existing category.
      * @since 6.0
      */
     Category getCategory(long categoryId) throws CategoryNotFoundException;
@@ -715,13 +710,13 @@ public interface ProcessManagementAPI {
      * Associates the process definition with the category.
      *
      * @param categoryId
-     *            the identifier of the category.
+     *        the identifier of the category.
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @throws AlreadyExistsException
-     *             if the association category/process already exists.
+     *         if the association category/process already exists.
      * @throws CreationException
-     *             if an exception occurs while adding the process to the category.
+     *         if an exception occurs while adding the process to the category.
      * @since 6.0
      */
     void addProcessDefinitionToCategory(long categoryId, long processDefinitionId) throws AlreadyExistsException, CreationException;
@@ -730,13 +725,13 @@ public interface ProcessManagementAPI {
      * Associates a list of process definitions with the category.
      *
      * @param categoryId
-     *            the identifier of the category.
+     *        the identifier of the category.
      * @param processDefinitionIds
-     *            the identifiers of the process definitions.
+     *        the identifiers of the process definitions.
      * @throws AlreadyExistsException
-     *             if an association category/process already exists.
+     *         if an association category/process already exists.
      * @throws CreationException
-     *             if an exception occurs while adding the process to the category.
+     *         if an exception occurs while adding the process to the category.
      * @since 6.0
      */
     void addProcessDefinitionsToCategory(long categoryId, List<Long> processDefinitionIds) throws AlreadyExistsException, CreationException;
@@ -745,7 +740,7 @@ public interface ProcessManagementAPI {
      * Counts the number of categories of the process definition, that is, the number of categories to which the process belongs.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @return the number of categories of the process.
      * @since 6.0
      */
@@ -756,7 +751,7 @@ public interface ProcessManagementAPI {
      * This is the number of deployed processes in the specified category.
      *
      * @param categoryId
-     *            the identifier of the category.
+     *        the identifier of the category.
      * @return the number of process deployment informations of the category.
      * @since 6.0
      */
@@ -766,13 +761,13 @@ public interface ProcessManagementAPI {
      * Returns the paged list of process deployment information items for the category.
      *
      * @param categoryId
-     *            the identifier of the category.
+     *        the identifier of the category.
      * @param startIndex
-     *            the index of the first result (starting from 0).
+     *        the index of the first result (starting from 0).
      * @param maxResults
-     *            the maximum number of process deployment information.
+     *        the maximum number of process deployment information.
      * @param sort
-     *            the sorting criterion.
+     *        the sorting criterion.
      * @return the ordered list of process deployment informations of the category.
      * @since 6.0
      */
@@ -782,13 +777,13 @@ public interface ProcessManagementAPI {
      * Get categories from process definition
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param startIndex
-     *            the index of the first result (starting from 0).
+     *        the index of the first result (starting from 0).
      * @param maxResults
-     *            the maximum number of categories.
+     *        the maximum number of categories.
      * @param sort
-     *            the sorting criterion.
+     *        the sorting criterion.
      * @return the ordered list of categories of the process definition.
      * @since 6.0
      */
@@ -798,13 +793,13 @@ public interface ProcessManagementAPI {
      * Updates the category according to the updater values.
      *
      * @param categoryId
-     *            the identifier of the category.
+     *        the identifier of the category.
      * @param updater
-     *            the role updater.
+     *        the role updater.
      * @throws CategoryNotFoundException
-     *             if the category identifier does not refer to an existing category.
+     *         if the category identifier does not refer to an existing category.
      * @throws UpdateException
-     *             if an exception occurs during the category update.
+     *         if an exception occurs during the category update.
      * @since 6.0
      */
     void updateCategory(long categoryId, CategoryUpdater updater) throws CategoryNotFoundException, UpdateException;
@@ -813,9 +808,9 @@ public interface ProcessManagementAPI {
      * Deletes a category and its associations. It does not delete the associated process definitions.
      *
      * @param categoryId
-     *            the identifier of the category.
+     *        the identifier of the category.
      * @throws DeletionException
-     *             if an exception occurs when deleting the category.
+     *         if an exception occurs when deleting the category.
      * @since 6.0
      */
     void deleteCategory(long categoryId) throws DeletionException;
@@ -825,9 +820,9 @@ public interface ProcessManagementAPI {
      * It does not delete the associated process definitions.
      *
      * @param categoryId
-     *            the identifier of the category.
+     *        the identifier of the category.
      * @throws DeletionException
-     *             if an error occurs while removing the process definitions of category.
+     *         if an error occurs while removing the process definitions of category.
      * @since 6.0
      * @deprecated As of release 6.1, replaced by {@link #removeProcessDefinitionsFromCategory(long, int, int)}
      */
@@ -839,14 +834,14 @@ public interface ProcessManagementAPI {
      * It does not delete the associated process definitions.
      *
      * @param categoryId
-     *            the identifier of the category.
+     *        the identifier of the category.
      * @param startIndex
-     *            the index
+     *        the index
      * @param maxResults
-     *            the max number of elements to retrieve per page
+     *        the max number of elements to retrieve per page
      * @return the number of elements that have been removed
      * @throws DeletionException
-     *             if an error occurs while removing the process definitions of category.
+     *         if an error occurs while removing the process definitions of category.
      * @since 6.1
      */
     long removeProcessDefinitionsFromCategory(long categoryId, int startIndex, int maxResults) throws DeletionException;
@@ -857,9 +852,9 @@ public interface ProcessManagementAPI {
      * association between them.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @throws DeletionException
-     *             if an error occurs while removing the process definition from category.
+     *         if an error occurs while removing the process definition from category.
      * @since 6.0
      * @deprecated As of release 6.1, replaced by {@link #removeCategoriesFromProcessDefinition(long, int, int)}
      */
@@ -871,14 +866,14 @@ public interface ProcessManagementAPI {
      * The process definition and categories are not deleted, but there is no longer an association between them.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param startIndex
-     *            the index
+     *        the index
      * @param maxResults
-     *            the max number of elements to retrieve per page
+     *        the max number of elements to retrieve per page
      * @return the number of elements that have been removed
      * @throws DeletionException
-     *             if an error occurs while removing the process definition from category.
+     *         if an error occurs while removing the process definition from category.
      * @since 6.1
      */
     long removeCategoriesFromProcessDefinition(long processDefinitionId, int startIndex, int maxResults) throws DeletionException;
@@ -895,11 +890,11 @@ public interface ProcessManagementAPI {
      * Returns the paged list of process deployment information items which have no category.
      *
      * @param startIndex
-     *            the number of the page (the first page number is 0).
+     *        the number of the page (the first page number is 0).
      * @param maxResults
-     *            the number of categories.
+     *        the number of categories.
      * @param sortCriterion
-     *            the sorting criterion.
+     *        the sorting criterion.
      * @return The ordered list of process deployment informations.
      * @since 6.0
      */
@@ -909,18 +904,18 @@ public interface ProcessManagementAPI {
      * Returns the paged list of data definitions of the activity of the process definition.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param activityName
-     *            the name of the activity.
+     *        the name of the activity.
      * @param startIndex
-     *            the index of the first result (starting from 0).
+     *        the index of the first result (starting from 0).
      * @param maxResults
-     *            the maximum number of data definitions.
+     *        the maximum number of data definitions.
      * @return the ordered list of data definitions.
      * @throws ProcessDefinitionNotFoundException
-     *             if the identifier does not refer to an existing process definition.
+     *         if the identifier does not refer to an existing process definition.
      * @throws ActivityDefinitionNotFoundException
-     *             if the name does not refer to an existing activity.
+     *         if the name does not refer to an existing activity.
      * @since 6.0
      */
     List<DataDefinition> getActivityDataDefinitions(long processDefinitionId, String activityName, int startIndex, int maxResults)
@@ -930,14 +925,14 @@ public interface ProcessManagementAPI {
      * Counts the number of data definitions of the activity of the process definition.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param activityName
-     *            the name of the activity.
+     *        the name of the activity.
      * @return the number of data definitions of the activity of the process definition.
      * @throws ProcessDefinitionNotFoundException
-     *             if the identifier does not refer to an existing process definition.
+     *         if the identifier does not refer to an existing process definition.
      * @throws ActivityDefinitionNotFoundException
-     *             if the name does not refer to an existing activity.
+     *         if the name does not refer to an existing activity.
      * @since 6.0
      */
     int getNumberOfActivityDataDefinitions(long processDefinitionId, String activityName) throws ProcessDefinitionNotFoundException,
@@ -947,14 +942,14 @@ public interface ProcessManagementAPI {
      * Returns the paged list of data definitions of the process definition.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param startIndex
-     *            the index of the first result (starting from 0).
+     *        the index of the first result (starting from 0).
      * @param maxResults
-     *            the maximum number of data definitions.
+     *        the maximum number of data definitions.
      * @return the ordered list of data definitions.
      * @throws ProcessDefinitionNotFoundException
-     *             if the identifier does not refer to an existing process definition.
+     *         if the identifier does not refer to an existing process definition.
      * @since 6.0
      */
     List<DataDefinition> getProcessDataDefinitions(long processDefinitionId, int startIndex, int maxResults) throws ProcessDefinitionNotFoundException;
@@ -963,10 +958,10 @@ public interface ProcessManagementAPI {
      * Counts the number of data definitions of the process definition.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @return the number of data definitions of the process definition.
      * @throws ProcessDefinitionNotFoundException
-     *             if the identifier does not refer to an existing process definition.
+     *         if the identifier does not refer to an existing process definition.
      * @since 6.0
      */
     int getNumberOfProcessDataDefinitions(long processDefinitionId) throws ProcessDefinitionNotFoundException;
@@ -977,12 +972,12 @@ public interface ProcessManagementAPI {
      * or '/' character. The pattern can contain forward slashes after the first character.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param filenamesPattern
-     *            the pattern to retrieve the resources.
+     *        the pattern to retrieve the resources.
      * @return The map containing the pairs (name, content) of the matching files.
      * @throws RetrieveException
-     *             if an exception occurs when getting the resources of the process definition.
+     *         if an exception occurs when getting the resources of the process definition.
      * @since 6.0
      */
     Map<String, byte[]> getProcessResources(long processDefinitionId, String filenamesPattern) throws RetrieveException;
@@ -993,10 +988,10 @@ public interface ProcessManagementAPI {
      * but only its deployment date.
      *
      * @param processName
-     *            the process definition name.
+     *        the process definition name.
      * @return the identifier of the most recently deployed process definition with the given name.
      * @throws ProcessDefinitionNotFoundException
-     *             if the identifier does not refer to an existing process definition.
+     *         if the identifier does not refer to an existing process definition.
      * @since 6.0
      */
     long getLatestProcessDefinitionId(String processName) throws ProcessDefinitionNotFoundException;
@@ -1005,7 +1000,7 @@ public interface ProcessManagementAPI {
      * Returns the states of the flow node type. Flow nodes are activities, gateways, or events.
      *
      * @param nodeType
-     *            the flow node type.
+     *        the flow node type.
      * @return the set of the states of the flow node type.
      * @since 6.0
      */
@@ -1015,12 +1010,12 @@ public interface ProcessManagementAPI {
      * Returns the identifier of the process definition with the specified name and version.
      *
      * @param name
-     *            the name of the process definition.
+     *        the name of the process definition.
      * @param version
-     *            the version of the process definition.
+     *        the version of the process definition.
      * @return the identifier of the process definition.
      * @throws ProcessDefinitionNotFoundException
-     *             if the name and version do not refer to an existing process definition.
+     *         if the name and version do not refer to an existing process definition.
      * @since 6.0
      */
     long getProcessDefinitionId(String name, String version) throws ProcessDefinitionNotFoundException;
@@ -1029,13 +1024,13 @@ public interface ProcessManagementAPI {
      * Returns the paged list of process deployment information items that the actors can start.
      *
      * @param actorIds
-     *            the identifiers of the actors.
+     *        the identifiers of the actors.
      * @param startIndex
-     *            the index of the first result (starting from 0).
+     *        the index of the first result (starting from 0).
      * @param maxResults
-     *            the maximum number of process deployment informations.
+     *        the maximum number of process deployment informations.
      * @param sortingCriterion
-     *            the sort criterion
+     *        the sort criterion
      * @return the ordered list of process deployment informations.
      * @since 6.0
      */
@@ -1046,9 +1041,9 @@ public interface ProcessManagementAPI {
      * Checks whether the actors are allowed to start the process definition.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param actorIds
-     *            the identifiers of the actors.
+     *        the identifiers of the actors.
      * @return true if the actors are allowed to start the process definition; false otherwise.
      * @since 6.0
      */
@@ -1058,12 +1053,12 @@ public interface ProcessManagementAPI {
      * Returns the actor initiator of the process definition.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @return the actor initiator of the process definition.
      * @throws ActorNotFoundException
-     *             if the process definition does not have an actor initiator.
+     *         if the process definition does not have an actor initiator.
      * @throws ProcessDefinitionNotFoundException
-     *             if the process definition corresponding to the given identifier is not found
+     *         if the process definition corresponding to the given identifier is not found
      * @since 6.0
      */
     ActorInstance getActorInitiator(long processDefinitionId) throws ActorNotFoundException, ProcessDefinitionNotFoundException;
@@ -1129,13 +1124,13 @@ public interface ProcessManagementAPI {
      * Associates the categories to the process definition.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param categoryIds
-     *            the identifiers of the categories.
+     *        the identifiers of the categories.
      * @throws AlreadyExistsException
-     *             if the association category/process has already added.
+     *         if the association category/process has already added.
      * @throws CreationException
-     *             if an exception occurs when associating the process with the categories.
+     *         if an exception occurs when associating the process with the categories.
      * @since 6.0
      */
     void addCategoriesToProcess(long processDefinitionId, List<Long> categoryIds) throws AlreadyExistsException, CreationException;
@@ -1144,11 +1139,11 @@ public interface ProcessManagementAPI {
      * Dissociates the categories from the process definition. The process definition itself is unchanged.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param categoryIds
-     *            the identifiers of the categories.
+     *        the identifiers of the categories.
      * @throws DeletionException
-     *             if an exception occurs when dissociating the categories from the process definition.
+     *         if an exception occurs when dissociating the categories from the process definition.
      * @since 6.0
      */
     void removeCategoriesFromProcess(long processDefinitionId, List<Long> categoryIds) throws DeletionException;
@@ -1214,7 +1209,7 @@ public interface ProcessManagementAPI {
      * Returns the process deployment information of the process definitions.
      *
      * @param processDefinitionIds
-     *            the identifiers of the process definitions.
+     *        the identifiers of the process definitions.
      * @return The process deployment information of the process definitions, order by name ascending.
      * @since 6.0
      */
@@ -1224,14 +1219,14 @@ public interface ProcessManagementAPI {
      * Returns the implementation of a connector of the process definition.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param connectorName
-     *            the name of the connector.
+     *        the name of the connector.
      * @param connectorVersion
-     *            the version of the connector.
+     *        the version of the connector.
      * @return the description of the connector implementation.
      * @throws ConnectorNotFoundException
-     *             if an exception occurs when getting the connector implementation.
+     *         if an exception occurs when getting the connector implementation.
      * @since 6.0
      */
     ConnectorImplementationDescriptor getConnectorImplementation(long processDefinitionId, String connectorName, String connectorVersion)
@@ -1241,13 +1236,13 @@ public interface ProcessManagementAPI {
      * Returns a paged list of connector implementation descriptors for the process definition.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param startIndex
-     *            the index of the first result (starting from 0).
+     *        the index of the first result (starting from 0).
      * @param maxsResults
-     *            the maximum number of connector implementations.
+     *        the maximum number of connector implementations.
      * @param sortingCriterion
-     *            the sort criterion.
+     *        the sort criterion.
      * @return the ordered list of connector implementation descriptors of the process definition.
      * @since 6.0
      */
@@ -1258,7 +1253,7 @@ public interface ProcessManagementAPI {
      * Returns the number of connector implementations of the process definition.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @return the number of connector implementation of the process definition.
      * @since 6.0
      */
@@ -1268,7 +1263,7 @@ public interface ProcessManagementAPI {
      * Returns the actor instances.
      *
      * @param actorIds
-     *            the identifiers of the actors.
+     *        the identifiers of the actors.
      * @return the actor instances. (key=actorID, value=actor instance)
      * @since 6.0
      */
@@ -1281,13 +1276,13 @@ public interface ProcessManagementAPI {
      * A process that has no actor mapping is unresolved and cannot be started.
      *
      * @param groupId
-     *            the identifier of the group.
+     *        the identifier of the group.
      * @param startIndex
-     *            the index of the first result (starting from 0).
+     *        the index of the first result (starting from 0).
      * @param maxResults
-     *            the maximum number of processes.
+     *        the maximum number of processes.
      * @param sortingCriterion
-     *            the sort criterion.
+     *        the sort criterion.
      * @return the processes that the group is the last actor.
      * @since 6.0
      */
@@ -1301,13 +1296,13 @@ public interface ProcessManagementAPI {
      * A process that has no actor mapping is unresolved and cannot be started.
      *
      * @param groupIds
-     *            the identifiers of the groups.
+     *        the identifiers of the groups.
      * @param startIndex
-     *            the index of the first result (starting from 0).
+     *        the index of the first result (starting from 0).
      * @param maxResults
-     *            the maximum number of processes.
+     *        the maximum number of processes.
      * @param sortingCriterion
-     *            the sort criterion.
+     *        the sort criterion.
      * @return the processes that the groups are the last actor(s).
      * @since 6.0
      */
@@ -1321,13 +1316,13 @@ public interface ProcessManagementAPI {
      * A process that has no actor mapping is unresolved and cannot be started.
      *
      * @param roleId
-     *            the identifier of the role.
+     *        the identifier of the role.
      * @param startIndex
-     *            the index of the first result (starting from 0).
+     *        the index of the first result (starting from 0).
      * @param maxResults
-     *            the maximum number of processes.
+     *        the maximum number of processes.
      * @param sortingCriterion
-     *            the sort criterion.
+     *        the sort criterion.
      * @return the processes that the role is the last actor.
      * @since 6.0
      */
@@ -1341,13 +1336,13 @@ public interface ProcessManagementAPI {
      * A process that has no actor mapping is unresolved and cannot be started.
      *
      * @param roleIds
-     *            the identifiers of the roles.
+     *        the identifiers of the roles.
      * @param startIndex
-     *            the index of the first result (starting from 0).
+     *        the index of the first result (starting from 0).
      * @param maxResults
-     *            the maximum number of processes.
+     *        the maximum number of processes.
      * @param sortingCriterion
-     *            the sort criterion.
+     *        the sort criterion.
      * @return the processes that the roles are actor(s).
      * @since 6.0
      */
@@ -1361,13 +1356,13 @@ public interface ProcessManagementAPI {
      * A process that has no actor mapping is unresolved and cannot be started.
      *
      * @param userId
-     *            the identifier of the user.
+     *        the identifier of the user.
      * @param startIndex
-     *            the index of the first result (starting from 0).
+     *        the index of the first result (starting from 0).
      * @param maxResults
-     *            the maximum number of processes.
+     *        the maximum number of processes.
      * @param sortingCriterion
-     *            the sort criterion.
+     *        the sort criterion.
      * @return the processes that the user is the last actor.
      * @see #getProcessDeploymentInfosWithActorOnlyForUsers(List, int, int, ProcessDeploymentInfoCriterion)
      * @since 6.0
@@ -1379,13 +1374,13 @@ public interface ProcessManagementAPI {
      * Returns the processes for which one of the listed users is the only mapped actor.
      *
      * @param userIds
-     *            the identifiers of the users.
+     *        the identifiers of the users.
      * @param startIndex
-     *            the index of the first result (starting from 0).
+     *        the index of the first result (starting from 0).
      * @param maxResults
-     *            the maximum number of processes.
+     *        the maximum number of processes.
      * @param sortingCriterion
-     *            the sort criterion.
+     *        the sort criterion.
      * @return the processes that the users are the last actor(s).
      * @see #getProcessDeploymentInfosWithActorOnlyForUser(long, int, int, ProcessDeploymentInfoCriterion)
      * @since 6.0
@@ -1397,10 +1392,10 @@ public interface ProcessManagementAPI {
      * Returns a specific process definition that include informations such as tasks definition, actors...
      *
      * @param processDefinitionId
-     *            Identifier of process definition
+     *        Identifier of process definition
      * @return The corresponding process definition with informations.
      * @throws ProcessDefinitionNotFoundException
-     *             if the process definition doesn't exist.
+     *         if the process definition doesn't exist.
      * @since 6.1
      */
     DesignProcessDefinition getDesignProcessDefinition(long processDefinitionId) throws ProcessDefinitionNotFoundException;
@@ -1463,14 +1458,14 @@ public interface ProcessManagementAPI {
      * mapping groups or roles, the process can be supervised by several people.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param userId
-     *            the identifier of the user.
+     *        the identifier of the user.
      * @return the user as a process supervisor.
      * @throws CreationException
-     *             if an exception occurs when creating the process supervisor.
+     *         if an exception occurs when creating the process supervisor.
      * @throws AlreadyExistsException
-     *             if the user is already the process supervisor.
+     *         if the user is already the process supervisor.
      * @since 6.0
      */
     ProcessSupervisor createProcessSupervisorForUser(long processDefinitionId, long userId) throws CreationException, AlreadyExistsException;
@@ -1484,14 +1479,14 @@ public interface ProcessManagementAPI {
      * mapping groups or roles, the process can be supervised by several people.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param roleId
-     *            the identifier of the role.
+     *        the identifier of the role.
      * @return the role as a supervisor of the process.
      * @throws CreationException
-     *             if an exception occurs when creating the process supervisor.
+     *         if an exception occurs when creating the process supervisor.
      * @throws AlreadyExistsException
-     *             if the provided role is already a supervisor for the provided process.
+     *         if the provided role is already a supervisor for the provided process.
      * @since 6.0
      */
     ProcessSupervisor createProcessSupervisorForRole(long processDefinitionId, long roleId) throws CreationException, AlreadyExistsException;
@@ -1505,14 +1500,14 @@ public interface ProcessManagementAPI {
      * mapping groups or roles, the process can be supervised by several people.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param groupId
-     *            the identifier of the group.
+     *        the identifier of the group.
      * @return the group as a supervisor of the process.
      * @throws CreationException
-     *             if an exception occurs when creating the process supervisor.
+     *         if an exception occurs when creating the process supervisor.
      * @throws AlreadyExistsException
-     *             if the provided group is already a supervisor for the provided process.
+     *         if the provided group is already a supervisor for the provided process.
      * @since 6.0
      */
     ProcessSupervisor createProcessSupervisorForGroup(long processDefinitionId, long groupId) throws CreationException, AlreadyExistsException;
@@ -1526,16 +1521,16 @@ public interface ProcessManagementAPI {
      * mapping groups or roles, the process can be supervised by several people.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param groupId
-     *            the identifier of the group.
+     *        the identifier of the group.
      * @param roleId
-     *            the identifier of the role.
+     *        the identifier of the role.
      * @return the membership as a supervisor of the process.
      * @throws CreationException
-     *             if an exception occurs when creating the process supervisor.
+     *         if an exception occurs when creating the process supervisor.
      * @throws AlreadyExistsException
-     *             if the provided membership (group + role) is already a supervisor for the provided process.
+     *         if the provided membership (group + role) is already a supervisor for the provided process.
      * @since 6.0
      */
     ProcessSupervisor createProcessSupervisorForMembership(long processDefinitionId, long groupId, long roleId) throws CreationException,
@@ -1545,9 +1540,9 @@ public interface ProcessManagementAPI {
      * Checks whether the user is the process supervisor.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param userId
-     *            the identifier of the user.
+     *        the identifier of the user.
      * @return true if the user is currently a supervisor of the process; false otherwise.
      * @since 6.0
      */
@@ -1557,9 +1552,9 @@ public interface ProcessManagementAPI {
      * Deletes a process supervisor.
      *
      * @param supervisorId
-     *            the identifier of the {@link ProcessSupervisor}.
+     *        the identifier of the {@link ProcessSupervisor}.
      * @throws DeletionException
-     *             if an exception occurs when deleting the process supervisor.
+     *         if an exception occurs when deleting the process supervisor.
      * @since 6.0
      */
     void deleteSupervisor(long supervisorId) throws DeletionException;
@@ -1573,15 +1568,15 @@ public interface ProcessManagementAPI {
      * {@link ProcessSupervisor} that link the user to the process
      *
      * @param processDefinitionId
-     *            the Identifier of the process definition to delete the supervisor for.
+     *        the Identifier of the process definition to delete the supervisor for.
      * @param userId
-     *            the Id of the user used as a supervisor for the given process. Can be null.
+     *        the Id of the user used as a supervisor for the given process. Can be null.
      * @param roleId
-     *            the Id of the role used as a supervisor for the given process. Can be null.
+     *        the Id of the role used as a supervisor for the given process. Can be null.
      * @param groupId
-     *            the Id of the group used as a supervisor for the given process. Can be null.
+     *        the Id of the group used as a supervisor for the given process. Can be null.
      * @throws DeletionException
-     *             if a problem occurs while deleting the supervisor for the given process.
+     *         if a problem occurs while deleting the supervisor for the given process.
      * @since 6.0
      */
     void deleteSupervisor(Long processDefinitionId, Long userId, Long roleId, Long groupId) throws DeletionException;
@@ -1602,13 +1597,13 @@ public interface ProcessManagementAPI {
      * Returns a paged list of categories that are not associated with the process definition.
      *
      * @param processDefinitionId
-     *            the identifier of the process definition.
+     *        the identifier of the process definition.
      * @param startIndex
-     *            the number of the page (the first page number is 0).
+     *        the number of the page (the first page number is 0).
      * @param maxResults
-     *            the maximum number of categories.
+     *        the maximum number of categories.
      * @param sortingCriterion
-     *            the sort criterion.
+     *        the sort criterion.
      * @return the categories that are not associated with the process definition.
      */
     List<Category> getCategoriesUnrelatedToProcessDefinition(long processDefinitionId, int startIndex, int maxResults, CategoryCriterion sortingCriterion);
@@ -1617,7 +1612,7 @@ public interface ProcessManagementAPI {
      * Counts the number of process definitions that do not belong to the category.
      *
      * @param categoryId
-     *            the identifier of the category.
+     *        the identifier of the category.
      * @return the number of process definitions that have not the category.
      */
     long getNumberOfProcessDeploymentInfosUnrelatedToCategory(long categoryId);
@@ -1626,13 +1621,13 @@ public interface ProcessManagementAPI {
      * Returns the paginated list of process deployment information items of the category.
      *
      * @param categoryId
-     *            the identifier of the category.
+     *        the identifier of the category.
      * @param startIndex
-     *            the number of the page (the first page number is 0).
+     *        the number of the page (the first page number is 0).
      * @param maxResults
-     *            the number of process deployment informations.
+     *        the number of process deployment informations.
      * @param sortingCriterion
-     *            the sort criterion.
+     *        the sort criterion.
      * @return A list of process unrelated to the category which has categoryId as id
      * @since 6.0
      */
@@ -1658,7 +1653,7 @@ public interface ProcessManagementAPI {
      * Get process deployment information from a list of processInstance id
      *
      * @param processInstanceIds
-     *            Identifier of the processInstance
+     *        Identifier of the processInstance
      * @return A map of <processInstantsIds,ProcessDeploymentInfos>, ordered by the name of the process ascending
      * @since 6.0
      */
@@ -1668,7 +1663,7 @@ public interface ProcessManagementAPI {
      * Get process deployment information from a list of archived processInstance ids
      *
      * @param archivedProcessInstantsIds
-     *            Identifier of the archived process instance
+     *        Identifier of the archived process instance
      * @return A map of <archivedProcessInstantsIds,ProcessDeploymentInfos>
      * @since 6.0
      */
@@ -1678,10 +1673,10 @@ public interface ProcessManagementAPI {
      * Export processes of bar under home by a processDefinition id
      *
      * @param processDefinitionId
-     *            Identifier of the processDefinition
+     *        Identifier of the processDefinition
      * @return An array of byte
      * @throws ProcessExportException
-     *             if an export problem occurs
+     *         if an export problem occurs
      * @since 6.0
      */
     byte[] exportBarProcessContentUnderHome(long processDefinitionId) throws ProcessExportException;
@@ -1690,13 +1685,13 @@ public interface ProcessManagementAPI {
      * Disables and deletes the process.
      *
      * @param processDefinitionId
-     *            the process definition identifier.
+     *        the process definition identifier.
      * @throws ProcessDefinitionNotFoundException
-     *             if the identifier does not refer to an existing process definition.
+     *         if the identifier does not refer to an existing process definition.
      * @throws ProcessActivationException
-     *             if an exception occurs while disabling the process.
+     *         if an exception occurs while disabling the process.
      * @throws DeletionException
-     *             if an exception occurs while deleting the process.
+     *         if an exception occurs while deleting the process.
      * @see #disableProcess(long)
      * @see #deleteProcess(long)
      * @since 6.1
@@ -1713,18 +1708,18 @@ public interface ProcessManagementAPI {
      * - the flow node is not a human task
      *
      * @param processDefinitionId
-     *            the identifier of process definition
+     *        the identifier of process definition
      * @param humanTaskName
-     *            the name of the human task
+     *        the name of the human task
      * @param startIndex
-     *            the start index
+     *        the start index
      * @param maxResults
-     *            the list of users
+     *        the list of users
      * @return the list of users.
      * @throws InvalidSessionException
-     *             If the session is invalid (expired, unknown, ...)
+     *         If the session is invalid (expired, unknown, ...)
      * @throws RetrieveException
-     *             If an exception occurs while retrieving the users
+     *         If an exception occurs while retrieving the users
      * @since 6.1
      */
     List<User> getPossibleUsersOfHumanTask(long processDefinitionId, String humanTaskName, int startIndex, int maxResults);
@@ -1733,13 +1728,13 @@ public interface ProcessManagementAPI {
      * Retrieves the list of user identifiers for the given actor and process.
      *
      * @param processDefinitionId
-     *            The process definition identifier
+     *        The process definition identifier
      * @param actorName
-     *            The actor name
+     *        The actor name
      * @param startIndex
-     *            The start index (the first valid value is zero)
+     *        The start index (the first valid value is zero)
      * @param maxResults
-     *            max number of user identifiers to be retrieved
+     *        max number of user identifiers to be retrieved
      * @return Retrieves the list of user identifiers for the given actor and process.
      * @since 6.3.2
      */

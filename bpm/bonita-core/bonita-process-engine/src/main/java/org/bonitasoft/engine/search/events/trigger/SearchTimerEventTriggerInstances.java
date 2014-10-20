@@ -19,7 +19,7 @@ import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEventTriggerInstanceDescriptor;
@@ -44,12 +44,12 @@ public class SearchTimerEventTriggerInstances extends AbstractSearchEntity<Timer
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return eventInstanceService.getNumberOfTimerEventTriggerInstances(processInstanceId, searchOptions);
     }
 
     @Override
-    public List<STimerEventTriggerInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<STimerEventTriggerInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return eventInstanceService.searchTimerEventTriggerInstances(processInstanceId, searchOptions);
     }
 

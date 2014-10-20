@@ -43,7 +43,6 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -106,28 +105,20 @@ public class SCommentServiceImpl implements SCommentService {
     }
 
     @Override
-    public List<SComment> searchComments(final QueryOptions options) throws SBonitaSearchException {
-        try {
-            return persistenceService.searchEntity(SComment.class, options, null);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+    public List<SComment> searchComments(final QueryOptions options) throws SBonitaReadException {
+        return persistenceService.searchEntity(SComment.class, options, null);
     }
 
     @Override
-    public long getNumberOfComments(final QueryOptions options) throws SBonitaSearchException {
-        try {
-            return persistenceService.getNumberOfEntities(SComment.class, options, null);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+    public long getNumberOfComments(final QueryOptions options) throws SBonitaReadException {
+        return persistenceService.getNumberOfEntities(SComment.class, options, null);
     }
 
     @Deprecated
     @Override
     public List<SComment> getComments(final long processInstanceId) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("processInstanceId", (Object) processInstanceId);
-        OrderByOption orderByOption = new OrderByOption(SComment.class, "id", OrderByType.ASC);
+        final OrderByOption orderByOption = new OrderByOption(SComment.class, "id", OrderByType.ASC);
         final QueryOptions queryOptions = new QueryOptions(Arrays.asList(orderByOption));
         final SelectListDescriptor<SComment> selectDescriptor = new SelectListDescriptor<SComment>("getSComments", parameters, SComment.class, queryOptions);
         return persistenceService.selectList(selectDescriptor);
@@ -211,7 +202,7 @@ public class SCommentServiceImpl implements SCommentService {
         long sessionId;
         try {
             sessionId = sessionAccessor.getSessionId();
-        } catch (SessionIdNotSetException e) {
+        } catch (final SessionIdNotSetException e) {
             // system
             return -1;
         }
@@ -220,83 +211,55 @@ public class SCommentServiceImpl implements SCommentService {
     }
 
     @Override
-    public long getNumberOfCommentsSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException {
+    public long getNumberOfCommentsSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaReadException {
         try {
             final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
             return persistenceService.getNumberOfEntities(SComment.class, SUPERVISED_BY, queryOptions, parameters);
         } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
+            throw new SBonitaReadException(bre);
         }
     }
 
     @Override
-    public List<SComment> searchCommentsSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
-            return persistenceService.searchEntity(SComment.class, SUPERVISED_BY, queryOptions, parameters);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+    public List<SComment> searchCommentsSupervisedBy(final long supervisorId, final QueryOptions queryOptions) throws SBonitaReadException {
+        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+        return persistenceService.searchEntity(SComment.class, SUPERVISED_BY, queryOptions, parameters);
     }
 
     @Override
-    public long getNumberOfCommentsInvolvingUser(final long userId, final QueryOptions searchOptions) throws SBonitaSearchException {
-        try {
-            final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
-            return persistenceService.getNumberOfEntities(SComment.class, INVOLVING_USER, searchOptions, parameters);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+    public long getNumberOfCommentsInvolvingUser(final long userId, final QueryOptions searchOptions) throws SBonitaReadException {
+        final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
+        return persistenceService.getNumberOfEntities(SComment.class, INVOLVING_USER, searchOptions, parameters);
     }
 
     @Override
-    public List<SComment> searchCommentsInvolvingUser(final long userId, final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
-            return persistenceService.searchEntity(SComment.class, INVOLVING_USER, queryOptions, parameters);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+    public List<SComment> searchCommentsInvolvingUser(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
+        final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
+        return persistenceService.searchEntity(SComment.class, INVOLVING_USER, queryOptions, parameters);
     }
 
     @Override
-    public long getNumberOfCommentsManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaSearchException {
-        try {
-            final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
-            return persistenceService.getNumberOfEntities(SComment.class, MANAGED_BY, searchOptions, parameters);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+    public long getNumberOfCommentsManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaReadException {
+        final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
+        return persistenceService.getNumberOfEntities(SComment.class, MANAGED_BY, searchOptions, parameters);
     }
 
     @Override
-    public List<SComment> searchCommentsManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaSearchException {
-        try {
-            final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
-            return persistenceService.searchEntity(SComment.class, MANAGED_BY, searchOptions, parameters);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+    public List<SComment> searchCommentsManagedBy(final long managerUserId, final QueryOptions searchOptions) throws SBonitaReadException {
+        final Map<String, Object> parameters = Collections.singletonMap("managerUserId", (Object) managerUserId);
+        return persistenceService.searchEntity(SComment.class, MANAGED_BY, searchOptions, parameters);
     }
 
     @Override
-    public long getNumberOfArchivedComments(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long getNumberOfArchivedComments(final QueryOptions searchOptions) throws SBonitaReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-        try {
-            return persistenceService.getNumberOfEntities(SAComment.class, searchOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+        return persistenceService.getNumberOfEntities(SAComment.class, searchOptions, null);
     }
 
     @Override
-    public List<SAComment> searchArchivedComments(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SAComment> searchArchivedComments(final QueryOptions searchOptions) throws SBonitaReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-        try {
-            return persistenceService.searchEntity(SAComment.class, searchOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+        return persistenceService.searchEntity(SAComment.class, searchOptions, null);
     }
 
     @Override

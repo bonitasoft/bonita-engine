@@ -147,6 +147,9 @@ import org.bonitasoft.engine.command.CommandDescriptorImpl;
 import org.bonitasoft.engine.command.model.SCommand;
 import org.bonitasoft.engine.core.category.model.SCategory;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
+import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.model.SMappedDocument;
+import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
@@ -160,8 +163,6 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
@@ -1555,53 +1556,61 @@ public class ModelConvertor {
         return supervisor;
     }
 
-    public static List<Document> toDocuments(final Collection<SProcessDocument> attachments) {
+    public static List<Document> toDocuments(final Collection<SMappedDocument> mappedDocuments, final DocumentService documentService) {
         final List<Document> documents = new ArrayList<Document>();
-        for (final SProcessDocument sProcessDocument : attachments) {
-            final Document document = toDocument(sProcessDocument);
+        for (final SMappedDocument mappedDocument : mappedDocuments) {
+            final Document document = toDocument(mappedDocument, documentService);
             documents.add(document);
         }
         return documents;
     }
 
-    public static Document toDocument(final SProcessDocument attachment) {
-        final DocumentImpl documentImpl = new DocumentImpl();
-        documentImpl.setId(attachment.getId());
-        documentImpl.setProcessInstanceId(attachment.getProcessInstanceId());
-        documentImpl.setName(attachment.getName());
-        documentImpl.setAuthor(attachment.getAuthor());
-        documentImpl.setCreationDate(new Date(attachment.getCreationDate()));
-        documentImpl.setHasContent(attachment.hasContent());
-        documentImpl.setContentMimeType(attachment.getContentMimeType());
-        documentImpl.setFileName(attachment.getContentFileName());
-        documentImpl.setContentStorageId(attachment.getContentStorageId());
-        documentImpl.setUrl(attachment.getURL());
+    public static Document toDocument(final SMappedDocument mappedDocument, final DocumentService documentService) {
 
+        final DocumentImpl documentImpl = new DocumentImpl();
+        if (mappedDocument instanceof SAMappedDocument) {
+            documentImpl.setId(((SAMappedDocument) mappedDocument).getSourceObjectId());
+        } else {
+            documentImpl.setId(mappedDocument.getId());
+        }
+        setDocumentFields(mappedDocument, documentService, documentImpl);
         return documentImpl;
     }
 
-    public static List<ArchivedDocument> toArchivedDocuments(final Collection<SAProcessDocument> attachments) {
+    private static void setDocumentFields(final SMappedDocument mappedDocument, final DocumentService documentService, final DocumentImpl documentImpl) {
+        documentImpl.setProcessInstanceId(mappedDocument.getProcessInstanceId());
+        documentImpl.setName(mappedDocument.getName());
+        documentImpl.setDescription(mappedDocument.getDescription());
+        documentImpl.setVersion(mappedDocument.getVersion());
+        documentImpl.setAuthor(mappedDocument.getAuthor());
+        documentImpl.setCreationDate(new Date(mappedDocument.getCreationDate()));
+        documentImpl.setHasContent(mappedDocument.hasContent());
+        documentImpl.setContentMimeType(mappedDocument.getMimeType());
+        documentImpl.setFileName(mappedDocument.getFileName());
+        documentImpl.setContentStorageId(String.valueOf(mappedDocument.getDocumentId()));
+        documentImpl.setIndex(mappedDocument.getIndex());
+        if (mappedDocument.hasContent()) {
+            documentImpl.setUrl(documentService.generateDocumentURL(mappedDocument.getFileName(), String.valueOf(mappedDocument.getDocumentId())));
+        } else {
+            documentImpl.setUrl(mappedDocument.getUrl());
+        }
+    }
+
+    public static List<ArchivedDocument> toArchivedDocuments(final Collection<SAMappedDocument> mappedDocuments, final DocumentService documentService) {
         final List<ArchivedDocument> documents = new ArrayList<ArchivedDocument>();
-        for (final SAProcessDocument sAProcessDocument : attachments) {
-            final ArchivedDocument document = toArchivedDocument(sAProcessDocument);
+        for (final SAMappedDocument mappedDocument : mappedDocuments) {
+            final ArchivedDocument document = toArchivedDocument(mappedDocument, documentService);
             documents.add(document);
         }
         return documents;
     }
 
-    public static ArchivedDocument toArchivedDocument(final SAProcessDocument attachment) {
-        final ArchivedDocumentImpl documentImpl = new ArchivedDocumentImpl(attachment.getName());
-        documentImpl.setId(attachment.getId());
-        documentImpl.setProcessInstanceId(attachment.getProcessInstanceId());
-        documentImpl.setArchiveDate(new Date(attachment.getArchiveDate()));
-        documentImpl.setContentStorageId(attachment.getContentStorageId());
-        documentImpl.setDocumentAuthor(attachment.getAuthor());
-        documentImpl.setDocumentContentFileName(attachment.getContentFileName());
-        documentImpl.setDocumentContentMimeType(attachment.getContentMimeType());
-        documentImpl.setDocumentCreationDate(new Date(attachment.getCreationDate()));
-        documentImpl.setDocumentHasContent(attachment.hasContent());
-        documentImpl.setDocumentURL(attachment.getURL());
-        documentImpl.setSourceObjectId(attachment.getSourceObjectId());
+    public static ArchivedDocument toArchivedDocument(final SAMappedDocument mappedDocument, final DocumentService documentService) {
+        final ArchivedDocumentImpl documentImpl = new ArchivedDocumentImpl(mappedDocument.getName());
+        documentImpl.setId(mappedDocument.getId());
+        setDocumentFields(mappedDocument, documentService, documentImpl);
+        documentImpl.setArchiveDate(new Date(mappedDocument.getArchiveDate()));
+        documentImpl.setSourceObjectId(mappedDocument.getSourceObjectId());
         return documentImpl;
     }
 
@@ -2033,19 +2042,19 @@ public class ModelConvertor {
         return new ThemeImpl(sTheme.getContent(), sTheme.getCssContent(), sTheme.isDefault(), type, lastUpdateDate);
     }
 
-    public static CustomUserInfoDefinitionImpl convert(SCustomUserInfoDefinition sDefinition) {
-        CustomUserInfoDefinitionImpl definition = new CustomUserInfoDefinitionImpl();
+    public static CustomUserInfoDefinitionImpl convert(final SCustomUserInfoDefinition sDefinition) {
+        final CustomUserInfoDefinitionImpl definition = new CustomUserInfoDefinitionImpl();
         definition.setId(sDefinition.getId());
         definition.setName(sDefinition.getName());
         definition.setDescription(sDefinition.getDescription());
         return definition;
     }
 
-    public static CustomUserInfoValueImpl convert(SCustomUserInfoValue sValue) {
+    public static CustomUserInfoValueImpl convert(final SCustomUserInfoValue sValue) {
         if (sValue == null) {
             return null;
         }
-        CustomUserInfoValueImpl value = new CustomUserInfoValueImpl();
+        final CustomUserInfoValueImpl value = new CustomUserInfoValueImpl();
         value.setDefinitionId(sValue.getDefinitionId());
         value.setUserId(sValue.getUserId());
         value.setValue(sValue.getValue());

@@ -70,7 +70,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -250,7 +250,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
     }
 
     private SWaitingErrorEvent getWaitingErrorEventSubProcess(final SFlowElementContainerDefinition container, final long parentProcessInstanceId,
-            final String errorCode) throws SBonitaSearchException, SBPMEventHandlerException {
+            final String errorCode) throws SBonitaReadException, SBPMEventHandlerException {
         String catchingErrorCode = errorCode;
         boolean canHandleError = hasEventSubProcessCatchingError(container, catchingErrorCode);
         if (!canHandleError) {

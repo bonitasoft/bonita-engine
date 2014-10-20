@@ -49,7 +49,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -306,7 +305,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         assertEquals("Should be equals to the result of the mock.", 2L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public final void getNumberOfEventTriggerInstances_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
@@ -335,7 +334,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         assertEquals("Should be equals to the result of the mock.", triggerInstanceImpls, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public final void searchEventTriggerInstances_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final QueryOptions queryOptions = new QueryOptions(0, 100, SEventTriggerInstance.class, "id", OrderByType.ASC);
@@ -365,7 +364,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         assertEquals("Should be equals to the result of the mock.", 3L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public final void getNumberOfEventTriggerInstancesByProcessInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final int processInstanceId = 2;
@@ -399,7 +398,7 @@ public class EventInstanceServiceImplForEventTriggerTest {
         assertEquals("Should be equals to the result of the mock.", triggerInstanceImpls, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public final void searchEventTriggerInstancesByProcessInstance_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final int processInstanceId = 2;

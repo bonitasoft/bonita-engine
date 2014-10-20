@@ -16,7 +16,7 @@ package org.bonitasoft.engine.scheduler;
 import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.exception.failedJob.SFailedJobReadException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorCreationException;
@@ -117,9 +117,9 @@ public interface JobService {
      * @param queryOptions
      *        a map of specific parameters of a query
      * @return total number of job logs
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfJobDescriptors(QueryOptions queryOptions) throws SBonitaSearchException;
+    long getNumberOfJobDescriptors(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Search all job descriptors according to specific criteria
@@ -127,10 +127,10 @@ public interface JobService {
      * @param queryOptions
      *        a map of specific parameters of a query
      * @return A list of SJobParameter objects
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @since 6.1
      */
-    List<SJobDescriptor> searchJobDescriptors(QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SJobDescriptor> searchJobDescriptors(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Create new job parameters for a specific tenant
@@ -214,10 +214,10 @@ public interface JobService {
      * @param queryOptions
      *        a map of specific parameters of a query
      * @return A list of SJobParameter objects
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @since 6.1
      */
-    List<SJobParameter> searchJobParameters(QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SJobParameter> searchJobParameters(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Create a new job log for a specific tenant
@@ -270,9 +270,9 @@ public interface JobService {
      * @param queryOptions
      *        a map of specific parameters of a query
      * @return total number of job logs
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfJobLogs(QueryOptions queryOptions) throws SBonitaSearchException;
+    long getNumberOfJobLogs(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Search all job logs according to specific criteria
@@ -280,10 +280,10 @@ public interface JobService {
      * @param queryOptions
      *        a map of specific parameters of a query
      * @return A list of SJobLog objects
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @since 6.1
      */
-    List<SJobLog> searchJobLogs(QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SJobLog> searchJobLogs(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Get list of failed jobs
@@ -311,11 +311,11 @@ public interface JobService {
      *
      * @param jobDescriptorId
      *        The identifier of the {@link SJobDescriptor}
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @throws SJobLogDeletionException
      * @since 6.4.0
      */
-    void deleteJobLogs(long jobDescriptorId) throws SJobLogDeletionException, SBonitaSearchException;
+    void deleteJobLogs(long jobDescriptorId) throws SJobLogDeletionException, SBonitaReadException;
 
     /**
      * Get all {@link SJobLog} of a specific {@link SJobDescriptor}
@@ -327,9 +327,9 @@ public interface JobService {
      * @param maxResults
      *        The nulber max of elements of the list
      * @return A list of {@link SJobLog}
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @since 6.4.0
      */
-    List<SJobLog> getJobLogs(long jobDescriptorId, int fromIndex, int maxResults) throws SBonitaSearchException;
+    List<SJobLog> getJobLogs(long jobDescriptorId, int fromIndex, int maxResults) throws SBonitaReadException;
 
 }

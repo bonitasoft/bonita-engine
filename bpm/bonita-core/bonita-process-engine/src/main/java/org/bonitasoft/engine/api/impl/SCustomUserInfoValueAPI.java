@@ -28,7 +28,7 @@ import org.bonitasoft.engine.identity.model.builder.SCustomUserInfoValueUpdateBu
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
@@ -69,7 +69,7 @@ public class SCustomUserInfoValueAPI {
 
     public SCustomUserInfoValue set(long definitionId, long userId, String value) throws
             SIdentityException,
-            SBonitaSearchException {
+            SBonitaReadException {
 
         SCustomUserInfoValue customUserInfoValue = searchValue(definitionId, userId);
         if(value == null || value.isEmpty()) {
@@ -99,7 +99,7 @@ public class SCustomUserInfoValueAPI {
                 .setValue(value).done();
     }
 
-    private SCustomUserInfoValue searchValue(long definitionId, long userId) throws SBonitaSearchException {
+    private SCustomUserInfoValue searchValue(long definitionId, long userId) throws SBonitaReadException {
         List<SCustomUserInfoValue> result = service.searchCustomUserInfoValue(new QueryOptions(
                 0,
                 1,

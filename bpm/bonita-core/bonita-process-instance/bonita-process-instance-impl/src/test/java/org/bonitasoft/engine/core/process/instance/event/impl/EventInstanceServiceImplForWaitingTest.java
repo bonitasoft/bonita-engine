@@ -47,7 +47,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -182,11 +181,11 @@ public class EventInstanceServiceImplForWaitingTest {
         eventInstanceServiceImpl.deleteWaitingEvents(sIntermediateCatchEventInstanceImpl);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public final void deleteWaitingEvents_should_throw_exception_when_cant_search_waiting_event() throws Exception {
         // Given
         final SIntermediateCatchEventInstanceImpl sIntermediateCatchEventInstanceImpl = new SIntermediateCatchEventInstanceImpl();
-        doThrow(new SBonitaSearchException(new Exception(""))).when(eventInstanceServiceImpl).searchWaitingEvents(eq(SWaitingEvent.class),
+        doThrow(new SBonitaReadException(new Exception(""))).when(eventInstanceServiceImpl).searchWaitingEvents(eq(SWaitingEvent.class),
                 any(QueryOptions.class));
 
         // When
@@ -235,7 +234,7 @@ public class EventInstanceServiceImplForWaitingTest {
         assertEquals("Should be equals to the result of the mock.", 2L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public final void getNumberOfWaitingEvents_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final QueryOptions queryOptions = new QueryOptions(0, 100, SWaitingEvent.class, "id", OrderByType.ASC);
@@ -266,7 +265,7 @@ public class EventInstanceServiceImplForWaitingTest {
         assertEquals("Should be equals to the result of the mock.", sWaitingSignalEventImpls, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public final void searchStartWaitingEvents_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final long processDefinitionId = 9L;
@@ -387,7 +386,7 @@ public class EventInstanceServiceImplForWaitingTest {
         assertEquals("Should be equals to the result of the mock.", sWaitingSignalEventImpls, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public final void searchWaitingEvents_should_throw_exception_when_there_is_error() throws Exception {
         // Given
         final QueryOptions queryOptions = new QueryOptions(0, 100, SWaitingEvent.class, "id", OrderByType.ASC);
