@@ -15,6 +15,7 @@
 	
 	<bean id="timerEventTriggerJobListener" class="org.bonitasoft.engine.jobs.TimerEventTriggerJobListener">
 		<constructor-arg name="eventInstanceService" ref="eventInstanceService" />
+        <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 		<constructor-arg name="tenantId" value="1" />
 	</bean>
 
