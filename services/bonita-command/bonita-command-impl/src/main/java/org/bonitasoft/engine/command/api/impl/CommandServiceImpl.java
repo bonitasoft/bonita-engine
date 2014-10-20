@@ -42,7 +42,7 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -357,7 +357,7 @@ public class CommandServiceImpl implements CommandService {
     }
 
     @Override
-    public long getNumberOfCommands(final QueryOptions options) throws SBonitaSearchException {
+    public long getNumberOfCommands(final QueryOptions options) throws SBonitaReadException {
         logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfCommands"));
         try {
             final long number = persistenceService.getNumberOfEntities(SCommand.class, options, null);
@@ -365,12 +365,12 @@ public class CommandServiceImpl implements CommandService {
             return number;
         } catch (final SBonitaReadException bre) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfCommands", bre));
-            throw new SBonitaSearchException(bre);
+            throw new SBonitaReadException(bre);
         }
     }
 
     @Override
-    public List<SCommand> searchCommands(final QueryOptions options) throws SBonitaSearchException {
+    public List<SCommand> searchCommands(final QueryOptions options) throws SBonitaReadException {
         final boolean trace = logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE);
         if (trace) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "searchCommands"));
@@ -385,7 +385,7 @@ public class CommandServiceImpl implements CommandService {
             if (trace) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "searchCommands", bre));
             }
-            throw new SBonitaSearchException(bre);
+            throw new SBonitaReadException(bre);
         }
     }
 

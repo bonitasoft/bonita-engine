@@ -49,7 +49,7 @@ public class SBonitaReadException extends SBonitaException {
         selectDescriptor = null;
     }
 
-    public AbstractSelectDescriptor<?> getselectDescriptor() {
+    public AbstractSelectDescriptor<?> getSelectDescriptor() {
         return selectDescriptor;
     }
 

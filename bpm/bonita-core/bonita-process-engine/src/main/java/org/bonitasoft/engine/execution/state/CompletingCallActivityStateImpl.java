@@ -16,6 +16,7 @@ package org.bonitasoft.engine.execution.state;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
@@ -24,7 +25,6 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SCallActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
@@ -50,32 +50,32 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
 
     private final DataInstanceService dataInstanceService;
 
-    private final DocumentMappingService documentMappingService;
-
     private final TechnicalLoggerService logger;
 
     private final ArchiveService archiveService;
 
     private final SCommentService commentService;
 
-    private final ProcessDefinitionService processDeifnitionService;
+    private final ProcessDefinitionService processDefinitionService;
 
     private final ConnectorInstanceService connectorInstanceService;
 
+    private final DocumentService documentService;
+
     public CompletingCallActivityStateImpl(final StateBehaviors stateBehaviors, final OperationService operationService,
             final ProcessInstanceService processInstanceService, final DataInstanceService dataInstanceService,
-            final DocumentMappingService documentMappingService, final TechnicalLoggerService logger,
+            final DocumentService documentService, final TechnicalLoggerService logger,
             final ArchiveService archiveService, final SCommentService commentService,
-            final ProcessDefinitionService processDeifnitionService, final ConnectorInstanceService connectorInstanceService) {
+            final ProcessDefinitionService processDefinitionService, final ConnectorInstanceService connectorInstanceService) {
         super(stateBehaviors);
         this.operationService = operationService;
         this.processInstanceService = processInstanceService;
         this.dataInstanceService = dataInstanceService;
-        this.documentMappingService = documentMappingService;
+        this.documentService = documentService;
         this.logger = logger;
         this.archiveService = archiveService;
         this.commentService = commentService;
-        this.processDeifnitionService = processDeifnitionService;
+        this.processDefinitionService = processDefinitionService;
         this.connectorInstanceService = connectorInstanceService;
     }
 
@@ -99,8 +99,8 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
                 operationService.execute(operation, instance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), expressionContext);
             }
             // archive child process instance
-            ProcessArchiver.archiveProcessInstance(childProcInst, archiveService, processInstanceService, dataInstanceService, documentMappingService, logger,
-                    commentService, processDeifnitionService, connectorInstanceService);
+            ProcessArchiver.archiveProcessInstance(childProcInst, archiveService, processInstanceService, dataInstanceService, documentService, logger,
+                    commentService, processDefinitionService, connectorInstanceService);
         } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException(e);
         }

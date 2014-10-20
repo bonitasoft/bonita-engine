@@ -31,4 +31,16 @@ public class SubProcessDefinitionBuilder extends FlowElementContainerBuilder imp
         return new DocumentDefinitionBuilder(getProcessBuilder(), getContainer(), name);
     }
 
+    /**
+     * Add a document list definition in this container.
+     * <p/>
+     *
+     * @param name the name of the list
+     * @return the builder to add the optional description and initial value expression
+     */
+    @Override
+    public DocumentListDefinitionBuilder addDocumentListDefinition(String name) {
+        return new DocumentListDefinitionBuilder(getProcessBuilder(), getContainer(), name);
+    }
+
 }

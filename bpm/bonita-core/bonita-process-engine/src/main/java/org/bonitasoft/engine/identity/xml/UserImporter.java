@@ -29,7 +29,7 @@ import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -69,7 +69,7 @@ public class UserImporter {
         return userNameToSUsers;
     }
 
-    private boolean hasUserWithUserName(String userName) throws SBonitaSearchException {
+    private boolean hasUserWithUserName(String userName) throws SBonitaReadException {
         final SUserBuilderFactory keyProvider = BuilderFactory.get(SUserBuilderFactory.class);
         final FilterOption filter = new FilterOption(SUser.class, keyProvider.getUserNameKey(), userName);
         final QueryOptions queryOptions = new QueryOptions(Collections.singletonList(filter), null);

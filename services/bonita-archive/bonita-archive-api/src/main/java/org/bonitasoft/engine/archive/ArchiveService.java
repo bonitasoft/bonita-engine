@@ -33,13 +33,12 @@ public interface ArchiveService {
      * @param record
      *            Archive insert record containing the entity to be archived
      * @throws SRecorderException
-     * @throws SDefinitiveArchiveNotFound
      */
-    void recordInsert(long time, ArchiveInsertRecord record) throws SRecorderException, SDefinitiveArchiveNotFound;
+    void recordInsert(long time, ArchiveInsertRecord record) throws SRecorderException;
 
     /**
      * Archive the given entities in the definitive archive
-     * 
+     *
      * @param time
      *            the time of archiving
      * @param records

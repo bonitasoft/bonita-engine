@@ -1,8 +1,5 @@
 package org.bonitasoft.engine.archive;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.archive.model.Address;
 import org.bonitasoft.engine.archive.model.Employee;
@@ -23,6 +20,9 @@ import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class ArchiveServiceTest extends CommonServiceTest {
 
@@ -121,48 +121,48 @@ public class ArchiveServiceTest extends CommonServiceTest {
         }
     }
 
-    private Laptop insertLaptopRecordIntoArchiveWithYesterdayDate() throws SRecorderException, SDefinitiveArchiveNotFound {
+    private Laptop insertLaptopRecordIntoArchiveWithYesterdayDate() throws SRecorderException {
         final Laptop laptop = new Laptop("Dell", "1800");
         archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(laptop));
         return laptop;
     }
 
-    private Employee insertEmployeeWithYesterdayDate(final Laptop laptop) throws SRecorderException, SDefinitiveArchiveNotFound {
+    private Employee insertEmployeeWithYesterdayDate(final Laptop laptop) throws SRecorderException {
         final Employee employee = new Employee("ZhaoDa", 20);
         employee.setLaptopId(laptop.getId());
         archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(employee));
         return employee;
     }
 
-    private Employee insertEmployeeWithFirstJanuary2009Date(final Laptop laptop) throws SRecorderException, SDefinitiveArchiveNotFound {
+    private Employee insertEmployeeWithFirstJanuary2009Date(final Laptop laptop) throws SRecorderException {
         final Employee employee = new Employee("ZhaoDa", 20);
         employee.setLaptopId(laptop.getId());
         archiveService.recordInsert(START_OF_2009, new ArchiveInsertRecord(employee));
         return employee;
     }
 
-    private Employee insertEmployeeWithBefore2009Date(final Laptop laptop) throws SRecorderException, SDefinitiveArchiveNotFound {
+    private Employee insertEmployeeWithBefore2009Date(final Laptop laptop) throws SRecorderException {
         final Employee employee = new Employee("ZhaoDa", 20);
         employee.setLaptopId(laptop.getId());
         archiveService.recordInsert(BEFORE_2009, new ArchiveInsertRecord(employee));
         return employee;
     }
 
-    private Address insertAddressRecordIntoArchiveWithYesterdayDate(final Employee employee) throws SRecorderException, SDefinitiveArchiveNotFound {
+    private Address insertAddressRecordIntoArchiveWithYesterdayDate(final Employee employee) throws SRecorderException {
         final Address address = new Address("China");
         address.setEmployeeId(employee.getId());
         archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(address));
         return address;
     }
 
-    private Project insertProjectRecordIntoArchiveWithYesterdayDate() throws SRecorderException, SDefinitiveArchiveNotFound {
+    private Project insertProjectRecordIntoArchiveWithYesterdayDate() throws SRecorderException {
         final Project project = new Project("BOS6");
         archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(project));
         return project;
     }
 
     private EmployeeProjectMapping insertEmployeeProjectMappingRecordIntoArchiveWithYesterDayDate(final Employee employee, final Project project)
-            throws SRecorderException, SDefinitiveArchiveNotFound {
+            throws SRecorderException {
         final EmployeeProjectMapping epMapping = new EmployeeProjectMapping(employee, project);
         archiveService.recordInsert(System.currentTimeMillis() - ONE_DAY, new ArchiveInsertRecord(epMapping));
         return epMapping;

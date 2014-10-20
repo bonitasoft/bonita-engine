@@ -317,9 +317,9 @@ public abstract class SBonitaException extends Exception {
     }
 
     private void appendContextMessage(final StringBuilder stringBuilder) {
-        if (!context.isEmpty()) {
+        if (context != null && !context.isEmpty()) {
             for (final Entry<SExceptionContext, Serializable> entry : context.entrySet()) {
-                stringBuilder.append(entry.getKey() + "=" + entry.getValue() + " | ");
+                stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append(" | ");
             }
         }
     }

@@ -177,6 +177,11 @@ public class ExpressionBuilder {
                 .done();
     }
 
+    public Expression createDocumentListExpression(final String documentListName) throws InvalidExpressionException {
+        return createNewInstance(documentListName).setContent(documentListName).setExpressionType(ExpressionType.TYPE_DOCUMENT_LIST).setReturnType(List.class.getName())
+                .done();
+    }
+
     public Expression createPatternExpression(final String dataContent) throws InvalidExpressionException {
         return createNewInstance(dataContent).setContent(dataContent).setExpressionType(ExpressionType.TYPE_PATTERN).setReturnType(String.class.getName())
                 .done();

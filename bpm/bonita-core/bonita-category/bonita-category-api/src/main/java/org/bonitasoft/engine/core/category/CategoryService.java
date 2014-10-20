@@ -27,7 +27,7 @@ import org.bonitasoft.engine.core.category.model.SCategory;
 import org.bonitasoft.engine.core.category.model.SProcessCategoryMapping;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -213,7 +213,7 @@ public interface CategoryService {
      * @throws SCategoryException
      *         Error thrown if has exception during the process definition id retrieve
      */
-    long getNumberOfProcessDeploymentInfosOfCategory(long categoryId) throws SBonitaSearchException;
+    long getNumberOfProcessDeploymentInfosOfCategory(long categoryId) throws SBonitaReadException;
 
     /**
      * Remove specific categories for specific process definition
@@ -254,10 +254,10 @@ public interface CategoryService {
      * 
      * @param queryOptions
      * @return List of process category mappings
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @since 6.1
      */
-    List<SProcessCategoryMapping> searchProcessCategoryMappings(QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SProcessCategoryMapping> searchProcessCategoryMappings(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * @param mappings

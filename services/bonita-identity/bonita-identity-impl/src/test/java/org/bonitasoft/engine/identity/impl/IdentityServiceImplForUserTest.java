@@ -36,7 +36,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -101,7 +101,7 @@ public class IdentityServiceImplForUserTest {
         Assert.assertEquals(1L, identityServiceImpl.getNumberOfUsers(options));
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfUsersWithOptionsThrowException() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
 
@@ -270,8 +270,8 @@ public class IdentityServiceImplForUserTest {
         assertEquals(user, identityServiceImpl.searchUsers(options).get(0));
     }
 
-    @Test(expected = SBonitaSearchException.class)
-    public void searchUsersThrowException() throws SBonitaSearchException, SBonitaReadException {
+    @Test(expected = SBonitaReadException.class)
+    public void searchUsersThrowException() throws SBonitaReadException {
         final QueryOptions options = new QueryOptions(0, 10);
         doThrow(new SBonitaReadException("")).when(persistenceService).searchEntity(SUser.class, options, null);
 

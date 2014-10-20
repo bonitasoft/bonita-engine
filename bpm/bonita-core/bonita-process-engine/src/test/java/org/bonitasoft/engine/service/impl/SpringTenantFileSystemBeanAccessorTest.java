@@ -22,7 +22,7 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 @RunWith(PowerMockRunner.class)
 public class SpringTenantFileSystemBeanAccessorTest {
 
-    long tenantId = 1;
+    final long tenantId = 1;
 
     @Spy
     SpringTenantFileSystemBeanAccessor springTenantFileSystemBeanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);

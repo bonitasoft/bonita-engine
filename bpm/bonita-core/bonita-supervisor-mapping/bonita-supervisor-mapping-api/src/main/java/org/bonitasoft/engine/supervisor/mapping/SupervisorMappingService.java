@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 
 /**
@@ -96,9 +96,9 @@ public interface SupervisorMappingService {
      * @param queryOptions
      *            The QueryOptions object containing some query conditions
      * @return a list of SSupervisor objects
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<SProcessSupervisor> searchProcessSupervisors(QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SProcessSupervisor> searchProcessSupervisors(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Get total number of supervisors suit to the specific criteria
@@ -106,8 +106,8 @@ public interface SupervisorMappingService {
      * @param searchOptions
      *            The QueryOptions object containing some query conditions
      * @return a list of SSupervisor objects
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfProcessSupervisors(QueryOptions searchOptions) throws SBonitaSearchException;
+    long getNumberOfProcessSupervisors(QueryOptions searchOptions) throws SBonitaReadException;
 
 }

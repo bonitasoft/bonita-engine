@@ -24,7 +24,7 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -158,21 +158,13 @@ public class SupervisorMappingServiceImpl implements SupervisorMappingService {
     }
 
     @Override
-    public List<SProcessSupervisor> searchProcessSupervisors(final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            return persistenceService.searchEntity(SProcessSupervisor.class, null, queryOptions, null);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+    public List<SProcessSupervisor> searchProcessSupervisors(final QueryOptions queryOptions) throws SBonitaReadException {
+        return persistenceService.searchEntity(SProcessSupervisor.class, null, queryOptions, null);
     }
 
     @Override
-    public long getNumberOfProcessSupervisors(final QueryOptions searchOptions) throws SBonitaSearchException {
-        try {
-            return persistenceService.getNumberOfEntities(SProcessSupervisor.class, null, searchOptions, null);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+    public long getNumberOfProcessSupervisors(final QueryOptions searchOptions) throws SBonitaReadException {
+        return persistenceService.getNumberOfEntities(SProcessSupervisor.class, null, searchOptions, null);
     }
 
     private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {

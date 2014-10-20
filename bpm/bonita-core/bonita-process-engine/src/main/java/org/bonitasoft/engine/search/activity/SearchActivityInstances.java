@@ -19,7 +19,7 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractActivityInstanceSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchActivityInstanceDescriptor;
@@ -39,12 +39,12 @@ public class SearchActivityInstances extends AbstractActivityInstanceSearchEntit
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return activityInstanceService.getNumberOfActivityInstances(getEntityClass(), searchOptions);
     }
 
     @Override
-    public List<SActivityInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SActivityInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return activityInstanceService.searchActivityInstances(getEntityClass(), searchOptions);
     }
 

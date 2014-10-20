@@ -27,6 +27,7 @@ import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.data.TextDataDefinition;
 import org.bonitasoft.engine.bpm.data.XMLDataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
+import org.bonitasoft.engine.bpm.document.DocumentListDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.AutomaticTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
@@ -98,6 +99,10 @@ public class XMLProcessDefinition {
     public static final String DOCUMENT_DEFINITIONS_NODE = "documentDefinitions";
 
     public static final String DOCUMENT_DEFINITION_NODE = "documentDefinition";
+
+    public static final String DOCUMENT_LIST_DEFINITIONS_NODE = "documentListDefinitions";
+
+    public static final String DOCUMENT_LIST_DEFINITION_NODE = "documentListDefinition";
 
     public static final String DOCUMENT_DEFINITION_URL = "url";
 
@@ -461,6 +466,13 @@ public class XMLProcessDefinition {
             final XMLNode documentDefinitionNode = new XMLNode(DOCUMENT_DEFINITION_NODE);
             fillDocumentDefinitionNode(documentDefinitionNode, document);
             documentDefinitionsNode.addChild(documentDefinitionNode);
+        }
+        final XMLNode documentListDefinitionsNode = new XMLNode(DOCUMENT_LIST_DEFINITIONS_NODE);
+        flowElements.addChild(documentListDefinitionsNode);
+        for (final DocumentListDefinition documentList : containerDefinition.getDocumentListDefinitions()) {
+            final XMLNode documentListDefinitionNode = new XMLNode(DOCUMENT_LIST_DEFINITION_NODE);
+            fillDocumentListDefinitionNode(documentListDefinitionNode, documentList);
+            documentListDefinitionsNode.addChild(documentListDefinitionNode);
         }
 
         createAndFillFlowNodes(containerDefinition, flowElements);
@@ -941,6 +953,18 @@ public class XMLProcessDefinition {
         }
         if (documentDefinition.getFile() != null) {
             documentDefinitionNode.addChild(DOCUMENT_DEFINITION_FILE, documentDefinition.getFile());
+        }
+    }
+
+    private void fillDocumentListDefinitionNode(final XMLNode documentListDefinitionNode, final DocumentListDefinition documentListDefinition) {
+        documentListDefinitionNode.addAttribute(NAME, documentListDefinition.getName());
+        if (documentListDefinition.getDescription() != null) {
+            documentListDefinitionNode.addChild(DESCRIPTION, documentListDefinition.getDescription());
+        }
+        if (documentListDefinition.getExpression() != null) {
+            final XMLNode value = new XMLNode(EXPRESSION_NODE);
+            fillExpressionNode(value, documentListDefinition.getExpression(), false);
+            documentListDefinitionNode.addChild(value);
         }
     }
 

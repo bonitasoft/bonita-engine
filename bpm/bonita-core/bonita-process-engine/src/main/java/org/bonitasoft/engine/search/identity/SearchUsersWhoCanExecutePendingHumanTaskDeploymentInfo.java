@@ -21,7 +21,7 @@ import java.util.List;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractUserSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchUserDescriptor;
@@ -34,7 +34,7 @@ public class SearchUsersWhoCanExecutePendingHumanTaskDeploymentInfo extends Abst
 
     private final ActivityInstanceService activityInstanceService;
 
-    private long humanTaskInstanceId;
+    private final long humanTaskInstanceId;
 
     public SearchUsersWhoCanExecutePendingHumanTaskDeploymentInfo(long humanTaskInstanceId, final ActivityInstanceService activityInstanceService,
             final SearchUserDescriptor searchDescriptor, final SearchOptions options) {
@@ -44,12 +44,12 @@ public class SearchUsersWhoCanExecutePendingHumanTaskDeploymentInfo extends Abst
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return activityInstanceService.getNumberOfUsersWhoCanExecutePendingHumanTaskDeploymentInfo(humanTaskInstanceId, searchOptions);
     }
 
     @Override
-    public List<SUser> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SUser> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return activityInstanceService.searchUsersWhoCanExecutePendingHumanTaskDeploymentInfo(humanTaskInstanceId, searchOptions);
     }
 

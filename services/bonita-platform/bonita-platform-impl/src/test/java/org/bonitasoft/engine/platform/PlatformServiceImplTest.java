@@ -40,7 +40,7 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -138,7 +138,7 @@ public class PlatformServiceImplTest {
         assertEquals(numberOfTenants, platformServiceImpl.getNumberOfTenants(options));
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public final void getNumberOfTenantsWithOptionsThrowException() throws SBonitaException {
         final QueryOptions options = getQueryOptions();
         when(persistenceService.getNumberOfEntities(STenant.class, options, null)).thenThrow(new SBonitaReadException(""));
@@ -322,7 +322,7 @@ public class PlatformServiceImplTest {
         assertEquals(sTenants, platformServiceImpl.searchTenants(options));
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public final void searchTenantsThrowException() throws SBonitaException {
         final QueryOptions options = getQueryOptions();
         when(persistenceService.searchEntity(STenant.class, options, null)).thenThrow(new SBonitaReadException(""));

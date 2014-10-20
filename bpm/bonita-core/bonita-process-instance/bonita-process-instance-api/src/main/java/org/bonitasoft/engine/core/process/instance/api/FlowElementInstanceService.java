@@ -19,7 +19,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowElementInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowElementInstance;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Emmanuel Duchastenier
@@ -27,7 +27,7 @@ import org.bonitasoft.engine.persistence.SBonitaSearchException;
 public interface FlowElementInstanceService {
 
     List<SFlowElementInstance> searchFlowElementInstances(Class<? extends PersistentObject> entityClass, QueryOptions searchOptions)
-            throws SBonitaSearchException;
+            throws SBonitaReadException;
 
     /**
      * Retrieves the total number of <code>SFlowElementInstance</code> matching the given search criteria
@@ -37,13 +37,13 @@ public interface FlowElementInstanceService {
      * @param countOptions
      *            the search options for this count method
      * @return the number found, 0 if none matching search criteria
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @since 6.0
      */
-    long getNumberOfFlowElementInstances(Class<? extends PersistentObject> entityClass, QueryOptions countOptions) throws SBonitaSearchException;
+    long getNumberOfFlowElementInstances(Class<? extends PersistentObject> entityClass, QueryOptions countOptions) throws SBonitaReadException;
 
     List<SAFlowElementInstance> searchArchivedFlowElementInstances(Class<? extends PersistentObject> entityClass, QueryOptions searchOptions)
-            throws SBonitaSearchException;
+            throws SBonitaReadException;
 
     /**
      * Retrieves the total number of <code>SAFlowElementInstance</code> matching the given search criteria
@@ -53,8 +53,8 @@ public interface FlowElementInstanceService {
      * @param countOptions
      *            the search options for this count method
      * @return the number found, 0 if none matching search criteria
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @since 6.0
      */
-    long getNumberOfArchivedFlowElementInstances(Class<? extends PersistentObject> entityClass, QueryOptions countOptions) throws SBonitaSearchException;
+    long getNumberOfArchivedFlowElementInstances(Class<? extends PersistentObject> entityClass, QueryOptions countOptions) throws SBonitaReadException;
 }

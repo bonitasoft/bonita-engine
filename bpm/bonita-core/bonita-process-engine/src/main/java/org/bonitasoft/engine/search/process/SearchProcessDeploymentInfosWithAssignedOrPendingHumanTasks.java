@@ -18,7 +18,7 @@ import java.util.List;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractProcessDeploymentInfoSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchProcessDefinitionsDescriptor;
@@ -37,12 +37,12 @@ public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasks extends
     }
 
     @Override
-    public long executeCount(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions queryOptions) throws SBonitaReadException {
         return processDefinitionService.getNumberOfProcessDeploymentInfosWithAssignedOrPendingHumanTasks(queryOptions);
     }
 
     @Override
-    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SProcessDefinitionDeployInfo> executeSearch(final QueryOptions queryOptions) throws SBonitaReadException {
         return processDefinitionService.searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(queryOptions);
     }
 

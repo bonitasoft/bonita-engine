@@ -23,7 +23,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SearchFields;
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.search.Sort;
@@ -43,10 +43,10 @@ public abstract class SearchEntityDescriptor {
         return constructFilterOption(filter, fieldDescriptor);
     }
 
-    public OrderByOption getEntityOrder(final Sort sort) throws SBonitaSearchException {
+    public OrderByOption getEntityOrder(final Sort sort) throws SBonitaReadException {
         final FieldDescriptor fieldDescriptor = getEntityKeys().get(sort.getField());
         if (fieldDescriptor == null) {
-            throw new SBonitaSearchException("Invalid sort key: " + sort.getField());
+            throw new SBonitaReadException("Invalid sort key: " + sort.getField());
         }
         final OrderByType type = OrderByType.valueOf(sort.getOrder().name());
         return new OrderByOption(fieldDescriptor.getPersistentClass(), fieldDescriptor.getValue(), type);
