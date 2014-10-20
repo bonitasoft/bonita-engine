@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
@@ -30,6 +31,7 @@ import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.trigger.CronTrigger;
 import org.bonitasoft.engine.scheduler.trigger.RepeatTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.TransactionState;
@@ -60,12 +62,19 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
     private final TransactionService transactionService;
 
+    private final SessionAccessor sessionAccessor;
+
+    private final TechnicalLoggerService logger;
+
     private final boolean useOptimization;
 
     private QuartzScheduler quartzScheduler;
 
-    public QuartzSchedulerExecutor(final BonitaSchedulerFactory schedulerFactory, final TransactionService transactionService, final boolean useOptimization) {
+    public QuartzSchedulerExecutor(final BonitaSchedulerFactory schedulerFactory, final TransactionService transactionService,
+            final SessionAccessor sessionAccessor, final TechnicalLoggerService logger, final boolean useOptimization) {
         this.transactionService = transactionService;
+        this.sessionAccessor = sessionAccessor;
+        this.logger = logger;
         this.useOptimization = useOptimization;
         this.schedulerFactory = schedulerFactory;
     }
@@ -410,7 +419,8 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     @Override
     public void addJobListener(final List<AbstractBonitaTenantJobListener> jobListeners, final String groupName) throws SSchedulerException {
         try {
-            scheduler.getListenerManager().addJobListener(new TenantQuartzJobListener(jobListeners, groupName), GroupMatcher.<JobKey> groupEquals(groupName));
+            scheduler.getListenerManager().addJobListener(new TenantQuartzJobListener(jobListeners, groupName, sessionAccessor, transactionService, logger),
+                    GroupMatcher.<JobKey> groupEquals(groupName));
         } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         }

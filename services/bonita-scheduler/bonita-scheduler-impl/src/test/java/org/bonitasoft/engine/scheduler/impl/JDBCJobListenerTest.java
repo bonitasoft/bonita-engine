@@ -50,6 +50,9 @@ import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl;
 import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -84,6 +87,12 @@ public class JDBCJobListenerTest {
     private SchedulerService schedulerService;
 
     @Mock
+    private SessionAccessor sessionAccessor;
+
+    @Mock
+    private TransactionService transactionService;
+
+    @Mock
     private SchedulerExecutor schedulerExecutor;
 
     @Mock
@@ -112,6 +121,7 @@ public class JDBCJobListenerTest {
 
         // Then
         verify(incidentService).report(anyLong(), any(Incident.class));
+        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
     }
 
     @Test
@@ -125,6 +135,7 @@ public class JDBCJobListenerTest {
 
         // Then
         verify(jobService).createJobLog(argThat(new SJobLogMatcher(JOB_DESCRIPTOR_ID, Exception.class.getName(), 0)));
+        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
     }
 
     @Test
@@ -141,6 +152,85 @@ public class JDBCJobListenerTest {
 
         // Then
         verify(jobService).updateJobLog(eq(jobLog), any(EntityUpdateDescriptor.class));
+        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+    }
+
+    @Test
+    public void jobWasExecuted_should_log_if_can_log_when_no_job_descriptor_id() throws Exception {
+        // Given
+        context.put(AbstractBonitaJobListener.JOB_DESCRIPTOR_ID, null);
+
+        // When
+        jdbcJobListener.jobWasExecuted(context, exeption1);
+
+        // Then
+        verify(logger).log(any(Class.class), eq(TechnicalLogSeverity.WARNING), eq("An exception occurs during the job execution."), eq(exeption1));
+        verify(transactionService, never()).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+        verify(jobService, never()).deleteJobLogs(anyLong());
+        verify(jobService, never()).getJobLogs(anyLong(), eq(0), eq(1));
+    }
+
+    @Test
+    public void jobWasExecuted_should_log_if_can_log_when_job_descriptor_id_equals_0() throws Exception {
+        // Given
+        context.put(AbstractBonitaJobListener.JOB_DESCRIPTOR_ID, 0L);
+
+        // When
+        jdbcJobListener.jobWasExecuted(context, exeption1);
+
+        // Then
+        verify(logger).log(any(Class.class), eq(TechnicalLogSeverity.WARNING), eq("An exception occurs during the job execution."), eq(exeption1));
+        verify(transactionService, never()).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+        verify(jobService, never()).deleteJobLogs(anyLong());
+        verify(jobService, never()).getJobLogs(anyLong(), eq(0), eq(1));
+    }
+
+    @Test
+    public void jobWasExecuted_should_do_nothing_if_cant_log_when_no_job_descriptor_id() throws Exception {
+        // Given
+        context.put(AbstractBonitaJobListener.JOB_DESCRIPTOR_ID, null);
+        when(logger.isLoggable(any(Class.class), eq(TechnicalLogSeverity.WARNING))).thenReturn(false);
+
+        // When
+        jdbcJobListener.jobWasExecuted(context, exeption1);
+
+        // Then
+        verify(logger, never()).log(any(Class.class), eq(TechnicalLogSeverity.WARNING), anyString(), eq(exeption1));
+        verify(transactionService, never()).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+        verify(jobService, never()).deleteJobLogs(anyLong());
+        verify(jobService, never()).getJobLogs(anyLong(), eq(0), eq(1));
+    }
+
+    @Test
+    public void jobWasExecuted_should_do_nothing_if_cant_log_when_no_tenant_id() throws Exception {
+        // Given
+        context.put(AbstractBonitaJobListener.TENANT_ID, null);
+        when(logger.isLoggable(any(Class.class), eq(TechnicalLogSeverity.WARNING))).thenReturn(false);
+
+        // When
+        jdbcJobListener.jobWasExecuted(context, exeption1);
+
+        // Then
+        verify(logger, never()).log(any(Class.class), eq(TechnicalLogSeverity.WARNING), anyString(), eq(exeption1));
+        verify(transactionService, never()).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+        verify(jobService, never()).deleteJobLogs(anyLong());
+        verify(jobService, never()).getJobLogs(anyLong(), eq(0), eq(1));
+    }
+
+    @Test
+    public void jobWasExecuted_should_do_nothing_if_cant_log_when_tenant_id_equals_0() throws Exception {
+        // Given
+        context.put(AbstractBonitaJobListener.TENANT_ID, 0L);
+        when(logger.isLoggable(any(Class.class), eq(TechnicalLogSeverity.WARNING))).thenReturn(false);
+
+        // When
+        jdbcJobListener.jobWasExecuted(context, exeption1);
+
+        // Then
+        verify(logger, never()).log(any(Class.class), eq(TechnicalLogSeverity.WARNING), anyString(), eq(exeption1));
+        verify(transactionService, never()).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+        verify(jobService, never()).deleteJobLogs(anyLong());
+        verify(jobService, never()).getJobLogs(anyLong(), eq(0), eq(1));
     }
 
     @Test
@@ -159,10 +249,11 @@ public class JDBCJobListenerTest {
 
         // Then
         verify(jobService).deleteJobLogs(JOB_DESCRIPTOR_ID);
+        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
     }
 
     @Test
-    public void jobWasExecuted_should_call_deleteJob_itself_if_no_exception_and_Job_is_no_more_triggered_in_the_future() throws Exception {
+    public void jobWasExecuted_should_deleteJob_and_log_if_no_exception_and_Job_is_no_more_triggered_in_the_future() throws Exception {
         // Given
         final List<SJobLog> jobLogs = Collections.emptyList();
         final SJobDescriptor jobDesc = mock(SJobDescriptor.class);
@@ -177,22 +268,39 @@ public class JDBCJobListenerTest {
 
         // Then
         verify(schedulerService, times(1)).delete("myJob");
+        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
     }
 
     @Test
-    public void jobWasExecuted_should_deleteJob_ignore_SJobDescriptorNotFoundException_if_job_already_deleted() throws Exception {
+    public void jobWasExecuted_should_do_nothing_if_delete_job_failed_and_cant_log_and_Job_is_no_more_triggered_in_the_future() throws Exception {
         // Given
-        final SJobDescriptor jobDesc = mock(SJobDescriptor.class);
-        doReturn("myJob").when(jobDesc).getJobName();
-
+        doReturn(new SJobDescriptorImpl("jobClassName", "jobName", true)).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
+        doReturn(false).when(schedulerService).isStillScheduled(any(SJobDescriptor.class));
         doThrow(SJobDescriptorNotFoundException.class).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
-        doReturn(false).when(schedulerService).isStillScheduled(jobDesc);
+        doReturn(false).when(logger).isLoggable(JDBCJobListener.class, TechnicalLogSeverity.TRACE);
 
         // When
         jdbcJobListener.jobWasExecuted(context, null);
 
         // Then
-        verify(schedulerService, times(0)).delete("myJob");
+        verify(schedulerService, never()).delete("myJob");
+        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+        verify(logger, never()).log(any(Class.class), any(TechnicalLogSeverity.class), anyString());
+    }
+
+    @Test
+    public void jobWasExecuted_should_log_if_delete_job_failed_and_log_and_Job_is_no_more_triggered_in_the_future() throws Exception {
+        // Given
+        doThrow(SJobDescriptorNotFoundException.class).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
+        doReturn(false).when(schedulerService).isStillScheduled(new SJobDescriptorImpl("jobClassName", "jobName", true));
+
+        // When
+        jdbcJobListener.jobWasExecuted(context, null);
+
+        // Then
+        verify(schedulerService, never()).delete("myJob");
+        verify(sessionAccessor).setTenantId(TENANT_ID);
+        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
     }
 
     @Test
@@ -211,6 +319,7 @@ public class JDBCJobListenerTest {
 
         // Then
         verify(schedulerService, times(0)).delete("myJob");
+        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
     }
 
     @Test
@@ -228,6 +337,7 @@ public class JDBCJobListenerTest {
         verify(schedulerService, never()).delete(anyString());
         verify(jobService, never()).updateJobLog(any(SJobLog.class), any(EntityUpdateDescriptor.class));
         verify(jobService, never()).createJobLog(any(SJobLog.class));
+        verify(transactionService, never()).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
     }
 
     @Test
@@ -237,6 +347,41 @@ public class JDBCJobListenerTest {
 
         // Then
         verify(schedulerExecutor).delete(JOB_NAME, String.valueOf(TENANT_ID));
+        verify(sessionAccessor).setTenantId(TENANT_ID);
+        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+    }
+
+    @Test
+    public void jobToBeExecuted_should_log_when_registerBonitaSynchronization_failed_if_can_log() throws Exception {
+        // Given
+        final STransactionNotFoundException e = new STransactionNotFoundException();
+        doThrow(e).when(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+
+        // When
+        jdbcJobListener.jobToBeExecuted(context);
+
+        // Then
+        verify(schedulerExecutor).delete(JOB_NAME, String.valueOf(TENANT_ID));
+        verify(sessionAccessor).setTenantId(TENANT_ID);
+        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+        verify(logger).log(any(Class.class), eq(TechnicalLogSeverity.WARNING), eq(e));
+    }
+
+    @Test
+    public void jobToBeExecuted_should_do_nothing_when_registerBonitaSynchronization_failed_if_cant_log() throws Exception {
+        // Given
+        final STransactionNotFoundException e = new STransactionNotFoundException();
+        doThrow(e).when(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+        when(logger.isLoggable(any(Class.class), eq(TechnicalLogSeverity.WARNING))).thenReturn(false);
+
+        // When
+        jdbcJobListener.jobToBeExecuted(context);
+
+        // Then
+        verify(schedulerExecutor).delete(JOB_NAME, String.valueOf(TENANT_ID));
+        verify(sessionAccessor).setTenantId(TENANT_ID);
+        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+        verify(logger, never()).log(any(Class.class), any(TechnicalLogSeverity.class), anyString(), any(Exception.class));
     }
 
     @Test
@@ -251,6 +396,7 @@ public class JDBCJobListenerTest {
         // Then
         verify(logger).log(any(Class.class), eq(TechnicalLogSeverity.WARNING),
                 eq("An exception occurs during the check of the existence of the job descriptor '" + JOB_DESCRIPTOR_ID + "'."), eq(exception));
+        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
     }
 
     @Test
@@ -266,6 +412,7 @@ public class JDBCJobListenerTest {
         // Then
         verify(logger, never()).log(any(Class.class), eq(TechnicalLogSeverity.WARNING),
                 eq("An exception occurs during the check of the existence of the job descriptor '" + JOB_DESCRIPTOR_ID + "'."), eq(exception));
+        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
     }
 
     @Test
@@ -281,6 +428,7 @@ public class JDBCJobListenerTest {
         verify(schedulerExecutor, never()).delete(JOB_NAME, String.valueOf(TENANT_ID));
         verify(logger, never()).log(any(Class.class), eq(TechnicalLogSeverity.WARNING),
                 eq("An exception occurs during the check of the existence of the job descriptor '" + JOB_DESCRIPTOR_ID + "'."), any(SSchedulerException.class));
+        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
     }
 
     @Test
@@ -295,6 +443,52 @@ public class JDBCJobListenerTest {
         verify(schedulerExecutor, never()).delete(JOB_NAME, String.valueOf(TENANT_ID));
         verify(logger, never()).log(any(Class.class), eq(TechnicalLogSeverity.WARNING),
                 eq("An exception occurs during the check of the existence of the job descriptor '" + JOB_DESCRIPTOR_ID + "'."), any(SSchedulerException.class));
+        verify(transactionService, never()).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+    }
+
+    @Test
+    public void jobToBeExecuted_should_do_nothing_when_job_descriptor_id_equals_0() throws Exception {
+        // Given
+        context.put(AbstractBonitaJobListener.JOB_DESCRIPTOR_ID, 0L);
+
+        // When
+        jdbcJobListener.jobToBeExecuted(context);
+
+        // Then
+        verify(schedulerExecutor, never()).delete(JOB_NAME, String.valueOf(TENANT_ID));
+        verify(logger, never()).log(any(Class.class), eq(TechnicalLogSeverity.WARNING),
+                eq("An exception occurs during the check of the existence of the job descriptor '" + JOB_DESCRIPTOR_ID + "'."), any(SSchedulerException.class));
+        verify(transactionService, never()).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+    }
+
+    @Test
+    public void jobToBeExecuted_should_do_nothing_when_no_tenant_id() throws Exception {
+        // Given
+        context.put(AbstractBonitaJobListener.TENANT_ID, null);
+
+        // When
+        jdbcJobListener.jobToBeExecuted(context);
+
+        // Then
+        verify(schedulerExecutor, never()).delete(JOB_NAME, String.valueOf(TENANT_ID));
+        verify(logger, never()).log(any(Class.class), eq(TechnicalLogSeverity.WARNING),
+                eq("An exception occurs during the check of the existence of the job descriptor '" + JOB_DESCRIPTOR_ID + "'."), any(SSchedulerException.class));
+        verify(transactionService, never()).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+    }
+
+    @Test
+    public void jobToBeExecuted_should_do_nothing_when_tenant_id_equals_0() throws Exception {
+        // Given
+        context.put(AbstractBonitaJobListener.TENANT_ID, 0L);
+
+        // When
+        jdbcJobListener.jobToBeExecuted(context);
+
+        // Then
+        verify(schedulerExecutor, never()).delete(JOB_NAME, String.valueOf(TENANT_ID));
+        verify(logger, never()).log(any(Class.class), eq(TechnicalLogSeverity.WARNING),
+                eq("An exception occurs during the check of the existence of the job descriptor '" + JOB_DESCRIPTOR_ID + "'."), any(SSchedulerException.class));
+        verify(transactionService, never()).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
     }
 
     @Test
@@ -304,6 +498,17 @@ public class JDBCJobListenerTest {
 
         // Then
         assertEquals("JDBCJobListener", name);
+    }
+
+    @Test
+    public void jobExecutionVetoed_should_do_nothing() throws Exception {
+        // When
+        jdbcJobListener.jobExecutionVetoed(context);
+
+        // Then
+        verify(schedulerExecutor, never()).delete(anyString(), anyString());
+        verify(logger, never()).log(any(Class.class), eq(TechnicalLogSeverity.WARNING), anyString(), any(SSchedulerException.class));
+        verify(transactionService, never()).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
     }
 
 }

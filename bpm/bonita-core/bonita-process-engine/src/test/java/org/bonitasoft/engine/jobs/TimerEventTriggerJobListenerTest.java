@@ -30,12 +30,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.scheduler.AbstractBonitaJobListener;
 import org.bonitasoft.engine.scheduler.StatelessJob;
+import org.bonitasoft.engine.search.SSearchException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,10 +55,13 @@ public class TimerEventTriggerJobListenerTest {
 
     private static final String TRIGGER_NAME = "TriggerName";
 
-    private final long tenantId = 6;
+    private static final Long TENANT_ID = 987L;
 
     @Mock
     private EventInstanceService eventInstanceService;
+
+    @Mock
+    private TechnicalLoggerService logger;
 
     private TimerEventTriggerJobListener timerEventTriggerJobListener;
 
@@ -64,10 +69,12 @@ public class TimerEventTriggerJobListenerTest {
 
     @Before
     public void setUp() {
-        timerEventTriggerJobListener = new TimerEventTriggerJobListener(eventInstanceService, tenantId);
+        timerEventTriggerJobListener = new TimerEventTriggerJobListener(eventInstanceService, TENANT_ID, logger);
         MockitoAnnotations.initMocks(timerEventTriggerJobListener);
 
         context.put(AbstractBonitaJobListener.TRIGGER_NAME, TRIGGER_NAME);
+        context.put(AbstractBonitaJobListener.TENANT_ID, TENANT_ID);
+        context.put(AbstractBonitaJobListener.BOS_JOB, mock(StatelessJob.class));
     }
 
     /**
@@ -78,7 +85,6 @@ public class TimerEventTriggerJobListenerTest {
     @Test
     public final void jobWasExecuted_should_delete_timer_event_trigger_if_exists() throws Exception {
         // Given
-        context.put(AbstractBonitaJobListener.BOS_JOB, mock(StatelessJob.class));
         final STimerEventTriggerInstance sTimerEventTriggerInstance = mock(STimerEventTriggerInstance.class);
         final List<STimerEventTriggerInstance> timerEventTriggerInstances = Collections.singletonList(sTimerEventTriggerInstance);
         doReturn(timerEventTriggerInstances).when(eventInstanceService).searchEventTriggerInstances(eq(STimerEventTriggerInstance.class),
@@ -94,7 +100,6 @@ public class TimerEventTriggerJobListenerTest {
     @Test
     public final void jobWasExecuted_should_do_nothing_if_timer_event_trigger_doesnt_exist() throws Exception {
         // Given
-        context.put(AbstractBonitaJobListener.BOS_JOB, mock(StatelessJob.class));
         doReturn(Collections.<STimerEventTriggerInstance> emptyList()).when(eventInstanceService).searchEventTriggerInstances(
                 eq(STimerEventTriggerInstance.class), any(QueryOptions.class));
 
@@ -107,6 +112,9 @@ public class TimerEventTriggerJobListenerTest {
 
     @Test
     public final void jobWasExecuted_should_not_delete_timer_event_trigger_if_no_engine_job() throws Exception {
+        // Given
+        context.put(AbstractBonitaJobListener.BOS_JOB, null);
+
         // When
         timerEventTriggerJobListener.jobWasExecuted(context, null);
 
@@ -115,17 +123,59 @@ public class TimerEventTriggerJobListenerTest {
     }
 
     @Test
+    public void jobWasExecuted_should_do_nothing_when_no_tenant_id() throws Exception {
+        // Given
+        context.put(AbstractBonitaJobListener.TENANT_ID, null);
+
+        // When
+        timerEventTriggerJobListener.jobWasExecuted(context, null);
+
+        // Then
+        verify(eventInstanceService, never()).deleteEventTriggerInstance(any(STimerEventTriggerInstance.class));
+        verify(logger, never()).log(any(Class.class), any(TechnicalLogSeverity.class), anyString(), any(Exception.class));
+    }
+
+    @Test
+    public void jobWasExecuted_should_do_nothing_when_tenant_id_equals_0() throws Exception {
+        // Given
+        context.put(AbstractBonitaJobListener.TENANT_ID, 0L);
+
+        // When
+        timerEventTriggerJobListener.jobWasExecuted(context, null);
+
+        // Then
+        verify(eventInstanceService, never()).deleteEventTriggerInstance(any(STimerEventTriggerInstance.class));
+        verify(logger, never()).log(any(Class.class), any(TechnicalLogSeverity.class), anyString(), any(Exception.class));
+    }
+
+    @Test
     public final void jobWasExecuted_should_do_nothing_when_deleteTimerEventTriggerIfJobNotScheduledAnyMore_throws_exception() throws Exception {
         // Given
         final TimerEventTriggerJobListener spiedTimerEventTriggerJobListener = spy(timerEventTriggerJobListener);
-        doThrow(new SBonitaException() {
-        }).when(spiedTimerEventTriggerJobListener).deleteTimerEventTriggerIfJobNotScheduledAnyMore(anyString());
+        doThrow(new SSearchException(new Exception())).when(spiedTimerEventTriggerJobListener).deleteTimerEventTrigger(TRIGGER_NAME);
 
         // When
         spiedTimerEventTriggerJobListener.jobWasExecuted(context, null);
 
         // then
         verify(eventInstanceService, never()).deleteEventTriggerInstance(any(STimerEventTriggerInstance.class));
+    }
+
+    @Test
+    public final void jobWasExecuted_should_log_if_can_log_when_deleteTimerEventTriggerIfJobNotScheduledAnyMore_throws_exception() throws Exception {
+        // Given
+        doReturn(true).when(logger).isLoggable(any(Class.class), eq(TechnicalLogSeverity.WARNING));
+        final TimerEventTriggerJobListener spiedTimerEventTriggerJobListener = spy(timerEventTriggerJobListener);
+        final SSearchException e = new SSearchException(new Exception());
+        doThrow(e).when(spiedTimerEventTriggerJobListener).deleteTimerEventTrigger(TRIGGER_NAME);
+
+        // When
+        spiedTimerEventTriggerJobListener.jobWasExecuted(context, null);
+
+        // then
+        verify(eventInstanceService, never()).deleteEventTriggerInstance(any(STimerEventTriggerInstance.class));
+        verify(logger).log(any(Class.class), eq(TechnicalLogSeverity.WARNING),
+                eq("An exception occurs during the deleting of the timer event trigger '" + TRIGGER_NAME + "'."), eq(e));
     }
 
     /**
@@ -138,7 +188,7 @@ public class TimerEventTriggerJobListenerTest {
         final String name = timerEventTriggerJobListener.getName();
 
         // then
-        assertEquals("TimerEventTriggerJobListener_" + tenantId, name);
+        assertEquals("TimerEventTriggerJobListener_" + TENANT_ID, name);
     }
 
     /**

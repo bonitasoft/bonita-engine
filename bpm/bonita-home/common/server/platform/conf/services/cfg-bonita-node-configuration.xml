@@ -35,6 +35,8 @@
 		<constructor-arg name="schedulerService" ref="scheduler" />
 		<constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
 		<constructor-arg name="jobService" ref="jobService" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="incidentService" ref="incidentService" />
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>

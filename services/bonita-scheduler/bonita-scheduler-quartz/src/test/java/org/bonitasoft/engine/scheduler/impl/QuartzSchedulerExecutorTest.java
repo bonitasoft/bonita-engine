@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -36,6 +37,7 @@ import org.bonitasoft.engine.scheduler.trigger.RepeatTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger.MisfireRestartPolicy;
 import org.bonitasoft.engine.scheduler.trigger.UnixCronTrigger;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.After;
@@ -74,6 +76,12 @@ public class QuartzSchedulerExecutorTest {
     private TransactionService transactionService;
 
     @Mock
+    private SessionAccessor sessionAccessor;
+
+    @Mock
+    private TechnicalLoggerService logger;
+
+    @Mock
     private SchedulerServiceImpl schedulerService;
 
     @Mock
@@ -99,7 +107,7 @@ public class QuartzSchedulerExecutorTest {
     }
 
     private QuartzSchedulerExecutor initQuartzScheduler(final boolean useOptimization) throws SSchedulerException {
-        final QuartzSchedulerExecutor quartz = new QuartzSchedulerExecutor(schedulerFactory, transactionService, useOptimization);
+        final QuartzSchedulerExecutor quartz = new QuartzSchedulerExecutor(schedulerFactory, transactionService, sessionAccessor, logger, useOptimization);
         quartz.initializeScheduler();
         quartz.start();
         return quartz;

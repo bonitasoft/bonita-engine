@@ -21,6 +21,8 @@ import java.util.Map;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -43,9 +45,12 @@ public class TimerEventTriggerJobListener extends AbstractBonitaTenantJobListene
 
     private final EventInstanceService eventInstanceService;
 
-    public TimerEventTriggerJobListener(final EventInstanceService eventInstanceService, final long tenantId) {
+    private final TechnicalLoggerService logger;
+
+    public TimerEventTriggerJobListener(final EventInstanceService eventInstanceService, final long tenantId, final TechnicalLoggerService logger) {
         super(tenantId);
         this.eventInstanceService = eventInstanceService;
+        this.logger = logger;
     }
 
     @Override
@@ -72,13 +77,16 @@ public class TimerEventTriggerJobListener extends AbstractBonitaTenantJobListene
 
         final String triggerName = (String) context.get(TRIGGER_NAME);
         try {
-            deleteTimerEventTriggerIfJobNotScheduledAnyMore(triggerName);
-        } catch (final SBonitaException sbe) {
-            // Nothing to do
+            deleteTimerEventTrigger(triggerName);
+        } catch (final SBonitaException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
+                        "An exception occurs during the deleting of the timer event trigger '" + triggerName + "'.", e);
+            }
         }
     }
 
-    void deleteTimerEventTriggerIfJobNotScheduledAnyMore(final String triggerName) throws SBonitaException {
+    void deleteTimerEventTrigger(final String triggerName) throws SBonitaException {
         final List<FilterOption> filters = Collections.singletonList(new FilterOption(STimerEventTriggerInstance.class, "jobTriggerName", triggerName));
 
         final QueryOptions queryOptions = new QueryOptions(0, 1, Collections.<OrderByOption> emptyList(), filters, null);

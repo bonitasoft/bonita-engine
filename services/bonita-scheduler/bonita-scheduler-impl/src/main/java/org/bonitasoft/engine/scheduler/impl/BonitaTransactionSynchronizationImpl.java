@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 Bonitasoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,25 +11,29 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.scheduler;
 
+package org.bonitasoft.engine.scheduler.impl;
 
-/**
- * @author Celine Souchet
- */
-public abstract class AbstractBonitaTenantJobListener extends AbstractBonitaJobListener {
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import org.bonitasoft.engine.transaction.TransactionState;
 
-    private static final long serialVersionUID = 4115044015337726803L;
+public final class BonitaTransactionSynchronizationImpl implements BonitaTransactionSynchronization {
 
-    private final long tenantId;
+    private final SessionAccessor sessionAccessor;
 
-    public AbstractBonitaTenantJobListener(final long tenantId) {
+    public BonitaTransactionSynchronizationImpl(final SessionAccessor sessionAccessor) {
         super();
-        this.tenantId = tenantId;
+        this.sessionAccessor = sessionAccessor;
     }
 
-    protected long getTenantId() {
-        return tenantId;
+    @Override
+    public void beforeCommit() {
+        // Nothing to do
     }
 
+    @Override
+    public void afterCompletion(final TransactionState txState) {
+        sessionAccessor.deleteTenantId();
+    }
 }

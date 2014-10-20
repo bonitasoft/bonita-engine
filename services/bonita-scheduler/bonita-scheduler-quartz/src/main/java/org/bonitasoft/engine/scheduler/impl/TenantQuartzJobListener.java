@@ -18,8 +18,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.AbstractBonitaJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.transaction.TransactionService;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -32,13 +37,23 @@ import org.quartz.TriggerKey;
  */
 public class TenantQuartzJobListener extends AbstractQuartzJobListener {
 
+    private final SessionAccessor sessionAccessor;
+
+    private final TransactionService transactionService;
+
+    private final TechnicalLoggerService logger;
+
     private final List<AbstractBonitaTenantJobListener> bonitaJobListeners;
 
     private final String groupName;
 
-    public TenantQuartzJobListener(final List<AbstractBonitaTenantJobListener> bonitaJobListeners, final String groupName) {
+    public TenantQuartzJobListener(final List<AbstractBonitaTenantJobListener> bonitaJobListeners, final String groupName,
+            final SessionAccessor sessionAccessor, final TransactionService transactionService, final TechnicalLoggerService logger) {
+        this.logger = logger;
         this.bonitaJobListeners = bonitaJobListeners;
         this.groupName = groupName;
+        this.sessionAccessor = sessionAccessor;
+        this.transactionService = transactionService;
     }
 
     @Override
@@ -68,8 +83,15 @@ public class TenantQuartzJobListener extends AbstractQuartzJobListener {
         mapContext.put(AbstractBonitaJobListener.JOB_DATAS, (Serializable) getJobDataValueAndType(jobDetail));
         mapContext.put(AbstractBonitaJobListener.JOB_RESULT, String.valueOf(context.getResult()));
 
-        for (final AbstractBonitaTenantJobListener abstractBonitaTenantJobListener : bonitaJobListeners) {
-            abstractBonitaTenantJobListener.jobToBeExecuted(mapContext);
+        final Long tenantId = Long.valueOf(groupName);
+        try {
+            // Set the tenant id, because the jobService is a tenant service and need a session to use the tenant persistence service. But, a job listener runs not in a session.
+            sessionAccessor.setTenantId(tenantId);
+            for (final AbstractBonitaTenantJobListener abstractBonitaTenantJobListener : bonitaJobListeners) {
+                abstractBonitaTenantJobListener.jobToBeExecuted(mapContext);
+            }
+        } finally {
+            cleanSession();
         }
     }
 
@@ -95,8 +117,15 @@ public class TenantQuartzJobListener extends AbstractQuartzJobListener {
         mapContext.put(AbstractBonitaJobListener.JOB_DATAS, (Serializable) getJobDataValueAndType(jobDetail));
         mapContext.put(AbstractBonitaJobListener.JOB_RESULT, String.valueOf(context.getResult()));
 
-        for (final AbstractBonitaTenantJobListener abstractBonitaTenantJobListener : bonitaJobListeners) {
-            abstractBonitaTenantJobListener.jobExecutionVetoed(mapContext);
+        final Long tenantId = Long.valueOf(groupName);
+        try {
+            // Set the tenant id, because the jobService is a tenant service and need a session to use the tenant persistence service. But, a job listener runs not in a session.
+            sessionAccessor.setTenantId(tenantId);
+            for (final AbstractBonitaTenantJobListener abstractBonitaTenantJobListener : bonitaJobListeners) {
+                abstractBonitaTenantJobListener.jobExecutionVetoed(mapContext);
+            }
+        } finally {
+            cleanSession();
         }
     }
 
@@ -122,8 +151,25 @@ public class TenantQuartzJobListener extends AbstractQuartzJobListener {
         mapContext.put(AbstractBonitaJobListener.JOB_DATAS, (Serializable) getJobDataValueAndType(jobDetail));
         mapContext.put(AbstractBonitaJobListener.JOB_RESULT, String.valueOf(context.getResult()));
 
-        for (final AbstractBonitaTenantJobListener abstractBonitaTenantJobListener : bonitaJobListeners) {
-            abstractBonitaTenantJobListener.jobWasExecuted(mapContext, jobException);
+        final Long tenantId = Long.valueOf(groupName);
+        try {
+            // Set the tenant id, because the jobService is a tenant service and need a session to use the tenant persistence service. But, a job listener runs not in a session.
+            sessionAccessor.setTenantId(tenantId);
+            for (final AbstractBonitaTenantJobListener abstractBonitaTenantJobListener : bonitaJobListeners) {
+                abstractBonitaTenantJobListener.jobWasExecuted(mapContext, jobException);
+            }
+        } finally {
+            cleanSession();
+        }
+    }
+
+    private void cleanSession() {
+        try {
+            transactionService.registerBonitaSynchronization(new BonitaTransactionSynchronizationImpl(sessionAccessor));
+        } catch (final STransactionNotFoundException e) {
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
+            }
         }
     }
 

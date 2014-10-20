@@ -23,6 +23,8 @@
 
 	<bean id="schedulerExecutor" class="org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutor">
 		<constructor-arg name="schedulerFactory" ref="quartzSchedulerFactory" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="useOptimization" value="true" />
 	</bean>
