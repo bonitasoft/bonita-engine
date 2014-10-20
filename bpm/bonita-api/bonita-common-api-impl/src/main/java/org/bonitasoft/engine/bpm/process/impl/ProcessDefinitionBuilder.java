@@ -28,6 +28,8 @@ import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
+import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
+import org.bonitasoft.engine.bpm.contract.ContractDefinition;
 import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
@@ -243,8 +245,18 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     }
 
     private void validateUserTask(final UserTaskDefinition userTaskDefinition) {
-        if (userTaskDefinition.getContract() != null) {
-            validateUserTaskContractInputs(userTaskDefinition.getContract().getSimpleInputs(), userTaskDefinition.getContract().getComplexInputs());
+        final ContractDefinition contract = userTaskDefinition.getContract();
+        if (contract != null) {
+            validateUserTaskContractInputs(contract.getSimpleInputs(), contract.getComplexInputs());
+
+            for (final ConstraintDefinition constraint : contract.getConstraints()) {
+                if (constraint.getName() == null) {
+                    addError("A constraint name is missing");
+                }
+                if (constraint.getExpression() == null) {
+                    addError("The expression of constraint" + constraint.getName() + " is missing");
+                }
+            }
         }
     }
 

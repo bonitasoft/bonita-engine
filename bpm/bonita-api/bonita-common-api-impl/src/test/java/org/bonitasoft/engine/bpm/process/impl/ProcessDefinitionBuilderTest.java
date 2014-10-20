@@ -418,7 +418,7 @@ public class ProcessDefinitionBuilderTest {
 
         //given
         builder.addUserTask("step1", "mainActor").addContract().addSimpleInput("innput", Type.TEXT, "should fail")
-        .addComplexInput("innput", "should fail", null, null);
+                .addComplexInput("innput", "should fail", null, null).addConstraint("firstConstraint", "input != null", "mandatory", "input");
 
         //when
         builder.done();
@@ -444,6 +444,26 @@ public class ProcessDefinitionBuilderTest {
         builder.done();
 
         //then exception
+    }
+
+    @Test(expected = InvalidProcessDefinitionException.class)
+    public void userTask_with_null_constraint_name_of_contract_should_throw_exception() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithBadContract", "1.0");
+        builder.addActor("mainActor");
+        builder.addUserTask("step1", "mainActor").addContract()
+                .addSimpleInput("input", Type.TEXT, "").addConstraint(null, "input != null", "mandatory", "input");
+
+        builder.done();
+    }
+
+    @Test(expected = InvalidProcessDefinitionException.class)
+    public void userTask_with_null_constraint_condition_of_contract_should_throw_exception() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithBadContract", "1.0");
+        builder.addActor("mainActor");
+        builder.addUserTask("step1", "mainActor").addContract()
+                .addSimpleInput("input", Type.TEXT, "").addConstraint("firstConstraint", null, "mandatory", "input");
+
+        builder.done();
     }
 
 }
