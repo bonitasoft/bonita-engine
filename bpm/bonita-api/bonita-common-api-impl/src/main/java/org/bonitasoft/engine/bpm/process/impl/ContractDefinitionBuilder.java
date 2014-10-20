@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.process.impl;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
@@ -57,10 +58,18 @@ public class ContractDefinitionBuilder extends FlowElementContainerBuilder {
     }
 
     public ContractDefinitionBuilder addComplexInput(final String name, final String description, final boolean multiple,
-            final List<SimpleInputDefinition> simpleInputs,
-            final List<ComplexInputDefinition> complexInputs) {
+            final List<SimpleInputDefinition> simpleInputs, final List<ComplexInputDefinition> complexInputs) {
         final ComplexInputDefinitionImpl input = new ComplexInputDefinitionImpl(name, description, multiple, simpleInputs, complexInputs);
         contract.addComplexInput(input);
+        return this;
+    }
+
+    public ContractDefinitionBuilder addFileInput(final String name, final String description) {
+        final SimpleInputDefinitionImpl nameInput= new SimpleInputDefinitionImpl("name", Type.TEXT, "The file name");
+        final SimpleInputDefinitionImpl contentInput= new SimpleInputDefinitionImpl("content", Type.BYTE_ARRAY, "The file content");
+        final ComplexInputDefinitionImpl fileInput = new ComplexInputDefinitionImpl(name, description,
+                Arrays.<SimpleInputDefinition> asList(nameInput, contentInput), null);
+        contract.addComplexInput(fileInput);
         return this;
     }
 

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
 import org.bonitasoft.engine.bpm.contract.ConstraintDefinition;
 import org.bonitasoft.engine.bpm.contract.ConstraintType;
 import org.bonitasoft.engine.bpm.contract.SimpleInputDefinition;
@@ -41,8 +42,6 @@ public class ContractDefinitionBuilderTest {
 
     @Mock
     private FlowElementContainerDefinitionImpl container;
-
-    private List<SimpleInputDefinition> inputs;
 
     private UserTaskDefinitionImpl activity;
 
@@ -112,6 +111,22 @@ public class ContractDefinitionBuilderTest {
         assertThat(activity.getContract().getComplexInputs().get(0).isMultiple()).as("should be multiple").isTrue();
         checkBuilder(builder);
 
+    }
+
+    @Test
+    public void addFileComplexInputTest() throws Exception {
+        final ContractDefinitionBuilder builder = contractDefinitionBuilder.addFileInput("document", "It is a simple document");
+
+        final List<ComplexInputDefinition> complexInputs = activity.getContract().getComplexInputs();
+        assertThat(complexInputs).hasSize(1);
+        final List<SimpleInputDefinition> simpleInputs = complexInputs.get(0).getSimpleInputs();
+        assertThat(simpleInputs).hasSize(2);
+        assertThat(simpleInputs.get(0).getName()).isEqualTo("name");
+        assertThat(simpleInputs.get(0).getType()).isEqualTo(Type.TEXT);
+        assertThat(simpleInputs.get(1).getName()).isEqualTo("content");
+        assertThat(simpleInputs.get(1).getType()).isEqualTo(Type.BYTE_ARRAY);
+
+        checkBuilder(builder);
     }
 
     @Test

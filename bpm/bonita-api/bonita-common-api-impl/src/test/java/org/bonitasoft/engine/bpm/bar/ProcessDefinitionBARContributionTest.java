@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.bpm.bar;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,13 +81,15 @@ public class ProcessDefinitionBARContributionTest {
         final SimpleInputDefinition name = new SimpleInputDefinitionImpl("name", Type.TEXT, DESCRIPTION);
         final SimpleInputDefinition amount = new SimpleInputDefinitionImpl("amount", Type.DECIMAL, DESCRIPTION);
         final SimpleInputDefinition date = new SimpleInputDefinitionImpl("date", Type.DATE, DESCRIPTION);
+        final SimpleInputDefinition proof = new SimpleInputDefinitionImpl("proof", Type.BYTE_ARRAY, DESCRIPTION);
 
         final SimpleInputDefinition city = new SimpleInputDefinitionImpl("city", Type.TEXT, DESCRIPTION);
         final SimpleInputDefinition zip = new SimpleInputDefinitionImpl("zip", Type.INTEGER, DESCRIPTION);
 
         final ComplexInputDefinition adress = new ComplexInputDefinitionImpl("adress", DESCRIPTION, Arrays.asList(city, zip), null);
 
-        final ComplexInputDefinition expense = new ComplexInputDefinitionImpl("expense", DESCRIPTION, Arrays.asList(name, amount, date), Arrays.asList(adress));
+        final ComplexInputDefinition expense = new ComplexInputDefinitionImpl("expense", DESCRIPTION, Arrays.asList(name, amount, date, proof),
+                Arrays.asList(adress));
         return expense;
     }
 
@@ -135,7 +137,7 @@ public class ProcessDefinitionBARContributionTest {
         // Deserialize designProcessDefinition
         final File processDesignFile = new File(processDesignFolder, ProcessDefinitionBARContribution.PROCESS_DEFINITION_XML);
         final DesignProcessDefinition resultDesignProcessDefinition = processDefinitionBARContribution.deserializeProcessDefinition(processDesignFile);
-        assertEquals(designProcessDefinition, resultDesignProcessDefinition);
+        assertThat(resultDesignProcessDefinition).isEqualTo(designProcessDefinition);
 
         // Clean up
         final File[] listFiles = processDesignFolder.listFiles();

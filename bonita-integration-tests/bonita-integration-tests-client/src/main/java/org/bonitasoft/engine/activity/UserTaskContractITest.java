@@ -220,11 +220,13 @@ public class UserTaskContractITest extends CommonAPITest {
         final SimpleInputDefinition expenseType = new SimpleInputDefinitionImpl("expenseType", Type.TEXT, "describe expense type");
         final SimpleInputDefinition expenseAmount = new SimpleInputDefinitionImpl("expenseAmount", Type.DECIMAL, "expense amount");
         final SimpleInputDefinition expenseDate = new SimpleInputDefinitionImpl("expenseDate", Type.DATE, "expense date");
+        final SimpleInputDefinition expenseProof = new SimpleInputDefinitionImpl("expenseProof", Type.BYTE_ARRAY, "expense proof");
 
         //given
         final UserTaskDefinitionBuilder userTaskDefinitionBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
         userTaskDefinitionBuilder.addContract()
-                .addComplexInput("expenseReport", "expense report with several expense lines", true, Arrays.asList(expenseType, expenseDate, expenseAmount),
+                .addComplexInput("expenseReport", "expense report with several expense lines", true,
+                        Arrays.asList(expenseType, expenseDate, expenseAmount, expenseProof),
                         null);
         final List<Map<String, Object>> expenses = new ArrayList<Map<String, Object>>();
         userTaskDefinitionBuilder.addData("expenseData", expenses.getClass().getName(), null);
@@ -240,9 +242,9 @@ public class UserTaskContractITest extends CommonAPITest {
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
 
         final List<Map<String, Object>> expenseReport = new ArrayList<Map<String, Object>>();
-        expenseReport.add(createExpenseLine("hotel", 150.3f, new Date(System.currentTimeMillis())));
-        expenseReport.add(createExpenseLine("taxi", 25, new Date(System.currentTimeMillis())));
-        expenseReport.add(createExpenseLine("plane", 500, new Date(System.currentTimeMillis())));
+        expenseReport.add(createExpenseLine("hotel", 150.3f, new Date(System.currentTimeMillis()), null));
+        expenseReport.add(createExpenseLine("taxi", 25, new Date(System.currentTimeMillis()), new byte[0]));
+        expenseReport.add(createExpenseLine("plane", 500, new Date(System.currentTimeMillis()), new byte[] { 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1 }));
 
         final Map<String, Object> taskInput = new HashMap<String, Object>();
         taskInput.put("expenseReport", expenseReport);
@@ -262,11 +264,12 @@ public class UserTaskContractITest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    private Map<String, Object> createExpenseLine(final String expenseType, final float expenseAmount, final Date expenseDate) {
+    private Map<String, Object> createExpenseLine(final String expenseType, final float expenseAmount, final Date expenseDate, final byte[] expenseProof) {
         final Map<String, Object> expenseLine = new HashMap<String, Object>();
         expenseLine.put("expenseType", expenseType);
         expenseLine.put("expenseAmount", expenseAmount);
         expenseLine.put("expenseDate", expenseDate);
+        expenseLine.put("expenseProof", expenseProof);
         return expenseLine;
     }
 

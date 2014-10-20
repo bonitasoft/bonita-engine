@@ -27,11 +27,12 @@ public enum SType {
     BOOLEAN(Boolean.class),
     DATE(Date.class),
     INTEGER(Integer.class, Long.class, BigInteger.class, Short.class, Byte.class),
-    DECIMAL(Float.class, Double.class, BigDecimal.class, Integer.class, Long.class, BigInteger.class, Short.class, Byte.class);
+    DECIMAL(Float.class, Double.class, BigDecimal.class, Integer.class, Long.class, BigInteger.class, Short.class, Byte.class),
+    BYTE_ARRAY(byte[].class);
 
     private List<Class<?>> assignableTypes;
 
-    SType(final Class<?>... assignableTypes) {
+    private SType(final Class<?>... assignableTypes) {
         this.assignableTypes = Arrays.asList(assignableTypes);
     }
 
@@ -46,4 +47,5 @@ public enum SType {
         }
         return false;
     }
+
 }
