@@ -14,10 +14,8 @@
 package org.bonitasoft.engine.bpm.contract.validation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
@@ -32,10 +30,13 @@ public class ContractConstraintsValidator {
 
     private final TechnicalLoggerService logger;
     private final ConstraintsDefinitionHelper constraintsDefinitionHelper;
+    private final ContractVariableHelper contractVariableHelper;
 
-    public ContractConstraintsValidator(final TechnicalLoggerService logger, final ConstraintsDefinitionHelper constraintsDefinitionHelper) {
+    public ContractConstraintsValidator(final TechnicalLoggerService logger, final ConstraintsDefinitionHelper constraintsDefinitionHelper,
+            final ContractVariableHelper contractVariableHelper) {
         this.logger = logger;
         this.constraintsDefinitionHelper = constraintsDefinitionHelper;
+        this.contractVariableHelper = contractVariableHelper;
     }
 
     public void validate(final SContractDefinition contract, final Map<String, Object> variables) throws ContractViolationException {
@@ -43,7 +44,14 @@ public class ContractConstraintsValidator {
         for (final SConstraintDefinition constraint : contract.getConstraints()) {
             log(TechnicalLogSeverity.DEBUG, "Evaluating constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames());
             if (isMandatoryConstraint(constraint)) {
-                validateMandatoryContraint(comments, constraintsDefinitionHelper.getInputDefinition(contract, constraint.getName()), constraint, variables);
+                if (constraint.getInputNames().size() != 1) {
+                    log(TechnicalLogSeverity.WARNING, "Constraint [" + constraint.getName() + "] inputNames are not valid");
+                    comments.add("Constraint [" + constraint.getName() + "] inputNames are not valid");
+                }
+                else {
+                    validateMandatoryContraint(comments, constraintsDefinitionHelper.getInputDefinition(contract, constraint.getInputNames().get(0)),
+                            constraint, variables);
+                }
             } else {
                 validateContraint(comments, constraint, variables);
             }
@@ -53,24 +61,19 @@ public class ContractConstraintsValidator {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void validateMandatoryContraint(final List<String> comments, final SInputDefinition sInputDefinition, final SConstraintDefinition constraint,
             final Map<String, Object> variables) {
-        final Map<String, Object> inputVariables = buildMandatoryInputVariables(constraint, variables);
-        if (sInputDefinition.isMultiple()) {
-            final Object multipleInputVariable = variables.get(sInputDefinition.getName());
-            if (multipleInputVariable != null && multipleInputVariable instanceof List<?>) {
-                for (final Object variableValue : (List<Object>) multipleInputVariable) {
-                    final Map<String, Object> variable = new HashMap<String, Object>();
-                    variable.put(sInputDefinition.getName(), variableValue);
-                    validateContraint(comments, constraint, variable);
+        final List<Map<String, Object>> inputVariables = contractVariableHelper.buildMandatoryMultipleInputVariables(constraint, variables);
+        for (final Map<String, Object> inputVariable : inputVariables) {
+            if (sInputDefinition.isMultiple()) {
+                final List<Map<String, Object>> multipleVariables = contractVariableHelper.convertMultipleToList(inputVariable);
+                for (final Map<String, Object> multipleVariable : multipleVariables) {
+                    validateContraint(comments, constraint, multipleVariable);
                 }
-            } else {
-                log(TechnicalLogSeverity.WARNING, "Constraint [" + constraint.getName() + "] on multiple " + constraint.getInputNames() + " is not valid");
             }
-        }
-        else {
-            validateContraint(comments, constraint, inputVariables);
+            else {
+                validateContraint(comments, constraint, inputVariable);
+            }
         }
     }
 
@@ -92,35 +95,6 @@ public class ContractConstraintsValidator {
             log(TechnicalLogSeverity.WARNING, "Constraint [" + constraint.getName() + "] on input(s) " + constraint.getInputNames() + " is not valid");
             comments.add(constraint.getExplanation());
         }
-    }
-
-    private Map<String, Object> buildMandatoryInputVariables(final SConstraintDefinition constraint, final Map<String, Object> variables) {
-        final Map<String, Object> constraintValues = new HashMap<String, Object>();
-        for (final String inputName : constraint.getInputNames()) {
-            buildRecursiveVariable(variables, constraintValues, inputName);
-        }
-        return constraintValues;
-    }
-
-    private void buildRecursiveVariable(final Map<String, Object> variables, final Map<String, Object> constraintValues, final String inputName) {
-        if (variables.containsKey(inputName)) {
-            constraintValues.put(inputName, variables.get(inputName));
-        } else {
-            buildRecursiveComplexVariable(variables, constraintValues, inputName);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void buildRecursiveComplexVariable(final Map<String, Object> variables, final Map<String, Object> values, final String inputName) {
-        for (final Entry<String, Object> variableEntry : variables.entrySet()) {
-            final Object variableValue = variableEntry.getValue();
-            if (variableValue instanceof Map<?, ?>) {
-                final Map<String, Object> complexObject = new HashMap<String, Object>();
-                complexObject.put(variableEntry.getKey(), variableEntry.getValue());
-                buildRecursiveVariable((Map<String, Object>) variableValue, values, inputName);
-            }
-        }
-
     }
 
     private void log(final TechnicalLogSeverity severity, final String message) {

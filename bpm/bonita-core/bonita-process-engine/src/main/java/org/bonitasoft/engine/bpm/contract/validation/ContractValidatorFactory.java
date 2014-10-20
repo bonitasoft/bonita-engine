@@ -17,14 +17,15 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
 /**
  * Contract validator factory - might be replaced by a spring configuration
- * 
+ *
  * @author Colin Puy
  */
 public class ContractValidatorFactory {
 
-    public ContractValidator createContractValidator(TechnicalLoggerService loggerService) {
-        ContractStructureValidator complexValidator = new ContractStructureValidator(new ContractTypeValidator(), loggerService);
-        ContractConstraintsValidator contractRulesValidator = new ContractConstraintsValidator(loggerService, null);
-        return new ContractValidator(complexValidator, contractRulesValidator);
+    public ContractValidator createContractValidator(final TechnicalLoggerService loggerService) {
+        final ContractStructureValidator complexValidator = new ContractStructureValidator(new ContractTypeValidator(), loggerService);
+        final ContractConstraintsValidator contractConstraintValidator = new ContractConstraintsValidator(loggerService, new ConstraintsDefinitionHelper(),
+                new ContractVariableHelper());
+        return new ContractValidator(complexValidator, contractConstraintValidator);
     }
 }

@@ -48,8 +48,6 @@ public class ContractValidatorTest {
     @InjectMocks
     private ContractValidator contractValidator;
 
-   
-
     private Map<String, Object> anyVariables() {
         return anyMapOf(String.class, Object.class);
     }
