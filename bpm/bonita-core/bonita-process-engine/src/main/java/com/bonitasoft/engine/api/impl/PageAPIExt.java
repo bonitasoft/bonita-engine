@@ -70,8 +70,7 @@ public class PageAPIExt implements PageAPI {
         final PageService pageService = getTenantAccessor().getPageService();
 
         try {
-            final byte[] content = pageService.getPageContent(pageId);
-            return content;
+            return pageService.getPageContent(pageId);
         } catch (final SBonitaReadException e) {
             throw new PageNotFoundException(e);
 

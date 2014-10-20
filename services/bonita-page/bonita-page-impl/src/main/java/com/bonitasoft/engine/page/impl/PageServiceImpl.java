@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.page.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -437,7 +438,11 @@ public class PageServiceImpl implements PageService {
         final byte[] content = pageContent.getContent();
         try {
             final Map<String, byte[]> contentAsMap = IOUtil.unzip(content);
+            byte[] bytes = contentAsMap.get("page.properties");
             final Properties pageProperties = new Properties();
+            if(bytes != null){
+                pageProperties.load(new ByteArrayInputStream(bytes));
+            }
             pageProperties.put(PROPERTIES_NAME, page.getName());
             pageProperties.put(PROPERTIES_DISPLAY_NAME, page.getDisplayName());
             pageProperties.put(PROPERTIES_DESCRIPTION, page.getDescription());

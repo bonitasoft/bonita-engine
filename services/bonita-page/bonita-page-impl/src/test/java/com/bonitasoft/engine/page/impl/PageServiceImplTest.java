@@ -336,7 +336,7 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void getPageContent_should_update_properties_in_the_zip_if_exists() throws SBonitaException, IOException {
+    public void getPageContent_should_update_properties_in_the_zip_if_exists_and_keep_others() throws SBonitaException, IOException {
         // given: a zip with outdated properties
         final SPageImpl page = new SPageImpl("mypageUpdated", "mypageUpdated description", "mypageUpdated display name", System.currentTimeMillis(), -1, false,
                 System.currentTimeMillis(),
@@ -345,7 +345,7 @@ public class PageServiceImplTest {
         page.setId(12);
         @SuppressWarnings("unchecked")
         final byte[] content = IOUtil.zip(pair("Index.groovy", "content of the groovy".getBytes()),
-                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\naCustomProperty=plop\n".getBytes()));
         doReturn(new SPageContentBuilderFactoryImpl().createNewInstance(content).done()).when(readPersistenceService).selectById(
                 new SelectByIdDescriptor<SPageContent>("getPageContent",
                         SPageContent.class, 12));
@@ -361,6 +361,7 @@ public class PageServiceImplTest {
         assertThat(pageProperties.get("name")).isEqualTo("mypageUpdated");
         assertThat(pageProperties.get("displayName")).isEqualTo("mypageUpdated display name");
         assertThat(pageProperties.get("description")).isEqualTo("mypageUpdated description");
+        assertThat(pageProperties.get("aCustomProperty")).isEqualTo("plop");
     }
 
     @Test
