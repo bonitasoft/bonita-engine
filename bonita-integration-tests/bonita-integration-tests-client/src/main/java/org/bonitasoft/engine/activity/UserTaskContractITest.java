@@ -69,7 +69,7 @@ public class UserTaskContractITest extends CommonAPITest {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("contract", "1.0");
         builder.addActor(ACTOR_NAME);
         builder.addUserTask(TASK1, ACTOR_NAME).addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
-                .addConstraint("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
+                .addMandatoryConstraint("numberOfDays");
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
@@ -87,9 +87,7 @@ public class UserTaskContractITest extends CommonAPITest {
 
         assertThat(contract.getConstraints()).hasSize(1);
         final ConstraintDefinition rule = contract.getConstraints().get(0);
-        assertThat(rule.getName()).isEqualTo("mandatory");
-        assertThat(rule.getExpression()).isEqualTo("numberOfDays != null");
-        assertThat(rule.getExplanation()).isEqualTo("numberOfDays must be set");
+        assertThat(rule.getName()).isEqualTo("numberOfDays");
         assertThat(rule.getInputNames()).containsExactly("numberOfDays");
 
         //clean up
@@ -227,7 +225,11 @@ public class UserTaskContractITest extends CommonAPITest {
         userTaskDefinitionBuilder.addContract()
                 .addComplexInput("expenseReport", "expense report with several expense lines", true,
                         Arrays.asList(expenseType, expenseDate, expenseAmount, expenseProof),
-                        null);
+                        null)
+                .addMandatoryConstraint("expenseAmount")
+                .addMandatoryConstraint("expenseReport")
+                .addMandatoryConstraint("expenseDate");
+
         final List<Map<String, Object>> expenses = new ArrayList<Map<String, Object>>();
         userTaskDefinitionBuilder.addData("expenseData", expenses.getClass().getName(), null);
         userTaskDefinitionBuilder.addOperation(new OperationBuilder().createSetDataOperation("expenseData",
@@ -326,7 +328,7 @@ public class UserTaskContractITest extends CommonAPITest {
         builder.addActor(ACTOR_NAME);
         final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask(TASK1, ACTOR_NAME);
         userTaskBuilder.addContract().addSimpleInput("numberOfDays", Type.INTEGER, null)
-                .addConstraint("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
+                .addMandatoryConstraint("numberOfDays");
         userTaskBuilder.addData("result", BigDecimal.class.getName(), null);
         userTaskBuilder.addOperation(new OperationBuilder().createSetDataOperation("result",
                 new ExpressionBuilder().createContractInputExpression("numberOfDays", Long.class.getName())));

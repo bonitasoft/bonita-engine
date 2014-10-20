@@ -44,7 +44,7 @@ public class SConstraintDefinitionImpl extends SNamedElementImpl implements SCon
     }
 
     public SConstraintDefinitionImpl(final ConstraintDefinition rule) {
-        this(rule.getName(), rule.getExpression(), rule.getExplanation(), SConstraintType.CUSTOM);
+        this(rule.getName(), rule.getExpression(), rule.getExplanation(), SConstraintType.valueOf(rule.getConstraintType().toString()));
         for (final String inputName : rule.getInputNames()) {
             inputNames.add(inputName);
         }

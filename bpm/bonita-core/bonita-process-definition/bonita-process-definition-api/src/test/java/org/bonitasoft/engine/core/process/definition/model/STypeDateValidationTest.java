@@ -20,30 +20,30 @@ import java.util.Date;
 import org.junit.Test;
 
 public class STypeDateValidationTest {
-    
+
     @Test
     public void date_are_valid() throws Exception {
-        
-        boolean validation = SType.DATE.validate(new Date());
-        
+
+        final boolean validation = SType.DATE.validate(new Date());
+
         assertThat(validation).isTrue();
     }
-    
+
     @Test
     public void null_is_valid() throws Exception {
-        
-        boolean validation = SType.DATE.validate(null);
-        
+
+        final boolean validation = SType.DATE.validate(null);
+
         assertThat(validation).isTrue();
     }
-    
+
     @Test
     public void other_type_are_not_valid() throws Exception {
-        
-        boolean stringValidation = SType.DATE.validate("2014/08/09");
+
+        final boolean stringValidation = SType.DATE.validate("2014/08/09");
         assertThat(stringValidation).isFalse();
-        
-        boolean longValidation = SType.DATE.validate(1410862853708L);
+
+        final boolean longValidation = SType.DATE.validate(1410862853708L);
         assertThat(longValidation).isFalse();
     }
 }

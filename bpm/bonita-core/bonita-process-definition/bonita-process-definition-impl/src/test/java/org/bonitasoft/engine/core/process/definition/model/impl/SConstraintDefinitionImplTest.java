@@ -13,36 +13,14 @@ public class SConstraintDefinitionImplTest {
 
     @Test
     public void should_retrieve_constraint_type() throws Exception {
-        //given
-        final SConstraintDefinition sConstraintDefinition = new SConstraintDefinitionImpl("name", "expression", "explanation", SConstraintType.CUSTOM);
-
-        //then
-        assertThat(sConstraintDefinition.getConstraintType()).isEqualTo(SConstraintType.CUSTOM);
-        assertThat(sConstraintDefinition.getName()).isEqualTo("name");
-        assertThat(sConstraintDefinition.getExpression()).isEqualTo("expression");
-        assertThat(sConstraintDefinition.getExplanation()).isEqualTo("explanation");
-
-        assertThat(sConstraintDefinition.getInputNames()).isNotNull().isEmpty();
-
+        check_retrieve_constraint_type(SConstraintType.CUSTOM);
+        check_retrieve_constraint_type(SConstraintType.MANDATORY);
     }
 
     @Test
     public void constructor_with_constraint_definition() throws Exception {
-        //given
-        final ConstraintDefinition constraintDefinition = new ConstraintDefinitionImpl("name", "expression", "explanation", ConstraintType.CUSTOM);
-        constraintDefinition.getInputNames().add("inputName");
-
-        //when
-        final SConstraintDefinition sConstraintDefinition = new SConstraintDefinitionImpl(constraintDefinition);
-
-        //then
-        assertThat(sConstraintDefinition.getConstraintType()).isEqualTo(SConstraintType.CUSTOM);
-        assertThat(sConstraintDefinition.getName()).isEqualTo("name");
-        assertThat(sConstraintDefinition.getExpression()).isEqualTo("expression");
-        assertThat(sConstraintDefinition.getExplanation()).isEqualTo("explanation");
-
-        assertThat(sConstraintDefinition.getInputNames()).isNotNull().hasSize(1).containsExactly("inputName");
-
+        check_constructor_from_constraintDefinition(ConstraintType.CUSTOM);
+        check_constructor_from_constraintDefinition(ConstraintType.MANDATORY);
     }
 
     @Test
@@ -56,5 +34,36 @@ public class SConstraintDefinitionImplTest {
         //then
         assertThat(sConstraintDefinition.getInputNames()).isNotNull().hasSize(1).containsExactly("inputName");
 
+    }
+
+    private void check_retrieve_constraint_type(final SConstraintType constraintType) {
+        //given
+        final SConstraintDefinition sConstraintDefinition = new SConstraintDefinitionImpl("name", "expression", "explanation", constraintType);
+
+        //then
+        assertThat(sConstraintDefinition.getConstraintType()).isEqualTo(constraintType);
+        assertThat(sConstraintDefinition.getName()).isEqualTo("name");
+        assertThat(sConstraintDefinition.getExpression()).isEqualTo("expression");
+        assertThat(sConstraintDefinition.getExplanation()).isEqualTo("explanation");
+
+        assertThat(sConstraintDefinition.getInputNames()).isNotNull().isEmpty();
+
+    }
+
+    private void check_constructor_from_constraintDefinition(final ConstraintType constraintType) {
+        //given
+        final ConstraintDefinition constraintDefinition = new ConstraintDefinitionImpl("name", "expression", "explanation", constraintType);
+        constraintDefinition.getInputNames().add("inputName");
+
+        //when
+        final SConstraintDefinition sConstraintDefinition = new SConstraintDefinitionImpl(constraintDefinition);
+
+        //then
+        assertThat(sConstraintDefinition.getConstraintType().toString()).as("should retrieve constraint type").isEqualTo(constraintType.toString());
+        assertThat(sConstraintDefinition.getName()).isEqualTo("name");
+        assertThat(sConstraintDefinition.getExpression()).isEqualTo("expression");
+        assertThat(sConstraintDefinition.getExplanation()).isEqualTo("explanation");
+
+        assertThat(sConstraintDefinition.getInputNames()).isNotNull().hasSize(1).containsExactly("inputName");
     }
 }
