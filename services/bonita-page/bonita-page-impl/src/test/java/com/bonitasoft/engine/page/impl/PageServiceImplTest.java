@@ -344,8 +344,10 @@ public class PageServiceImplTest {
                 CONTENT_NAME);
         page.setId(12);
         @SuppressWarnings("unchecked")
-        final byte[] content = IOUtil.zip(pair("Index.groovy", "content of the groovy".getBytes()),
-                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\naCustomProperty=plop\n".getBytes()));
+        final byte[] content = IOUtil.zip(
+                pair("Index.groovy", "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES,
+                        "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\naCustomProperty=plop\n".getBytes()));
         doReturn(new SPageContentBuilderFactoryImpl().createNewInstance(content).done()).when(readPersistenceService).selectById(
                 new SelectByIdDescriptor<SPageContent>("getPageContent",
                         SPageContent.class, 12));
@@ -362,6 +364,14 @@ public class PageServiceImplTest {
         assertThat(pageProperties.get("displayName")).isEqualTo("mypageUpdated display name");
         assertThat(pageProperties.get("description")).isEqualTo("mypageUpdated description");
         assertThat(pageProperties.get("aCustomProperty")).isEqualTo("plop");
+    }
+
+    @Test(expected = SObjectNotFoundException.class)
+    public void should_getPageContent_throw_not_found() throws SBonitaException, IOException {
+        //given
+        doReturn(null).when(readPersistenceService).selectById(new SelectByIdDescriptor<SPageContent>("getPageContent", SPageContent.class, 12));
+        //when
+        pageServiceImpl.getPageContent(12);
     }
 
     @Test

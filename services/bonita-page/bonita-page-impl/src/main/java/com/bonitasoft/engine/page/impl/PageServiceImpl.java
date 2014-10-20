@@ -298,16 +298,14 @@ public class PageServiceImpl implements PageService {
         if (!active) {
             return null;
         }
-        final SPage page = persistenceService.selectOne(new SelectOneDescriptor<SPage>(QUERY_GET_PAGE_BY_NAME, Collections.singletonMap("pageName",
+        return persistenceService.selectOne(new SelectOneDescriptor<SPage>(QUERY_GET_PAGE_BY_NAME, Collections.singletonMap("pageName",
                 (Object) pageName), SPage.class));
-        return page;
     }
 
     @Override
     public long getNumberOfPages(final QueryOptions options) throws SBonitaReadException {
         check();
-        final long number = persistenceService.getNumberOfEntities(SPage.class, options, null);
-        return number;
+        return persistenceService.getNumberOfEntities(SPage.class, options, null);
     }
 
     @Override
