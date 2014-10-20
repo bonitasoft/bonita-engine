@@ -35,7 +35,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -160,7 +160,7 @@ public class ReportingServiceImplTest {
         assertEquals(expectedReportNumber, numberOfReports);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfReportsThrowsException() throws SBonitaException {
         final QueryOptions options = mock(QueryOptions.class);
         when(persistence.getNumberOfEntities(SReport.class, options, null)).thenThrow(new SBonitaReadException("ouch!"));
@@ -181,7 +181,7 @@ public class ReportingServiceImplTest {
         assertEquals(expected, reports);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchReportsThrowsException() throws SBonitaException {
         final QueryOptions options = mock(QueryOptions.class);
         when(persistence.searchEntity(SReport.class, options, null)).thenThrow(new SBonitaReadException("ouch!"));
