@@ -190,7 +190,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             }
 
             if (!sFlowNodeInstance.isStateExecuting()) {
-                if (state.isTerminal()) {
+                if (state != null && state.isTerminal()) {
                     try {
                         // we notify in a work: transitions and so on will be executed
                         workService.registerWork(WorkFactory.createNotifyChildFinishedWork(processDefinitionId, sFlowNodeInstance.getParentProcessInstanceId(),
@@ -199,7 +199,7 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
                     } catch (final SWorkRegisterException e) {
                         throw new SFlowNodeExecutionException(e);
                     }
-                } else if (!state.isStable() && !state.isInterrupting()) {
+                } else if (state != null && !state.isStable() && !state.isInterrupting()) {
                     try {
                         // reschedule this work but without the operations
                         workService.registerWork(WorkFactory.createExecuteFlowNodeWork(processDefinitionId, processInstanceId, flowNodeInstanceId, null, null));

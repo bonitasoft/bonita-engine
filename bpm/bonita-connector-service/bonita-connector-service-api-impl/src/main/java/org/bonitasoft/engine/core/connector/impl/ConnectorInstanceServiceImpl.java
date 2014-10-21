@@ -405,7 +405,7 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
             for (final SAConnectorInstance sConnectorInstance : connectorInstances) {
                 deleteArchivedConnectorInstance(sConnectorInstance);
             }
-        } while (connectorInstances != null && !connectorInstances.isEmpty());
+        } while (!connectorInstances.isEmpty());
 
     }
 

@@ -45,27 +45,25 @@ public abstract class AbstractUserFilter implements UserFilter {
     protected Object getInputParameter(final String paramName) throws IllegalStateException {
         if (inputParameters.containsKey(paramName)) {
             return inputParameters.get(paramName);
-        } else {
-            throw new IllegalStateException("Input parameter '" + paramName + "' is not set");
         }
+        throw new IllegalStateException("Input parameter '" + paramName + "' is not set");
     }
-    
+
     @SuppressWarnings("unchecked")
-    protected <T> T getOptinalInputParameter(String paramName) {
+    protected <T> T getOptinalInputParameter(final String paramName) {
         return (T) inputParameters.get(paramName);
     }
-    
+
     protected String getStringInputParameter(final String paramName) {
         return (String) getInputParameter(paramName);
     }
-    
-    protected void validateStringInputParameterIsNotNulOrEmpty(String paramName) throws ConnectorValidationException {
+
+    protected void validateStringInputParameterIsNotNulOrEmpty(final String paramName) throws ConnectorValidationException {
         final String paramValue = (String) getInputParameter(paramName);
         if (paramValue == null || "".equals(paramValue.trim())) {
             throw new ConnectorValidationException("The input parameter '" + paramName + "' cannot be null or empty");
         }
     }
-    
 
     /**
      * {@inheritDoc} Default implementation returns true

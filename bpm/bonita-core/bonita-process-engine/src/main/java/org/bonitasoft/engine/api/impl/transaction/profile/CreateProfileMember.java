@@ -71,16 +71,25 @@ public class CreateProfileMember implements TransactionContentWithResult<SProfil
         }
         switch (memberType) {
             case USER:
-                sProfileMember = profileService.addUserToProfile(profileId, userId, user.getUserName(), user.getLastName(), user.getUserName());
+                if (user != null) {
+                    sProfileMember = profileService.addUserToProfile(profileId, userId, user.getUserName(), user.getLastName(), user.getUserName());
+                }
                 break;
             case GROUP:
-                sProfileMember = profileService.addGroupToProfile(profileId, groupId, group.getName(), group.getParentPath());
+                if (group != null) {
+                    sProfileMember = profileService.addGroupToProfile(profileId, groupId, group.getName(), group.getParentPath());
+                }
                 break;
             case ROLE:
-                sProfileMember = profileService.addRoleToProfile(profileId, roleId, role.getName());
+                if (role != null) {
+                    sProfileMember = profileService.addRoleToProfile(profileId, roleId, role.getName());
+                }
                 break;
             default:
-                sProfileMember = profileService.addRoleAndGroupToProfile(profileId, roleId, groupId, role.getName(), group.getName(), group.getParentPath());
+                if (group != null && role != null) {
+                    sProfileMember = profileService
+                            .addRoleAndGroupToProfile(profileId, roleId, groupId, role.getName(), group.getName(), group.getParentPath());
+                }
                 break;
         }
     }

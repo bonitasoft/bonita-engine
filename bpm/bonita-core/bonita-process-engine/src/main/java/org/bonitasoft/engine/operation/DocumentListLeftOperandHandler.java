@@ -75,7 +75,7 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
         if (!(newValue instanceof List)) {
             throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
         }
-        for (final Object item : (List) newValue) {
+        for (final Object item : (List<?>) newValue) {
             if (!(item instanceof DocumentValue)) {
                 throw new SOperationExecutionException("Document operation only accepts an expression returning a list of DocumentValue");
             }
