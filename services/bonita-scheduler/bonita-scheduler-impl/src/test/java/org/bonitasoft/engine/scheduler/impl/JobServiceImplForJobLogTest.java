@@ -15,6 +15,7 @@ package org.bonitasoft.engine.scheduler.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
@@ -22,6 +23,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -141,11 +143,16 @@ public class JobServiceImplForJobLogTest {
         verify(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
     }
 
-    @Test(expected = SJobLogNotFoundException.class)
-    public final void deleteNotExistingJobLog_by_id() throws SBonitaReadException, SJobLogDeletionException, SJobLogNotFoundException, SJobLogReadException {
+    @Test
+    public final void deleteJobLog_by_id_should_do_nothing_when_job_log_doesnt_exist() throws SBonitaReadException, SJobLogDeletionException {
+        // Given
         when(readPersistenceService.selectById(Matchers.<SelectByIdDescriptor<SJobLog>> any())).thenReturn(null);
 
+        // When
         jobServiceImpl.deleteJobLog(1);
+
+        // Then
+        verify(jobServiceImpl, never()).deleteJobLog(any(SJobLog.class));
     }
 
     @Test(expected = SJobLogDeletionException.class)
@@ -247,18 +254,21 @@ public class JobServiceImplForJobLogTest {
         Assert.assertEquals(sJobLog, result);
     }
 
-    @Test(expected = SJobLogNotFoundException.class)
-    public void getJobLog_should_throw_exception_when_not_exist() throws SBonitaReadException, SJobLogNotFoundException, SJobLogReadException {
+    @Test
+    public void getJobLog_should_throw_exception_when_not_exist() throws SBonitaReadException {
         // Given
         final long jobLogId = 455;
         doReturn(null).when(readPersistenceService).selectById(SelectDescriptorBuilder.getElementById(SJobLog.class, "SJobLog", jobLogId));
 
         // When
-        jobServiceImpl.getJobLog(jobLogId);
+        final SJobLog jobLog = jobServiceImpl.getJobLog(jobLogId);
+
+        // Then
+        assertNull(jobLog);
     }
 
-    @Test(expected = SJobLogReadException.class)
-    public void getJobLog_should_throw_exception_when_persistenceService_failed() throws SBonitaReadException, SJobLogNotFoundException, SJobLogReadException {
+    @Test(expected = SBonitaReadException.class)
+    public void getJobLog_should_throw_exception_when_persistenceService_failed() throws SBonitaReadException {
         // Given
         final long jobLogId = 1;
         doThrow(new SBonitaReadException("")).when(readPersistenceService).selectById(

@@ -48,8 +48,6 @@ import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorDel
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorReadException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogDeletionException;
-import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogNotFoundException;
-import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogReadException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogUpdatingException;
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterDeletionException;
@@ -259,9 +257,11 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public void deleteJobLog(final long id) throws SJobLogNotFoundException, SJobLogReadException, SJobLogDeletionException {
+    public void deleteJobLog(final long id) throws SJobLogDeletionException, SBonitaReadException {
         final SJobLog sJobLog = getJobLog(id);
-        deleteJobLog(sJobLog);
+        if (sJobLog != null) {
+            deleteJobLog(sJobLog);
+        }
     }
 
     @Override
@@ -297,16 +297,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public SJobLog getJobLog(final long id) throws SJobLogNotFoundException, SJobLogReadException {
-        try {
-            final SJobLog sJobLog = readPersistenceService.selectById(SelectDescriptorBuilder.getElementById(SJobLog.class, "SJobLog", id));
-            if (sJobLog == null) {
-                throw new SJobLogNotFoundException(id);
-            }
-            return sJobLog;
-        } catch (final SBonitaReadException sbre) {
-            throw new SJobLogReadException(sbre);
-        }
+    public SJobLog getJobLog(final long id) throws SBonitaReadException {
+        return readPersistenceService.selectById(SelectDescriptorBuilder.getElementById(SJobLog.class, "SJobLog", id));
     }
 
     @Override

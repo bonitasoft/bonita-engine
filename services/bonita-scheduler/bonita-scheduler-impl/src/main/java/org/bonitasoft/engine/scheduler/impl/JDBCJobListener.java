@@ -33,7 +33,6 @@ import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
-import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNotFoundException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorReadException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogUpdatingException;
@@ -192,14 +191,13 @@ public class JDBCJobListener extends AbstractBonitaPlatormJobListener {
         jobService.updateJobLog(jobLog, descriptor);
     }
 
-    private void deleteJobIfNotScheduledAnyMore(final Long jobDescriptorId) throws SJobDescriptorNotFoundException, SJobDescriptorReadException,
-            SSchedulerException {
-        try {
-            final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
+    private void deleteJobIfNotScheduledAnyMore(final Long jobDescriptorId) throws SJobDescriptorReadException, SSchedulerException {
+        final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
+        if (jobDescriptor != null) {
             if (!schedulerService.isStillScheduled(jobDescriptor)) {
                 schedulerService.delete(jobDescriptor.getJobName());
             }
-        } catch (final SJobDescriptorNotFoundException e) {
+        } else {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 final StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append("jobDescriptor with id");

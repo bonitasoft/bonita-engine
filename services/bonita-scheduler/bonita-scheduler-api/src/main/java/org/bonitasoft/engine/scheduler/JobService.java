@@ -25,8 +25,6 @@ import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNot
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorReadException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogDeletionException;
-import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogNotFoundException;
-import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogReadException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogUpdatingException;
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobParameter.SJobParameterDeletionException;
@@ -235,12 +233,11 @@ public interface JobService {
      *
      * @param id
      *        Identifier of job log to delete
-     * @throws SJobLogReadException
-     * @throws SJobLogNotFoundException
+     * @throws SBonitaReadException
      * @throws SJobLogDeletionException
      * @since 6.1
      */
-    void deleteJobLog(long id) throws SJobLogNotFoundException, SJobLogReadException, SJobLogDeletionException;
+    void deleteJobLog(long id) throws SJobLogDeletionException, SBonitaReadException;
 
     /**
      * Delete the specified job log
@@ -258,11 +255,10 @@ public interface JobService {
      * @param id
      *        Identifier of job log
      * @return
-     * @throws SJobLogReadException
-     * @throws SJobLogNotFoundException
+     * @throws SBonitaReadException
      * @since 6.1
      */
-    SJobLog getJobLog(long id) throws SJobLogNotFoundException, SJobLogReadException;
+    SJobLog getJobLog(long id) throws SBonitaReadException;
 
     /**
      * Get total number of job logs
