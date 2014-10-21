@@ -314,8 +314,7 @@ public class StateBehaviors {
 
     private void mapUsingUserFilters(final SFlowNodeInstance flowNodeInstance, final SHumanTaskDefinition humanTaskDefinition, final String actorName,
             final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition) throws SClassLoaderException, SUserFilterExecutionException,
-            SActivityStateExecutionException, SActivityCreationException, SFlowNodeNotFoundException, SFlowNodeReadException, SActivityModificationException,
-            SCommentAddException, SUserNotFoundException {
+            SActivityStateExecutionException, SActivityCreationException, SFlowNodeNotFoundException, SFlowNodeReadException, SActivityModificationException {
         final ClassLoader processClassloader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
         final SExpressionContext expressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                 flowNodeInstance.getLogicalGroup(0));
@@ -965,10 +964,9 @@ public class StateBehaviors {
             if (value instanceof List) {
                 final List<?> loopDataInputCollection = (List<?>) value;
                 return loopDataInputCollection.size();
-            } else {
-                throw new SActivityStateExecutionException("The multi instance on activity " + flowNodeInstance.getName() + " of process "
-                        + processDefinition.getName() + " " + processDefinition.getVersion() + " have a loop data input which is not a java.util.List");
             }
+            throw new SActivityStateExecutionException("The multi instance on activity " + flowNodeInstance.getName() + " of process "
+                    + processDefinition.getName() + " " + processDefinition.getVersion() + " have a loop data input which is not a java.util.List");
         }
         return numberOfInstanceMax;
     }

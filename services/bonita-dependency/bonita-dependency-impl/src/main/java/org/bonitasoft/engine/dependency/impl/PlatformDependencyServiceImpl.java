@@ -405,7 +405,7 @@ public class PlatformDependencyServiceImpl implements DependencyService {
                 }
             }
             fromIndex = fromIndex + BATCH_SIZE;
-        } while (dependencyIds.size() == BATCH_SIZE);
+        } while (dependencyIds != null && dependencyIds.size() == BATCH_SIZE);
         return resources;
     }
 

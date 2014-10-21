@@ -5876,7 +5876,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public Document addDocument(final long processInstanceId, final String documentName, final String description, final DocumentValue documentValue)
-            throws ProcessInstanceNotFoundException, DocumentAttachmentException, AlreadyExistsException {
+            throws DocumentAttachmentException, AlreadyExistsException {
         return documentAPIImpl.addDocument(processInstanceId, documentName, description, documentValue);
     }
 
