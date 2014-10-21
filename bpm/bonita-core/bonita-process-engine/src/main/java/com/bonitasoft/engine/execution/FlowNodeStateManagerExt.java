@@ -52,18 +52,17 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
 
     private final BreakpointService breakpointService;
 
-    public FlowNodeStateManagerExt(final ProcessDefinitionService processDefinitionService, final ProcessInstanceService processInstanceService,
-            final ActivityInstanceService activityInstanceService, final ConnectorInstanceService connectorInstanceService,
-            final ClassLoaderService classLoaderService, final ExpressionResolverService expressionResolverService, final SchedulerService schedulerService,
-            final DataInstanceService dataInstanceService, final EventInstanceService eventInstanceService,
-            final OperationService operationService, final BPMInstancesCreator bpmInstancesCreator,
-            final ContainerRegistry containerRegistry, final ArchiveService archiveService, final TechnicalLoggerService logger,
-            final DocumentService documentService, final SCommentService commentService,
-            final BreakpointService breakpointService, final EventsHandler eventsHandler, final UserFilterService userFilterService,
-            final ActorMappingService actorMappingService, final WorkService workService, final TokenService tokenService,
-            final IdentityService identityService, final RefBusinessDataService refBusinessDataService) {
-        super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, expressionResolverService,
-                dataInstanceService, operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentService, commentService,
+    public FlowNodeStateManagerExt(ProcessDefinitionService processDefinitionService, ProcessInstanceService processInstanceService,
+            ActivityInstanceService activityInstanceService, ConnectorInstanceService connectorInstanceService, ClassLoaderService classLoaderService,
+            ExpressionResolverService expressionResolverService, SchedulerService schedulerService, DataInstanceService dataInstanceService,
+            EventInstanceService eventInstanceService, OperationService operationService, BPMInstancesCreator bpmInstancesCreator,
+            ContainerRegistry containerRegistry, ArchiveService archiveService, TechnicalLoggerService logger, DocumentService documentService,
+            SCommentService commentService, EventsHandler eventsHandler, UserFilterService userFilterService, ActorMappingService actorMappingService,
+            WorkService workService, TokenService tokenService, IdentityService identityService, BreakpointService breakpointService,
+            final RefBusinessDataService refBusinessDataService) {
+        super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService,
+                expressionResolverService, dataInstanceService, operationService, bpmInstancesCreator,
+                containerRegistry, archiveService, logger, documentService, commentService,
                 new StateBehaviorsExt(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService,
                         connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService,
                         containerRegistry, eventInstanceService, schedulerService, commentService, identityService, logger, tokenService,
