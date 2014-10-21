@@ -17,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -49,8 +48,6 @@ import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogDeletionException;
-import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogNotFoundException;
-import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogReadException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogUpdatingException;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
 import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
@@ -241,7 +238,7 @@ public class JobServiceImplForJobLogTest {
     }
 
     @Test
-    public void getJobLog() throws SBonitaReadException, SJobLogNotFoundException, SJobLogReadException {
+    public void getJobLog() throws SBonitaReadException {
         // Given
         final long jobLogId = 1;
         final SJobLog sJobLog = mock(SJobLog.class);
@@ -330,7 +327,6 @@ public class JobServiceImplForJobLogTest {
 
         // Then
         assertEquals(sJobLog, result);
-        verify(readPersistenceService).searchEntity(any(Class.class), any(QueryOptions.class), anyMap());
     }
 
     @Test(expected = SBonitaReadException.class)

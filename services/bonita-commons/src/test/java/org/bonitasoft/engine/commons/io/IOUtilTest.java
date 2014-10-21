@@ -21,12 +21,12 @@ import org.w3c.dom.Document;
 public class IOUtilTest {
 
     @Test
-    public void testGetClassNameList() throws Exception {
+    public void getClassNameList() throws Exception {
         // given:
-        byte[] jarContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("bdr-jar.bak").getFile()));
+        final byte[] jarContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("bdr-jar.bak").getFile()));
 
         // when:
-        List<String> classNameList = IOUtil.getClassNameList(jarContent);
+        final List<String> classNameList = IOUtil.getClassNameList(jarContent);
 
         // then:
         assertThat(classNameList).containsOnly("org.bonita.pojo.Employee");
@@ -34,7 +34,7 @@ public class IOUtilTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldToByteArray_ThrowIlllegalArgumentException_ForNullDocument() throws Exception {
-        Document document = null;
+        final Document document = null;
         IOUtil.toByteArray(document);
     }
 
@@ -42,7 +42,7 @@ public class IOUtilTest {
     public void shouldToByteArray_ForDocumentReturnAByteArray() throws Exception {
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setValidating(false);
-        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 
         InputStream is = null;
         Document document = null;
@@ -50,28 +50,30 @@ public class IOUtilTest {
             is = IOUtilTest.class.getResourceAsStream("persistence.xml");
             document = documentBuilder.parse(is);
         } finally {
-            is.close();
+            if (is != null) {
+                is.close();
+            }
         }
-        byte[] byteArray = IOUtil.toByteArray(document);
+        final byte[] byteArray = IOUtil.toByteArray(document);
         assertThat(byteArray).isNotNull();
     }
 
     @Test
     public void shouldAddJarEntry_AddAnEntryInExistingJar() throws Exception {
-        byte[] jarContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("bdr-jar.bak").getFile()));
-        byte[] entryContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("persistence.xml").getFile()));
-        String entryName = "META-INF/myNewEntry.xml";
-        byte[] updatedJar = IOUtil.addJarEntry(jarContent, entryName, entryContent);
+        final byte[] jarContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("bdr-jar.bak").getFile()));
+        final byte[] entryContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("persistence.xml").getFile()));
+        final String entryName = "META-INF/myNewEntry.xml";
+        final byte[] updatedJar = IOUtil.addJarEntry(jarContent, entryName, entryContent);
         assertThat(updatedJar).isNotNull();
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(updatedJar);
-        JarInputStream jis = new JarInputStream(bais);
+        final ByteArrayInputStream bais = new ByteArrayInputStream(updatedJar);
+        final JarInputStream jis = new JarInputStream(bais);
         JarEntry entry = null;
-        Map<String, byte[]> entryNames = new HashMap<String, byte[]>();
-        byte[] buffer = new byte[4096];
+        final Map<String, byte[]> entryNames = new HashMap<String, byte[]>();
+        final byte[] buffer = new byte[4096];
         while ((entry = jis.getNextJarEntry()) != null) {
             if (!entry.isDirectory()) {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 int len;
                 while ((len = jis.read(buffer)) > 0) {
                     baos.write(buffer, 0, len);
@@ -87,9 +89,9 @@ public class IOUtilTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldAddJarEntry_ThrowIllegalArgumentExceptionIfEntryAlreadyExists() throws Exception {
-        byte[] jarContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("bdr-jar.bak").getFile()));
-        byte[] entryContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("persistence.xml").getFile()));
-        String entryName = "META-INF/persistence.xml";
+        final byte[] jarContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("bdr-jar.bak").getFile()));
+        final byte[] entryContent = IOUtil.getAllContentFrom(new File(IOUtilTest.class.getResource("persistence.xml").getFile()));
+        final String entryName = "META-INF/persistence.xml";
         IOUtil.addJarEntry(jarContent, entryName, entryContent);
     }
 }

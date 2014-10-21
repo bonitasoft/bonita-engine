@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -238,7 +238,8 @@ public class JobServiceImplForJobDescriptorTest {
     @Test(expected = SJobDescriptorDeletionException.class)
     public void deleteAllJobDescriptors_should_throw_exception_when_searchEntity_failed() throws Exception {
         //Given
-        when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class), anyMap())).thenThrow(new SBonitaReadException("error"));
+        when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class), anyMapOf(String.class, Object.class))).thenThrow(
+                new SBonitaReadException("error"));
 
         //When
         jobServiceImpl.deleteAllJobDescriptors();
@@ -250,7 +251,8 @@ public class JobServiceImplForJobDescriptorTest {
         final SJobDescriptor sJobDescriptor = mock(SJobDescriptor.class);
         doReturn(3L).when(sJobDescriptor).getId();
         final List<SJobDescriptor> descriptors = asList(sJobDescriptor, sJobDescriptor);
-        when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class), anyMap())).thenReturn(descriptors);
+        when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class), anyMapOf(String.class, Object.class))).thenReturn(
+                descriptors);
 
         //When
         jobServiceImpl.deleteAllJobDescriptors();

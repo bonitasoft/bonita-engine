@@ -43,6 +43,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -77,7 +78,7 @@ public class IdentityServiceImplForUserTest {
      */
     @Test
     public void getNumberOfUsers() throws Exception {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(1L);
+        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<Long>> any())).thenReturn(1L);
         Assert.assertEquals(1L, identityServiceImpl.getNumberOfUsers());
 
         verifyZeroInteractions(recorder);
@@ -85,7 +86,7 @@ public class IdentityServiceImplForUserTest {
 
     @Test(expected = SIdentityException.class)
     public void getNumberOfUsersThrowException() throws Exception {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SUser>> any())).thenThrow(new SBonitaReadException(""));
         identityServiceImpl.getNumberOfUsers();
     }
 

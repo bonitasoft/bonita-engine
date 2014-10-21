@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -69,7 +68,7 @@ public class JobServiceImplForFailedJobTest {
 
         // Then
         assertEquals(sFailedJob, result);
-        verify(readPersistenceService).selectList(any(SelectListDescriptor.class));
+        verify(readPersistenceService).selectList(Matchers.<SelectListDescriptor<SFailedJob>> any());
     }
 
     @Test(expected = SFailedJobReadException.class)
