@@ -234,13 +234,9 @@ public class JDBCJobListenerTest {
     }
 
     @Test
-    public void jobWasExecuted_should_deleteJobLogs_if_no_exception_and_has_previous_jobLog() throws Exception {
+    public void jobWasExecuted_should_deleteJobLogs_when_no_job_exception() throws Exception {
         // Given
-        final SJobLogImpl jobLog = mock(SJobLogImpl.class);
-        final List<SJobLog> jobLogs = Collections.singletonList((SJobLog) jobLog);
         final SJobDescriptor jobDesc = mock(SJobDescriptor.class);
-
-        doReturn(jobLogs).when(jobService).getJobLogs(JOB_DESCRIPTOR_ID, 0, 1);
         doReturn(jobDesc).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
         doReturn(true).when(schedulerService).isStillScheduled(jobDesc);
 
@@ -253,13 +249,10 @@ public class JDBCJobListenerTest {
     }
 
     @Test
-    public void jobWasExecuted_should_deleteJob_and_log_if_no_exception_and_Job_is_no_more_triggered_in_the_future() throws Exception {
+    public void jobWasExecuted_should_deleteJob_and_log_if_no_job_exception_and_job_is_no_more_triggered() throws Exception {
         // Given
-        final List<SJobLog> jobLogs = Collections.emptyList();
         final SJobDescriptor jobDesc = mock(SJobDescriptor.class);
         doReturn("myJob").when(jobDesc).getJobName();
-
-        doReturn(jobLogs).when(jobService).getJobLogs(JOB_DESCRIPTOR_ID, 0, 1);
         doReturn(jobDesc).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
         doReturn(false).when(schedulerService).isStillScheduled(jobDesc);
 
@@ -304,13 +297,10 @@ public class JDBCJobListenerTest {
     }
 
     @Test
-    public void jobWasExecuted_should_not_call_deleteJob_itself_if_no_exception_occurs_and_Job_is_still_triggered_in_the_future() throws Exception {
+    public void jobWasExecuted_should_not_call_deleteJob_if_no_job_exception_and_job_is_still_triggered() throws Exception {
         // Given
-        final List<SJobLog> jobLogs = Collections.emptyList();
         final SJobDescriptor jobDesc = mock(SJobDescriptor.class);
         doReturn("myJob").when(jobDesc).getJobName();
-
-        doReturn(jobLogs).when(jobService).getJobLogs(JOB_DESCRIPTOR_ID, 0, 1);
         doReturn(jobDesc).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
         doReturn(true).when(schedulerService).isStillScheduled(jobDesc);
 
@@ -319,6 +309,35 @@ public class JDBCJobListenerTest {
 
         // Then
         verify(schedulerService, times(0)).delete("myJob");
+        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+    }
+
+    @Test
+    public void jobWasExecuted_should_log_if_can_log_when_job_descriptor_doesnt_exist() throws Exception {
+        // Given
+        doReturn(null).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
+
+        // When
+        jdbcJobListener.jobWasExecuted(context, null);
+
+        // Then
+        verify(schedulerService, never()).delete(anyString());
+        verify(logger).log(any(Class.class), eq(TechnicalLogSeverity.TRACE), anyString());
+        verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+    }
+
+    @Test
+    public void jobWasExecuted_should_do_nothing_if_cant_log_when_job_descriptor_doesnt_exist() throws Exception {
+        // Given
+        doReturn(null).when(jobService).getJobDescriptor(JOB_DESCRIPTOR_ID);
+        doReturn(false).when(logger).isLoggable(JDBCJobListener.class, TechnicalLogSeverity.TRACE);
+
+        // When
+        jdbcJobListener.jobWasExecuted(context, null);
+
+        // Then
+        verify(schedulerService, never()).delete(anyString());
+        verify(logger, never()).log(any(Class.class), eq(TechnicalLogSeverity.TRACE), anyString());
         verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
     }
 
