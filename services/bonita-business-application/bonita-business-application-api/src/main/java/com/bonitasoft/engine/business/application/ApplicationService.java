@@ -16,8 +16,12 @@ import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+
+import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplicationMenu;
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
 
 
 /**
@@ -30,19 +34,24 @@ public interface ApplicationService {
 
     String APPLICATION_PAGE = "APPLICATION_PAGE";
 
-    SApplication createApplication(SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException, SInvalidNameException;
+    String APPLICATION_MENU = "APPLICATION_MENU";
+
+    SApplication createApplication(SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException, SInvalidNameException,
+    SInvalidDisplayNameException;
 
     SApplication getApplication(long applicationId) throws SBonitaReadException, SObjectNotFoundException;
 
     void deleteApplication(long applicationId) throws SObjectModificationException, SObjectNotFoundException;
 
-    SApplication updateApplication(long applicationId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException;
+    SApplication updateApplication(long applicationId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException, SInvalidNameException,
+    SInvalidDisplayNameException, SBonitaReadException, SObjectAlreadyExistsException, SObjectNotFoundException;
 
     long getNumberOfApplications(QueryOptions options) throws SBonitaReadException;
 
-    List<SApplication> searchApplications(QueryOptions options) throws SBonitaSearchException;
+    List<SApplication> searchApplications(QueryOptions options) throws SBonitaReadException;
 
-    SApplicationPage createApplicationPage(SApplicationPage applicationPage) throws SObjectCreationException, SObjectAlreadyExistsException, SInvalidNameException;
+    SApplicationPage createApplicationPage(SApplicationPage applicationPage) throws SObjectCreationException, SObjectAlreadyExistsException,
+    SInvalidNameException, SInvalidDisplayNameException;
 
     SApplicationPage getApplicationPage(String applicationName, String applicationPageName) throws SBonitaReadException, SObjectNotFoundException;
 
@@ -54,5 +63,16 @@ public interface ApplicationService {
 
     long getNumberOfApplicationPages(final QueryOptions options) throws SBonitaReadException;
 
-    List<SApplicationPage> searchApplicationPages(final QueryOptions options) throws SBonitaSearchException;
+    List<SApplicationPage> searchApplicationPages(final QueryOptions options) throws SBonitaReadException;
+
+    SApplicationMenu createApplicationMenu(SApplicationMenu applicationMenu) throws SObjectCreationException;
+
+    SApplicationMenu getApplicationMenu(long applicationMenuId) throws SBonitaReadException, SObjectNotFoundException;
+
+    void deleteApplicationMenu(long applicationMenuId) throws SObjectModificationException, SObjectNotFoundException;
+
+    long getNumberOfApplicationMenus(QueryOptions options) throws SBonitaReadException;
+
+    List<SApplicationMenu> searchApplicationMenus(QueryOptions options) throws SBonitaReadException;
+
 }

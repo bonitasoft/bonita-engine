@@ -117,8 +117,13 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SAXMLObjectDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstanceVisibilityMapping" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" />
-				<entry key="com.bonitasoft.engine.business.application.SApplication" value="com.bonitasoft.engine.business.application.impl.SApplicationImpl" />
-                <entry key="com.bonitasoft.engine.business.application.SApplicationPage" value="com.bonitasoft.engine.business.application.impl.SApplicationPageImpl" />
+				<entry key="com.bonitasoft.engine.business.application.model.SApplication" value="com.bonitasoft.engine.business.application.model.impl.SApplicationImpl" />
+                <entry key="com.bonitasoft.engine.business.application.model.SApplicationPage" value="com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl" />
+                <entry key="com.bonitasoft.engine.business.application.model.SApplicationMenu" value="com.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl" />
+                <entry key="org.bonitasoft.engine.core.document.model.SDocumentMapping" value="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl" />
+                <entry key="org.bonitasoft.engine.core.document.model.SDocument" value="org.bonitasoft.engine.core.document.model.impl.SDocumentImpl" />
+                <entry key="org.bonitasoft.engine.core.document.model.SMappedDocument" value="org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl" />
+                <entry key="org.bonitasoft.engine.core.document.model.SLightDocument" value="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" />
 
 				<!-- bpm -->
 				<entry key="org.bonitasoft.engine.actor.mapping.model.SActor" value="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" />
@@ -174,7 +179,6 @@
 
 				<entry key="org.bonitasoft.engine.core.category.model.SCategory" value="org.bonitasoft.engine.core.category.model.impl.SCategoryImpl" />
 				<entry key="org.bonitasoft.engine.core.category.model.SProcessCategoryMapping" value="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" />
-				<entry key="org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping" value="org.bonitasoft.engine.core.process.document.mapping.model.impl.SDocumentMappingImpl" />
 				<entry key="org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor" value="org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl" />
 
 				<entry key="org.bonitasoft.engine.core.process.comment.model.SComment" value="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" />
@@ -182,7 +186,6 @@
 				<entry key="org.bonitasoft.engine.core.process.comment.model.SSystemComment" value="org.bonitasoft.engine.core.process.comment.model.impl.SSystemCommentImpl" />
 				<entry key="org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping" value="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" />
 				<entry key="org.bonitasoft.engine.core.process.comment.model.archive.SAComment" value="org.bonitasoft.engine.core.process.comment.model.archive.impl.SACommentImpl" />
-				<entry key="org.bonitasoft.engine.document.model.SDocumentContent" value="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SHiddenTaskInstance" value="org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SToken" value="org.bonitasoft.engine.core.process.instance.model.impl.STokenImpl" />
 				<!-- archived objects -->
@@ -204,7 +207,8 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAGatewayInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance" value="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAConnectorInstanceImpl" />
-				<entry key="org.bonitasoft.engine.core.process.document.mapping.model.archive.SADocumentMapping" value="org.bonitasoft.engine.core.process.document.mapping.model.archive.impl.SADocumentMappingImpl" />
+                <entry key="org.bonitasoft.engine.core.document.model.archive.SADocumentMapping" value="org.bonitasoft.engine.core.document.model.archive.impl.SADocumentMappingImpl" />
+                <entry key="org.bonitasoft.engine.core.document.model.archive.SAMappedDocument" value="org.bonitasoft.engine.core.document.model.archive.impl.SAMappedDocumentImpl" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="mappingExclusions">
@@ -304,8 +308,6 @@
 				<ref bean="hbm-bos-platform-command-model" />
 				<ref bean="hbm-bos-process-comment-model" />
 				<ref bean="hbm-bos-process-comment-model-arch" />
-				<ref bean="hbm-bos-process-document-mapping-model" />
-				<ref bean="hbm-bos-process-document-mapping-model-arch" />
 				<ref bean="hbm-bos-profile-model" />
 				<ref bean="hbm-bos-theme-model" />
 				<ref bean="hbm-bos-supervisor-mapping" />
@@ -325,14 +327,15 @@
 				<entry key="org.bonitasoft.engine.core.category.model.impl.SProcessCategoryMappingImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.core.process.comment.model.impl.SCommentImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.core.process.document.mapping.model.impl.SDocumentMappingImpl" value="read-write" />
+                <entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentImpl" value="read-write" />
+                <entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl" value="read-write" />
+                <entry key="org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl" value="read-write" />
-				<entry key="org.bonitasoft.engine.document.model.impl.SDocumentContentImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.identity.model.impl.SGroupImpl" value="read-write" />
 				<entry key="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl" value="read-write" />

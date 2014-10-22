@@ -30,7 +30,7 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -44,21 +44,33 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.SApplication;
-import com.bonitasoft.engine.business.application.SApplicationPage;
-import com.bonitasoft.engine.business.application.SApplicationUpdateBuilder;
+import com.bonitasoft.engine.business.application.SInvalidDisplayNameException;
 import com.bonitasoft.engine.business.application.SInvalidNameException;
+import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplicationMenu;
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilder;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationBuilderFactoryImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuBuilderFactoryImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationPageBuilderFactoryImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationUpdateBuilderFactoryImpl;
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationServiceImplTest {
+
+    private static final String DELETED_SUFFIX = "_DELETED";
+
+    private static final String CREATED_SUFFIX = "_CREATED";
 
     private static final int CREATED_BY = 10;
 
@@ -137,16 +149,24 @@ public class ApplicationServiceImplTest {
         //then exception
     }
 
-    @Test(expected = SObjectCreationException.class)
-    public void createApplication_should_throw_SObjectCreationException_when_displayname_is_null() throws Exception {
+    @Test(expected = SInvalidDisplayNameException.class)
+    public void createApplication_should_throw_SInvalidDisplayNameException_when_display_name_is_empty() throws Exception {
+        //when
+        applicationServiceActive.createApplication(buildApplication(APPLICATION_NAME, ""));
+
+        //then exception
+    }
+
+    @Test(expected = SInvalidDisplayNameException.class)
+    public void createApplication_should_throw_SInvalidDisplayNameException_when_displayname_is_null() throws Exception {
         //when
         applicationServiceActive.createApplication(buildApplication(APPLICATION_NAME, null));
 
         //then exception
     }
 
-    @Test(expected = SObjectCreationException.class)
-    public void createApplication_should_throw_SObjectCreationException_when_displayname_is_empty_after_trim() throws Exception {
+    @Test(expected = SInvalidDisplayNameException.class)
+    public void createApplication_should_throw_SInvalidDisplayNameException_when_displayname_is_empty_after_trim() throws Exception {
         //when
         applicationServiceActive.createApplication(buildApplication(APPLICATION_NAME, " "));
 
@@ -305,8 +325,8 @@ public class ApplicationServiceImplTest {
         assertThat(retrievedApplications).isEqualTo(applications);
     }
 
-    @Test(expected = SBonitaSearchException.class)
-    public void searchApplications_should_throw_SBonitaSearchException_when_persistenceSevice_throws_SBonitaReadException() throws Exception {
+    @Test(expected = SBonitaReadException.class)
+    public void searchApplications_should_throw_SBonitaReadException_when_persistenceSevice_throws_SBonitaReadException() throws Exception {
         //given
         final QueryOptions options = new QueryOptions(0, 10);
         given(applicationServiceActive.searchApplications(options)).willThrow(new SBonitaReadException(""));
@@ -463,9 +483,12 @@ public class ApplicationServiceImplTest {
         applicationServiceActive.deleteApplicationPage(applicationPageId);
 
         //then
-        final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_PAGE)
-                .setObject(applicationPage).done();
-        verify(recorder, times(1)).recordDelete(new DeleteRecord(applicationPage), event);
+        final ArgumentCaptor<SDeleteEvent> deleteEventCaptor = ArgumentCaptor.forClass(SDeleteEvent.class);
+        final ArgumentCaptor<DeleteRecord> deleteRecordCaptor = ArgumentCaptor.forClass(DeleteRecord.class);
+        verify(recorder, times(1)).recordDelete(deleteRecordCaptor.capture(), deleteEventCaptor.capture());
+        assertThat(deleteRecordCaptor.getValue().getEntity()).isEqualTo(applicationPage);
+        assertThat(deleteEventCaptor.getValue().getType()).isEqualTo(ApplicationService.APPLICATION_PAGE + DELETED_SUFFIX);
+        assertThat(deleteEventCaptor.getValue().getObject()).isEqualTo(applicationPage);
     }
 
     @Test(expected = SObjectNotFoundException.class)
@@ -508,7 +531,7 @@ public class ApplicationServiceImplTest {
     @Test
     public void updateApplicationPage_should_call_recorder_recordUpdate_and_return_updated_object() throws Exception {
         //given
-        final SApplicationUpdateBuilder updateBuilder = new SApplicationUpdateBuilderFactoryImpl().createNewInstance(new EntityUpdateDescriptor());
+        final SApplicationUpdateBuilder updateBuilder = new SApplicationUpdateBuilderFactoryImpl().createNewInstance();
         updateBuilder.updateHomePageId(150L);
         final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
 
@@ -528,7 +551,7 @@ public class ApplicationServiceImplTest {
         assertThat(updatedApplication).isEqualTo(application);
     }
 
-    @Test(expected = SObjectModificationException.class)
+    @Test(expected = SObjectNotFoundException.class)
     public void updateApplicationPage_should_throw_SObjectModificationException_when_recorder_throws_SRecorderException() throws Exception {
         //given
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
@@ -630,8 +653,8 @@ public class ApplicationServiceImplTest {
         assertThat(retrievedAppPages).isEqualTo(applicationPages);
     }
 
-    @Test(expected = SBonitaSearchException.class)
-    public void searchApplicationPages_should_throw_SBonitaSearchException_when_persistenceSevice_throws_SBonitaReadException() throws Exception {
+    @Test(expected = SBonitaReadException.class)
+    public void searchApplicationPages_should_throw_SBonitaReadException_when_persistenceSevice_throws_SBonitaReadException() throws Exception {
         //given
         final QueryOptions options = new QueryOptions(0, 10);
         given(applicationServiceActive.searchApplicationPages(options)).willThrow(new SBonitaReadException(""));
@@ -646,6 +669,197 @@ public class ApplicationServiceImplTest {
     public void searchApplicationPages_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
         //when
         applicationServiceDisabled.searchApplicationPages(new QueryOptions(0, 10));
+
+        //then exception
+    }
+
+    @Test
+    public void createApplicationMenu_should_call_recordInsert_and_return_created_object() throws Exception {
+        //given
+        final SApplicationMenu appMenu = buildApplicationMenu("main", 5, 1);
+        appMenu.setId(15);
+
+        //when
+        final SApplicationMenu createdAppMenu = applicationServiceActive.createApplicationMenu(appMenu);
+
+        //then
+        assertThat(createdAppMenu).isEqualTo(appMenu);
+
+        final ArgumentCaptor<SInsertEvent> insertEventCaptor = ArgumentCaptor.forClass(SInsertEvent.class);
+        final ArgumentCaptor<InsertRecord> insertRecordCaptor = ArgumentCaptor.forClass(InsertRecord.class);
+        verify(recorder, times(1)).recordInsert(insertRecordCaptor.capture(), insertEventCaptor.capture());
+        assertThat(insertRecordCaptor.getValue().getEntity()).isEqualTo(appMenu);
+        assertThat(insertEventCaptor.getValue().getObject()).isEqualTo(appMenu);
+        assertThat(insertEventCaptor.getValue().getType()).isEqualTo(ApplicationService.APPLICATION_MENU + CREATED_SUFFIX);
+    }
+
+    private SApplicationMenu buildApplicationMenu(final String displayName, final long applicationPageId, final int index) {
+        final SApplicationMenuBuilder builder = new SApplicationMenuBuilderFactoryImpl().createNewInstance(displayName, applicationPageId, index);
+        return builder.done();
+    }
+
+    @Test(expected = SObjectCreationException.class)
+    public void createApplication_should_throw_SObjectCreationExceptio_when_recorder_throws_Exception() throws Exception {
+        //given
+        doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
+
+        //when
+        applicationServiceActive.createApplicationMenu(buildApplicationMenu("main", 4, 1));
+
+        //then exception
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void createApplicationMenu_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+        //when
+        applicationServiceDisabled.createApplicationMenu(buildApplicationMenu("main", 5, 1));
+
+        //then exception
+    }
+
+    @Test
+    public void getApplicationMenu_by_id_should_return_result_of_persitence_service() throws Exception {
+        //given
+        final SApplicationMenu applicationMenu = buildApplicationMenu("main", 2, 1);
+        final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById",
+                SApplicationMenu.class, 3);
+        given(persistenceService.selectById(selectDescriptor)).willReturn(applicationMenu);
+
+        //when
+        final SApplicationMenu retrivedAppMenu = applicationServiceActive.getApplicationMenu(3);
+
+        //then
+        assertThat(retrivedAppMenu).isEqualTo(applicationMenu);
+    }
+
+    @Test(expected = SObjectNotFoundException.class)
+    public void getApplicationMenu_by_id_should_throw_SObjectNotFoundException_when_persitence_service_returns_null() throws Exception {
+        //given
+        final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById",
+                SApplicationMenu.class, 3);
+        given(persistenceService.selectById(selectDescriptor)).willReturn(null);
+
+        //when
+        applicationServiceActive.getApplicationMenu(3);
+
+        //then exception
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void getApplicationMenu_by_id_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+        //when
+        applicationServiceDisabled.getApplicationMenu(1);
+
+        //then exception
+    }
+
+    @Test
+    public void deleteApplicationMenu_should_delete_application_menu_identified_for_the_given_identifier() throws Exception {
+        //given
+        final SApplicationMenu applicationMenu = buildApplicationMenu("main", 2, 1);
+        final int applicationId = 3;
+        applicationMenu.setId(applicationId);
+        final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById",
+                SApplicationMenu.class, applicationId);
+        given(persistenceService.selectById(selectDescriptor)).willReturn(applicationMenu);
+
+        //when
+        applicationServiceActive.deleteApplicationMenu(applicationId);
+
+        //then
+        final ArgumentCaptor<SDeleteEvent> deleteEventCaptor = ArgumentCaptor.forClass(SDeleteEvent.class);
+        final ArgumentCaptor<DeleteRecord> deleteRecordCaptor = ArgumentCaptor.forClass(DeleteRecord.class);
+        verify(recorder, times(1)).recordDelete(deleteRecordCaptor.capture(), deleteEventCaptor.capture());
+        assertThat(deleteEventCaptor.getValue().getObject()).isEqualTo(applicationMenu);
+        assertThat(deleteEventCaptor.getValue().getType()).isEqualTo(ApplicationService.APPLICATION_MENU + DELETED_SUFFIX);
+        assertThat(deleteRecordCaptor.getValue().getEntity()).isEqualTo(applicationMenu);
+    }
+
+    @Test(expected = SObjectNotFoundException.class)
+    public void deleteApplicationMenu_should_throw_SObjectObjectNotFoundException_if_no_application_menu_is_found_with_the_given_id() throws Exception {
+        //given
+        given(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SApplicationMenu>> any())).willReturn(null);
+
+        //when
+        applicationServiceActive.deleteApplicationMenu(5);
+
+        //then exception
+    }
+
+    @Test(expected = SObjectModificationException.class)
+    public void deleteApplicationMenu_should_throw_SObjectObjectModificationException_recorder_throws_exception() throws Exception {
+        //given
+        final SApplicationMenu applicationMenu = buildApplicationMenu("main", 1, 1);
+        given(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SApplicationMenu>> any())).willReturn(applicationMenu);
+        doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
+
+        //when
+        applicationServiceActive.deleteApplicationMenu(5);
+
+        //then exception
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void deleteApplicationMenu_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+        //when
+        applicationServiceDisabled.deleteApplicationMenu(1);
+
+        //then exception
+    }
+
+    @Test
+    public void getNumberOfApplicationMenus_should_return_the_result_of_persistenc_service() throws Exception {
+        //given
+        final QueryOptions options = new QueryOptions(0, 10);
+        final long count = 7;
+        given(persistenceService.getNumberOfEntities(SApplicationMenu.class, options, null)).willReturn(count);
+
+        //when
+        final long numberOfMenus = applicationServiceActive.getNumberOfApplicationMenus(options);
+
+        //then
+        assertThat(numberOfMenus).isEqualTo(count);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void getNumberOfApplicationMenus_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+        //when
+        applicationServiceDisabled.getNumberOfApplicationMenus(new QueryOptions(0, 10));
+
+        //then exception
+    }
+
+    @Test
+    public void searchApplicationMenus_should_return_the_result_of_persistence_service() throws Exception {
+        //given
+        final QueryOptions options = new QueryOptions(0, 2);
+        final List<SApplicationMenu> applicationMenus = new ArrayList<SApplicationMenu>(1);
+        applicationMenus.add(mock(SApplicationMenu.class));
+        given(persistenceService.searchEntity(SApplicationMenu.class, options, null)).willReturn(applicationMenus);
+
+        //when
+        final List<SApplicationMenu> retrievedAppMenus = applicationServiceActive.searchApplicationMenus(options);
+
+        //then
+        assertThat(retrievedAppMenus).isEqualTo(applicationMenus);
+    }
+
+    @Test(expected = SBonitaReadException.class)
+    public void searchApplicationMenus_should_throw_SBontiaSearchException_when_persistence_service_throws_exception() throws Exception {
+        //given
+        final QueryOptions options = new QueryOptions(0, 2);
+        given(persistenceService.searchEntity(SApplicationMenu.class, options, null)).willThrow(new SBonitaReadException(""));
+
+        //when
+        applicationServiceActive.searchApplicationMenus(options);
+
+        //then exception
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void searchApplicationMenus_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
+        //when
+        applicationServiceDisabled.searchApplicationMenus(new QueryOptions(0, 10));
 
         //then exception
     }
