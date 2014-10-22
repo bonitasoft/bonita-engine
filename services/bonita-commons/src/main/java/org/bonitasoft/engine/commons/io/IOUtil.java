@@ -271,7 +271,7 @@ public class IOUtil {
      * Return the whole underlying stream content into a single String.
      * Warning: the whole content of stream will be kept in memory!! Use with
      * care!
-     * 
+     *
      * @param in
      *        the stream to read
      * @return the whole content of the stream in a single String.
@@ -310,7 +310,7 @@ public class IOUtil {
 
     /**
      * Read the contents from the given FileInputStream. Return the result as a String.
-     * 
+     *
      * @param inputStream
      *        the stream to read from
      * @return the content read from the inputStream, as a String
@@ -336,7 +336,7 @@ public class IOUtil {
 
     /**
      * Read the contents of the given file.
-     * 
+     *
      * @param file
      */
     public static String read(final File file) throws IOException {
@@ -351,7 +351,7 @@ public class IOUtil {
     /**
      * Equivalent to {@link #getAllContentFrom(InputStream) getAllContentFrom(new
      * FileInputStream(file))};
-     * 
+     *
      * @param file
      *        the file to read
      * @return the whole content of the file in a single String.
@@ -374,7 +374,7 @@ public class IOUtil {
      * Return the whole underlying stream content into a single String.
      * Warning: the whole content of stream will be kept in memory!! Use with
      * care!
-     * 
+     *
      * @param url
      *        the URL to read
      * @return the whole content of the stream in a single String.
@@ -726,7 +726,7 @@ public class IOUtil {
     }
 
     public static byte[] getPropertyAsString(final Properties prop) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
         prop.store(out, "");
         return out.toByteArray();
     }
