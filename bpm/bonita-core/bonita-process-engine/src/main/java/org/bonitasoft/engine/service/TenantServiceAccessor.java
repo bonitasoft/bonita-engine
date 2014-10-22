@@ -215,4 +215,6 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     TimeTracker getTimeTracker();
 
+    PermissionService getPermissionService();
+
 }

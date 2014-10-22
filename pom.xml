@@ -184,6 +184,11 @@
 				<artifactId>btm-tomcat55-lifecycle</artifactId>
 				<version>2.1.4</version>
 			</dependency>
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>1.8.6</version>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 
