@@ -46,7 +46,7 @@ public class SearchProcessInstanceDescriptor extends SearchEntityDescriptor {
         final SProcessInstanceBuilderFactory instanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         final SUserTaskInstanceBuilderFactory sUserTaskInstanceBuilder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
 
-        searchEntityKeys = new HashMap<String, FieldDescriptor>(11);
+        searchEntityKeys = new HashMap<String, FieldDescriptor>(12);
         searchEntityKeys.put(ProcessInstanceSearchDescriptor.NAME, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getNameKey()));
         searchEntityKeys.put(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID,
                 new FieldDescriptor(SProcessInstance.class, instanceBuilder.getProcessDefinitionIdKey()));

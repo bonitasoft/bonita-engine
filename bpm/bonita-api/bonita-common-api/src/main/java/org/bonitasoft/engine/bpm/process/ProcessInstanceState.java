@@ -18,7 +18,7 @@ import java.util.Map;
 
 public enum ProcessInstanceState {
 
-    INITIALIZING(0), STARTED(1), SUSPENDED(2), CANCELLED(3), ABORTED(4), COMPLETING(5), COMPLETED(6), ERROR(7), ABORTING(11);
+    INITIALIZING(0), STARTED(1), SUSPENDED(2), CANCELLED(3), ABORTED(4), COMPLETING(5), COMPLETED(6), ERROR(7), ABORTING(11); //, TO_MIGRATE(12)
 
     private static Map<Integer, ProcessInstanceState> map = new HashMap<Integer, ProcessInstanceState>(11);
 
@@ -40,7 +40,7 @@ public enum ProcessInstanceState {
     }
 
 	private static ProcessInstanceState fromIdToProcessInstanceState(final int id) {
-		for (ProcessInstanceState state : values()) {
+		for (final ProcessInstanceState state : values()) {
 			if (id == state.getId()) {
 				return state;
 			}
