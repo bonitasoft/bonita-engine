@@ -34,7 +34,7 @@ public class TimerEventTriggerInstanceImpl extends EventTriggerInstanceImpl impl
     public TimerEventTriggerInstanceImpl(final long id, final long eventInstanceId, final String eventInstanceName, final Date executionDate) {
         super(id, eventInstanceId);
         this.eventInstanceName = eventInstanceName;
-        this.setExecutionDate(executionDate);
+        setExecutionDate(executionDate);
     }
 
     @Override
@@ -55,31 +55,46 @@ public class TimerEventTriggerInstanceImpl extends EventTriggerInstanceImpl impl
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((eventInstanceName == null) ? 0 : eventInstanceName.hashCode());
-        result = prime * result + ((executionDate == null) ? 0 : executionDate.hashCode());
+        result = prime * result + (eventInstanceName == null ? 0 : eventInstanceName.hashCode());
+        result = prime * result + (executionDate == null ? 0 : executionDate.hashCode());
         return result;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
-        if (!super.equals(obj))
+        }
+        if (!super.equals(obj)) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
-        TimerEventTriggerInstanceImpl other = (TimerEventTriggerInstanceImpl) obj;
+        }
+        final TimerEventTriggerInstanceImpl other = (TimerEventTriggerInstanceImpl) obj;
         if (eventInstanceName == null) {
-            if (other.eventInstanceName != null)
+            if (other.eventInstanceName != null) {
                 return false;
-        } else if (!eventInstanceName.equals(other.eventInstanceName))
+            }
+        } else if (!eventInstanceName.equals(other.eventInstanceName)) {
             return false;
+        }
         if (executionDate == null) {
-            if (other.executionDate != null)
+            if (other.executionDate != null) {
                 return false;
-        } else if (!executionDate.equals(other.executionDate))
+            }
+        } else if (!executionDate.equals(other.executionDate)) {
             return false;
+        }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("TimerEventTriggerInstanceImpl [id=").append(getId()).append(", executionDate=").append(executionDate).append(", eventInstanceName=")
+                .append(eventInstanceName).append(", eventInstanceId=").append(getEventInstanceId()).append("]");
+        return builder.toString();
     }
 
 }
