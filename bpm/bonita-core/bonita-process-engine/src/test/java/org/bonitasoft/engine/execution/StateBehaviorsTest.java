@@ -69,7 +69,7 @@ public class StateBehaviorsTest {
     @InjectMocks
     private StateBehaviors behaviors;
 
-    long flownodeInstanceId = 3541L;
+    final long flownodeInstanceId = 3541L;
 
     private final static Map<Integer, String> phaseNames = new HashMap<Integer, String>(5);
     static {

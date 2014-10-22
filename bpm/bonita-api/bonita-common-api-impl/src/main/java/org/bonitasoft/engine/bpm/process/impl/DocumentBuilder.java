@@ -61,6 +61,18 @@ public class DocumentBuilder {
     }
 
     /**
+     * Sets the description of the document
+     * @param description the description of the document
+     * @return
+     */
+    public DocumentBuilder setDescription(final String description){
+        document.setDescription(description);
+        return this;
+    }
+
+
+
+    /**
      * Sets the document MIME type
      * @param documentContentMimeType document MIME type
      * @return

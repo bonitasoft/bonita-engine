@@ -20,7 +20,7 @@ import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchFlowNodeInstanceDescriptor;
@@ -43,12 +43,12 @@ public class SearchFlowNodeInstances extends AbstractSearchEntity<FlowNodeInstan
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return flowNodeInstanceService.getNumberOfFlowNodeInstances(SFlowNodeInstance.class, searchOptions);
     }
 
     @Override
-    public List<SFlowNodeInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SFlowNodeInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return flowNodeInstanceService.searchFlowNodeInstances(SFlowNodeInstance.class, searchOptions);
     }
 

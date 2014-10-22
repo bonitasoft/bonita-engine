@@ -31,6 +31,8 @@ public interface LeftOperand extends Serializable {
 
     String TYPE_DOCUMENT = "DOCUMENT";
 
+    String TYPE_DOCUMENT_LIST = "DOCUMENT_LIST";
+
     String TYPE_EXTERNAL_DATA = "EXTERNAL_DATA";
 
     String TYPE_TRANSIENT_DATA = "TRANSIENT_DATA";

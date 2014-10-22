@@ -46,7 +46,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.xml.XMLNode;
 import org.bonitasoft.engine.xml.XMLWriter;
@@ -212,7 +212,7 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
     }
 
     protected void addCustomUserInfoValues(final long userId, final ExportedUserBuilder clientUserbuilder, final Map<Long, String> userInfoDefinitionNames)
-            throws SBonitaSearchException {
+            throws SBonitaReadException {
         final List<SCustomUserInfoValue> userInfoValues = getAllCustomUserInfoForUser(userId);
         for (final SCustomUserInfoValue infoValue : userInfoValues) {
             final String definitionName = userInfoDefinitionNames.get(infoValue.getDefinitionId());
@@ -220,7 +220,7 @@ public class ExportOrganization implements TransactionContentWithResult<String> 
         }
     }
 
-    protected List<SCustomUserInfoValue> getAllCustomUserInfoForUser(final long userId) throws SBonitaSearchException {
+    protected List<SCustomUserInfoValue> getAllCustomUserInfoForUser(final long userId) throws SBonitaReadException {
         final List<SCustomUserInfoValue> allValues = new ArrayList<SCustomUserInfoValue>(5);
         int fromIndex = 0;
         List<SCustomUserInfoValue> currentPage;

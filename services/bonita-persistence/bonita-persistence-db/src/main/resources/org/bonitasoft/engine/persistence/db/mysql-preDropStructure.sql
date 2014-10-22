@@ -11,8 +11,9 @@ ALTER TABLE data_instance DROP FOREIGN KEY fk_data_instance_tenantId;
 ALTER TABLE data_mapping DROP FOREIGN KEY fk_data_mapping_tenantId;
 ALTER TABLE dependency DROP FOREIGN KEY fk_dependency_tenantId;
 ALTER TABLE dependencymapping DROP FOREIGN KEY fk_dependencymapping_tenantId;
-ALTER TABLE document_content DROP FOREIGN KEY fk_document_content_tenantId;
+ALTER TABLE document DROP FOREIGN KEY fk_document_tenantId;
 ALTER TABLE document_mapping DROP FOREIGN KEY fk_document_mapping_tenantId;
+ALTER TABLE document_mapping DROP FOREIGN KEY fk_docmap_docid;
 ALTER TABLE event_trigger_instance DROP FOREIGN KEY fk_event_trigger_instance_tenantId;
 ALTER TABLE external_identity_mapping DROP FOREIGN KEY fk_external_identity_mapping_tenantId;
 ALTER TABLE flownode_instance DROP FOREIGN KEY fk_flownode_instance_tenantId;
@@ -45,13 +46,18 @@ ALTER TABLE profilemember DROP FOREIGN KEY fk_profilemember_profileId;
 ALTER TABLE profileentry DROP FOREIGN KEY fk_profileentry_profileId;
 
 -- business application
-ALTER TABLE business_app DROP FOREIGN KEY  fk_app_tenantId;
+ALTER TABLE business_app_menu DROP FOREIGN KEY fk_app_menu_tenantId;
+ALTER TABLE business_app_menu DROP FOREIGN KEY fk_app_menu_pageId;
+ALTER TABLE business_app_menu DROP FOREIGN KEY fk_app_menu_parentId;
 ALTER TABLE business_app_page DROP FOREIGN KEY fk_app_page_tenantId;
 ALTER TABLE business_app_page DROP FOREIGN KEY fk_bus_app_id;
 ALTER TABLE business_app_page DROP FOREIGN KEY fk_page_id;
+ALTER TABLE business_app DROP FOREIGN KEY fk_app_profileId;
+ALTER TABLE business_app DROP FOREIGN KEY fk_app_tenantId;
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------
 ALTER TABLE arch_document_mapping DROP FOREIGN KEY fk_arch_document_mapping_tenantId;
+ALTER TABLE arch_document_mapping DROP FOREIGN KEY fk_archdocmap_docid;
 ALTER TABLE arch_flownode_instance DROP FOREIGN KEY fk_arch_flownode_instance_tenantId;
 ALTER TABLE arch_process_comment DROP FOREIGN KEY fk_arch_process_comment_tenantId;
 ALTER TABLE arch_process_instance DROP FOREIGN KEY fk_arch_process_instance_tenantId;
@@ -83,7 +89,7 @@ DROP INDEX fk_data_mapping_data_instanceId_idx on data_mapping;
 DROP INDEX fk_data_mapping_tenantId_idx on data_mapping;
 DROP INDEX fk_dependency_tenantId_idx on dependency;
 DROP INDEX fk_dependencymapping_tenantId_idx on dependencymapping;
-DROP INDEX fk_document_content_tenantId_idx on document_content;
+DROP INDEX fk_document_tenantId_idx on document;
 DROP INDEX fk_external_identity_mapping_user_Id_idx on external_identity_mapping;
 DROP INDEX fk_external_identity_mapping_roleId_idx on external_identity_mapping;
 DROP INDEX fk_external_identity_mapping_group_Id_idx on external_identity_mapping;

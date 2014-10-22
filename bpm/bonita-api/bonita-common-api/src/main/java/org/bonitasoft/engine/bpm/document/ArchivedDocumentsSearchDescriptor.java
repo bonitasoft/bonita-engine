@@ -26,6 +26,10 @@ public final class ArchivedDocumentsSearchDescriptor {
     
     public static final String DOCUMENT_NAME = "documentName";
 
+    public static final String DOCUMENT_DESCRIPTION  = "documentDescription";
+
+    public static final String DOCUMENT_VERSION = "version";
+
     public static final String DOCUMENT_AUTHOR = "documentAuthor";
 
     public static final String DOCUMENT_CREATIONDATE = "documentCreationDate";
@@ -39,5 +43,7 @@ public final class ArchivedDocumentsSearchDescriptor {
     public static final String CONTENT_STORAGE_ID = "contentStorageId";
 
     public static final String DOCUMENT_URL = "documentURL";
+
+    public static final String LIST_INDEX = "index";
 
 }

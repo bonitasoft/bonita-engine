@@ -44,7 +44,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -113,10 +113,10 @@ public interface EventInstanceService extends FlowNodeInstanceService {
      * @param processDefinitionId
      * @param searchOptions
      * @return
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @since 6.3
      */
-    List<SWaitingEvent> searchStartWaitingEvents(long processDefinitionId, QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SWaitingEvent> searchStartWaitingEvents(long processDefinitionId, QueryOptions queryOptions) throws SBonitaReadException;
 
     List<SMessageEventCouple> getMessageEventCouples(int fromIndex, int maxResults) throws SEventTriggerInstanceReadException;
 
@@ -128,13 +128,13 @@ public interface EventInstanceService extends FlowNodeInstanceService {
 
     void updateMessageInstance(SMessageInstance messageInstance, EntityUpdateDescriptor descriptor) throws SMessageModificationException;
 
-    <T extends SWaitingEvent> List<T> searchWaitingEvents(Class<T> entityClass, QueryOptions searchOptions) throws SBonitaSearchException;
+    <T extends SWaitingEvent> List<T> searchWaitingEvents(Class<T> entityClass, QueryOptions searchOptions) throws SBonitaReadException;
 
-    long getNumberOfWaitingEvents(Class<? extends SWaitingEvent> entityClass, QueryOptions countOptions) throws SBonitaSearchException;
+    long getNumberOfWaitingEvents(Class<? extends SWaitingEvent> entityClass, QueryOptions countOptions) throws SBonitaReadException;
 
-    <T extends SEventTriggerInstance> List<T> searchEventTriggerInstances(Class<T> entityClass, QueryOptions searchOptions) throws SBonitaSearchException;
+    <T extends SEventTriggerInstance> List<T> searchEventTriggerInstances(Class<T> entityClass, QueryOptions searchOptions) throws SBonitaReadException;
 
-    long getNumberOfEventTriggerInstances(Class<? extends SEventTriggerInstance> entityClass, QueryOptions countOptions) throws SBonitaSearchException;
+    long getNumberOfEventTriggerInstances(Class<? extends SEventTriggerInstance> entityClass, QueryOptions countOptions) throws SBonitaReadException;
 
     SWaitingEvent getWaitingEvent(Long waintingEventId) throws SWaitingEventNotFoundException, SWaitingEventReadException;
 

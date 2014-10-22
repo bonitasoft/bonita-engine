@@ -33,7 +33,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
@@ -146,21 +146,13 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public long getNumberOfJobDescriptors(final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            return readPersistenceService.getNumberOfEntities(SJobDescriptor.class, queryOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+    public long getNumberOfJobDescriptors(final QueryOptions queryOptions) throws SBonitaReadException {
+        return readPersistenceService.getNumberOfEntities(SJobDescriptor.class, queryOptions, null);
     }
 
     @Override
-    public List<SJobDescriptor> searchJobDescriptors(final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            return readPersistenceService.searchEntity(SJobDescriptor.class, queryOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+    public List<SJobDescriptor> searchJobDescriptors(final QueryOptions queryOptions) throws SBonitaReadException {
+        return readPersistenceService.searchEntity(SJobDescriptor.class, queryOptions, null);
     }
 
     @Override
@@ -252,12 +244,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<SJobParameter> searchJobParameters(final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            return readPersistenceService.searchEntity(SJobParameter.class, queryOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+    public List<SJobParameter> searchJobParameters(final QueryOptions queryOptions) throws SBonitaReadException {
+        return readPersistenceService.searchEntity(SJobParameter.class, queryOptions, null);
     }
 
     @Override
@@ -299,21 +287,13 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public long getNumberOfJobLogs(final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            return readPersistenceService.getNumberOfEntities(SJobLog.class, queryOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+    public long getNumberOfJobLogs(final QueryOptions queryOptions) throws SBonitaReadException {
+        return readPersistenceService.getNumberOfEntities(SJobLog.class, queryOptions, null);
     }
 
     @Override
-    public List<SJobLog> searchJobLogs(final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            return readPersistenceService.searchEntity(SJobLog.class, queryOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+    public List<SJobLog> searchJobLogs(final QueryOptions queryOptions) throws SBonitaReadException {
+        return readPersistenceService.searchEntity(SJobLog.class, queryOptions, null);
     }
 
     private void delete(final PersistentObject persistentObject, final String eventType) throws SRecorderException {
@@ -367,7 +347,7 @@ public class JobServiceImpl implements JobService {
                 final SJobDescriptor sJobDescriptor = jobDescriptors.get(0);
                 deleteJobDescriptor(sJobDescriptor);
             }
-        } catch (final SBonitaSearchException e) {
+        } catch (final SBonitaReadException e) {
             throw new SJobDescriptorDeletionException("Job " + jobName + " not found, can't delete corresponding job descriptor");
         }
     }
@@ -381,7 +361,7 @@ public class JobServiceImpl implements JobService {
             for (final SJobDescriptor sJobDescriptor : jobDescriptors) {
                 deleteJobDescriptor(sJobDescriptor);
             }
-        } catch (final SBonitaSearchException e) {
+        } catch (final SBonitaReadException e) {
             throw new SJobDescriptorDeletionException(e);
         }
     }
