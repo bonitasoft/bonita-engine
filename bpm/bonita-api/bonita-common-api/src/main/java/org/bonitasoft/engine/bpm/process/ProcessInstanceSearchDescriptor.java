@@ -28,20 +28,38 @@ public class ProcessInstanceSearchDescriptor {
 
     public static final String ID = "id";
 
+    /**
+     * Allows to filter process instances with at least one task assigned to a specific user.
+     */
     public static final String ASSIGNEE_ID = "assigneeId";
 
     public static final String STARTED_BY = "startedBy";
 
     public static final String STARTED_BY_SUBSTITUTE = "startedBySubstitute";
 
+    /**
+     * Allows to filter on the start date of the process instance.
+     */
     public static final String START_DATE = "startDate";
 
+    /**
+     * Allows to filter on the last update date of the process instance.
+     */
     public static final String LAST_UPDATE = "lastUpdate";
 
+    /**
+     * Allows to filter on the user supervisor of the process.
+     */
     public static final String USER_ID = "userId";
 
+    /**
+     * Allows to filter on the group supervisor of the process.
+     */
     public static final String GROUP_ID = "groupId";
 
+    /**
+     * Allows to filter on the role supervisor of the process.
+     */
     public static final String ROLE_ID = "roleId";
 
     public static final String STATE_ID = "stateId";
