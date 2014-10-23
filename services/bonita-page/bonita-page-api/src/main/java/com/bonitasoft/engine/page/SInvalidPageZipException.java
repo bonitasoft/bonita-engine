@@ -19,15 +19,15 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
  * @author Baptiste Mesta
  * 
  */
-public class SInvalidPageZipContentException extends SBonitaException {
+public abstract class SInvalidPageZipException extends SBonitaException {
 
     private static final long serialVersionUID = -7263291210428082852L;
 
-    public SInvalidPageZipContentException(final String message) {
+    public SInvalidPageZipException(final String message) {
         super(message);
     }
 
-    public SInvalidPageZipContentException(final String string, final IOException e) {
+    public SInvalidPageZipException(final String string, final IOException e) {
         super(string, e);
     }
 

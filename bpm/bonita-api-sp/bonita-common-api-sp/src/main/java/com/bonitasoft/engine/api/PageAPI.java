@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.api;
 
 import java.util.List;
+import java.util.Properties;
 
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -152,13 +153,13 @@ public interface PageAPI {
     void deletePages(final List<Long> pageIds) throws DeletionException;
 
     /**
-     * 
+     *
      * create a page using the given content
-     * 
+     *
      * the content must contain a page.properties file that contains informations on the page:
-     * 
+     *
      * name, displayName and description
-     * 
+     *
      * @param contentName
      *            name of the zip file containing the page
      * @param content
@@ -172,5 +173,18 @@ public interface PageAPI {
      */
     Page createPage(String contentName, byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
             InvalidPageZipContentException;
+
+    /**
+     *
+     * Read the content of the page zip file check it is consistent and return it's properties
+     *
+     * @param content
+     *            content of the zip file containing the page
+     * @return
+     *         the properties of the page
+     * @since 6.4.0
+     */
+    Properties getPageProperties(byte[] content, boolean checkIfItAlreadyExists) throws InvalidPageTokenException,
+            InvalidPageZipContentException, AlreadyExistsException;
 
 }
