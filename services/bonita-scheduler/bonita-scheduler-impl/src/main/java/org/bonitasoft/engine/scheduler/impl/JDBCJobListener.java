@@ -26,6 +26,7 @@ import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
 import org.bonitasoft.engine.scheduler.JobService;
@@ -87,39 +88,42 @@ public class JDBCJobListener extends AbstractBonitaPlatormJobListener {
     @Override
     public void jobToBeExecuted(final Map<String, Serializable> context) {
         final Long jobDescriptorId = (Long) context.get(JOB_DESCRIPTOR_ID);
-        if (jobDescriptorId == null) {
-            return;
-        } else if (jobDescriptorId == 0) {
-            return;
-        }
         final Long tenantId = (Long) context.get(TENANT_ID);
-        if (tenantId == null) {
-            return;
-        } else if (tenantId == 0) {
-            return;
+        if (isNotNullOrEmpty(jobDescriptorId) && isNotNullOrEmpty(tenantId)) {
+            jobToBeExecutedInSession(context, jobDescriptorId, tenantId);
         }
+        return;
+    }
 
+    private void jobToBeExecutedInSession(final Map<String, Serializable> context, final Long jobDescriptorId, final Long tenantId) {
         try {
             // Set the tenant id, because the jobService is a tenant service and need a session to use the tenant persistence service. But, a job listener runs not in a session.
             sessionAccessor.setTenantId(tenantId);
             final SJobDescriptor sJobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
             if (sJobDescriptor == null) {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
-                            "No job descriptor found with id '" + jobDescriptorId + "'. It was probably deleted during the scheduler executed it.");
-                }
-
-                final String jobName = (String) context.get(JOB_NAME);
-                schedulerExecutor.delete(jobName, String.valueOf(tenantId));
+                deleteJob(context, jobDescriptorId, tenantId);
             }
         } catch (final SBonitaException e) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
-                        "An exception occurs during the check of the existence of the job descriptor '" + jobDescriptorId + "'.", e);
-            }
+            logWarningWhenExceptionOccurs("check of the existence of the job descriptor '" + jobDescriptorId + "'.", e);
         } finally {
             cleanSession();
         }
+    }
+
+    private void logWarningWhenExceptionOccurs(final String message, final Exception e) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.WARNING, "An exception occurs during the " + message, e);
+        }
+    }
+
+    private void deleteJob(final Map<String, Serializable> context, final Long jobDescriptorId, final Long tenantId) throws SSchedulerException {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.WARNING)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.WARNING,
+                    "No job descriptor found with id '" + jobDescriptorId + "'. It was probably deleted during the scheduler executed it.");
+        }
+
+        final String jobName = (String) context.get(JOB_NAME);
+        schedulerExecutor.delete(jobName, String.valueOf(tenantId));
     }
 
     @Override
@@ -136,32 +140,44 @@ public class JDBCJobListener extends AbstractBonitaPlatormJobListener {
 
         final Long jobDescriptorId = (Long) context.get(JOB_DESCRIPTOR_ID);
         final Long tenantId = (Long) context.get(TENANT_ID);
-        if (jobDescriptorId != null && jobDescriptorId != 0 && tenantId != null && tenantId != 0) {
-            // Set the tenant id, because the jobService is a tenant service and need a session to use the tenant persistence service. But, a job listener runs not in a session.
-            sessionAccessor.setTenantId(tenantId);
-            try {
-                if (jobException != null) {
-                    final List<SJobLog> jobLogs = jobService.getJobLogs(jobDescriptorId, 0, 1);
-                    if (!jobLogs.isEmpty()) {
-                        updateJobLog(jobException, jobLogs);
-                    } else {
-                        createJobLog(jobException, jobDescriptorId);
-                    }
-                } else {
-                    jobService.deleteJobLogs(jobDescriptorId);
-                    deleteJobIfNotScheduledAnyMore(jobDescriptorId);
-                }
-            } catch (final SBonitaException sbe) {
-                final Incident incident = new Incident("An exception occurs during the job execution of the job descriptor " + jobDescriptorId, "",
-                        jobException,
-                        sbe);
-                incidentService.report(tenantId, incident);
-            } finally {
-                cleanSession();
-            }
-        } else if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-            logger.log(getClass(), TechnicalLogSeverity.WARNING, "An exception occurs during the job execution.", jobException);
+        if (isNotNullOrEmpty(jobDescriptorId) && isNotNullOrEmpty(tenantId)) {
+            jobWasExecutedInSession(jobException, jobDescriptorId, tenantId);
+        } else {
+            logWarningWhenExceptionOccurs("job execution.", jobException);
         }
+    }
+
+    private void jobWasExecutedInSession(final Exception jobException, final Long jobDescriptorId, final Long tenantId) {
+        // Set the tenant id, because the jobService is a tenant service and need a session to use the tenant persistence service. But, a job listener runs not in a session.
+        sessionAccessor.setTenantId(tenantId);
+        try {
+            if (jobException != null) {
+                setJobLog(jobException, jobDescriptorId);
+            } else {
+                jobService.deleteJobLogs(jobDescriptorId);
+                deleteJobIfNotScheduledAnyMore(jobDescriptorId);
+            }
+        } catch (final SBonitaException sbe) {
+            final Incident incident = new Incident("An exception occurs during the job execution of the job descriptor " + jobDescriptorId, "",
+                    jobException, sbe);
+            incidentService.report(tenantId, incident);
+        } finally {
+            cleanSession();
+        }
+    }
+
+    private void setJobLog(final Exception jobException, final Long jobDescriptorId) throws SBonitaReadException, SJobLogUpdatingException,
+            SJobLogCreationException {
+        final List<SJobLog> jobLogs = jobService.getJobLogs(jobDescriptorId, 0, 1);
+        if (!jobLogs.isEmpty()) {
+            updateJobLog(jobException, jobLogs);
+        } else {
+            createJobLog(jobException, jobDescriptorId);
+        }
+    }
+
+    private boolean isNotNullOrEmpty(final Long id) {
+        return id != null && id != 0;
     }
 
     private void cleanSession() {
@@ -193,18 +209,14 @@ public class JDBCJobListener extends AbstractBonitaPlatormJobListener {
 
     private void deleteJobIfNotScheduledAnyMore(final Long jobDescriptorId) throws SJobDescriptorReadException, SSchedulerException {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
-        if (jobDescriptor != null) {
-            if (!schedulerService.isStillScheduled(jobDescriptor)) {
-                schedulerService.delete(jobDescriptor.getJobName());
-            }
-        } else {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                final StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("jobDescriptor with id");
-                stringBuilder.append(jobDescriptorId);
-                stringBuilder.append(" already deleted, ignore it");
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, stringBuilder.toString());
-            }
+        if (jobDescriptor != null && !schedulerService.isStillScheduled(jobDescriptor)) {
+            schedulerService.delete(jobDescriptor.getJobName());
+        } else if (jobDescriptor == null && logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            final StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("jobDescriptor with id");
+            stringBuilder.append(jobDescriptorId);
+            stringBuilder.append(" already deleted, ignore it");
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, stringBuilder.toString());
         }
     }
 
