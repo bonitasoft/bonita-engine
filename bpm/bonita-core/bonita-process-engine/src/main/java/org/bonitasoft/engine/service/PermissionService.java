@@ -16,21 +16,22 @@
 package org.bonitasoft.engine.service;
 
 import org.bonitasoft.engine.api.permission.APICallContext;
+import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 
 /**
  * @author Baptiste Mesta
  */
-public interface PermissionService {
+public interface PermissionService extends TenantLifecycleService {
 
     /**
-     * execute the script in parameter using the given context
+     * execute the {@link org.bonitasoft.engine.api.permission.PermissionRule} having the class name in parameter using the given context
      * 
-     * @param scriptContent
-     *        the content of the script
+     * @param className
+     *        the class name of the rule to execute
      * @param context
      *        the context of the api call to check
      * @return true if the security script allows the user to make the api call
      */
-    boolean checkAPICallWithScript(String scriptContent, APICallContext context) throws SExecutionException;
+    boolean checkAPICallWithScript(String className, APICallContext context) throws SExecutionException, ClassNotFoundException;
 }

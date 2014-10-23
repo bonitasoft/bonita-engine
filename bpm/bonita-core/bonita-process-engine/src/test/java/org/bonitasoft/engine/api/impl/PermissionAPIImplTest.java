@@ -20,12 +20,9 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-
-import java.io.File;
 
 import org.bonitasoft.engine.api.permission.APICallContext;
+import org.bonitasoft.engine.commons.exceptions.SExecutionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.service.PermissionService;
@@ -44,60 +41,49 @@ public class PermissionAPIImplTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
     @Mock
-    private File scriptFile;
-    @Mock
     private TenantServiceAccessor tenantServiceAccessor;
     @Mock
     private PermissionService permissionService;
     private PermissionAPIImpl permissionAPI;
-    private APICallContext apiCallContext = new APICallContext("GET","identity","user","1","query","body");
+    private APICallContext apiCallContext = new APICallContext("GET", "identity", "user", "1", "query", "body");
 
     @Before
     public void before() throws Exception {
         permissionAPI = spy(new PermissionAPIImpl());
         doReturn(tenantServiceAccessor).when(permissionAPI).getTenantServiceAccessor();
-        doReturn(true).when(scriptFile).exists();
         doReturn(permissionService).when(tenantServiceAccessor).getPermissionService();
-        doReturn(scriptFile).when(permissionAPI).getScriptFile("myScript", tenantServiceAccessor);
-        doReturn("the script content").when(permissionAPI).readFile(scriptFile);
     }
 
     @Test
     public void should_executeSecurityScript_call_the_service() throws Exception {
         //given all ok
-        doReturn(true).when(permissionService).checkAPICallWithScript("the script content", apiCallContext);
+        doReturn(true).when(permissionService).checkAPICallWithScript("myScript", apiCallContext);
 
         //when
         boolean isAllowed = permissionAPI.checkAPICallWithScript("myScript", apiCallContext);
 
         //then
-        verify(permissionService).checkAPICallWithScript("the script content", apiCallContext);
         assertThat(isAllowed).isTrue();
     }
 
     @Test
-    public void should_executeSecurityScript_throw_execution_exception_when_file_does_not_exists() throws Exception {
+    public void should_executeSecurityScript_throw_not_found_exception_when_file_does_not_exists() throws Exception {
         //given
-        doReturn(false).when(scriptFile).exists();
+        doThrow(ClassNotFoundException.class).when(permissionService).checkAPICallWithScript("myScript", apiCallContext);
 
         expectedException.expect(NotFoundException.class);
-        expectedException.expectMessage(containsString("file is not found"));
+        expectedException.expectMessage(containsString("class is not found"));
         //when
         permissionAPI.checkAPICallWithScript("myScript", apiCallContext);
-
-        //then
-        verifyZeroInteractions(permissionService);
     }
+
     @Test
-    public void should_executeSecurityScript_throw_execution_exception_when_file_cannot_be_read() throws Exception {
+    public void should_executeSecurityScript_throw_execution_exception() throws Exception {
         //given
-        doThrow(ExecutionException.class).when(permissionAPI).readFile(scriptFile);
+        doThrow(SExecutionException.class).when(permissionService).checkAPICallWithScript("myScript", apiCallContext);
 
         expectedException.expect(ExecutionException.class);
         //when
         permissionAPI.checkAPICallWithScript("myScript", apiCallContext);
-
-        //then
     }
-
 }

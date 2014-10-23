@@ -15,15 +15,16 @@
 
 package org.bonitasoft.engine.api.permission;
 
-import org.bonitasoft.engine.session.APISession;
+import java.io.Serializable;
 
 /**
- *
  * Context of a call made on a REST API
  *
  * @author Baptiste Mesta
  */
-public class APICallContext {
+public class APICallContext implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /*
      * The http method
@@ -45,11 +46,30 @@ public class APICallContext {
      */
     private String resourceId;
 
-
+    /*
+     * query string of the api call
+     */
     private String queryString;
 
+    /*
+     * body of the api call
+     */
     private String body;
 
+    /**
+     * @param method
+     *        the HTTP method
+     * @param apiName
+     *        the name of the api
+     * @param resourceName
+     *        the name of the resource
+     * @param resourceId
+     *        the id (or multiple id) of the resource if specified
+     * @param queryString
+     *        the query string of the api context if specified
+     * @param body
+     *        the body string of the api context if specified
+     */
     public APICallContext(String method, String apiName, String resourceName, String resourceId, String queryString, String body) {
         this.method = method;
         this.apiName = apiName;
@@ -57,6 +77,12 @@ public class APICallContext {
         this.resourceId = resourceId;
         this.queryString = queryString;
         this.body = body;
+    }
+
+    /**
+     * empty constructor
+     */
+    public APICallContext() {
     }
 
     public String getMethod() {
@@ -109,17 +135,25 @@ public class APICallContext {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         APICallContext that = (APICallContext) o;
 
-        if (apiName != null ? !apiName.equals(that.apiName) : that.apiName != null) return false;
-        if (body != null ? !body.equals(that.body) : that.body != null) return false;
-        if (method != null ? !method.equals(that.method) : that.method != null) return false;
-        if (queryString != null ? !queryString.equals(that.queryString) : that.queryString != null) return false;
-        if (resourceId != null ? !resourceId.equals(that.resourceId) : that.resourceId != null) return false;
-        if (resourceName != null ? !resourceName.equals(that.resourceName) : that.resourceName != null) return false;
+        if (apiName != null ? !apiName.equals(that.apiName) : that.apiName != null)
+            return false;
+        if (body != null ? !body.equals(that.body) : that.body != null)
+            return false;
+        if (method != null ? !method.equals(that.method) : that.method != null)
+            return false;
+        if (queryString != null ? !queryString.equals(that.queryString) : that.queryString != null)
+            return false;
+        if (resourceId != null ? !resourceId.equals(that.resourceId) : that.resourceId != null)
+            return false;
+        if (resourceName != null ? !resourceName.equals(that.resourceName) : that.resourceName != null)
+            return false;
 
         return true;
     }

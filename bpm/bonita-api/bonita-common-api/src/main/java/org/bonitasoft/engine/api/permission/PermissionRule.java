@@ -20,13 +20,25 @@ import org.bonitasoft.engine.api.Logger;
 import org.bonitasoft.engine.session.APISession;
 
 /**
- *
  * Class to extend when implementing permission rule to be checked by {@link org.bonitasoft.engine.api.PermissionAPI}
  *
  * @author Baptiste Mesta
  */
 public interface PermissionRule {
 
-
+    /**
+     * Called by the engine when using {@link org.bonitasoft.engine.api.PermissionAPI#checkAPICallWithScript(String, APICallContext)}
+     *
+     * @param apiSession
+     *        the api session from the user doing the api call
+     * @param apiCallContext
+     *        the context of the api call
+     * @param apiAccessor
+     *        an accessor to call apis
+     * @param logger
+     *        a logger that use the engine logger
+     * @return
+     *         true if the user is allowed to access the api or false otherwise
+     */
     boolean check(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger);
 }

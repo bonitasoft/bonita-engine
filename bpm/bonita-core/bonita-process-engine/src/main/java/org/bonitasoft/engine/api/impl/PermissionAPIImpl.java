@@ -15,17 +15,11 @@
 
 package org.bonitasoft.engine.api.impl;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.commons.exceptions.SExecutionException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.service.PermissionService;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
@@ -35,45 +29,21 @@ import org.bonitasoft.engine.service.TenantServiceSingleton;
  */
 public class PermissionAPIImpl implements PermissionAPI {
 
-    public static final String SECURITY_SCRIPTS = "security-scripts";
-
     @Override
-    public boolean checkAPICallWithScript(String scriptName, APICallContext context) throws ExecutionException, NotFoundException {
+    public boolean checkAPICallWithScript(String className, APICallContext context) throws ExecutionException, NotFoundException {
         TenantServiceAccessor serviceAccessor = getTenantServiceAccessor();
         PermissionService permissionService = serviceAccessor.getPermissionService();
-        File file = getScriptFile(scriptName, serviceAccessor);
-        if (!file.exists()) {
-            throw new NotFoundException("Unable to execute the security script because the file is not found, path=" + file.getPath());
-        }
         try {
-            return permissionService.checkAPICallWithScript(readFile(file), context);
+            return permissionService.checkAPICallWithScript(className, context);
         } catch (SExecutionException e) {
-            throw new ExecutionException("Unable to execute the security script " + scriptName + " for the api call " + context, e);
+            throw new ExecutionException("Unable to execute the security rule " + className + " for the api call " + context, e);
+        } catch (ClassNotFoundException e) {
+            throw new NotFoundException("Unable to execute the security rule " + className + " for the api call " + context + "because the class is not found",
+                    e);
         }
     }
 
     TenantServiceAccessor getTenantServiceAccessor() {
         return TenantServiceSingleton.getInstance();
-    }
-
-    String readFile(File file) throws ExecutionException {
-        String scriptContent;
-        try {
-            scriptContent = FileUtils.readFileToString(file);
-        } catch (IOException e) {
-            throw new ExecutionException("Unable to execute the security script because the file is not readable, path=" + file.getPath(), e);
-        }
-        return scriptContent;
-    }
-
-    File getScriptFile(String scriptName, TenantServiceAccessor serviceAccessor) {
-        File file;
-        try {
-            file = new File(new File(BonitaHomeServer.getInstance().getTenantConfFolder(serviceAccessor.getTenantId()), SECURITY_SCRIPTS), scriptName
-                    + ".groovy");
-        } catch (BonitaHomeNotSetException e) {
-            throw new RuntimeException("Unable to execute the script", e);
-        }
-        return file;
     }
 }

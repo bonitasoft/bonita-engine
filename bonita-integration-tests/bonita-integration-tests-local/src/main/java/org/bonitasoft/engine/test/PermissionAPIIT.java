@@ -27,11 +27,15 @@ import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.api.permission.APICallContext;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.service.PermissionService;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -58,15 +62,13 @@ public class PermissionAPIIT extends CommonAPILocalTest {
     }
 
     @Test
-    @Ignore("NYI")
     public void execute_security_script_that_throw_exception() throws Exception {
         //given
-        writeScriptToBonitaHome("throw new java.lang.IllegalStateException()", "myScript");
+        writeScriptToBonitaHome(getContentOfResource("/RuleWithException"), "RuleWithException");
 
         exception.expect(ExecutionException.class);
-        exception.expectCause(CoreMatchers.any(IllegalStateException.class));
         //when
-        getPermissionAPI().checkAPICallWithScript("myScript", apiCallContext);
+        getPermissionAPI().checkAPICallWithScript("RuleWithException", apiCallContext);
 
         //then: ExecutionException
     }
@@ -75,7 +77,7 @@ public class PermissionAPIIT extends CommonAPILocalTest {
     public void execute_security_script_with_dependencies() throws Exception {
 
         //given
-        writeScriptToBonitaHome(getContentOfResource("/MyRule.groovy"), "MyRule");
+        writeScriptToBonitaHome(getContentOfResource("/MyRule"), "MyRule");
         User john = createUser("john", "bpm");
         User jack = createUser("jack", "bpm");
 
@@ -109,10 +111,15 @@ public class PermissionAPIIT extends CommonAPILocalTest {
         //then: ExecutionException
     }
 
-    private void writeScriptToBonitaHome(String script, String scriptName) throws IOException {
+    private void writeScriptToBonitaHome(String script, String scriptName) throws IOException, SBonitaException {
         File file = new File(securityScriptsFolder, scriptName + ".groovy");
         file.createNewFile();
         IOUtil.writeFile(file, script);
         System.out.println("write to file " + file.getPath());
+        PermissionService permissionService = TenantServiceSingleton.getInstance().getPermissionService();
+        //restart the service to reload scritps
+        permissionService.stop();
+        permissionService.start();
+
     }
 }
