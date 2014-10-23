@@ -117,6 +117,13 @@ public class PermissionServiceImplTest {
     }
 
     @Test
+    public void should_pause_call_stop_tow_times() throws SBonitaException, ClassNotFoundException {
+        //when
+        permissionService.stop();
+        permissionService.stop();
+    }
+
+    @Test
     public void should_start_with_no_folder_log() throws SBonitaException, ClassNotFoundException, IOException {
         //given
         FileUtils.deleteDirectory(new File(scriptFolder));

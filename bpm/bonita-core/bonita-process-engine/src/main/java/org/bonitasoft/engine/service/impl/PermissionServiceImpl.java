@@ -100,8 +100,10 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public void stop() throws SBonitaException {
-        groovyClassLoader.clearCache();
-        groovyClassLoader = null;
+        if(groovyClassLoader != null){
+            groovyClassLoader.clearCache();
+            groovyClassLoader = null;
+        }
     }
 
     @Override
