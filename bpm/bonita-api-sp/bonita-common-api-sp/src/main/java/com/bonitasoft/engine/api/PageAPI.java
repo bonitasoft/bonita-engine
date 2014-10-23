@@ -16,6 +16,10 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.InvalidPageTokenException;
 import org.bonitasoft.engine.exception.InvalidPageZipContentException;
+import org.bonitasoft.engine.exception.InvalidPageZipInconsistentException;
+import org.bonitasoft.engine.exception.InvalidPageZipMissingAPropertyException;
+import org.bonitasoft.engine.exception.InvalidPageZipMissingIndexException;
+import org.bonitasoft.engine.exception.InvalidPageZipMissingPropertiesException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
@@ -185,6 +189,6 @@ public interface PageAPI {
      * @since 6.4.0
      */
     Properties getPageProperties(byte[] content, boolean checkIfItAlreadyExists) throws InvalidPageTokenException,
-            InvalidPageZipContentException, AlreadyExistsException;
+            AlreadyExistsException, InvalidPageZipMissingPropertiesException, InvalidPageZipMissingIndexException, InvalidPageZipInconsistentException, InvalidPageZipMissingAPropertyException;
 
 }
