@@ -3105,19 +3105,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     public List<ProcessDeploymentInfo> getStartableProcessDeploymentInfosForActors(final Set<Long> actorIds, final int startIndex, final int maxResults,
             final ProcessDeploymentInfoCriterion sortingCriterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final SProcessDefinitionDeployInfoBuilderFactory builder = BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class);
 
         try {
-            final List<SActor> actors = actorMappingService.getActors(new ArrayList<Long>(actorIds));
-            final HashSet<Long> processDefIds = new HashSet<Long>(actors.size());
-            for (final SActor sActor : actors) {
-                if (sActor.isInitiator()) {
-                    processDefIds.add(sActor.getScopeId());
-                }
-            }
+            final Set<Long> processDefIds = getIdOfStartableProcessDeploymentInfosForActors(actorIds);
 
             String field = null;
             OrderByType order = null;
@@ -3172,7 +3164,20 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
+    }
 
+    private Set<Long> getIdOfStartableProcessDeploymentInfosForActors(final Set<Long> actorIds) throws SActorNotFoundException, SBonitaReadException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
+
+        final List<SActor> actors = actorMappingService.getActors(new ArrayList<Long>(actorIds));
+        final Set<Long> processDefIds = new HashSet<Long>(actors.size());
+        for (final SActor sActor : actors) {
+            if (sActor.isInitiator()) {
+                processDefIds.add(sActor.getScopeId());
+            }
+        }
+        return processDefIds;
     }
 
     @Override
@@ -3756,10 +3761,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         try {
             final List<SAProcessInstance> saProcessInstances = processInstanceService.getArchivedProcessInstancesInAllStates(sourceProcessInstanceIds);
-            if (!saProcessInstances.isEmpty()) {
-                return processInstanceService.deleteParentArchivedProcessInstancesAndElements(saProcessInstances);
-            }
-            return 0;
+            return processInstanceService.deleteParentArchivedProcessInstancesAndElements(saProcessInstances);
         } catch (final SProcessInstanceHierarchicalDeletionException e) {
             throw new ProcessInstanceHierarchicalDeletionException(e.getMessage(), e.getProcessInstanceId());
         } catch (final SBonitaException e) {
