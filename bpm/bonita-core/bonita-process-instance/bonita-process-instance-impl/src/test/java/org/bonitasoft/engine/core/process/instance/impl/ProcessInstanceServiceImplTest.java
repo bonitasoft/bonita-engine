@@ -56,6 +56,9 @@ import org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEve
 import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SReceiveTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
@@ -487,6 +490,60 @@ public class ProcessInstanceServiceImplTest {
 
         // When
         processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
+
+        // Then
+        verify(activityInstanceService).deleteHiddenTasksForActivity(flowNodeInstance.getId());
+        verify(activityInstanceService).deletePendingMappings(flowNodeInstance.getId());
+    }
+
+    @Test
+    public void deleteFlowNodeInstanceElements_should_call_deleteHiddenTasksForActivity_and_deletePendingMappings_when_flownode_is_type_MANUAL_TASK()
+            throws Exception {
+        // Given
+        final SFlowNodeInstance flowNodeInstance = new SManualTaskInstanceImpl("name", 1L, 2L, 3L, 4L, STaskPriority.ABOVE_NORMAL, 5L, 6L);
+        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
+        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
+        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
+
+        // When
+        processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
+
+        // Then
+        verify(activityInstanceService).deleteHiddenTasksForActivity(flowNodeInstance.getId());
+        verify(activityInstanceService).deletePendingMappings(flowNodeInstance.getId());
+    }
+
+    @Test
+    public void deleteFlowNodeInstanceElements_should_just_deleteDataInstancesIfNecessary_and_deleteConnectorInstancesIfNecessary_when_flownode_is_loop()
+            throws Exception {
+        // Given
+        final SFlowNodeInstance flowNodeInstance = new SLoopActivityInstanceImpl();
+        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
+        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
+        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
+
+        // When
+        processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
+
+        // Then
+        verify(activityInstanceService, never()).deleteHiddenTasksForActivity(flowNodeInstance.getId());
+        verify(activityInstanceService, never()).deletePendingMappings(flowNodeInstance.getId());
+        verify(processInstanceService, never()).deleteSubProcess(flowNodeInstance, processDefinition);
+    }
+
+    @Test
+    public void deleteFlowNodeInstanceElements_should_do_nothing_when_flownode_is_gateway()
+            throws Exception {
+        // Given
+        final SFlowNodeInstance flowNodeInstance = new SGatewayInstanceImpl();
+        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
+
+        // When
+        processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
+
+        // Then
+        verify(processInstanceService, never()).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
+        verify(processInstanceService, never()).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
     }
 
 }

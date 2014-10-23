@@ -22,6 +22,7 @@ import java.util.Set;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.CollectionUtil;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
@@ -185,26 +186,30 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
     @Override
     public void deletePendingMappings(final long humanTaskInstanceId) throws SActivityModificationException {
-        List<SPendingActivityMapping> mappings = null;
-        final boolean createEvents = getEventService().hasHandlers(PENDINGACTIVITYMAPPING, EventActionType.DELETED);
         try {
+            List<SPendingActivityMapping> mappings = null;
+            final boolean createEvents = getEventService().hasHandlers(PENDINGACTIVITYMAPPING, EventActionType.DELETED);
             while ((mappings = getPendingMappings(humanTaskInstanceId, new QueryOptions(0, BATCH_SIZE))).size() > 0) {
-                for (final SPendingActivityMapping mapping : mappings) {
-                    SDeleteEvent deleteEvent = null;
-                    if (createEvents) {
-                        deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PENDINGACTIVITYMAPPING)
-                                .setObject(mapping).done();
-                    }
-                    try {
-                        getRecorder().recordDelete(new DeleteRecord(mapping), deleteEvent);
-                    } catch (final SRecorderException e) {
-                        throw new SActivityModificationException(e);
-                    }
-                }
+                deletePendingMappings(mappings, createEvents);
             }
-        } catch (final SActivityReadException e) {
+        } catch (final SBonitaException e) {
             throw new SActivityModificationException(e);
         }
+    }
+
+    private void deletePendingMappings(final List<SPendingActivityMapping> mappings, final boolean createEvents) throws SRecorderException {
+        for (final SPendingActivityMapping mapping : mappings) {
+            deletePendingMapping(mapping, createEvents);
+        }
+    }
+
+    private void deletePendingMapping(final SPendingActivityMapping mapping, final boolean createEvents) throws SRecorderException {
+        SDeleteEvent deleteEvent = null;
+        if (createEvents) {
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(PENDINGACTIVITYMAPPING)
+                    .setObject(mapping).done();
+        }
+        getRecorder().recordDelete(new DeleteRecord(mapping), deleteEvent);
     }
 
     @Override
@@ -224,14 +229,10 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
      * @return
      */
     @Override
-    public List<SPendingActivityMapping> getPendingMappings(final long humanTaskInstanceId, final QueryOptions queryOptions) throws SActivityReadException {
+    public List<SPendingActivityMapping> getPendingMappings(final long humanTaskInstanceId, final QueryOptions queryOptions) throws SBonitaReadException {
         final Map<String, Object> parameters = CollectionUtil.buildSimpleMap("activityId", humanTaskInstanceId);
-        try {
-            return getPersistenceService().selectList(
-                    new SelectListDescriptor<SPendingActivityMapping>("getPendingMappingsOfTask", parameters, SPendingActivityMapping.class, queryOptions));
-        } catch (final SBonitaReadException e) {
-            throw new SActivityReadException(e);
-        }
+        return getPersistenceService().selectList(
+                new SelectListDescriptor<SPendingActivityMapping>("getPendingMappingsOfTask", parameters, SPendingActivityMapping.class, queryOptions));
     }
 
     @Override
@@ -805,7 +806,6 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         }
 
         try {
-
             getRecorder().recordInsert(insertRecord, insertEvent);
         } catch (final SRecorderException e) {
             throw new STaskVisibilityException("Can't hide the task.", activityInstanceId, userId);

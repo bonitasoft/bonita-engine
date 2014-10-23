@@ -788,9 +788,9 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @param humanTaskInstanceId
      * @param queryOptions
      * @return
-     * @throws SActivityReadException
+     * @throws SBonitaReadException
      */
-    List<SPendingActivityMapping> getPendingMappings(long humanTaskInstanceId, QueryOptions queryOptions) throws SActivityReadException;
+    List<SPendingActivityMapping> getPendingMappings(long humanTaskInstanceId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * @param userId

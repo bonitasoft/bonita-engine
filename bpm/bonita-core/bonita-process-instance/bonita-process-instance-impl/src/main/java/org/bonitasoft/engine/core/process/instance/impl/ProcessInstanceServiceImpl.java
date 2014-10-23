@@ -523,42 +523,47 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
             activityService.deleteFlowNodeInstance(flowNodeInstance);
         } catch (final SBonitaException e) {
+            setExceptionContext(processDefinition, flowNodeInstance, e);
             throw new SProcessInstanceModificationException(e);
         }
     }
 
     void deleteFlowNodeInstanceElements(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition) throws SBonitaException {
-        if (flowNodeInstance.getType().equals(SFlowNodeType.INTERMEDIATE_CATCH_EVENT) || flowNodeInstance.getType().equals(SFlowNodeType.BOUNDARY_EVENT)
-                || flowNodeInstance.getType().equals(SFlowNodeType.RECEIVE_TASK) || flowNodeInstance.getType().equals(SFlowNodeType.START_EVENT)) {
+        final SFlowNodeType type = flowNodeInstance.getType();
+        if (type.equals(SFlowNodeType.INTERMEDIATE_CATCH_EVENT) || type.equals(SFlowNodeType.BOUNDARY_EVENT) || type.equals(SFlowNodeType.RECEIVE_TASK)
+                || type.equals(SFlowNodeType.START_EVENT)) {
             bpmEventInstanceService.deleteWaitingEvents(flowNodeInstance);
         }
         if (flowNodeInstance instanceof SEventInstance) {
             bpmEventInstanceService.deleteEventTriggerInstances(flowNodeInstance.getId());
         } else if (flowNodeInstance instanceof SActivityInstance) {
-            deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
-            deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
-            if (SFlowNodeType.USER_TASK.equals(flowNodeInstance.getType()) || SFlowNodeType.MANUAL_TASK.equals(flowNodeInstance.getType())) {
-                activityService.deleteHiddenTasksForActivity(flowNodeInstance.getId());
-                try {
-                    activityService.deletePendingMappings(flowNodeInstance.getId());
-                } catch (final SActivityModificationException e) {
-                    setExceptionContext(processDefinition, flowNodeInstance, e);
-                    throw new SFlowNodeReadException(e);
-                }
-            } else if (SFlowNodeType.CALL_ACTIVITY.equals(flowNodeInstance.getType()) || SFlowNodeType.SUB_PROCESS.equals(flowNodeInstance.getType())) {
-                // in the case of a call activity or subprocess activity delete the child process instance
-                try {
-                    deleteProcessInstance(getChildOfActivity(flowNodeInstance.getId()));
-                } catch (final SProcessInstanceNotFoundException e) {
-                    setExceptionContext(processDefinition, flowNodeInstance, e);
+            deleteActivityInstanceElements(flowNodeInstance, processDefinition);
+        }
+    }
 
-                    // if the child process is not found, it's because it has already finished and archived or it was not created
-                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                        logger.log(getClass(), TechnicalLogSeverity.DEBUG,
-                                "Can't find the process instance called by the activity. This process may be already finished.");
-                        logger.log(getClass(), TechnicalLogSeverity.DEBUG, e);
-                    }
-                }
+    private void deleteActivityInstanceElements(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition) throws SBonitaException {
+        deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
+        deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
+        if (SFlowNodeType.USER_TASK.equals(flowNodeInstance.getType()) || SFlowNodeType.MANUAL_TASK.equals(flowNodeInstance.getType())) {
+            activityService.deleteHiddenTasksForActivity(flowNodeInstance.getId());
+            activityService.deletePendingMappings(flowNodeInstance.getId());
+        } else if (SFlowNodeType.CALL_ACTIVITY.equals(flowNodeInstance.getType()) || SFlowNodeType.SUB_PROCESS.equals(flowNodeInstance.getType())) {
+            // in the case of a call activity or subprocess activity delete the child process instance
+            deleteSubProcess(flowNodeInstance, processDefinition);
+        }
+    }
+
+    void deleteSubProcess(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition) throws SBonitaException {
+        try {
+            deleteProcessInstance(getChildOfActivity(flowNodeInstance.getId()));
+        } catch (final SProcessInstanceNotFoundException e) {
+            setExceptionContext(processDefinition, flowNodeInstance, e);
+
+            // if the child process is not found, it's because it has already finished and archived or it was not created
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+                        "Can't find the process instance called by the activity. This process may be already finished.");
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, e);
             }
         }
     }
