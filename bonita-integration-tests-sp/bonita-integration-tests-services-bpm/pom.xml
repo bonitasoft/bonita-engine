@@ -744,7 +744,7 @@
 					</properties>
 					<systemPropertyVariables>
 						<bonita.home>${bonita.home}</bonita.home>
-						<bonita.services.folder>${basedir}/conf</bonita.services.folder>
+						<bonita.services.folder>${project.build.directory}/test-classes/conf</bonita.services.folder>
 					</systemPropertyVariables>
 					<includes>
 						<include>com/bonitasoft/engine/bpm/test/AllBPMSPTestsWithJNDI.java</include>
