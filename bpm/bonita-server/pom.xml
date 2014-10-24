@@ -23,9 +23,9 @@
                     <artifactId>bonita-common-api</artifactId>
                 </exclusion>
 				<exclusion>
-					<groupId>org.bonitasoft.engine.api</groupId>
+                    <groupId>org.bonitasoft.engine.api</groupId>
 					<artifactId>bonita-common-api-impl</artifactId>
-				</exclusion>
+                </exclusion>
             </exclusions>
     </dependency>
 
@@ -356,6 +356,7 @@
       <version>${project.version}</version>
     </dependency>
     
+
     <!-- Parameter -->
     <dependency>
       <groupId>com.bonitasoft.engine.core.parameter</groupId>

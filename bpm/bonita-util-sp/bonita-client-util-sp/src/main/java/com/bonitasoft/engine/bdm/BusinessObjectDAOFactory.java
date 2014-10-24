@@ -1,17 +1,11 @@
-/**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2.0 of the License, or
- * (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+/*******************************************************************************
+ * Copyright (C) 2013, 2014 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bdm;
 
 import java.lang.reflect.Constructor;
@@ -20,18 +14,25 @@ import java.lang.reflect.InvocationTargetException;
 import org.bonitasoft.engine.session.APISession;
 
 import com.bonitasoft.engine.bdm.dao.BusinessObjectDAO;
+import com.bonitasoft.engine.bdm.model.BusinessObject;
 
 /**
+ * A factory to create Data Access Objects (DAO). These DAOs interact with {@link BusinessObject}s.
+ *
  * @author Romain Bioteau
+ * @author Matthieu Chaffotte
  */
 public class BusinessObjectDAOFactory {
 
     private static final String IMPL_SUFFIX = "Impl";
 
     /**
-     * @param apiSession
-     * @param daoInterface
-     * @return An implementation for the requested dao interface
+     * Creates the implementation of the DAO for the given session.
+     *
+     * @param session the current opened session
+     * @param daoInterface the interface of the DAO
+     * @return the implementation of the DAO
+     * @throws BusinessObjectDaoCreationException if the factory is not able to instantiate the DAO
      */
     public <T extends BusinessObjectDAO> T createDAO(final APISession session, final Class<T> daoInterface) throws BusinessObjectDaoCreationException {
         if (session == null) {
@@ -43,34 +44,43 @@ public class BusinessObjectDAOFactory {
         if (!daoInterface.isInterface()) {
             throw new IllegalArgumentException(daoInterface.getName() + " is not an interface");
         }
-        String daoClassName = daoInterface.getName();
+        final String daoClassName = daoInterface.getName();
         Class<T> daoImplClass = null;
         try {
             daoImplClass = loadClass(daoClassName);
-        } catch (ClassNotFoundException e) {
+        } catch (final ClassNotFoundException e) {
             throw new BusinessObjectDaoCreationException(e);
         }
         if (daoImplClass != null) {
             try {
-                Constructor<T> constructor = daoImplClass.getConstructor(APISession.class);
+                final Constructor<T> constructor = daoImplClass.getConstructor(APISession.class);
                 return constructor.newInstance(session);
-            } catch (SecurityException e) {
+            } catch (final SecurityException e) {
                 throw new BusinessObjectDaoCreationException(e);
-            } catch (NoSuchMethodException e) {
+            } catch (final NoSuchMethodException e) {
                 throw new BusinessObjectDaoCreationException(e);
-            } catch (IllegalArgumentException e) {
+            } catch (final IllegalArgumentException e) {
                 throw new BusinessObjectDaoCreationException(e);
-            } catch (InstantiationException e) {
+            } catch (final InstantiationException e) {
                 throw new BusinessObjectDaoCreationException(e);
-            } catch (IllegalAccessException e) {
+            } catch (final IllegalAccessException e) {
                 throw new BusinessObjectDaoCreationException(e);
-            } catch (InvocationTargetException e) {
+            } catch (final InvocationTargetException e) {
                 throw new BusinessObjectDaoCreationException(e);
             }
         }
         return null;
     }
 
+    /**
+     * Loads the class of the {@link BusinessObjectDAO} according to its class name.
+     * <p>
+     * The loading is done in the current Thread.
+     *
+     * @param daoClassName the name of the class of the DAO
+     * @return the class of the BusinessObjectDAO
+     * @throws ClassNotFoundException if the daoClassName is unknown by the current Thread
+     */
     @SuppressWarnings("unchecked")
     protected <T extends BusinessObjectDAO> Class<T> loadClass(final String daoClassName) throws ClassNotFoundException {
         return (Class<T>) Class.forName(toDaoImplClassName(daoClassName), true, Thread.currentThread().getContextClassLoader());
