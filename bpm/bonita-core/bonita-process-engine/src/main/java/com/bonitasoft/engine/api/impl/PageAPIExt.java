@@ -308,7 +308,8 @@ public class PageAPIExt implements PageAPI {
     }
 
     @Override
-    public Properties getPageProperties(byte[] content, boolean checkIfItAlreadyExists) throws InvalidPageTokenException, InvalidPageZipContentException, AlreadyExistsException {
+    public Properties getPageProperties(byte[] content, boolean checkIfItAlreadyExists) throws InvalidPageTokenException,
+            AlreadyExistsException, InvalidPageZipMissingPropertiesException, InvalidPageZipMissingIndexException, InvalidPageZipInconsistentException, InvalidPageZipMissingAPropertyException {
         final PageService pageService = getTenantAccessor().getPageService();
         try {
             Properties properties = pageService.readPageZip(content);
@@ -320,12 +321,18 @@ public class PageAPIExt implements PageAPI {
                 }
             }
             return properties;
-        } catch (SInvalidPageZipException e) {
-            throw convertException(e);
         } catch (SInvalidPageTokenException e) {
             throw new InvalidPageTokenException(e.getMessage());
         } catch (SBonitaReadException e) {
             throw new RetrieveException(e);
+        } catch (SInvalidPageZipMissingAPropertyException e) {
+            throw new InvalidPageZipMissingAPropertyException(e.getFields());
+        } catch (SInvalidPageZipInconsistentException e) {
+            throw new InvalidPageZipInconsistentException(e.getMessage(), e);
+        } catch (SInvalidPageZipMissingIndexException e) {
+            throw new InvalidPageZipMissingIndexException();
+        } catch (SInvalidPageZipMissingPropertiesException e) {
+            throw new InvalidPageZipMissingPropertiesException();
         }
     }
 }
