@@ -16,20 +16,32 @@ package org.bonitasoft.engine.platform;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
+ * Indicates that a problem occurred when starting the node
+ *
  * @author Matthieu Chaffotte
  */
 public class StartNodeException extends ExecutionException {
 
     private static final long serialVersionUID = 2714223184438785735L;
 
+    /**
+     * @param message a String indicating the exception message
+     */
     public StartNodeException(final String message) {
         super(message);
     }
 
+    /**
+     * @param cause a Throwable indicating the root cause
+     */
     public StartNodeException(final Throwable cause) {
         super(cause);
     }
 
+    /**
+     * @param message a String indicating the exception messages
+     * @param cause a Throwable indicating the root cause
+     */
     public StartNodeException(final String message, final Throwable cause) {
         super(message, cause);
     }

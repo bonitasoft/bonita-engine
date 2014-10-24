@@ -14,38 +14,84 @@
 package org.bonitasoft.engine.bpm.process;
 
 /**
+ * Search descriptors are used to filter / sort results of a generic search. <br>
+ * ProcessDeploymentInfoSearchDescriptor defines the fields that can be used as filters or sort fields on <code>List{@literal <}ProcessDeploymentInfo></code>
+ * returning methods.
+ *
  * @author Zhao Na
  * @author Celine Souchet
  * @author Matthieu Chaffotte
+ * @see org.bonitasoft.engine.api.ProcessAPI
+ * @see ProcessDeploymentInfo
+ * @see ProcessDefinition
+ * @version 6.3.5
+ * @since 6.0.0
  */
 public class ProcessDeploymentInfoSearchDescriptor {
 
+    /**
+     * The field corresponding to the identifier of the process in the database.
+     */
     public static final String ID = "id";
 
+    /**
+     * The field corresponding to the name of the process.
+     */
     public static final String NAME = "name";
 
+    /**
+     * The field corresponding to the version of the process.
+     */
     public static final String VERSION = "version";
 
+    /**
+     * The field corresponding to the date of the deployment of the process.
+     */
     public static final String DEPLOYMENT_DATE = "deploymentDate";
 
+    /**
+     * The field corresponding to the identifier of the user who deployed the process.
+     */
     public static final String DEPLOYED_BY = "deployedBy";
 
     /**
+     * The field corresponding to the activation state of the process.
      * To filter on this field, example :
      * {@code searchOptionsBuilder.filter(ProcessDeploymentInfoSearchDescriptor.ACTIVATION_STATE, ActivationState.ENABLED.name());}
      */
     public static final String ACTIVATION_STATE = "activationState";
 
+    /**
+     * The field corresponding to the configuration state of the process.
+     */
     public static final String CONFIGURATION_STATE = "configurationState";
 
+    /**
+     * The field corresponding to the identifier of the process definition (in the bonita home).
+     */
     public static final String PROCESS_ID = "processId";
 
+    /**
+     * The field corresponding to the display name of the process.
+     */
     public static final String DISPLAY_NAME = "displayName";
 
+    /**
+     * The field corresponding to the last date of the updating of the process.
+     */
     public static final String LAST_UPDATE_DATE = "lastUpdateDate";
 
+    /**
+     * The field corresponding to the identifier of the category of the process.
+     */
     public static final String CATEGORY_ID = "categoryId";
 
+    /**
+     * This field doesn't exist on a process definition.
+     * 
+     * @deprecated since 6.3.5
+     */
+    @Deprecated
     public static final String LABEL = "label";
 
 }

@@ -14,14 +14,18 @@
 package org.bonitasoft.engine.bpm.process.impl;
 
 /**
+ * Builder for all definition elements that have a description.
+ *
  * @author Matthieu Chaffotte
+ * @author Emmanuel Duchastenier
  */
 public interface DescriptionBuilder {
 
     /**
-     * Adds a description to current element
-     * @param description the description
-     * @return
+     * Adds a description to current element.
+     *
+     * @param description the description to set on this element.
+     * @return this <code>DescriptionBuilder</code>, to allow to chain the calls.
      */
     DescriptionBuilder addDescription(final String description);
 
