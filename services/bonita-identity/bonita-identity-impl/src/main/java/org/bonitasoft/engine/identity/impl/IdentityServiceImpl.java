@@ -388,7 +388,7 @@ public class IdentityServiceImpl implements IdentityService {
         return logBuilder;
     }
 
-    private SUserLogBuilder getUserLog(final ActionType actionType, final String message) {
+    protected SUserLogBuilder getUserLog(final ActionType actionType, final String message) {
         final SUserLogBuilder logBuilder = BuilderFactory.get(SUserLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
@@ -895,7 +895,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(final String name) throws SCustomUserInfoDefinitionNotFoundException,
-            SCustomUserInfoDefinitionReadException {
+    SCustomUserInfoDefinitionReadException {
         final String methodName = "getCustomUserInfoDefinitionByName";
         SCustomUserInfoDefinition definition = null;
         try {
@@ -1011,7 +1011,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SCustomUserInfoValue getCustomUserInfoValue(final long customUserInfoValueId) throws SCustomUserInfoValueNotFoundException,
-            SCustomUserInfoValueReadException {
+    SCustomUserInfoValueReadException {
         final String methodName = "getCustomUserInfoValue";
         logBeforeMethod(methodName);
         try {

@@ -16,16 +16,40 @@ package org.bonitasoft.engine.platform.command;
 import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
+ * Describes a <code>Platform command</code>. Actions related to <code>platform commands</code> are managed by the {@link PlatformCommandAPI}
+ *
  * @author Zhang Bole
+ * @see PlatformCommandAPI
+ * @since 6.0.0
  */
 public interface PlatformCommandDescriptor extends BonitaObject {
 
+    /**
+     * Retrieves the command identifier
+     *
+     * @return a long indicating the command identifier
+     */
     long getId();
 
+    /**
+     * Retrieves the command name
+     *
+     * @return a String containing the command name
+     */
     String getName();
 
+    /**
+     * Retrieves the command description
+     *
+     * @return a String containing the command description
+     */
     String getDescription();
 
+    /**
+     * Retrieves the complete name of the class that implements the command
+     *
+     * @return a String containing the complete name of the class that implements the command
+     */
     String getImplementation();
 
 }

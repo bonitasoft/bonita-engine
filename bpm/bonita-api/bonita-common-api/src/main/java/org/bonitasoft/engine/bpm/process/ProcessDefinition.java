@@ -18,22 +18,21 @@ import org.bonitasoft.engine.bpm.NamedElement;
 
 /**
  * Represents the Definition of a process. Gives access to basic information of the process, whereas it is deployed or not.
- * For information about deployment information, use ProcessDeploymentInfo.
- * 
+ * For information about deployment information, use {@link ProcessDeploymentInfo}.
+ *
+ * @see ProcessDeploymentInfo
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
- * @see ProcessDeploymentInfo
  */
 public interface ProcessDefinition extends NamedElement, BaseElement {
 
     /**
-     * @return
-     *         The version of the process definition
+     * @return The version of the process definition
      */
     String getVersion();
 
     /**
-     * @return the desciption of the process definition, as set at design-time.
+     * @return The description of the process definition, as set at design-time.
      */
     String getDescription();
 

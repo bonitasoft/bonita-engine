@@ -43,10 +43,7 @@ public abstract class AbstractUserFilter implements UserFilter {
     }
 
     protected Object getInputParameter(final String paramName) throws IllegalStateException {
-        if (inputParameters.containsKey(paramName)) {
-            return inputParameters.get(paramName);
-        }
-        throw new IllegalStateException("Input parameter '" + paramName + "' is not set");
+        return inputParameters.get(paramName);
     }
 
     @SuppressWarnings("unchecked")

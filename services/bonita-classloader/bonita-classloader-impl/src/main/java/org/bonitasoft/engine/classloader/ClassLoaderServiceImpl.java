@@ -58,6 +58,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private final Object mutex = new ClassLoaderServiceMutex();
 
+    private boolean shuttingDown = false;
+
     public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver, final String temporaryFolder, final TechnicalLoggerService logger) {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
         this.logger = logger;
@@ -113,6 +115,12 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         return getVirtualGlobalClassLoader();
     }
 
+    private void warnOnShuttingDown(final String key) {
+        if (shuttingDown && logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+            logger.log(getClass(), TechnicalLogSeverity.WARNING, "Using local classloader on after ClassLoaderService shuttingdown: " + key);
+        }
+    }
+
     @Override
     public ClassLoader getLocalClassLoader(final String type, final long id) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -120,6 +128,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
         NullCheckingUtil.checkArgsNotNull(id, type);
         final String key = getKey(type, id);
+        warnOnShuttingDown(key);
         // here we have to manage the case of the "first" get to avoid creating 2 classloaders
         // we decided to do it in a "double" check manner
         // as it happens almost "never" (concurrency maybe on 2 or more threads but only on time...
@@ -156,11 +165,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
         // Remove the class loader
         final String key = getKey(type, id);
-        final VirtualClassLoader localClassLoader = localClassLoaders.get(key);
-        if (localClassLoader != null) {
-            localClassLoader.destroy();
-            localClassLoaders.remove(key);
-        }
+        destroyLocalClassLoader(key);
 
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeLocalClassLoader"));
@@ -195,15 +200,19 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         final Set<String> keySet = new HashSet<String>(localClassLoaders.keySet());
         for (final String key : keySet) {
             if (key.startsWith(application + SEPARATOR)) {
-                final VirtualClassLoader localClassLoader = localClassLoaders.get(key);
-                if (localClassLoader != null) {
-                    localClassLoader.destroy();
-                }
-                localClassLoaders.remove(key);
+                destroyLocalClassLoader(key);
             }
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeAllLocalClassLoaders"));
+        }
+    }
+
+    private void destroyLocalClassLoader(final String key) {
+        final VirtualClassLoader localClassLoader = localClassLoaders.get(key);
+        if (localClassLoader != null) {
+            localClassLoader.destroy();
+            localClassLoaders.remove(key);
         }
     }
 
@@ -234,12 +243,22 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     @Override
     public void start() {
+        shuttingDown = false;
         virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
     }
 
     @Override
     public void stop() {
+        shuttingDown = true;
+        destroyAllLocalClassLoaders();
         virtualGlobalClassLoader.destroy();
+    }
+
+    private void destroyAllLocalClassLoaders() {
+        for (final VirtualClassLoader classLoader : localClassLoaders.values()) {
+            classLoader.destroy();
+        }
+        localClassLoaders.clear();
     }
 
     @Override

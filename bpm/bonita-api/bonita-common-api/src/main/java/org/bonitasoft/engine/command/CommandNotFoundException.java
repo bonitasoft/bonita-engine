@@ -16,7 +16,10 @@ package org.bonitasoft.engine.command;
 import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
+ * Happens when a command is not found
+ * 
  * @author Matthieu Chaffotte
+ * @since 6.0.0
  */
 public class CommandNotFoundException extends NotFoundException {
 

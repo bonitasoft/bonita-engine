@@ -70,7 +70,6 @@ import org.bonitasoft.engine.bpm.flownode.ActivityStates;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedAutomaticTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedCallActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedFlowElementInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedGatewayInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
@@ -183,7 +182,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInsta
 import org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowElementInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
@@ -686,9 +684,9 @@ public class ModelConvertor {
         aFlowNode.setParentContainerId(saFlowNode.getParentContainerId());
         aFlowNode.setRootContainerId(saFlowNode.getRootContainerId());
         aFlowNode.setSourceObjectId(saFlowNode.getSourceObjectId());
-        aFlowNode.setProcessDefinitionId(saFlowNode.getLogicalGroup(0));
-        aFlowNode.setProcessInstanceId(saFlowNode.getLogicalGroup(1));
-        aFlowNode.setParentActivityInstanceId(saFlowNode.getLogicalGroup(2));
+        aFlowNode.setProcessDefinitionId(saFlowNode.getProcessDefinitionId());
+        aFlowNode.setProcessInstanceId(saFlowNode.getParentProcessInstanceId());
+        aFlowNode.setParentActivityInstanceId(saFlowNode.getParentActivityInstanceId());
         aFlowNode.setDescription(saFlowNode.getDescription());
         aFlowNode.setDisplayName(saFlowNode.getDisplayName());
         aFlowNode.setDisplayDescription(saFlowNode.getDisplayDescription());
@@ -1819,11 +1817,6 @@ public class ModelConvertor {
             actors.add(actor);
         }
         return actors;
-    }
-
-    public static List<ArchivedFlowElementInstance> toArchivedFlowElementInstances(final List<SAFlowElementInstance> serverObjects) {
-        // TODO Implement me!
-        return null;
     }
 
     public static List<ArchivedFlowNodeInstance> toArchivedFlowNodeInstances(final List<SAFlowNodeInstance> saFlowNodes,

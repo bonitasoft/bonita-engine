@@ -267,8 +267,7 @@ public class StateBehaviors {
             final Serializable value = loopData.getValue();
             final int index = flowNodeInstance.getLoopCounter();
             if (value instanceof List<?>) {
-                final List<Serializable> list = (List<Serializable>) value;
-                list.set(index, outputData.getValue());
+                ((List<Serializable>) value).set(index, outputData.getValue());
             } else {
                 throw new SActivityExecutionException("unable to map the ouput of the multi instanciated activity "
                         + flowNodeInstance.getName() + " the output loop data named " + loopData.getName() + " is not a list but "
@@ -395,7 +394,7 @@ public class StateBehaviors {
      */
     public BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> getConnectorToExecuteAndFlag(final SProcessDefinition processDefinition,
             final SFlowNodeInstance flowNodeInstance, final boolean executeConnectorsOnEnter, final boolean executeConnectorsOnFinish)
-            throws SActivityStateExecutionException {
+                    throws SActivityStateExecutionException {
         try {
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SFlowNodeDefinition flowNodeDefinition = processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
@@ -478,7 +477,7 @@ public class StateBehaviors {
 
     private BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> getConnectorWithFlagIfIsNextToExecute(final SFlowNodeInstance flowNodeInstance,
             final List<SConnectorDefinition> sConnectorDefinitions, final SConnectorInstance nextConnectorInstanceToExecute, final int flag)
-            throws SActivityStateExecutionException {
+                    throws SActivityStateExecutionException {
         for (final SConnectorDefinition sConnectorDefinition : sConnectorDefinitions) {
             if (sConnectorDefinition.getName().equals(nextConnectorInstanceToExecute.getName())) {
                 return getConnectorWithFlag(nextConnectorInstanceToExecute, sConnectorDefinition, flag);
@@ -563,7 +562,7 @@ public class StateBehaviors {
     }
 
     private long getTargetProcessDefinitionId(final String callableElement, final String callableElementVersion) throws SProcessDefinitionReadException,
-            SProcessDefinitionNotFoundException {
+    SProcessDefinitionNotFoundException {
         if (callableElementVersion != null) {
             return processDefinitionService.getProcessDefinitionId(callableElement, callableElementVersion);
         }
@@ -733,7 +732,7 @@ public class StateBehaviors {
 
     public void executeConnectorInWork(final Long processDefinitionId, final long processInstanceId, final long flowNodeDefinitionId,
             final long flowNodeInstanceId, final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition)
-            throws SActivityStateExecutionException {
+                    throws SActivityStateExecutionException {
         final long connectorInstanceId = connector.getId();
         // final Long connectorDefinitionId = sConnectorDefinition.getId();// FIXME: Uncomment when generate id
         final String connectorDefinitionName = sConnectorDefinition.getName();

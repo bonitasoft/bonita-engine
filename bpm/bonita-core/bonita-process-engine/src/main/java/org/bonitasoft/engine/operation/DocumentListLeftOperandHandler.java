@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -43,14 +43,14 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     public DocumentListLeftOperandHandler(final DocumentService documentService, final ActivityInstanceService activityInstanceService,
             final SessionAccessor sessionAccessor, final SessionService sessionService, final ProcessDefinitionService processDefinitionService,
             final ProcessInstanceService processInstanceService) {
-        super(activityInstanceService, sessionAccessor, sessionService, documentService);
+        super(activityInstanceService, sessionAccessor, sessionService);
         this.documentService = documentService;
         documentHelper = new DocumentHelper(documentService, processDefinitionService, processInstanceService);
     }
 
     public DocumentListLeftOperandHandler(final ActivityInstanceService activityInstanceService, final SessionAccessor sessionAccessor,
             final SessionService sessionService, final DocumentService documentService, final DocumentHelper documentHelper) {
-        super(activityInstanceService, sessionAccessor, sessionService, documentService);
+        super(activityInstanceService, sessionAccessor, sessionService);
         this.documentHelper = documentHelper;
         this.documentService = documentService;
     }

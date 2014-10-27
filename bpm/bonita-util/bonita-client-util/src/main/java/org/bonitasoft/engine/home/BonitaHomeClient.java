@@ -18,8 +18,15 @@ import java.io.File;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 
 /**
+ * Utility class that handles the path to the client part of the bonita home
+ * <p>
+ * The client part of the bonita home contains connection information to the server and can also contains working directories for client application of the
+ * bonita engine
+ * </p>
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @since 6.0.0
  */
 public final class BonitaHomeClient extends BonitaHome {
 
@@ -37,6 +44,12 @@ public final class BonitaHomeClient extends BonitaHome {
         return INSTANCE;
     }
 
+    /**
+     * @return the path to the client part of the  bonita home
+     * @throws BonitaHomeNotSetException
+     *         when bonita.home system property is not set
+     * @since 6.0.0
+     */
     public String getBonitaHomeClientFolder() throws BonitaHomeNotSetException {
         if (clientPath == null) {
             final StringBuilder path = new StringBuilder(getBonitaHomeFolder());

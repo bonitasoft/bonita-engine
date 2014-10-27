@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.command;
 
-
 /**
  * @author Celine Souchet
  */
@@ -23,14 +22,6 @@ public class SUserProfileMemberAlreadyExistsException extends SCommandExecutionE
 
     public SUserProfileMemberAlreadyExistsException(final String message) {
         super(message);
-    }
-
-    public SUserProfileMemberAlreadyExistsException(final Throwable cause) {
-        super(cause);
-    }
-
-    public SUserProfileMemberAlreadyExistsException(final String message, final Throwable cause) {
-        super(message, cause);
     }
 
 }

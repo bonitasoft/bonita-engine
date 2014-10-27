@@ -74,6 +74,7 @@ public class OperationBuilder {
      *             Sets the <code>LeftOperand</code> of this operation. It is built for you with its name and external properties.
      * @param name
      *        the name of the left operand
+     * @param type
      * @param external
      * @return this builder itself, so that calls the various exposed methods can be chained.
      */
@@ -91,7 +92,7 @@ public class OperationBuilder {
      *
      * @param name
      *        the name of the left operand
-     * @param external
+     * @param type
      * @return this builder itself, so that calls the various exposed methods can be chained.
      */
     public OperationBuilder setLeftOperand(final String name, final String type) {
@@ -153,7 +154,7 @@ public class OperationBuilder {
      * @param methodName
      *        the Java setter method to call.
      * @param methodParamType
-     *        the type of the Java setter method parameter (to be able to differenciate 2 methods with the same name but with different parameter types)
+     *        the type of the Java setter method parameter (to be able to differentiate 2 methods with the same name but with different parameter types)
      * @param expression
      *        the Expression to evaluate that represents the new value to set.
      * @return the newly created <code>Operation</code>.
@@ -198,7 +199,7 @@ public class OperationBuilder {
      * @param docName
      *        the name of the document
      * @param expression
-     *        the expression that returns a {@link DocumentValue}
+     *        the expression that returns a {@link org.bonitasoft.engine.bpm.document.DocumentValue}
      * @return the newly created <code>Operation</code>.
      */
     public Operation createSetDocument(final String docName, final Expression expression) {
