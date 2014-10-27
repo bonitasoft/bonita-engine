@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.xml.XMLConstants;
 import javax.xml.bind.ValidationException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -44,7 +43,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.w3c.dom.Document;
@@ -66,25 +64,17 @@ public class XMLHandler {
 
     private final List<Class<? extends ElementBinding>> bindings;
 
-    private Schema schema;
+    private final Schema schema;
 
     private final DocumentBuilder documentBuilder;
 
     private final Transformer transformer;
 
     public XMLHandler(final List<Class<? extends ElementBinding>> bindings, final URL schemaURL) throws ParserConfigurationException,
-            TransformerConfigurationException, InvalidSchemaException, IOException {
+    TransformerConfigurationException, InvalidSchemaException, IOException {
         this.bindings = bindings;
 
-        final SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        final InputStream sIn = schemaURL.openStream();
-        try {
-            schema = factory.newSchema(new StreamSource(sIn, schemaURL.toURI().toString()));
-        } catch (final Exception e) {
-            throw new InvalidSchemaException(e);
-        } finally {
-            sIn.close();
-        }
+        schema = new SchemaLoader().loadSchema(schemaURL);
 
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);

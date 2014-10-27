@@ -16,12 +16,21 @@ package org.bonitasoft.engine.identity;
 import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
+ * thrown when a {@link UserMembership} is not found
+ *
  * @author Matthieu Chaffotte
+ * @see UserMembership
+ * @since 6.0.0
  */
 public class MembershipNotFoundException extends NotFoundException {
 
     private static final long serialVersionUID = -264860778869560830L;
 
+    /**
+     * creates a new instance of the exception with the given cause
+     * 
+     * @param cause the cause of the exception
+     */
     public MembershipNotFoundException(final Throwable cause) {
         super(cause);
     }

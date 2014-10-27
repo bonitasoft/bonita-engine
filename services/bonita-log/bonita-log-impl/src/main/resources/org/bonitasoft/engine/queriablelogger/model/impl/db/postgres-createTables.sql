@@ -6,7 +6,7 @@ CREATE TABLE queriable_log (
   month SMALLINT NOT NULL,
   dayOfYear SMALLINT NOT NULL,
   weekOfYear SMALLINT NOT NULL,
-  userId VARCHAR(50) NOT NULL,
+  userId VARCHAR(255) NOT NULL,
   threadNumber INT8 NOT NULL,
   clusterNode VARCHAR(50),
   productVersion VARCHAR(50) NOT NULL,

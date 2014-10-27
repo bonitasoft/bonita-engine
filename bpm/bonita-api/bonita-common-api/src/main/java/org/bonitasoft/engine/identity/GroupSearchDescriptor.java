@@ -14,16 +14,24 @@
 package org.bonitasoft.engine.identity;
 
 /**
+ * holds constants about {@link Group} search filters
+ *
  * @author Matthieu Chaffotte
+ * @see Group
+ * @since 6.0.0
  */
 public class GroupSearchDescriptor {
 
+	/** filter search on Group's id */
     public static final String ID = "id";
 
+    /** filter search on Group's name */
     public static final String NAME = "name";
 
+	/** filter search on Group's parent path */
     public static final String PARENT_PATH = "parentPath";
 
+	/** filter search on Group's display name */
     public static final String DISPLAY_NAME = "displayName";
 
 }

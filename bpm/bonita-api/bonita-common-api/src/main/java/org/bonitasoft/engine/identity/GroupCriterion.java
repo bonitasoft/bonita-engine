@@ -14,8 +14,12 @@
 package org.bonitasoft.engine.identity;
 
 /**
+ * represents group criterion sort orders
+ *
  * @author Lu Kai
  * @author Matthieu Chaffotte
+ * @see Group
+ * @since 6.0.0
  */
 public enum GroupCriterion {
     /**

@@ -14,14 +14,20 @@
 package org.bonitasoft.engine.identity;
 
 /**
+ * holds constants about {@link CustomUserInfoValue} search filters.
+ *
  * @author Vincent Elcrin
+ * @since 6.3.1
  */
 public final class CustomUserInfoValueSearchDescriptor {
 
+	/** filter search on Custom user info's user id*/
     public static final String USER_ID = "userId";
 
+	/** filter search on Custom user info's definition id*/
     public static final String DEFINITION_ID = "definitionId";
 
+    /** filter search on Custom user info's value*/
     public static final String VALUE = "value";
 
 }

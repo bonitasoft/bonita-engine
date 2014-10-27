@@ -16,13 +16,21 @@ package org.bonitasoft.engine.identity;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
+ * thrown to indicate an organization export error
+ *
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
+ * @since 6.0.0
  */
 public class OrganizationExportException extends ExecutionException {
 
     private static final long serialVersionUID = 3608804813319882731L;
 
+    /**
+     * creates a new exception instance with the given exception as cause
+     *
+     * @param cause the exception cause
+     */
     public OrganizationExportException(final Throwable cause) {
         super(cause);
     }

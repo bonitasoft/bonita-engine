@@ -16,6 +16,8 @@ package org.bonitasoft.engine.platform;
 import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
+ * Indicates that the platform does not exist
+ *
  * @author Lu Kai
  * @author Emmanuel Duchastenier
  */
@@ -23,14 +25,24 @@ public class PlatformNotFoundException extends NotFoundException {
 
     private static final long serialVersionUID = -7397972100656765511L;
 
+    /**
+     * @param message a String indicating the exception message
+     */
     public PlatformNotFoundException(final String message) {
         super(message);
     }
 
+    /**
+     * @param message a String indicating the exception message
+     * @param cause a Throwable indicating the root cause
+     */
     public PlatformNotFoundException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * @param cause a Throwable indicating the root cause
+     */
     public PlatformNotFoundException(final Throwable cause) {
         super(cause);
     }

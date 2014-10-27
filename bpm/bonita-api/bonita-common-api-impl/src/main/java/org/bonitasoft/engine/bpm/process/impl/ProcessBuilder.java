@@ -60,7 +60,7 @@ public class ProcessBuilder extends FlowElementContainerBuilder {
     }
 
     /**
-     * Adds a {@link DocumentDefinition} on this process
+     * Adds a {@link org.bonitasoft.engine.bpm.document.DocumentDefinition} on this process
      * 
      * @param name document name
      * @param fileName document file name

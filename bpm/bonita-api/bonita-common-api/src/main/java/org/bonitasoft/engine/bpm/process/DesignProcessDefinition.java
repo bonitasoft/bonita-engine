@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -22,38 +22,111 @@ import org.bonitasoft.engine.bpm.parameter.ParameterDefinition;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
+ * Represents the Design Definition of a process. It gives access to process attributes.
+ * <ul>
+ * <li>display name</li>
+ * <li>description</li>
+ * <li>parameters</li>
+ * <li>actors</li>
+ * <li>search indexes</li>
+ * </ul>
+ *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
+ * @author Laurent Leseigneur
+ * @version 6.3.5
+ * @since 6.0.0
  */
 public interface DesignProcessDefinition extends ProcessDefinition {
 
+    /**
+     * Retrieves the displayed name of the process definition, as set at design-time.
+     *
+     * @return The displayed name of the process definition, as set at design-time.
+     */
     String getDisplayName();
 
+    /**
+     * Retrieves the displayed description of the process definition, as set at design-time.
+     *
+     * @return The displayed description of the process definition, as set at design-time.
+     */
     String getDisplayDescription();
 
+    /**
+     * Retrieves the definition of the FlowElementContainerDefinition of the process container
+     *
+     * @return The {@link FlowElementContainerDefinition} of the process container.<br/>
+     *         return type FlowElementContainerDefinition in this package is deprecated. Instead use
+     *         {@link org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition}
+     */
+    @Deprecated
     FlowElementContainerDefinition getProcessContainer();
 
+    /**
+     * Retrieves a Set of ParameterDefinition objects from a ProcessDefinition
+     *
+     * @return A set of {@link ParameterDefinition} objects
+     */
     Set<ParameterDefinition> getParameters();
 
     /**
-     * @return A set of ActorDefinition
+     * Retrieves a Set of ActorDefinition objects from a ProcessDefinition
+     *
+     * @return A set of {@link ActorDefinition} objects.
+     *         <br/>If no actors have been defined, return an empty Set.
      * @see #getActorsList()
      * @since 6.0
-     * @deprecated As of release 6.1, replaced by {@link #getActorsList()}
+     * @deprecated As of release 6.1, replaced by {@link #getActorsList()} which return the same information as a list
      */
     @Deprecated
     Set<ActorDefinition> getActors();
 
     /**
-     * @return A list of ActorDefinition
+     * Gets the list of all actors defined on this process.
+     *
+     * @return The list of {@link ActorDefinition} objects defined in this process.
+     *         <br/>If no actors have been defined, return an empty List.
      * @since 6.1
      */
     List<ActorDefinition> getActorsList();
 
+    /**
+     * Retrieves the ActorDefinition of process's actor defined as initiator.
+     *
+     * @return The {@link ActorDefinition} of process's actor defined as initiator.
+     * @since 6.1
+     */
     ActorDefinition getActorInitiator();
+
+
+    /**
+     * Retrieves the label for the ProcessDefinition given search index.
+     * <p>
+     * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
+     * index</a> Bonitasoft documentation page
+     * </p>
+     *
+     * @param index
+     *        The position of search index to retrieve. Valid values are between 1 and 5 (inclusive)
+     * @throws IndexOutOfBoundsException if index is invalid
+     * @return The label the Expression of the search index
+     */
 
     String getStringIndexLabel(int index);
 
+    /**
+     * Retrieves the Expression for the ProcessDefinition given search index.
+     * <p>
+     * You can define up to five search indexes for a process. See more at <a href="http://documentation.bonitasoft.com/define-search-index">Define a search
+     * index</a> Bonitasoft documentation page
+     * </p>
+     *
+     * @param index
+     *        The position of search index to retrieve. Valid values are between 1 and 5 (inclusive)
+     * @throws IndexOutOfBoundsException if index is invalid
+     * @return The {@link Expression} of the search index
+     */
     Expression getStringIndexValue(int index);
 
 }

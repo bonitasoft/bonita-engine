@@ -13,20 +13,32 @@
  **/
 package org.bonitasoft.engine.identity;
 
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
+
 /**
+ * Identity related exception indicating that the {@link SCustomUserInfoDefinition} already exists
+ *
  * @author Elias Ricken de Medeiros
  */
 public class SCustomUserInfoDefinitionAlreadyExistsException extends SIdentityException {
 
     private static final long serialVersionUID = 1061806810101480038L;
 
-    private String definitionName;
+    private final String definitionName;
 
-    public SCustomUserInfoDefinitionAlreadyExistsException(String definitionName) {
+    /**
+     * creates a new instance with a given definition Name that already exists
+     *
+     * @param definitionName the definition name that already exists
+     */
+    public SCustomUserInfoDefinitionAlreadyExistsException(final String definitionName) {
         super("A custom user info definition already exists with name '" + definitionName + "'");
         this.definitionName = definitionName;
     }
 
+    /**
+     * @return the definition name that already exists
+     */
     public String getDefinitionName() {
         return definitionName;
     }

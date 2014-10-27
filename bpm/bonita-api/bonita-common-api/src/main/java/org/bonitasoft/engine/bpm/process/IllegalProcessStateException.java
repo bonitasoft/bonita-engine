@@ -16,15 +16,16 @@ package org.bonitasoft.engine.bpm.process;
 import org.bonitasoft.engine.exception.BonitaException;
 
 /**
- * Thrown when the process instance is in illegal state.
- * 
- * The class IllegalProcessStateException is a form of Throwable that indicates conditions that a reasonable application might want to catch.
- * The class IllegalProcessStateException that is not also subclasses of {@link RuntimeException} are checked exceptions.
+ * <p>Thrown when the process instance is in illegal state.</p>
+ * <p>The class IllegalProcessStateException is a form of Throwable that indicates conditions that a reasonable application might want to catch.<br>
+ * The class IllegalProcessStateException that is not also subclasses of {@link RuntimeException} are checked exceptions.<br>
  * Checked exceptions need to be declared in a method or constructor's {@literal throws} clause if they can be thrown by the execution of the method or
- * constructor and propagate outside the method or constructor boundary.
+ * constructor and propagate outside the method or constructor boundary.</p>
  * 
  * @author Matthieu Chaffotte
  * @author Celine Souchet
+ * @version 6.3.5
+ * @since 6.0.0
  */
 public class IllegalProcessStateException extends BonitaException {
 
@@ -34,7 +35,7 @@ public class IllegalProcessStateException extends BonitaException {
      * Constructs a new exception with the specified detail message.
      * 
      * @param message
-     *            The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
+     *        The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
      */
     public IllegalProcessStateException(final String message) {
         super(message);
@@ -44,8 +45,8 @@ public class IllegalProcessStateException extends BonitaException {
      * Constructs a new exception with the specified detail cause.
      * 
      * @param cause
-     *            The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
-     *            cause is nonexistent or unknown.)
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        cause is nonexistent or unknown.)
      */
     public IllegalProcessStateException(final Throwable cause) {
         super(cause);
