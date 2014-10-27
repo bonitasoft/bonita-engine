@@ -401,6 +401,27 @@
 		<plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>complete test conf setup</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target name="copy-service-test-conf">
+                                <copy todir="${project.build.directory}/conf" overwrite="true">
+                                    <fileset dir="${project.build.directory}/server/conf/service" />
+                                    <fileset dir="${basedir}/src/test/resources/conf" />
+                                </copy>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
@@ -418,12 +439,11 @@
                                     <type>zip</type>
                                 </artifactItem>
                             </artifactItems>
-                            <outputDirectory>${project.build.directory}/test-classes/</outputDirectory>
+                            <outputDirectory>${project.build.directory}/server</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-        
 			<plugin>
 				<!-- don't execute tests in test phase -->
 				<groupId>org.apache.maven.plugins</groupId>
@@ -432,7 +452,6 @@
 					<skipTests>true</skipTests>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
@@ -444,7 +463,7 @@
 						</property>
 					</properties>
 					<systemPropertyVariables>
-						<bonita.services.folder>${project.build.directory}/test-classes/conf</bonita.services.folder>
+						<bonita.services.folder>${project.build.directory}/conf</bonita.services.folder>
 					</systemPropertyVariables>
 					<includes>
 						<include>com/bonitasoft/services/AllTestsSPWithJNDI.java</include>
@@ -461,6 +480,49 @@
 				</executions>
 			</plugin>
 		</plugins>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings 
+                    only. It has no influence on the Maven build itself. -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-antrun-plugin</artifactId>
+                                        <versionRange>[1.6,)</versionRange>
+                                        <goals>
+                                            <goal>run</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-dependency-plugin</artifactId>
+                                        <versionRange>[2.7,)</versionRange>
+                                        <goals>
+                                            <goal>unpack</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
 	</build>
 
 </project>

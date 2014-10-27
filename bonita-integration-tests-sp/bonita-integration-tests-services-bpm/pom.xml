@@ -700,6 +700,19 @@
 										<ignore />
 									</action>
 								</pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-dependency-plugin</artifactId>
+                                        <versionRange>[2.7,)</versionRange>
+                                        <goals>
+                                            <goal>unpack</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
@@ -724,6 +737,13 @@
 								<copy todir="${bonita.home}/server/licenses" failonerror="true">
 									<fileset dir="${user.home}/lic" includes="*.lic" />
 								</copy>
+                                <copy todir="${project.build.directory}/conf" overwrite="true">
+                                    <fileset dir="${project.build.directory}/server/conf/service" />
+                                    <fileset dir="${project.build.directory}/server/conf/bpm" />
+                                </copy>
+                                <copy todir="${project.build.directory}/conf" overwrite="true">
+                                    <fileset dir="${basedir}/src/test/resources/conf" />
+                                </copy>
 							</target>
 						</configuration>
 						<goals>
@@ -732,6 +752,30 @@
 					</execution>
 				</executions>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>initialize test conf setup</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.bonitasoft.engine.test</groupId>
+                                    <artifactId>bonita-server-test-utils</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/server</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
@@ -744,7 +788,7 @@
 					</properties>
 					<systemPropertyVariables>
 						<bonita.home>${bonita.home}</bonita.home>
-						<bonita.services.folder>${project.build.directory}/test-classes/conf</bonita.services.folder>
+						<bonita.services.folder>${project.build.directory}/conf</bonita.services.folder>
 					</systemPropertyVariables>
 					<includes>
 						<include>com/bonitasoft/engine/bpm/test/AllBPMSPTestsWithJNDI.java</include>
