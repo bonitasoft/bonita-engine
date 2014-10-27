@@ -31,8 +31,6 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
 
     private final PersistenceService persistenceService;
 
-    private final TechnicalLoggerService logger;
-
     private final boolean delayable;
 
     private final ThreadLocal<BatchLogSynchronization> synchronizations = new ThreadLocal<BatchLogSynchronization>();
@@ -40,10 +38,9 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
     public BatchQueriableLoggerImpl(final PersistenceService persistenceService, final TransactionService transactionService,
             final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider,
             final TechnicalLoggerService logger, final PlatformService platformService, final Boolean delayable) {
-        super(persistenceService, loggerStrategy, sessionProvider, platformService);
+        super(persistenceService, loggerStrategy, sessionProvider, platformService, logger);
         this.persistenceService = persistenceService;
         this.transactionService = transactionService;
-        this.logger = logger;
         this.delayable = delayable;
     }
 
@@ -52,7 +49,7 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
         if (synchro == null) {
             synchro = new BatchLogSynchronization(persistenceService, BatchLogBuffer.getInstance(), delayable, this);
             synchronizations.set(synchro);
-            this.transactionService.registerBonitaSynchronization(synchro);
+            transactionService.registerBonitaSynchronization(synchro);
         }
         return synchro;
     }
@@ -66,7 +63,7 @@ public class BatchQueriableLoggerImpl extends AbstractQueriableLoggerImpl {
                 synchro.addLog(sQueriableLog);
             }
         } catch (final STransactionNotFoundException e) {
-            this.logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register synchronization to log queriable logs: transaction not found");
+            logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Unable to register synchronization to log queriable logs: transaction not found");
         }
     }
 

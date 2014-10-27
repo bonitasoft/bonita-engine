@@ -31,6 +31,7 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.Index;
@@ -39,7 +40,7 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
 /**
  * {@link ProcessRuntimeAPI} extends {@link org.bonitasoft.engine.api.ProcessRuntimeAPI} and adds capabilities on Manual tasks, connector execution (directly
  * available at API level), search index updating.
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
  */
@@ -47,7 +48,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
 
     /**
      * Add a manual task with given human task id.
-     * 
+     *
      * @param creator
      *            the manual task creator
      * @return the matching an instance of manual task
@@ -63,7 +64,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
 
     /**
      * Delete a manual task. Only manual tasks can be deleted at runtime.
-     * 
+     *
      * @param manualTaskId
      *            the id of the task to delete
      * @throws DeletionException
@@ -75,7 +76,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
 
     /**
      * Execute connector in given process instance initialized.
-     * 
+     *
      * @param connectorDefinitionId
      *            Identifier of connector definition
      * @param connectorDefinitionVersion
@@ -97,11 +98,11 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      */
     Map<String, Serializable> executeConnectorAtProcessInstantiation(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long processInstanceId)
-            throws ConnectorExecutionException, ConnectorNotFoundException;
+                    throws ConnectorExecutionException, ConnectorNotFoundException;
 
     /**
      * Execute connector in given process instance initialized with operations.
-     * 
+     *
      * @param connectorDefinitionId
      *            Identifier of connector definition
      * @param connectorDefinitionVersion
@@ -131,7 +132,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
 
     /**
      * Execute connector in given activity instance.
-     * 
+     *
      * @param connectorDefinitionId
      *            Identifier of connector definition
      * @param connectorDefinitionVersion
@@ -153,11 +154,11 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      */
     Map<String, Serializable> executeConnectorOnActivityInstance(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long activityInstanceId)
-            throws ConnectorExecutionException, ConnectorNotFoundException;
+                    throws ConnectorExecutionException, ConnectorNotFoundException;
 
     /**
      * Execute connector in given activity instance.
-     * 
+     *
      * @param connectorDefinitionId
      *            Identifier of connector definition
      * @param connectorDefinitionVersion
@@ -187,7 +188,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
 
     /**
      * Execute connector in given activity instance finished.
-     * 
+     *
      * @param connectorDefinitionId
      *            Identifier of connector definition
      * @param connectorDefinitionVersion
@@ -209,11 +210,11 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      */
     Map<String, Serializable> executeConnectorOnCompletedActivityInstance(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long activityInstanceId)
-            throws ConnectorExecutionException, ConnectorNotFoundException;
+                    throws ConnectorExecutionException, ConnectorNotFoundException;
 
     /**
      * Execute connector in given activity instance finished.
-     * 
+     *
      * @param connectorDefinitionId
      *            Identifier of connector definition
      * @param connectorDefinitionVersion
@@ -243,7 +244,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
 
     /**
      * Execute connector in given process instance finished.
-     * 
+     *
      * @param connectorDefinitionId
      *            Identifier of connector definition
      * @param connectorDefinitionVersion
@@ -265,11 +266,11 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      */
     Map<String, Serializable> executeConnectorOnCompletedProcessInstance(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long processInstanceId)
-            throws ConnectorExecutionException, ConnectorNotFoundException;
+                    throws ConnectorExecutionException, ConnectorNotFoundException;
 
     /**
      * Execute connector in given process instance finished with operations.
-     * 
+     *
      * @param connectorDefinitionId
      *            Identifier of connector definition
      * @param connectorDefinitionVersion
@@ -299,7 +300,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
 
     /**
      * Execute connector in given process instance.
-     * 
+     *
      * @param connectorDefinitionId
      *            Identifier of connector definition
      * @param connectorDefinitionVersion
@@ -321,11 +322,11 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      */
     Map<String, Serializable> executeConnectorOnProcessInstance(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long processInstanceId)
-            throws ConnectorExecutionException, ConnectorNotFoundException;
+                    throws ConnectorExecutionException, ConnectorNotFoundException;
 
     /**
      * Execute connector in given process instance with operations
-     * 
+     *
      * @param connectorDefinitionId
      *            Identifier of connector definition
      * @param connectorDefinitionVersion
@@ -355,7 +356,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
 
     /**
      * Update an index of a process instance.
-     * 
+     *
      * @param processInstanceId
      *            identifier of the process instance
      * @param index
@@ -375,7 +376,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
 
     /**
      * Update an instance of process with the given processInstanceId.
-     * 
+     *
      * @param processInstanceId
      *            Identifier of the process instance
      * @param updater
@@ -393,7 +394,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
 
     /**
      * Retrieves a <code>ConnectorInstanceWithFailureInfo</code> specified by its identifier.
-     * 
+     *
      * @param connectorInstanceId
      *            the identifier of the <code>ConnectorInstanceWithFailureInfo</code> to be retrieved.
      * @return the <code>ConnectorInstanceWithFailureInfo</code> instance.
@@ -405,7 +406,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
 
     /**
      * Search for archived flow node instances (activities, gateways and events) supervised by the specified user.
-     * 
+     *
      * @param supervisorId
      *            The identifier of the supervising user.
      * @param searchOptions
@@ -421,7 +422,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
 
     /**
      * Search for archived flow node instances (activities, gateways and events) supervised by the specified user.
-     * 
+     *
      * @param supervisorId
      *            The identifier of the supervising user.
      * @param searchOptions
@@ -437,7 +438,7 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
 
     /**
      * Search for flow node instances (activities, gateways and events) supervised by the specified user.
-     * 
+     *
      * @param supervisorId
      *            The identifier of the supervising user.
      * @param searchOptions
