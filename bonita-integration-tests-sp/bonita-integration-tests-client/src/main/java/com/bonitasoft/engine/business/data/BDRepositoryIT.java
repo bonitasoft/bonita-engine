@@ -986,12 +986,13 @@ public class BDRepositoryIT extends CommonAPISPTest {
     //@Test deactivated until it is stable
     public void useMultipleBusinessDataInACallActivityWithOutDataMultiInstance() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
-                + "; Employee john = new Employee(); john.firstName = 'John' + processInstanceId; john.lastName = 'Doe'; john;",
-                EMPLOYEE_QUALIF_CLASSNAME, new ExpressionBuilder().createEngineConstant(ExpressionConstants.PROCESS_INSTANCE_ID));
+                + "; Employee john = new Employee(); john.firstName = 'John' + activityInstanceId; john.lastName = 'Doe'; john;",
+                EMPLOYEE_QUALIF_CLASSNAME, new ExpressionBuilder().createEngineConstant(ExpressionConstants.ACTIVITY_INSTANCE_ID));
         ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("createEmployee", "1.2-beta");
         builder.addActor(ACTOR_NAME);
-        builder.addBusinessData("employee", EMPLOYEE_QUALIF_CLASSNAME, employeeExpression);
-        builder.addUserTask("step1", ACTOR_NAME);
+        builder.addBusinessData("employee", EMPLOYEE_QUALIF_CLASSNAME, null);
+        builder.addUserTask("step1", ACTOR_NAME).addOperation(new OperationBuilder().attachBusinessDataSetAttributeOperation("employee",
+                employeeExpression));
         final ProcessDefinition subProcessDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
 
         builder = new ProcessDefinitionBuilderExt().createNewInstance("MBIMI", "1.2-beta");
