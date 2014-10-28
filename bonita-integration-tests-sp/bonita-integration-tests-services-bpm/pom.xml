@@ -737,8 +737,10 @@
 								<copy todir="${bonita.home}/server/licenses" failonerror="true">
 									<fileset dir="${user.home}/lic" includes="*.lic" />
 								</copy>
-                                <copy todir="${project.build.directory}/conf" overwrite="true">
+                                <copy todir="${project.build.directory}/conf">
                                     <fileset dir="${project.build.directory}/server/conf/service" />
+                                </copy>
+                                <copy todir="${project.build.directory}/conf" overwrite="true">
                                     <fileset dir="${project.build.directory}/server/conf/bpm" />
                                 </copy>
                                 <copy todir="${project.build.directory}/conf" overwrite="true">

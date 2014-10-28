@@ -4,7 +4,7 @@
 	<bean id="workService" class="org.bonitasoft.engine.work.ExecutorWorkService">
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="workSynchronizationFactory">
-			<bean class="org.bonitasoft.engine.work.SequenceWorkSynchronizationFactory" />
+			<bean class="com.bonitasoft.engine.work.ParallelWorkSynchronizationFactory" />
 		</constructor-arg>
 		<constructor-arg name="loggerService" ref="tenantTechnicalLoggerService" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
