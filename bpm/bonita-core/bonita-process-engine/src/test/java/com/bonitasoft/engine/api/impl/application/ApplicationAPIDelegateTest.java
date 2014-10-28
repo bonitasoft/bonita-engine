@@ -235,14 +235,26 @@ public class ApplicationAPIDelegateTest {
     @Test(expected = UpdateException.class)
     public void updateApplication_should_throw_UpdadateException_when_applicationservice_throws_SObjectModificationException() throws Exception {
         //given
-        final SApplication sApplication = mock(SApplication.class);
-        final Application application = mock(Application.class);
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("new name");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectModificationException());
-        given(convertor.toApplication(sApplication)).willReturn(application);
+
+        //when
+        delegate.updateApplication(APPLICATION_ID, updater);
+
+        //then exception
+    }
+
+    @Test(expected = AlreadyExistsException.class)
+    public void updateApplication_should_throw_UpdadateException_when_applicationservice_throws_SObjectAlreadyExistsException() throws Exception {
+        //given
+        final ApplicationUpdater updater = new ApplicationUpdater();
+        updater.setToken("new name");
+        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
+        given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
+        given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectAlreadyExistsException());
 
         //when
         delegate.updateApplication(APPLICATION_ID, updater);

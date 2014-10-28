@@ -111,14 +111,11 @@ public class ApplicationServiceImpl implements ApplicationService {
             recorder.recordInsert(new InsertRecord(application), insertEvent);
             log(application.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SInvalidTokenException e) {
-            log(application.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
+            return logAndRetrowException(application.getId(), methodName, logBuilder, e);
         } catch (final SInvalidDisplayNameException e) {
-            log(application.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
+            return logAndRetrowException(application.getId(), methodName, logBuilder, e);
         } catch (final SObjectAlreadyExistsException e) {
-            log(application.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
+            return logAndRetrowException(application.getId(), methodName, logBuilder, e);
         } catch (final SBonitaException e) {
             handleCreationException(application, logBuilder, e, methodName);
         }
@@ -233,8 +230,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             recorder.recordDelete(new DeleteRecord(application), event);
             log(application.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SObjectNotFoundException e) {
-            log(applicationId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
+            logAndRetrowException(applicationId, methodName, logBuilder, e);
         } catch (final SBonitaException e) {
             throwModificationException(applicationId, logBuilder, methodName, e);
         }
@@ -243,7 +239,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public SApplication updateApplication(final long applicationId, final EntityUpdateDescriptor updateDescriptor)
-            throws SObjectModificationException, SInvalidTokenException, SInvalidDisplayNameException, SObjectAlreadyExistsException, SObjectNotFoundException {
+            throws SObjectModificationException, SInvalidTokenException, SInvalidDisplayNameException, SObjectNotFoundException, SObjectAlreadyExistsException {
         checkLicense();
         final String methodName = "updateApplication";
         final long now = System.currentTimeMillis();
@@ -251,16 +247,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         try {
             final SApplication application = getApplication(applicationId);
-
-            if (updateDescriptor.getFields().containsKey(SApplicationFields.TOKEN)
-                    && !application.getToken().equals(updateDescriptor.getFields().get(SApplicationFields.TOKEN))) {
-                validateApplicationToken((String) updateDescriptor.getFields().get(SApplicationFields.TOKEN));
-            }
-            if (updateDescriptor.getFields().containsKey(SApplicationFields.DISPLAY_NAME)
-                    && !application.getDisplayName().equals(updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME))) {
-                validateApplicationDisplayName((String) updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME));
-            }
-
+            validateUpdatedFields(updateDescriptor, application);
             updateDescriptor.addField(applicationKeyProvider.getLastUpdatedDateKey(), now);
 
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(application,
@@ -272,17 +259,32 @@ public class ApplicationServiceImpl implements ApplicationService {
             return application;
 
         } catch (SObjectNotFoundException e) {
-            log(applicationId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
+            return logAndRetrowException(applicationId, methodName, logBuilder, e);
         } catch (SInvalidTokenException e) {
-            log(applicationId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
+            return logAndRetrowException(applicationId, methodName, logBuilder, e);
         } catch (SInvalidDisplayNameException e) {
-            log(applicationId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
+            return logAndRetrowException(applicationId, methodName, logBuilder, e);
+        } catch (SObjectAlreadyExistsException e) {
+            return logAndRetrowException(applicationId, methodName, logBuilder, e);
         } catch (final SBonitaException e) {
             log(applicationId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SObjectModificationException(e);
+        }
+    }
+
+    private <T, E extends SBonitaException> T logAndRetrowException(long objectId, String methodName, SPersistenceLogBuilder logBuilder, E e) throws E {
+        log(objectId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+        throw e;
+    }
+
+    private void validateUpdatedFields(EntityUpdateDescriptor updateDescriptor, SApplication application) throws SInvalidTokenException, SBonitaReadException, SObjectAlreadyExistsException, SInvalidDisplayNameException {
+        if (updateDescriptor.getFields().containsKey(SApplicationFields.TOKEN)
+                && !application.getToken().equals(updateDescriptor.getFields().get(SApplicationFields.TOKEN))) {
+            validateApplicationToken((String) updateDescriptor.getFields().get(SApplicationFields.TOKEN));
+        }
+        if (updateDescriptor.getFields().containsKey(SApplicationFields.DISPLAY_NAME)
+                && !application.getDisplayName().equals(updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME))) {
+            validateApplicationDisplayName((String) updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME));
         }
     }
 
@@ -317,11 +319,9 @@ public class ApplicationServiceImpl implements ApplicationService {
             recorder.recordInsert(new InsertRecord(applicationPage), insertEvent);
             log(applicationPage.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SInvalidTokenException e) {
-            log(applicationPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
+            return logAndRetrowException(applicationPage.getId(), methodName, logBuilder, e);
         } catch (final SObjectAlreadyExistsException e) {
-            log(applicationPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
+            return logAndRetrowException(applicationPage.getId(), methodName, logBuilder, e);
         } catch (final SBonitaException e) {
             handleCreationException(applicationPage, logBuilder, e, methodName);
         }
@@ -412,8 +412,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             recorder.recordDelete(new DeleteRecord(applicationPage), event);
             log(applicationPage.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SObjectNotFoundException e) {
-            log(applicationpPageId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
+            logAndRetrowException(applicationpPageId, methodName, logBuilder, e);
         } catch (final SBonitaException e) {
             throwModificationException(applicationpPageId, logBuilder, methodName, e);
         }
@@ -484,8 +483,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             updateApplicationMenu(applicationMenu, updateDescriptor, true);
             return applicationMenu;
         } catch (SObjectNotFoundException e) {
-            log(applicationMenuId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
+            return logAndRetrowException(applicationMenuId, methodName, logBuilder, e);
         } catch (SBonitaReadException e) {
             log(applicationMenuId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SObjectModificationException(e);
@@ -555,8 +553,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             recorder.recordDelete(new DeleteRecord(applicationMenu), event);
             log(applicationMenu.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SObjectNotFoundException e) {
-            log(applicationMenuId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
+            logAndRetrowException(applicationMenuId, methodName, logBuilder, e);
         } catch (final SBonitaException e) {
             throwModificationException(applicationMenuId, logBuilder, methodName, e);
         }

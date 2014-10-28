@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuFields;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -64,6 +63,7 @@ import com.bonitasoft.engine.business.application.model.builder.SApplicationMenu
 import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationBuilderFactoryImpl;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuBuilderFactoryImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuFields;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderFactoryImpl;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderImpl;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationPageBuilderFactoryImpl;
@@ -597,6 +597,24 @@ public class ApplicationServiceImplTest {
         //then exception
     }
 
+    @Test(expected = SObjectAlreadyExistsException.class)
+    public void updateApplication_should_throw_SObjectAlreadyExistsException_when_another_application_exists_with_the_same_name() throws Exception {
+        //given
+        ApplicationServiceImpl applicationService = spy(applicationServiceActive);
+        final SApplicationUpdateBuilder updateBuilder = new SApplicationUpdateBuilderFactoryImpl().createNewInstance();
+        updateBuilder.updateHomePageId(150L);
+        final EntityUpdateDescriptor updateDescriptor = updateBuilder.updateToken("newToken").done();
+
+        final int applicationId = 17;
+        doReturn(application).when(applicationService).getApplication(applicationId);
+        doReturn(true).when(applicationService).hasApplicationWithName("newToken");
+
+        //when
+        applicationService.updateApplication(applicationId, updateDescriptor);
+
+        //then exception
+    }
+
     @Test(expected = IllegalStateException.class)
     public void updateApplication_should_throw_IllegalStateException_when_feature_is_not_available() throws Exception {
         //when
@@ -808,7 +826,6 @@ public class ApplicationServiceImplTest {
 
         doReturn(appMenu).when(applicationService).getApplicationMenu(applicationMenuId);
 
-
         MenuIndex newIndex = new MenuIndex(null, newIndexValue, 5);
         MenuIndex oldIndex = new MenuIndex(null, oldIndexValue, 6);
         given(convertor.toMenuIndex(appMenu)).willReturn(oldIndex);
@@ -834,7 +851,6 @@ public class ApplicationServiceImplTest {
         appMenu.setId(applicationMenuId);
 
         doReturn(appMenu).when(applicationService).getApplicationMenu(applicationMenuId);
-
 
         MenuIndex newIndex = new MenuIndex(28L, 6, 5);
         MenuIndex oldIndex = new MenuIndex(null, 4, 6);
