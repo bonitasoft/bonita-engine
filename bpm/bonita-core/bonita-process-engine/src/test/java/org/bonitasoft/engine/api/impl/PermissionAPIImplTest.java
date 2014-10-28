@@ -72,7 +72,7 @@ public class PermissionAPIImplTest {
         doThrow(ClassNotFoundException.class).when(permissionService).checkAPICallWithScript("myScript", apiCallContext);
 
         expectedException.expect(NotFoundException.class);
-        expectedException.expectMessage(containsString("class is not found"));
+        expectedException.expectMessage(containsString("the class myScript is not found"));
         //when
         permissionAPI.checkAPICallWithScript("myScript", apiCallContext);
     }
