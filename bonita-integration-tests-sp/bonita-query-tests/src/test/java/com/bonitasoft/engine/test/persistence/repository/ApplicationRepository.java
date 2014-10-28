@@ -75,4 +75,15 @@ public class ApplicationRepository extends TestRepository {
         return (SApplicationMenu) namedQuery.uniqueResult();
     }
 
+    public int getLastIndexForRootMenu() {
+        final Query namedQuery = getNamedQuery("getLastIndexForRootMenu");
+        return (Integer) namedQuery.uniqueResult();
+    }
+
+    public int getLastIndexForChildOf(long parentMenuId) {
+        final Query namedQuery = getNamedQuery("getLastIndexForChildOf");
+        namedQuery.setParameter("parentId", parentMenuId);
+        return (Integer) namedQuery.uniqueResult();
+    }
+
 }

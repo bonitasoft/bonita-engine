@@ -184,4 +184,45 @@ public class ApplicationQueriesTest {
         assertThat(retrievedMenu).isEqualTo(retrievedMenu);
     }
 
+    @Test
+    public void getLastIndexForRootMenu_should_return_last_used_index() throws Exception {
+        //given
+        final SApplication application = repository.add(anApplication().withToken("app1").withDispalyName("my app1").withDispalyName("my app")
+                .withVersion("1.0").withPath("/app1")
+                .build());
+        final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
+        final SApplicationPage appPage = repository.add(anApplicationPage().withToken("FirstPage").withApplicationId(application.getId())
+                .withPageId(page.getId()).build());
+        repository.add(anApplicationMenu().withApplicationId(application.getId()).withApplicationPageId(appPage.getId()).withDisplayName("menu app1").withIndex(1)
+                .build());
+
+        //when
+        int lastIndex = repository.getLastIndexForRootMenu();
+
+        //then
+        assertThat(lastIndex).isEqualTo(1);
+    }
+
+
+    @Test
+    public void getLastIndexForChildMenu_should_return_last_used_index_by_children_of_a_given_parent() throws Exception {
+        //given
+        final SApplication application = repository.add(anApplication().withToken("app1").withDispalyName("my app1").withDispalyName("my app")
+                .withVersion("1.0").withPath("/app1")
+                .build());
+        final SPage page = repository.add(aPage().withName("MyPage").withContent("The content".getBytes()).build());
+        final SApplicationPage appPage = repository.add(anApplicationPage().withToken("FirstPage").withApplicationId(application.getId())
+                .withPageId(page.getId()).build());
+        SApplicationMenu parentMenu = repository.add(anApplicationMenu().withApplicationId(application.getId()).withApplicationPageId(appPage.getId()).withDisplayName("menu app1").withIndex(1)
+                .build());
+        repository.add(anApplicationMenu().withApplicationId(application.getId()).withParentId(parentMenu.getId()).withApplicationPageId(appPage.getId()).withDisplayName("menu app1").withIndex(1)
+                .build());
+
+        //when
+        int lastIndex = repository.getLastIndexForChildOf(parentMenu.getId());
+
+        //then
+        assertThat(lastIndex).isEqualTo(1);
+    }
+
 }

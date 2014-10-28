@@ -3,13 +3,13 @@ package com.bonitasoft.engine.api.impl.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
-import org.bonitasoft.engine.actor.mapping.SActorMemberNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -50,7 +50,7 @@ public class ApplicationMenuAPIDelegateTest {
     private ApplicationMenuConvertor convertor;
 
     @Mock
-    private ApplicationMenuCreatorValidator validator;
+    private ApplicationMenuCreatorValidator creatorValidator;
 
     @Mock
     private SearchApplicationMenus searchApplicatonMenus;
@@ -70,17 +70,18 @@ public class ApplicationMenuAPIDelegateTest {
     @Before
     public void setUp() throws Exception {
         given(accessor.getApplicationService()).willReturn(applicationService);
-        delegate = new ApplicationMenuAPIDelegate(accessor, convertor, searchApplicatonMenus, validator);
-        given(validator.isValid(any(ApplicationMenuCreator.class))).willReturn(true);
+        delegate = new ApplicationMenuAPIDelegate(accessor, convertor, searchApplicatonMenus, creatorValidator);
+        given(creatorValidator.isValid(any(ApplicationMenuCreator.class))).willReturn(true);
     }
 
     @Test
-    public void createApplicationMenu_should_call_applicationService_createApplicationMenu_and_return_created_applicationMenu() throws Exception {
+    public void createApplicationMenu_with_no_parent_should_call_applicationService_createApplicationMenu_with_nexIndex_and_return_created_applicationMenu() throws Exception {
         //given
-        final ApplicationMenuCreator creator = new ApplicationMenuCreator(APPLICATION_ID, "Main", APPLICATION_PAGE_ID, 1);
+        final ApplicationMenuCreator creator = new ApplicationMenuCreator(APPLICATION_ID, "Main", APPLICATION_PAGE_ID);
         final SApplicationMenuImpl sAppMenu = new SApplicationMenuImpl("Main", APPLICATION_ID, APPLICATION_PAGE_ID, 1);
         final ApplicationMenuImpl appMenu = new ApplicationMenuImpl("Main", APPLICATION_ID, APPLICATION_PAGE_ID, 1);
-        given(convertor.buildSApplicationMenu(creator)).willReturn(sAppMenu);
+        given(applicationService.getNextAvailableIndex(null)).willReturn(5);
+        given(convertor.buildSApplicationMenu(creator, 5)).willReturn(sAppMenu);
         given(convertor.toApplicationMenu(sAppMenu)).willReturn(appMenu);
         given(applicationService.createApplicationMenu(sAppMenu)).willReturn(sAppMenu);
 
@@ -95,9 +96,10 @@ public class ApplicationMenuAPIDelegateTest {
     @Test(expected = CreationException.class)
     public void createApplicationMenu_should_throw_CreationException_when_applicationService_throws_SObjectCreationException() throws Exception {
         //given
-        final ApplicationMenuCreator creator = new ApplicationMenuCreator(APPLICATION_ID, "Main", APPLICATION_PAGE_ID, 1);
+        final ApplicationMenuCreator creator = new ApplicationMenuCreator(APPLICATION_ID, "Main", APPLICATION_PAGE_ID);
         final SApplicationMenuImpl sAppMenu = new SApplicationMenuImpl("Main", APPLICATION_ID, APPLICATION_PAGE_ID, 1);
-        given(convertor.buildSApplicationMenu(creator)).willReturn(sAppMenu);
+        given(applicationService.getNextAvailableIndex(null)).willReturn(1);
+        given(convertor.buildSApplicationMenu(creator, 1)).willReturn(sAppMenu);
         given(applicationService.createApplicationMenu(sAppMenu)).willThrow(new SObjectCreationException());
 
         //when
@@ -109,8 +111,8 @@ public class ApplicationMenuAPIDelegateTest {
     @Test(expected = CreationException.class)
     public void createApplicationMenu_should_throw_CreationException_when_creator_is_not_valid() throws Exception {
         //given
-        final ApplicationMenuCreator creator = new ApplicationMenuCreator(APPLICATION_ID, "Main", APPLICATION_PAGE_ID, 1);
-        given(validator.isValid(creator)).willReturn(false);
+        final ApplicationMenuCreator creator = new ApplicationMenuCreator(APPLICATION_ID, "Main", APPLICATION_PAGE_ID);
+        given(creatorValidator.isValid(creator)).willReturn(false);
 
         //when
         delegate.createApplicationMenu(creator);

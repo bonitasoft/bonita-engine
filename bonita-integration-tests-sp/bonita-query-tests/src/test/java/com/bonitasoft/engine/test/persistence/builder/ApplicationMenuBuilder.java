@@ -30,10 +30,13 @@ public class ApplicationMenuBuilder extends PersistentObjectBuilder<SApplication
     private long applicationId;
     private Long applicationPageId;
     private int index;
+    private Long parentId;
 
     @Override
     SApplicationMenuImpl _build() {
-        return new SApplicationMenuImpl(displayName, applicationId, applicationPageId, index);
+        SApplicationMenuImpl menu = new SApplicationMenuImpl(displayName, applicationId, applicationPageId, index);
+        menu.setParentId(parentId);
+        return menu;
     }
 
     public ApplicationMenuBuilder withDisplayName(final String displayName) {
@@ -41,8 +44,8 @@ public class ApplicationMenuBuilder extends PersistentObjectBuilder<SApplication
         return this;
     }
 
-    public ApplicationMenuBuilder withApplicationId(final Long applicationPageId) {
-        this.applicationPageId = applicationPageId;
+    public ApplicationMenuBuilder withApplicationId(final Long applicationId) {
+        this.applicationId = applicationId;
         return this;
     }
 
@@ -53,6 +56,10 @@ public class ApplicationMenuBuilder extends PersistentObjectBuilder<SApplication
 
     public ApplicationMenuBuilder withIndex(final int index) {
         this.index = index;
+        return this;
+    }
+    public ApplicationMenuBuilder withParentId(final long parentId) {
+        this.parentId = parentId;
         return this;
     }
 }

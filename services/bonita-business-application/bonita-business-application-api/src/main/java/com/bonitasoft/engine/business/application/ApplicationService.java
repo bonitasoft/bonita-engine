@@ -72,6 +72,8 @@ public interface ApplicationService {
     SApplicationMenu updateApplicationMenu(long applicationMenuId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException,
             SObjectNotFoundException;
 
+    SApplicationMenu updateApplicationMenu(SApplicationMenu applicationMenu, EntityUpdateDescriptor updateDescriptor, boolean organizeIndexes) throws SObjectModificationException;
+
     SApplicationMenu getApplicationMenu(long applicationMenuId) throws SBonitaReadException, SObjectNotFoundException;
 
     void deleteApplicationMenu(long applicationMenuId) throws SObjectModificationException, SObjectNotFoundException;
@@ -79,5 +81,9 @@ public interface ApplicationService {
     long getNumberOfApplicationMenus(QueryOptions options) throws SBonitaReadException;
 
     List<SApplicationMenu> searchApplicationMenus(QueryOptions options) throws SBonitaSearchException;
+
+    int getNextAvailableIndex(Long parentMenuId) throws SBonitaReadException;
+
+    int getLastUsedIndex(Long parentMenuId) throws SBonitaReadException;
 
 }

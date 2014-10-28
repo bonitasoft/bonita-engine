@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl.application;
 
-import com.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -17,6 +16,7 @@ import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchResult;
 
@@ -25,43 +25,46 @@ import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationM
 import com.bonitasoft.engine.api.impl.validator.ApplicationMenuCreatorValidator;
 import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
+import com.bonitasoft.engine.business.application.ApplicationMenuField;
 import com.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
+import com.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class ApplicationMenuAPIDelegate {
 
     private final ApplicationMenuConvertor convertor;
     private final ApplicationService applicationService;
     private final SearchApplicationMenus searchApplicationMenus;
-    private final ApplicationMenuCreatorValidator validator;
+    private final ApplicationMenuCreatorValidator creatorValidator;
 
     public ApplicationMenuAPIDelegate(final TenantServiceAccessor accessor, final ApplicationMenuConvertor convertor,
-            final SearchApplicationMenus searchApplicationMenus, final ApplicationMenuCreatorValidator validator) {
+            final SearchApplicationMenus searchApplicationMenus, final ApplicationMenuCreatorValidator creatorValidator) {
         this.searchApplicationMenus = searchApplicationMenus;
-        this.validator = validator;
+        this.creatorValidator = creatorValidator;
         applicationService = accessor.getApplicationService();
         this.convertor = convertor;
     }
 
     public ApplicationMenu createApplicationMenu(final ApplicationMenuCreator applicationMenuCreator) throws CreationException {
         try {
-            if(!validator.isValid(applicationMenuCreator)) {
-                throw new CreationException("The ApplicationMenuCreator is invalid. Problems: " + validator.getProblems());
+            if (!creatorValidator.isValid(applicationMenuCreator)) {
+                throw new CreationException("The ApplicationMenuCreator is invalid. Problems: " + creatorValidator.getProblems());
             }
-            final SApplicationMenu sApplicationMenu = applicationService.createApplicationMenu(convertor.buildSApplicationMenu(applicationMenuCreator));
+            int index = applicationService.getNextAvailableIndex(applicationMenuCreator.getParentId());
+            final SApplicationMenu sApplicationMenu = applicationService.createApplicationMenu(convertor.buildSApplicationMenu(applicationMenuCreator, index));
             return convertor.toApplicationMenu(sApplicationMenu);
         } catch (final SBonitaException e) {
             throw new CreationException(e);
         }
     }
 
-    public ApplicationMenu updateApplicationMenu(long applicationMenuId, ApplicationMenuUpdater updater) throws ApplicationMenuNotFoundException, UpdateException {
+    public ApplicationMenu updateApplicationMenu(long applicationMenuId, ApplicationMenuUpdater updater) throws ApplicationMenuNotFoundException,
+            UpdateException {
         EntityUpdateDescriptor updateDescriptor = convertor.toApplicationMenuUpdateDescriptor(updater);
         try {
             SApplicationMenu sApplicationMenu = applicationService.updateApplicationMenu(applicationMenuId, updateDescriptor);

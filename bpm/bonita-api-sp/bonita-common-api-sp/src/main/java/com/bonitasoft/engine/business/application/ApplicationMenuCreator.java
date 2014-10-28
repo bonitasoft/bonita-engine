@@ -29,30 +29,27 @@ public class ApplicationMenuCreator implements Serializable {
     /**
      * Creates an instance of {@code ApplicationMenuCreator}
      *
-     * @param applicationId the identifier of related {@link Application}
-     * @param displayName the {@link ApplicationMenu} display name
-     * @param applicationPageId the identifier of related {@link ApplicationPage}
-     * @param index the index indicating the menu position
+     * @param applicationId the identifier of related {@link com.bonitasoft.engine.business.application.Application}
+     * @param displayName the {@link com.bonitasoft.engine.business.application.ApplicationMenu} display name
+     * @param applicationPageId the identifier of related {@link com.bonitasoft.engine.business.application.ApplicationPage}
      * @see ApplicationMenu
      */
-    public ApplicationMenuCreator(final Long applicationId, final String displayName, final Long applicationPageId, final int index) {
-        this(applicationId, displayName, index);
+    public ApplicationMenuCreator(final Long applicationId, final String displayName, final Long applicationPageId) {
+        this(applicationId, displayName);
         fields.put(ApplicationMenuField.APPLICATION_PAGE_ID, applicationPageId);
     }
 
     /**
      * Creates an instance of {@code ApplicationMenuCreator}
      *
-     * @param applicationId the identifier of related {@link com.bonitasoft.engine.business.application.Application}
-     * @param displayName the {@link com.bonitasoft.engine.business.application.ApplicationMenu} display name
-     * @param index the index indicating the menu position
+     * @param applicationId the identifier of related {@link Application}
+     * @param displayName the {@link ApplicationMenu} display name
      * @see ApplicationMenu
      */
-    public ApplicationMenuCreator(final Long applicationId, final String displayName, final int index) {
+    public ApplicationMenuCreator(final Long applicationId, final String displayName) {
         fields = new HashMap<ApplicationMenuField, Serializable>(4);
         fields.put(ApplicationMenuField.DISPLAY_NAME, displayName);
         fields.put(ApplicationMenuField.APPLICATION_ID, applicationId);
-        fields.put(ApplicationMenuField.INDEX, index);
     }
 
     /**
@@ -64,6 +61,15 @@ public class ApplicationMenuCreator implements Serializable {
     public ApplicationMenuCreator setParentId(final long parentId) {
         fields.put(ApplicationMenuField.PARENT_ID, parentId);
         return this;
+    }
+
+    /**
+     * Retrieves the identifier of the parent {@link ApplicationMenu}. If no parent is defined this method will return null.
+     * @return the identifier of the parent {@code ApplicationMenu} or null if no parent is defined
+     * @see com.bonitasoft.engine.business.application.ApplicationMenu
+     */
+    public Long getParentId() {
+        return (Long)fields.get(ApplicationMenuField.PARENT_ID);
     }
 
     /**

@@ -33,13 +33,13 @@ public class ApplicationMenuConvertorTest {
     }
 
     @Test
-    public void buildSApplicationMenu_should_map_all_creator_fields() throws Exception {
+    public void buildSApplicationMenu_should_map_all_creator_fields_and_add_index() throws Exception {
         //given
-        final ApplicationMenuCreator creator = new ApplicationMenuCreator(4L, "main", 20L, 1);
+        final ApplicationMenuCreator creator = new ApplicationMenuCreator(4L, "main", 20L);
         creator.setParentId(11);
 
         //when
-        final SApplicationMenu menu = convertor.buildSApplicationMenu(creator);
+        final SApplicationMenu menu = convertor.buildSApplicationMenu(creator, 1);
 
         //then
         assertThat(menu).isNotNull();
@@ -53,10 +53,10 @@ public class ApplicationMenuConvertorTest {
     @Test
     public void buildSApplicationMenu_should_have_null_parentId_when_not_set_on_creator() throws Exception {
         //given
-        final ApplicationMenuCreator creator = new ApplicationMenuCreator(4L, "main", 20L, 1);
+        final ApplicationMenuCreator creator = new ApplicationMenuCreator(4L, "main", 20L);
 
         //when
-        final SApplicationMenu menu = convertor.buildSApplicationMenu(creator);
+        final SApplicationMenu menu = convertor.buildSApplicationMenu(creator, 1);
 
         //then
         assertThat(menu).isNotNull();

@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -55,7 +54,10 @@ import com.bonitasoft.engine.business.application.model.builder.SApplicationBuil
 import com.bonitasoft.engine.business.application.model.builder.SApplicationLogBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuLogBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationPageLogBuilder;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationLogBuilderImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuBuilderFactoryImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuFields;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuLogBuilderImpl;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationPageLogBuilderImpl;
 import com.bonitasoft.manager.Features;
@@ -76,12 +78,19 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     private final boolean active;
 
+    private IndexManager indexManager;
+    private MenuIndexConvertor menuIndexConvertor;
+
     public ApplicationServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final QueriableLoggerService queriableLoggerService) {
-        this(Manager.getInstance(), recorder, persistenceService, queriableLoggerService);
+        this(Manager.getInstance(), recorder, persistenceService, queriableLoggerService, null, null);
+        this.indexManager = new IndexManager(new IndexUpdater(this, 1000), new MenuIndexValidator());
+        this.menuIndexConvertor = new MenuIndexConvertor(this);
     }
 
     ApplicationServiceImpl(final Manager manager, final Recorder recorder, final ReadPersistenceService persistenceService,
-            final QueriableLoggerService queriableLoggerService) {
+            final QueriableLoggerService queriableLoggerService, IndexManager indexManager, MenuIndexConvertor menuIndexConvertor) {
+        this.indexManager = indexManager;
+        this.menuIndexConvertor = menuIndexConvertor;
         active = manager.isFeatureActive(Features.BUSINESS_APPLICATIONS);
         this.recorder = recorder;
         this.persistenceService = persistenceService;
@@ -449,7 +458,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         checkLicense();
         final String methodName = "createApplicationMenu";
         final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.CREATED,
-                "Creating application menu with diplay name " + applicationMenu.getDisplayName());
+                "Creating application menu with display name " + applicationMenu.getDisplayName());
         try {
             final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class)
                     .createInsertEvent(ApplicationService.APPLICATION_MENU)
@@ -463,7 +472,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public SApplicationMenu updateApplicationMenu(long applicationMenuId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException, SObjectNotFoundException {
+    public SApplicationMenu updateApplicationMenu(long applicationMenuId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException,
+            SObjectNotFoundException {
         checkLicense();
         final String methodName = "updateApplicationMenu";
         final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.UPDATED, "Updating application menu with id " + applicationMenuId);
@@ -471,19 +481,52 @@ public class ApplicationServiceImpl implements ApplicationService {
         try {
             final SApplicationMenu applicationMenu = getApplicationMenu(applicationMenuId);
 
-            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(applicationMenu,
-                    updateDescriptor);
-            final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ApplicationService.APPLICATION_MENU)
-                    .setObject(applicationMenu).done();
-            recorder.recordUpdate(updateRecord, updateEvent);
-            log(applicationMenuId, SQueriableLog.STATUS_OK, logBuilder, methodName);
+            updateApplicationMenu(applicationMenu, updateDescriptor, true);
             return applicationMenu;
         } catch (SObjectNotFoundException e) {
             log(applicationMenuId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw e;
-        } catch (final SBonitaException e) {
+        } catch (SBonitaReadException e) {
             log(applicationMenuId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SObjectModificationException(e);
+        }
+    }
+
+    @Override
+    public SApplicationMenu updateApplicationMenu(SApplicationMenu applicationMenu, EntityUpdateDescriptor updateDescriptor, boolean organizeIndexes)
+            throws SObjectModificationException {
+        final String methodName = "updateApplicationMenu";
+        final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.UPDATED,
+                "Updating application menu with id " + applicationMenu.getId());
+
+        try {
+            organizeIndexesOnUpdate(applicationMenu, updateDescriptor, organizeIndexes);
+            final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class)
+                    .createUpdateEvent(ApplicationService.APPLICATION_MENU)
+                    .setObject(applicationMenu).done();
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(applicationMenu,
+                    updateDescriptor);
+            recorder.recordUpdate(updateRecord, updateEvent);
+            log(applicationMenu.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            return applicationMenu;
+        } catch (final SBonitaException e) {
+            log(applicationMenu.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            throw new SObjectModificationException(e);
+        }
+    }
+
+    private void organizeIndexesOnUpdate(SApplicationMenu applicationMenu, EntityUpdateDescriptor updateDescriptor, boolean organizeIndexes)
+            throws SBonitaSearchException, SObjectModificationException, SBonitaReadException {
+        Map<String, Object> fields = updateDescriptor.getFields();
+        if(fields.containsKey(SApplicationMenuFields.PARENT_ID) && !fields.containsKey(SApplicationMenuFields.INDEX) ) {
+            //we need to force the update of index, as it has change of parent
+            fields.put(SApplicationMenuFields.INDEX, getNextAvailableIndex((Long)fields.get(SApplicationMenuFields.PARENT_ID)));
+        }
+        Integer newIndexValue = (Integer) fields.get(SApplicationMenuFields.INDEX);
+        if (newIndexValue != null && organizeIndexes) {
+            MenuIndex oldIndex = menuIndexConvertor.toMenuIndex(applicationMenu);
+            MenuIndex newIndex = menuIndexConvertor.toMenuIndex(applicationMenu, updateDescriptor);
+            indexManager.organizeIndexesOnUpdate(oldIndex, newIndex);
         }
     }
 
@@ -507,6 +550,8 @@ public class ApplicationServiceImpl implements ApplicationService {
             final SApplicationMenu applicationMenu = getApplicationMenu(applicationMenuId);
             final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_MENU)
                     .setObject(applicationMenu).done();
+            int lastUsedIndex = getLastUsedIndex(applicationMenu.getParentId());
+            indexManager.organizeIndexesOnDelete(new MenuIndex(applicationMenu.getParentId(), applicationMenu.getIndex(), lastUsedIndex));
             recorder.recordDelete(new DeleteRecord(applicationMenu), event);
             log(applicationMenu.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SObjectNotFoundException e) {
@@ -531,6 +576,31 @@ public class ApplicationServiceImpl implements ApplicationService {
         } catch (final SBonitaReadException e) {
             throw new SBonitaSearchException(e);
         }
+    }
+
+    public int getNextAvailableIndex(Long parentMenuId) throws SBonitaReadException {
+        int lastIndex = getLastUsedIndex(parentMenuId);
+        return lastIndex + 1;
+    }
+
+    protected Integer executeGetLastUsedIndexQuery(Long parentMenuId) throws SBonitaReadException {
+        SelectOneDescriptor<Integer> selectDescriptor;
+        if (parentMenuId == null) {
+            selectDescriptor = new SelectOneDescriptor<Integer>("getLastIndexForRootMenu", Collections.<String, Object> emptyMap(),
+                    SApplicationMenu.class);
+        } else {
+            SApplicationMenuBuilderFactoryImpl factory = new SApplicationMenuBuilderFactoryImpl();
+            selectDescriptor = new SelectOneDescriptor<Integer>("getLastIndexForChildOf", Collections.<String, Object> singletonMap(
+                    factory.getParentIdKey(), parentMenuId),
+                    SApplicationMenu.class);
+        }
+        Integer lastUsedIndex = persistenceService.selectOne(selectDescriptor);
+        return lastUsedIndex;
+    }
+
+    public int getLastUsedIndex(Long parentMenuId) throws SBonitaReadException {
+        Integer lastUsedIndex = executeGetLastUsedIndexQuery(parentMenuId);
+        return lastUsedIndex == null ? 0 : lastUsedIndex;
     }
 
 }

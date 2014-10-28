@@ -33,17 +33,16 @@ import com.bonitasoft.engine.business.application.model.builder.SApplicationMenu
  */
 public class ApplicationMenuConvertor {
 
-    public SApplicationMenu buildSApplicationMenu(final ApplicationMenuCreator creator) {
+    public SApplicationMenu buildSApplicationMenu(final ApplicationMenuCreator creator, int menuIndex) {
         final Map<ApplicationMenuField, Serializable> fields = creator.getFields();
         final String displayName = (String) fields.get(ApplicationMenuField.DISPLAY_NAME);
         final Long applicationId = (Long) fields.get(ApplicationMenuField.APPLICATION_ID);
         final Long applicationPageId = (Long) fields.get(ApplicationMenuField.APPLICATION_PAGE_ID);
-        final int index = (Integer) fields.get(ApplicationMenuField.INDEX);
         final Long parentId = (Long) fields.get(ApplicationMenuField.PARENT_ID);
 
         final SApplicationMenuBuilder builder = BuilderFactory.get(SApplicationMenuBuilderFactory.class).createNewInstance(displayName, applicationId,
                 applicationPageId,
-                index);
+                menuIndex);
         if (parentId != null) {
             builder.setParentId(parentId);
         }

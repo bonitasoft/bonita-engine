@@ -9,8 +9,10 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -19,10 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuUpdateBuilder;
-import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderFactoryImpl;
-import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderImpl;
-import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationUpdateBuilderImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuFields;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -61,14 +60,17 @@ import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilder;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuUpdateBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationBuilderFactoryImpl;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuBuilderFactoryImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderFactoryImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderImpl;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationPageBuilderFactoryImpl;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationUpdateBuilderFactoryImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationUpdateBuilderImpl;
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
-
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationServiceImplTest {
@@ -98,6 +100,12 @@ public class ApplicationServiceImplTest {
     @Mock
     private QueriableLoggerService queriableLogService;
 
+    @Mock
+    private IndexManager indexManager;
+
+    @Mock
+    private MenuIndexConvertor convertor;
+
     private SApplication application;
 
     private ApplicationServiceImpl applicationServiceActive;
@@ -108,8 +116,9 @@ public class ApplicationServiceImplTest {
     public void setUp() throws Exception {
         given(managerActiveFeature.isFeatureActive(Features.BUSINESS_APPLICATIONS)).willReturn(true);
         given(managerDisabledFeature.isFeatureActive(Features.BUSINESS_APPLICATIONS)).willReturn(false);
-        applicationServiceActive = new ApplicationServiceImpl(managerActiveFeature, recorder, persistenceService, queriableLogService);
-        applicationServiceDisabled = new ApplicationServiceImpl(managerDisabledFeature, recorder, persistenceService, queriableLogService);
+        applicationServiceActive = new ApplicationServiceImpl(managerActiveFeature, recorder, persistenceService, queriableLogService, indexManager, convertor);
+        applicationServiceDisabled = new ApplicationServiceImpl(managerDisabledFeature, recorder, persistenceService, queriableLogService, indexManager,
+                convertor);
 
         when(queriableLogService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(true);
         application = buildApplication(APPLICATION_TOKEN, APPLICATION_DISP_NAME);
@@ -248,7 +257,8 @@ public class ApplicationServiceImplTest {
     public void deleteApplication_should_call_record_delete() throws Exception {
         //given
         final long applicationId = 10L;
-        given(persistenceService.selectById(new SelectByIdDescriptor<SApplication>("getApplicationById", SApplication.class, applicationId))).willReturn(application);
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplication>("getApplicationById", SApplication.class, applicationId))).willReturn(
+                application);
 
         //when
         applicationServiceActive.deleteApplication(applicationId);
@@ -447,7 +457,7 @@ public class ApplicationServiceImplTest {
         inputParameters.put("applicationPageToken", "firstPage");
         given(persistenceService.selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationPageByTokenAndApplicationToken", inputParameters,
                 SApplicationPage.class
-        ))).willReturn(applicationPage);
+                ))).willReturn(applicationPage);
 
         //when
         final SApplicationPage retrievedAppPage = applicationServiceActive.getApplicationPage("app", "firstPage");
@@ -482,7 +492,7 @@ public class ApplicationServiceImplTest {
         final SApplicationPage applicationPage = buildApplicationPage(20, 30, "myPage");
         applicationPage.setId(27);
         given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationPage>("getApplicationPageById", SApplicationPage.class, applicationPageId)))
-        .willReturn(applicationPage);
+                .willReturn(applicationPage);
 
         //when
         applicationServiceActive.deleteApplicationPage(applicationPageId);
@@ -501,7 +511,7 @@ public class ApplicationServiceImplTest {
         //given
         final long applicationPageId = 10L;
         given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationPage>("getApplicationPageById", SApplicationPage.class, applicationPageId)))
-        .willReturn(null);
+                .willReturn(null);
 
         //when
         applicationServiceActive.deleteApplicationPage(applicationPageId);
@@ -516,7 +526,7 @@ public class ApplicationServiceImplTest {
         final SApplicationPage applicationPage = buildApplicationPage(20, 30, "myPage");
         applicationPage.setId(27);
         given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationPage>("getApplicationPageById", SApplicationPage.class, applicationPageId)))
-        .willReturn(applicationPage);
+                .willReturn(applicationPage);
         doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
 
         //when
@@ -731,7 +741,8 @@ public class ApplicationServiceImplTest {
     }
 
     private SApplicationMenu buildApplicationMenu(final String displayName, final long applicationPageId, final int index, long applicationId) {
-        final SApplicationMenuBuilder builder = new SApplicationMenuBuilderFactoryImpl().createNewInstance(displayName, applicationId, applicationPageId, index);
+        final SApplicationMenuBuilder builder = new SApplicationMenuBuilderFactoryImpl()
+                .createNewInstance(displayName, applicationId, applicationPageId, index);
         return builder.done();
     }
 
@@ -765,8 +776,9 @@ public class ApplicationServiceImplTest {
         appMenu.setId(17);
 
         final int applicationMenuId = 17;
-        given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById", SApplicationMenu.class, applicationMenuId))).willReturn(
-                appMenu);
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById", SApplicationMenu.class, applicationMenuId)))
+                .willReturn(
+                        appMenu);
 
         //when
         final SApplicationMenu updatedApplicationMenu = applicationServiceActive.updateApplicationMenu(applicationMenuId, updateDescriptor);
@@ -780,6 +792,88 @@ public class ApplicationServiceImplTest {
         assertThat(updatedApplicationMenu).isEqualTo(appMenu);
     }
 
+    @Test
+    public void updateApplicationMenu_should_organize_indexes_when_field_index_is_updated() throws Exception {
+        //given
+        ApplicationServiceImpl applicationService = spy(applicationServiceActive);
+        int newIndexValue = 1;
+        int oldIndexValue = 5;
+        final SApplicationMenuUpdateBuilder updateBuilder = new SApplicationMenuUpdateBuilderImpl();
+        updateBuilder.updateIndex(newIndexValue);
+        final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
+
+        final int applicationMenuId = 17;
+        final SApplicationMenu appMenu = buildApplicationMenu("main", 5, oldIndexValue, 12);
+        appMenu.setId(applicationMenuId);
+
+        doReturn(appMenu).when(applicationService).getApplicationMenu(applicationMenuId);
+
+
+        MenuIndex newIndex = new MenuIndex(null, newIndexValue, 5);
+        MenuIndex oldIndex = new MenuIndex(null, oldIndexValue, 6);
+        given(convertor.toMenuIndex(appMenu)).willReturn(oldIndex);
+        given(convertor.toMenuIndex(appMenu, updateDescriptor)).willReturn(newIndex);
+
+        //when
+        applicationService.updateApplicationMenu(applicationMenuId, updateDescriptor);
+
+        //then
+        verify(indexManager, times(1)).organizeIndexesOnUpdate(oldIndex, newIndex);
+    }
+
+    @Test
+    public void updateApplicationMenu_should_force_update_index_when_field_parent_is_updated() throws Exception {
+        //given
+        ApplicationServiceImpl applicationService = spy(applicationServiceActive);
+        final SApplicationMenuUpdateBuilder updateBuilder = new SApplicationMenuUpdateBuilderImpl();
+        updateBuilder.updateParentId(28L);
+        final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
+
+        final int applicationMenuId = 17;
+        final SApplicationMenu appMenu = buildApplicationMenu("main", 5, 4, 12);
+        appMenu.setId(applicationMenuId);
+
+        doReturn(appMenu).when(applicationService).getApplicationMenu(applicationMenuId);
+
+
+        MenuIndex newIndex = new MenuIndex(28L, 6, 5);
+        MenuIndex oldIndex = new MenuIndex(null, 4, 6);
+        given(convertor.toMenuIndex(appMenu)).willReturn(oldIndex);
+        given(convertor.toMenuIndex(appMenu, updateDescriptor)).willReturn(newIndex);
+        given(applicationService.getLastUsedIndex(28L)).willReturn(5);
+
+        //when
+        applicationService.updateApplicationMenu(applicationMenuId, updateDescriptor);
+
+        //then
+        ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
+        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
+
+        UpdateRecord updateRecord = updateRecordCaptor.getValue();
+        assertThat(updateRecord.getFields().get(SApplicationMenuFields.INDEX)).isEqualTo(6);
+    }
+
+    @Test
+    public void updateApplicationMenu_should_not_organize_indexes_when_field_index_is_not_updated() throws Exception {
+        //given
+        final SApplicationMenuUpdateBuilder updateBuilder = new SApplicationMenuUpdateBuilderImpl();
+        updateBuilder.updateDisplayName("new display name");
+        final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
+
+        final SApplicationMenu appMenu = buildApplicationMenu("main", 5, 1, 12);
+        appMenu.setId(17);
+
+        final int applicationMenuId = 17;
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById", SApplicationMenu.class, applicationMenuId)))
+                .willReturn(
+                        appMenu);
+
+        //when
+        applicationServiceActive.updateApplicationMenu(applicationMenuId, updateDescriptor);
+
+        //then
+        verifyZeroInteractions(indexManager);
+    }
 
     @Test(expected = SObjectNotFoundException.class)
     public void updateApplicationMenu_should_throw_SObjectNotFoundException_when_recorder_returns_null() throws Exception {
@@ -789,8 +883,9 @@ public class ApplicationServiceImplTest {
         final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
 
         final int applicationMenuId = 17;
-        given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById", SApplicationMenu.class, applicationMenuId))).willReturn(
-                null);
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById", SApplicationMenu.class, applicationMenuId)))
+                .willReturn(
+                        null);
 
         //when
         applicationServiceActive.updateApplicationMenu(applicationMenuId, updateDescriptor);
@@ -809,8 +904,9 @@ public class ApplicationServiceImplTest {
         appMenu.setId(17);
 
         final int applicationMenuId = 17;
-        given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById", SApplicationMenu.class, applicationMenuId))).willReturn(
-                appMenu);
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById", SApplicationMenu.class, applicationMenuId)))
+                .willReturn(
+                        appMenu);
         doThrow(new SRecorderException("")).when(recorder).recordUpdate(any(UpdateRecord.class), any(SUpdateEvent.class));
 
         //when
@@ -864,6 +960,9 @@ public class ApplicationServiceImplTest {
         final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById",
                 SApplicationMenu.class, applicationId);
         given(persistenceService.selectById(selectDescriptor)).willReturn(applicationMenu);
+        SelectOneDescriptor<Integer> descriptor = new SelectOneDescriptor<Integer>("getLastIndexForRootMenu", Collections.<String, Object> emptyMap(),
+                SApplicationMenu.class);
+        given(persistenceService.selectOne(descriptor)).willReturn(2);
 
         //when
         applicationServiceActive.deleteApplicationMenu(applicationId);
@@ -875,6 +974,32 @@ public class ApplicationServiceImplTest {
         assertThat(deleteEventCaptor.getValue().getObject()).isEqualTo(applicationMenu);
         assertThat(deleteEventCaptor.getValue().getType()).isEqualTo(ApplicationService.APPLICATION_MENU + DELETED_SUFFIX);
         assertThat(deleteRecordCaptor.getValue().getEntity()).isEqualTo(applicationMenu);
+    }
+
+    @Test
+    public void deleteApplicationMenu_without_parent_should_update_indexes() throws Exception {
+        //given
+        int indexValue = 6;
+        int lastUsedIndex = 10;
+        final int applicationId = 3;
+        final SApplicationMenu applicationMenu = buildApplicationMenu("main", 2, indexValue, 12);
+        applicationMenu.setId(applicationId);
+        final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById",
+                SApplicationMenu.class, applicationId);
+        given(persistenceService.selectById(selectDescriptor)).willReturn(applicationMenu);
+
+        SelectOneDescriptor<Integer> descriptor = new SelectOneDescriptor<Integer>("getLastIndexForRootMenu", Collections.<String, Object> emptyMap(),
+                SApplicationMenu.class);
+        given(persistenceService.selectOne(descriptor)).willReturn(lastUsedIndex);
+
+        MenuIndex menuIndex = new MenuIndex(null, indexValue, lastUsedIndex);
+        given(convertor.toMenuIndex(applicationMenu)).willReturn(menuIndex);
+
+        //when
+        applicationServiceActive.deleteApplicationMenu(applicationId);
+
+        //then
+        verify(indexManager, times(1)).organizeIndexesOnDelete(menuIndex);
     }
 
     @Test(expected = SObjectNotFoundException.class)
@@ -893,6 +1018,11 @@ public class ApplicationServiceImplTest {
         //given
         final SApplicationMenu applicationMenu = buildApplicationMenu("main", 1, 1, 12);
         given(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SApplicationMenu>> any())).willReturn(applicationMenu);
+
+        SelectOneDescriptor<Integer> descriptor = new SelectOneDescriptor<Integer>("getLastIndexForRootMenu", Collections.<String, Object> emptyMap(),
+                SApplicationMenu.class);
+        given(persistenceService.selectOne(descriptor)).willReturn(2);
+
         doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
 
         //when
@@ -964,6 +1094,107 @@ public class ApplicationServiceImplTest {
         applicationServiceDisabled.searchApplicationMenus(new QueryOptions(0, 10));
 
         //then exception
+    }
+
+    @Test
+    public void getNextIndex_should_return_getLastUsedIndex_more_one() throws Exception {
+        //given
+        ApplicationServiceImpl applicationService = spy(applicationServiceActive);
+        given(applicationService.getLastUsedIndex(4L)).willReturn(7);
+
+        //when
+        int next = applicationServiceActive.getNextAvailableIndex(4L);
+
+        //then
+        assertThat(next).isEqualTo(8);
+    }
+
+    @Test
+    public void executeGetLastUsedIndexQuery_should_use_persistence_service_getLastIndexForRootMenu_if_parent_is_null() throws Exception {
+        //given
+        SelectOneDescriptor<Integer> descriptor = new SelectOneDescriptor<Integer>("getLastIndexForRootMenu", Collections.<String, Object> emptyMap(),
+                SApplicationMenu.class);
+        given(persistenceService.selectOne(descriptor)).willReturn(1);
+
+        //when
+        Integer result = applicationServiceActive.executeGetLastUsedIndexQuery(null);
+
+        //then
+        assertThat(result).isEqualTo(1);
+    }
+
+    @Test
+    public void executeGetLastUsedIndexQuery_should_use_persistence_service_getLastIndexForChildOf_if_parent_is_not_null() throws Exception {
+        //given
+        SApplicationMenuBuilderFactoryImpl factory = new SApplicationMenuBuilderFactoryImpl();
+        long parentId = 10;
+        SelectOneDescriptor<Integer> descriptor = new SelectOneDescriptor<Integer>("getLastIndexForChildOf", Collections.<String, Object> singletonMap(
+                factory.getParentIdKey(), parentId),
+                SApplicationMenu.class);
+        given(persistenceService.selectOne(descriptor)).willReturn(1);
+
+        //when
+        Integer result = applicationServiceActive.executeGetLastUsedIndexQuery(parentId);
+
+        //then
+        assertThat(result).isEqualTo(1);
+    }
+
+    @Test
+    public void getLastUsedIndex_should_return_executeGetLastUsedIndexQuery_if_result_is_not_null() throws Exception {
+        //given
+        ApplicationServiceImpl applicationService = spy(applicationServiceActive);
+        given(applicationService.executeGetLastUsedIndexQuery(1L)).willReturn(4);
+
+        //when
+        int lastUsedIndex = applicationService.getLastUsedIndex(1L);
+
+        //then
+        assertThat(lastUsedIndex).isEqualTo(4);
+    }
+
+    @Test
+    public void getLastUsedIndex_should_return_zero_executeGetLastUsedIndexQuery_if_result_is_null() throws Exception {
+        //given
+        ApplicationServiceImpl applicationService = spy(applicationServiceActive);
+        given(applicationService.executeGetLastUsedIndexQuery(1L)).willReturn(null);
+
+        //when
+        int lastUsedIndex = applicationService.getLastUsedIndex(1L);
+
+        //then
+        assertThat(lastUsedIndex).isEqualTo(0);
+    }
+
+    @Test
+    public void getLastUsedIndex_should_return_zero_when_persistence_service_getLastIndexForChildOf_return_null() throws Exception {
+        //given
+        SelectOneDescriptor<Integer> descriptor = new SelectOneDescriptor<Integer>("getLastIndexForRootMenu", Collections.<String, Object> emptyMap(),
+                SApplicationMenu.class);
+        given(persistenceService.selectOne(descriptor)).willReturn(null);
+
+        //when
+        Integer lastUsedIndex = applicationServiceActive.getLastUsedIndex(null);
+
+        //then
+        assertThat(lastUsedIndex).isEqualTo(0);
+    }
+
+    @Test
+    public void getLastUsedIndex_for_child_menu_should_return_zero_when_persistence_service_getLastIndexForChildOf_return_null() throws Exception {
+        //given
+        SApplicationMenuBuilderFactoryImpl factory = new SApplicationMenuBuilderFactoryImpl();
+        long parentId = 10;
+        SelectOneDescriptor<Integer> descriptor = new SelectOneDescriptor<Integer>("getLastIndexForChildOf", Collections.<String, Object> singletonMap(
+                factory.getParentIdKey(), parentId),
+                SApplicationMenu.class);
+        given(persistenceService.selectOne(descriptor)).willReturn(null);
+
+        //when
+        int next = applicationServiceActive.getLastUsedIndex(parentId);
+
+        //then
+        assertThat(next).isEqualTo(0);
     }
 
 }
