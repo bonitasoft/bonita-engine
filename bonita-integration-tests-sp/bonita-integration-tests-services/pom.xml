@@ -413,6 +413,8 @@
                             <target name="copy-service-test-conf">
                                 <copy todir="${project.build.directory}/conf" overwrite="true">
                                     <fileset dir="${project.build.directory}/server/conf/service" />
+                                </copy>
+                                 <copy todir="${project.build.directory}/conf" overwrite="true">
                                     <fileset dir="${basedir}/src/test/resources/conf" />
                                 </copy>
                             </target>
