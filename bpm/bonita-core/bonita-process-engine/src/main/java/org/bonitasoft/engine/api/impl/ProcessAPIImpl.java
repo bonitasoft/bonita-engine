@@ -481,17 +481,19 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         try {
             final boolean hasOpenProcessInstances = searchProcessInstances(getTenantAccessor(), searchOptions).getCount() > 0;
-            if (hasOpenProcessInstances) {
-                throw new DeletionException("Some active process instances are still found, process #" + processDefinitionId + " can't be deleted.");
-            }
+            checkIfItIsPossibleToDeleteProcessInstance(processDefinitionId, hasOpenProcessInstances);
             final boolean hasArchivedProcessInstances = searchArchivedProcessInstances(searchOptions).getCount() > 0;
-            if (hasArchivedProcessInstances) {
-                throw new DeletionException("Some archived process instances are still found, process #" + processDefinitionId + " can't be deleted.");
-            }
+            checkIfItIsPossibleToDeleteProcessInstance(processDefinitionId, hasArchivedProcessInstances);
 
             processManagementAPIImplDelegate.deleteProcessDefinition(processDefinitionId);
         } catch (final Exception e) {
             throw new DeletionException(e);
+        }
+    }
+
+    private void checkIfItIsPossibleToDeleteProcessInstance(final long processDefinitionId, final boolean canThrowException) throws DeletionException {
+        if (canThrowException) {
+            throw new DeletionException("Some active process instances are still found, process #" + processDefinitionId + " can't be deleted.");
         }
     }
 
@@ -1217,7 +1219,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ActorInstance updateActor(final long actorId, final ActorUpdater descriptor) throws ActorNotFoundException, UpdateException {
         if (descriptor == null || descriptor.getFields().isEmpty()) {
-            throw new UpdateException("The update descriptor does not contain field updates");
+            throw new UpdateException();
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
@@ -1291,7 +1293,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 return addUserToActor(ai.getId(), userId);
             }
         }
-        throw new ActorNotFoundException("Actor " + actorName + " not found in process definition " + processDefinition.getName());
+        throw new ActorNotFoundException(actorName, processDefinition);
     }
 
     @Override
@@ -1336,7 +1338,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 return addGroupToActor(actorInstance.getId(), groupId);
             }
         }
-        throw new ActorNotFoundException("Actor " + actorName + " not found in process definition " + processDefinition.getName());
+        throw new ActorNotFoundException(actorName, processDefinition);
     }
 
     @Override
@@ -1381,7 +1383,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 return addRoleToActor(ai.getId(), roleId);
             }
         }
-        throw new ActorNotFoundException("Actor " + actorName + " not found in process definition " + processDefinition.getName());
+        throw new ActorNotFoundException(actorName, processDefinition);
     }
 
     @Override
@@ -1393,7 +1395,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 return addRoleAndGroupToActor(ai.getId(), roleId, groupId);
             }
         }
-        throw new ActorNotFoundException("Actor " + actorName + " not found in process definition " + processDefinition.getName());
+        throw new ActorNotFoundException(actorName, processDefinition);
     }
 
     @Override
@@ -1995,7 +1997,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void updateCategory(final long categoryId, final CategoryUpdater updater) throws CategoryNotFoundException, UpdateException {
         if (updater == null || updater.getFields().isEmpty()) {
-            throw new UpdateException("The update descriptor does not contain field updates");
+            throw new UpdateException();
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final CategoryService categoryService = tenantAccessor.getCategoryService();
@@ -2543,8 +2545,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final List<SDataInstance> sDataInstances = dataInstanceService.getDataInstances(new ArrayList<String>(dataNameValues.keySet()), processInstanceId,
                     DataInstanceContainer.PROCESS_INSTANCE.toString());
             for (final SDataInstance sDataInstance : sDataInstances) {
-                final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-                entityUpdateDescriptor.addField("value", dataNameValues.get(sDataInstance.getName()));
+                final EntityUpdateDescriptor entityUpdateDescriptor = buildEntityUpdateDescriptorForData(dataNameValues.get(sDataInstance.getName()));
                 dataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
             }
         } catch (final SBonitaException e) {
@@ -2552,6 +2553,12 @@ public class ProcessAPIImpl implements ProcessAPI {
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
+    }
+
+    private EntityUpdateDescriptor buildEntityUpdateDescriptorForData(final Serializable dataValue) {
+        final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+        entityUpdateDescriptor.addField("value", dataValue);
+        return entityUpdateDescriptor;
     }
 
     /**
@@ -2643,8 +2650,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             throws SDataInstanceException {
         final SDataInstance sDataInstance = dataInstanceService.getDataInstance(dataName, activityInstanceId,
                 DataInstanceContainer.ACTIVITY_INSTANCE.toString());
-        final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-        entityUpdateDescriptor.addField("value", dataValue);
+        final EntityUpdateDescriptor entityUpdateDescriptor = buildEntityUpdateDescriptorForData(dataValue);
         dataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
     }
 
@@ -2737,8 +2743,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             throws SDataInstanceException {
         final SDataInstance sDataInstance = transientDataInstanceService.getDataInstance(dataName, activityInstanceId,
                 DataInstanceContainer.ACTIVITY_INSTANCE.toString());
-        final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-        entityUpdateDescriptor.addField("value", dataValue);
+        final EntityUpdateDescriptor entityUpdateDescriptor = buildEntityUpdateDescriptorForData(dataValue);
         transientDataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
     }
 
@@ -2908,8 +2913,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             for (final Entry<String, Serializable> variable : variables.entrySet()) {
                 final SDataInstance sDataInstance = dataInstanceService.getDataInstance(variable.getKey(), activityInstanceId,
                         DataInstanceContainer.ACTIVITY_INSTANCE.toString());
-                final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
-                entityUpdateDescriptor.addField("value", variable.getValue());
+                final EntityUpdateDescriptor entityUpdateDescriptor = buildEntityUpdateDescriptorForData(variable.getValue());
                 dataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
             }
         } catch (final SBonitaException e) {
@@ -3010,7 +3014,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final int assignedUserTaskInstanceNumber = (int) getNumberOfAssignedHumanTaskInstances(userId);
         final List<HumanTaskInstance> userTaskInstances = getAssignedHumanTaskInstances(userId, 0, assignedUserTaskInstanceNumber,
                 ActivityInstanceCriterion.DEFAULT);
-        if (userTaskInstances.size() != 0) {
+        if (!userTaskInstances.isEmpty()) {
             for (final HumanTaskInstance userTaskInstance : userTaskInstances) {
                 final String stateName = userTaskInstance.getState();
                 try {
@@ -3084,7 +3088,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void updateProcessDeploymentInfo(final long processDefinitionId, final ProcessDeploymentInfoUpdater processDeploymentInfoUpdater)
             throws ProcessDefinitionNotFoundException, UpdateException {
         if (processDeploymentInfoUpdater == null || processDeploymentInfoUpdater.getFields().isEmpty()) {
-            throw new UpdateException("The update descriptor does not contain field updates");
+            throw new UpdateException();
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
@@ -3727,10 +3731,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final OrderByOption order2 = new OrderByOption(SProcessInstance.class, keyProvider.getIdKey(), OrderByType.ASC);
         // Order by caller id ASC because we need to have parent process deleted before their sub processes
         final OrderByOption order = new OrderByOption(SProcessInstance.class, keyProvider.getCallerIdKey(), OrderByType.ASC);
-        final ArrayList<OrderByOption> orders = new ArrayList<OrderByOption>();
-        orders.add(order);
-        orders.add(order2);
-        final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults, orders, Collections.singletonList(filterOption), null);
+        final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults, Arrays.asList(order, order2), Collections.singletonList(filterOption), null);
         return processInstanceService.searchProcessInstances(queryOptions);
     }
 
@@ -3753,7 +3754,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public long deleteArchivedProcessInstancesInAllStates(final List<Long> sourceProcessInstanceIds) throws DeletionException {
-        if (sourceProcessInstanceIds == null || sourceProcessInstanceIds.size() == 0) {
+        if (sourceProcessInstanceIds == null || sourceProcessInstanceIds.isEmpty()) {
             throw new IllegalArgumentException("The identifier of the archived process instances to deleted are missing !!");
         }
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -3781,10 +3782,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final OrderByOption order = new OrderByOption(SAProcessInstance.class, keyProvider.getIdKey(), OrderByType.ASC);
         // Order by caller id ASC because we need to have parent process deleted before their sub processes
         final OrderByOption order2 = new OrderByOption(SAProcessInstance.class, keyProvider.getCallerIdKey(), OrderByType.ASC);
-        final ArrayList<OrderByOption> orders = new ArrayList<OrderByOption>();
-        orders.add(order);
-        orders.add(order2);
-        final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults, orders, Collections.singletonList(filterOption), null);
+        final QueryOptions queryOptions = new QueryOptions(startIndex, maxResults, Arrays.asList(order, order2), Collections.singletonList(filterOption), null);
         return processInstanceService.searchArchivedProcessInstances(queryOptions);
     }
 
@@ -4420,8 +4418,12 @@ public class ProcessAPIImpl implements ProcessAPI {
             // TODO: refactor this method when deprecated addComment() method is removed from API:
             return addComment(processInstanceId, comment);
         } catch (final RetrieveException e) {
-            throw new CreationException("Cannot add a comment on a finished or inexistant process instance", e.getCause());
+            throw new CreationException(buildCantAddCommentOnProcessInstance(), e.getCause());
         }
+    }
+
+    private String buildCantAddCommentOnProcessInstance() {
+        return "Cannot add a comment on a finished or inexistant process instance";
     }
 
     @Override
@@ -4431,9 +4433,9 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             tenantAccessor.getProcessInstanceService().getProcessInstance(processInstanceId);
         } catch (final SProcessInstanceReadException e) {
-            throw new RetrieveException("Cannot add a comment on a finished or inexistant process instance", e); // FIXME: should be another exception
+            throw new RetrieveException(buildCantAddCommentOnProcessInstance(), e); // FIXME: should be another exception
         } catch (final SProcessInstanceNotFoundException e) {
-            throw new RetrieveException("Cannot add a comment on a finished or inexistant process instance", e); // FIXME: should be another exception
+            throw new RetrieveException(buildCantAddCommentOnProcessInstance(), e); // FIXME: should be another exception
         }
         final SCommentService commentService = tenantAccessor.getCommentService();
         final AddComment addComment = new AddComment(commentService, processInstanceId, comment);
@@ -5069,7 +5071,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             if (processDef != null) {
                 expcontext.setProcessDefinition(processDef);
             }
-            final HashMap<String, Object> hashMap = new HashMap<String, Object>(context);
+            final Map<String, Object> hashMap = new HashMap<String, Object>(context);
             expcontext.setInputValues(hashMap);
             return (Serializable) expressionResolverService.evaluate(sExpression, expcontext);
         } catch (final SExpressionEvaluationException e) {
@@ -5215,7 +5217,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         } catch (final SProcessDefinitionReadException e) {
             throw new ProcessDefinitionNotFoundException(e);
         }
-        final ArrayList<Problem> problems = new ArrayList<Problem>();
+        final List<Problem> problems = new ArrayList<Problem>();
         for (final ProcessDependencyResolver resolver : resolvers) {
             final List<Problem> problem = resolver.checkResolution(tenantAccessor, processDefinition);
             if (problem != null) {

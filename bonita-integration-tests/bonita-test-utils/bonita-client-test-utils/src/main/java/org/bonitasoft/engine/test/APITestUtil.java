@@ -259,11 +259,11 @@ public class APITestUtil extends PlatformTestUtil {
         getProcessAPI().addUserToActor(actor.getId(), userId);
     }
 
-    public ActorInstance getActor(final String actorName, final ProcessDefinition definition) throws ActorNotFoundException {
-        final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 50, ActorCriterion.NAME_ASC);
+    public ActorInstance getActor(final String actorName, final ProcessDefinition processDefinition) throws ActorNotFoundException {
+        final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 50, ActorCriterion.NAME_ASC);
         final ActorInstance actorInstance = getActorInstance(actors, actorName);
         if (actorInstance == null) {
-            throw new ActorNotFoundException(actorName + " is an unknown actor");
+            throw new ActorNotFoundException(actorName, processDefinition);
         }
         return actorInstance;
     }
