@@ -70,7 +70,6 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreat
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
@@ -108,10 +107,6 @@ import org.bonitasoft.engine.execution.event.OperationsWithContext;
 import org.bonitasoft.engine.execution.flowmerger.TokenInfo;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.execution.work.WorkFactory;
-import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
-import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
-import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownException;
-import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
@@ -394,7 +389,7 @@ public class StateBehaviors {
      */
     public BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> getConnectorToExecuteAndFlag(final SProcessDefinition processDefinition,
             final SFlowNodeInstance flowNodeInstance, final boolean executeConnectorsOnEnter, final boolean executeConnectorsOnFinish)
-                    throws SActivityStateExecutionException {
+            throws SActivityStateExecutionException {
         try {
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SFlowNodeDefinition flowNodeDefinition = processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
@@ -477,7 +472,7 @@ public class StateBehaviors {
 
     private BEntry<Integer, BEntry<SConnectorInstance, SConnectorDefinition>> getConnectorWithFlagIfIsNextToExecute(final SFlowNodeInstance flowNodeInstance,
             final List<SConnectorDefinition> sConnectorDefinitions, final SConnectorInstance nextConnectorInstanceToExecute, final int flag)
-                    throws SActivityStateExecutionException {
+            throws SActivityStateExecutionException {
         for (final SConnectorDefinition sConnectorDefinition : sConnectorDefinitions) {
             if (sConnectorDefinition.getName().equals(nextConnectorInstanceToExecute.getName())) {
                 return getConnectorWithFlag(nextConnectorInstanceToExecute, sConnectorDefinition, flag);
@@ -562,7 +557,7 @@ public class StateBehaviors {
     }
 
     private long getTargetProcessDefinitionId(final String callableElement, final String callableElementVersion) throws SProcessDefinitionReadException,
-    SProcessDefinitionNotFoundException {
+            SProcessDefinitionNotFoundException {
         if (callableElementVersion != null) {
             return processDefinitionService.getProcessDefinitionId(callableElement, callableElementVersion);
         }
@@ -608,15 +603,7 @@ public class StateBehaviors {
                 activityInstanceService.updateDisplayName(flowNodeInstance, displayName);
                 activityInstanceService.updateDisplayDescription(flowNodeInstance, displayDescription);
             }
-        } catch (final SFlowNodeModificationException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
-        } catch (final SExpressionTypeUnknownException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
-        } catch (final SExpressionEvaluationException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
-        } catch (final SExpressionDependencyMissingException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
-        } catch (final SInvalidExpressionException e) {
+        } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException("error while updating display name and description", e);
         }
     }
@@ -637,15 +624,7 @@ public class StateBehaviors {
                     activityInstanceService.updateDisplayDescription(flowNodeInstance, displayDescriptionAfterCompletion);
                 }
             }
-        } catch (final SFlowNodeModificationException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
-        } catch (final SExpressionTypeUnknownException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
-        } catch (final SExpressionEvaluationException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
-        } catch (final SExpressionDependencyMissingException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
-        } catch (final SInvalidExpressionException e) {
+        } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException("error while updating display name and description", e);
         }
     }
@@ -732,7 +711,7 @@ public class StateBehaviors {
 
     public void executeConnectorInWork(final Long processDefinitionId, final long processInstanceId, final long flowNodeDefinitionId,
             final long flowNodeInstanceId, final SConnectorInstance connector, final SConnectorDefinition sConnectorDefinition)
-                    throws SActivityStateExecutionException {
+            throws SActivityStateExecutionException {
         final long connectorInstanceId = connector.getId();
         // final Long connectorDefinitionId = sConnectorDefinition.getId();// FIXME: Uncomment when generate id
         final String connectorDefinitionName = sConnectorDefinition.getName();

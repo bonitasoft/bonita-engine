@@ -63,25 +63,7 @@ public class TenantQuartzJobListener extends AbstractQuartzJobListener {
 
     @Override
     public void jobToBeExecuted(final JobExecutionContext context) {
-        final JobDetail jobDetail = context.getJobDetail();
-        final Trigger trigger = context.getTrigger();
-        final TriggerKey triggerKey = trigger.getKey();
-        final JobKey jobKey = jobDetail.getKey();
-
-        final Map<String, Serializable> mapContext = new HashMap<String, Serializable>();
-        mapContext.put(AbstractBonitaJobListener.BOS_JOB, getBosJob(context));
-        mapContext.put(AbstractBonitaJobListener.JOB_DESCRIPTOR_ID, getJobDescriptorId(jobDetail));
-        mapContext.put(AbstractBonitaJobListener.TENANT_ID, getTenantId(jobDetail));
-        mapContext.put(AbstractBonitaJobListener.JOB_TYPE, getJobType(context.getJobInstance()));
-        mapContext.put(AbstractBonitaJobListener.JOB_NAME, jobKey.getName());
-        mapContext.put(AbstractBonitaJobListener.JOB_GROUP, jobKey.getGroup());
-        mapContext.put(AbstractBonitaJobListener.TRIGGER_NAME, triggerKey.getName());
-        mapContext.put(AbstractBonitaJobListener.TRIGGER_GROUP, triggerKey.getGroup());
-        mapContext.put(AbstractBonitaJobListener.TRIGGER_PREVIOUS_FIRE_TIME, trigger.getPreviousFireTime());
-        mapContext.put(AbstractBonitaJobListener.TRIGGER_NEXT_FIRE_TIME, trigger.getNextFireTime());
-        mapContext.put(AbstractBonitaJobListener.REFIRE_COUNT, Integer.valueOf(context.getRefireCount()));
-        mapContext.put(AbstractBonitaJobListener.JOB_DATAS, (Serializable) getJobDataValueAndType(jobDetail));
-        mapContext.put(AbstractBonitaJobListener.JOB_RESULT, String.valueOf(context.getResult()));
+        final Map<String, Serializable> mapContext = buildMapContext(context);
 
         final Long tenantId = Long.valueOf(groupName);
         try {
@@ -97,25 +79,7 @@ public class TenantQuartzJobListener extends AbstractQuartzJobListener {
 
     @Override
     public void jobExecutionVetoed(final JobExecutionContext context) {
-        final JobDetail jobDetail = context.getJobDetail();
-        final Trigger trigger = context.getTrigger();
-        final TriggerKey triggerKey = trigger.getKey();
-        final JobKey jobKey = jobDetail.getKey();
-
-        final Map<String, Serializable> mapContext = new HashMap<String, Serializable>();
-        mapContext.put(AbstractBonitaJobListener.BOS_JOB, getBosJob(context));
-        mapContext.put(AbstractBonitaJobListener.JOB_DESCRIPTOR_ID, getJobDescriptorId(jobDetail));
-        mapContext.put(AbstractBonitaJobListener.TENANT_ID, getTenantId(jobDetail));
-        mapContext.put(AbstractBonitaJobListener.JOB_TYPE, getJobType(context.getJobInstance()));
-        mapContext.put(AbstractBonitaJobListener.JOB_NAME, jobKey.getName());
-        mapContext.put(AbstractBonitaJobListener.JOB_GROUP, jobKey.getGroup());
-        mapContext.put(AbstractBonitaJobListener.TRIGGER_NAME, triggerKey.getName());
-        mapContext.put(AbstractBonitaJobListener.TRIGGER_GROUP, triggerKey.getGroup());
-        mapContext.put(AbstractBonitaJobListener.TRIGGER_PREVIOUS_FIRE_TIME, trigger.getPreviousFireTime());
-        mapContext.put(AbstractBonitaJobListener.TRIGGER_NEXT_FIRE_TIME, trigger.getNextFireTime());
-        mapContext.put(AbstractBonitaJobListener.REFIRE_COUNT, Integer.valueOf(context.getRefireCount()));
-        mapContext.put(AbstractBonitaJobListener.JOB_DATAS, (Serializable) getJobDataValueAndType(jobDetail));
-        mapContext.put(AbstractBonitaJobListener.JOB_RESULT, String.valueOf(context.getResult()));
+        final Map<String, Serializable> mapContext = buildMapContext(context);
 
         final Long tenantId = Long.valueOf(groupName);
         try {
@@ -131,6 +95,21 @@ public class TenantQuartzJobListener extends AbstractQuartzJobListener {
 
     @Override
     public void jobWasExecuted(final JobExecutionContext context, final JobExecutionException jobException) {
+        final Map<String, Serializable> mapContext = buildMapContext(context);
+
+        final Long tenantId = Long.valueOf(groupName);
+        try {
+            // Set the tenant id, because the jobService is a tenant service and need a session to use the tenant persistence service. But, a job listener runs not in a session.
+            sessionAccessor.setTenantId(tenantId);
+            for (final AbstractBonitaTenantJobListener abstractBonitaTenantJobListener : bonitaJobListeners) {
+                abstractBonitaTenantJobListener.jobWasExecuted(mapContext, jobException);
+            }
+        } finally {
+            cleanSession();
+        }
+    }
+
+    private Map<String, Serializable> buildMapContext(final JobExecutionContext context) {
         final JobDetail jobDetail = context.getJobDetail();
         final Trigger trigger = context.getTrigger();
         final TriggerKey triggerKey = trigger.getKey();
@@ -150,17 +129,7 @@ public class TenantQuartzJobListener extends AbstractQuartzJobListener {
         mapContext.put(AbstractBonitaJobListener.REFIRE_COUNT, Integer.valueOf(context.getRefireCount()));
         mapContext.put(AbstractBonitaJobListener.JOB_DATAS, (Serializable) getJobDataValueAndType(jobDetail));
         mapContext.put(AbstractBonitaJobListener.JOB_RESULT, String.valueOf(context.getResult()));
-
-        final Long tenantId = Long.valueOf(groupName);
-        try {
-            // Set the tenant id, because the jobService is a tenant service and need a session to use the tenant persistence service. But, a job listener runs not in a session.
-            sessionAccessor.setTenantId(tenantId);
-            for (final AbstractBonitaTenantJobListener abstractBonitaTenantJobListener : bonitaJobListeners) {
-                abstractBonitaTenantJobListener.jobWasExecuted(mapContext, jobException);
-            }
-        } finally {
-            cleanSession();
-        }
+        return mapContext;
     }
 
     private void cleanSession() {
