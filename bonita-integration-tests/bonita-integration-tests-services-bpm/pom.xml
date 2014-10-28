@@ -585,13 +585,15 @@
 						</goals>
 						<configuration>
 							<target name="copy-bpm-test-conf">
-                                <copy todir="${project.build.directory}/conf" overwrite="true">
+                                <copy todir="${project.build.directory}/conf">
                                     <fileset dir="${project.build.directory}/server/conf/service" />
+                                </copy>
+                                <copy todir="${project.build.directory}/conf" overwrite="true">
                                     <fileset dir="${project.build.directory}/server/conf/bpm" />
                                 </copy>
-								<copy todir="${project.build.directory}/conf" overwrite="true">
-									<fileset dir="${basedir}/src/test/resources/conf" />
-								</copy>
+<!-- 								<copy todir="${project.build.directory}/conf" overwrite="true"> -->
+<!-- 									<fileset dir="${basedir}/src/test/resources/conf" /> -->
+<!-- 								</copy> -->
 							</target>
 						</configuration>
 					</execution>
