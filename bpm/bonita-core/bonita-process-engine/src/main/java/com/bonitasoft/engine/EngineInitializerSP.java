@@ -11,7 +11,7 @@ package com.bonitasoft.engine;
 import org.bonitasoft.engine.EngineInitializer;
 import org.bonitasoft.engine.EngineInitializerProperties;
 import org.bonitasoft.engine.PlatformTenantManager;
-import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
+import org.bonitasoft.engine.api.PlatformAPI;
 
 import com.bonitasoft.engine.api.impl.PlatformAPIExt;
 
@@ -22,7 +22,7 @@ public class EngineInitializerSP extends EngineInitializer {
     }
 
     @Override
-    protected PlatformAPIImpl createPlatformAPI() {
+    protected PlatformAPI buildPlatformAPIInstance() {
         return new PlatformAPIExt();
     }
 

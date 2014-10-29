@@ -17,6 +17,7 @@ import static org.assertj.core.util.Strings.concat;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
@@ -27,11 +28,13 @@ import java.util.UUID;
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.util.Files;
 import org.assertj.core.util.FilesException;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.bdm.AbstractBDMCodeGenerator;
+import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.CompilableCode;
 import com.bonitasoft.engine.bdm.builder.BusinessObjectModelBuilder;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
@@ -261,6 +264,17 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
     }
 
     @Test
+    public void newInstance_is_generated_with_mandatory_fields_in_parameters() throws Exception {
+        final InputStream resourceAsStream = ClientBDMCodeGeneratorTest.class.getResourceAsStream("/failing_bdm.zip");
+        final BusinessObjectModel businessObjectModel = new BusinessObjectModelConverter().unzip(IOUtil.getAllContentFrom(resourceAsStream));
+
+        bdmCodeGenerator = new ClientBDMCodeGenerator();
+        bdmCodeGenerator.generateBom(businessObjectModel, destDir);
+
+        assertFilesAreEqual("com/test/model/PersonneDAOImpl.java", "PersonneDAOImpl.java");
+    }
+
+    @Test
     public void addSimpleReferenceWithAggregation() throws Exception {
         final RelationField aggregation = aRelationField().withName("address").aggregation().referencing(addressBO()).build();
         final BusinessObjectModel bom = employeeWithRelations(aggregation);
@@ -347,7 +361,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
         final File file = new File(destDir, qualifiedName);
         final URL resource = ClientBDMCodeGeneratorTest.class.getResource(resourceName);
         final File expected = new File(resource.toURI());
-        
+
         assertThat(file).hasContentEqualTo(expected);
     }
 

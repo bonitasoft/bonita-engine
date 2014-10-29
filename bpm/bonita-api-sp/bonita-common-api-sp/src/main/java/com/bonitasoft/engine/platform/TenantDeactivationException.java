@@ -11,8 +11,12 @@ package com.bonitasoft.engine.platform;
 import org.bonitasoft.engine.exception.BonitaException;
 
 /**
+ * Thrown when an exception happens during the deactivation of a tenant
+ *
  * @author Lu Kai
  * @author Matthieu Chaffotte
+ * @see com.bonitasoft.engine.api.PlatformAPI#deactiveTenant(long)
+ * @since 6.0.0
  */
 public class TenantDeactivationException extends BonitaException {
 
@@ -24,10 +28,6 @@ public class TenantDeactivationException extends BonitaException {
 
     public TenantDeactivationException(final String message, final Throwable cause) {
         super(message, cause);
-    }
-
-    public TenantDeactivationException(final Throwable cause) {
-        super(cause);
     }
 
 }
