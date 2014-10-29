@@ -16,6 +16,11 @@
 package org.bonitasoft.engine.api.permission;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Context of a call made on a REST API
@@ -54,7 +59,9 @@ public class APICallContext implements Serializable {
     /*
      * body of the api call
      */
-    private String body;
+    private JSONObject body;
+    private Map<String, String> filters;
+    private String searchTerm;
 
     /**
      * @param method
@@ -70,13 +77,33 @@ public class APICallContext implements Serializable {
      * @param body
      *        the body string of the api context if specified
      */
-    public APICallContext(String method, String apiName, String resourceName, String resourceId, String queryString, String body) {
+    public APICallContext(String method, String apiName, String resourceName, String resourceId, String queryString, String body) throws JSONException {
         this.method = method;
         this.apiName = apiName;
         this.resourceName = resourceName;
         this.resourceId = resourceId;
         this.queryString = queryString;
-        this.body = body;
+        parseQueryString(queryString);
+        this.body = new JSONObject(body);
+    }
+
+    private void parseQueryString(String queryString) {
+        this.filters = new HashMap<String, String>();
+        for (String element : queryString.split("&")) {
+            int indexOfEquals = element.indexOf("=");
+            if (indexOfEquals > 0 && indexOfEquals + 1 < element.length()) {
+                String key = element.substring(0, indexOfEquals);
+                String value = element.substring(indexOfEquals + 1, element.length());
+                if (key.equals("f")) {
+                    int indexOfEncodedEquals = value.indexOf("%3d");
+                    if (indexOfEncodedEquals > 0 && indexOfEncodedEquals + 3 < value.length()) {
+                        filters.put(value.substring(0, indexOfEncodedEquals), value.substring(indexOfEncodedEquals + 3, value.length()));
+                    }
+                } else if (key.equals("s")) {
+                    searchTerm = value;
+                }
+            }
+        }
     }
 
     /**
@@ -123,14 +150,15 @@ public class APICallContext implements Serializable {
 
     public void setQueryString(String queryString) {
         this.queryString = queryString;
+        parseQueryString(queryString);
     }
 
-    public String getBody() {
+    public JSONObject getBody() {
         return body;
     }
 
-    public void setBody(String body) {
-        this.body = body;
+    public void setBody(String body) throws JSONException {
+        this.body = new JSONObject(body);
     }
 
     @Override
@@ -156,6 +184,14 @@ public class APICallContext implements Serializable {
             return false;
 
         return true;
+    }
+
+    public Map<String, String> getFilters() {
+        return filters;
+    }
+
+    public String getSearchTerm() {
+        return searchTerm;
     }
 
     @Override

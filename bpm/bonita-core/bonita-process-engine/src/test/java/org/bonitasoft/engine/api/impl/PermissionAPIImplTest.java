@@ -45,13 +45,14 @@ public class PermissionAPIImplTest {
     @Mock
     private PermissionService permissionService;
     private PermissionAPIImpl permissionAPI;
-    private APICallContext apiCallContext = new APICallContext("GET", "identity", "user", "1", "query", "body");
+    private APICallContext apiCallContext;
 
     @Before
     public void before() throws Exception {
         permissionAPI = spy(new PermissionAPIImpl());
         doReturn(tenantServiceAccessor).when(permissionAPI).getTenantServiceAccessor();
         doReturn(permissionService).when(tenantServiceAccessor).getPermissionService();
+        apiCallContext = new APICallContext("GET", "identity", "user", "1", "query", "body");
     }
 
     @Test
