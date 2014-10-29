@@ -348,7 +348,6 @@ import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.model.SFailedJob;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
 import org.bonitasoft.engine.search.Order;
-import org.bonitasoft.engine.search.SSearchException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -374,6 +373,7 @@ import org.bonitasoft.engine.search.process.SearchArchivedProcessInstances;
 import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesInvolvingUser;
 import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesSupervisedBy;
 import org.bonitasoft.engine.search.process.SearchArchivedProcessInstancesWithoutSubProcess;
+import org.bonitasoft.engine.search.process.SearchFailedProcessInstances;
 import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesInvolvingUser;
 import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesInvolvingUsersManagedBy;
 import org.bonitasoft.engine.search.process.SearchOpenProcessInstancesSupervisedBy;
@@ -637,7 +637,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     private List<ProcessInstance> searchProcessInstancesFromProcessDefinition(final TenantServiceAccessor tenantAccessor, final long processDefinitionId,
-            final int startIndex, final int maxResults) throws SSearchException {
+            final int startIndex, final int maxResults) throws SBonitaException {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(startIndex, maxResults);
         searchOptionsBuilder.filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinitionId);
         // Order by caller id ASC because we need to have parent process deleted before their sub processes
@@ -1594,7 +1594,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         List<ProcessInstance> result;
         try {
             result = searchProcessInstances(tenantAccessor, searchOptionsBuilder.done()).getResult();
-        } catch (final SSearchException e) {
+        } catch (final SBonitaException e) {
             result = Collections.emptyList();
         }
         return result;
@@ -1619,20 +1619,15 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     protected SearchResult<ProcessInstance> searchProcessInstances(final TenantServiceAccessor tenantAccessor, final SearchOptions searchOptions)
-            throws SSearchException {
-
+            throws SBonitaException {
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
 
-        try {
-            final SearchProcessInstances searchProcessInstances = new SearchProcessInstances(processInstanceService,
-                    searchEntitiesDescriptor.getSearchProcessInstanceDescriptor(), searchOptions, processDefinitionService);
-            searchProcessInstances.execute();
-            return searchProcessInstances.getResult();
-        } catch (final SBonitaException sbe) {
-            throw new SSearchException(sbe);
-        }
+        final SearchProcessInstances searchProcessInstances = new SearchProcessInstances(processInstanceService,
+                searchEntitiesDescriptor.getSearchProcessInstanceDescriptor(), searchOptions, processDefinitionService);
+        searchProcessInstances.execute();
+        return searchProcessInstances.getResult();
     }
 
     @Override
@@ -3669,7 +3664,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         searchOptionsBuilder.filter(ProcessInstanceSearchDescriptor.CALLER_ID, -1);
         try {
             return searchProcessInstances(getTenantAccessor(), searchOptionsBuilder.done());
-        } catch (final SSearchException e) {
+        } catch (final SBonitaException e) {
             throw new SearchException(e);
         }
     }
@@ -3678,8 +3673,25 @@ public class ProcessAPIImpl implements ProcessAPI {
     public SearchResult<ProcessInstance> searchProcessInstances(final SearchOptions searchOptions) throws SearchException {
         try {
             return searchProcessInstances(getTenantAccessor(), searchOptions);
-        } catch (final SSearchException e) {
+        } catch (final SBonitaException e) {
             throw new SearchException(e);
+        }
+    }
+
+    @Override
+    public SearchResult<ProcessInstance> searchFailedProcessInstances(final SearchOptions searchOptions) throws SearchException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
+
+        try {
+            final SearchFailedProcessInstances searchProcessInstances = new SearchFailedProcessInstances(processInstanceService,
+                    searchEntitiesDescriptor.getSearchProcessInstanceDescriptor(), searchOptions, processDefinitionService);
+            searchProcessInstances.execute();
+            return searchProcessInstances.getResult();
+        } catch (final SBonitaException sbe) {
+            throw new SearchException(sbe);
         }
     }
 

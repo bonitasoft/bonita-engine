@@ -3,6 +3,7 @@ package org.bonitasoft.engine.api.impl;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
@@ -33,7 +34,9 @@ import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.impl.IntegerDataInstanceImpl;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.process.impl.internal.ProcessInstanceImpl;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.operation.OperationService;
@@ -43,11 +46,14 @@ import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
+import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
@@ -55,6 +61,7 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor;
 import org.bonitasoft.engine.expression.Expression;
@@ -66,9 +73,15 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.model.SJobParameter;
+import org.bonitasoft.engine.search.SearchOptions;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
+import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
 import org.junit.Test;
@@ -108,7 +121,13 @@ public class ProcessAPIImplTest {
     private ProcessDefinitionService processDefinitionService;
 
     @Mock
+    private ProcessInstanceService processInstanceService;
+
+    @Mock
     private ClassLoaderService classLoaderService;
+
+    @Mock
+    private SearchEntitiesDescriptor searchEntitiesDescriptor;
 
     private ProcessAPIImpl processAPI;
 
@@ -121,8 +140,10 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
         when(tenantAccessor.getClassLoaderService()).thenReturn(classLoaderService);
         when(tenantAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
+        when(tenantAccessor.getProcessInstanceService()).thenReturn(processInstanceService);
         when(tenantAccessor.getDataInstanceService()).thenReturn(dataInstanceService);
         when(tenantAccessor.getOperationService()).thenReturn(operationService);
+        when(tenantAccessor.getSearchEntitiesDescriptor()).thenReturn(searchEntitiesDescriptor);
     }
 
     @Test
@@ -148,9 +169,9 @@ public class ProcessAPIImplTest {
     }
 
     @Test
-    public void generateRelativeResourcePathShouldHandleBackslashOS() throws Exception {
+    public void generateRelativeResourcePathShouldHandleBackslashOS() {
         // given:
-        String pathname = "C:\\hello\\hi\\folder";
+        final String pathname = "C:\\hello\\hi\\folder";
         final String resourceRelativePath = "resource/toto.lst";
 
         // when:
@@ -162,9 +183,9 @@ public class ProcessAPIImplTest {
     }
 
     @Test
-    public void generateRelativeResourcePathShouldNotContainFirstSlash() throws Exception {
+    public void generateRelativeResourcePathShouldNotContainFirstSlash() {
         // given:
-        String pathname = "/home/target/some_folder/";
+        final String pathname = "/home/target/some_folder/";
         final String resourceRelativePath = "resource/toto.lst";
 
         // when:
@@ -176,9 +197,9 @@ public class ProcessAPIImplTest {
     }
 
     @Test
-    public void generateRelativeResourcePathShouldWorkWithRelativeInitialPath() throws Exception {
+    public void generateRelativeResourcePathShouldWorkWithRelativeInitialPath() {
         // given:
-        String pathname = "target/nuns";
+        final String pathname = "target/nuns";
         final String resourceRelativePath = "resource/toto.lst";
 
         // when:
@@ -331,7 +352,7 @@ public class ProcessAPIImplTest {
     }
 
     @Test
-    public void testGetActivityTransientDataInstances() throws Exception {
+    public void getActivityTransientDataInstances() throws Exception {
         final String dataValue = "TestOfCourse";
         final long activityInstanceId = 13244;
         final String dataName = "TransientName";
@@ -345,7 +366,7 @@ public class ProcessAPIImplTest {
         when(sDataInstance.getClassName()).thenReturn(Integer.class.getName());
         final List<SDataInstance> sDataInstances = Lists.newArrayList(sDataInstance);
         when(transientDataService.getDataInstances(activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), startIndex, nbResults))
-        .thenReturn(sDataInstances);
+                .thenReturn(sDataInstances);
         final IntegerDataInstanceImpl dataInstance = mock(IntegerDataInstanceImpl.class);
         doReturn(Lists.newArrayList(dataInstance)).when(processAPI).convertModelToDataInstances(sDataInstances);
 
@@ -364,7 +385,7 @@ public class ProcessAPIImplTest {
     }
 
     @Test
-    public void testGetActivityTransientDataInstance() throws Exception {
+    public void getActivityTransientDataInstance() throws Exception {
         final String dataValue = "TestOfCourse";
         final int activityInstanceId = 13244;
         final String dataName = "TransientName";
@@ -393,7 +414,7 @@ public class ProcessAPIImplTest {
     }
 
     @Test
-    public void testUpdateActivityTransientDataInstance_should_call_update() throws Exception {
+    public void updateActivityTransientDataInstance_should_call_update() throws Exception {
         final String dataValue = "TestOfCourse";
         final int activityInstanceId = 13244;
         final String dataName = "TransientName";
@@ -413,7 +434,7 @@ public class ProcessAPIImplTest {
     }
 
     @Test(expected = UpdateException.class)
-    public void testUpdateActivityTransientDataInstance_should_throw_Exception() throws Exception {
+    public void updateActivityTransientDataInstance_should_throw_Exception() throws Exception {
         final String dataValue = "TestOfCourse";
         final int activityInstanceId = 13244;
         final String dataName = "TransientName";
@@ -425,7 +446,7 @@ public class ProcessAPIImplTest {
     }
 
     @Test
-    public void testUpdateTransientData() throws Exception {
+    public void updateTransientData() throws Exception {
         final String dataValue = "TestOfCourse";
         final int activityInstanceId = 13244;
         final String dataName = "TransientName";
@@ -475,9 +496,6 @@ public class ProcessAPIImplTest {
 
     }
 
-
-
-
     @Test
     public void updateActivityInstanceVariables_should_load_processDef_classes() throws Exception {
         final String dataInstanceName = "acase";
@@ -511,6 +529,36 @@ public class ProcessAPIImplTest {
         processAPI.updateActivityInstanceVariables(operations, 2, null);
 
         verify(classLoaderService).getLocalClassLoader(anyString(), anyLong());
+    }
+
+    @Test
+    public void searchFailedProcessInstances_should_return_failed_process_instances() throws Exception {
+        // Given
+        final SearchOptions searchOptions = new SearchOptionsBuilder(0, 20).done();
+        final long numberOfFailedProcessInstances = 2L;
+        final List<ProcessInstance> failedProcessInstances = Arrays.asList((ProcessInstance) new ProcessInstanceImpl("name"));
+        final long processDefinitionId = 9L;
+        final List<SProcessInstance> sFailedProcessInstances = Arrays.asList((SProcessInstance) new SProcessInstanceImpl("name", processDefinitionId));
+        doReturn(numberOfFailedProcessInstances).when(processInstanceService).getNumberOfFailedProcessInstances(any(QueryOptions.class));
+        doReturn(sFailedProcessInstances).when(processInstanceService).searchFailedProcessInstances(any(QueryOptions.class));
+        doReturn(mock(SProcessDefinition.class)).when(processDefinitionService).getProcessDefinition(processDefinitionId);
+
+        // When
+        final SearchResult<ProcessInstance> searchFailedProcessInstances = processAPI.searchFailedProcessInstances(searchOptions);
+
+        // Then
+        assertEquals(numberOfFailedProcessInstances, searchFailedProcessInstances.getCount());
+        assertEquals(failedProcessInstances, searchFailedProcessInstances.getResult());
+    }
+
+    @Test(expected = SearchException.class)
+    public void searchFailedProcessInstances_should_throw_exception_when_transaction_content_failed() throws Exception {
+        // Given
+        final SearchOptions searchOptions = new SearchOptionsBuilder(0, 20).done();
+        doThrow(new SBonitaReadException(new Exception("plop"))).when(processInstanceService).getNumberOfFailedProcessInstances(any(QueryOptions.class));
+
+        // When
+        processAPI.searchFailedProcessInstances(searchOptions);
     }
 
     //    @Test
