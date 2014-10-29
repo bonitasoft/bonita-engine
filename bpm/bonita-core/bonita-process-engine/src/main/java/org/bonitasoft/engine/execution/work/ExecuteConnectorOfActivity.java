@@ -79,11 +79,11 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     @Override
     protected void continueFlow(final Map<String, Object> context) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        FlowNodeInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        WorkService workService = tenantAccessor.getWorkService();
+        final FlowNodeInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final WorkService workService = tenantAccessor.getWorkService();
         final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
         final long parentProcessInstanceId = sFlowNodeInstance.getParentProcessInstanceId();
-        BonitaWork executeFlowNodeWork = WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getProcessDefinitionId(), parentProcessInstanceId,
+        final BonitaWork executeFlowNodeWork = WorkFactory.createExecuteFlowNodeWork(sFlowNodeInstance.getProcessDefinitionId(), parentProcessInstanceId,
                 flowNodeInstanceId, null, null);
         workService.registerWork(executeFlowNodeWork);
     }
@@ -168,7 +168,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
         final SConnectorDefinition sConnectorDefinition = flowNodeDefinition.getConnectorDefinition(connectorDefinitionName);
         if (sConnectorDefinition == null) {
-            throw new SConnectorDefinitionNotFoundException("Coud'nt find the connector definition [" + connectorDefinitionName + "]");
+            throw new SConnectorDefinitionNotFoundException("Coudn't find the connector definition [" + connectorDefinitionName + "]");
         }
         return sConnectorDefinition;
     }

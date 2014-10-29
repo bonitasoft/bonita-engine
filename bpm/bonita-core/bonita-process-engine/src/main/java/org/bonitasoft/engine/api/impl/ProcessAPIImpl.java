@@ -171,7 +171,6 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.SendEventException;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
-import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
@@ -1513,6 +1512,24 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
+    public long getNumberOfPendingHumanTaskInstances(final long userId) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+
+        final ProcessDefinitionService processDefService = tenantAccessor.getProcessDefinitionService();
+        try {
+            final Set<Long> actorIds = getActorsForUser(userId, actorMappingService, processDefService);
+            if (actorIds.isEmpty()) {
+                return 0L;
+            }
+            return activityInstanceService.getNumberOfPendingTasksForUser(userId, QueryOptions.countQueryOptions());
+        } catch (final SBonitaException e) {
+            throw new RetrieveException(e);
+        }
+    }
+
+    @Override
     public List<HumanTaskInstance> getPendingHumanTaskInstances(final long userId, final int startIndex, final int maxResults,
             final ActivityInstanceCriterion pagingCriterion) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
@@ -1534,18 +1551,16 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private Set<Long> getActorsForUser(final long userId, final ActorMappingService actorMappingService, final ProcessDefinitionService definitionService)
             throws SBonitaReadException, SProcessDefinitionReadException {
-        final List<Long> processDefIds = definitionService.getProcessDefinitionIds(ActivationState.ENABLED, 0, Integer.MAX_VALUE);
-        final HashSet<Long> processDefinitionIds = new HashSet<Long>(processDefIds);
-        if (processDefinitionIds.isEmpty()) {
-            return Collections.emptySet();
-        }
-        final List<SActor> actors = actorMappingService.getActors(processDefinitionIds, userId);
-        if (actors.isEmpty()) {
-            return Collections.emptySet();
-        }
         final Set<Long> actorIds = new HashSet<Long>();
-        for (final SActor sActor : actors) {
-            actorIds.add(sActor.getId());
+        final List<Long> processDefIds = definitionService.getProcessDefinitionIds(0, Integer.MAX_VALUE);
+        if (!processDefIds.isEmpty()) {
+            final Set<Long> processDefinitionIds = new HashSet<Long>(processDefIds);
+            final List<SActor> actors = actorMappingService.getActors(processDefinitionIds, userId);
+            if (!actors.isEmpty()) {
+                for (final SActor sActor : actors) {
+                    actorIds.add(sActor.getId());
+                }
+            }
         }
         return actorIds;
     }
@@ -2399,24 +2414,6 @@ public class ProcessAPIImpl implements ProcessAPI {
             final GetNumberOfOpenTasksForUsers transactionContent = new GetNumberOfOpenTasksForUsers(userIds, activityInstanceService);
             transactionContent.execute();
             return transactionContent.getResult();
-        } catch (final SBonitaException e) {
-            throw new RetrieveException(e);
-        }
-    }
-
-    @Override
-    public long getNumberOfPendingHumanTaskInstances(final long userId) {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-
-        final ProcessDefinitionService processDefService = tenantAccessor.getProcessDefinitionService();
-        try {
-            final Set<Long> actorIds = getActorsForUser(userId, actorMappingService, processDefService);
-            if (actorIds.isEmpty()) {
-                return 0L;
-            }
-            return activityInstanceService.getNumberOfPendingTasksForUser(userId, QueryOptions.countQueryOptions());
         } catch (final SBonitaException e) {
             throw new RetrieveException(e);
         }
@@ -5341,7 +5338,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             final ArchivedActivityInstance activityInstance = getArchivedActivityInstance(activityInstanceId);
             // same archive time to process even if there're many activities in the process
-            final ArchivedProcessInstance lastArchivedProcessInstance = getLastArchivedProcessInstance(activityInstance.getParentContainerId());
+            final ArchivedProcessInstance lastArchivedProcessInstance = getLastArchivedProcessInstance(activityInstance.getProcessInstanceId());
 
             return evaluateExpressionsInstanceLevelAndArchived(expressions, activityInstanceId, CONTAINER_TYPE_ACTIVITY_INSTANCE,
                     lastArchivedProcessInstance.getProcessDefinitionId(), activityInstance.getArchiveDate().getTime());
@@ -5429,7 +5426,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     }
 
-    private ArchivedProcessInstance getLastArchivedProcessInstance(final long processInstanceId) throws SBonitaException {
+    protected ArchivedProcessInstance getLastArchivedProcessInstance(final long processInstanceId) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
