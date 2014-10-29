@@ -140,12 +140,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-commons-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<!-- because we need the builderfactory impl and it does not make sense 
 				to mock them -->
 			<groupId>org.bonitasoft.engine.core.process.instance</groupId>
