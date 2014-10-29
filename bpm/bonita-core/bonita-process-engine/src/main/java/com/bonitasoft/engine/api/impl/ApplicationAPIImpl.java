@@ -8,13 +8,19 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
+import java.util.Collections;
+import java.util.List;
+
+import com.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import com.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import com.bonitasoft.engine.business.application.ApplicationPageUpdater;
+import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -199,6 +205,16 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions) throws SearchException {
         return getApplicationMenuAPIDelegate(searchOptions).searchApplicationMenus();
+    }
+
+    @Override
+    public byte[] exportApplications(long[] profileIds) throws ExecutionException {
+        return new byte[0];
+    }
+
+    @Override
+    public List<ImportStatus> importApplications(byte[] xmlContent, ApplicationImportPolicy policy) throws ExecutionException {
+        return Collections.emptyList();
     }
 
 }

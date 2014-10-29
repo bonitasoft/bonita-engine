@@ -8,9 +8,13 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
+import java.util.List;
+
+import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -18,6 +22,7 @@ import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
+import com.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import com.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
@@ -128,7 +133,8 @@ public interface ApplicationAPI {
      * @return the {@code ApplicationPage} up to date
      * @throws ApplicationPageNotFoundException if no {@code ApplicationPage} is found for the given identifier
      * @throws UpdateException if an exception occurs during the update
-     * @throws AlreadyExistsException if the token is updated and the new value is already used by another <code>ApplicationPage</code> on this <code>Application</code>
+     * @throws AlreadyExistsException if the token is updated and the new value is already used by another <code>ApplicationPage</code> on this
+     *         <code>Application</code>
      */
     ApplicationPage updateApplicationPage(long applicationPageId, ApplicationPageUpdater updater) throws ApplicationPageNotFoundException, UpdateException,
             AlreadyExistsException;
@@ -260,5 +266,9 @@ public interface ApplicationAPI {
      * @see SearchResult
      */
     SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions) throws SearchException;
+
+    byte[] exportApplications(long[] profileIds) throws ExecutionException;
+
+    List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy) throws ExecutionException;
 
 }
