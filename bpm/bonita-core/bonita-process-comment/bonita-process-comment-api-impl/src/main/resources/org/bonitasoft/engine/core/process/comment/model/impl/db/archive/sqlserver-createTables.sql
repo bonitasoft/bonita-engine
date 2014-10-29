@@ -11,7 +11,7 @@ CREATE TABLE arch_process_comment(
 )
 GO
 
-CREATE INDEX idx1_arch_process_comment on arch_process_comment (tenantid, sourceobjectid)
+CREATE INDEX idx1_arch_process_comment on arch_process_comment (sourceObjectId, tenantid);
 GO
-CREATE INDEX idx2_arch_process_comment on arch_process_comment (tenantid, processinstanceid, archivedate)
+CREATE INDEX idx2_arch_process_comment on arch_process_comment (processInstanceId, archivedate, tenantid)
 GO

@@ -17,25 +17,37 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 
 /**
  * Exception related to the identity module
- * 
+ *
  * @author Baptiste Mesta
  */
 public class SIdentityException extends SBonitaException {
 
     private static final long serialVersionUID = 7615655279956204016L;
 
+    /**
+     * @see SBonitaException#SBonitaException(Object...)
+     */
     public SIdentityException(final Object... parameters) {
         super(parameters);
     }
 
+    /**
+     * @see SBonitaException#SBonitaException(Throwable)
+     */
     public SIdentityException(final Throwable cause) {
         super(cause);
     }
 
+    /**
+     * @see SBonitaException#SBonitaException(String, Throwable)
+     */
     public SIdentityException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * @see SBonitaException#SBonitaException(String)
+     */
     public SIdentityException(final String message) {
         super(message);
     }

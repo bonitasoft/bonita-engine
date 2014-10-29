@@ -97,7 +97,7 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 
 /**
  * Default implementation of the Identity service
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Bole Zhang
@@ -184,14 +184,14 @@ public class IdentityServiceImpl implements IdentityService {
             return customUserInfo;
         } catch (final SRecorderException e) {
             throw handleCustomUserInfoDefinitionCreationFailure(customUserInfo, methodName, logBuilder, e);
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             throw handleCustomUserInfoDefinitionCreationFailure(customUserInfo, methodName, logBuilder, e);
         }
     }
 
     private void throwExceptionIfAlreadyExists(final SCustomUserInfoDefinition customUserInfo) throws SBonitaReadException,
-            SCustomUserInfoDefinitionAlreadyExistsException {
-        SCustomUserInfoDefinition storedDef = getCustomUserInfoDefinitionWithoutCheck(customUserInfo.getName());
+    SCustomUserInfoDefinitionAlreadyExistsException {
+        final SCustomUserInfoDefinition storedDef = getCustomUserInfoDefinitionWithoutCheck(customUserInfo.getName());
         if (storedDef != null) {
             throw new SCustomUserInfoDefinitionAlreadyExistsException(customUserInfo.getName());
         }
@@ -199,7 +199,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     private SCustomUserInfoDefinitionCreationException handleCustomUserInfoDefinitionCreationFailure(final SCustomUserInfoDefinition customUserInfo,
             final String methodName, final SCustomUserInfoDefinitionLogBuilder logBuilder, final SBonitaException exception)
-            throws SCustomUserInfoDefinitionCreationException {
+                    throws SCustomUserInfoDefinitionCreationException {
         logOnExceptionMethod(methodName, exception);
         initiateLogBuilder(customUserInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
         return new SCustomUserInfoDefinitionCreationException(customUserInfo.getName(), exception);
@@ -392,7 +392,7 @@ public class IdentityServiceImpl implements IdentityService {
         return logBuilder;
     }
 
-    private SUserLogBuilder getUserLog(final ActionType actionType, final String message) {
+    protected SUserLogBuilder getUserLog(final ActionType actionType, final String message) {
         final SUserLogBuilder logBuilder = BuilderFactory.get(SUserLogBuilderFactory.class).createNewInstance();
         this.initializeLogBuilder(logBuilder, message);
         this.updateLog(actionType, logBuilder);
@@ -419,7 +419,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public void deleteCustomUserInfoDefinition(final long customUserInfoDefinitionId) throws SIdentityException {
-        this.deleteCustomUserInfoDefinition(this.getCustomUserInfoDefinition(customUserInfoDefinitionId));
+        this.deleteCustomUserInfoDefinition(getCustomUserInfoDefinition(customUserInfoDefinitionId));
     }
 
     @Override
@@ -899,7 +899,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(final String name) throws SCustomUserInfoDefinitionNotFoundException,
-            SCustomUserInfoDefinitionReadException {
+    SCustomUserInfoDefinitionReadException {
         final String methodName = "getCustomUserInfoDefinitionByName";
         SCustomUserInfoDefinition definition = null;
         try {
@@ -910,7 +910,7 @@ public class IdentityServiceImpl implements IdentityService {
             throw new SCustomUserInfoDefinitionReadException(name, e);
         }
         if (definition == null) {
-            SCustomUserInfoDefinitionNotFoundException notFoundException = new SCustomUserInfoDefinitionNotFoundException(name);
+            final SCustomUserInfoDefinitionNotFoundException notFoundException = new SCustomUserInfoDefinitionNotFoundException(name);
             logOnExceptionMethod(methodName, notFoundException);
             throw notFoundException;
         }
@@ -953,7 +953,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<Long> getUserIdsWithCustomUserInfo(String userInfoName, String userInfoValue, boolean usePartialMatch, int fromIndex, int maxResults) throws SIdentityException {
+    public List<Long> getUserIdsWithCustomUserInfo(final String userInfoName, String userInfoValue, final boolean usePartialMatch, final int fromIndex, final int maxResults) throws SIdentityException {
         final String methodName = "getUserIdsWithCustomUserInfo";
         logBeforeMethod(methodName);
         try {
@@ -1014,7 +1014,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SCustomUserInfoValue getCustomUserInfoValue(final long customUserInfoValueId) throws SCustomUserInfoValueNotFoundException,
-            SCustomUserInfoValueReadException {
+    SCustomUserInfoValueReadException {
         final String methodName = "getCustomUserInfoValue";
         logBeforeMethod(methodName);
         try {
@@ -1800,7 +1800,7 @@ public class IdentityServiceImpl implements IdentityService {
         }
     }
 
-    private void logAfterMethod(String methodName) {
+    private void logAfterMethod(final String methodName) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), methodName));
         }

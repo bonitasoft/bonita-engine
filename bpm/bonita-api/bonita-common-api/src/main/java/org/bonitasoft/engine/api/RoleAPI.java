@@ -30,7 +30,7 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
 /**
- * RoleAPI forms part of the {@link OrganizationAPI} and gives access to all the Administation operations available on Roles: creation, deletion,
+ * RoleAPI forms part of the {@link OrganizationAPI} and gives access to all the Administration operations available on Roles: creation, deletion,
  * search, etc...
  * 
  * @author Feng Hui
