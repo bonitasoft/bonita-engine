@@ -24,7 +24,7 @@ import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.identity.UserMembershipCriterion;
 
 /**
- * MembershipAPI forms part of the {@link OrganizationAPI} and gives access to all the Administation operations available on <code>UserMembership</code>s:
+ * MembershipAPI forms part of the {@link OrganizationAPI} and gives access to all the Administration operations available on <code>UserMembership</code>s:
  * creation, deletion, updating, retrieval, etc...
  * 
  * @author Matthieu Chaffotte

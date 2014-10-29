@@ -17,8 +17,12 @@ import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
  * A {@link CustomUserInfoValue} defines the value of {@link CustomUserInfoDefinition} for a given {@link User}
- * 
+ *
  * @author Elias Ricken de Medeiros
+ * @see CustomUserInfoDefinition
+ * @see CustomUserInfoValue
+ * @see User
+ * @since 6.3
  */
 public interface CustomUserInfoValue extends BonitaObject {
 

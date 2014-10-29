@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.command;
 
-
 /**
  * @author Celine Souchet
  */
@@ -23,14 +22,6 @@ public class SRoleProfileMemberAlreadyExistsException extends SCommandExecutionE
 
     public SRoleProfileMemberAlreadyExistsException(final String message) {
         super(message);
-    }
-
-    public SRoleProfileMemberAlreadyExistsException(final Throwable cause) {
-        super(cause);
-    }
-
-    public SRoleProfileMemberAlreadyExistsException(final String message, final Throwable cause) {
-        super(message, cause);
     }
 
 }

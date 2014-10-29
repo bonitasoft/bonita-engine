@@ -37,7 +37,7 @@ public interface OrganizationAPI {
      *             If an exception occurs during the organization deletion
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
-     * @since6.0
+     * @since 6.0.0
      */
     void deleteOrganization() throws DeletionException;
 
@@ -52,7 +52,7 @@ public interface OrganizationAPI {
      *             If an exception occurs during the organization import
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
-     * @since6.0
+     * @since 6.0.0
      */
     void importOrganization(String organizationContent) throws OrganizationImportException;
 
@@ -69,7 +69,7 @@ public interface OrganizationAPI {
      *             If an exception occurs during the organization import
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
-     * @since6.0
+     * @since 6.0.0
      */
     void importOrganization(String organizationContent, ImportPolicy policy) throws OrganizationImportException;
 
@@ -83,7 +83,7 @@ public interface OrganizationAPI {
      *             If an exception occurs during the organization export
      * @throws InvalidSessionException
      *             If the session is invalid (expired, unknown, ...)
-     * @since6.0
+     * @since 6.0.0
      */
     String exportOrganization() throws OrganizationExportException;
 
