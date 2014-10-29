@@ -61,7 +61,7 @@ public interface ApplicationService {
 
     SApplicationPage getApplicationHomePage(long applicationId) throws SBonitaReadException, SObjectNotFoundException;
 
-    void deleteApplicationPage(long applicationpPageId) throws SObjectModificationException, SObjectNotFoundException;
+    void deleteApplicationPage(long applicationPageId) throws SObjectModificationException, SObjectNotFoundException;
 
     long getNumberOfApplicationPages(final QueryOptions options) throws SBonitaReadException;
 
@@ -77,6 +77,8 @@ public interface ApplicationService {
     SApplicationMenu getApplicationMenu(long applicationMenuId) throws SBonitaReadException, SObjectNotFoundException;
 
     void deleteApplicationMenu(long applicationMenuId) throws SObjectModificationException, SObjectNotFoundException;
+
+    public void deleteApplicationMenu(SApplicationMenu applicationMenu) throws SObjectModificationException;
 
     long getNumberOfApplicationMenus(QueryOptions options) throws SBonitaReadException;
 

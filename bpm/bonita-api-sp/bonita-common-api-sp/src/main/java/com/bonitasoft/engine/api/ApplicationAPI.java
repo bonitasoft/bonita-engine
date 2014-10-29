@@ -159,12 +159,12 @@ public interface ApplicationAPI {
      * Deletes an {@link ApplicationPage} by its identifier. All related {@link com.bonitasoft.engine.business.application.ApplicationMenu} will be
      * automatically deleted.
      *
-     * @param applicationpPageId the {@code ApplicationPage} identifier
+     * @param applicationPageId the {@code ApplicationPage} identifier
      * @throws DeletionException if an error occurs during the deletion
      * @see ApplicationPage
      * @see com.bonitasoft.engine.business.application.ApplicationMenu
      */
-    void deleteApplicationPage(long applicationpPageId) throws DeletionException;
+    void deleteApplicationPage(long applicationPageId) throws DeletionException;
 
     /**
      * Searches for {@link ApplicationPage}s with specific search criteria.
@@ -239,7 +239,7 @@ public interface ApplicationAPI {
     ApplicationMenu getApplicationMenu(long applicationMenuId) throws ApplicationMenuNotFoundException;
 
     /**
-     * Deletes an {@link ApplicationMenu} by its identifier
+     * Deletes an {@link ApplicationMenu} by its identifier. All children {@code ApplicationMenu} will be automatically deleted.
      *
      * @param applicationMenuId the {@code ApplicationMenu} identifier
      * @throws DeletionException if an error occurs during the deletion

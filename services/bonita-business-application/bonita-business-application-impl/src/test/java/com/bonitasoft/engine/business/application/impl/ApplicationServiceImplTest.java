@@ -84,6 +84,7 @@ public class ApplicationServiceImplTest {
     private static final String APPLICATION_TOKEN = "app";
 
     private static final String APPLICATION_DISP_NAME = "My app";
+    public static final int MAX_RESULTS = 2;
 
     @Mock
     private Manager managerActiveFeature;
@@ -106,6 +107,9 @@ public class ApplicationServiceImplTest {
     @Mock
     private MenuIndexConvertor convertor;
 
+    @Mock
+    private ApplicationMenuCleaner applicationMenuCleaner;
+
     private SApplication application;
 
     private ApplicationServiceImpl applicationServiceActive;
@@ -116,9 +120,10 @@ public class ApplicationServiceImplTest {
     public void setUp() throws Exception {
         given(managerActiveFeature.isFeatureActive(Features.BUSINESS_APPLICATIONS)).willReturn(true);
         given(managerDisabledFeature.isFeatureActive(Features.BUSINESS_APPLICATIONS)).willReturn(false);
-        applicationServiceActive = new ApplicationServiceImpl(managerActiveFeature, recorder, persistenceService, queriableLogService, indexManager, convertor);
+        applicationServiceActive = new ApplicationServiceImpl(managerActiveFeature, recorder, persistenceService, queriableLogService, indexManager, convertor,
+                applicationMenuCleaner);
         applicationServiceDisabled = new ApplicationServiceImpl(managerDisabledFeature, recorder, persistenceService, queriableLogService, indexManager,
-                convertor);
+                convertor, applicationMenuCleaner);
 
         when(queriableLogService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(true);
         application = buildApplication(APPLICATION_TOKEN, APPLICATION_DISP_NAME);
@@ -267,6 +272,28 @@ public class ApplicationServiceImplTest {
         final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION)
                 .setObject(application).done();
         verify(recorder, times(1)).recordDelete(new DeleteRecord(application), event);
+    }
+
+    @Test
+    public void deleteApplication_should_delete_related_applicationMenus() throws Exception {
+        //given
+        ApplicationServiceImpl applicationService = spy(applicationServiceActive);
+
+        final long applicationId = 10L;
+        final SApplication app = buildApplication("app", "my app");
+        app.setId(27);
+        doReturn(app).when(applicationService).getApplication(applicationId);
+
+        //when
+        applicationService.deleteApplication(applicationId);
+
+        //then
+        ArgumentCaptor<ApplicationRelatedFilterBuilder> filterCaptor = ArgumentCaptor.forClass(ApplicationRelatedFilterBuilder.class);
+        verify(applicationMenuCleaner, times(1)).deleteRelatedApplicationMenus(filterCaptor.capture());
+        ApplicationRelatedFilterBuilder filterBuilder = filterCaptor.getValue();
+        assertThat(filterBuilder.getStartIndex()).isEqualTo(0);
+        assertThat(filterBuilder.getMaxResults()).isEqualTo(ApplicationServiceImpl.MAX_RESULTS);
+        assertThat(filterBuilder.getApplicationId()).isEqualTo(applicationId);
     }
 
     @Test(expected = SObjectNotFoundException.class)
@@ -504,6 +531,29 @@ public class ApplicationServiceImplTest {
         assertThat(deleteRecordCaptor.getValue().getEntity()).isEqualTo(applicationPage);
         assertThat(deleteEventCaptor.getValue().getType()).isEqualTo(ApplicationService.APPLICATION_PAGE + DELETED_SUFFIX);
         assertThat(deleteEventCaptor.getValue().getObject()).isEqualTo(applicationPage);
+    }
+
+    @Test
+    public void deleteApplicationPage_should_delete_related_applicationMenus() throws Exception {
+        //given
+        ApplicationServiceImpl applicationService = spy(applicationServiceActive);
+
+        //application page
+        final long applicationPageId = 10L;
+        final SApplicationPage applicationPage = buildApplicationPage(20, 30, "myPage");
+        applicationPage.setId(27);
+        doReturn(applicationPage).when(applicationService).getApplicationPage(applicationPageId);
+
+        //when
+        applicationService.deleteApplicationPage(applicationPageId);
+
+        //then
+        ArgumentCaptor<ApplicationPageRelatedFilterBuilder> filterCaptor = ArgumentCaptor.forClass(ApplicationPageRelatedFilterBuilder.class);
+        verify(applicationMenuCleaner, times(1)).deleteRelatedApplicationMenus(filterCaptor.capture());
+        ApplicationPageRelatedFilterBuilder filterBuilder = filterCaptor.getValue();
+        assertThat(filterBuilder.getStartIndex()).isEqualTo(0);
+        assertThat(filterBuilder.getMaxResults()).isEqualTo(ApplicationServiceImpl.MAX_RESULTS);
+        assertThat(filterBuilder.getApplicationPageId()).isEqualTo(applicationPageId);
     }
 
     @Test(expected = SObjectNotFoundException.class)
@@ -970,18 +1020,18 @@ public class ApplicationServiceImplTest {
     @Test
     public void deleteApplicationMenu_should_delete_application_menu_identified_for_the_given_identifier() throws Exception {
         //given
+        final int applicationMenuId = 3;
         final SApplicationMenu applicationMenu = buildApplicationMenu("main", 2, 1, 12);
-        final int applicationId = 3;
-        applicationMenu.setId(applicationId);
+        applicationMenu.setId(applicationMenuId);
         final SelectByIdDescriptor<SApplicationMenu> selectDescriptor = new SelectByIdDescriptor<SApplicationMenu>("getApplicationMenuById",
-                SApplicationMenu.class, applicationId);
+                SApplicationMenu.class, applicationMenuId);
         given(persistenceService.selectById(selectDescriptor)).willReturn(applicationMenu);
         SelectOneDescriptor<Integer> descriptor = new SelectOneDescriptor<Integer>("getLastIndexForRootMenu", Collections.<String, Object> emptyMap(),
                 SApplicationMenu.class);
         given(persistenceService.selectOne(descriptor)).willReturn(2);
 
         //when
-        applicationServiceActive.deleteApplicationMenu(applicationId);
+        applicationServiceActive.deleteApplicationMenu(applicationMenuId);
 
         //then
         final ArgumentCaptor<SDeleteEvent> deleteEventCaptor = ArgumentCaptor.forClass(SDeleteEvent.class);
@@ -990,6 +1040,27 @@ public class ApplicationServiceImplTest {
         assertThat(deleteEventCaptor.getValue().getObject()).isEqualTo(applicationMenu);
         assertThat(deleteEventCaptor.getValue().getType()).isEqualTo(ApplicationService.APPLICATION_MENU + DELETED_SUFFIX);
         assertThat(deleteRecordCaptor.getValue().getEntity()).isEqualTo(applicationMenu);
+    }
+
+    @Test
+    public void deleteApplicationMenu_should_delete_children_applicationMenus() throws Exception {
+        //given
+        ApplicationServiceImpl applicationService = spy(applicationServiceActive);
+
+        final int applicationMenuId = 3;
+        final SApplicationMenu applicationMenu = buildApplicationMenu("main", 2, 1, 12);
+        applicationMenu.setId(applicationMenuId);
+
+        //when
+        applicationService.deleteApplicationMenu(applicationMenu);
+
+        //then
+        ArgumentCaptor<ChildrenFilterBuilder> filterCaptor = ArgumentCaptor.forClass(ChildrenFilterBuilder.class);
+        verify(applicationMenuCleaner, times(1)).deleteRelatedApplicationMenus(filterCaptor.capture());
+        ChildrenFilterBuilder filterBuilder = filterCaptor.getValue();
+        assertThat(filterBuilder.getStartIndex()).isEqualTo(0);
+        assertThat(filterBuilder.getMaxResults()).isEqualTo(ApplicationServiceImpl.MAX_RESULTS);
+        assertThat(filterBuilder.getParentId()).isEqualTo(applicationMenuId);
     }
 
     @Test

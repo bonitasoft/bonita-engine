@@ -68,6 +68,7 @@ import com.bonitasoft.manager.Manager;
  */
 public class ApplicationServiceImpl implements ApplicationService {
 
+    public static final int MAX_RESULTS = 1000;
     private final Recorder recorder;
 
     private final ReadPersistenceService persistenceService;
@@ -80,17 +81,20 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     private IndexManager indexManager;
     private MenuIndexConvertor menuIndexConvertor;
+    private ApplicationMenuCleaner applicationMenuCleaner;
 
     public ApplicationServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final QueriableLoggerService queriableLoggerService) {
-        this(Manager.getInstance(), recorder, persistenceService, queriableLoggerService, null, null);
-        this.indexManager = new IndexManager(new IndexUpdater(this, 1000), new MenuIndexValidator());
+        this(Manager.getInstance(), recorder, persistenceService, queriableLoggerService, null, null, null);
+        this.indexManager = new IndexManager(new IndexUpdater(this, MAX_RESULTS), new MenuIndexValidator());
         this.menuIndexConvertor = new MenuIndexConvertor(this);
+        this.applicationMenuCleaner = new ApplicationMenuCleaner(this, MAX_RESULTS);
     }
 
     ApplicationServiceImpl(final Manager manager, final Recorder recorder, final ReadPersistenceService persistenceService,
-            final QueriableLoggerService queriableLoggerService, IndexManager indexManager, MenuIndexConvertor menuIndexConvertor) {
+            final QueriableLoggerService queriableLoggerService, IndexManager indexManager, MenuIndexConvertor menuIndexConvertor, ApplicationMenuCleaner applicationMenuCleaner) {
         this.indexManager = indexManager;
         this.menuIndexConvertor = menuIndexConvertor;
+        this.applicationMenuCleaner = applicationMenuCleaner;
         active = manager.isFeatureActive(Features.BUSINESS_APPLICATIONS);
         this.recorder = recorder;
         this.persistenceService = persistenceService;
@@ -227,6 +231,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             final SApplication application = getApplication(applicationId);
             final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION)
                     .setObject(application).done();
+            applicationMenuCleaner.deleteRelatedApplicationMenus(new ApplicationRelatedFilterBuilder(0, MAX_RESULTS, applicationId));
             recorder.recordDelete(new DeleteRecord(application), event);
             log(application.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SObjectNotFoundException e) {
@@ -277,7 +282,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         throw e;
     }
 
-    private void validateUpdatedFields(EntityUpdateDescriptor updateDescriptor, SApplication application) throws SInvalidTokenException, SBonitaReadException, SObjectAlreadyExistsException, SInvalidDisplayNameException {
+    private void validateUpdatedFields(EntityUpdateDescriptor updateDescriptor, SApplication application) throws SInvalidTokenException, SBonitaReadException,
+            SObjectAlreadyExistsException, SInvalidDisplayNameException {
         if (updateDescriptor.getFields().containsKey(SApplicationFields.TOKEN)
                 && !application.getToken().equals(updateDescriptor.getFields().get(SApplicationFields.TOKEN))) {
             validateApplicationToken((String) updateDescriptor.getFields().get(SApplicationFields.TOKEN));
@@ -400,21 +406,22 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public void deleteApplicationPage(final long applicationpPageId) throws SObjectModificationException, SObjectNotFoundException {
+    public void deleteApplicationPage(final long applicationPageId) throws SObjectModificationException, SObjectNotFoundException {
         checkLicense();
         final String methodName = "deleteApplicationPage";
         final SApplicationPageLogBuilder logBuilder = getApplicationPageLogBuilder(ActionType.DELETED, "Deleting application page with id "
-                + applicationpPageId);
+                + applicationPageId);
         try {
-            final SApplicationPage applicationPage = getApplicationPage(applicationpPageId);
+            final SApplicationPage applicationPage = getApplicationPage(applicationPageId);
             final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_PAGE)
                     .setObject(applicationPage).done();
+            applicationMenuCleaner.deleteRelatedApplicationMenus(new ApplicationPageRelatedFilterBuilder(0, MAX_RESULTS, applicationPageId));
             recorder.recordDelete(new DeleteRecord(applicationPage), event);
             log(applicationPage.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SObjectNotFoundException e) {
-            logAndRetrowException(applicationpPageId, methodName, logBuilder, e);
+            logAndRetrowException(applicationPageId, methodName, logBuilder, e);
         } catch (final SBonitaException e) {
-            throwModificationException(applicationpPageId, logBuilder, methodName, e);
+            throwModificationException(applicationPageId, logBuilder, methodName, e);
         }
 
     }
@@ -516,9 +523,9 @@ public class ApplicationServiceImpl implements ApplicationService {
     private void organizeIndexesOnUpdate(SApplicationMenu applicationMenu, EntityUpdateDescriptor updateDescriptor, boolean organizeIndexes)
             throws SBonitaSearchException, SObjectModificationException, SBonitaReadException {
         Map<String, Object> fields = updateDescriptor.getFields();
-        if(fields.containsKey(SApplicationMenuFields.PARENT_ID) && !fields.containsKey(SApplicationMenuFields.INDEX) ) {
+        if (fields.containsKey(SApplicationMenuFields.PARENT_ID) && !fields.containsKey(SApplicationMenuFields.INDEX)) {
             //we need to force the update of index, as it has change of parent
-            fields.put(SApplicationMenuFields.INDEX, getNextAvailableIndex((Long)fields.get(SApplicationMenuFields.PARENT_ID)));
+            fields.put(SApplicationMenuFields.INDEX, getNextAvailableIndex((Long) fields.get(SApplicationMenuFields.PARENT_ID)));
         }
         Integer newIndexValue = (Integer) fields.get(SApplicationMenuFields.INDEX);
         if (newIndexValue != null && organizeIndexes) {
@@ -546,16 +553,28 @@ public class ApplicationServiceImpl implements ApplicationService {
         final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.DELETED, "Deleting application menu with id " + applicationMenuId);
         try {
             final SApplicationMenu applicationMenu = getApplicationMenu(applicationMenuId);
-            final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_MENU)
-                    .setObject(applicationMenu).done();
-            int lastUsedIndex = getLastUsedIndex(applicationMenu.getParentId());
-            indexManager.organizeIndexesOnDelete(new MenuIndex(applicationMenu.getParentId(), applicationMenu.getIndex(), lastUsedIndex));
-            recorder.recordDelete(new DeleteRecord(applicationMenu), event);
+            deleteApplicationMenu(applicationMenu);
             log(applicationMenu.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SObjectNotFoundException e) {
             logAndRetrowException(applicationMenuId, methodName, logBuilder, e);
-        } catch (final SBonitaException e) {
+        } catch (SBonitaReadException e) {
             throwModificationException(applicationMenuId, logBuilder, methodName, e);
+        }
+    }
+
+    @Override
+    public void deleteApplicationMenu(SApplicationMenu applicationMenu) throws SObjectModificationException {
+        final String methodName = "deleteApplicationMenu";
+        final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.DELETED, "Deleting application menu with id " + applicationMenu.getId());
+        try {
+            final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_MENU)
+                    .setObject(applicationMenu).done();
+            applicationMenuCleaner.deleteRelatedApplicationMenus(new ChildrenFilterBuilder(0, MAX_RESULTS, applicationMenu.getId()));
+            int lastUsedIndex = getLastUsedIndex(applicationMenu.getParentId());
+            indexManager.organizeIndexesOnDelete(new MenuIndex(applicationMenu.getParentId(), applicationMenu.getIndex(), lastUsedIndex));
+            recorder.recordDelete(new DeleteRecord(applicationMenu), event);
+        } catch (final SBonitaException e) {
+            throwModificationException(applicationMenu.getId(), logBuilder, methodName, e);
         }
     }
 

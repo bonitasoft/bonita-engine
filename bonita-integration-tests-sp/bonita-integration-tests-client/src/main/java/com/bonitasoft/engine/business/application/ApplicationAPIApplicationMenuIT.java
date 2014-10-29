@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.business.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -208,7 +209,7 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
         assertThat(getApplicationAPI().getApplicationMenu(childCreatedAppMenu2.getId()).getIndex()).isEqualTo(3);
 
         //when change parent
-        updatedChildMenu = getApplicationAPI().updateApplicationMenu(childCreatedAppMenu3.getId(),  new ApplicationMenuUpdater().setParentId(parentAppMenu2.getId()));
+        updatedChildMenu = getApplicationAPI().updateApplicationMenu(childCreatedAppMenu3.getId(), new ApplicationMenuUpdater().setParentId(parentAppMenu2.getId()));
 
         //then
         assertThat(updatedChildMenu.getIndex()).isEqualTo(1);
@@ -250,19 +251,70 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application, Application menu",
     "delete cascade" })
-    @Test(expected = ApplicationMenuNotFoundException.class)
-    public void deleteApplication_also_deletes_applicationMenu() throws Exception {
+    @Test
+    public void deleteApplication_also_deletes_application_pages_and_applicationMenu() throws Exception {
         //given
         final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app2", "My secpond app", "1.0"));
         final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "myPage");
-        final ApplicationMenuCreator creator = new ApplicationMenuCreator(application.getId(), "Main", appPage.getId());
-        final ApplicationMenu createdAppMenu = getApplicationAPI().createApplicationMenu(creator);
+        final ApplicationMenu mainMenu = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "Main"));
+        ApplicationMenuCreator subMenuCreator = new ApplicationMenuCreator(application.getId(), "Main", appPage.getId());
+        subMenuCreator.setParentId(mainMenu.getId());
+        final ApplicationMenu subMenu = getApplicationAPI().createApplicationMenu(subMenuCreator);
 
         //when
         getApplicationAPI().deleteApplication(application.getId());
 
         //then
-        getApplicationAPI().getApplicationMenu(createdAppMenu.getId()); //throws exception
+        verifyNotExists(mainMenu);
+        verifyNotExists(subMenu);
+        verifyNotExists(appPage);
+
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application page, Application menu",
+    "delete cascade" })
+    @Test
+    public void deleteApplicationPage_also_deletes_related_applicationMenu() throws Exception {
+        //given
+        final ApplicationPage pageToDelete = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "pageToDelete");
+        final ApplicationPage pageToKeep = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "pageToKeep");
+        final ApplicationMenu menuToDelete = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "Main", pageToDelete.getId()));
+        final ApplicationMenu menuToKeep = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "Main", pageToKeep.getId()));
+        final ApplicationMenu containerMenu = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "Main"));
+
+        //when
+        getApplicationAPI().deleteApplicationPage(pageToDelete.getId());
+
+        //then
+        // container menu and menu related to another page are keep
+        verifyExists(containerMenu);
+        verifyExists(menuToKeep);
+
+        // menu related application is deleted
+        verifyNotExists(menuToDelete);
+    }
+
+    private void verifyExists(ApplicationMenu applicationMenu) throws ApplicationMenuNotFoundException {
+        ApplicationMenu retrievedMenu = getApplicationAPI().getApplicationMenu(applicationMenu.getId());
+        assertThat(retrievedMenu).isNotNull();
+    }
+
+    private void verifyNotExists(ApplicationMenu applicationMenu) {
+        try {
+            getApplicationAPI().getApplicationMenu(applicationMenu.getId()); //throws exception
+            fail("exception expected");
+        } catch (ApplicationMenuNotFoundException e) {
+            //OK
+        }
+    }
+
+    private void verifyNotExists(ApplicationPage applicationPage) {
+        try {
+            getApplicationAPI().getApplicationPage(applicationPage.getId()); //throws exception
+            fail("exception expected");
+        } catch (ApplicationPageNotFoundException e) {
+            //OK
+        }
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu",

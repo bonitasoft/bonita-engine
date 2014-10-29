@@ -162,8 +162,8 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public void deleteApplicationPage(final long applicationpPageId) throws DeletionException {
-        getApplicationPageAPIDelegate().deleteApplicationPage(applicationpPageId);
+    public void deleteApplicationPage(final long applicationPageId) throws DeletionException {
+        getApplicationPageAPIDelegate().deleteApplicationPage(applicationPageId);
     }
 
     @Override

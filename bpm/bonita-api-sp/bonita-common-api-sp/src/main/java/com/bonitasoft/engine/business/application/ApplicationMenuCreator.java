@@ -45,6 +45,7 @@ public class ApplicationMenuCreator implements Serializable {
      * @param applicationId the identifier of related {@link Application}
      * @param displayName the {@link ApplicationMenu} display name
      * @see ApplicationMenu
+     * @see com.bonitasoft.engine.business.application.Application
      */
     public ApplicationMenuCreator(final Long applicationId, final String displayName) {
         fields = new HashMap<ApplicationMenuField, Serializable>(4);
