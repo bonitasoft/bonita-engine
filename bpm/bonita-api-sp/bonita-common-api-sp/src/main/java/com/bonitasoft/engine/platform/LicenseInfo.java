@@ -13,39 +13,44 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Informations on the license of a node
- * 
+ * Defines information about the node license
+ *
  * @author Matthieu Chaffotte
  */
 public interface LicenseInfo extends Serializable {
 
     /**
-     * @return
-     *         name of the license owner
+     * Retrieves the name of the license owner
+     *
+     * @return the name of the license owner
      */
     String getLicensee();
 
     /**
-     * @return
-     *         date after which the license will expire
+     * Retrieves the license expiration date
+     *
+     * @return the license expiration date
      */
     Date getExpirationDate();
 
     /**
-     * @return
-     *         name of the edition this license allow to run
+     * Retrieves the name of the edition this license allows to run
+     *
+     * @return the name of the edition this license allows to run
      */
     String getEdition();
 
     /**
-     * @return
-     *         list of features that are available using this license
+     * Retrieves a list containing the names of all features available for this license
+     *
+     * @return a list containing the names of all features available for this license
      */
     List<String> getFeatures();
 
     /**
-     * @return
-     *         the number of CPU cores this license allows
+     * Retrieves the number of CPU cores this license allows
+     *
+     * @return the number of CPU cores this license allows
      */
     int getNumberOfCPUCores();
 
