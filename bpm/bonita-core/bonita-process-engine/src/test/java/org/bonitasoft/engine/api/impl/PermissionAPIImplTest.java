@@ -52,7 +52,7 @@ public class PermissionAPIImplTest {
         permissionAPI = spy(new PermissionAPIImpl());
         doReturn(tenantServiceAccessor).when(permissionAPI).getTenantServiceAccessor();
         doReturn(permissionService).when(tenantServiceAccessor).getPermissionService();
-        apiCallContext = new APICallContext("GET", "identity", "user", "1", "query", "body");
+        apiCallContext = new APICallContext("GET", "identity", "user", "1", "query", "{\"body\":\"value\"}");
     }
 
     @Test
