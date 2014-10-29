@@ -15,10 +15,17 @@ package org.bonitasoft.engine.bpm;
 
 
 /**
+ * Any element that has a name and description in Bonita BPM implements this interface.
+ *
  * @author Matthieu Chaffotte
  */
 public interface DescriptionElement extends NamedElement {
 
+    /**
+     * Retrieves the element description
+     * 
+     * @return the element description
+     */
     String getDescription();
 
 }

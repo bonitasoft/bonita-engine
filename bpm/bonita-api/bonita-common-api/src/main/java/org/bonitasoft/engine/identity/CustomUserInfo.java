@@ -3,8 +3,12 @@ package org.bonitasoft.engine.identity;
 import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
- * Aggregate information of {@link CustomUserInfoDefinition} and {@link CustomUserInfoValue} 
+ * Aggregate information of {@link CustomUserInfoDefinition} and {@link CustomUserInfoValue}
+ *
  * @author Vincent Elcrin
+ * @see CustomUserInfoDefinition
+ * @see CustomUserInfoValue
+ * @since 6.3
  */
 public class CustomUserInfo implements BonitaObject {
 
@@ -16,7 +20,14 @@ public class CustomUserInfo implements BonitaObject {
 
     private final long userId;
 
-    public CustomUserInfo(long userId, CustomUserInfoDefinition definition, CustomUserInfoValue value) {
+    /**
+     * Default Constructor.
+     * 
+     * @param userId the user id
+     * @param definition the {@link CustomUserInfoDefinition} definition
+     * @param value the {@link CustomUserInfoValue} value
+     */
+    public CustomUserInfo(final long userId, final CustomUserInfoDefinition definition, final CustomUserInfoValue value) {
         this.userId = userId;
         this.definition = definition;
         if(value != null) {

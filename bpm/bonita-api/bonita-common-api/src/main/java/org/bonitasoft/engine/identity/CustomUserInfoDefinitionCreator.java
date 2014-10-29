@@ -16,38 +16,65 @@ package org.bonitasoft.engine.identity;
 import java.io.Serializable;
 
 /**
+ * represents a helper for creating a {@link CustomUserInfoDefinition}.
+ *
  * @author Vincent Elcrin
+ * @see CustomUserInfoDefinition
+ * @since 6.3.1
  */
 public class CustomUserInfoDefinitionCreator implements Serializable {
-    
+
     private static final long serialVersionUID = 6929368716340973445L;
 
     private String name;
 
     private String description;
 
-    public CustomUserInfoDefinitionCreator(String name) {
+    /**
+     * creates a new {@link CustomUserInfoDefinitionCreator} with the specified name
+     *
+     * @param name the name to set
+     */
+    public CustomUserInfoDefinitionCreator(final String name) {
         this.name = name;
     }
-    
-    public CustomUserInfoDefinitionCreator(String name, String description) {
+
+    /**
+     * creates a new {@link CustomUserInfoDefinitionCreator} with the specified name and description
+     *
+     * @param name the name to set
+     * @param description the description to set
+     */
+    public CustomUserInfoDefinitionCreator(final String name, final String description) {
         this(name);
         this.description = description;
     }
 
+    /**
+     * @return the {@link CustomUserInfoDefinitionCreator}'s name to create
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return the {@link CustomUserInfoDefinitionCreator}'s description to create
+     */
     public String getDescription() {
         return description;
     }
 
-    public void setName(String name) {
+    /**
+     * @param name the {@link CustomUserInfoDefinitionCreator}'s name to create
+     */
+    public void setName(final String name) {
         this.name = name;
     }
 
-    public void setDescription(String description) {
+    /**
+     * @param description the {@link CustomUserInfoDefinitionCreator}'s name to create
+     */
+    public void setDescription(final String description) {
         this.description = description;
     }
 }

@@ -44,7 +44,6 @@ import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMapping
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -405,7 +404,6 @@ public class ClassLoaderServiceTest extends CommonServiceTest {
     }
 
     @Test
-    @Ignore("ENGINE-1366")
     public void testResetGlobalClassLoader() throws Exception {
         initializeClassLoaderService();
 

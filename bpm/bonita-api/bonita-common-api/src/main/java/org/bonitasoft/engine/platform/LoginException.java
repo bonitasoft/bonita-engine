@@ -16,18 +16,26 @@ package org.bonitasoft.engine.platform;
 import org.bonitasoft.engine.exception.BonitaException;
 
 /**
+ * Indicates that a problem occurred during tenant login action
+ *
  * @author Matthieu Chaffotte
  */
 public class LoginException extends BonitaException {
 
     private static final long serialVersionUID = 2644120305805282693L;
 
+    /**
+     * @param message a String indicating the exception message
+     */
     public LoginException(final String message) {
         super(message);
     }
 
-    public LoginException(final Throwable e) {
-        super(e);
+    /**
+     * @param cause a Throwable indicating the root cause
+     */
+    public LoginException(final Throwable cause) {
+        super(cause);
     }
 
 }

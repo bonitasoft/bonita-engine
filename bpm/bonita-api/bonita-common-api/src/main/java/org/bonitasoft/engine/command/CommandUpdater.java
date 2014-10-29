@@ -18,14 +18,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Updater for <code>Commands</code> <br/>
+ *
  * @author Matthieu Chaffotte
+ * @see org.bonitasoft.engine.api.CommandAPI#update(long, CommandUpdater)
+ * @see org.bonitasoft.engine.api.CommandAPI#update(String, CommandUpdater)
  */
 public class CommandUpdater implements Serializable {
 
     private static final long serialVersionUID = 1326464578602375090L;
 
     public enum CommandField {
-        NAME, DESCRIPTION;
+        NAME, DESCRIPTION
     }
 
     private final Map<CommandField, Serializable> fields;
