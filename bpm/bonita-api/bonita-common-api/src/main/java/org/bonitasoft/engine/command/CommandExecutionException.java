@@ -16,7 +16,10 @@ package org.bonitasoft.engine.command;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
+ * Happens when an exception occurs during the execution of a command
+ *
  * @author Matthieu Chaffotte
+ * @since 6.0.0
  */
 public class CommandExecutionException extends ExecutionException {
 

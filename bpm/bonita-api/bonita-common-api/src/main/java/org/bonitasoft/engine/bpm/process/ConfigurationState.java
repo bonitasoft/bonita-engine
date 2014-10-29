@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -14,12 +14,32 @@
 package org.bonitasoft.engine.bpm.process;
 
 /**
+ * Autoset by Bonita BPM Engine. Determines if a process is resolved / unresolved, that is, if a process can be started or not.
+ * Reasons for unresolved processes are:
+ * <ul>
+ * <li>Not all actors of the process have mappings to users / groups / roles / memberships</li>
+ * <li>Some business data used in the process are not available on the currently deployed Business Data Model version (Subscription editions only)</li>
+ * <li>Not all connectors used in the process have an implementation defined</li>
+ * <li>Not all user filters used in the process have an implementation defined</li>
+ * <li>Not all parameters used in the process have a value defined (Subscription editions only)</li>
+ * </ul>
+ * <p>Use {@link ProcessDeploymentInfo#getConfigurationState()} to retrieve the configuration state for a process.</p>
+ *
+ * @see ProcessDeploymentInfo#getConfigurationState()
  * @author Celine Souchet
- * 
- *         Autoset by engine
+ * @author Emmanuel Duchastenier
+ * @version 6.3.5
+ * @since 6.0.0
  */
 public enum ConfigurationState {
 
-    UNRESOLVED, RESOLVED
+    /**
+     * The process is unresolved, for one or more of the causes defined above.
+     */
+    UNRESOLVED,
 
+    /**
+     * The process is resolved, and can be started to create a new instance.
+     */
+    RESOLVED
 }

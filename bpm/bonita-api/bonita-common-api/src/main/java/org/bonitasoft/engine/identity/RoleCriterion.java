@@ -14,7 +14,11 @@
 package org.bonitasoft.engine.identity;
 
 /**
+ * list the available {@link Role} sort orders
+ *
  * @author Yanyan Liu
+ * @see Role
+ * @since 6.0.0
  */
 public enum RoleCriterion {
 

@@ -73,7 +73,7 @@ public class ProcessStarter {
     private final Filter<SFlowNodeDefinition> filter;
 
     private ProcessStarter(final long userId, final long processDefinitionId, final List<Operation> operations,
-            final Map<String, Serializable> context, final Filter<SFlowNodeDefinition> filter) {
+           final Map<String, Serializable> context, final Filter<SFlowNodeDefinition> filter) {
         this.userId = userId;
         this.processDefinitionId = processDefinitionId;
         this.operations = operations;
@@ -106,7 +106,7 @@ public class ProcessStarter {
 
     // For commands
     public ProcessInstance start(final List<ConnectorDefinitionWithInputValues> connectorsWithInput) throws SProcessInstanceCreationException,
-    SProcessDefinitionReadException, SProcessDefinitionException {
+            SProcessDefinitionReadException, SProcessDefinitionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
 
@@ -127,11 +127,11 @@ public class ProcessStarter {
             e.setProcessDefinitionNameOnContext(sProcessDefinition.getName());
             e.setProcessDefinitionVersionOnContext(sProcessDefinition.getVersion());
             throw e;
-        }
+            }
 
         logProcessInstanceStartedAndAddComment(sProcessDefinition, starterUserId, starterSubstituteUserId, startedSProcessInstance);
         return ModelConvertor.toProcessInstance(sProcessDefinition, startedSProcessInstance);
-    }
+        }
 
     protected void log(final TenantServiceAccessor tenantAccessor, final Exception e) {
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
@@ -155,35 +155,35 @@ public class ProcessStarter {
     private SProcessDefinition getProcessDefinition() throws SProcessDefinitionReadException, SProcessDefinitionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final SProcessDefinitionDeployInfo deployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
-        if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
+            final SProcessDefinitionDeployInfo deployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
+            if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
             throw new SProcessDefinitionException("The process definition is not enabled !!", deployInfo.getProcessId(), deployInfo.getName(),
                     deployInfo.getVersion());
-        }
+            }
         return processDefinitionService.getProcessDefinition(processDefinitionId);
-    }
+        }
 
     private void logProcessInstanceStartedAndAddComment(final SProcessDefinition sProcessDefinition, final long starterId, final long starterSubstituteId,
             final SProcessInstance sProcessInstance) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
 
-        final StringBuilder stb = new StringBuilder();
-        stb.append("The user <");
-        stb.append(SessionInfos.getUserNameFromSession());
+            final StringBuilder stb = new StringBuilder();
+            stb.append("The user <");
+            stb.append(SessionInfos.getUserNameFromSession());
         if (starterId != starterSubstituteId) {
-            stb.append("> acting as delegate of user with id <");
-            stb.append(starterId);
-        }
+                stb.append("> acting as delegate of user with id <");
+                stb.append(starterId);
+            }
         stb.append("> has started the process instance <");
         stb.append(sProcessInstance.getId());
-        stb.append("> of process <");
-        stb.append(sProcessDefinition.getName());
-        stb.append("> in version <");
-        stb.append(sProcessDefinition.getVersion());
-        stb.append("> and id <");
-        stb.append(sProcessDefinition.getId());
-        stb.append(">");
+            stb.append("> of process <");
+            stb.append(sProcessDefinition.getName());
+            stb.append("> in version <");
+            stb.append(sProcessDefinition.getVersion());
+            stb.append("> and id <");
+            stb.append(sProcessDefinition.getId());
+            stb.append(">");
 
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, stb.toString());

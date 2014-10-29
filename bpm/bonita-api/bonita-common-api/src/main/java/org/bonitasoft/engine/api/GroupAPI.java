@@ -30,7 +30,7 @@ import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 
 /**
- * GroupAPI forms part of the {@link OrganizationAPI} and gives access to all the Administation operations available on Groups: creation, deletion, updating,
+ * GroupAPI forms part of the {@link OrganizationAPI} and gives access to all the Administration operations available on Groups: creation, deletion, updating,
  * search, etc...
  * 
  * @author Zhao Na

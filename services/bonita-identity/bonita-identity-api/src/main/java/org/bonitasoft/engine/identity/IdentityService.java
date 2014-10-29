@@ -22,6 +22,10 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
+import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SRoleBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
+import org.bonitasoft.engine.identity.model.builder.SUserMembershipBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -29,52 +33,106 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
- * @author Anthony Birembaut
- * @author Baptiste Mesta
- * @author Matthieu Chaffotte
+ * This service allow to manage the users and organizations and membership and the relations between them.
+ *
+ * @author Anthony Birembaut, Baptiste Mesta, Matthieu Chaffotte
  * @since 6.0
  */
 public interface IdentityService {
 
-    String GROUP = "GROUP";
+    static final String GROUP = "GROUP";
 
-    String CUSTOM_USER_INFO_DEFINITION = "CUSTOM_USER_INFO_DEFINITION";
+    static final String CUSTOM_USER_INFO_DEFINITION = "CUSTOM_USER_INFO_DEFINITION";
 
-    String CUSTOM_USER_INFO_VALUE = "CUSTOM_USER_INFO_VALUE";
+    static final String CUSTOM_USER_INFO_VALUE = "CUSTOM_USER_INFO_VALUE";
 
-    String ROLE = "ROLE";
+    static final String ROLE = "ROLE";
 
-    String USER = "USER";
+    static final String USER = "USER";
 
-    String USER_CONTACT_INFO = "USER_CONTACT_INFO";
+    static final String USER_CONTACT_INFO = "USER_CONTACT_INFO";
 
-    String USERMEMBERSHIP = "USERMEMBERSHIP";
+    static final String USERMEMBERSHIP = "USERMEMBERSHIP";
 
     /**
-     * Gets the role given by its identifier.
-     * 
+     * Gets the {@link SRole} given by its identifier.
+     *
      * @param roleId
      *        the role identifier
-     * @return the role
+     * @return the role of the given id
      * @throws SRoleNotFoundException
      *         occurs when the roleId does not refer to any role.
      */
     SRole getRole(long roleId) throws SRoleNotFoundException;
 
     /**
-     * Get the role given by its name.
-     * 
+     * Get the {@link SRole} given by its name.
+     *
      * @param roleName
      *        The name of role
-     * @return the role
+     * @return the role of the given name
      * @throws SRoleNotFoundException
      *         occurs when the roleName does not refer to any role.
      */
     SRole getRoleByName(String roleName) throws SRoleNotFoundException;
 
     /**
-     * Get the group by its path
-     * 
+     * Get total number of {@link SRole} for this tenant
+     *
+     * @return the total number of roles for this tenant
+     * @throws SIdentityException occurs on persistence layer access problem
+     */
+    long getNumberOfRoles() throws SIdentityException;
+
+    /**
+     * Get a {@link List} of {@link SRole} by their identifiers
+     *
+     * @param roleIds
+     *        the role identifiers
+     * @return a list of {@link SRole} objects
+     * @throws SRoleNotFoundException
+     *         Occurs when roleId does not refer to any role.
+     */
+    List<SRole> getRoles(List<Long> roleIds) throws SRoleNotFoundException;
+
+    /**
+     * Get a {@link List} of {@link SRole} in specific interval
+     * <p>
+     * If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     *
+     * @param fromIndex
+     *        Index of the record to be retrieved from. First record has index 0
+     * @param numberOfRoles
+     *        Number of result to retrieve
+     * @return a list of SRole objects
+     * @throws SIdentityException occurs on persistence layer access problem
+     */
+    List<SRole> getRoles(int fromIndex, int numberOfRoles) throws SIdentityException;
+
+    /**
+     * <p>
+     * Get a {@link List} of {@link SRole} in specific interval, sorted by <i>field</i> attribute in the given {@link OrderByType} <i>order</i>.
+     * <p> For instance, getRoles(0,10,"displayName", OrderByType.DESC) returns the 10 first roles sorted by &quot;displayName&quot; in desc order
+     * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     * <p> check {@link SRoleBuilderFactory} to get a list of available field keys to sort
+     *
+     * @param fromIndex
+     *        Index of the record to be retrieved from. First record has index 0
+     * @param numberOfRoles
+     *        Number of result to retrieve
+     * @param field
+     *        The field used by the sort
+     * @param order
+     *        ASC or DESC
+     * @return a list of paginated SRole objects
+     * @see SRoleBuilderFactory to get a list of available field keys to use
+     * @throws SIdentityException occurs on persistence layer access problem
+     */
+    List<SRole> getRoles(int fromIndex, int numberOfRoles, String field, OrderByType order) throws SIdentityException;
+
+    /**
+     * Get the {@link SGroup} by its path
+     *
      * @param groupPath
      *        The group path
      * @return the group
@@ -84,55 +142,8 @@ public interface IdentityService {
     SGroup getGroupByPath(String groupPath) throws SGroupNotFoundException;
 
     /**
-     * Get total number of roles
-     * 
-     * @return the total number of roles
-     * @throws SIdentityException
-     */
-    long getNumberOfRoles() throws SIdentityException;
-
-    /**
-     * Get roles by their ids
-     * 
-     * @param roleIds
-     *        the role identifiers
-     * @return a list of SRole objects
-     * @throws SRoleNotFoundException
-     *         Occurs when roleId does not refer to any role.
-     */
-    List<SRole> getRoles(List<Long> roleIds) throws SRoleNotFoundException;
-
-    /**
-     * Get roles in specific interval
-     * 
-     * @param fromIndex
-     *        Index of the record to be retrieved from. First record has index 0
-     * @param numberOfRoles
-     *        Number of result we want to get. Maximum number of result returned.
-     * @return a list of SRole objects
-     * @throws SIdentityException
-     */
-    List<SRole> getRoles(int fromIndex, int numberOfRoles) throws SIdentityException;
-
-    /**
-     * Get roles in specific interval, The returned list is paginated
-     * 
-     * @param fromIndex
-     *        Index of the record to be retrieved from. First record has index 0
-     * @param numberOfRoles
-     *        Number of result we want to get. Maximum number of result returned.
-     * @param field
-     *        The field used by the order
-     * @param order
-     *        ASC or DESC
-     * @return a list of paginated SRole objects
-     * @throws SIdentityException
-     */
-    List<SRole> getRoles(int fromIndex, int numberOfRoles, String field, OrderByType order) throws SIdentityException;
-
-    /**
-     * Get group by its id
-     * 
+     * Get {@link SGroup} by its identifier
+     *
      * @param groupId
      *        The group identifier
      * @return the group
@@ -142,96 +153,108 @@ public interface IdentityService {
     SGroup getGroup(long groupId) throws SGroupNotFoundException;
 
     /**
-     * Get total number of groups
-     * 
-     * @return the total number of groups
-     * @throws SIdentityException
+     * Get total number of {@link SGroup} in the current tenant
+     *
+     * @return the total number of {@link SGroup}
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     long getNumberOfGroups() throws SIdentityException;
 
     /**
-     * Get groups for specific groupIds
-     * 
+     * Get a {@link List} of {@link SGroup} for specific groupIds
+     *
      * @param groupIds
      *        The group identifiers
-     * @return a list of SGroup object
-     * @throws SGroupNotFoundException
+     * @return a {@link List} of {@link SGroup} object
+     * @throws SGroupNotFoundException occurs when no given group identifiers refer to any group.
      */
     List<SGroup> getGroups(List<Long> groupIds) throws SGroupNotFoundException;
 
     /**
-     * Get groups in a specific interval, this is used for pagination
-     * 
+     * Get a {@link List} of {@link SGroup} in a specific interval, this is used for pagination
+     * <p>
+     * If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     *
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfGroups
-     *        Number of result we want to get. Maximum number of result returned.
-     * @return a list of SGroup objects
-     * @throws SIdentityException
+     *        Number of result to retrieve
+     * @return a {@link List} of {@link SGroup}
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     List<SGroup> getGroups(int fromIndex, int numberOfGroups) throws SIdentityException;
 
     /**
-     * Get groups in specific interval, The returned list is paginated
-     * 
+     * <p>
+     * Get a {@link List} of {@link SGroup} in specific interval, sorted by <i>field</i> attribute in the given {@link OrderByType} <i>order</i>.
+     * <p> For instance, getGroups(0,10,"displayName", OrderByType.DESC) returns the 10 first {@link SGroup} sorted by &quot;displayName&quot; in desc order
+     * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     * <p> check {@link SGroupBuilderFactory} to get a list of available field keys to sort
+     *
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfGroups
-     *        Number of result we want to get. Maximum number of result returned.
+     *        Number of result to retrieve
      * @param field
-     *        The field used by the order
+     *        The field used to sort
      * @param order
      *        ASC or DESC
-     * @return a list of paginated SGroup objects
-     * @throws SIdentityException
+     * @return a {@link List} of paginated {@link SGroup} objects
+     * @see SGroupBuilderFactory
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     List<SGroup> getGroups(int fromIndex, int numberOfGroups, String field, OrderByType order) throws SIdentityException;
 
     /**
-     * Get number of child groups for the specific group
-     * 
+     * Get number of child groups for the group identified by the given id
+     *
      * @param parentGroupId
      *        The parent group identifier
      * @return the number of child groups
-     * @throws SIdentityException
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     long getNumberOfGroupChildren(long parentGroupId) throws SIdentityException;
 
     /**
-     * Get child groups in a specific interval for specific group, this is used for pagination
-     * 
+     * Get a {@link List} child {@link SGroup} in a specific interval for specific group. This is used for pagination
+     * If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     *
      * @param parentGroupId
      *        The parent group identifier
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfGroups
-     *        Number of result we want to get. Maximum number of result returned.
-     * @return a list of SGroup objects
-     * @throws SIdentityException
+     *        Number of result to retrieve
+     * @return a {@link List} of child {@link SGroup}
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     List<SGroup> getGroupChildren(long parentGroupId, int fromIndex, int numberOfGroups) throws SIdentityException;
 
     /**
-     * Get child groups in specific interval, The returned list is paginated
-     * 
+     * Get a {@link List} of child {@link SGroup} in specific interval, sorted by <i>field</i> attribute in the given {@link OrderByType} <i>order</i>.
+     * <p> For instance, getGroupChildren(0,10,"displayName", OrderByType.DESC) returns the 10 first child {@link SGroup} of the parent {@link SGroup}
+     * identified by <i>parentGroupId</i> sorted by &quot;displayName&quot; in desc order
+     * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     * <p> check {@link SGroupBuilderFactory} to get a list of available field keys to sort
+     *
      * @param parentGroupId
      *        The parent group identifier
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfGroups
-     *        Number of result we want to get. Maximum number of result returned.
+     *        Number of result to retrieve
      * @param field
-     *        The field used by the order
+     *        The field used to sort
      * @param order
      *        ASC or DESC
-     * @return a list of SGroup objects
-     * @throws SIdentityException
+     * @return a {@link List} of child {@link SGroup}
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     List<SGroup> getGroupChildren(long parentGroupId, int fromIndex, int numberOfGroups, String field, OrderByType order) throws SIdentityException;
 
     /**
-     * Get user by its id
-     * 
+     * Get {@link SUser} by its id
+     *
      * @param userId
      *        The user identifier
      * @return the user
@@ -242,7 +265,7 @@ public interface IdentityService {
 
     /**
      * Checks whether the couple user/password is valid.
-     * 
+     *
      * @param user
      *        the user
      * @param password
@@ -252,8 +275,8 @@ public interface IdentityService {
     boolean chechCredentials(SUser user, String password);
 
     /**
-     * Get user by its name
-     * 
+     * Get {@link SUser} by its name
+     *
      * @param username
      *        The user name
      * @return the user
@@ -263,50 +286,55 @@ public interface IdentityService {
     SUser getUserByUserName(String username) throws SUserNotFoundException;
 
     /**
-     * Get total number of users
-     * 
+     * Get total number of {@link SUser} on the current tenant
+     *
      * @return the total number of users
-     * @throws SIdentityException
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     long getNumberOfUsers() throws SIdentityException;
 
     /**
-     * Get users by their userIds
-     * 
+     * Get {@link SUser} by their userIds
+     *
      * @param userIds
-     *        A list of user identifiers
-     * @return a list of SUser objects
+     *        A {@link List} of user identifiers
+     * @return a {@link List} of {@link SUser}
      * @throws SUserNotFoundException
-     *         occurs when the userId does not refer to any user.
+     *         occurs when none of the given userIds refer to any user.
      */
     List<SUser> getUsers(List<Long> userIds) throws SUserNotFoundException;
 
     /**
-     * Lists the users from their names.
-     * 
+     * retrieve a {@link List} of {@link SUser} from their names.
+     *
      * @param userNames
      *        the list of user names
-     * @return the list of users
+     * @return a {@link List} of {@link SUser}
      * @throws SIdentityException
      *         If an exception occurs when retrieving the users
      */
     List<SUser> getUsersByUsername(List<String> userNames) throws SIdentityException;
 
     /**
-     * Get users in a specific interval, this is used for pagination
-     * 
+     * Get a {@link List} of {@link SUser} from a specific interval.
+     * <p>
+     * If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     *
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfUsers
-     *        Number of result we want to get. Maximum number of result returned.
-     * @return a list of SUser objects
-     * @throws SIdentityException
+     *        Number of result to retrieve
+     * @return a {@link List} of {@link SUser}
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     List<SUser> getUsers(int fromIndex, int numberOfUsers) throws SIdentityException;
 
     /**
-     * Get users in specific interval, The returned list is paginated
-     * 
+     * Get a {@link List} of child {@link SUser} from specific interval, sorted by <i>field</i> attribute in the given {@link OrderByType} <i>order</i> order.
+     * <p> For instance, getUsers(0,10,"displayName", OrderByType.DESC) returns the 10 first {@link SUser} sorted by &quot;displayName&quot; in desc order
+     * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     * <p> check {@link SUserBuilderFactory} to get a list of available field keys to sort
+     *
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfUsers
@@ -315,221 +343,254 @@ public interface IdentityService {
      *        The field used by the order
      * @param order
      *        ASC or DESC
-     * @return a list of paginated SUser objects
-     * @throws SIdentityException
+     * @return a {@link List} of paginated {@link SUser}
+     * @see SUserBuilderFactory
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     List<SUser> getUsers(int fromIndex, int numberOfUsers, String field, OrderByType order) throws SIdentityException;
 
     /**
-     * Get all users managed by a specific manager
-     * 
+     * Get all users managed by a specific manager from a specific interval.
+     * <p>
+     * If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     *
      * @param managerId
      *        The manager identifier, actually it is user identifier
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
      * @param numberMaxOfUsers
-     *        Number of result we want to get. Maximum number of result returned.
-     * @return a list of SUser objects
-     * @throws SIdentityException
+     *        Number of result to retrieve
+     * @return a {@link List} of {@link SUser}
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     List<SUser> getUsersByManager(long managerId, int fromIndex, int numberMaxOfUsers) throws SIdentityException;
 
     /**
-     * Get total number of users for the given role
-     * 
+     * Get total number of users for the given role on the current tenant
+     *
      * @param roleId
      *        The identifier of role
      * @return total number of users related to the given role
-     * @throws SIdentityException
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     long getNumberOfUsersByRole(long roleId) throws SIdentityException;
 
     /**
-     * Get users in a specific interval for the given role, this is used for pagination
-     * 
+     * Get a {@link List} of {@link SUser} from a specific interval for the given {@link SRole} identifier.
+     * <p>
+     * If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     *
      * @param roleId
-     *        The identifier of the role
+     *        The identifier of the {@link SRole} of the {@link SUser} to retrieve
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfUsers
-     *        Number of result we want to get. Maximum number of result returned.
-     * @return a list of SUser objects
-     * @throws SIdentityException
+     *        Number of result to retrieve
+     * @return a {@link List} of {@link SUser}
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     List<SUser> getUsersByRole(long roleId, int fromIndex, int numberOfUsers) throws SIdentityException;
 
     /**
-     * Get users in specific interval for given role, The returned list is paginated
-     * 
+     * Get a {@link List} of {@link SUser} for given {@link SRole} from specific interval, sorted by <i>field</i> attribute in the given {@link OrderByType}
+     * <i>order</i> order.
+     * <p> For instance, getUsersByRole(1,0,10,"displayName", OrderByType.DESC) returns the 10 first {@link SUser} of the {@link SRole} with id '1' sorted by
+     * &quot;displayName&quot; in desc order
+     * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     * <p> check {@link SUserBuilderFactory} to get a list of available field keys to sort
+     *
      * @param roleId
-     *        The identifier of the role
+     *        The identifier of the {@link SRole}
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfUsers
-     *        Number of result we want to get. Maximum number of result returned.
+     *        Number of result to retrieve
      * @param field
-     *        The field used by the order
+     *        The field used to sort
      * @param order
      *        ASC or DESC
-     * @return a list of paginated SUser objects
-     * @throws SIdentityException
+     * @return a {@link List} of {@link SUser}
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     List<SUser> getUsersByRole(long roleId, int fromIndex, int numberOfUsers, String field, OrderByType order) throws SIdentityException;
 
     /**
-     * Get total number of users for the given group
-     * 
+     * Get total number of users for the given {@link SGroup}
+     *
      * @param groupId
-     *        The identifier of the group
+     *        The identifier of the {@link SGroup}
      * @return total number of users in the given group
-     * @throws SIdentityException
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     long getNumberOfUsersByGroup(long groupId) throws SIdentityException;
 
     /**
-     * Get users in a specific interval for the given group, this is used for pagination
-     * 
+     * Get a {@link List} of {@link SUser} of the given group from a specific interval.
+     * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     *
      * @param groupId
-     *        Identifier of the group
+     *        Identifier of the {@link SGroup}
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfUsers
-     *        Number of result we want to get. Maximum number of result returned.
-     * @return a list of SUser objects
-     * @throws SIdentityException
+     *        Number of result to retrieve
+     * @return a {@link List} of {@link SUser}
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     List<SUser> getUsersByGroup(long groupId, int fromIndex, int numberOfUsers) throws SIdentityException;
 
     /**
-     * Get users in specific interval for given group, The returned list is paginated
-     * 
+     * Get a {@link List} of {@link SUser} for given {@link SGroup} from specific interval, sorted by <i>field</i> attribute in the given {@link OrderByType}
+     * <i>order</i> order.
+     * <p> For instance, getUsersByGroup(1,0,10,"displayName", OrderByType.DESC) returns the 10 first {@link SUser} of the {@link SGroup} with id '1' sorted by
+     * &quot;displayName&quot; in desc order
+     * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     * <p> check {@link SUserBuilderFactory} to get a list of available field keys to sort
+     *
      * @param groupId
-     *        Identifier of the group
+     *        Identifier of the {@link SGroup}
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfUsers
-     *        Number of result we want to get. Maximum number of result returned.
+     *        Number of result to retrieve
      * @param field
-     *        The field used by the order
+     *        The field used to sort
      * @param order
      *        ASC or DESC
-     * @return a list of SUser objects
-     * @throws SIdentityException
+     * @return a {@link List} of {@link SUser}
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     List<SUser> getUsersByGroup(long groupId, int fromIndex, int numberOfUsers, String field, OrderByType order) throws SIdentityException;
 
     /**
-     * Get user memberships for given group
-     * 
+     * Get a {@link List} of {@link SUserMembership} for given group from specific interval
+     * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     *
      * @param groupId
      *        Identifier of the group
-     * @param maxResults
-     * @param startIndex
-     * @return a list of SUserMembership objects
-     * @throws SIdentityException
+     * @param fromIndex
+     *        Index of the record to be retrieved from. First record has index 0
+     * @param numberOfResults
+     *        Number of result to retrieve
+     * @return a {@link List} of {@link SUserMembership}
+     * @throws SIdentityException occurs on persistence layer access problem
      */
-    List<SUserMembership> getUserMembershipsOfGroup(long groupId, int startIndex, int maxResults) throws SIdentityException;
+    List<SUserMembership> getUserMembershipsOfGroup(long groupId, int fromIndex, int numberOfResults) throws SIdentityException;
 
     /**
-     * Get user memberships for given role
-     * 
+     * Get a {@link List} of {@link SUserMembership} for given role from specific interval
+     * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     *
      * @param roleId
      *        Identifier of the role
-     * @return a list of SUserMembership objects
-     * @throws SIdentityException
+     * @param fromIndex
+     *        Index of the record to be retrieved from. First record has index 0
+     * @param numberOfResults
+     *        Number of result to retrieve
+     * @return a {@link List} of {@link SUserMembership}
+     * @throws SIdentityException occurs on persistence layer access problem
      */
-    List<SUserMembership> getUserMembershipsOfRole(long roleId, int startIndex, int maxResults) throws SIdentityException;
+    List<SUserMembership> getUserMembershipsOfRole(long roleId, int fromIndex, int numberOfResults) throws SIdentityException;
 
     /**
-     * Get userMembership by given id
-     * 
+     * Get {@link SUserMembership} by given id
+     *
      * @param userMembershipId
      *        The identifier of userMembership
-     * @return a SUserMembership object
-     * @throws SIdentityException
+     * @return the {@link SUserMembership} of the given id
+     * @throws SIdentityException occurs on persistence layer access problem or if the {@link SUserMembership} does not exists
      */
     SUserMembership getUserMembership(long userMembershipId) throws SIdentityException;
 
     /**
-     * Get user membership of specific user, group and role
-     * 
+     * Get {@link SUserMembership} of specific {@link SUser}, {@link SGroup} and {@link SRole}
+     *
      * @param userId
-     *        The identifier of user
+     *        The user's identifier
      * @param groupId
-     *        The identifier of group
+     *        The group's identifier
      * @param roleId
-     *        The identifier of role
-     * @return a SUserMembership object
-     * @throws SIdentityException
+     *        The role's identifier
+     * @return the {@link SUserMembership}
+     * @throws SIdentityException occurs on persistence layer access problem or if the {@link SUserMembership} does not exists
      */
     SUserMembership getUserMembership(long userId, long groupId, long roleId) throws SIdentityException;
 
     /**
-     * Get light user membership of specific user, group and role
-     * 
+     * Get the {@link SUserMembership} of the specific user, group and role without userName, groupName and roleName being set.
+     *
      * @param userId
-     *        The identifier of user
+     *        The user's identifier
      * @param groupId
-     *        The identifier of group
+     *        The group's identifier
      * @param roleId
-     *        The identifier of role
-     * @return a SUserMembership object without userName, groupName and roleName
-     * @throws SIdentityException
+     *        The role's identifier
+     * @return the lightened {@link SUserMembership}
+     * @throws SIdentityException occurs on persistence layer access problem or if the {@link SUserMembership} does not exists
      */
     SUserMembership getLightUserMembership(long userId, long groupId, long roleId) throws SIdentityException;
 
     /**
-     * Get userMembership by given id
-     * 
+     * Get a {@link List} of {@link SUserMembership} of the given identifiers if they exists
+     *
      * @param userMembershipIds
-     *        The identifier of userMembership
-     * @return a list of SUserMembership objects
-     * @throws SIdentityException
+     *        The {@link SUserMembership}'s identifiers
+     * @return a {@link List} of {@link SUserMembership}
+     * @throws SIdentityException occurs on persistence layer access problem or if none identifiers match an existing {@link SUserMembership}
      */
     List<SUserMembership> getUserMemberships(List<Long> userMembershipIds) throws SIdentityException;
 
     /**
-     * Get userMemberships in a specific interval, this is used for pagination
-     * 
+     * Get a {@link List} of {@link SUserMembership} from specific interval
+     * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     *
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
-     * @param numberOfUserMemberships
-     *        Number of result we want to get. Maximum number of result returned.
-     * @return a list of SUserMembership objects
-     * @throws SIdentityException
+     * @param numberOfResults
+     *        Number of result to retrieve
+     * @return a {@link List} of {@link SUserMembership}
+     * @throws SIdentityException occurs on persistence layer access problem
      */
-    List<SUserMembership> getUserMemberships(int fromIndex, int numberOfUserMemberships) throws SIdentityException;
+    List<SUserMembership> getUserMemberships(int fromIndex, int numberOfResults) throws SIdentityException;
 
     /**
-     * Get userMemberships in a specific interval with specific order, this is used for pagination
-     * 
+     * Get a {@link List} of {@link SUserMembership} from specific interval, sorted by <i>field</i> attribute in the given {@link OrderByType} <i>order</i>
+     * order.
+     * <p> For instance, getUserMemberships(0,10,"id", OrderByType.DESC) returns the 10 first {@link SUserMembership} sorted by
+     * &quot;displayName&quot; in desc order
+     * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     * <p> check {@link SUserMembershipBuilderFactory} to check available field keys to sort
+     *
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfUserMemberships
-     *        Number of result we want to get. Maximum number of result returned
-     * @param orderByOption
-     *        OrderByOption object containing order by information
-     * @return a list of SUserMembership objects
-     * @throws SIdentityException
+     *        Number of result to retrieve
+     * @param field
+     *        The field used to sort
+     * @param order
+     *        ASC or DESC
+     * @return a {@link List} of {@link SUserMembership}
+     * @see SUserMembershipBuilderFactory
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     List<SUserMembership> getUserMemberships(int fromIndex, int numberOfUserMemberships, OrderByOption orderByOption) throws SIdentityException;
 
     /**
-     * Get customUserInfoDefinition by its id
-     * 
+     * Get {@link SCustomUserInfoDefinition} by its id
+     *
      * @param customUserInfoDefinitionId
-     *        The identifier of customUserInfoDefinition
+     *        The {@link SCustomUserInfoDefinition}'s identifier
      * @return the customUserInfoDefinition
-     * @throws SIdentityException
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     SCustomUserInfoDefinition getCustomUserInfoDefinition(long customUserInfoDefinitionId) throws SIdentityException;
 
     /**
-     * Get custom user info value by its id
-     * 
+     * Get {@link SCustomUserInfoValue} by its id
+     *
      * @param customUserInfoValueId
      *        The identifier of the custom user info value
-     * @return the profileMetadataValue
+     * @return the {@link SCustomUserInfoValue}
      * @throws SCustomUserInfoValueNotFoundException
      *         if no custom user info value is found for the given id
      * @throws SCustomUserInfoValueReadException
@@ -538,25 +599,25 @@ public interface IdentityService {
     SCustomUserInfoValue getCustomUserInfoValue(long customUserInfoValueId) throws SCustomUserInfoValueNotFoundException, SCustomUserInfoValueReadException;
 
     /**
-     * Get a custom user info definition by its name
-     * 
+     * Get a {@link SCustomUserInfoDefinition} by its name
+     *
      * @param name
-     *        The name custom user info definition name
-     * @return the custom user info definition identified by the given name
+     *        The name of the {@link SCustomUserInfoDefinition} to retrieve
+     * @return the {@link SCustomUserInfoDefinition} identified by the given name
      * @throws SCustomUserInfoDefinitionNotFoundException
      *         if there is no custom user info definition for the given name
      * @throws SCustomUserInfoDefinitionReadException
      *         if an exception occurs when trying to retrieve the custom user info definition
      */
     SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(String name) throws SCustomUserInfoDefinitionNotFoundException,
-            SCustomUserInfoDefinitionReadException;
+    SCustomUserInfoDefinitionReadException;
 
     /**
-     * Verify if there is a custom user info for the given name
-     * 
+     * Verify if there is a {@link SCustomUserInfoDefinition} of the given name
+     *
      * @param name
-     *        The name custom user info definition name
-     * @return the custom user info definition identified by the given name
+     *        The {@link SCustomUserInfoDefinition}'s name to check
+     * @return the {@link SCustomUserInfoDefinition} of the given name
      * @throws SCustomUserInfoDefinitionNotFoundException
      *         if there is no custom user info definition for the given name
      * @throws SCustomUserInfoDefinitionReadException
@@ -565,172 +626,189 @@ public interface IdentityService {
     boolean hasCustomUserInfoDefinition(String name) throws SCustomUserInfoDefinitionReadException;
 
     /**
-     * Get total number of custom user info
-     * 
-     * @return the total number of custom user info
-     * @throws SIdentityException
+     * Get total number of {@link SCustomUserInfoDefinition} of the current tenant
+     *
+     * @return the total number of {@link SCustomUserInfoDefinition} of the current tenant
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     long getNumberOfCustomUserInfoDefinition() throws SIdentityException;
 
     /**
-     * Get total number of custom user info value
-     * 
+     * Get total number of {@link SCustomUserInfoValue} of the current tenant matching the criterias of the given {@link QueryOptions}
+     *
      * @param options
-     *        The QueryOptions object containing some query conditions
+     *        The {@link QueryOptions} containing filtering conditions
      * @return the total number of custom user info value
-     * @throws SIdentityException
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     long getNumberOfCustomUserInfoValue(QueryOptions options) throws SBonitaReadException;
 
     /**
-     * Get customUserInfoDefinition by their ids
-     * 
+     * Get a {@link List} of {@link SCustomUserInfoDefinition} of the given identifiers
+     *
      * @param customUserInfoDefinitionIds
-     *        A list of identifiers of customUserInfoDefinition
-     * @return a list of SCustomUserInfoDefinition objects corresponding to parameters
-     * @throws SIdentityException
+     *        A {@link List} of {@link SCustomUserInfoDefinition} identifiers
+     * @return a {@link List} of {@link SCustomUserInfoDefinition}
+     * @throws SIdentityException occurs on persistence layer access problem or if none identifiers match an existing {@link SCustomUserInfoDefinition}
      */
     List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions(List<Long> customUserInfoDefinitionIds) throws SIdentityException;
 
     /**
-     * Get profileMetadataValues by their ids
-     * 
+     * Get a {@link List} of {@link SCustomUserInfoValue} of the given identifiers
+     *
      * @param customUserInfoValueIds
-     *        A list of identifiers of profileMetadataValue
-     * @return a list of SCustomUserInfoValue objects corresponding to parameters
-     * @throws SIdentityException
+     *        A {@link List} of {@link SCustomUserInfoValue} identifiers
+     * @return A {@link List} of {@link SCustomUserInfoValue}
+     * @throws SIdentityException occurs on persistence layer access problem or if none identifiers match an existing {@link SCustomUserInfoDefinition}
      */
     List<SCustomUserInfoValue> getCustomUserInfoValues(List<Long> customUserInfoValueIds) throws SIdentityException;
 
     /**
-     * Get custom user info in a specific interval, this is used for pagination
-     * 
+     * Get a {@link List} of {@link SCustomUserInfoDefinition} from specific interval
+     * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     *
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
      * @param maxResults
-     *        Number of result we want to get. Maximum number of result returned
-     * @return a list of SCustomUserInfo object
-     * @throws SIdentityException
+     *        Number of result to retrieve
+     * @return a {@link List} of {@link SCustomUserInfoDefinition}
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     List<SCustomUserInfoDefinition> getCustomUserInfoDefinitions(int fromIndex, int maxResults) throws SIdentityException;
 
     /**
-     * Retrieves the list of user identifiers containing the chosen custom user information with the given value.
-     * @param userInfoName The user information name.
-     * @param userInfoValue The user information value.
-     * @param usePartialMatch Defines whether the custom user information value should use a partial match. 
+     * Retrieve a {@link List} of user identifiers from specific interval. The returned user's ids have their associated user's userInfo of the given
+     * name <i>userInfoName</i> matches the given value <i>userInfoValue</i> partially or not depending on the <i>usePartialMatch</i> parameter.
+     * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     *
+     * @param userInfoName The user's information name.
+     * @param userInfoValue The user's information value.
+     * @param usePartialMatch Defines whether the custom user information value should use a partial match.
      * @param fromIndex The index of the first record to be retrieved. First record has index 0.
-     * @param maxResults The max results to be retrieved. 
-     * @return the list of user identifiers containing the chosen custom user information with the given value.
-     * @throws SIdentityException
+     * @param maxResults The max results to be retrieved.
+     * @return the list identifiers of users matching the given user's information name & value.
+     * @throws SIdentityException occurs on persistence layer access problem
      * @since 6.3.2
      */
-    List<Long> getUserIdsWithCustomUserInfo(String userInfoName, String userInfoValue, boolean usePartialMatch, int fromIndex, int maxResults) throws SIdentityException;
+    List<Long> getUserIdsWithCustomUserInfo(String userInfoName, String userInfoValue, boolean usePartialMatch, int fromIndex, int maxResults)
+            throws SIdentityException;
 
     /**
-     * Search custom user info values according to specific query options
-     * 
+     * Search {@link SCustomUserInfoValue} matching the criterias of the given {@link QueryOptions}
+     *
      * @param options
      *        The QueryOptions object containing some query conditions
      * @return a list of SCustomUserInfoValue objects
-     * @throws SBonitaReadException
+     * @throws SBonitaReadException occurs on persistence layer access problem or if search parameters are not correct
      */
     List<SCustomUserInfoValue> searchCustomUserInfoValue(QueryOptions options) throws SBonitaReadException;
 
     /**
-     * Get userMemberships in a specific interval for a user, this is used for pagination
-     * 
+     * Get {@link SUserMembership} for a specific interval for a given user
+     *
      * @param userId
-     *        The identifier of user
+     *        The user's identifier
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfMemberships
-     *        Number of result we want to get. Maximum number of result returned
-     * @return a list of SUserMembership objects
-     * @throws SIdentityException
+     *        Number of result to retrieve
+     * @return a {@link List} of {@link SUserMembership}
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     List<SUserMembership> getUserMembershipsOfUser(long userId, int fromIndex, int numberOfMemberships) throws SIdentityException;
 
     /**
-     * Get userMemberships in a specific interval for a user in specific order, this is used for pagination
-     * 
+     * Get a {@link List} of {@link SUserMembership} of a given user from specific interval, sorted by <i>field</i> attribute in the given {@link OrderByType}
+     * <i>sortOrder</i> order.
+     * <p> For instance, getUserMembershipsOfUser(1,0,10,"id", OrderByType.DESC) returns the 10 first {@link SUserMembership} of the given user sorted by
+     * &quot;id&quot; in desc order
+     * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     * <p> check {@link SUserMembershipBuilderFactory} to check available field keys to sort
+     *
      * @param userId
      *        The identifier of user
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfMemberships
-     *        Number of result we want to get. Maximum number of result returned
+     *        Number of result to retrieve
      * @param field
      *        The field user to do order
-     * @param order
+     * @param sortOrder
      *        ASC or DESC
-     * @return a list of SUserMembership objects
-     * @throws SIdentityException
+     * @return a {@link List} of {@link SUserMembership}
+     * @see SUserMembershipBuilderFactory
+     * @throws SIdentityException occurs on persistence layer access problem
      */
-    List<SUserMembership> getUserMembershipsOfUser(long userId, int fromIndex, int numberOfMemberships, String field, OrderByType order)
+    List<SUserMembership> getUserMembershipsOfUser(long userId, int fromIndex, int numberOfMemberships, String field, OrderByType sortOrder)
             throws SIdentityException;
 
     /**
+     * Get a {@link List} of {@link SUserMembership} of a given user from specific interval, sorted by default field in the given {@link OrderByType}
+     * <i>sortOrder</i> order.
+     * <p> For instance, getUserMembershipsOfUser(1,0,10, OrderByType.DESC) returns the 10 first {@link SUserMembership} of the given user sorted by
+     * the default field in desc order
+     * <p> If the number of existing results are lower than the number asked, all results from the given index are retrieved.
+     *
      * @param userId
      *        The identifier of user
      * @param fromIndex
      *        Index of the record to be retrieved from. First record has index 0
      * @param numberPerPage
-     *        Number of result we want to get. Maximum number of result returned
-     * @param orderByOption
+     *        Number of result o retrieve
+     * @param sortOrder
      *        OrderByOption object containing order information
      * @return a list of SUserMembership objects
-     * @throws SIdentityException
+     * @throws SIdentityException occurs on persistence layer access problem
      */
-    List<SUserMembership> getUserMembershipsOfUser(long userId, int fromIndex, int numberPerPage, OrderByOption orderByOption) throws SIdentityException;
+    List<SUserMembership> getUserMembershipsOfUser(long userId, int fromIndex, int numberPerPage, OrderByOption sortOrder) throws SIdentityException;
 
     /**
-     * Get total number of userMemberships for specific user
-     * 
+     * Get total number of {@link SUserMembership} for a specific user
+     *
      * @param userId
-     *        The identifier of user
+     *        The user's identifier
      * @return total number of userMemberships for the specific user
-     * @throws SIdentityException
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     long getNumberOfUserMembershipsOfUser(long userId) throws SIdentityException;
 
     /**
-     * Get total number of userMemberships
-     * 
+     * Get total number of userMemberships of the current tenant
+     *
      * @return total number of userMemberships
-     * @throws SIdentityException
+     * @throws SIdentityException occurs on persistence layer access problem
      */
     long getNumberOfUserMemberships() throws SIdentityException;
 
     /**
-     * Create user in DB for give user
-     * 
+     * Create {@link SUser} and store it to persistence layer
+     *
      * @param user
-     *        The user object
-     * @return the created use
-     * @throws SUserCreationException
+     *        The user to create and store
+     * @return the created user with its identifier set
+     * @throws SUserCreationException occurs on persistence layer access problem
      */
     SUser createUser(SUser user) throws SUserCreationException;
 
     /**
-     * Update user according to the descriptor
-     * 
+     * Update {@link SUser} according to the {@link EntityUpdateDescriptor}
+     *
      * @param user
-     *        The user will be updated
+     *        The {@link SUser} to update
      * @param descriptor
-     *        The update description
-     * @throws SUserUpdateException
+     *        The {@link SUser} contents to update
+     * @throws SUserUpdateException occurs on persistence layer access problem
      */
     void updateUser(SUser user, EntityUpdateDescriptor descriptor) throws SUserUpdateException;
 
     /**
-     * Update user according to the descriptor
-     * 
+     * Update {@link SUser} according to the {@link EntityUpdateDescriptor}
+     *
      * @param user
-     *        The user will be updated
+     *        The {@link SUser} to update
      * @param descriptor
-     *        The update description
-     * @param isPasswordEncrypted
+     *        The {@link SUser} contents to update
+     * @param isPasswordEncrypted allow to know if the password given in the {@link EntityUpdateDescriptor} is encrypted or not
      * @throws SUserUpdateException
      */
     @Deprecated
@@ -738,7 +816,7 @@ public interface IdentityService {
 
     /**
      * Create custom user info definition in DB for a server given custom user info definition
-     * 
+     *
      * @param customUserInfo
      *        SCustomUserInfoDefinition object
      * @throws SCustomUserInfoDefinitionAlreadyExistsException
@@ -747,11 +825,11 @@ public interface IdentityService {
      *         TODO
      */
     SCustomUserInfoDefinition createCustomUserInfoDefinition(SCustomUserInfoDefinition customUserInfo) throws SCustomUserInfoDefinitionAlreadyExistsException,
-            SCustomUserInfoDefinitionCreationException;
+    SCustomUserInfoDefinitionCreationException;
 
     /**
      * Update customUserInfoDefinition according to the descriptor
-     * 
+     *
      * @param customUserInfo
      *        The customUserInfoDefinition will be updated
      * @param descriptor
@@ -762,7 +840,7 @@ public interface IdentityService {
 
     /**
      * Create profileMetadataValue in DB for give profileMetadataValue object
-     * 
+     *
      * @param customUserInfo
      *        A profileMetadataValue object
      * @throws SIdentityException
@@ -771,7 +849,7 @@ public interface IdentityService {
 
     /**
      * Update profileMetadataValue according to the descriptor
-     * 
+     *
      * @param customUserInfo
      *        The profileMetadataValue will be updated
      * @param descriptor
@@ -782,7 +860,7 @@ public interface IdentityService {
 
     /**
      * Create role in DB for the given role
-     * 
+     *
      * @param role
      *        A role object
      * @throws SIdentityException
@@ -791,7 +869,7 @@ public interface IdentityService {
 
     /**
      * Update role according to the descriptor
-     * 
+     *
      * @param role
      *        The role will be updated
      * @param descriptor
@@ -802,7 +880,7 @@ public interface IdentityService {
 
     /**
      * Create group in DB for the given group object
-     * 
+     *
      * @param group
      *        A group object
      * @throws SGroupCreationException
@@ -811,7 +889,7 @@ public interface IdentityService {
 
     /**
      * Update group according to the descriptor
-     * 
+     *
      * @param group
      *        The group will be updated
      * @param descriptor
@@ -822,7 +900,7 @@ public interface IdentityService {
 
     /**
      * Create userMembership in DB for the given userMembership object
-     * 
+     *
      * @param userMembership
      *        A userMembership object
      * @throws SUserMembershipCreationException
@@ -831,7 +909,7 @@ public interface IdentityService {
 
     /**
      * Update userMembership according to the descriptor
-     * 
+     *
      * @param userMembership
      *        The userMembership will be updated
      * @param descriptor
@@ -842,7 +920,7 @@ public interface IdentityService {
 
     /**
      * Delete the specific user
-     * 
+     *
      * @param user
      *        The user will be deleted
      * @throws SUserDeletionException
@@ -851,7 +929,7 @@ public interface IdentityService {
 
     /**
      * Delete user by its id
-     * 
+     *
      * @param userId
      *        The identifier of user
      * @throws SUserDeletionException
@@ -860,7 +938,7 @@ public interface IdentityService {
 
     /**
      * Delete all users for the connected tenant
-     * 
+     *
      * @throws SUserDeletionException
      * @since 6.1
      */
@@ -868,7 +946,7 @@ public interface IdentityService {
 
     /**
      * Delete the specific custom user info
-     * 
+     *
      * @param metadataDefinition
      *        The custom user info object will be deleted
      * @throws SIdentityException
@@ -877,7 +955,7 @@ public interface IdentityService {
 
     /**
      * Delete the id specified custom user info
-     * 
+     *
      * @param customUserInfoDefinitionId
      *        The identifier of custom user info
      * @throws SIdentityException
@@ -886,7 +964,7 @@ public interface IdentityService {
 
     /**
      * Delete the specific profileMetadataValue
-     * 
+     *
      * @param customUserInfo
      *        The profileMetadataValue object will be deleted
      * @throws SIdentityException
@@ -895,7 +973,7 @@ public interface IdentityService {
 
     /**
      * Delete the id specified profileMetadataValue
-     * 
+     *
      * @param customUserInfoValueId
      *        The identifier of profileMetadataValue
      * @throws SIdentityException
@@ -904,7 +982,7 @@ public interface IdentityService {
 
     /**
      * Delete the specific role
-     * 
+     *
      * @param role
      *        The role will be deleted
      * @throws SRoleDeletionException
@@ -913,7 +991,7 @@ public interface IdentityService {
 
     /**
      * Delete the id specified role
-     * 
+     *
      * @param roleId
      *        The role identifier
      * @throws SRoleNotFoundException
@@ -924,7 +1002,7 @@ public interface IdentityService {
 
     /**
      * Delete all roles for the connected tenant
-     * 
+     *
      * @throws SRoleDeletionException
      * @since 6.1
      */
@@ -932,7 +1010,7 @@ public interface IdentityService {
 
     /**
      * Delete the specific group
-     * 
+     *
      * @param group
      *        The group will be deleted
      * @throws SGroupDeletionException
@@ -941,7 +1019,7 @@ public interface IdentityService {
 
     /**
      * Delete the id specified group
-     * 
+     *
      * @param groupId
      *        The identifier of group
      * @throws SGroupNotFoundException
@@ -952,7 +1030,7 @@ public interface IdentityService {
 
     /**
      * Delete all groups for the connected tenant
-     * 
+     *
      * @throws SGroupDeletionException
      * @since 6.1
      */
@@ -960,7 +1038,7 @@ public interface IdentityService {
 
     /**
      * Delete the specific userMembership
-     * 
+     *
      * @param userMembership
      *        The userMembership will be deleted
      * @throws SMembershipDeletionException
@@ -969,7 +1047,7 @@ public interface IdentityService {
 
     /**
      * Delete the specific light userMembership
-     * 
+     *
      * @param userMembership
      * @throws SMembershipDeletionException
      * @since 6.1
@@ -978,7 +1056,7 @@ public interface IdentityService {
 
     /**
      * Delete the id specified userMembership
-     * 
+     *
      * @param userMembershipId
      *        The identifier of userMembership
      * @throws SMembershipDeletionException
@@ -987,7 +1065,7 @@ public interface IdentityService {
 
     /**
      * Delete all user memberships for the connected tenant
-     * 
+     *
      * @throws SMembershipDeletionException
      * @since 6.1
      */
@@ -995,7 +1073,7 @@ public interface IdentityService {
 
     /**
      * Get total number of users according to specific query options
-     * 
+     *
      * @param options
      *        The QueryOptions object containing some query conditions
      * @return the satisfied user number
@@ -1005,7 +1083,7 @@ public interface IdentityService {
 
     /**
      * Search users according to specific query options
-     * 
+     *
      * @param options
      *        The QueryOptions object containing some query conditions
      * @return a list of SUser objects
@@ -1015,7 +1093,7 @@ public interface IdentityService {
 
     /**
      * Get total number of roles according to specific query options
-     * 
+     *
      * @param options
      *        The QueryOptions object containing some query conditions
      * @return the satisfied role number
@@ -1025,7 +1103,7 @@ public interface IdentityService {
 
     /**
      * Search roles according to specific query options
-     * 
+     *
      * @param options
      *        The QueryOptions object containing some query conditions
      * @return a list of SRole objects
@@ -1035,7 +1113,7 @@ public interface IdentityService {
 
     /**
      * Get total number of groups according to specific query options
-     * 
+     *
      * @param options
      *        The QueryOptions object containing some query conditions
      * @return the group number
@@ -1045,7 +1123,7 @@ public interface IdentityService {
 
     /**
      * Search groups according to specific query options
-     * 
+     *
      * @param options
      *        The QueryOptions object containing some query conditions
      * @return a list of SGroup objects
@@ -1055,7 +1133,7 @@ public interface IdentityService {
 
     /**
      * Get total number of userMemberships contains specific group and role
-     * 
+     *
      * @param groupId
      *        The identifier of group
      * @param roleId
@@ -1067,7 +1145,7 @@ public interface IdentityService {
 
     /**
      * Get light userMembership by its id
-     * 
+     *
      * @param userMembershipId
      *        The identifier of userMembership
      * @return a SUserMembership object without userName, groupName and roleName
@@ -1077,7 +1155,7 @@ public interface IdentityService {
 
     /**
      * Get light userMembership in a specific interval, this is used for pagination
-     * 
+     *
      * @param startIndex
      *        Index of the record to be retrieved from. First record has index 0
      * @param numberOfElements
@@ -1089,7 +1167,7 @@ public interface IdentityService {
 
     /**
      * delete children groups of the given group if there is some
-     * 
+     *
      * @param groupId
      *        The index of the group to delete
      * @throws SGroupDeletionException
@@ -1099,7 +1177,7 @@ public interface IdentityService {
 
     /**
      * Return the user contact info for a specific user.
-     * 
+     *
      * @param userId
      *        the ID of the user to retrieve the contact info from
      * @param isPersonal
@@ -1112,7 +1190,7 @@ public interface IdentityService {
 
     /**
      * Create user contact information for given data
-     * 
+     *
      * @param contactInfo
      *        The user contact information object
      * @return
@@ -1123,7 +1201,7 @@ public interface IdentityService {
 
     /**
      * Update user contact information according to the descriptor
-     * 
+     *
      * @param contactInfo
      *        The user contact information to be updated
      * @param descriptor
@@ -1134,7 +1212,7 @@ public interface IdentityService {
 
     /**
      * Create user in DB for given user and
-     * 
+     *
      * @param user
      *        The user object
      * @throws SUserCreationException
