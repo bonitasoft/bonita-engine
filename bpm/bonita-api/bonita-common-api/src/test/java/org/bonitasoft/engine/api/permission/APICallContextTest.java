@@ -31,7 +31,7 @@ public class APICallContextTest {
         APICallContext apiCallContext = new APICallContext();
         apiCallContext.setBody("{\"a\":\"b\",\"c\":\"1\"}");
 
-        JSONObject body = apiCallContext.getBody();
+        JSONObject body = apiCallContext.getBodyAsJSON();
 
         assertThat(body.getString("a")).isEqualTo("b");
         assertThat(body.getLong("c")).isEqualTo(1l);

@@ -59,7 +59,7 @@ public class APICallContext implements Serializable {
     /*
      * body of the api call
      */
-    private JSONObject body;
+    private String body;
     private Map<String, String> filters;
     private String searchTerm;
 
@@ -77,14 +77,14 @@ public class APICallContext implements Serializable {
      * @param body
      *        the body string of the api context if specified
      */
-    public APICallContext(String method, String apiName, String resourceName, String resourceId, String queryString, String body) throws JSONException {
+    public APICallContext(String method, String apiName, String resourceName, String resourceId, String queryString, String body) {
         this.method = method;
         this.apiName = apiName;
         this.resourceName = resourceName;
         this.resourceId = resourceId;
         this.queryString = queryString;
         parseQueryString(queryString);
-        this.body = new JSONObject(body);
+        this.body = body;
     }
 
     private void parseQueryString(String queryString) {
@@ -153,12 +153,16 @@ public class APICallContext implements Serializable {
         parseQueryString(queryString);
     }
 
-    public JSONObject getBody() {
+    public String getBody() {
         return body;
     }
 
-    public void setBody(String body) throws JSONException {
-        this.body = new JSONObject(body);
+    public JSONObject getBodyAsJSON() throws JSONException {
+        return new JSONObject(body);
+    }
+
+    public void setBody(String body) {
+        this.body = body;
     }
 
     @Override
