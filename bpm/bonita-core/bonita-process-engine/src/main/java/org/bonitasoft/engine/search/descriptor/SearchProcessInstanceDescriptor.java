@@ -48,12 +48,13 @@ public class SearchProcessInstanceDescriptor extends SearchEntityDescriptor {
         final SProcessInstanceBuilderFactory instanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         final SUserTaskInstanceBuilderFactory sUserTaskInstanceBuilder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
 
-        searchEntityKeys = new HashMap<String, FieldDescriptor>(12);
+        searchEntityKeys = new HashMap<String, FieldDescriptor>(14);
         searchEntityKeys.put(ProcessInstanceSearchDescriptor.NAME, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getNameKey()));
         searchEntityKeys.put(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID,
                 new FieldDescriptor(SProcessInstance.class, instanceBuilder.getProcessDefinitionIdKey()));
         searchEntityKeys.put(ProcessInstanceSearchDescriptor.LAST_UPDATE, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getLastUpdateKey()));
         searchEntityKeys.put(ProcessInstanceSearchDescriptor.START_DATE, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getStartDateKey()));
+        searchEntityKeys.put(ProcessInstanceSearchDescriptor.END_DATE, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getEndDateKey()));
         searchEntityKeys.put(ProcessInstanceSearchDescriptor.STATE_ID, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getStateIdKey()));
         searchEntityKeys.put(ProcessInstanceSearchDescriptor.STATE_NAME, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getStateIdKey()));
         searchEntityKeys.put(ProcessInstanceSearchDescriptor.ID, new FieldDescriptor(SProcessInstance.class, instanceBuilder.getIdKey()));
@@ -93,7 +94,7 @@ public class SearchProcessInstanceDescriptor extends SearchEntityDescriptor {
             } else if (filterValue instanceof ProcessInstanceState) {
                 return ((ProcessInstanceState) filterValue).getId();
             } else {
-                throw new IllegalArgumentException("The state name must to be a String or a ProcessInstanceState !!");
+                throw new IllegalArgumentException("The state name must be a String or a ProcessInstanceState !!");
             }
         }
         return filterValue;

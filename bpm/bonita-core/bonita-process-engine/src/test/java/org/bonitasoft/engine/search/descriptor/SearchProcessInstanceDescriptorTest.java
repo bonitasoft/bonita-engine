@@ -117,6 +117,21 @@ public class SearchProcessInstanceDescriptorTest {
      * Test method for {@link org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#getEntityKeys()}.
      */
     @Test
+    public final void getEntityKeys_should_return_map_containing_end_date() {
+        // When
+        final Map<String, FieldDescriptor> entityKeys = searchProcessInstanceDescriptor.getEntityKeys();
+
+        // Then
+        final FieldDescriptor fieldDescriptor = entityKeys.get(ProcessInstanceSearchDescriptor.END_DATE);
+        assertNotNull(fieldDescriptor);
+        assertEquals(SProcessInstance.class, fieldDescriptor.getPersistentClass());
+        assertEquals("endDate", fieldDescriptor.getValue());
+    }
+
+    /**
+     * Test method for {@link org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor#getEntityKeys()}.
+     */
+    @Test
     public final void getEntityKeys_should_return_map_containing_state_id() {
         // When
         final Map<String, FieldDescriptor> entityKeys = searchProcessInstanceDescriptor.getEntityKeys();

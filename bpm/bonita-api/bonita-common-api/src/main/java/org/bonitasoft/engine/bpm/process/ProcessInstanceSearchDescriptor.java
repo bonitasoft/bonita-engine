@@ -66,6 +66,11 @@ public class ProcessInstanceSearchDescriptor {
     public static final String START_DATE = "startDate";
 
     /**
+     * The field corresponding to the date when the process instance completed.
+     */
+    public static final String END_DATE = "endDate";
+
+    /**
      * The field corresponding to the last date of the updating of the process instance.
      */
     public static final String LAST_UPDATE = "lastUpdate";
