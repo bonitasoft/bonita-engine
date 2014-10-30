@@ -99,7 +99,7 @@ public interface Application extends BaseElement {
      * @return the identifier of the {@link ApplicationPage} defined as home page for this application
      * @see ApplicationPage
      */
-    long getHomePageId();
+    Long getHomePageId();
 
     /**
      * Retrieves the identifier of the associated {@link Profile} or null if there is no profile is associated to this application.

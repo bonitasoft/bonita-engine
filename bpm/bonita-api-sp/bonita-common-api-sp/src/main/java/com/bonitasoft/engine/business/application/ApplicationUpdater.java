@@ -130,12 +130,12 @@ public class ApplicationUpdater implements Serializable {
     }
 
     /**
-     * Defines the identifier of the new {@link Profile} associated to the {@link Application}
+     * Defines the identifier of the new {@link com.bonitasoft.engine.business.application.ApplicationPage} defined as the {@link Application} home page
      *
-     * @param applicationPageId the identifier of {@code Profile} associated to the {@code Application}
+     * @param applicationPageId the identifier of {@code ApplicationPage} associated to the {@code Application}
      * @return the current {@code ApplicationUpdater}
      * @see Application
-     * @see Profile
+     * @see com.bonitasoft.engine.business.application.ApplicationPage
      */
     public ApplicationUpdater setHomePageId(final Long applicationPageId) {
         fields.put(ApplicationField.HOME_PAGE_ID, applicationPageId);
