@@ -18,7 +18,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
@@ -38,16 +38,16 @@ public class IndexUpdater {
         this.maxResults = maxResults;
     }
 
-    public void incrementIndexes(Long parentId, int from, int to) throws SBonitaSearchException, SObjectModificationException {
+    public void incrementIndexes(Long parentId, int from, int to) throws SBonitaReadException, SObjectModificationException {
         updateIndexes(parentId, from, to, 1);
     }
 
-    public void decrementIndexes(Long parentId, int from, int to) throws SBonitaSearchException, SObjectModificationException {
+    public void decrementIndexes(Long parentId, int from, int to) throws SBonitaReadException, SObjectModificationException {
         updateIndexes(parentId, from, to, -1);
     }
 
-    private void updateIndexes(Long parentId, int from, int to, int offSet) throws SBonitaSearchException, SObjectModificationException {
-        if(to >= from) {
+    private void updateIndexes(Long parentId, int from, int to, int offSet) throws SObjectModificationException, SBonitaReadException {
+        if (to >= from) {
             List<SApplicationMenu> menusToUpdate = null;
             int firstResult = 0;
             do {
@@ -58,7 +58,7 @@ public class IndexUpdater {
         }
     }
 
-    private List<SApplicationMenu> getCurrentPage(Long parentId, int from, int to, int firstResult) throws SBonitaSearchException {
+    private List<SApplicationMenu> getCurrentPage(Long parentId, int from, int to, int firstResult) throws SBonitaReadException {
         SApplicationMenuBuilderFactoryImpl appMenuFactory = new SApplicationMenuBuilderFactoryImpl();
         List<OrderByOption> orderBy = Collections.singletonList(new OrderByOption(SApplicationMenu.class, appMenuFactory.getIndexKey(), OrderByType.ASC));
         List<FilterOption> filters = Arrays.asList(new FilterOption(SApplicationMenu.class, appMenuFactory.getIndexKey(), from, to), new FilterOption(

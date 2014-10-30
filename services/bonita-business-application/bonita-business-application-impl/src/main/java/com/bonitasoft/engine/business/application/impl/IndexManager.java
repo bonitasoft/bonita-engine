@@ -12,7 +12,7 @@ package com.bonitasoft.engine.business.application.impl;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -21,18 +21,17 @@ public class IndexManager {
 
     private IndexUpdater updater;
     private MenuIndexValidator validator;
-    private MenuIndexConvertor convertor;
 
     public IndexManager(IndexUpdater updater, MenuIndexValidator validator) {
         this.updater = updater;
         this.validator = validator;
     }
 
-    public void organizeIndexesOnDelete(MenuIndex deletedMenuIndex) throws SBonitaSearchException, SObjectModificationException {
+    public void organizeIndexesOnDelete(MenuIndex deletedMenuIndex) throws SBonitaReadException, SObjectModificationException {
         updater.decrementIndexes(deletedMenuIndex.getParentId(), deletedMenuIndex.getValue() + 1, deletedMenuIndex.getLastUsedIndex());
     }
 
-    public void organizeIndexesOnUpdate(MenuIndex oldIndex, MenuIndex newIndex) throws SBonitaSearchException, SObjectModificationException {
+    public void organizeIndexesOnUpdate(MenuIndex oldIndex, MenuIndex newIndex) throws SBonitaReadException, SObjectModificationException {
         validateNewIndex(oldIndex, newIndex);
         if(oldIndex.getParentId() == newIndex.getParentId()) {
             if (newIndex.getValue() < oldIndex.getValue()) {

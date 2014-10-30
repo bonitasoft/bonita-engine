@@ -27,7 +27,6 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -91,7 +90,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     ApplicationServiceImpl(final Manager manager, final Recorder recorder, final ReadPersistenceService persistenceService,
-            final QueriableLoggerService queriableLoggerService, IndexManager indexManager, MenuIndexConvertor menuIndexConvertor, ApplicationMenuCleaner applicationMenuCleaner) {
+            final QueriableLoggerService queriableLoggerService, IndexManager indexManager, MenuIndexConvertor menuIndexConvertor,
+            ApplicationMenuCleaner applicationMenuCleaner) {
         this.indexManager = indexManager;
         this.menuIndexConvertor = menuIndexConvertor;
         this.applicationMenuCleaner = applicationMenuCleaner;
@@ -513,7 +513,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     private void organizeIndexesOnUpdate(SApplicationMenu applicationMenu, EntityUpdateDescriptor updateDescriptor, boolean organizeIndexes)
-            throws SBonitaSearchException, SObjectModificationException, SBonitaReadException {
+            throws SObjectModificationException, SBonitaReadException {
         Map<String, Object> fields = updateDescriptor.getFields();
         if (fields.containsKey(SApplicationMenuFields.PARENT_ID) && !fields.containsKey(SApplicationMenuFields.INDEX)) {
             //we need to force the update of index, as it has change of parent
@@ -557,7 +557,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public void deleteApplicationMenu(SApplicationMenu applicationMenu) throws SObjectModificationException {
         final String methodName = "deleteApplicationMenu";
-        final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.DELETED, "Deleting application menu with id " + applicationMenu.getId());
+        final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.DELETED,
+                "Deleting application menu with id " + applicationMenu.getId());
         try {
             final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_MENU)
                     .setObject(applicationMenu).done();
