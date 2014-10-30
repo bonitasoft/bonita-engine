@@ -39,7 +39,7 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
 
     private String state;
 
-    private long homePageId;
+    private Long homePageId;
 
     private String displayName;
 
@@ -125,11 +125,11 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
     }
 
     @Override
-    public long getHomePageId() {
+    public Long getHomePageId() {
         return homePageId;
     }
 
-    public void setHomePageId(final long homePageId) {
+    public void setHomePageId(final Long homePageId) {
         this.homePageId = homePageId;
     }
 
@@ -167,101 +167,45 @@ public class SApplicationImpl extends PersistentObjectId implements SApplication
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (createdBy ^ createdBy >>> 32);
-        result = prime * result + (int) (creationDate ^ creationDate >>> 32);
-        result = prime * result + (description == null ? 0 : description.hashCode());
-        result = prime * result + (displayName == null ? 0 : displayName.hashCode());
-        result = prime * result + (int) (homePageId ^ homePageId >>> 32);
-        result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
-        result = prime * result + (int) (lastUpdateDate ^ lastUpdateDate >>> 32);
-        result = prime * result + (token == null ? 0 : token.hashCode());
-        result = prime * result + (profileId == null ? 0 : profileId.hashCode());
-        result = prime * result + (state == null ? 0 : state.hashCode());
-        result = prime * result + (int) (updatedBy ^ updatedBy >>> 32);
-        result = prime * result + (version == null ? 0 : version.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SApplicationImpl)) return false;
+        if (!super.equals(o)) return false;
+
+        SApplicationImpl that = (SApplicationImpl) o;
+
+        if (createdBy != that.createdBy) return false;
+        if (creationDate != that.creationDate) return false;
+        if (lastUpdateDate != that.lastUpdateDate) return false;
+        if (updatedBy != that.updatedBy) return false;
+        if (description != null ? !description.equals(that.description) : that.description != null) return false;
+        if (displayName != null ? !displayName.equals(that.displayName) : that.displayName != null) return false;
+        if (homePageId != null ? !homePageId.equals(that.homePageId) : that.homePageId != null) return false;
+        if (iconPath != null ? !iconPath.equals(that.iconPath) : that.iconPath != null) return false;
+        if (profileId != null ? !profileId.equals(that.profileId) : that.profileId != null) return false;
+        if (state != null ? !state.equals(that.state) : that.state != null) return false;
+        if (token != null ? !token.equals(that.token) : that.token != null) return false;
+        if (version != null ? !version.equals(that.version) : that.version != null) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SApplicationImpl other = (SApplicationImpl) obj;
-        if (createdBy != other.createdBy) {
-            return false;
-        }
-        if (creationDate != other.creationDate) {
-            return false;
-        }
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (displayName == null) {
-            if (other.displayName != null) {
-                return false;
-            }
-        } else if (!displayName.equals(other.displayName)) {
-            return false;
-        }
-        if (homePageId != other.homePageId) {
-            return false;
-        }
-        if (iconPath == null) {
-            if (other.iconPath != null) {
-                return false;
-            }
-        } else if (!iconPath.equals(other.iconPath)) {
-            return false;
-        }
-        if (lastUpdateDate != other.lastUpdateDate) {
-            return false;
-        }
-        if (token == null) {
-            if (other.token != null) {
-                return false;
-            }
-        } else if (!token.equals(other.token)) {
-            return false;
-        }
-        if (profileId == null) {
-            if (other.profileId != null) {
-                return false;
-            }
-        } else if (!profileId.equals(other.profileId)) {
-            return false;
-        }
-        if (state == null) {
-            if (other.state != null) {
-                return false;
-            }
-        } else if (!state.equals(other.state)) {
-            return false;
-        }
-        if (updatedBy != other.updatedBy) {
-            return false;
-        }
-        if (version == null) {
-            if (other.version != null) {
-                return false;
-            }
-        } else if (!version.equals(other.version)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (token != null ? token.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (iconPath != null ? iconPath.hashCode() : 0);
+        result = 31 * result + (int) (creationDate ^ (creationDate >>> 32));
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (lastUpdateDate ^ (lastUpdateDate >>> 32));
+        result = 31 * result + (int) (updatedBy ^ (updatedBy >>> 32));
+        result = 31 * result + (state != null ? state.hashCode() : 0);
+        result = 31 * result + (homePageId != null ? homePageId.hashCode() : 0);
+        result = 31 * result + (displayName != null ? displayName.hashCode() : 0);
+        result = 31 * result + (profileId != null ? profileId.hashCode() : 0);
+        return result;
     }
 
     @Override

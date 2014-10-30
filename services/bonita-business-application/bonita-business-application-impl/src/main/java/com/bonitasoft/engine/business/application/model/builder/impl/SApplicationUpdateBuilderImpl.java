@@ -36,12 +36,6 @@ public class SApplicationUpdateBuilderImpl implements SApplicationUpdateBuilder 
     }
 
     @Override
-    public SApplicationUpdateBuilder updateHomePageId(final long applicationPageId) {
-        descriptor.addField(SApplicationFields.HOME_PAGE_ID, applicationPageId);
-        return this;
-    }
-
-    @Override
     public SApplicationUpdateBuilder updateToken(final String token) {
         descriptor.addField(SApplicationFields.TOKEN, token);
         return this;

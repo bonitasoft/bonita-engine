@@ -18,8 +18,6 @@ public interface SApplicationUpdateBuilder {
 
     EntityUpdateDescriptor done();
 
-    SApplicationUpdateBuilder updateHomePageId(long applicationPageId);
-
     public SApplicationUpdateBuilder updateToken(final String name);
 
     public SApplicationUpdateBuilder updateDisplayName(final String displayName);

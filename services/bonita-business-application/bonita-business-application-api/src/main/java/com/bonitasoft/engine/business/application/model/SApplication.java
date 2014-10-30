@@ -35,7 +35,7 @@ public interface SApplication extends PersistentObject {
 
     String getState();
 
-    long getHomePageId();
+    Long getHomePageId();
 
     Long getProfileId();
 
