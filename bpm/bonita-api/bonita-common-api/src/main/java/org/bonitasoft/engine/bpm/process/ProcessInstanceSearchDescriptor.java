@@ -17,7 +17,7 @@ package org.bonitasoft.engine.bpm.process;
  * Search descriptors are used to filter / sort results of a generic search. <br>
  * ProcessInstanceSearchDescriptor defines the fields that can be used as filters or sort fields on <code>List{@literal <} ProcessInstance></code> returning
  * methods.
- * 
+ *
  * @author Yanyan Liu
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
@@ -86,9 +86,17 @@ public class ProcessInstanceSearchDescriptor {
     public static final String ROLE_ID = "roleId";
 
     /**
-     * The field corresponding to the identifier of the state of the archived process instance.
+     * The field corresponding to the identifier of the state of the process instance.
      */
     public static final String STATE_ID = "stateId";
+
+    /**
+     * The field corresponding to the name of the state of the process instance.
+     * The value can be of the type String or ProcessInstanceState.
+     *
+     * @see ProcessInstanceState
+     */
+    public static final String STATE_NAME = "stateName";
 
     /**
      * The field corresponding to the identifier of the flow node that starts the process instance.

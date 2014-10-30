@@ -158,15 +158,28 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         assertEquals(instance2.getId(), processInstanceList1.get(1).getId());
 
         // search and check result DESC
-        final SearchOptionsBuilder searchOptions3 = BuildTestUtil.buildSearchOptions(0, 3, ProcessInstanceSearchDescriptor.START_DATE, Order.DESC);
-        result = getProcessAPI().searchFailedProcessInstances(searchOptions3.done());
+        final SearchOptionsBuilder searchOptions2 = BuildTestUtil.buildSearchOptions(0, 3, ProcessInstanceSearchDescriptor.START_DATE, Order.DESC);
+        result = getProcessAPI().searchFailedProcessInstances(searchOptions2.done());
         assertNotNull(result);
         assertEquals(3, result.getCount());
-        final List<ProcessInstance> processInstanceList3 = result.getResult();
-        assertEquals(3, processInstanceList3.size());
-        assertEquals(instance3.getId(), processInstanceList3.get(0).getId());
-        assertEquals(instance2.getId(), processInstanceList3.get(1).getId());
-        assertEquals(instance1.getId(), processInstanceList3.get(2).getId());
+        final List<ProcessInstance> processInstanceList2 = result.getResult();
+        assertEquals(3, processInstanceList2.size());
+        assertEquals(instance3.getId(), processInstanceList2.get(0).getId());
+        assertEquals(instance2.getId(), processInstanceList2.get(1).getId());
+        assertEquals(instance1.getId(), processInstanceList2.get(2).getId());
+
+        // Search only process instance with state ERROR
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 3);
+        builder.filter(ProcessInstanceSearchDescriptor.STATE_NAME, ProcessInstanceState.ERROR);
+        builder.sort(ProcessInstanceSearchDescriptor.START_DATE, Order.ASC);
+        result = getProcessAPI().searchFailedProcessInstances(builder.done());
+        assertNotNull(result);
+        assertEquals(2, result.getCount());
+        final List<ProcessInstance> processInstances = result.getResult();
+        assertNotNull(processInstances);
+        assertEquals(2, processInstances.size());
+        assertEquals(instance1.getId(), processInstances.get(0).getId());
+        assertEquals(instance3.getId(), processInstances.get(1).getId());
 
         disableAndDeleteProcess(processDefinitionWithFailedConnector, processDefinitionWithFailedTask);
     }
