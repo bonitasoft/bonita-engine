@@ -19,6 +19,8 @@ ALTER TABLE business_app ADD CONSTRAINT pk_business_app PRIMARY KEY (tenantid, i
 ALTER TABLE business_app ADD CONSTRAINT uk_app_token_version UNIQUE (tenantId, token, version);
 
 CREATE INDEX idx_app_token ON business_app (token, tenantid);
+CREATE INDEX idx_app_profile ON business_app (profileId, tenantid);
+CREATE INDEX idx_app_homepage ON business_app (homePageId, tenantid);
 
 CREATE TABLE business_app_page (
   tenantId BIGINT NOT NULL,

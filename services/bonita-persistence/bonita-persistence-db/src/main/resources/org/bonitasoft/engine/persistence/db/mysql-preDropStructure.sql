@@ -53,6 +53,7 @@ ALTER TABLE business_app_menu DROP FOREIGN KEY fk_app_menu_parentId;
 ALTER TABLE business_app_page DROP FOREIGN KEY fk_app_page_tenantId;
 ALTER TABLE business_app_page DROP FOREIGN KEY fk_bus_app_id;
 ALTER TABLE business_app_page DROP FOREIGN KEY fk_page_id;
+ALTER TABLE business_app DROP FOREIGN KEY fk_app_homepageId;
 ALTER TABLE business_app DROP FOREIGN KEY fk_app_profileId;
 ALTER TABLE business_app DROP FOREIGN KEY fk_app_tenantId;
 

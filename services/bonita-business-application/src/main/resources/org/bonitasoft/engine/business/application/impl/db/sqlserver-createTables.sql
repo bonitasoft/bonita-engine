@@ -23,6 +23,10 @@ GO
 
 CREATE INDEX idx_app_token ON business_app (token, tenantid)
 GO
+CREATE INDEX idx_app_profile ON business_app (profileId, tenantid)
+GO
+CREATE INDEX idx_app_homepage ON business_app (homePageId, tenantid)
+GO
 
 CREATE TABLE business_app_page (
   tenantId NUMERIC(19, 0) NOT NULL,
