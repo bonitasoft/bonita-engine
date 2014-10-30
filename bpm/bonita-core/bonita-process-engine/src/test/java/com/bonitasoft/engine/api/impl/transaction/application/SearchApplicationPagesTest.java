@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -59,7 +59,7 @@ public class SearchApplicationPagesTest {
         assertThat(count).isEqualTo(8L);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void executeCount_should_throw_SBonitaSeachException_when_applicationService_throws_SBonitaReadException() throws Exception {
         //given
         final QueryOptions options = new QueryOptions(START_INDEX, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);

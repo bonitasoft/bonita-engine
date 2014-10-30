@@ -16,7 +16,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 import com.bonitasoft.engine.business.application.model.SApplication;
@@ -48,7 +48,7 @@ public interface ApplicationService {
 
     long getNumberOfApplications(QueryOptions options) throws SBonitaReadException;
 
-    List<SApplication> searchApplications(QueryOptions options) throws SBonitaSearchException;
+    List<SApplication> searchApplications(QueryOptions options) throws SBonitaReadException;
 
     SApplicationPage createApplicationPage(SApplicationPage applicationPage) throws SObjectCreationException, SObjectAlreadyExistsException, SInvalidTokenException;
 
@@ -65,7 +65,7 @@ public interface ApplicationService {
 
     long getNumberOfApplicationPages(final QueryOptions options) throws SBonitaReadException;
 
-    List<SApplicationPage> searchApplicationPages(final QueryOptions options) throws SBonitaSearchException;
+    List<SApplicationPage> searchApplicationPages(final QueryOptions options) throws SBonitaReadException;
 
     SApplicationMenu createApplicationMenu(SApplicationMenu applicationMenu) throws SObjectCreationException;
 
@@ -82,7 +82,7 @@ public interface ApplicationService {
 
     long getNumberOfApplicationMenus(QueryOptions options) throws SBonitaReadException;
 
-    List<SApplicationMenu> searchApplicationMenus(QueryOptions options) throws SBonitaSearchException;
+    List<SApplicationMenu> searchApplicationMenus(QueryOptions options) throws SBonitaReadException;
 
     int getNextAvailableIndex(Long parentMenuId) throws SBonitaReadException;
 

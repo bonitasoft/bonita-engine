@@ -27,7 +27,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -301,13 +301,9 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<SApplication> searchApplications(final QueryOptions options) throws SBonitaSearchException {
+    public List<SApplication> searchApplications(final QueryOptions options) throws SBonitaReadException {
         checkLicense();
-        try {
-            return persistenceService.searchEntity(SApplication.class, options, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+        return persistenceService.searchEntity(SApplication.class, options, null);
     }
 
     @Override
@@ -450,13 +446,9 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<SApplicationPage> searchApplicationPages(final QueryOptions options) throws SBonitaSearchException {
+    public List<SApplicationPage> searchApplicationPages(final QueryOptions options) throws SBonitaReadException {
         checkLicense();
-        try {
-            return persistenceService.searchEntity(SApplicationPage.class, options, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+        return persistenceService.searchEntity(SApplicationPage.class, options, null);
     }
 
     @Override
@@ -585,13 +577,9 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<SApplicationMenu> searchApplicationMenus(final QueryOptions options) throws SBonitaSearchException {
+    public List<SApplicationMenu> searchApplicationMenus(final QueryOptions options) throws SBonitaReadException {
         checkLicense();
-        try {
-            return persistenceService.searchEntity(SApplicationMenu.class, options, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+        return persistenceService.searchEntity(SApplicationMenu.class, options, null);
     }
 
     public int getNextAvailableIndex(Long parentMenuId) throws SBonitaReadException {

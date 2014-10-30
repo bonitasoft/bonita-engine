@@ -33,7 +33,7 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -367,8 +367,8 @@ public class ApplicationServiceImplTest {
         assertThat(retrievedApplications).isEqualTo(applications);
     }
 
-    @Test(expected = SBonitaSearchException.class)
-    public void searchApplications_should_throw_SBonitaSearchException_when_persistenceSevice_throws_SBonitaReadException() throws Exception {
+    @Test(expected = SBonitaReadException.class)
+    public void searchApplications_should_throw_SBonitaReadException_when_persistenceSevice_throws_SBonitaReadException() throws Exception {
         //given
         final QueryOptions options = new QueryOptions(0, 10);
         given(applicationServiceActive.searchApplications(options)).willThrow(new SBonitaReadException(""));
@@ -768,8 +768,8 @@ public class ApplicationServiceImplTest {
         assertThat(retrievedAppPages).isEqualTo(applicationPages);
     }
 
-    @Test(expected = SBonitaSearchException.class)
-    public void searchApplicationPages_should_throw_SBonitaSearchException_when_persistenceSevice_throws_SBonitaReadException() throws Exception {
+    @Test(expected = SBonitaReadException.class)
+    public void searchApplicationPages_should_throw_SBonitaReadException_when_persistenceSevice_throws_SBonitaReadException() throws Exception {
         //given
         final QueryOptions options = new QueryOptions(0, 10);
         given(applicationServiceActive.searchApplicationPages(options)).willThrow(new SBonitaReadException(""));
@@ -1163,7 +1163,7 @@ public class ApplicationServiceImplTest {
         assertThat(retrievedAppMenus).isEqualTo(applicationMenus);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchApplicationMenus_should_throw_SBontiaSearchException_when_persistence_service_throws_exception() throws Exception {
         //given
         final QueryOptions options = new QueryOptions(0, 2);
