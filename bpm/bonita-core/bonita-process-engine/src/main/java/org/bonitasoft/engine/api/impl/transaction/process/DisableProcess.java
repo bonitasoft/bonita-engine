@@ -15,7 +15,6 @@ package org.bonitasoft.engine.api.impl.transaction.process;
 
 import java.util.List;
 
-import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
@@ -24,7 +23,6 @@ import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefi
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.job.JobNameBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -33,6 +31,8 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
+import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Baptiste Mesta
@@ -48,17 +48,15 @@ public final class DisableProcess implements TransactionContent {
     private final SchedulerService scheduler;
     private final TechnicalLoggerService logger;
     private final String username;
-    private final ClassLoaderService classLoaderService;
 
-    public DisableProcess(final ProcessDefinitionService processDefinitionService, final long processId, final EventInstanceService eventInstanceService,
-            final SchedulerService scheduler, final TechnicalLoggerService logger, final String username, final ClassLoaderService classLoaderService) {
-        this.processDefinitionService = processDefinitionService;
-        this.eventInstanceService = eventInstanceService;
+    public DisableProcess(final TenantServiceAccessor tenantServiceAccessor, final PlatformServiceAccessor platformServiceAccessor, final long processId,
+            final String username) {
+        scheduler = platformServiceAccessor.getSchedulerService();
+        processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
+        eventInstanceService = tenantServiceAccessor.getEventInstanceService();
+        logger = tenantServiceAccessor.getTechnicalLoggerService();
         this.processId = processId;
-        this.scheduler = scheduler;
-        this.logger = logger;
         this.username = username;
-        this.classLoaderService = classLoaderService;
     }
 
     @Override
@@ -66,7 +64,6 @@ public final class DisableProcess implements TransactionContent {
         processDefinitionService.disableProcessDeploymentInfo(processId);
         final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processId);
         disableStartEvents(processDefinition);
-        classLoaderService.removeLocalClassLoader(ScopeType.PROCESS.name(), processId);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(this.getClass(), TechnicalLogSeverity.INFO, "The user <" + username + "> has disabled process <" + processDefinition.getName()
                     + "> in version <" + processDefinition.getVersion() + "> with id <" + processDefinition.getId() + ">");

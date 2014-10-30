@@ -13,21 +13,34 @@
  **/
 package org.bonitasoft.engine.core.process.instance.impl;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
@@ -40,6 +53,8 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Before;
 import org.junit.Test;
@@ -81,11 +96,13 @@ public class ProcessInstanceServiceImplTest {
     @Mock
     private ArchiveService archiveService;
 
+    @Mock
+    private ReadPersistenceService readPersistenceService;;
+
     @Before
     public void setUp() throws SBonitaException {
-
         processInstanceService = spy(new ProcessInstanceServiceImpl(mock,
-                mock(ReadPersistenceService.class), mock(EventService.class),
+                readPersistenceService, mock(EventService.class),
                 mock(ActivityInstanceService.class), mock(TechnicalLoggerService.class),
                 eventService, mock(DataInstanceService.class),
                 archiveService, mock(TransitionService.class), mock(ProcessDefinitionService.class), mock(ConnectorInstanceService.class),
@@ -169,13 +186,13 @@ public class ProcessInstanceServiceImplTest {
 
     @Test
     public void deleteParentProcessInstanceAndElements_returns_1_when_1_elements_are_deleted() throws Exception {
-        List<SProcessInstance> processInstances = Arrays.asList(mock(SProcessInstance.class));
+        final List<SProcessInstance> processInstances = Arrays.asList(mock(SProcessInstance.class));
         assertEquals(1, mockedProcessInstanceService.deleteParentProcessInstanceAndElements(processInstances));
     }
 
     @Test
     public void deleteParentProcessInstanceAndElements_returns_n_when_n_elements_are_deleted() throws Exception {
-        List<SProcessInstance> processInstances = Arrays.asList(mock(SProcessInstance.class), mock(SProcessInstance.class), mock(SProcessInstance.class));
+        final List<SProcessInstance> processInstances = Arrays.asList(mock(SProcessInstance.class), mock(SProcessInstance.class), mock(SProcessInstance.class));
         assertEquals(3, mockedProcessInstanceService.deleteParentProcessInstanceAndElements(processInstances));
     }
 
@@ -186,20 +203,20 @@ public class ProcessInstanceServiceImplTest {
 
     @Test
     public void deleteParentArchivedProcessInstancesAndElements_returns_1_when_1_elements_are_deleted() throws Exception {
-        List<SAProcessInstance> processInstances = Arrays.asList(mock(SAProcessInstance.class));
+        final List<SAProcessInstance> processInstances = Arrays.asList(mock(SAProcessInstance.class));
         assertEquals(1, mockedProcessInstanceService.deleteParentArchivedProcessInstancesAndElements(processInstances));
     }
 
     @Test
     public void deleteParentArchivedProcessInstancesAndElements_returns_n_when_n_elements_are_deleted() throws Exception {
-        List<SAProcessInstance> processInstances = Arrays.asList(mock(SAProcessInstance.class), mock(SAProcessInstance.class), mock(SAProcessInstance.class));
+        final List<SAProcessInstance> processInstances = Arrays.asList(mock(SAProcessInstance.class), mock(SAProcessInstance.class), mock(SAProcessInstance.class));
         assertEquals(3, mockedProcessInstanceService.deleteParentArchivedProcessInstancesAndElements(processInstances));
     }
 
     @Test
     public void testDeleteProcessInstance_delete_archived_activity() throws Exception {
-        SProcessInstance sProcessInstance = mock(SProcessInstance.class);
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
+        final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         when(classLoaderService.getLocalClassLoader("PROCESS", sProcessInstance.getId())).thenReturn(classLoader);
         when(archiveService.getDefinitiveArchiveReadPersistenceService()).thenReturn(mock(ReadPersistenceService.class));
         processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstance);
@@ -207,4 +224,25 @@ public class ProcessInstanceServiceImplTest {
         verify(processInstanceService, times(1)).deleteArchivedProcessInstanceElements(sProcessInstance.getId(), sProcessInstance.getProcessDefinitionId());
         verify(processInstanceService, times(1)).deleteArchivedFlowNodeInstances(sProcessInstance.getId());
     }
+
+    @Test
+    public void getNumberOfProcessInstances_should_call_getNumberOfEntities() throws Exception {
+        final Map<String, Object> inputParameters = new HashMap<String, Object>();
+        inputParameters.put("processDefinitionId", 45L);
+        final SelectOneDescriptor<Long> countDescriptor = new SelectOneDescriptor<Long>("countProcessInstancesOfProcessDefinition", inputParameters,
+                SProcessInstance.class);
+        when(readPersistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(4L);
+
+        processInstanceService.getNumberOfProcessInstances(45L);
+
+        verify(readPersistenceService).selectOne(argThat(new SelectOneDescriptorMatcher(countDescriptor)));
+    }
+
+    @Test(expected = SBonitaReadException.class)
+    public void getNumberOfProcessInstances_should_throw_a_read_exception_if_getNumberOfEntities_does_it() throws Exception {
+        when(readPersistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException("error"));
+
+        processInstanceService.getNumberOfProcessInstances(45L);
+    }
+
 }

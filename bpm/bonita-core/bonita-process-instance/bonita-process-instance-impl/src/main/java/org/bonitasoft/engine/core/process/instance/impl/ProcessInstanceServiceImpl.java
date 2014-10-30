@@ -13,6 +13,15 @@
  **/
 package org.bonitasoft.engine.core.process.instance.impl;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -75,7 +84,6 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -84,15 +92,6 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -240,9 +239,9 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 getProcessInstance(sProcessInstance.getId());
                 // process is still here, that's not normal. The problem must be raised:
                 throw e;
-            } catch (SProcessInstanceReadException e1) {
+            } catch (final SProcessInstanceReadException e1) {
                 logProcessInstanceNotFound(e);
-            } catch (SProcessInstanceNotFoundException e1) {
+            } catch (final SProcessInstanceNotFoundException e1) {
                 logProcessInstanceNotFound(e);
             }
         }
@@ -282,9 +281,9 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 getArchivedProcessInstance(saProcessInstance.getId());
                 // archived process is still here, that's not normal. The problem must be raised:
                 throw e;
-            } catch (SProcessInstanceReadException e1) {
+            } catch (final SProcessInstanceReadException e1) {
                 logArchivedProcessInstanceNotFound(e);
-            } catch (SProcessInstanceNotFoundException e1) {
+            } catch (final SProcessInstanceNotFoundException e1) {
                 logArchivedProcessInstanceNotFound(e);
             }
         }
@@ -590,7 +589,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     public void setState(final SProcessInstance processInstance, final ProcessInstanceState state) throws SProcessInstanceModificationException {
         // Let's archive the process instance before changing the state (to keep a track of state change):
         archiveProcessInstance(processInstance);
-        int previousStateId = processInstance.getStateId();
+        final int previousStateId = processInstance.getStateId();
         setProcessState(processInstance, state);
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
             logger.log(getClass(), TechnicalLogSeverity.DEBUG, MessageFormat.format("[{0} with id {1}]{2}->{3}(new={4})", processInstance.getClass()
@@ -857,7 +856,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     @Override
     public List<SProcessInstance> getProcessInstancesInStates(final QueryOptions queryOptions, final ProcessInstanceState... states)
             throws SProcessInstanceReadException {
-        Set<Integer> stateIds = getStateIdsFromStates(states);
+        final Set<Integer> stateIds = getStateIdsFromStates(states);
         final Map<String, Object> inputParameters = new HashMap<String, Object>(1);
         inputParameters.put("stateIds", stateIds);
         final SelectListDescriptor<SProcessInstance> selectProcessInstancesInStates = new SelectListDescriptor<SProcessInstance>("getProcessInstancesInStates",
@@ -873,7 +872,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         if (states.length < 1) {
             throw new IllegalArgumentException("ProcessInstanceServiceImpl.getProcessInstancesInStates() must have at least one state as parameter");
         }
-        Set<Integer> stateIds = new HashSet<Integer>(states.length);
+        final Set<Integer> stateIds = new HashSet<Integer>(states.length);
         for (int i = 0; i < states.length; i++) {
             stateIds.add(states[i].getId());
         }
@@ -906,7 +905,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
-    public SAProcessInstance getLastArchivedProcessInstance(long processInstanceId) throws SBonitaReadException {
+    public SAProcessInstance getLastArchivedProcessInstance(final long processInstanceId) throws SBonitaReadException {
         final SAProcessInstanceBuilderFactory processInstanceBuilderFact = BuilderFactory.get(SAProcessInstanceBuilderFactory.class);
         final FilterOption filterOption = new FilterOption(SAProcessInstance.class, processInstanceBuilderFact.getSourceObjectIdKey(), processInstanceId);
         final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>();
@@ -918,6 +917,15 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             return processInstances.get(0);
         }
         return null;
+    }
+
+    @Override
+    public long getNumberOfProcessInstances(final long processDefinitionId) throws SBonitaReadException {
+        final Map<String, Object> inputParameters = new HashMap<String, Object>();
+        inputParameters.put("processDefinitionId", processDefinitionId);
+        final SelectOneDescriptor<Long> countDescriptor = new SelectOneDescriptor<Long>("countProcessInstancesOfProcessDefinition", inputParameters,
+                SProcessInstance.class);
+        return persistenceRead.selectOne(countDescriptor);
     }
 
 }

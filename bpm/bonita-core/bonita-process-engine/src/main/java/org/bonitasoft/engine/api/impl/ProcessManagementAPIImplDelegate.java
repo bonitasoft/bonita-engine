@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2014 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.api.impl;
 
 import java.io.File;
@@ -5,28 +18,36 @@ import java.io.IOException;
 
 import org.bonitasoft.engine.api.impl.transaction.process.DeleteProcess;
 import org.bonitasoft.engine.api.impl.transaction.process.DisableProcess;
-import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.bpm.process.ActivationState;
+import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
+import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
+import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
+/**
+ * @author Matthieu Chaffotte
+ */
 // Uncomment the "implements" when this delegate implements all the methods.
 public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI */{
 
-    protected static TenantServiceAccessor getTenantAccessor() {
+    protected TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
@@ -84,15 +105,33 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
 
     public void disableProcess(final long processId) throws SProcessDefinitionNotFoundException, SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final PlatformServiceAccessor platformServiceAccessor = getPlatformServiceAccessor();
+        final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
+        final String userName = SessionInfos.getUserNameFromSession();
+        final DisableProcess disableProcess = new DisableProcess(tenantAccessor, platformAccessor, processId, userName);
+        disableProcess.execute();
+    }
+
+    public void purgeClassLoader(final long processDefinitionId) throws ProcessDefinitionNotFoundException, UpdateException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
-        final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
-        final TransactionContent transactionContent = new DisableProcess(processDefinitionService, processId, eventInstanceService, schedulerService, logger,
-                SessionInfos.getUserNameFromSession(), classLoaderService);
-        transactionContent.execute();
+        try {
+            final SProcessDefinitionDeployInfo processDeploymentInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
+            if (!ActivationState.DISABLED.name().equals(processDeploymentInfo.getActivationState())) {
+                throw new UpdateException("Purge can only be done on a disabled process");
+            }
+            final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+            final long numberOfProcessInstances = processInstanceService.getNumberOfProcessInstances(processDefinitionId);
+            if (numberOfProcessInstances != 0) {
+                throw new UpdateException("Purge can only be done on a disabled process with no running instances");
+            }
+            tenantAccessor.getClassLoaderService().removeLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
+        } catch (final SProcessDefinitionNotFoundException spdnfe) {
+            throw new ProcessDefinitionNotFoundException(spdnfe);
+        } catch (final SProcessDefinitionReadException spdre) {
+            throw new RetrieveException(spdre);
+        } catch (final SBonitaReadException sbre) {
+            throw new RetrieveException(sbre);
+        }
     }
 
 }

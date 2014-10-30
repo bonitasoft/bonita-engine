@@ -36,6 +36,7 @@ import java.util.Set;
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
+import org.bonitasoft.engine.api.DocumentAPI;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementations;
 import org.bonitasoft.engine.bpm.connector.ConnectorCriterion;
 import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
@@ -136,6 +137,12 @@ public class ProcessAPIImplTest {
     @Mock
     private ActorMappingService actorMappingService;
 
+    @Mock
+    private DocumentAPI documentAPI;
+
+    @Mock
+    ProcessManagementAPIImplDelegate managementAPIImplDelegate;
+
     private ProcessAPIImpl processAPI;
 
     @Mock
@@ -146,7 +153,7 @@ public class ProcessAPIImplTest {
 
     @Before
     public void setup() {
-        processAPI = spy(new ProcessAPIImpl());
+        processAPI = spy(new ProcessAPIImpl(managementAPIImplDelegate, documentAPI));
         doReturn(tenantAccessor).when(processAPI).getTenantAccessor();
         when(tenantAccessor.getTenantId()).thenReturn(TENANT_ID);
         when(tenantAccessor.getTransientDataService()).thenReturn(transientDataService);
@@ -185,7 +192,7 @@ public class ProcessAPIImplTest {
     @Test
     public void generateRelativeResourcePathShouldHandleBackslashOS() throws Exception {
         // given:
-        String pathname = "C:\\hello\\hi\\folder";
+        final String pathname = "C:\\hello\\hi\\folder";
         final String resourceRelativePath = "resource/toto.lst";
 
         // when:
@@ -199,7 +206,7 @@ public class ProcessAPIImplTest {
     @Test
     public void generateRelativeResourcePathShouldNotContainFirstSlash() throws Exception {
         // given:
-        String pathname = "/home/target/some_folder/";
+        final String pathname = "/home/target/some_folder/";
         final String resourceRelativePath = "resource/toto.lst";
 
         // when:
@@ -213,7 +220,7 @@ public class ProcessAPIImplTest {
     @Test
     public void generateRelativeResourcePathShouldWorkWithRelativeInitialPath() throws Exception {
         // given:
-        String pathname = "target/nuns";
+        final String pathname = "target/nuns";
         final String resourceRelativePath = "resource/toto.lst";
 
         // when:
@@ -510,9 +517,6 @@ public class ProcessAPIImplTest {
 
     }
 
-
-
-
     @Test
     public void updateActivityInstanceVariables_should_load_processDef_classes() throws Exception {
         final String dataInstanceName = "acase";
@@ -546,6 +550,13 @@ public class ProcessAPIImplTest {
         processAPI.updateActivityInstanceVariables(operations, 2, null);
 
         verify(classLoaderService).getLocalClassLoader(anyString(), anyLong());
+    }
+
+    @Test
+    public void purgeClassLoader_should_call_delegate() throws Exception {
+        processAPI.purgeClassLoader(45L);
+
+        verify(managementAPIImplDelegate).purgeClassLoader(45L);
     }
 
     //    @Test

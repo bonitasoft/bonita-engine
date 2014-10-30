@@ -53,12 +53,14 @@ import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * This API deals with definition objects such as {@link ProcessDefinition}, {@link ProcessDeploymentInfo}, {@link Category}, ...
@@ -1747,5 +1749,18 @@ public interface ProcessManagementAPI {
      * @since 6.3.2
      */
     List<Long> getUserIdsForActor(long processDefinitionId, String actorName, int startIndex, int maxResults);
+
+    /**
+     * Purges the classLoader of the process definition. The process must be disable and no instances should run, otherwise an UpdateException is thrown.
+     *
+     * @param processDefinitionId
+     *        The identifier of the process definition.
+     * @throws ProcessDefinitionNotFoundException
+     *         If the identifier does not refer to an existing process definition.
+     * @throws UpdateException
+     *         If the process is not disable or if instances are still running
+     * @since 6.4.0
+     */
+    void purgeClassLoader(long processDefinitionId) throws ProcessDefinitionNotFoundException, UpdateException;
 
 }
