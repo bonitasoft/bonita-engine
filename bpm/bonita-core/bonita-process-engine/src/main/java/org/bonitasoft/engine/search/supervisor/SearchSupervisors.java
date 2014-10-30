@@ -16,7 +16,7 @@ package org.bonitasoft.engine.search.supervisor;
 import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractSupervisorSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
@@ -38,12 +38,12 @@ public class SearchSupervisors extends AbstractSupervisorSearchEntity {
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return supervisorService.getNumberOfProcessSupervisors(searchOptions);
     }
 
     @Override
-    public List<SProcessSupervisor> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SProcessSupervisor> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return supervisorService.searchProcessSupervisors(searchOptions);
     }
 

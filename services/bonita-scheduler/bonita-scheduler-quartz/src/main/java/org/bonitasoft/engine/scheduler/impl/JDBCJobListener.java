@@ -30,7 +30,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorNotFoundException;
@@ -152,14 +152,14 @@ public class JDBCJobListener extends AbstractJobListener {
         }
     }
 
-    private void cleanJobLogIfAny(final Long jobDescriptorId) throws SBonitaSearchException, SJobLogDeletionException {
+    private void cleanJobLogIfAny(final Long jobDescriptorId) throws SBonitaReadException, SJobLogDeletionException {
         final List<SJobLog> jobLogs = getJobLogs(jobDescriptorId);
         if (!jobLogs.isEmpty()) {
             jobService.deleteJobLog(jobLogs.get(0));
         }
     }
 
-    private List<SJobLog> getJobLogs(final long jobDescriptorId) throws SBonitaSearchException {
+    private List<SJobLog> getJobLogs(final long jobDescriptorId) throws SBonitaReadException {
         final List<FilterOption> filters = new ArrayList<FilterOption>(2);
         filters.add(new FilterOption(SJobLog.class, "jobDescriptorId", jobDescriptorId));
         final OrderByOption orderByOption = new OrderByOption(SJobLog.class, "jobDescriptorId", OrderByType.ASC);

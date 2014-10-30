@@ -24,7 +24,7 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
  */
 public class FlowNodeNameFilter implements Filter<SFlowNodeDefinition>{
     
-    private List<String> flowNodeNames;
+    private final List<String> flowNodeNames;
 
     public FlowNodeNameFilter(List<String> flowNodeNames) {
         this.flowNodeNames = flowNodeNames;

@@ -22,7 +22,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.Recorder;
 
 /**
@@ -42,23 +42,15 @@ public abstract class FlowElementInstanceServiceImpl implements FlowElementInsta
 
     @Override
     public long getNumberOfFlowElementInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions countOptions)
-            throws SBonitaSearchException {
-        try {
-            return getPersistenceRead().getNumberOfEntities(entityClass, countOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+            throws SBonitaReadException {
+        return getPersistenceRead().getNumberOfEntities(entityClass, countOptions, null);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public List<SFlowElementInstance> searchFlowElementInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions searchOptions)
-            throws SBonitaSearchException {
-        try {
-            return (List<SFlowElementInstance>) getPersistenceRead().searchEntity(entityClass, searchOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+            throws SBonitaReadException {
+        return (List<SFlowElementInstance>) getPersistenceRead().searchEntity(entityClass, searchOptions, null);
     }
 
     protected Recorder getRecorder() {

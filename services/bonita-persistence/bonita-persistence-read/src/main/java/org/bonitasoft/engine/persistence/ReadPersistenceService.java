@@ -74,12 +74,11 @@ public interface ReadPersistenceService {
      * @param options
      * @param parameters
      * @return
-     * @throws SBonitaSearchException
      * @throws SBonitaReadException
      * @throws SRetryableException
      */
     <T extends PersistentObject> List<T> searchEntity(Class<T> entityClass, QueryOptions options, Map<String, Object> parameters)
-            throws SBonitaSearchException, SBonitaReadException;
+            throws SBonitaReadException;
 
     /**
      * @param entityClass
@@ -90,12 +89,11 @@ public interface ReadPersistenceService {
      *            query options
      * @param parameters
      * @return
-     * @throws SBonitaSearchException
      * @throws SBonitaReadException
      * @throws SRetryableException
      */
     <T extends PersistentObject> List<T> searchEntity(Class<T> entityClass, String querySuffix, QueryOptions options, Map<String, Object> parameters)
-            throws SBonitaSearchException, SBonitaReadException;
+            throws SBonitaReadException;
 
     /**
      * @return

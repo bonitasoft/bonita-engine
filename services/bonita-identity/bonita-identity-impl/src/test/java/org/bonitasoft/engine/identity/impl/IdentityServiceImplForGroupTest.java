@@ -31,7 +31,7 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Before;
@@ -149,7 +149,7 @@ public class IdentityServiceImplForGroupTest {
         assertEquals(125, identityServiceImpl.getNumberOfGroups(options));
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfGroupsWithOptionsThrowException() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistenceService.getNumberOfEntities(SGroup.class, options, null)).thenThrow(new SBonitaReadException(""));
@@ -186,7 +186,7 @@ public class IdentityServiceImplForGroupTest {
         assertEquals(group, identityServiceImpl.searchGroups(options).get(0));
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchGroupsThrowException() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistenceService.searchEntity(SGroup.class, options, null)).thenThrow(new SBonitaReadException(""));

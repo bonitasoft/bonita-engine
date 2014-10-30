@@ -24,7 +24,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SearchFields;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 import org.bonitasoft.engine.search.impl.SearchFilter;
@@ -66,7 +66,7 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
     public void execute() throws SBonitaException {
         List<S> serverObjects;
         if (options == null) {
-            throw new SBonitaSearchException("SearchOptions cannot be null");
+            throw new SBonitaReadException("SearchOptions cannot be null");
         }
         final int numberOfResults = options.getMaxResults();
         final int fromIndex = options.getStartIndex();
@@ -92,10 +92,6 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
         final QueryOptions countOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, null, filterOptions, userSearchTerm);
         count = executeCount(countOptions);
         if (count > 0 && numberOfResults != 0) {
-            if (fromIndex >= count) {
-                // If out of range, no results. No more OutofBound exception:
-                serverObjects = Collections.emptyList();
-            }
             final QueryOptions searchOptions = new QueryOptions(fromIndex, numberOfResults, orderOptions, filterOptions, userSearchTerm);
             serverObjects = executeSearch(searchOptions);
         } else {
@@ -110,9 +106,9 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
      * @param queryOptions
      *            The query options to execute the count with
      * @return The number of result on the server
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    public abstract long executeCount(QueryOptions queryOptions) throws SBonitaSearchException;
+    public abstract long executeCount(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Execute the search here
@@ -120,9 +116,9 @@ public abstract class AbstractSearchEntity<C extends Serializable, S extends Per
      * @param queryOptions
      *            The query options to execute the search with
      * @return The list of searched server objects
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    public abstract List<S> executeSearch(QueryOptions queryOptions) throws SBonitaSearchException;
+    public abstract List<S> executeSearch(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Must convert server objects in client objects here

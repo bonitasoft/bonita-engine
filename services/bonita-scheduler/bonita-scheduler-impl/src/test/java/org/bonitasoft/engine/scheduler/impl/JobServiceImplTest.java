@@ -8,12 +8,7 @@ import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +26,6 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -106,9 +100,6 @@ public class JobServiceImplTest {
     private SDeleteEvent sDeleteEvent;
 
     @Mock
-    private SBonitaReadException sBonitaReadException;
-
-    @Mock
     private SBonitaException sBonitaException;
 
     @Mock
@@ -116,9 +107,6 @@ public class JobServiceImplTest {
 
     @Mock
     private SJobParameter sJobParameter;
-
-    @Mock
-    private SBonitaSearchException sBonitaSearchException;
 
     @Mock
     private SJobLog sJobLog;
@@ -167,7 +155,7 @@ public class JobServiceImplTest {
 
     @Test(expected = SJobDescriptorDeletionException.class)
     public void should_throw_exception_if_error_occurs_when_deleting_all_job_descriptors() throws Exception {
-        when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class), anyMap())).thenThrow(new SBonitaSearchException("error"));
+        when(readPersistenceService.searchEntity(eq(SJobDescriptor.class), any(QueryOptions.class), anyMap())).thenThrow(new SBonitaReadException("error"));
 
         jobService.deleteAllJobDescriptors();
     }
@@ -314,7 +302,7 @@ public class JobServiceImplTest {
     @Test(expected = SJobDescriptorReadException.class)
     public void getJobDescriptor_should_throw_exception() throws Exception {
         //given
-        doThrow(sBonitaReadException).when(readPersistenceService).selectById(any(SelectByIdDescriptor.class));
+        doThrow(SBonitaReadException.class).when(readPersistenceService).selectById(any(SelectByIdDescriptor.class));
 
         //when
         jobService.getJobDescriptor(1l);
@@ -346,10 +334,10 @@ public class JobServiceImplTest {
         assertThat(numberOfJobDescriptors).isEqualTo(RETURNED);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfJobDescriptors_should_throw_exception() throws Exception {
         //given
-        doThrow(sBonitaReadException).when(readPersistenceService).getNumberOfEntities(any(Class.class), any(QueryOptions.class),
+        doThrow(SBonitaReadException.class).when(readPersistenceService).getNumberOfEntities(any(Class.class), any(QueryOptions.class),
                 anyMapOf(String.class, Object.class));
 
         //when
@@ -358,10 +346,10 @@ public class JobServiceImplTest {
         //then
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchJobDescriptors_should_throw_exception() throws Exception {
         //given
-        doThrow(sBonitaReadException).when(readPersistenceService).searchEntity(any(Class.class), any(QueryOptions.class),
+        doThrow(SBonitaReadException.class).when(readPersistenceService).searchEntity(any(Class.class), any(QueryOptions.class),
                 anyMapOf(String.class, Object.class));
 
         //when
@@ -412,7 +400,7 @@ public class JobServiceImplTest {
         for (int i = 0; i < NEW_SIZE; i++) {
             newJobParameterList.add(sJobParameter);
         }
-        doThrow(sBonitaSearchException).when(jobService).searchJobParameters(any(QueryOptions.class));
+        doThrow(SBonitaReadException.class).when(jobService).searchJobParameters(any(QueryOptions.class));
 
         //when
         jobService.setJobParameters(TENANT_ID, JOB_DESCRIPTOR_ID, newJobParameterList);
@@ -501,7 +489,7 @@ public class JobServiceImplTest {
     @Test(expected = SJobParameterReadException.class)
     public void getJobParameter_should_throw_exception() throws Exception {
         //given
-        doThrow(sBonitaReadException).when(readPersistenceService).selectById(any(SelectByIdDescriptor.class));
+        doThrow(SBonitaReadException.class).when(readPersistenceService).selectById(any(SelectByIdDescriptor.class));
 
         //when
         jobService.getJobParameter(1l);
@@ -528,10 +516,10 @@ public class JobServiceImplTest {
 
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchJobParameter_should_throw_exception() throws Exception {
         //given
-        doThrow(sBonitaReadException).when(readPersistenceService).searchEntity(any(Class.class), any(QueryOptions.class), anyMap());
+        doThrow(SBonitaReadException.class).when(readPersistenceService).searchEntity(any(Class.class), any(QueryOptions.class), anyMap());
 
         //when
         jobService.searchJobParameters(queryOptions);
@@ -624,7 +612,7 @@ public class JobServiceImplTest {
     @Test(expected = SJobLogReadException.class)
     public void getJobLog_should_throw_exception() throws Exception {
         //given
-        doThrow(sBonitaReadException).when(readPersistenceService).selectById(any(SelectByIdDescriptor.class));
+        doThrow(SBonitaReadException.class).when(readPersistenceService).selectById(any(SelectByIdDescriptor.class));
 
         //when
         jobService.getJobLog(1l);
@@ -646,10 +634,10 @@ public class JobServiceImplTest {
         assertThat(numberOfJobLogs).isEqualTo(15l);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfJobLog_should_throw_exception() throws Exception {
         //given
-        doThrow(sBonitaReadException).when(readPersistenceService).getNumberOfEntities(any(Class.class), any(QueryOptions.class),
+        doThrow(SBonitaReadException.class).when(readPersistenceService).getNumberOfEntities(any(Class.class), any(QueryOptions.class),
                 anyMapOf(String.class, Object.class));
 
         //when
@@ -676,10 +664,10 @@ public class JobServiceImplTest {
 
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchJobLog_should_throw_exception() throws Exception {
         //given
-        doThrow(sBonitaReadException).when(readPersistenceService).searchEntity(any(Class.class), any(QueryOptions.class), anyMap());
+        doThrow(SBonitaReadException.class).when(readPersistenceService).searchEntity(any(Class.class), any(QueryOptions.class), anyMap());
 
         //when
         jobService.searchJobLogs(queryOptions);
@@ -709,7 +697,7 @@ public class JobServiceImplTest {
     @Test(expected = SFailedJobReadException.class)
     public void getFailedJobs_should_throw_exception() throws Exception {
         //given
-        doThrow(sBonitaReadException).when(readPersistenceService).selectList(any(SelectListDescriptor.class));
+        doThrow(SBonitaReadException.class).when(readPersistenceService).selectList(any(SelectListDescriptor.class));
 
         //when
         jobService.getFailedJobs(1, 10);

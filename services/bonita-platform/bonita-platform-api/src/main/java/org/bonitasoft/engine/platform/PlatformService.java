@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
 import org.bonitasoft.engine.platform.exception.SPlatformAlreadyExistException;
 import org.bonitasoft.engine.platform.exception.SPlatformCreationException;
@@ -257,9 +257,9 @@ public interface PlatformService {
      * 
      * @param options
      * @return a list of tenants by the given conditions
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<STenant> searchTenants(QueryOptions options) throws SBonitaSearchException;
+    List<STenant> searchTenants(QueryOptions options) throws SBonitaReadException;
 
     /**
      * Get all tenants
@@ -277,9 +277,9 @@ public interface PlatformService {
      * 
      * @param options
      * @return a number of tenants by the given conditions
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfTenants(QueryOptions options) throws SBonitaSearchException;
+    long getNumberOfTenants(QueryOptions options) throws SBonitaReadException;
 
     void deleteTenantTables() throws STenantDeletionException;
 

@@ -23,7 +23,6 @@
 		<module>bonita-cache</module>
 		<module>bonita-classloader</module>
 		<module>bonita-scheduler</module>
-		<module>bonita-document</module>
 		<module>bonita-xml</module>
 		<module>bonita-events</module>
 		<module>bonita-dependency</module>
@@ -50,6 +49,6 @@
 		<module>bonita-page</module>
 		<module>bonita-time-tracker</module>
 		<module>bonita-business-application</module>
-	</modules>
-	
+			</modules>
+		
 </project>

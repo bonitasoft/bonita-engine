@@ -16,7 +16,7 @@ package org.bonitasoft.engine.theme;
 import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.theme.exception.SRestoreThemeException;
 import org.bonitasoft.engine.theme.exception.SThemeCreationException;
@@ -145,7 +145,7 @@ public interface ThemeService {
      *            A map of specific parameters of a query
      * @return A list of STheme objects
      */
-    long getNumberOfThemes(QueryOptions queryOptions) throws SBonitaSearchException;
+    long getNumberOfThemes(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Search the themes corresponding to criteria
@@ -154,6 +154,6 @@ public interface ThemeService {
      *            A map of specific parameters of a query
      * @return A list of STheme objects
      */
-    List<STheme> searchThemes(QueryOptions queryOptions) throws SBonitaSearchException;
+    List<STheme> searchThemes(QueryOptions queryOptions) throws SBonitaReadException;
 
 }

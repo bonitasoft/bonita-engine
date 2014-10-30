@@ -14,8 +14,19 @@
 package org.bonitasoft.engine.platform;
 
 /**
+ * Describes the possible states for the {@link Platform}
+ *
  * @author Yanyan Liu
+ * @see Platform
  */
 public enum PlatformState {
-    STARTED, STOPPED
+    /**
+     * The {@link Platform} is started
+     */
+    STARTED,
+
+    /**
+     * The {@link Platform} is stopped
+     */
+    STOPPED
 }

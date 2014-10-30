@@ -16,6 +16,8 @@ package org.bonitasoft.engine.platform;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 
 /**
+ * Indicates that an operation incompatible with the current node state was called.
+ *
  * @author Emmanuel Duchastenier
  */
 public class IllegalNodeStateException extends BonitaRuntimeException {
@@ -23,28 +25,25 @@ public class IllegalNodeStateException extends BonitaRuntimeException {
     private static final long serialVersionUID = 7043887433404383538L;
 
     /**
-     * @param message
+     * @param message a String indicating the exception message
      */
     public IllegalNodeStateException(final String message) {
         super(message);
-        // TODO Auto-generated constructor stub
     }
 
     /**
-     * @param message
-     * @param cause
+     * @param message a String indicating the exception message
+     * @param cause a Throwable indicating the root cause
      */
     public IllegalNodeStateException(final String message, final Throwable cause) {
         super(message, cause);
-        // TODO Auto-generated constructor stub
     }
 
     /**
-     * @param cause
+     * @param cause a Throwable indicating the root cause
      */
     public IllegalNodeStateException(final Throwable cause) {
         super(cause);
-        // TODO Auto-generated constructor stub
     }
 
 }

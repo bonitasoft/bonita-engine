@@ -210,7 +210,6 @@
 				<ref bean="hbm-bonita-dependency-platform-model" />
 				<ref bean="hbm-bonita-identity-model" />
 				<ref bean="hbm-bonita-scheduler" />
-				<ref bean="hbm-bonita-document-model" />
 				<ref bean="hbm-bos-command-model" />
 				<ref bean="hbm-bos-data-instance-model" />
 				<ref bean="hbm-bos-data-instance-model-arch" />

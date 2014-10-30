@@ -13,17 +13,14 @@
  **/
 package org.bonitasoft.engine.execution.archive;
 
-import java.text.MessageFormat;
-import java.util.List;
-
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
-import org.bonitasoft.engine.archive.SDefinitiveArchiveNotFound;
-import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
@@ -32,10 +29,6 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
-import org.bonitasoft.engine.core.process.document.mapping.exception.SDocumentMappingException;
-import org.bonitasoft.engine.core.process.document.mapping.exception.SPageOutOfRangeException;
-import org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
@@ -52,7 +45,8 @@ import org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.*;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SACallActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAGatewayInstanceBuilderFactory;
@@ -74,6 +68,9 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
 
+import java.text.MessageFormat;
+import java.util.List;
+
 /**
  * @author Elias Ricken de Medeiros
  * @author Baptiste Mesta
@@ -85,7 +82,7 @@ public class ProcessArchiver {
 
     public static void archiveProcessInstance(final SProcessInstance processInstance, final ArchiveService archiveService,
             final ProcessInstanceService processInstanceService, final DataInstanceService dataInstanceService,
-            final DocumentMappingService documentMappingService, final TechnicalLoggerService logger,
+            final DocumentService documentService, final TechnicalLoggerService logger,
             final SCommentService commentService, final ProcessDefinitionService processDefinitionService,
             final ConnectorInstanceService connectorInstanceService) throws SArchivingException {
         final SAProcessInstance saProcessInstance = BuilderFactory.get(SAProcessInstanceBuilderFactory.class).createNewInstance(processInstance).done();
@@ -109,7 +106,7 @@ public class ProcessArchiver {
         archiveComments(processDefinition, processInstance, archiveService, logger, commentService, archiveDate);
 
         // archive document mappings
-        archiveDocumentMappings(processDefinition, processInstance, documentMappingService, archiveDate);
+        archiveDocumentMappings(processDefinition, processInstance, documentService, archiveDate);
 
         if (!processDefinition.getProcessContainer().getConnectors().isEmpty()) {
             archiveConnectors(connectorInstanceService, archiveDate, processInstance.getId(), SConnectorInstance.PROCESS_TYPE);
@@ -120,7 +117,6 @@ public class ProcessArchiver {
     }
 
     /**
-     * @param sProcessInstance
      * @param connectorInstanceService
      * @param archiveDate
      * @param containerId
@@ -166,28 +162,20 @@ public class ProcessArchiver {
         } catch (final SRecorderException e) {
             setExceptionContext(processDefinition, processInstance, e);
             throw new SArchivingException("Unable to archive the process instance.", e);
-        } catch (final SDefinitiveArchiveNotFound e) {
-            setExceptionContext(processDefinition, processInstance, e);
-            if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
-                logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "The process instance was not archived.", e);
-            }
         }
     }
 
     private static void archiveDocumentMappings(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
-            final DocumentMappingService documentMappingService, final long archiveDate) throws SArchivingException {
+            final DocumentService documentService, final long archiveDate) throws SArchivingException {
         try {
-            List<SDocumentMapping> sDocumentMappings = null;
+            List<SMappedDocument> mappedDocuments;
             do {
-                sDocumentMappings = documentMappingService.getDocumentMappingsForProcessInstance(processInstance.getId(), 0, BATCH_SIZE, null, null);
-                for (final SDocumentMapping sDocumentMapping : sDocumentMappings) {
-                    documentMappingService.archive(sDocumentMapping, archiveDate);
+                mappedDocuments = documentService.getDocumentsOfProcessInstance(processInstance.getId(), 0, BATCH_SIZE, null, null);
+                for (final SMappedDocument mappedDocument : mappedDocuments) {
+                    documentService.archive(mappedDocument, archiveDate);
                 }
-            } while (sDocumentMappings.size() == BATCH_SIZE);
-        } catch (final SPageOutOfRangeException e) {
-            setExceptionContext(processDefinition, processInstance, e);
-            throw new SArchivingException("Unable to archive the process instance.", e);
-        } catch (final SDocumentMappingException e) {
+            } while (mappedDocuments.size() == BATCH_SIZE);
+        } catch (final SBonitaException e) {
             setExceptionContext(processDefinition, processInstance, e);
             throw new SArchivingException("Unable to archive the process instance.", e);
         }
@@ -226,11 +214,6 @@ public class ProcessArchiver {
             } catch (final SRecorderException e) {
                 setExceptionContext(processDefinition, processInstance, e);
                 throw new SArchivingException("Unable to archive the process instance comments.", e);
-            } catch (final SDefinitiveArchiveNotFound e) {
-                setExceptionContext(processDefinition, processInstance, e);
-                if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
-                    logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "The process instance was not archived.", e);
-                }
             }
         }
     }

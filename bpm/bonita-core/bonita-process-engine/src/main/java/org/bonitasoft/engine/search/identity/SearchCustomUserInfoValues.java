@@ -20,7 +20,7 @@ import org.bonitasoft.engine.identity.CustomUserInfoValue;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
@@ -39,12 +39,12 @@ public class SearchCustomUserInfoValues extends AbstractSearchEntity<CustomUserI
     }
 
     @Override
-    public long executeCount(QueryOptions options) throws SBonitaSearchException {
+    public long executeCount(QueryOptions options) throws SBonitaReadException {
         return service.getNumberOfCustomUserInfoValue(options);
     }
 
     @Override
-    public List<SCustomUserInfoValue> executeSearch(QueryOptions options) throws SBonitaSearchException {
+    public List<SCustomUserInfoValue> executeSearch(QueryOptions options) throws SBonitaReadException {
         return service.searchCustomUserInfoValue(options);
     }
 

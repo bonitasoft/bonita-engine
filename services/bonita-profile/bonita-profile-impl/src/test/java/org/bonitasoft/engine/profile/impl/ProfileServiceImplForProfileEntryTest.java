@@ -35,7 +35,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.profile.builder.SProfileEntryUpdateBuilder;
@@ -270,18 +270,18 @@ public class ProfileServiceImplForProfileEntryTest {
     /**
      * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getNumberOfProfileEntries(org.bonitasoft.engine.persistence.QueryOptions)}.
      * 
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @throws SBonitaReadException
      */
     @Test
-    public final void getNumberOfProfileEntries() throws SBonitaSearchException, SBonitaReadException {
+    public final void getNumberOfProfileEntries() throws SBonitaReadException, SBonitaReadException {
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistenceService.getNumberOfEntities(SProfileEntry.class, options, Collections.<String, Object> emptyMap())).thenReturn(1L);
 
         assertEquals(1L, profileServiceImpl.getNumberOfProfileEntries(options));
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfProfilesThrowException() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistenceService.getNumberOfEntities(SProfileEntry.class, options, Collections.<String, Object> emptyMap())).thenThrow(
@@ -322,18 +322,18 @@ public class ProfileServiceImplForProfileEntryTest {
     /**
      * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#searchProfileEntries(org.bonitasoft.engine.persistence.QueryOptions)}.
      * 
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @throws SBonitaReadException
      */
     @Test
-    public final void searchProfileEntries() throws SBonitaSearchException, SBonitaReadException {
+    public final void searchProfileEntries() throws SBonitaReadException {
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistenceService.searchEntity(SProfileEntry.class, options, Collections.<String, Object> emptyMap())).thenReturn(new ArrayList<SProfileEntry>());
 
         assertNotNull(profileServiceImpl.searchProfileEntries(options));
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchProfileEntriesThrowException() throws Exception {
         final QueryOptions options = new QueryOptions(0, 10);
         when(persistenceService.searchEntity(SProfileEntry.class, options, Collections.<String, Object> emptyMap())).thenThrow(new SBonitaReadException(""));

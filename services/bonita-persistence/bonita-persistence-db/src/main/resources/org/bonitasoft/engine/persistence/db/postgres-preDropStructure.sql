@@ -11,8 +11,9 @@ ALTER TABLE data_instance DROP CONSTRAINT fk_data_instance_tenantId;
 ALTER TABLE data_mapping DROP CONSTRAINT fk_data_mapping_tenantId;
 ALTER TABLE dependency DROP CONSTRAINT fk_dependency_tenantId;
 ALTER TABLE dependencymapping DROP CONSTRAINT fk_dependencymapping_tenantId;
-ALTER TABLE document_content DROP CONSTRAINT fk_document_content_tenantId;
+ALTER TABLE document DROP CONSTRAINT fk_document_tenantId;
 ALTER TABLE document_mapping DROP CONSTRAINT fk_document_mapping_tenantId;
+ALTER TABLE document_mapping DROP CONSTRAINT fk_docmap_docid;
 ALTER TABLE event_trigger_instance DROP CONSTRAINT fk_event_trigger_instance_tenantId;
 ALTER TABLE external_identity_mapping DROP CONSTRAINT fk_external_identity_mapping_tenantId;
 ALTER TABLE flownode_instance DROP CONSTRAINT fk_flownode_instance_tenantId;
@@ -44,6 +45,8 @@ ALTER TABLE waiting_event DROP CONSTRAINT fk_waiting_event_tenantId;
 ALTER TABLE profilemember DROP CONSTRAINT fk_profilemember_profileId;
 ALTER TABLE profileentry DROP CONSTRAINT fk_profileentry_profileId;
 
+
+
 -- business application
 ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_tenantId;
 ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_appId;
@@ -58,6 +61,7 @@ ALTER TABLE business_app DROP CONSTRAINT fk_app_tenantId;
 
 --  ------------------------ Foreign Keys to disable if archiving is on another BD ------------------
 ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_arch_document_mapping_tenantId;
+ALTER TABLE arch_document_mapping DROP CONSTRAINT fk_archdocmap_docid;
 ALTER TABLE arch_flownode_instance DROP CONSTRAINT fk_arch_flownode_instance_tenantId;
 ALTER TABLE arch_process_comment DROP CONSTRAINT fk_arch_process_comment_tenantId;
 ALTER TABLE arch_process_instance DROP CONSTRAINT fk_arch_process_instance_tenantId;

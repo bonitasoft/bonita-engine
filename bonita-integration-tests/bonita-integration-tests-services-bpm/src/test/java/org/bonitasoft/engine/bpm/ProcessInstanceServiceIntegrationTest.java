@@ -29,7 +29,7 @@ import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.transaction.STransactionCommitException;
 import org.bonitasoft.engine.transaction.STransactionCreationException;
 import org.bonitasoft.engine.transaction.STransactionRollbackException;
@@ -95,13 +95,13 @@ public class ProcessInstanceServiceIntegrationTest extends CommonBPMServicesTest
         }
     }
 
-    private List<SProcessInstance> get100FirstProcessInstances() throws SBonitaSearchException {
+    private List<SProcessInstance> get100FirstProcessInstances() throws SBonitaReadException {
         return getFirstProcessInstances(100);
     }
 
     @Test
     public void getNumberOfProcessInstances() throws STransactionCreationException, STransactionCommitException, SProcessInstanceCreationException,
-            STransactionRollbackException, SBonitaSearchException {
+            STransactionRollbackException, SBonitaReadException {
         transactionService.begin();
         final SProcessInstanceBuilderFactory sProcessInstanceBuilder = BuilderFactory.get(SProcessInstanceBuilderFactory.class);
         final long processDefinitionId = 123L;

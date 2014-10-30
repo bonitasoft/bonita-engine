@@ -139,45 +139,21 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Dependency -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.dependency</groupId>
-			<artifactId>bonita-dependency-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
+        <!-- Dependency -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.dependency</groupId>
+            <artifactId>bonita-dependency-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-		<!-- Document -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.document</groupId>
-			<artifactId>bonita-document-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
-			<artifactId>bonita-process-document-mapping-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.document.mapping</groupId>
-			<artifactId>bonita-process-document-mapping-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.document</groupId>
-			<artifactId>bonita-process-document-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.document</groupId>
-			<artifactId>bonita-process-document-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
+        <!-- Document -->
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.document</groupId>
+            <artifactId>bonita-document-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
 
 		<!-- Engine -->
 		<dependency>

@@ -24,7 +24,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
  */
 public class NormalStateTransitionsManager {
 
-    protected Map<Integer, FlowNodeState> stateTransitions;
+    protected final Map<Integer, FlowNodeState> stateTransitions;
 
     private final SFlowNodeInstance flowNodeInstance;
 

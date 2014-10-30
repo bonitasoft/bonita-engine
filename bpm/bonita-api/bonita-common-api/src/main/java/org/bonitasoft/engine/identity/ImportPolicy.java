@@ -13,10 +13,16 @@
  **/
 package org.bonitasoft.engine.identity;
 
+import org.bonitasoft.engine.api.OrganizationAPI;
+
 /**
- * Define how to handle conflicts when an organization is imported
- * 
+ * Define how to handle conflicts when an organization is imported.
+ * <br/>
+ * Check {@link OrganizationAPI#importOrganization(String)} and {@link OrganizationAPI#importOrganization(String, ImportPolicy)} to see the usage.
+ *
+ * @see OrganizationAPI
  * @author Baptiste Mesta
+ * @since 6.0.0
  */
 public enum ImportPolicy {
 
