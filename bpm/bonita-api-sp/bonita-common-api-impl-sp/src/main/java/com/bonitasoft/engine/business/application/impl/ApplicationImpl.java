@@ -124,7 +124,7 @@ public class ApplicationImpl extends BaseElementImpl implements Application {
         return homePageId;
     }
 
-    public void setHomePageId(final long homePageId) {
+    public void setHomePageId(final Long homePageId) {
         this.homePageId = homePageId;
     }
 
