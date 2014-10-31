@@ -43,9 +43,7 @@ public class SAXMLObjectDataInstanceImplTest {
     }
 
     /**
-     * Test method for
-     * {@link SAXMLObjectDataInstanceImpl#SAXMLObjectDataInstanceImpl(org.bonitasoft.engine.data.instance.model.SDataInstance)}
-     * .
+     * Test method for {@link SAXMLObjectDataInstanceImpl#SAXMLObjectDataInstanceImpl(org.bonitasoft.engine.data.instance.model.SDataInstance)} .
      */
     @Test
     public final void sAXMLObjectDataInstanceImplSDataInstance() {
@@ -69,6 +67,16 @@ public class SAXMLObjectDataInstanceImplTest {
         final SAXMLObjectDataInstanceImpl saxmlObjectDataInstanceImpl = new SAXMLObjectDataInstanceImpl();
         saxmlObjectDataInstanceImpl.setValue("plop");
         assertEquals("plop", saxmlObjectDataInstanceImpl.getValue());
+    }
+
+    /**
+     * Test method for {@link SAXMLObjectDataInstanceImpl#getValue()}.
+     * Test method for {@link SAXMLObjectDataInstanceImpl#setValue(java.io.Serializable)}.
+     */
+    @Test
+    public final void getValueShouldBeNull() {
+        final SAXMLObjectDataInstanceImpl saxmlObjectDataInstanceImpl = new SAXMLObjectDataInstanceImpl();
+        assertEquals(null, saxmlObjectDataInstanceImpl.getValue());
     }
 
     /**
