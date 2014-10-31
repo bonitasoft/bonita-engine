@@ -52,7 +52,7 @@ public class LicenseChecker {
         exceptions.put(Features.WEB_ORGANIZATION_EXCHANGE, "Export Organization is not an active feature.");
     }
 
-    public boolean checkLicence() {
+    public boolean checkLicense() {
         if (!Manager.getInstance().isValid()) {
             stopNode();
             return false;
@@ -60,8 +60,8 @@ public class LicenseChecker {
         return true;
     }
 
-    public void checkLicenceAndFeature(final String feature) throws IllegalStateException {
-        checkLicence();
+    public void checkLicenseAndFeature(final String feature) throws IllegalStateException {
+        checkLicense();
         if (!Manager.getInstance().isFeatureActive(feature)) {
             throw new IllegalStateException(exceptions.get(feature));
         }

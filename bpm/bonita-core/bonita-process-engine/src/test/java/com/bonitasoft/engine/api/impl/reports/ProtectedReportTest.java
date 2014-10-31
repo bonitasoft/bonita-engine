@@ -34,7 +34,7 @@ public class ProtectedReportTest {
 
     @Test(expected = IllegalStateException.class)
     public void should_throw_an_illegal_state_exception_if_license_is_not_valid() throws Exception {
-        doThrow(IllegalStateException.class).when(checker).checkLicenceAndFeature("feature");
+        doThrow(IllegalStateException.class).when(checker).checkLicenseAndFeature("feature");
         final ProtectedReport report = new ProtectedReport("myreport", "feature", checker);
 
         report.deploy("path/to/report", null);
