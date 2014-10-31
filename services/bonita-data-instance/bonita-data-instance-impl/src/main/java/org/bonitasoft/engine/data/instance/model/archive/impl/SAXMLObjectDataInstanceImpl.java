@@ -16,9 +16,7 @@ package org.bonitasoft.engine.data.instance.model.archive.impl;
 import java.io.Serializable;
 
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
+import org.bonitasoft.engine.data.instance.model.impl.XStreamFactory;
 
 /**
  * @author Matthieu Chaffotte
@@ -30,28 +28,30 @@ public final class SAXMLObjectDataInstanceImpl extends SADataInstanceImpl {
 
     private String value;
 
+    private final XStreamFactory xStreamFactory;
+
     public SAXMLObjectDataInstanceImpl() {
         super();
+        xStreamFactory = new XStreamFactory();
     }
 
     public SAXMLObjectDataInstanceImpl(final SDataInstance sDataInstance) {
         super(sDataInstance);
+        xStreamFactory = new XStreamFactory();
         setValue(sDataInstance.getValue());
     }
 
     @Override
     public Serializable getValue() {
         if (value != null) {
-            final XStream xstream = new XStream(new StaxDriver());
-            return (Serializable) xstream.fromXML(value);
+            return (Serializable) xStreamFactory.getXStream().fromXML(value);
         }
         return null;
     }
 
     @Override
     public void setValue(final Serializable value) {
-        final XStream xStream = new XStream(new StaxDriver());
-        this.value = xStream.toXML(value);
+        this.value = xStreamFactory.getXStream().toXML(value);
     }
 
     @Override
