@@ -72,6 +72,20 @@ public class APICallContext implements Serializable {
      *        the name of the resource
      * @param resourceId
      *        the id (or multiple id) of the resource if specified
+     */
+    public APICallContext(String method, String apiName, String resourceName, String resourceId) {
+        this(method, apiName, resourceName, resourceId, null, null);
+    }
+
+    /**
+     * @param method
+     *        the HTTP method
+     * @param apiName
+     *        the name of the api
+     * @param resourceName
+     *        the name of the resource
+     * @param resourceId
+     *        the id (or multiple id) of the resource if specified
      * @param queryString
      *        the query string of the api context if specified
      * @param body
@@ -89,6 +103,9 @@ public class APICallContext implements Serializable {
 
     private void parseQueryString(String queryString) {
         this.filters = new HashMap<String, String>();
+        if (queryString == null) {
+            return;
+        }
         for (String element : queryString.split("&")) {
             int indexOfEquals = element.indexOf("=");
             if (indexOfEquals > 0 && indexOfEquals + 1 < element.length()) {

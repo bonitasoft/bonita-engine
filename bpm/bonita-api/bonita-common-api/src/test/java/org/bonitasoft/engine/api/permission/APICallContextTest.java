@@ -87,4 +87,17 @@ public class APICallContextTest {
         assertThat(searchTerm).isEqualTo(null);
     }
 
+    @Test
+    public void construct_with_null_body_and_query() throws JSONException {
+        APICallContext apiCallContext = new APICallContext("GET","identity","user","1");
+
+        String searchTerm = apiCallContext.getSearchTerm();
+        Map<String, String> filters = apiCallContext.getFilters();
+        String body = apiCallContext.getBody();
+
+        assertThat(searchTerm).isEqualTo(null);
+        assertThat(filters).isEmpty();
+        assertThat(body).isEqualTo(null);
+    }
+
 }
