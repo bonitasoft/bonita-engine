@@ -7,7 +7,7 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.impl;
+package com.bonitasoft.engine.business.application.impl.cleaner;
 
 import java.util.List;
 
@@ -15,6 +15,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.persistence.QueryOptions;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.impl.filter.FilterBuilder;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 
 /**
@@ -23,11 +24,9 @@ import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 public class ApplicationMenuCleaner {
 
     private ApplicationService applicationService;
-    private int maxResults;
 
-    public ApplicationMenuCleaner(ApplicationService applicationService, int maxResults) {
+    public ApplicationMenuCleaner(ApplicationService applicationService) {
         this.applicationService = applicationService;
-        this.maxResults = maxResults;
     }
 
     public void deleteRelatedApplicationMenus(FilterBuilder filterBuilder) throws SBonitaException {
@@ -38,7 +37,7 @@ public class ApplicationMenuCleaner {
             for (SApplicationMenu relatedMenu : relatedMenus) {
                 applicationService.deleteApplicationMenu(relatedMenu);
             }
-        } while (relatedMenus.size() == maxResults);
+        } while (relatedMenus.size() == options.getNumberOfResults());
 
     }
 

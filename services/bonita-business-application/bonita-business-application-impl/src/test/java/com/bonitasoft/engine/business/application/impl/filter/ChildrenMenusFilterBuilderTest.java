@@ -7,19 +7,20 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.impl;
+package com.bonitasoft.engine.business.application.impl.filter;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bonitasoft.engine.business.application.model.SApplicationMenu;
-import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuBuilderFactoryImpl;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.junit.Test;
 
-public class ChildrenFilterBuilderTest {
+import com.bonitasoft.engine.business.application.model.SApplicationMenu;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuBuilderFactoryImpl;
+
+public class ChildrenMenusFilterBuilderTest {
 
     public static final int START_INDEX = 0;
     public static final int MAX_RESULTS = 10;
@@ -29,7 +30,7 @@ public class ChildrenFilterBuilderTest {
         //given
         SApplicationMenuBuilderFactoryImpl factory = new SApplicationMenuBuilderFactoryImpl();
         long parentId = 4L;
-        ChildrenFilterBuilder builder = new ChildrenFilterBuilder(START_INDEX, MAX_RESULTS, parentId);
+        ChildrenMenusFilterBuilder builder = new ChildrenMenusFilterBuilder(new SelectRange(START_INDEX, MAX_RESULTS), parentId);
 
         //when
         QueryOptions options = builder.buildQueryOptions();
@@ -41,42 +42,5 @@ public class ChildrenFilterBuilderTest {
         assertThat(options.getOrderByOptions()).containsExactly(new OrderByOption(SApplicationMenu.class, factory.getIdKey(), OrderByType.ASC));
         assertThat(options.getFilters()).containsExactly(new FilterOption(SApplicationMenu.class, factory.getParentIdKey(), parentId));
     }
-
-    @Test
-    public void getStartIndex_should_return_value_passed_by_constructor() throws Exception {
-        //given
-        ChildrenFilterBuilder builder = new ChildrenFilterBuilder(11, 10, 2L);
-
-        //when
-        int startIndex = builder.getStartIndex();
-
-        //then
-        assertThat(startIndex).isEqualTo(11);
-    }
-
-    @Test
-    public void getMaxResults_should_return_value_passed_by_constructor() throws Exception {
-        //given
-        ChildrenFilterBuilder builder = new ChildrenFilterBuilder(11, 10, 2L);
-
-        //when
-        int maxResults = builder.getMaxResults();
-
-        //then
-        assertThat(maxResults).isEqualTo(10);
-    }
-
-    @Test
-    public void getParentId_should_return_value_passed_by_constructor() throws Exception {
-        //given
-        ChildrenFilterBuilder builder = new ChildrenFilterBuilder(11, 10, 2L);
-
-        //when
-        long parentId = builder.getParentId();
-
-        //then
-        assertThat(parentId).isEqualTo(2L);
-    }
-
 
 }

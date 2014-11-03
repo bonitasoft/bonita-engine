@@ -9,11 +9,12 @@
 
 package com.bonitasoft.engine.business.application.impl;
 
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
+
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuFields;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
  * @author Elias Ricken de Medeiros

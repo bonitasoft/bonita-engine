@@ -46,6 +46,9 @@ public interface ApplicationService {
     SApplication updateApplication(long applicationId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException, SInvalidTokenException,
     SInvalidDisplayNameException, SBonitaReadException, SObjectAlreadyExistsException, SObjectNotFoundException;
 
+    SApplication updateApplication(SApplication application, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException, SInvalidTokenException,
+    SInvalidDisplayNameException, SBonitaReadException, SObjectAlreadyExistsException;
+
     long getNumberOfApplications(QueryOptions options) throws SBonitaReadException;
 
     List<SApplication> searchApplications(QueryOptions options) throws SBonitaReadException;
@@ -62,6 +65,8 @@ public interface ApplicationService {
     SApplicationPage getApplicationHomePage(long applicationId) throws SBonitaReadException, SObjectNotFoundException;
 
     void deleteApplicationPage(long applicationPageId) throws SObjectModificationException, SObjectNotFoundException;
+
+    void deleteApplicationPage(SApplicationPage applicationPage) throws SObjectModificationException;
 
     long getNumberOfApplicationPages(final QueryOptions options) throws SBonitaReadException;
 

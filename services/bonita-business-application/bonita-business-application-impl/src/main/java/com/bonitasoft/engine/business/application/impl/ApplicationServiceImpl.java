@@ -46,6 +46,10 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.SInvalidDisplayNameException;
 import com.bonitasoft.engine.business.application.SInvalidTokenException;
+import com.bonitasoft.engine.business.application.impl.cleaner.ApplicationDestructor;
+import com.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuCleaner;
+import com.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuDestructor;
+import com.bonitasoft.engine.business.application.impl.cleaner.ApplicationPageDestructor;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
@@ -80,21 +84,29 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     private IndexManager indexManager;
     private MenuIndexConvertor menuIndexConvertor;
-    private ApplicationMenuCleaner applicationMenuCleaner;
+    private ApplicationDestructor applicationDestructor;
+    private ApplicationPageDestructor applicationPageDestructor;
+    private ApplicationMenuDestructor applicationMenuDestructor;
 
     public ApplicationServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final QueriableLoggerService queriableLoggerService) {
-        this(Manager.getInstance(), recorder, persistenceService, queriableLoggerService, null, null, null);
+        this(Manager.getInstance(), recorder, persistenceService, queriableLoggerService, null, null, null, null, null);
         this.indexManager = new IndexManager(new IndexUpdater(this, MAX_RESULTS), new MenuIndexValidator());
         this.menuIndexConvertor = new MenuIndexConvertor(this);
-        this.applicationMenuCleaner = new ApplicationMenuCleaner(this, MAX_RESULTS);
+        ApplicationMenuCleaner applicationMenuCleaner = new ApplicationMenuCleaner(this);
+        this.applicationDestructor = new ApplicationDestructor(applicationMenuCleaner);
+        this.applicationPageDestructor = new ApplicationPageDestructor(applicationMenuCleaner, new HomePageChecker(this));
+        this.applicationMenuDestructor = new ApplicationMenuDestructor(applicationMenuCleaner);
     }
 
     ApplicationServiceImpl(final Manager manager, final Recorder recorder, final ReadPersistenceService persistenceService,
             final QueriableLoggerService queriableLoggerService, IndexManager indexManager, MenuIndexConvertor menuIndexConvertor,
-            ApplicationMenuCleaner applicationMenuCleaner) {
+            ApplicationDestructor applicationDestructor, ApplicationPageDestructor applicationPageDestructor,
+            ApplicationMenuDestructor applicationMenuDestructor) {
         this.indexManager = indexManager;
         this.menuIndexConvertor = menuIndexConvertor;
-        this.applicationMenuCleaner = applicationMenuCleaner;
+        this.applicationDestructor = applicationDestructor;
+        this.applicationPageDestructor = applicationPageDestructor;
+        this.applicationMenuDestructor = applicationMenuDestructor;
         active = manager.isFeatureActive(Features.BUSINESS_APPLICATIONS);
         this.recorder = recorder;
         this.persistenceService = persistenceService;
@@ -231,7 +243,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             final SApplication application = getApplication(applicationId);
             final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION)
                     .setObject(application).done();
-            applicationMenuCleaner.deleteRelatedApplicationMenus(new ApplicationRelatedFilterBuilder(0, MAX_RESULTS, applicationId));
+            applicationDestructor.onDeleteApplication(application);
             recorder.recordDelete(new DeleteRecord(application), event);
             log(application.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SObjectNotFoundException e) {
@@ -252,6 +264,33 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         try {
             final SApplication application = getApplication(applicationId);
+            return updateApplication(application, updateDescriptor);
+
+        } catch (SObjectNotFoundException e) {
+            throw e;
+        } catch (SInvalidTokenException e) {
+            throw e;
+        } catch (SInvalidDisplayNameException e) {
+            throw e;
+        } catch (SObjectAlreadyExistsException e) {
+            throw e;
+        } catch (SObjectModificationException e) {
+            throw e;
+        } catch (final SBonitaException e) {
+            log(applicationId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            throw new SObjectModificationException(e);
+        }
+    }
+
+    @Override
+    public SApplication updateApplication(SApplication application, final EntityUpdateDescriptor updateDescriptor)
+            throws SObjectModificationException, SInvalidTokenException, SInvalidDisplayNameException, SObjectAlreadyExistsException {
+        checkLicense();
+        final String methodName = "updateApplication";
+        final long now = System.currentTimeMillis();
+        final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.UPDATED, "Updating application with id " + application.getId());
+
+        try {
             validateUpdatedFields(updateDescriptor, application);
             updateDescriptor.addField(applicationKeyProvider.getLastUpdatedDateKey(), now);
 
@@ -260,19 +299,17 @@ public class ApplicationServiceImpl implements ApplicationService {
             final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ApplicationService.APPLICATION)
                     .setObject(application).done();
             recorder.recordUpdate(updateRecord, updateEvent);
-            log(applicationId, SQueriableLog.STATUS_OK, logBuilder, methodName);
+            log(application.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             return application;
 
-        } catch (SObjectNotFoundException e) {
-            return logAndRetrowException(applicationId, methodName, logBuilder, e);
         } catch (SInvalidTokenException e) {
-            return logAndRetrowException(applicationId, methodName, logBuilder, e);
+            return logAndRetrowException(application.getId(), methodName, logBuilder, e);
         } catch (SInvalidDisplayNameException e) {
-            return logAndRetrowException(applicationId, methodName, logBuilder, e);
+            return logAndRetrowException(application.getId(), methodName, logBuilder, e);
         } catch (SObjectAlreadyExistsException e) {
-            return logAndRetrowException(applicationId, methodName, logBuilder, e);
+            return logAndRetrowException(application.getId(), methodName, logBuilder, e);
         } catch (final SBonitaException e) {
-            log(applicationId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            log(application.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SObjectModificationException(e);
         }
     }
@@ -409,15 +446,33 @@ public class ApplicationServiceImpl implements ApplicationService {
                 + applicationPageId);
         try {
             final SApplicationPage applicationPage = getApplicationPage(applicationPageId);
-            final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_PAGE)
-                    .setObject(applicationPage).done();
-            applicationMenuCleaner.deleteRelatedApplicationMenus(new ApplicationPageRelatedFilterBuilder(0, MAX_RESULTS, applicationPageId));
-            recorder.recordDelete(new DeleteRecord(applicationPage), event);
-            log(applicationPage.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            deleteApplicationPage(applicationPage);
         } catch (final SObjectNotFoundException e) {
             logAndRetrowException(applicationPageId, methodName, logBuilder, e);
+        } catch (final SObjectModificationException e) {
+            throw e;
         } catch (final SBonitaException e) {
             throwModificationException(applicationPageId, logBuilder, methodName, e);
+        }
+
+    }
+
+    @Override
+    public void deleteApplicationPage(final SApplicationPage applicationPage) throws SObjectModificationException {
+        checkLicense();
+        final String methodName = "deleteApplicationPage";
+        final SApplicationPageLogBuilder logBuilder = getApplicationPageLogBuilder(ActionType.DELETED, "Deleting application page with id "
+                + applicationPage.getId());
+        try {
+            final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_PAGE)
+                    .setObject(applicationPage).done();
+            applicationPageDestructor.onDeleteApplicationPage(applicationPage);
+            recorder.recordDelete(new DeleteRecord(applicationPage), event);
+            log(applicationPage.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+        } catch (SObjectModificationException e) {
+            logAndRetrowException(applicationPage.getId(), methodName, logBuilder, e);
+        } catch (final SBonitaException e) {
+            throwModificationException(applicationPage.getId(), logBuilder, methodName, e);
         }
 
     }
@@ -562,7 +617,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         try {
             final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_MENU)
                     .setObject(applicationMenu).done();
-            applicationMenuCleaner.deleteRelatedApplicationMenus(new ChildrenFilterBuilder(0, MAX_RESULTS, applicationMenu.getId()));
+            applicationMenuDestructor.onDeleteApplicationMenu(applicationMenu);
             int lastUsedIndex = getLastUsedIndex(applicationMenu.getParentId());
             indexManager.organizeIndexesOnDelete(new MenuIndex(applicationMenu.getParentId(), applicationMenu.getIndex(), lastUsedIndex));
             recorder.recordDelete(new DeleteRecord(applicationMenu), event);

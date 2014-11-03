@@ -26,8 +26,8 @@ public class SApplicationUpdateBuilderImpl implements SApplicationUpdateBuilder 
 
     private final EntityUpdateDescriptor descriptor;
 
-    public SApplicationUpdateBuilderImpl(final EntityUpdateDescriptor descriptor) {
-        this.descriptor = descriptor;
+    public SApplicationUpdateBuilderImpl() {
+        this.descriptor = new EntityUpdateDescriptor();
     }
 
     @Override

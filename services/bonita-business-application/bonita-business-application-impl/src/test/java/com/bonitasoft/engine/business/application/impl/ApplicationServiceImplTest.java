@@ -33,7 +33,6 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -55,6 +54,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.SInvalidDisplayNameException;
 import com.bonitasoft.engine.business.application.SInvalidTokenException;
+import com.bonitasoft.engine.business.application.impl.cleaner.ApplicationDestructor;
+import com.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuDestructor;
+import com.bonitasoft.engine.business.application.impl.cleaner.ApplicationPageDestructor;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
@@ -108,7 +110,13 @@ public class ApplicationServiceImplTest {
     private MenuIndexConvertor convertor;
 
     @Mock
-    private ApplicationMenuCleaner applicationMenuCleaner;
+    private ApplicationDestructor applicationDestructor;
+
+    @Mock
+    private ApplicationPageDestructor applicationPageDestructor;
+
+    @Mock
+    private ApplicationMenuDestructor applicationMenuDestructor;
 
     private SApplication application;
 
@@ -121,9 +129,9 @@ public class ApplicationServiceImplTest {
         given(managerActiveFeature.isFeatureActive(Features.BUSINESS_APPLICATIONS)).willReturn(true);
         given(managerDisabledFeature.isFeatureActive(Features.BUSINESS_APPLICATIONS)).willReturn(false);
         applicationServiceActive = new ApplicationServiceImpl(managerActiveFeature, recorder, persistenceService, queriableLogService, indexManager, convertor,
-                applicationMenuCleaner);
+                applicationDestructor, applicationPageDestructor, applicationMenuDestructor);
         applicationServiceDisabled = new ApplicationServiceImpl(managerDisabledFeature, recorder, persistenceService, queriableLogService, indexManager,
-                convertor, applicationMenuCleaner);
+                convertor, applicationDestructor, applicationPageDestructor, applicationMenuDestructor);
 
         when(queriableLogService.isLoggable(anyString(), any(SQueriableLogSeverity.class))).thenReturn(true);
         application = buildApplication(APPLICATION_TOKEN, APPLICATION_DISP_NAME);
@@ -204,7 +212,7 @@ public class ApplicationServiceImplTest {
     public void createApplication_should_throw_SObjectAlreadyExistsException_when_an_application_with_the_same_name_already_exists() throws Exception {
         //given
         final String name = APPLICATION_TOKEN;
-        given(persistenceService.selectOne(new SelectOneDescriptor<SApplication>("getApplicationByToken", Collections.<String, Object> singletonMap("name",
+        given(persistenceService.selectOne(new SelectOneDescriptor<SApplication>("getApplicationByToken", Collections.<String, Object>singletonMap("name",
                 name), SApplication.class))).willReturn(application);
 
         final SApplication newApp = buildApplication(APPLICATION_TOKEN, APPLICATION_DISP_NAME);
@@ -275,7 +283,7 @@ public class ApplicationServiceImplTest {
     }
 
     @Test
-    public void deleteApplication_should_delete_related_applicationMenus() throws Exception {
+    public void deleteApplication_should_call_applicationDestructor() throws Exception {
         //given
         ApplicationServiceImpl applicationService = spy(applicationServiceActive);
 
@@ -288,12 +296,7 @@ public class ApplicationServiceImplTest {
         applicationService.deleteApplication(applicationId);
 
         //then
-        ArgumentCaptor<ApplicationRelatedFilterBuilder> filterCaptor = ArgumentCaptor.forClass(ApplicationRelatedFilterBuilder.class);
-        verify(applicationMenuCleaner, times(1)).deleteRelatedApplicationMenus(filterCaptor.capture());
-        ApplicationRelatedFilterBuilder filterBuilder = filterCaptor.getValue();
-        assertThat(filterBuilder.getStartIndex()).isEqualTo(0);
-        assertThat(filterBuilder.getMaxResults()).isEqualTo(ApplicationServiceImpl.MAX_RESULTS);
-        assertThat(filterBuilder.getApplicationId()).isEqualTo(applicationId);
+        verify(applicationDestructor, times(1)).onDeleteApplication(app);
     }
 
     @Test(expected = SObjectNotFoundException.class)
@@ -391,11 +394,16 @@ public class ApplicationServiceImplTest {
         return new SApplicationPageBuilderFactoryImpl().createNewInstance(applicationId, pageId, name).done();
     }
 
+    private SApplicationPage buildApplicationPage(long applicationPageId, long applicationId, long pageId, String pageToken) {
+        final SApplicationPage applicationPage = buildApplicationPage(applicationId, pageId, pageToken);
+        applicationPage.setId(applicationPageId);
+        return applicationPage;
+    }
+
     @Test
     public void createApplicationPage_should_call_recordInsert_and_return_created_object() throws Exception {
         //given
-        final SApplicationPage applicationPage = buildApplicationPage(5, 15, "mainDashBoard");
-        applicationPage.setId(15);
+        final SApplicationPage applicationPage = buildApplicationPage(15, 5, 15, "mainDashBoard");
         final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ApplicationService.APPLICATION_PAGE)
                 .setObject(applicationPage).done();
         final InsertRecord record = new InsertRecord(applicationPage);
@@ -411,8 +419,7 @@ public class ApplicationServiceImplTest {
     @Test(expected = SObjectCreationException.class)
     public void createApplicationPage_should_throw_SObjectCreationException_when_recorder_throws_SBonitaException() throws Exception {
         //given
-        final SApplicationPage applicationPage = buildApplicationPage(5, 15, "mainDashBoard");
-        applicationPage.setId(15);
+        final SApplicationPage applicationPage = buildApplicationPage(15, 5, 15, "mainDashBoard");
         doThrow(new SRecorderException("")).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
 
         //when
@@ -424,8 +431,7 @@ public class ApplicationServiceImplTest {
     @Test(expected = SInvalidTokenException.class)
     public void createApplicationPage_should_throw_SInvalidApplicationName_when_name_is_invalid() throws Exception {
         //given
-        final SApplicationPage applicationPage = buildApplicationPage(5, 15, "name with spaces");
-        applicationPage.setId(15);
+        final SApplicationPage applicationPage = buildApplicationPage(15, 5, 15, "name with spaces");
 
         //when
         applicationServiceActive.createApplicationPage(applicationPage);
@@ -446,8 +452,7 @@ public class ApplicationServiceImplTest {
                 ))).willReturn(applicationPage);
 
         //when
-        final SApplicationPage applicationPageToCreate = buildApplicationPage(5, 16, "mainDashBoard");
-        applicationPageToCreate.setId(7);
+        final SApplicationPage applicationPageToCreate = buildApplicationPage(7, 5, 16, "mainDashBoard");
         applicationServiceActive.createApplicationPage(applicationPageToCreate);
 
         //then exception
@@ -515,14 +520,15 @@ public class ApplicationServiceImplTest {
     @Test
     public void deleteApplicationPage_should_call_record_delete_with_applicationPage_identified_by_the_given_id() throws Exception {
         //given
+        ApplicationServiceImpl applicationService = spy(applicationServiceActive);
         final long applicationPageId = 10L;
-        final SApplicationPage applicationPage = buildApplicationPage(20, 30, "myPage");
-        applicationPage.setId(27);
-        given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationPage>("getApplicationPageById", SApplicationPage.class, applicationPageId)))
-                .willReturn(applicationPage);
+        final SApplicationPage applicationPage = buildApplicationPage(applicationPageId, 20, 30, "myPage");
+        doReturn(applicationPage).when(applicationService).getApplicationPage(applicationPageId);
+        long applicationId = 20L;
+        doReturn(application).when(applicationService).getApplication(applicationId);
 
         //when
-        applicationServiceActive.deleteApplicationPage(applicationPageId);
+        applicationService.deleteApplicationPage(applicationPageId);
 
         //then
         final ArgumentCaptor<SDeleteEvent> deleteEventCaptor = ArgumentCaptor.forClass(SDeleteEvent.class);
@@ -534,26 +540,39 @@ public class ApplicationServiceImplTest {
     }
 
     @Test
-    public void deleteApplicationPage_should_delete_related_applicationMenus() throws Exception {
+    public void deleteApplicationPage_should_call_applicationPageDestructor() throws Exception {
         //given
         ApplicationServiceImpl applicationService = spy(applicationServiceActive);
 
         //application page
         final long applicationPageId = 10L;
-        final SApplicationPage applicationPage = buildApplicationPage(20, 30, "myPage");
-        applicationPage.setId(27);
+        long applicationId = 20L;
+        final SApplicationPage applicationPage = buildApplicationPage(applicationPageId, applicationId, 30, "myPage");
         doReturn(applicationPage).when(applicationService).getApplicationPage(applicationPageId);
 
         //when
-        applicationService.deleteApplicationPage(applicationPageId);
+        applicationService.deleteApplicationPage(applicationPage);
 
         //then
-        ArgumentCaptor<ApplicationPageRelatedFilterBuilder> filterCaptor = ArgumentCaptor.forClass(ApplicationPageRelatedFilterBuilder.class);
-        verify(applicationMenuCleaner, times(1)).deleteRelatedApplicationMenus(filterCaptor.capture());
-        ApplicationPageRelatedFilterBuilder filterBuilder = filterCaptor.getValue();
-        assertThat(filterBuilder.getStartIndex()).isEqualTo(0);
-        assertThat(filterBuilder.getMaxResults()).isEqualTo(ApplicationServiceImpl.MAX_RESULTS);
-        assertThat(filterBuilder.getApplicationPageId()).isEqualTo(applicationPageId);
+        verify(applicationPageDestructor, times(1)).onDeleteApplicationPage(applicationPage);
+    }
+
+    @Test(expected = SObjectModificationException.class)
+    public void deleteApplicationPage_should_throw_SObjectModificationException_when_applicationPageDestructor_throws_SObjectModificationException() throws Exception {
+        //given
+        ApplicationServiceImpl applicationService = spy(applicationServiceActive);
+
+        //application page
+        final long applicationPageId = 10L;
+        long applicationId = 20L;
+        final SApplicationPage applicationPage = buildApplicationPage(applicationPageId, applicationId, 30, "myPage");
+        doReturn(applicationPage).when(applicationService).getApplicationPage(applicationPageId);
+        doThrow(new SObjectModificationException()).when(applicationPageDestructor).onDeleteApplicationPage(applicationPage);
+
+        //when
+        applicationService.deleteApplicationPage(applicationPage);
+
+        //then exception
     }
 
     @Test(expected = SObjectNotFoundException.class)
@@ -573,8 +592,7 @@ public class ApplicationServiceImplTest {
     public void deleteApplicationPage_should_throw_SObjectModificationException_when_recorder_throws_SRecorderException() throws Exception {
         //given
         final long applicationPageId = 10L;
-        final SApplicationPage applicationPage = buildApplicationPage(20, 30, "myPage");
-        applicationPage.setId(27);
+        final SApplicationPage applicationPage = buildApplicationPage(27, 20, 30, "myPage");
         given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationPage>("getApplicationPageById", SApplicationPage.class, applicationPageId)))
                 .willReturn(applicationPage);
         doThrow(new SRecorderException("")).when(recorder).recordDelete(any(DeleteRecord.class), any(SDeleteEvent.class));
@@ -634,7 +652,7 @@ public class ApplicationServiceImplTest {
     @Test(expected = SInvalidTokenException.class)
     public void updateApplication_should_throw_SInvalidTokenException_when_token_is_invalid() throws Exception {
         //given
-        SApplicationUpdateBuilder builder = new SApplicationUpdateBuilderImpl(new EntityUpdateDescriptor());
+        SApplicationUpdateBuilder builder = new SApplicationUpdateBuilderImpl();
         builder.updateToken("token with spaces");
         final int applicationId = 17;
 
@@ -678,7 +696,7 @@ public class ApplicationServiceImplTest {
     @Test(expected = SInvalidDisplayNameException.class)
     public void updateApplication_should_throw_SInvalidDisplayNameException_when_token_is_invalid() throws Exception {
         //given
-        SApplicationUpdateBuilder builder = new SApplicationUpdateBuilderImpl(new EntityUpdateDescriptor());
+        SApplicationUpdateBuilder builder = new SApplicationUpdateBuilderImpl();
         builder.updateDisplayName(null);
         final int applicationId = 17;
 
@@ -1043,7 +1061,7 @@ public class ApplicationServiceImplTest {
     }
 
     @Test
-    public void deleteApplicationMenu_should_delete_children_applicationMenus() throws Exception {
+    public void deleteApplicationMenu_should_call_applicationMenuDestructor() throws Exception {
         //given
         ApplicationServiceImpl applicationService = spy(applicationServiceActive);
 
@@ -1055,12 +1073,7 @@ public class ApplicationServiceImplTest {
         applicationService.deleteApplicationMenu(applicationMenu);
 
         //then
-        ArgumentCaptor<ChildrenFilterBuilder> filterCaptor = ArgumentCaptor.forClass(ChildrenFilterBuilder.class);
-        verify(applicationMenuCleaner, times(1)).deleteRelatedApplicationMenus(filterCaptor.capture());
-        ChildrenFilterBuilder filterBuilder = filterCaptor.getValue();
-        assertThat(filterBuilder.getStartIndex()).isEqualTo(0);
-        assertThat(filterBuilder.getMaxResults()).isEqualTo(ApplicationServiceImpl.MAX_RESULTS);
-        assertThat(filterBuilder.getParentId()).isEqualTo(applicationMenuId);
+        verify(applicationMenuDestructor, times(1)).onDeleteApplicationMenu(applicationMenu);
     }
 
     @Test

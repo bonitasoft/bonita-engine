@@ -11,6 +11,7 @@ package com.bonitasoft.engine.business.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -127,16 +128,24 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     public void deleteApplication_should_also_delete_related_applicationPage() throws Exception {
         //given
         final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0"));
-        final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
+        final ApplicationPage homePage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
+        getApplicationAPI().setApplicationHomePage(application.getId(), homePage.getId());
+        final ApplicationPage aAppPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "secondPage");
+
 
         //when
         getApplicationAPI().deleteApplication(application.getId());
 
         //then
+        verifyNotExists(homePage);
+        verifyNotExists(aAppPage);
+    }
+
+    private void verifyNotExists(ApplicationPage applicationPage) {
         try {
-            getApplicationAPI().getApplicationPage(appPage.getId());
-            fail("Not found expected");
-        } catch (final ApplicationPageNotFoundException e) {
+            getApplicationAPI().getApplicationPage(applicationPage.getId()); //throws exception
+            Assertions.fail("exception expected");
+        } catch (ApplicationPageNotFoundException e) {
             //OK
         }
     }

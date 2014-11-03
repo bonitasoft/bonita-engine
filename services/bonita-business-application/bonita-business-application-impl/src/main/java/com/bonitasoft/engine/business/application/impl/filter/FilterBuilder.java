@@ -7,7 +7,7 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.impl;
+package com.bonitasoft.engine.business.application.impl.filter;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
 

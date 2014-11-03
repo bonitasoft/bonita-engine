@@ -7,24 +7,26 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.impl;
+package com.bonitasoft.engine.business.application.impl.cleaner;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 
-import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.impl.filter.FilterBuilder;
+import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationMenuCleanerTest {
@@ -40,11 +42,12 @@ public class ApplicationMenuCleanerTest {
 
     private static int MAX_RESULTS = 2;
 
+    @InjectMocks
     private ApplicationMenuCleaner cleaner;
 
     @Before
     public void setUp() throws Exception {
-        cleaner = new ApplicationMenuCleaner(applicationService, MAX_RESULTS);
+        given(options.getNumberOfResults()).willReturn(MAX_RESULTS);
     }
 
     @Test

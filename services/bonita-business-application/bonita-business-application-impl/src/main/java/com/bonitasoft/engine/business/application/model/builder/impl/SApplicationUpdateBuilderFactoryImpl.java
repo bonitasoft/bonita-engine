@@ -27,8 +27,7 @@ public class SApplicationUpdateBuilderFactoryImpl implements SApplicationUpdateB
 
     @Override
     public SApplicationUpdateBuilder createNewInstance() {
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        return new SApplicationUpdateBuilderImpl(descriptor);
+        return new SApplicationUpdateBuilderImpl();
     }
 
 }
