@@ -28,30 +28,26 @@ public final class SAXMLObjectDataInstanceImpl extends SADataInstanceImpl {
 
     private String value;
 
-    private final XStreamFactory xStreamFactory;
-
     public SAXMLObjectDataInstanceImpl() {
         super();
-        xStreamFactory = new XStreamFactory();
     }
 
     public SAXMLObjectDataInstanceImpl(final SDataInstance sDataInstance) {
         super(sDataInstance);
-        xStreamFactory = new XStreamFactory();
         setValue(sDataInstance.getValue());
     }
 
     @Override
     public Serializable getValue() {
         if (value != null) {
-            return (Serializable) xStreamFactory.getXStream().fromXML(value);
+            return (Serializable) XStreamFactory.getXStream().fromXML(value);
         }
         return null;
     }
 
     @Override
     public void setValue(final Serializable value) {
-        this.value = xStreamFactory.getXStream().toXML(value);
+        this.value = XStreamFactory.getXStream().toXML(value);
     }
 
     @Override

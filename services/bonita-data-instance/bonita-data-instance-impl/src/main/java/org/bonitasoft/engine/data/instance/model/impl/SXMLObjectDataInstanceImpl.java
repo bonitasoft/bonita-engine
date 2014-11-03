@@ -27,16 +27,12 @@ public final class SXMLObjectDataInstanceImpl extends SDataInstanceImpl {
 
     private String value;
 
-    private final XStreamFactory xStreamFactory;
-
     public SXMLObjectDataInstanceImpl() {
         super();
-        xStreamFactory = new XStreamFactory();
     }
 
     public SXMLObjectDataInstanceImpl(final SDataDefinition dataDefinition) {
         super(dataDefinition);
-        xStreamFactory = new XStreamFactory();
     }
 
     @Override
@@ -55,12 +51,12 @@ public final class SXMLObjectDataInstanceImpl extends SDataInstanceImpl {
     }
 
     private String convert(final Serializable value) {
-        return xStreamFactory.getXStream().toXML(value);
+        return XStreamFactory.getXStream().toXML(value);
     }
 
     private Serializable revert(final String value) {
         if (value != null) {
-            return (Serializable) xStreamFactory.getXStream().fromXML(value);
+            return (Serializable) XStreamFactory.getXStream().fromXML(value);
         }
         return null;
     }
