@@ -615,7 +615,7 @@ public class ApplicationServiceImplTest {
     public void updateApplication_should_call_recorder_recordUpdate_and_return_updated_object() throws Exception {
         //given
         final SApplicationUpdateBuilder updateBuilder = new SApplicationUpdateBuilderFactoryImpl().createNewInstance();
-        updateBuilder.updateHomePageId(150L);
+        updateBuilder.updateDisplayName("new display name");
         final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
 
         final int applicationId = 17;
@@ -632,6 +632,27 @@ public class ApplicationServiceImplTest {
                 .setObject(application).done();
         verify(recorder, times(1)).recordUpdate(updateRecord, updateEvent);
         assertThat(updatedApplication).isEqualTo(application);
+    }
+
+    @Test(expected = SObjectModificationException.class)
+    public void updateApplication_should_throw_SObjectModificationException_if_set_homepage_references_invalid_page() throws Exception {
+        //given
+        final SApplicationUpdateBuilder updateBuilder = new SApplicationUpdateBuilderFactoryImpl().createNewInstance();
+        long homePageId = 150L;
+        updateBuilder.updateHomePageId(homePageId);
+        final EntityUpdateDescriptor updateDescriptor = updateBuilder.done();
+
+        final int applicationId = 17;
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplication>("getApplicationById", SApplication.class, applicationId))).willReturn(
+                application);
+
+        given(persistenceService.selectById(new SelectByIdDescriptor<SApplicationPage>("getApplicationPageById", SApplicationPage.class, homePageId))).willReturn(
+                null);
+
+        //when
+        applicationServiceActive.updateApplication(applicationId, updateDescriptor);
+
+        //then exception
     }
 
     @Test(expected = SObjectNotFoundException.class)
@@ -670,7 +691,6 @@ public class ApplicationServiceImplTest {
         //given
         ApplicationServiceImpl applicationService = spy(applicationServiceActive);
         final SApplicationUpdateBuilder updateBuilder = new SApplicationUpdateBuilderFactoryImpl().createNewInstance();
-        updateBuilder.updateHomePageId(150L);
         final EntityUpdateDescriptor updateDescriptor = updateBuilder.updateToken("newToken").done();
 
         final int applicationId = 17;

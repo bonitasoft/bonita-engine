@@ -259,10 +259,16 @@ public class ApplicationServiceImpl implements ApplicationService {
             throws SObjectModificationException, SInvalidTokenException, SInvalidDisplayNameException, SObjectNotFoundException, SObjectAlreadyExistsException {
         checkLicense();
         final String methodName = "updateApplication";
-        final long now = System.currentTimeMillis();
         final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.UPDATED, "Updating application with id " + applicationId);
 
         try {
+            Long homePageId = (Long) updateDescriptor.getFields().get(SApplicationFields.HOME_PAGE_ID);
+            if(homePageId != null) {
+                SApplicationPage applicationPage = executeGetApplicationPageById(homePageId);
+                if(applicationPage == null) {
+                    throw new SObjectModificationException("Invalid home page id: No application page found with id '" + homePageId + "'");
+                }
+            }
             final SApplication application = getApplication(applicationId);
             return updateApplication(application, updateDescriptor);
 
@@ -430,12 +436,16 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public SApplicationPage getApplicationPage(final long applicationPageId) throws SBonitaReadException, SObjectNotFoundException {
-        final SApplicationPage applicationPage = persistenceService
-                .selectById(new SelectByIdDescriptor<SApplicationPage>("getApplicationPageById", SApplicationPage.class, applicationPageId));
+        final SApplicationPage applicationPage = executeGetApplicationPageById(applicationPageId);
         if (applicationPage == null) {
             throw new SObjectNotFoundException("No application page found with id '" + applicationPageId + "'.");
         }
         return applicationPage;
+    }
+
+    private SApplicationPage executeGetApplicationPageById(long applicationPageId) throws SBonitaReadException {
+        return persistenceService
+                .selectById(new SelectByIdDescriptor<SApplicationPage>("getApplicationPageById", SApplicationPage.class, applicationPageId));
     }
 
     @Override
