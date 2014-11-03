@@ -94,8 +94,6 @@ ALTER TABLE business_app ADD CONSTRAINT fk_app_tenantId FOREIGN KEY (tenantid) R
 GO
 ALTER TABLE business_app ADD CONSTRAINT fk_app_profileId FOREIGN KEY (tenantid, profileId) REFERENCES profile (tenantid, id)
 GO
-ALTER TABLE business_app ADD CONSTRAINT fk_app_homepageId FOREIGN KEY (tenantid, homePageId) REFERENCES business_app_page (tenantid, id)
-GO
 ALTER TABLE business_app_page ADD CONSTRAINT fk_app_page_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
 GO
 ALTER TABLE business_app_page ADD CONSTRAINT fk_bus_app_id FOREIGN KEY (tenantid, applicationId) REFERENCES business_app (tenantid, id) ON DELETE CASCADE
