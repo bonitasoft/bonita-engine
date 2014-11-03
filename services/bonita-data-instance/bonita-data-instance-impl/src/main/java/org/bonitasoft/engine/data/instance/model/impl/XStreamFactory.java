@@ -1,24 +1,22 @@
 package org.bonitasoft.engine.data.instance.model.impl;
 
+import java.util.Map;
+import java.util.WeakHashMap;
+
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 public class XStreamFactory {
 
-    private final Object lock = new Object();
-    private static XStream xstream;
+    private static final Map<ClassLoader, XStream> XSTREAM_MAP = new WeakHashMap<ClassLoader, XStream>();
 
-    public XStream getXStream() {
-        synchronized (lock) {
-            if (xstream == null) {
-                createXStream();
-            }
+    public static XStream getXStream() {
+        final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        XStream xStream = XSTREAM_MAP.get(classLoader);
+        if (xStream == null) {
+            xStream = new XStream(new StaxDriver());
+            XSTREAM_MAP.put(classLoader, xStream);
         }
-        return xstream;
+        return xStream;
     }
-
-    private void createXStream() {
-        xstream = new XStream(new StaxDriver());
-    }
-
 }
