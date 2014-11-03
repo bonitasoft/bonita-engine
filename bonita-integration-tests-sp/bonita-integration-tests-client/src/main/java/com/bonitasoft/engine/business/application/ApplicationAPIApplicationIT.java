@@ -298,6 +298,36 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         applicationAPI.deleteApplication(marketing.getId());
     }
 
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "filter on profileId",
+            "no search term" })
+    @Test
+    public void searchApplications_can_filter_on_profileId() throws Exception {
+        //given
+        Profile profile = getProfileAPI().createProfile("engineering", "Engineering");
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "HR dash board", "1.0");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
+        engineeringCreator.setProfileId(profile.getId());
+        final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
+
+        final Application hr = applicationAPI.createApplication(hrCreator);
+        final Application engineering = applicationAPI.createApplication(engineeringCreator);
+        final Application marketing = applicationAPI.createApplication(marketingCreator);
+
+        //when
+        final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationSearchDescriptor.PROFILE_ID, profile.getId());
+
+        final SearchResult<Application> applications = applicationAPI.searchApplications(builder.done());
+        assertThat(applications).isNotNull();
+        assertThat(applications.getCount()).isEqualTo(1);
+        assertThat(applications.getResult()).containsExactly(engineering);
+
+        applicationAPI.deleteApplication(hr.getId());
+        applicationAPI.deleteApplication(engineering.getId());
+        applicationAPI.deleteApplication(marketing.getId());
+        getProfileAPI().deleteProfile(profile.getId());
+    }
+
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "no filter",
     "search term" })
     @Test
