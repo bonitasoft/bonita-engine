@@ -77,4 +77,12 @@ public class ApplicationSearchDescriptor {
      */
     public static final String STATE = "state";
 
+    /**
+     * Used to filter or order by the identifier of {@link org.bonitasoft.engine.profile.Profile} associated to the {@link com.bonitasoft.engine.business.application.Application}.
+     *
+     * @see org.bonitasoft.engine.profile.Profile
+     * @see com.bonitasoft.engine.business.application.Application
+     */
+    public static final String PROFILE_ID = "profileId";
+
 }
