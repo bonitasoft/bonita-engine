@@ -58,10 +58,10 @@ public class PermissionAPIImplTest {
     @Test
     public void should_executeSecurityScript_call_the_service() throws Exception {
         //given all ok
-        doReturn(true).when(permissionService).checkAPICallWithScript("myScript", apiCallContext);
+        doReturn(true).when(permissionService).checkAPICallWithScript("myScript", apiCallContext, false);
 
         //when
-        boolean isAllowed = permissionAPI.checkAPICallWithScript("myScript", apiCallContext);
+        boolean isAllowed = permissionAPI.checkAPICallWithScript("myScript", apiCallContext, false);
 
         //then
         assertThat(isAllowed).isTrue();
@@ -70,21 +70,21 @@ public class PermissionAPIImplTest {
     @Test
     public void should_executeSecurityScript_throw_not_found_exception_when_file_does_not_exists() throws Exception {
         //given
-        doThrow(ClassNotFoundException.class).when(permissionService).checkAPICallWithScript("myScript", apiCallContext);
+        doThrow(ClassNotFoundException.class).when(permissionService).checkAPICallWithScript("myScript", apiCallContext, false);
 
         expectedException.expect(NotFoundException.class);
         expectedException.expectMessage(containsString("the class myScript is not found"));
         //when
-        permissionAPI.checkAPICallWithScript("myScript", apiCallContext);
+        permissionAPI.checkAPICallWithScript("myScript", apiCallContext, false);
     }
 
     @Test
     public void should_executeSecurityScript_throw_execution_exception() throws Exception {
         //given
-        doThrow(SExecutionException.class).when(permissionService).checkAPICallWithScript("myScript", apiCallContext);
+        doThrow(SExecutionException.class).when(permissionService).checkAPICallWithScript("myScript", apiCallContext, false);
 
         expectedException.expect(ExecutionException.class);
         //when
-        permissionAPI.checkAPICallWithScript("myScript", apiCallContext);
+        permissionAPI.checkAPICallWithScript("myScript", apiCallContext, false);
     }
 }

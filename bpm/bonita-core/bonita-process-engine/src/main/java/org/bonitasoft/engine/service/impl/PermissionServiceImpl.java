@@ -62,11 +62,17 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public boolean checkAPICallWithScript(String className, APICallContext context) throws SExecutionException, ClassNotFoundException {
+    public boolean checkAPICallWithScript(String className, APICallContext context, boolean reload) throws SExecutionException, ClassNotFoundException {
         checkStarted();
         SSession session;
         //groovy class loader load class from files and cache then when loaded, no need to do some lazy loading or load all class on start
-        Class aClass = Class.forName(className, true, groovyClassLoader);
+        Class aClass;
+        if(reload){
+            groovyClassLoader.clearCache();
+            aClass = groovyClassLoader.loadClass(className,true,true,true);
+        }else{
+            aClass = Class.forName(className,true,groovyClassLoader);
+        }
         if(!PermissionRule.class.isAssignableFrom(aClass)){
             throw new SExecutionException("The class "+aClass.getName()+" does not implements org.bonitasoft.engine.api.permission.PermissionRule");
         }
@@ -89,6 +95,8 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public void start() throws SBonitaException {
         groovyClassLoader = new GroovyClassLoader(classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId));
+        groovyClassLoader.setShouldRecompile(true);
+
         File file = new File(scriptFolder);
         if (file.exists() && file.isDirectory()) {
             groovyClassLoader.addClasspath(file.getAbsolutePath());
@@ -116,3 +124,5 @@ public class PermissionServiceImpl implements PermissionService {
         start();
     }
 }
+
+

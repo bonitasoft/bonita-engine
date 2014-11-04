@@ -39,10 +39,12 @@ public interface PermissionAPI {
      *        the name of the class of the rule
      * @param apiCallContext
      *        the context of the api call
+     * @param reload
+     *        reload class when calling this method, warning if some class were called with reload set to false, they will never be reloadable
      * @return true if the user is permitted to make the api call
      * @throws ExecutionException
      *         If there is an exception while executing the script
      * @since 6.4.0
      */
-    boolean checkAPICallWithScript(String className, APICallContext apiCallContext) throws ExecutionException, NotFoundException;
+    boolean checkAPICallWithScript(String className, APICallContext apiCallContext, boolean reload) throws ExecutionException, NotFoundException;
 }

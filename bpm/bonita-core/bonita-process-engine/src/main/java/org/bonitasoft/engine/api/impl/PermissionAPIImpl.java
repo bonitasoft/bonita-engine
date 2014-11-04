@@ -30,11 +30,11 @@ import org.bonitasoft.engine.service.TenantServiceSingleton;
 public class PermissionAPIImpl implements PermissionAPI {
 
     @Override
-    public boolean checkAPICallWithScript(String className, APICallContext context) throws ExecutionException, NotFoundException {
+    public boolean checkAPICallWithScript(String className, APICallContext context, boolean reload) throws ExecutionException, NotFoundException {
         TenantServiceAccessor serviceAccessor = getTenantServiceAccessor();
         PermissionService permissionService = serviceAccessor.getPermissionService();
         try {
-            return permissionService.checkAPICallWithScript(className, context);
+            return permissionService.checkAPICallWithScript(className, context, reload);
         } catch (SExecutionException e) {
             throw new ExecutionException("Unable to execute the security rule " + className + " for the api call " + context, e);
         } catch (ClassNotFoundException e) {

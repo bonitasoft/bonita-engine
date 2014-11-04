@@ -16,6 +16,7 @@
 package org.bonitasoft.engine.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -90,7 +91,7 @@ public class PermissionServiceImplTest {
         //when
         expectedException.expect(SExecutionException.class);
         expectedException.expectMessage(containsString("not started"));
-        permissionService.checkAPICallWithScript("plop", new APICallContext());
+        permissionService.checkAPICallWithScript("plop", new APICallContext(), false);
     }
 
     @Test
@@ -141,7 +142,7 @@ public class PermissionServiceImplTest {
         expectedException.expectMessage(containsString("not started"));
 
         //when
-        permissionService.checkAPICallWithScript("plop", new APICallContext());
+        permissionService.checkAPICallWithScript("plop", new APICallContext(), false);
     }
 
     @Test
@@ -152,7 +153,7 @@ public class PermissionServiceImplTest {
         expectedException.expectMessage(containsString("does not implements org.bonitasoft.engine.api.permission.PermissionRule"));
 
         //when
-        permissionService.checkAPICallWithScript(String.class.getName(), new APICallContext());
+        permissionService.checkAPICallWithScript(String.class.getName(), new APICallContext(), false);
     }
 
     @Test
@@ -177,10 +178,87 @@ public class PermissionServiceImplTest {
         permissionService.start();
 
         //when
-        boolean myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext());
+        boolean myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), false);
 
         assertThat(myCustomRule).isTrue();
         verify(logger).log(argThat(new HasName("MyCustomRule")), eq(TechnicalLogSeverity.WARNING), eq("Executing my custom rule"));
+    }
+
+/*
+    @Test
+    public void perf() throws SBonitaException, ClassNotFoundException, IOException {
+        //given
+        FileUtils.writeStringToFile(new File(scriptFolder, "MyCustomRule.groovy"), "" +
+                "import org.bonitasoft.engine.api.APIAccessor\n" +
+                "import org.bonitasoft.engine.api.Logger\n" +
+                "import org.bonitasoft.engine.api.permission.APICallContext\n" +
+                "import org.bonitasoft.engine.api.permission.PermissionRule\n" +
+                "import org.bonitasoft.engine.session.APISession\n" +
+                "\n" +
+                "class MyCustomRule implements PermissionRule {\n" +
+                "    @Override\n" +
+                "    boolean check(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
+                "        logger.warning(\"Executing my custom rule\")\n" +
+                "        return true\n" +
+                "    }\n" +
+                "}" +
+                "");
+
+        permissionService.start();
+
+        long before = System.nanoTime();
+        //when
+        for (int i = 0; i < 25000; i++) {
+
+            boolean myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), false);
+
+            assertThat(myCustomRule).isTrue();
+        }
+        fail("time= "+(System.nanoTime()-before)/250000);
+    }*/
+
+
+    @Test
+    public void should_checkAPICallWithScript_reload_classes() throws SBonitaException, ClassNotFoundException, IOException, InterruptedException {
+        //given
+        permissionService.start();
+        FileUtils.writeStringToFile(new File(scriptFolder, "MyCustomRule.groovy"), "" +
+                "import org.bonitasoft.engine.api.APIAccessor\n" +
+                "import org.bonitasoft.engine.api.Logger\n" +
+                "import org.bonitasoft.engine.api.permission.APICallContext\n" +
+                "import org.bonitasoft.engine.api.permission.PermissionRule\n" +
+                "import org.bonitasoft.engine.session.APISession\n" +
+                "\n" +
+                "class MyCustomRule implements PermissionRule {\n" +
+                "    @Override\n" +
+                "    boolean check(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
+                "        return true\n" +
+                "    }\n" +
+                "}" +
+                "");
+
+
+        //when
+        boolean myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), true);
+
+        assertThat(myCustomRule).isTrue();
+        FileUtils.writeStringToFile(new File(scriptFolder, "MyCustomRule.groovy"), "" +
+                "import org.bonitasoft.engine.api.APIAccessor\n" +
+                "import org.bonitasoft.engine.api.Logger\n" +
+                "import org.bonitasoft.engine.api.permission.APICallContext\n" +
+                "import org.bonitasoft.engine.api.permission.PermissionRule\n" +
+                "import org.bonitasoft.engine.session.APISession\n" +
+                "\n" +
+                "class MyCustomRule implements PermissionRule {\n" +
+                "    @Override\n" +
+                "    boolean check(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
+                "        return false\n" +
+                "    }\n" +
+                "}" +
+                "");
+        myCustomRule = permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), true);
+
+        assertThat(myCustomRule).isFalse();
     }
 
 
@@ -208,7 +286,7 @@ public class PermissionServiceImplTest {
         expectedException.expect(SExecutionException.class);
         expectedException.expectCause(CoreMatchers.<Throwable>instanceOf(RuntimeException.class));
         //when
-        permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext());
+        permissionService.checkAPICallWithScript("MyCustomRule", new APICallContext(), false);
     }
 
     @Test
@@ -218,7 +296,7 @@ public class PermissionServiceImplTest {
         expectedException.expect(ClassNotFoundException.class);
 
         //when
-        permissionService.checkAPICallWithScript("plop", new APICallContext());
+        permissionService.checkAPICallWithScript("plop", new APICallContext(), false);
     }
 
     private static class HasName extends BaseMatcher<Class> {

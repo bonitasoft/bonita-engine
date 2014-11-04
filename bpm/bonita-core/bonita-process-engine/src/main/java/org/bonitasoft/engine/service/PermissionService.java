@@ -31,7 +31,9 @@ public interface PermissionService extends TenantLifecycleService {
      *        the class name of the rule to execute
      * @param context
      *        the context of the api call to check
+     * @param reload
+     *        reload class when calling this method, warning if some class were called with reload set to false, they will never be reloadable
      * @return true if the security script allows the user to make the api call
      */
-    boolean checkAPICallWithScript(String className, APICallContext context) throws SExecutionException, ClassNotFoundException;
+    boolean checkAPICallWithScript(String className, APICallContext context, boolean reload) throws SExecutionException, ClassNotFoundException;
 }

@@ -21,11 +21,7 @@ import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
-import org.assertj.core.api.Assertions;
-import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.api.permission.APICallContext;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.io.IOUtil;
@@ -34,11 +30,8 @@ import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.service.PermissionService;
-import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -68,7 +61,7 @@ public class PermissionAPIIT extends CommonAPILocalTest {
 
         exception.expect(ExecutionException.class);
         //when
-        getPermissionAPI().checkAPICallWithScript("RuleWithException", apiCallContext);
+        getPermissionAPI().checkAPICallWithScript("RuleWithException", apiCallContext, false);
 
         //then: ExecutionException
     }
@@ -84,11 +77,11 @@ public class PermissionAPIIT extends CommonAPILocalTest {
 
         //when
         loginOnDefaultTenantWith("jack","bpm");
-        boolean jackResult = getPermissionAPI().checkAPICallWithScript("org.test.MyRule", new APICallContext("GET", "identity", "user", String.valueOf(jack.getId()), "query", "body"));
+        boolean jackResult = getPermissionAPI().checkAPICallWithScript("org.test.MyRule", new APICallContext("GET", "identity", "user", String.valueOf(jack.getId()), "query", "body"), false);
         logoutOnTenant();
         loginOnDefaultTenantWith("john","bpm");
-        boolean johnResult = getPermissionAPI().checkAPICallWithScript("org.test.MyRule", new APICallContext("GET", "identity", "user", String.valueOf(john.getId()), "query", "body"));
-        boolean johnResultOnOtherAPI = getPermissionAPI().checkAPICallWithScript("org.test.MyRule", new APICallContext("GET", "identity", "user", String.valueOf(jack.getId()), "query", "body"));
+        boolean johnResult = getPermissionAPI().checkAPICallWithScript("org.test.MyRule", new APICallContext("GET", "identity", "user", String.valueOf(john.getId()), "query", "body"), false);
+        boolean johnResultOnOtherAPI = getPermissionAPI().checkAPICallWithScript("org.test.MyRule", new APICallContext("GET", "identity", "user", String.valueOf(jack.getId()), "query", "body"), false);
 
         //then: ExecutionException
         assertThat(jackResult).isFalse();
@@ -106,7 +99,7 @@ public class PermissionAPIIT extends CommonAPILocalTest {
 
         exception.expect(NotFoundException.class);
         //when
-        getPermissionAPI().checkAPICallWithScript("unknown", apiCallContext);
+        getPermissionAPI().checkAPICallWithScript("unknown", apiCallContext, false);
 
         //then: ExecutionException
     }
