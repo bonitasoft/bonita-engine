@@ -38,7 +38,7 @@ public class SearchWaitingEventsCommand extends CommandWithParameters {
 
     /**
      * @param parameters
-     *            searchOptions: the searchOptions
+     *        searchOptions: the searchOptions
      */
     @Override
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)

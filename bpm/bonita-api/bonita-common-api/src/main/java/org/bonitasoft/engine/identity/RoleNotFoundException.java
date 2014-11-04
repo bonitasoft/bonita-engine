@@ -16,13 +16,22 @@ package org.bonitasoft.engine.identity;
 import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
+ * thrown when a {@link Role} is not found in organization
+ *
  * @author Bole Zhang
  * @author Matthieu Chaffotte
+ * @see Role
+ * @since 6.0.0
  */
 public class RoleNotFoundException extends NotFoundException {
 
     private static final long serialVersionUID = 7582998881291080021L;
 
+    /**
+     * creates a new exception instance with the given exception as cause
+     *
+     * @param cause the exception cause
+     */
     public RoleNotFoundException(final Throwable cause) {
         super(cause);
     }

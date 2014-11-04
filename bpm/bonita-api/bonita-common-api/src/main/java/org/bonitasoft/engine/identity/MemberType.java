@@ -14,11 +14,33 @@
 package org.bonitasoft.engine.identity;
 
 /**
+ * lists the membership types
+ *
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
+ * @see UserMembership
+ * @since 6.0.0
  */
 public enum MemberType {
 
-    USER, GROUP, ROLE, MEMBERSHIP;
+    /**
+     * User membership
+     */
+    USER,
+
+    /**
+     * Group membership
+     */
+    GROUP,
+
+    /**
+     * Role membership
+     */
+    ROLE,
+
+    /**
+     * Group and Role membership
+     */
+    MEMBERSHIP;
 
 }

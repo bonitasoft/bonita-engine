@@ -15,19 +15,70 @@ package org.bonitasoft.engine.platform;
 
 import java.io.Serializable;
 
+import org.bonitasoft.engine.api.PlatformAPI;
+
 /**
+ * Contains information about the <code>Bonita BPM Platform</code>.
+ * <p>
+ * The <code>platform</code> is the base on which runs the <code>Bonita BPM Engine</code>. There is only one platform for a running <code>Bonita BPM
+ * Engine</code>.
+ * <p>
+ * In order to perform actions on the platform, please, refer to the {@link PlatformAPI}
+ *
  * @author Matthieu Chaffotte
+ * @see PlatformAPI
+ * @since 6.0.0
  */
 public interface Platform extends Serializable {
 
+    /**
+     * Retrieves the <code>platform</code> version
+     *
+     * @return a String representing the <code>platform</code> version
+     * @see #getPreviousVersion()
+     * @see #getInitialVersion()
+     */
     String getVersion();
 
+    /**
+     * Retrieves the <code>platform</code> previous version. This information only will be set if you have installed the <code>Bonita BPM engine</code> in a
+     * previous
+     * version before upgrading to a new version using the <code>Bonita BPM Migration Tool</code>. Otherwise, this method will return an empty string.
+     * <p>
+     * For instance, if you have migrated from version 6.3.3 to version 6.3.4, <code>getPreviousVersion</code> will return 6.3.3 and {@link #getVersion()} will
+     * return 6.3.4.
+     *
+     * @return a String representing the <code>platform</code> previous version
+     * @see #getVersion()
+     * @see #getInitialVersion()
+     */
     String getPreviousVersion();
 
+    /**
+     * Retrieves the <code>platform</code> initial version. That is, the Bonita BPM version in which you have initially created the platform before migrating
+     * to the current version.
+     * <p>
+     * For instance, if you have created your platform in the version 6.1.0 and have migrated to the version 6.3.4 using the <code>Bonita BPM Migration
+     * Tool</code>, {@code getInitialVersion} will return 6.1.0, {@link #getPreviousVersion()} will return 6.3.3 and {@link #getVersion()} will return 6.3.4.
+     *
+     * @return a String representing the <code>platform</code> initial version
+     * @see #getVersion()
+     * @see #getPreviousVersion()
+     */
     String getInitialVersion();
 
+    /**
+     * Retrieves the timestamp at which the platform was created
+     *
+     * @return a long representing the timestamp at which the platform was created
+     */
     long getCreated();
 
+    /**
+     * Retrieves the name of the platform technical user that created the platform
+     *
+     * @return a String representing the name of the platform technical user that created the platform
+     */
     String getCreatedBy();
 
 }

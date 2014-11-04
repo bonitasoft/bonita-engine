@@ -18,8 +18,14 @@ import java.io.File;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 
 /**
+ * Utility class to retrieve the bonita home based on the system property <code>bonita.home</code>
+ * <p>
+ * The bonita home is the folder containing all configuration files and working directories
+ * </p>
+ * 
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
+ * @since 6.0.0
  */
 public abstract class BonitaHome {
 
@@ -27,6 +33,12 @@ public abstract class BonitaHome {
 
     private String home;
 
+    /**
+     * @return the path to the bonita home
+     * @throws BonitaHomeNotSetException
+     *         when bonita.home system property is not set
+     * @since 6.0.0
+     */
     public final String getBonitaHomeFolder() throws BonitaHomeNotSetException {
         if (this.home == null) {// once set bonita home will never change
             String path = System.getProperty(BONITA_HOME);

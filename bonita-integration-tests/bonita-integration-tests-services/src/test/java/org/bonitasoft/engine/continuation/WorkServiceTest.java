@@ -1,13 +1,9 @@
 package org.bonitasoft.engine.continuation;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.bonitasoft.engine.CommonServiceTest;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -29,20 +25,6 @@ public class WorkServiceTest extends CommonServiceTest {
         getWorkService().stop();
     }
 
-    @Test
-    public void testContinuation() throws Exception {
-        final Logger logger = Logger.getLogger(this.getClass().getName());
-        logger.setLevel(Level.FINEST);
-        logger.addHandler(new ConsoleHandler());
-        getTransactionService().begin();
-        final List<String> works = new ArrayList<String>();
-        getWorkService().registerWork(new ListAdder(works, "1"));
-        getTransactionService().complete();
-        Thread.sleep(1000);
-        assertEquals(1, works.size());
-        assertTrue(works.contains("1"));
-    }
-
     @Test(expected = SWorkRegisterException.class)
     public void testWorkOnNotActiveTransaction() throws Exception {
         final List<String> works = new ArrayList<String>();
@@ -56,16 +38,16 @@ public class WorkServiceTest extends CommonServiceTest {
         final WorkService workService = getWorkService();
         workService.registerWork(new ListAdder(works, "1"));
         getTransactionService().complete();
-        Thread.sleep(100);
-        assertEquals(1, works.size());
-        assertTrue(works.contains("1"));
+
+        waitFor(1, works);
+        assertThat(works).contains("1");
 
         getTransactionService().begin();
         workService.registerWork(new ListAdder(works, "2"));
         getTransactionService().complete();
-        Thread.sleep(100);
-        assertEquals(2, works.size());
-        assertTrue(works.contains("2"));
+
+        waitFor(2, works);
+        assertThat(works).contains("2");
     }
 
     @Test
@@ -77,17 +59,23 @@ public class WorkServiceTest extends CommonServiceTest {
         getWorkService().registerWork(new ListAdder(works, "3"));
         getWorkService().registerWork(new ListAdder(works, "4"));
         getWorkService().registerWork(new ListAdder(works, "5"));
-        getWorkService().registerWork(new ListAdder(works, "6"));
 
         getTransactionService().complete();
-        Thread.sleep(100);
-        assertEquals(6, works.size());
-        assertTrue(works.contains("1"));
-        assertTrue(works.contains("2"));
-        assertTrue(works.contains("3"));
-        assertTrue(works.contains("4"));
-        assertTrue(works.contains("5"));
-        assertTrue(works.contains("6"));
+        waitFor(5, works);
+        assertThat(works).contains("1", "2", "3", "4", "5");
+    }
+
+    public void waitFor(final int number, final List<String> works) throws InterruptedException {
+        final long timeout = System.currentTimeMillis() + 2000;
+        boolean reached = false;
+        do {
+            if (works.size() == number) {
+                reached = true;
+            } else {
+                Thread.sleep(50);
+            }
+        } while (!reached || timeout < System.currentTimeMillis());
+        assertThat(reached).isTrue();
     }
 
 }

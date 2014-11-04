@@ -325,4 +325,17 @@ public class ExecutorWorkServiceTest {
         verify(loggerService, times(1)).log(any(Class.class), eq(TechnicalLogSeverity.WARNING), contains("Interrupted"), any(InterruptedException.class));
     }
 
+    @Test
+    public void registerWorkAddTheWorkToTheTransactionSynchronization() throws SBonitaException {
+        // given
+        workService.start();
+
+        // when
+        final BonitaWork bonitaWork = createBonitaWork();
+        workService.registerWork(bonitaWork);
+
+        // then
+        verify(abstractWorkSynchronization).addWork(bonitaWork);
+    }
+
 }
