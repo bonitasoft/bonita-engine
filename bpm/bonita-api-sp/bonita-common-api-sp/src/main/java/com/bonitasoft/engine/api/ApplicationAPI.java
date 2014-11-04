@@ -267,7 +267,14 @@ public interface ApplicationAPI {
      */
     SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions) throws SearchException;
 
-    byte[] exportApplications(long[] profileIds) throws ExecutionException;
+    /**
+     * Exports the {@link com.bonitasoft.engine.business.application.Application}s which identifier is in {@code applicationIds}
+     * @param applicationIds the identifiers of {@code Application}s to be exported
+     * @return a byte array representing the content of XML file containing the exported {@code Application}s
+     * @throws ExecutionException if an exception occurs during the export.
+     * @see com.bonitasoft.engine.business.application.Application
+     */
+    byte[] exportApplications(long... applicationIds) throws ExecutionException;
 
     List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy) throws ExecutionException;
 

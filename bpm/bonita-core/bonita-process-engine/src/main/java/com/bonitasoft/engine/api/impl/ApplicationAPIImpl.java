@@ -11,6 +11,7 @@ package com.bonitasoft.engine.api.impl;
 import java.util.Collections;
 import java.util.List;
 
+import com.bonitasoft.engine.api.impl.application.ApplicationExporterDeletegate;
 import com.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import com.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import com.bonitasoft.engine.business.application.ApplicationPageUpdater;
@@ -112,6 +113,11 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         return delegate;
     }
 
+    private ApplicationExporterDeletegate getApplicationExporterDelegate() {
+        TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        return new ApplicationExporterDeletegate(tenantAccessor.getApplicationExportService());
+    }
+
     @Override
     public Application getApplication(final long applicationId) throws ApplicationNotFoundException {
         return getApplicationAPIDelegate().getApplication(applicationId);
@@ -208,8 +214,8 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public byte[] exportApplications(long[] profileIds) throws ExecutionException {
-        return new byte[0];
+    public byte[] exportApplications(long... applicationIds) throws ExecutionException {
+        return getApplicationExporterDelegate().exportApplications(applicationIds);
     }
 
     @Override

@@ -17,16 +17,16 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchema;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-@XmlRootElement
+@XmlRootElement(name = "applications")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ApplicationNodeContainer {
 
-    @XmlElementWrapper(name = "applications", required = true)
-    @XmlElement(name = "application", required = true)
+    @XmlElement(name = "application")
     private List<ApplicationNode> applications;
 
     public ApplicationNodeContainer() {

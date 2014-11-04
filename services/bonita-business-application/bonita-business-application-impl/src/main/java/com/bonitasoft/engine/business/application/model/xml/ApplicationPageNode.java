@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ApplicationPageNode {
 
-    @XmlElement
+    @XmlAttribute(required = true)
     private String customPage;
 
     @XmlAttribute(required = true)

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ Copyright (C) 2014 BonitaSoft S.A.
+  ~ BonitaSoft is a trademark of BonitaSoft SA.
+  ~ This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+  ~ For commercial licensing information, contact:
+  ~ BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+  ~ or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+<applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.0">
+    <application state="DEACTIVATED" version="2.0" token="HR-dashboard">
+        <displayName>My HR dashboard</displayName>
+    </application>
+    <application state="DEACTIVATED" version="2.0" token="My">
+        <displayName>Marketing</displayName>
+    </application>
+</applications>

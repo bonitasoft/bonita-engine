@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.service;
 
+import com.bonitasoft.engine.business.application.ApplicationExportService;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
@@ -45,4 +46,7 @@ public interface TenantServiceAccessor extends org.bonitasoft.engine.service.Ten
     RefBusinessDataService getRefBusinessDataService();
 
     ApplicationService getApplicationService();
+
+    ApplicationExportService getApplicationExportService();
+
 }

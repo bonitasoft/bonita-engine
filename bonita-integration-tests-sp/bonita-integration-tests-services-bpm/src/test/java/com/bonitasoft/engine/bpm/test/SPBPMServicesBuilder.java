@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bpm.test;
 
+import com.bonitasoft.engine.business.application.ApplicationExportService;
 import org.bonitasoft.engine.bpm.BPMServicesBuilder;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
@@ -129,4 +130,8 @@ public class SPBPMServicesBuilder extends BPMServicesBuilder implements Platform
         return getInstanceOf(ApplicationService.class);
     }
 
+    @Override
+    public ApplicationExportService getApplicationExportService() {
+        return getInstanceOf(ApplicationExportService.class);
+    }
 }

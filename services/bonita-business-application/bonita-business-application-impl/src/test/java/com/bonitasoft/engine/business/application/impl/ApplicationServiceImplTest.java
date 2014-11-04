@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bonitasoft.engine.business.application.impl.converter.MenuIndexConverter;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -107,7 +108,7 @@ public class ApplicationServiceImplTest {
     private IndexManager indexManager;
 
     @Mock
-    private MenuIndexConvertor convertor;
+    private MenuIndexConverter convertor;
 
     @Mock
     private ApplicationDestructor applicationDestructor;
