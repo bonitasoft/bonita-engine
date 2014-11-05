@@ -22,10 +22,6 @@ import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserMembership;
-import org.bonitasoft.engine.identity.model.builder.SGroupBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SRoleBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SUserBuilderFactory;
-import org.bonitasoft.engine.identity.model.builder.SUserMembershipBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -610,7 +606,7 @@ public interface IdentityService {
      *         if an exception occurs when trying to retrieve the custom user info definition
      */
     SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(String name) throws SCustomUserInfoDefinitionNotFoundException,
-    SCustomUserInfoDefinitionReadException;
+            SCustomUserInfoDefinitionReadException;
 
     /**
      * Verify if there is a {@link SCustomUserInfoDefinition} of the given name
@@ -825,7 +821,7 @@ public interface IdentityService {
      *         TODO
      */
     SCustomUserInfoDefinition createCustomUserInfoDefinition(SCustomUserInfoDefinition customUserInfo) throws SCustomUserInfoDefinitionAlreadyExistsException,
-    SCustomUserInfoDefinitionCreationException;
+            SCustomUserInfoDefinitionCreationException;
 
     /**
      * Update customUserInfoDefinition according to the descriptor

@@ -99,6 +99,7 @@ public class DataDefinitionBuilder extends FlowElementContainerBuilder implement
 
     /**
      * Marks this data as transient
+     * 
      * @return
      */
     public DataDefinitionBuilder isTransient() {

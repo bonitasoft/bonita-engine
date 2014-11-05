@@ -36,6 +36,7 @@
                
                <!-- GLUPSSSS Needed by process instance queries -->
                <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.hbm.xml</value>
+               <value>/org/bonitasoft/engine/core/process/instance/model/impl/hibernate/archived.process.instance.queries.hbm.xml</value>
            </list>
        </property>
        <property name="hibernateProperties">

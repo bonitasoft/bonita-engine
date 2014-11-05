@@ -35,7 +35,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.profile.builder.SProfileEntryUpdateBuilder;
@@ -87,9 +86,8 @@ public class ProfileServiceImplForProfileEntryTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#createProfileEntry(org.bonitasoft.engine.profile.model.SProfileEntry)}.
-     * 
+     *
      * @param l
-     * 
      * @throws SRecorderException
      * @throws SProfileEntryCreationException
      */
@@ -130,7 +128,7 @@ public class ProfileServiceImplForProfileEntryTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#deleteProfileEntry(long)}.
-     * 
+     *
      * @throws SProfileEntryDeletionException
      * @throws SProfileEntryNotFoundException
      * @throws SBonitaReadException
@@ -168,7 +166,7 @@ public class ProfileServiceImplForProfileEntryTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#deleteProfileEntry(org.bonitasoft.engine.profile.model.SProfileEntry)}.
-     * 
+     *
      * @throws SRecorderException
      * @throws SProfileEntryDeletionException
      */
@@ -202,7 +200,7 @@ public class ProfileServiceImplForProfileEntryTest {
      * Test method for
      * {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getEntriesOfProfileByParentId(long, long, int, int, java.lang.String, org.bonitasoft.engine.persistence.OrderByType)}
      * .
-     * 
+     *
      * @throws SBonitaReadException
      * @throws SProfileEntryReadException
      */
@@ -236,7 +234,7 @@ public class ProfileServiceImplForProfileEntryTest {
     /**
      * Test method for
      * {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getEntriesOfProfile(long, int, int, java.lang.String, org.bonitasoft.engine.persistence.OrderByType)}
-     * 
+     *
      * @throws SProfileEntryReadException
      * @throws SBonitaReadException
      */
@@ -269,7 +267,7 @@ public class ProfileServiceImplForProfileEntryTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getNumberOfProfileEntries(org.bonitasoft.engine.persistence.QueryOptions)}.
-     * 
+     *
      * @throws SBonitaReadException
      * @throws SBonitaReadException
      */
@@ -292,7 +290,7 @@ public class ProfileServiceImplForProfileEntryTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getProfileEntry(long)}.
-     * 
+     *
      * @throws SProfileEntryNotFoundException
      * @throws SBonitaReadException
      */
@@ -321,7 +319,7 @@ public class ProfileServiceImplForProfileEntryTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#searchProfileEntries(org.bonitasoft.engine.persistence.QueryOptions)}.
-     * 
+     *
      * @throws SBonitaReadException
      * @throws SBonitaReadException
      */
@@ -345,7 +343,7 @@ public class ProfileServiceImplForProfileEntryTest {
      * Test method for
      * {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#updateProfileEntry(org.bonitasoft.engine.profile.model.SProfileEntry, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
      * .
-     * 
+     *
      * @throws SProfileEntryUpdateException
      */
     @Test
@@ -353,8 +351,8 @@ public class ProfileServiceImplForProfileEntryTest {
         final SProfileEntry sProfileEntry = createProfileEntry(3);
         final SProfileEntryUpdateBuilder sProfileEntryUpdateBuilder = new SProfileEntryUpdateBuilderImpl();
         sProfileEntryUpdateBuilder.setDescription("description").setName("newName").setIndex(6).setCustom(true).setPage("page").setParentId(5858)
-        .setProfileId(9)
-        .setType("type");
+                .setProfileId(9)
+                .setType("type");
 
         doReturn(false).when(eventService).hasHandlers(anyString(), any(EventActionType.class));
         doReturn(false).when(queriableLoggerService).isLoggable(anyString(), any(SQueriableLogSeverity.class));

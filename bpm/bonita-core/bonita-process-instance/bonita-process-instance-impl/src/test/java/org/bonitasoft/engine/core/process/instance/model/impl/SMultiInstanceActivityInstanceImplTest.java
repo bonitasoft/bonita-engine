@@ -5,37 +5,35 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 
-
-
 public class SMultiInstanceActivityInstanceImplTest {
 
     private SMultiInstanceActivityInstanceImpl multi;
-    
+
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         multi = new SMultiInstanceActivityInstanceImpl();
     }
-    
+
     @Test
-    public void mustExecuteOnAbortOrCancelProcess_should_return_false_when_is_stable() throws Exception {
+    public void mustExecuteOnAbortOrCancelProcess_should_return_false_when_is_stable() {
         //given
         multi.setStable(true);
-        
+
         //when
-        boolean executeOnAbortOrCancelProcess = multi.mustExecuteOnAbortOrCancelProcess();
-        
+        final boolean executeOnAbortOrCancelProcess = multi.mustExecuteOnAbortOrCancelProcess();
+
         //then
         assertThat(executeOnAbortOrCancelProcess).isFalse();
     }
 
     @Test
-    public void mustExecuteOnAbortOrCancelProcess_should_return_false_when_is_not_stable() throws Exception {
-      //given
+    public void mustExecuteOnAbortOrCancelProcess_should_return_false_when_is_not_stable() {
+        //given
         multi.setStable(false);
-        
+
         //when
-        boolean executeOnAbortOrCancelProcess = multi.mustExecuteOnAbortOrCancelProcess();
-        
+        final boolean executeOnAbortOrCancelProcess = multi.mustExecuteOnAbortOrCancelProcess();
+
         //then
         assertThat(executeOnAbortOrCancelProcess).isFalse();
     }

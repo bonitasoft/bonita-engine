@@ -114,7 +114,7 @@ public class EngineInitializerTest {
     }
 
     @Test
-    public void getPlatformAPI_should_reuse_the_previous_instance_in_the_second_call() throws Exception {
+    public void getPlatformAPI_should_reuse_the_previous_instance_in_the_second_call() {
         //given
         final EngineInitializer initializer = new EngineInitializer(platformManager, platformProperties);
         final PlatformAPI firstCall = initializer.getPlatformAPI();

@@ -53,7 +53,6 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -193,7 +192,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     private void logTruncationWarning(final String value, final String truncatedValue, final int maxLengh, final SFlowNodeInstance flowNodeInstance,
             final String key) {
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-            StringBuilder stb = new StringBuilder();
+            final StringBuilder stb = new StringBuilder();
             stb.append("The field ");
             stb.append(key);
             stb.append(" is too long in the flow node instance [id: ");
@@ -211,14 +210,14 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
             stb.append("'. The original value was: '");
             stb.append(value);
             stb.append("'.");
-            String message = stb.toString();
+            final String message = stb.toString();
             logger.log(getClass(), TechnicalLogSeverity.WARNING, message);
         }
     }
 
     private void updateOneField(final SFlowNodeInstance flowNodeInstance, final String attributeValue, final String event, final String attributeKey,
             final int maxLengh) throws SFlowNodeModificationException {
-        String truncatedValue = getTruncated(attributeValue, maxLengh, flowNodeInstance, attributeKey);
+        final String truncatedValue = getTruncated(attributeValue, maxLengh, flowNodeInstance, attributeKey);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(attributeKey, truncatedValue);
 
@@ -388,11 +387,10 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         return getPersistenceService().getNumberOfEntities(entityClass, countOptions, null);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public List<SFlowNodeInstance> searchFlowNodeInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions searchOptions)
+    public <T extends SFlowNodeInstance> List<T> searchFlowNodeInstances(final Class<T> entityClass, final QueryOptions searchOptions)
             throws SBonitaReadException {
-        return (List<SFlowNodeInstance>) getPersistenceService().searchEntity(entityClass, searchOptions, null);
+        return getPersistenceService().searchEntity(entityClass, searchOptions, null);
     }
 
     @Override

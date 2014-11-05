@@ -524,6 +524,12 @@
 		SELECT COUNT(ap.id)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap
 	</query>
+	
+	<query name="getArchivedProcessInstancesInAllStates">
+		SELECT ap
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap
+		WHERE ap.sourceObjectId IN (:sourceObjectIds)
+	</query>
 
 	<query name="getArchivedProcessInstance">
 		SELECT ap

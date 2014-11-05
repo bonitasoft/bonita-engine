@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -243,13 +242,13 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     @Override
-    public void start() throws SBonitaException {
+    public void start() {
         shuttingDown = false;
         virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
     }
 
     @Override
-    public void stop() throws SBonitaException {
+    public void stop() {
         shuttingDown = true;
         destroyAllLocalClassLoaders();
         virtualGlobalClassLoader.destroy();
@@ -263,12 +262,12 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     }
 
     @Override
-    public void pause() throws SBonitaException {
+    public void pause() {
         // Nothing to do
     }
 
     @Override
-    public void resume() throws SBonitaException {
+    public void resume() {
         // Nothing to do
     }
 }

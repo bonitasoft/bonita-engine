@@ -24,7 +24,10 @@ import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuil
 import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
 import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -32,6 +35,8 @@ import javax.inject.Inject;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
@@ -588,6 +593,41 @@ public class ProcessInstanceQueriesTest {
         sProcessInstance.setStateId(7);
         sProcessInstance.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
         return sProcessInstance;
+    }
+
+    @Test
+    public void getArchivedProcessInstancesInAllStates_should_return_archived_process_instances_when_exist() {
+        // Given
+        final SAProcessInstance saProcessInstance1 = repository.add(buildSAProcessInstance(1L));
+        final SAProcessInstance saProcessInstance2 = repository.add(buildSAProcessInstance(2L));
+
+        // When
+        final List<SAProcessInstance> archivedProcessInstances = repository.getArchivedProcessInstancesInAllStates(Arrays.asList(1L, 2L));
+
+        // Then
+        assertFalse("The list of archived process instance must not be empty !!", archivedProcessInstances.isEmpty());
+        assertEquals("The first element of the list must to have as id 1", saProcessInstance1, archivedProcessInstances.get(0));
+        assertEquals("The second element of the list must to have as id 2", saProcessInstance2, archivedProcessInstances.get(1));
+    }
+
+    @Test
+    public void getArchivedProcessInstancesInAllStates_should_return_empty_list_when_no_archived_process_instances_with_ids() {
+        // Given
+
+        // When
+        final List<SAProcessInstance> archivedProcessInstances = repository.getArchivedProcessInstancesInAllStates(Arrays.asList(1L, 2L));
+
+        // Then
+        assertTrue("The list of archived process instance must be empty !!", archivedProcessInstances.isEmpty());
+    }
+
+    private SAProcessInstanceImpl buildSAProcessInstance(final long id) {
+        final SAProcessInstanceImpl saProcessInstanceImpl = new SAProcessInstanceImpl();
+        saProcessInstanceImpl.setId(id);
+        saProcessInstanceImpl.setSourceObjectId(id);
+        saProcessInstanceImpl.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        saProcessInstanceImpl.setName("process" + id);
+        return saProcessInstanceImpl;
     }
 
 }

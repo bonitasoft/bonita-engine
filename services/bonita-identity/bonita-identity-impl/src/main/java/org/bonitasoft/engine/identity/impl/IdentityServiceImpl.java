@@ -77,7 +77,6 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -154,17 +153,15 @@ public class IdentityServiceImpl implements IdentityService {
     private SInsertEvent getInsertEvent(final Object object, final String type) {
         if (eventService.hasHandlers(type, EventActionType.CREATED)) {
             return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(type).setObject(object).done();
-        } else {
-            return null;
         }
+        return null;
     }
 
     private SDeleteEvent getDeleteEvent(final Object object, final String type) {
         if (eventService.hasHandlers(type, EventActionType.DELETED)) {
             return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(type).setObject(object).done();
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override
@@ -190,7 +187,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     private void throwExceptionIfAlreadyExists(final SCustomUserInfoDefinition customUserInfo) throws SBonitaReadException,
-    SCustomUserInfoDefinitionAlreadyExistsException {
+            SCustomUserInfoDefinitionAlreadyExistsException {
         final SCustomUserInfoDefinition storedDef = getCustomUserInfoDefinitionWithoutCheck(customUserInfo.getName());
         if (storedDef != null) {
             throw new SCustomUserInfoDefinitionAlreadyExistsException(customUserInfo.getName());
@@ -198,8 +195,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     private SCustomUserInfoDefinitionCreationException handleCustomUserInfoDefinitionCreationFailure(final SCustomUserInfoDefinition customUserInfo,
-            final String methodName, final SCustomUserInfoDefinitionLogBuilder logBuilder, final SBonitaException exception)
-                    throws SCustomUserInfoDefinitionCreationException {
+            final String methodName, final SCustomUserInfoDefinitionLogBuilder logBuilder, final SBonitaException exception) {
         logOnExceptionMethod(methodName, exception);
         initiateLogBuilder(customUserInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
         return new SCustomUserInfoDefinitionCreationException(customUserInfo.getName(), exception);
@@ -953,7 +949,8 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<Long> getUserIdsWithCustomUserInfo(final String userInfoName, String userInfoValue, final boolean usePartialMatch, final int fromIndex, final int maxResults) throws SIdentityException {
+    public List<Long> getUserIdsWithCustomUserInfo(final String userInfoName, String userInfoValue, final boolean usePartialMatch, final int fromIndex,
+            final int maxResults) throws SIdentityException {
         final String methodName = "getUserIdsWithCustomUserInfo";
         logBeforeMethod(methodName);
         try {
@@ -1813,7 +1810,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SCustomUserInfoValue> searchCustomUserInfoValue(QueryOptions options) throws SBonitaReadException {
+    public List<SCustomUserInfoValue> searchCustomUserInfoValue(final QueryOptions options) throws SBonitaReadException {
         final String methodName = "searchCustomUserInfoValue";
         logBeforeMethod(methodName);
         final List<SCustomUserInfoValue> result = persistenceService.searchEntity(SCustomUserInfoValue.class, options, null);

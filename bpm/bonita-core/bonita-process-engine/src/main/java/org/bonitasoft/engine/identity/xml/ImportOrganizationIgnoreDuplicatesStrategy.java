@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.identity.xml;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator;
 import org.bonitasoft.engine.identity.ExportedUser;
 import org.bonitasoft.engine.identity.GroupCreator;
@@ -38,7 +37,7 @@ public class ImportOrganizationIgnoreDuplicatesStrategy implements ImportOrganiz
     }
 
     @Override
-    public void foundExistingUser(final SUser existingUser, final ExportedUser user) throws SBonitaException {
+    public void foundExistingUser(final SUser existingUser, final ExportedUser user) {
     }
 
     @Override
@@ -50,8 +49,8 @@ public class ImportOrganizationIgnoreDuplicatesStrategy implements ImportOrganiz
     }
 
     @Override
-    public void foundExistingCustomUserInfoDefinition(SCustomUserInfoDefinition existingUserInfoDefinition,
-            CustomUserInfoDefinitionCreator newUserInfoDefinition) throws ImportDuplicateInOrganizationException {
+    public void foundExistingCustomUserInfoDefinition(final SCustomUserInfoDefinition existingUserInfoDefinition,
+            final CustomUserInfoDefinitionCreator newUserInfoDefinition) {
     }
 
 }

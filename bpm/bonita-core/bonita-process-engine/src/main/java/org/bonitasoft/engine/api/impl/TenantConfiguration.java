@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
+import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.JobRegister;
 
 /**
@@ -36,6 +37,8 @@ public class TenantConfiguration {
     private List<JobRegister> jobsToRegister;
 
     private List<TenantLifecycleService> lifecycleServices;
+
+    private List<AbstractBonitaTenantJobListener> jobListeners;
 
     /**
      * Specify how often we look for matching matching event couple
@@ -82,6 +85,22 @@ public class TenantConfiguration {
 
     public void setLifecycleServices(final List<TenantLifecycleService> lifecycleServices) {
         this.lifecycleServices = lifecycleServices;
+    }
+
+    /**
+     * @return The job listeners to add at the scheduler
+     * @since 6.4.0
+     */
+    public List<AbstractBonitaTenantJobListener> getJobListeners() {
+        return jobListeners;
+    }
+
+    /**
+     * @param jobListeners
+     * @since 6.4.0
+     */
+    public void setJobListeners(List<AbstractBonitaTenantJobListener> jobListeners) {
+        this.jobListeners = jobListeners;
     }
 
 }

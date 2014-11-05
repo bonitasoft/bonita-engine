@@ -4,72 +4,25 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.MessageEventTriggerDefinition;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
-import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
-import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-public class MessageBoundaryEventTest extends CommonAPITest {
-
-    private static final String BOUNDARY_NAME = "waitMessage";
-
-    private User donaBenta;
-
-    @Before
-    public void beforeTest() throws BonitaException {
-         loginOnDefaultTenantWithDefaultTechnicalUser();
-        donaBenta = createUser(USERNAME, PASSWORD);
-        logoutOnTenant();
-        loginOnDefaultTenantWith(USERNAME, PASSWORD);
-    }
-
-    @After
-    public void afterTest() throws BonitaException {
-        logoutOnTenant();
-         loginOnDefaultTenantWithDefaultTechnicalUser();
-        deleteUser(donaBenta.getId());
-        logoutOnTenant();
-    }
-
-    private ProcessDefinition deployProcessWithBoundaryEvent(final String message) throws BonitaException {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("pMessageBoundary", "2.0");
-        final String actorName = "delivery";
-        processDefinitionBuilder.addActor(actorName);
-        processDefinitionBuilder.addStartEvent("start");
-        final UserTaskDefinitionBuilder userTaskDefinitionBuilder = processDefinitionBuilder.addUserTask("step1", actorName);
-        userTaskDefinitionBuilder.addBoundaryEvent(BOUNDARY_NAME, true).addMessageEventTrigger(message);
-        userTaskDefinitionBuilder.addUserTask("exceptionStep", actorName);
-        userTaskDefinitionBuilder.addUserTask("step2", actorName);
-        processDefinitionBuilder.addEndEvent("end");
-        processDefinitionBuilder.addTransition("start", "step1");
-        processDefinitionBuilder.addTransition("step1", "step2");
-        processDefinitionBuilder.addTransition(BOUNDARY_NAME, "exceptionStep");
-
-        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), actorName, donaBenta);
-    }
+public class MessageBoundaryEventTest extends AbstractEventTest {
 
     @Test
     @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "boundary",
             "event" }, jira = "ENGINE-499", story = "message sent on a user task having a boundary catch message event")
-    public void testMessageBoundaryEventTriggered() throws Exception {
-        final ProcessDefinition processDefinition = deployProcessWithBoundaryEvent("MyMessage");
+    public void messageBoundaryEventTriggered() throws Exception {
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEvent("MyMessage");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
@@ -91,8 +44,8 @@ public class MessageBoundaryEventTest extends CommonAPITest {
     @Test
     @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "boundary",
             "event", "call activity" }, jira = "ENGINE-499", story = "message with wrong name sent on a user task having a boundary catch message event")
-    public void testMessageBoundaryEventNotTriggered() throws Exception {
-        final ProcessDefinition processDefinition = deployProcessWithBoundaryEvent("MyMessage1");
+    public void messageBoundaryEventNotTriggered() throws Exception {
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEvent("MyMessage1");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt("step1", processInstance, donaBenta);
@@ -110,107 +63,62 @@ public class MessageBoundaryEventTest extends CommonAPITest {
     @Test
     @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "boundary",
             "event", "call activity" }, jira = "ENGINE-499", story = "message sent on a call activity having a boundary catch message event")
-    public void testMessageBoundaryEventOnCallActivityTriggered() throws Exception {
-        final String actorName = "delivery";
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryOnCallActivity(actorName);
-        final ProcessDefinition calledProcessDefinition = deployAndEnableSimpleProcess(actorName);
+    public void messageBoundaryEventOnCallActivityTriggered() throws Exception {
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnCallActivity();
+        final ProcessDefinition calledProcessDefinition = deployAndEnableSimpleProcess("calledProcess", "calledTask");
 
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance calledStep = waitForUserTask("calledStep", processInstance.getId());
-        final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
+        try {
+            final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+            final ActivityInstance calledStep = waitForUserTask("calledTask", processInstance.getId());
+            final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
 
-        getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
-                new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
+            getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
+                    new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
 
-        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, donaBenta);
-        waitForProcessToFinish(calledProcessInstance, TestStates.ABORTED);
-        waitForProcessToFinish(processInstance);
+            waitForUserTaskAndExecuteIt("exceptionStep", processInstance, donaBenta);
+            waitForProcessToFinish(calledProcessInstance, TestStates.ABORTED);
+            waitForProcessToFinish(processInstance);
 
-        waitForArchivedActivity(calledStep.getId(), TestStates.ABORTED);
+            waitForArchivedActivity(calledStep.getId(), TestStates.ABORTED);
 
-        checkWasntExecuted(processInstance, "step2");
-
-        disableAndDeleteProcess(processDefinition);
-        disableAndDeleteProcess(calledProcessDefinition);
+            checkWasntExecuted(processInstance, "step2");
+        } finally {
+            disableAndDeleteProcess(processDefinition, calledProcessDefinition);
+        }
     }
 
     @Test
     @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "message", "boundary",
             "event", "call activity" }, jira = "ENGINE-499", story = "message sent on a call activity having a boundary catch message event")
-    public void testMessageBoundaryEventOnCallActivityNotTriggered() throws Exception {
-        final String actorName = "delivery";
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryOnCallActivity(actorName);
-        final ProcessDefinition calledProcessDefinition = deployAndEnableSimpleProcess(actorName);
+    public void messageBoundaryEventOnCallActivityNotTriggered() throws Exception {
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnCallActivity();
+        final ProcessDefinition calledProcessDefinition = deployAndEnableSimpleProcess("calledProcess", "calledTask");
 
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance calledStep = waitForUserTask("calledStep", processInstance.getId());
-        final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
-        assignAndExecuteStep(calledStep, donaBenta.getId());
+        try {
+            final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+            final ActivityInstance calledStep = waitForUserTask("calledTask", processInstance.getId());
+            final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
+            assignAndExecuteStep(calledStep, donaBenta.getId());
 
-        final ActivityInstance step2 = waitForUserTask("step2", processInstance.getId());
+            final ActivityInstance step2 = waitForUserTask("step2", processInstance.getId());
 
-        getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
-                new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
+            getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
+                    new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
 
-        waitForProcessToFinish(calledProcessInstance);
-        assignAndExecuteStep(step2, donaBenta.getId());
-        waitForProcessToFinish(processInstance);
+            waitForProcessToFinish(calledProcessInstance);
+            assignAndExecuteStep(step2, donaBenta.getId());
+            waitForProcessToFinish(processInstance);
 
-        checkWasntExecuted(processInstance, "exceptionStep");
-
-        disableAndDeleteProcess(processDefinition);
-        disableAndDeleteProcess(calledProcessDefinition);
-    }
-
-    protected ProcessDefinition deployAndEnableSimpleProcess(final String actorName) throws BonitaException {
-        final ProcessDefinitionBuilder calledProcess = new ProcessDefinitionBuilder().createNewInstance("calledProcess", "1.0");
-        calledProcess.addActor(actorName);
-        calledProcess.addStartEvent("start");
-        calledProcess.addUserTask("calledStep", actorName);
-        calledProcess.addEndEvent("end");
-        calledProcess.addTransition("start", "calledStep");
-        calledProcess.addTransition("calledStep", "end");
-        return deployAndEnableProcessWithActor(calledProcess.done(), actorName, donaBenta);
-    }
-
-    protected ProcessDefinition deployAndEnableProcessWithBoundaryOnCallActivity(final String actorName) throws BonitaException {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("pMessageBoundary", "2.0");
-        processDefinitionBuilder.addActor(actorName);
-        processDefinitionBuilder.addStartEvent("start");
-        final CallActivityBuilder callActivityBuilder = processDefinitionBuilder.addCallActivity("step1",
-                new ExpressionBuilder().createConstantStringExpression("calledProcess"), new ExpressionBuilder().createConstantStringExpression("1.0"));
-        callActivityBuilder.addBoundaryEvent(BOUNDARY_NAME, true).addMessageEventTrigger("MyMessage");
-        processDefinitionBuilder.addUserTask("exceptionStep", actorName);
-        processDefinitionBuilder.addUserTask("step2", actorName);
-        processDefinitionBuilder.addEndEvent("end");
-        processDefinitionBuilder.addTransition("start", "step1");
-        processDefinitionBuilder.addTransition("step1", "step2");
-        processDefinitionBuilder.addTransition(BOUNDARY_NAME, "exceptionStep");
-        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), actorName, donaBenta);
-    }
-
-    private ProcessDefinition deployAndEnableProcessWithBoundaryMessageEventOnMultiInstance(final int loopCardinality, final boolean isSequential)
-            throws BonitaException {
-        final String actorName = "delivery";
-
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithBoundaryMessageEventAndMultiInstance",
-                "1.0");
-        processBuilder.addActor(actorName).addStartEvent("start");
-
-        final UserTaskDefinitionBuilder userTaskBuilder = processBuilder.addUserTask("step1", actorName);
-        userTaskBuilder.addMultiInstance(isSequential, new ExpressionBuilder().createConstantIntegerExpression(loopCardinality));
-        userTaskBuilder.addBoundaryEvent(BOUNDARY_NAME, true).addMessageEventTrigger("MyMessage");
-
-        processBuilder.addUserTask("step2", actorName).addUserTask("exceptionStep", actorName).addEndEvent("end").addTransition("start", "step1")
-                .addTransition("step1", "step2").addTransition("step2", "end").addTransition(BOUNDARY_NAME, "exceptionStep");
-
-        return deployAndEnableProcessWithActor(processBuilder.done(), actorName, donaBenta);
+            checkWasntExecuted(processInstance, "exceptionStep");
+        } finally {
+            disableAndDeleteProcess(processDefinition, calledProcessDefinition);
+        }
     }
 
     @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message",
             "Boundary", "Multi-instance", "Sequential" }, story = "Execute message boundary event triggered on sequential multi-instance.", jira = "ENGINE-547")
     @Test
-    public void testMessageBoundaryEventTriggeredOnSequentialMultiInstance() throws Exception {
+    public void messageBoundaryEventTriggeredOnSequentialMultiInstance() throws Exception {
         final int loopCardinality = 4;
         final boolean isSequential = true;
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnMultiInstance(loopCardinality, isSequential);
@@ -235,7 +143,7 @@ public class MessageBoundaryEventTest extends CommonAPITest {
     @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message",
             "Boundary", "Multi-instance", "Sequential" }, story = "Execute message boundary event not triggered on sequential multi-instance", jira = "ENGINE-547")
     @Test
-    public void testMessageBoundaryEventNotTriggeredOnSequentialMultiInstance() throws Exception {
+    public void messageBoundaryEventNotTriggeredOnSequentialMultiInstance() throws Exception {
         final int loopCardinality = 3;
         final boolean isSequential = true;
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnMultiInstance(loopCardinality, isSequential);
@@ -259,7 +167,7 @@ public class MessageBoundaryEventTest extends CommonAPITest {
     @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message",
             "Boundary", "Multi-instance", "Sequential" }, story = "Execute message boundary event triggered on parallel multi-instance.", jira = "ENGINE-547")
     @Test
-    public void testMessageBoundaryEventTriggeredOnParallelMultiInstance() throws Exception {
+    public void messageBoundaryEventTriggeredOnParallelMultiInstance() throws Exception {
         final int loopCardinality = 4;
         final boolean isSequential = false;
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnMultiInstance(loopCardinality, isSequential);
@@ -289,7 +197,7 @@ public class MessageBoundaryEventTest extends CommonAPITest {
     @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message",
             "Boundary", "Multi-instance", "Sequential" }, story = "Execute message boundary event not triggered on parallel multi-instance.", jira = "ENGINE-547")
     @Test
-    public void testMessageBoundaryEventNotTriggeredOnParallelMultiInstance() throws Exception {
+    public void messageBoundaryEventNotTriggeredOnParallelMultiInstance() throws Exception {
         final int loopCardinality = 3;
         final boolean isSequential = false;
 
@@ -312,28 +220,10 @@ public class MessageBoundaryEventTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    private ProcessDefinition deployAndEnableProcessWithBoundaryMessageEventOnLoopActivity(final int loopMax) throws BonitaException,
-            InvalidProcessDefinitionException {
-        final String actorName = "delivery";
-        final Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
-
-        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithLoopActivityAndBoundaryEvent", "1.0");
-        processBuilder.addActor(actorName).addStartEvent("start");
-
-        final UserTaskDefinitionBuilder userTaskBuilder = processBuilder.addUserTask("step1", actorName);
-        userTaskBuilder.addLoop(false, condition, new ExpressionBuilder().createConstantIntegerExpression(loopMax));
-        userTaskBuilder.addBoundaryEvent(BOUNDARY_NAME, true).addMessageEventTrigger("MyMessage");
-
-        processBuilder.addUserTask("step2", actorName).addUserTask("exceptionStep", actorName).addEndEvent("end").addTransition("start", "step1")
-                .addTransition("step1", "step2").addTransition("step2", "end").addTransition(BOUNDARY_NAME, "exceptionStep");
-
-        return deployAndEnableProcessWithActor(processBuilder.done(), actorName, donaBenta);
-    }
-
     @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message",
             "Boundary", "Loop activity" }, story = "Execute message boundary event triggered on loop activity", jira = "ENGINE-547")
     @Test
-    public void testMessageBoundaryEventTriggeredOnLoopActivity() throws Exception {
+    public void messageBoundaryEventTriggeredOnLoopActivity() throws Exception {
         final int loopMax = 3;
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnLoopActivity(loopMax);
@@ -358,7 +248,7 @@ public class MessageBoundaryEventTest extends CommonAPITest {
     @Cover(classes = { MessageEventTriggerDefinition.class, BoundaryEventDefinition.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Message",
             "Boundary", "Loop activity" }, story = "Execute message boundary event not triggered on loop activity", jira = "ENGINE-547")
     @Test
-    public void testMessageBoundaryEventNotTriggeredOnLoopActivity() throws Exception {
+    public void messageBoundaryEventNotTriggeredOnLoopActivity() throws Exception {
         final int loopMax = 2;
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEventOnLoopActivity(loopMax);
 
