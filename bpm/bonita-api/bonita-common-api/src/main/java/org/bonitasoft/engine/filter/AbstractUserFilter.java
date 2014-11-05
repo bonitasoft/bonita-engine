@@ -62,7 +62,6 @@ public abstract class AbstractUserFilter implements UserFilter {
         }
     }
 
-
     /**
      * {@inheritDoc} Default implementation returns true
      */

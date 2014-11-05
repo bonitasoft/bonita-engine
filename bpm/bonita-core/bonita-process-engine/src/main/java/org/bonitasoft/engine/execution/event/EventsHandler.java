@@ -116,7 +116,7 @@ public class EventsHandler {
         this.tokenService = tokenService;
         this.logger = logger;
         handlers = new HashMap<SEventTriggerType, EventHandlerStrategy>(4);
-        handlers.put(SEventTriggerType.TIMER, new TimerEventHandlerStrategy(expressionResolverService, schedulerService, logger));
+        handlers.put(SEventTriggerType.TIMER, new TimerEventHandlerStrategy(expressionResolverService, schedulerService, eventInstanceService, logger));
         handlers.put(SEventTriggerType.MESSAGE, new MessageEventHandlerStrategy(expressionResolverService, eventInstanceService,
                 bpmInstancesCreator, dataInstanceService, processDefinitionService));
         handlers.put(SEventTriggerType.SIGNAL, new SignalEventHandlerStrategy(this, eventInstanceService));

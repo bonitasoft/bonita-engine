@@ -16,7 +16,6 @@ package org.bonitasoft.engine.expression.impl;
 import java.util.Map;
 
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
-import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
@@ -35,13 +34,13 @@ public class ReturnTypeChecker {
     /**
      * Check if the declared return type is compatible with the real Expression evaluation return type. If the result of the Expression evaluation is null, then
      * this method returns true.
-     * 
+     *
      * @param expression
-     *            the evaluated expression
+     *        the evaluated expression
      * @param result
-     *            the expression result to check
+     *        the expression result to check
      * @throws SInvalidExpressionException
-     *             if the condition is not fulfilled, does nothing otherwise
+     *         if the condition is not fulfilled, does nothing otherwise
      */
     public void checkReturnType(final SExpression expression, final Object result, final Map<String, Object> context) throws SExpressionEvaluationException {
         if (result != null && !result.getClass().getName().equals(expression.getReturnType())) {
@@ -49,7 +48,7 @@ public class ReturnTypeChecker {
                 try {
                     final Class<?> declaredReturnedType = Thread.currentThread().getContextClassLoader().loadClass(expression.getReturnType());
                     final Class<?> evaluatedReturnedType = result.getClass();
-                    if (!(declaredReturnedType.isAssignableFrom(evaluatedReturnedType))) {
+                    if (!declaredReturnedType.isAssignableFrom(evaluatedReturnedType)) {
                         throw new SExpressionEvaluationException("Declared return type " + declaredReturnedType + " is not compatible with evaluated type "
                                 + evaluatedReturnedType + " for expression " + expression.getName(), expression.getName());
                     }
@@ -57,7 +56,7 @@ public class ReturnTypeChecker {
                     throw new SExpressionEvaluationException("Declared return type unknown : " + expression.getReturnType() + " for expression "
                             + expression.getName(), e, expression.getName());
                 }
-            } catch (SExpressionEvaluationException e) {
+            } catch (final SExpressionEvaluationException e) {
                 if (isContextOnActivity(context)) {
                     e.setFlowNodeInstanceIdOnContext((Long) context.get(CONTAINER_ID));
                 }

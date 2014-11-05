@@ -69,7 +69,6 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -714,7 +713,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     public List<SProcessDefinitionDeployInfo> searchProcessDeploymentInfos(final long userId, final QueryOptions searchOptions, final String querySuffix)
             throws SBonitaReadException {
         return persistenceService.searchEntity(SProcessDefinitionDeployInfo.class, querySuffix, searchOptions,
-                    Collections.singletonMap(USER_ID, (Object) userId));
+                Collections.singletonMap(USER_ID, (Object) userId));
     }
 
     @Override

@@ -17,7 +17,6 @@ import java.io.File;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.filefilter.AbstractFileFilter;
-import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.bonitasoft.engine.commons.StringUtils;
 
 /**
@@ -45,7 +44,7 @@ public class DeepRegexFileFilter extends AbstractFileFilter {
 
     @Override
     public boolean accept(final File file) {
-        String fullName = StringUtils.uniformizePathPattern(file.getAbsolutePath());
+        final String fullName = StringUtils.uniformizePathPattern(file.getAbsolutePath());
         return regExPattern.matcher(fullName).matches();
     }
 

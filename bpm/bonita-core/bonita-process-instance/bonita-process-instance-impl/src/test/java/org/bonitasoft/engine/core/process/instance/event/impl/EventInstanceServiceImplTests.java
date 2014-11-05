@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2014 Bonitasoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,23 +11,23 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.scheduler.impl;
+package org.bonitasoft.engine.core.process.instance.event.impl;
 
-import org.quartz.JobListener;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
 /**
- * @author Matthieu Chaffotte
+ * @author Celine Souchet
+ * @version 6.4.0
+ * @since 6.4.0
  */
-public abstract class AbstractJobListener implements JobListener {
-
-    private SchedulerServiceImpl schedulerService;
-
-    public void setBOSSchedulerService(final SchedulerServiceImpl schedulerService) {
-        this.schedulerService = schedulerService;
-    }
-
-    public SchedulerServiceImpl getSchedulerService() {
-        return schedulerService;
-    }
+@RunWith(Suite.class)
+@SuiteClasses({
+        EventInstanceServiceImplForEventTest.class,
+        EventInstanceServiceImplForEventTriggerTest.class,
+        EventInstanceServiceImplForMessageTest.class,
+        EventInstanceServiceImplForWaitingTest.class })
+public class EventInstanceServiceImplTests {
 
 }

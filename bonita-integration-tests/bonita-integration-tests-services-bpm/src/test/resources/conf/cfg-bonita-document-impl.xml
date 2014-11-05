@@ -4,7 +4,6 @@
 
     <bean id="documentService" class="org.bonitasoft.engine.core.document.api.impl.DocumentServiceImpl">
         <constructor-arg name="urlProvider" ref="documentURLProvider"/>
-        <constructor-arg name="technicalLogger" ref="platformTechnicalLoggerService"/>
         <constructor-arg name="persistenceService" ref="persistenceService"/>
         <constructor-arg name="recorder" ref="recorderSync"/>
         <constructor-arg name="eventService" ref="eventService"/>

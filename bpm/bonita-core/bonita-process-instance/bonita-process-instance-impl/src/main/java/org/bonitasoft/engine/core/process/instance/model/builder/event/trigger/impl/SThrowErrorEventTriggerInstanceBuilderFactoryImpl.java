@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,16 +15,27 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.
 
 import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowErrorEventTriggerInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowErrorEventTriggerInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowErrorEventTriggerInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
-public class SThrowErrorEventTriggerInstanceBuilderFactoryImpl extends SEventTriggerInstanceBuilderFactoryImpl implements SThrowErrorEventTriggerInstanceBuilderFactory {
+public class SThrowErrorEventTriggerInstanceBuilderFactoryImpl extends SEventTriggerInstanceBuilderFactoryImpl implements
+        SThrowErrorEventTriggerInstanceBuilderFactory {
 
     @Override
     public SThrowErrorEventTriggerInstanceBuilder createNewInstance(final long eventInstanceId, final String errorCode) {
         final SThrowErrorEventTriggerInstanceImpl entity = new SThrowErrorEventTriggerInstanceImpl(eventInstanceId, errorCode);
+        return new SThrowErrorEventTriggerInstanceBuilderImpl(entity);
+    }
+
+    @Override
+    public SThrowErrorEventTriggerInstanceBuilder createNewInstance(final SThrowErrorEventTriggerInstance sThrowErrorEventTriggerInstance) {
+        final SThrowErrorEventTriggerInstanceImpl entity = new SThrowErrorEventTriggerInstanceImpl(sThrowErrorEventTriggerInstance.getEventInstanceId(),
+                sThrowErrorEventTriggerInstance.getErrorCode());
+        entity.setId(sThrowErrorEventTriggerInstance.getId());
         return new SThrowErrorEventTriggerInstanceBuilderImpl(entity);
     }
 

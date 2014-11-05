@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.identity;
 
-import org.bonitasoft.engine.api.OrganizationAPI;
-
 /**
  * Define how to handle conflicts when an organization is imported.
  * <br/>

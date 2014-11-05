@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.platform.command.impl;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,6 +32,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -61,21 +61,21 @@ public class PlatformCommandServiceImplTest {
     @Test
     public final void getPlatformCommandByName() throws SBonitaReadException, SPlatformCommandNotFoundException, SPlatformCommandGettingException {
         final SPlatformCommand sPlatformCommand = mock(SPlatformCommand.class);
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(sPlatformCommand);
+        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SPlatformCommand>> any())).thenReturn(sPlatformCommand);
 
         Assert.assertEquals(sPlatformCommand, platformCommandServiceImpl.getPlatformCommand("name"));
     }
 
     @Test(expected = SPlatformCommandNotFoundException.class)
     public final void getPlatformCommandByNameNotExists() throws SBonitaReadException, SPlatformCommandNotFoundException, SPlatformCommandGettingException {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(null);
+        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SPlatformCommand>> any())).thenReturn(null);
 
         platformCommandServiceImpl.getPlatformCommand("name");
     }
 
     @Test(expected = SPlatformCommandGettingException.class)
     public final void getPlatformCommandByNameThrowException() throws SBonitaReadException, SPlatformCommandNotFoundException, SPlatformCommandGettingException {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SPlatformCommand>> any())).thenThrow(new SBonitaReadException(""));
 
         platformCommandServiceImpl.getPlatformCommand("name");
     }
@@ -89,7 +89,7 @@ public class PlatformCommandServiceImplTest {
         final List<SPlatformCommand> sPlatformCommands = new ArrayList<SPlatformCommand>();
         sPlatformCommands.add(mock(SPlatformCommand.class));
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sPlatformCommands);
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SPlatformCommand>> any())).thenReturn(sPlatformCommands);
 
         Assert.assertEquals(sPlatformCommands, platformCommandServiceImpl.getPlatformCommands(options));
     }
@@ -97,7 +97,7 @@ public class PlatformCommandServiceImplTest {
     @Test(expected = SPlatformCommandGettingException.class)
     public final void getPlatformCommandsWithOptionsThrowException() throws SBonitaReadException, SPlatformCommandGettingException {
         final QueryOptions options = new QueryOptions(0, 10);
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SPlatformCommand>> any())).thenThrow(new SBonitaReadException(""));
 
         platformCommandServiceImpl.getPlatformCommands(options);
     }

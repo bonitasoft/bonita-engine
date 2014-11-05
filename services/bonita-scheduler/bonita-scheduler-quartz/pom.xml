@@ -55,11 +55,7 @@
 			<artifactId>bonita-log-technical-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.incident</groupId>
-			<artifactId>bonita-incident-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+
 
 		<!-- Tests -->
 		<dependency>
@@ -77,6 +73,12 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.events</groupId>
+			<artifactId>bonita-events-api-impl</artifactId>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

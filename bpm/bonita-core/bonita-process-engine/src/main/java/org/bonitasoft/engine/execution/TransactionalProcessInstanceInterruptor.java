@@ -63,8 +63,8 @@ public class TransactionalProcessInstanceInterruptor extends AbstractProcessInst
 
     @Override
     protected List<SFlowNodeInstance> getChildren(final long processInstanceId) throws SBonitaException {
-        final SearchFlowNodeInstances searchFlowNodeInstancesTransaction = new SearchFlowNodeInstances(flowNodeInstanceService,
-                getQueryOptions(processInstanceId), SFlowNodeInstance.class);
+        final SearchFlowNodeInstances<SFlowNodeInstance> searchFlowNodeInstancesTransaction = new SearchFlowNodeInstances<SFlowNodeInstance>(
+                flowNodeInstanceService, getQueryOptions(processInstanceId), SFlowNodeInstance.class);
         searchFlowNodeInstancesTransaction.execute();
         final List<SFlowNodeInstance> children = searchFlowNodeInstancesTransaction.getResult();
         count = searchFlowNodeInstancesTransaction.getCount();
@@ -73,8 +73,8 @@ public class TransactionalProcessInstanceInterruptor extends AbstractProcessInst
 
     @Override
     protected List<SFlowNodeInstance> getChildrenExcept(final long processInstanceId, final long childExceptionId) throws SBonitaException {
-        final SearchFlowNodeInstances searchFlowNodeInstancesTransaction = new SearchFlowNodeInstances(flowNodeInstanceService, getQueryOptions(
-                processInstanceId, childExceptionId), SFlowNodeInstance.class);
+        final SearchFlowNodeInstances<SFlowNodeInstance> searchFlowNodeInstancesTransaction = new SearchFlowNodeInstances<SFlowNodeInstance>(
+                flowNodeInstanceService, getQueryOptions(processInstanceId, childExceptionId), SFlowNodeInstance.class);
         searchFlowNodeInstancesTransaction.execute();
         final List<SFlowNodeInstance> children = searchFlowNodeInstancesTransaction.getResult();
         count = searchFlowNodeInstancesTransaction.getCount();

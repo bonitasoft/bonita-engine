@@ -8,10 +8,12 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefiniti
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SMessageInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingMessageEventImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SConnectorInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl;
@@ -140,6 +142,12 @@ public class TestRepository {
                 new PersistentObjectId(sProcessInstance.getId(), sProcessInstance.getTenantId()));
     }
 
+    public SAProcessInstanceImpl add(final SAProcessInstanceImpl saProcessInstance) {
+        getSession().save(saProcessInstance);
+        return (SAProcessInstanceImpl) getSession().get(saProcessInstance.getClass(),
+                new PersistentObjectId(saProcessInstance.getId(), saProcessInstance.getTenantId()));
+    }
+
     public SFlowNodeInstance add(final SFlowNodeInstanceImpl sFlowNode) {
         getSession().save(sFlowNode);
         return (SFlowNodeInstance) getSession().get(sFlowNode.getClass(), new PersistentObjectId(sFlowNode.getId(), sFlowNode.getTenantId()));
@@ -149,6 +157,12 @@ public class TestRepository {
         getSession().save(sHiddenTaskInstanceImpl);
         return (SHiddenTaskInstanceImpl) getSession().get(sHiddenTaskInstanceImpl.getClass(),
                 new PersistentObjectId(sHiddenTaskInstanceImpl.getId(), sHiddenTaskInstanceImpl.getTenantId()));
+    }
+
+    public SEventTriggerInstanceImpl add(final SEventTriggerInstanceImpl sEventTriggerInstanceImpl) {
+        getSession().save(sEventTriggerInstanceImpl);
+        return (SEventTriggerInstanceImpl) getSession().get(sEventTriggerInstanceImpl.getClass(),
+                new PersistentObjectId(sEventTriggerInstanceImpl.getId(), sEventTriggerInstanceImpl.getTenantId()));
     }
 
     public SCustomUserInfoDefinition add(final SCustomUserInfoDefinitionImpl infoDef) {

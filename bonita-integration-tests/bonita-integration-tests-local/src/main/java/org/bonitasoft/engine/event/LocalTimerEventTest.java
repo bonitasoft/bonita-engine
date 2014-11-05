@@ -56,7 +56,7 @@ public class LocalTimerEventTest extends CommonAPILocalTest {
     }
 
     @Test
-    public void testTimerJobsAreDeleteOnDisable() throws Exception {
+    public void timerJobsAreDeleteOnDisable() throws Exception {
         final ProcessDefinitionBuilder definitionBuilder = new ProcessDefinitionBuilder().createNewInstance("proc", "1.0");
         final String timerEventName = "startTimer";
         definitionBuilder.addStartEvent(timerEventName).addTimerEventTriggerDefinition(TimerType.DURATION,
@@ -122,7 +122,7 @@ public class LocalTimerEventTest extends CommonAPILocalTest {
 
     @Test
     public void cancelProcessInstanceWithTimerIntermediateCatchEvent() throws Exception {
-        //given
+        // given
         final int timerTrigger = 20000; // the timer intermediate catch event will wait 20 seconds
         final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(timerTrigger);
         final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEvent(TimerType.DURATION, timerExpression, "step");
@@ -132,10 +132,10 @@ public class LocalTimerEventTest extends CommonAPILocalTest {
         final String jobName = getJobName(floNodeInstanceId);
         assertThat(containsTimerJob(jobName)).isTrue();
 
-        //when
+        // when
         getProcessAPI().cancelProcessInstance(processInstance.getId());
 
-        //then
+        // then
         waitForFlowNodeInState(processInstance, "intermediateCatchEvent", TestStates.CANCELLED, false);
         assertThat(containsTimerJob(jobName)).isFalse();
 

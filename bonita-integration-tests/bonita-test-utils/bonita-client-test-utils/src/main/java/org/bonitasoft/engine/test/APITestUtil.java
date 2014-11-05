@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -61,12 +62,12 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.Problem;
-import org.bonitasoft.engine.bpm.process.ProcessActivationException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessDeployException;
@@ -258,11 +259,11 @@ public class APITestUtil extends PlatformTestUtil {
         getProcessAPI().addUserToActor(actor.getId(), userId);
     }
 
-    public ActorInstance getActor(final String actorName, final ProcessDefinition definition) throws ActorNotFoundException {
-        final List<ActorInstance> actors = getProcessAPI().getActors(definition.getId(), 0, 50, ActorCriterion.NAME_ASC);
+    public ActorInstance getActor(final String actorName, final ProcessDefinition processDefinition) throws ActorNotFoundException {
+        final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 50, ActorCriterion.NAME_ASC);
         final ActorInstance actorInstance = getActorInstance(actors, actorName);
         if (actorInstance == null) {
-            throw new ActorNotFoundException(actorName + " is an unknown actor");
+            throw new ActorNotFoundException(actorName, processDefinition);
         }
         return actorInstance;
     }
@@ -1345,7 +1346,7 @@ public class APITestUtil extends PlatformTestUtil {
         return messages;
     }
 
-    public List<String> checkNoProcessDefinitions() throws DeletionException, ProcessDefinitionNotFoundException, ProcessActivationException {
+    public List<String> checkNoProcessDefinitions() throws BonitaException {
         final List<String> messages = new ArrayList<String>();
         final List<ProcessDeploymentInfo> processes = getProcessAPI().getProcessDeploymentInfos(0, 200, ProcessDeploymentInfoCriterion.DEFAULT);
         if (processes.size() > 0) {
@@ -1358,6 +1359,25 @@ public class APITestUtil extends PlatformTestUtil {
                 getProcessAPI().deleteProcess(processDeploymentInfo.getProcessId());
             }
             messages.add(processBuilder.toString());
+        }
+        return messages;
+    }
+
+    public List<String> checkNoWaitingEvent() throws BonitaException {
+        final List<String> messages = new ArrayList<String>();
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>(1);
+        parameters.put("searchOptions", new SearchOptionsBuilder(0, 200).done());
+
+        @SuppressWarnings("unchecked")
+        final List<WaitingEvent> waitingEvents = ((SearchResult<WaitingEvent>) getCommandAPI().execute("searchWaitingEventsCommand", parameters)).getResult();
+        if (waitingEvents.size() > 0) {
+            final StringBuilder messageBuilder = new StringBuilder("Waiting Event are still present: ");
+            for (final WaitingEvent waitingEvent : waitingEvents) {
+                messageBuilder.append(
+                        "[process instance:" + waitingEvent.getProcessName() + ", flow node instance:" + waitingEvent.getFlowNodeInstanceId() + "]").append(
+                        ", ");
+            }
+            messages.add(messageBuilder.toString());
         }
         return messages;
     }

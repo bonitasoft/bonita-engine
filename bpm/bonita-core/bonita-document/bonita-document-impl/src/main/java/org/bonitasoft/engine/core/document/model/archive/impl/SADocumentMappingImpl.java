@@ -15,12 +15,8 @@
 package org.bonitasoft.engine.core.document.model.archive.impl;
 
 import org.bonitasoft.engine.core.document.model.SDocumentMapping;
-import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.archive.SADocumentMapping;
-import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl;
-import org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl;
-import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
 /**
@@ -28,32 +24,37 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class SADocumentMappingImpl extends SDocumentMappingImpl implements SADocumentMapping, ArchivedPersistentObject {
+public class SADocumentMappingImpl extends SDocumentMappingImpl implements SADocumentMapping {
+
+    private static final long serialVersionUID = 2868546403934325445L;
 
     private long archiveDate;
 
     private long sourceObjectId;
 
+    @Override
     public long getArchiveDate() {
         return archiveDate;
     }
 
-    public void setArchiveDate(long archiveDate) {
+    public void setArchiveDate(final long archiveDate) {
         this.archiveDate = archiveDate;
     }
 
+    @Override
     public long getSourceObjectId() {
         return sourceObjectId;
     }
 
-    public void setSourceObjectId(long sourceObjectId) {
+    public void setSourceObjectId(final long sourceObjectId) {
         this.sourceObjectId = sourceObjectId;
     }
 
     public SADocumentMappingImpl() {
     }
 
-    public SADocumentMappingImpl(long documentId, long processInstanceId, long archiveDate, long sourceObjectId, String name, String description, String version) {
+    public SADocumentMappingImpl(final long documentId, final long processInstanceId, final long archiveDate, final long sourceObjectId, final String name,
+            final String description, final String version) {
         super(documentId, processInstanceId, name);
         setDescription(description);
         setVersion(version);
@@ -67,20 +68,25 @@ public class SADocumentMappingImpl extends SDocumentMappingImpl implements SADoc
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
+    public boolean equals(final Object o) {
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
-        if (!super.equals(o))
+        }
+        if (!super.equals(o)) {
             return false;
+        }
 
-        SADocumentMappingImpl that = (SADocumentMappingImpl) o;
+        final SADocumentMappingImpl that = (SADocumentMappingImpl) o;
 
-        if (archiveDate != that.archiveDate)
+        if (archiveDate != that.archiveDate) {
             return false;
-        if (sourceObjectId != that.sourceObjectId)
+        }
+        if (sourceObjectId != that.sourceObjectId) {
             return false;
+        }
 
         return true;
     }
@@ -88,8 +94,8 @@ public class SADocumentMappingImpl extends SDocumentMappingImpl implements SADoc
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + (int) (archiveDate ^ (archiveDate >>> 32));
-        result = 31 * result + (int) (sourceObjectId ^ (sourceObjectId >>> 32));
+        result = 31 * result + (int) (archiveDate ^ archiveDate >>> 32);
+        result = 31 * result + (int) (sourceObjectId ^ sourceObjectId >>> 32);
         return result;
     }
 

@@ -3,7 +3,6 @@ package org.bonitasoft.engine.event;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.EndEventInstance;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
@@ -17,29 +16,12 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-public class EndEventTest extends CommonAPITest {
-
-    private User user;
-
-    @After
-    public void afterTest() throws BonitaException {
-        deleteUser(user);
-        logoutOnTenant();
-    }
-
-    @Before
-    public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
-        user = createUser("john", "bpm");
-    }
+public class EndEventTest extends AbstractEventTest {
 
     @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Start event", "End event" }, story = "Execute process with start and end events.", jira = "")
     @Test
@@ -108,9 +90,9 @@ public class EndEventTest extends CommonAPITest {
         builder.addUserTask("step1", ACTOR_NAME);
         builder.addEndEvent("stop").addTerminateEventTrigger();
         builder.addTransition("step1", "stop");
-        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
+        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, getUser());
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
-        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
+        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), getUser().getId());
         waitForProcessToFinish(startProcess);
         disableAndDeleteProcess(process);
     }
@@ -125,10 +107,10 @@ public class EndEventTest extends CommonAPITest {
         builder.addEndEvent("stop").addTerminateEventTrigger();
         builder.addTransition("step1", "stop");
         builder.addTransition("step2", "stop");
-        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
+        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, getUser());
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
         final ActivityInstance userTask = waitForUserTask("step2", startProcess.getId());
-        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
+        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), getUser().getId());
         // should finish even if we don't execute step2
         waitForProcessToFinish(startProcess);
         waitForArchivedActivity(userTask.getId(), TestStates.ABORTED);
@@ -147,10 +129,10 @@ public class EndEventTest extends CommonAPITest {
         builder.addTransition("step1", "stop");
         builder.addTransition("step2", "step3");
         builder.addTransition("step3", "stop");
-        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
+        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, getUser());
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
         final ActivityInstance userTask = waitForUserTask("step2", startProcess.getId());
-        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
+        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), getUser().getId());
         // should finish even if we don't execute step2
         waitForProcessToFinish(startProcess);
         waitForArchivedActivity(userTask.getId(), TestStates.ABORTED);
@@ -170,10 +152,10 @@ public class EndEventTest extends CommonAPITest {
             builder.addUserTask("step" + i, ACTOR_NAME);
             builder.addTransition("step" + i, "stop");
         }
-        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
+        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, getUser());
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
         checkNbOfHumanTasks(14);
-        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), user.getId());
+        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), getUser().getId());
         // should finish even if we don't execute step2
         waitForProcessToFinish(startProcess);
         disableAndDeleteProcess(process);
@@ -203,11 +185,11 @@ public class EndEventTest extends CommonAPITest {
         builder.addActor(ACTOR_NAME).addUserTask("step1", ACTOR_NAME).addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(3));
         builder.addEndEvent("stop").addTerminateEventTrigger().addTransition("step1", "stop");
 
-        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
+        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, getUser());
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
 
         for (int i = 0; i < 3; i++) {
-            waitForUserTaskAndExecuteIt("step1", processInstance.getId(), user.getId());
+            waitForUserTaskAndExecuteIt("step1", processInstance.getId(), getUser().getId());
         }
 
         waitForProcessToFinish(processInstance);

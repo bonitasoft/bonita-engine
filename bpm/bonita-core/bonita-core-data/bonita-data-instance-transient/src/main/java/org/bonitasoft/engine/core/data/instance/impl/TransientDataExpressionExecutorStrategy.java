@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.2
  */
 package org.bonitasoft.engine.core.data.instance.impl;
@@ -36,7 +36,6 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Baptiste Mesta
- * 
  */
 public class TransientDataExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
 
@@ -59,8 +58,8 @@ public class TransientDataExpressionExecutorStrategy extends NonEmptyContentExpr
 
     @Override
     public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> dependencyValues,
-            final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionEvaluationException, SExpressionDependencyMissingException {
+            final Map<Integer, Object> resolvedExpressions, final ContainerState containerState) throws SExpressionEvaluationException,
+            SExpressionDependencyMissingException {
         long containerId;
         String containerType;
         final int maxExpressionSize = expressions.size();
@@ -98,7 +97,7 @@ public class TransientDataExpressionExecutorStrategy extends NonEmptyContentExpr
                     SDataInstance dataInstance;
                     try {
                         dataInstance = transientDataService.getDataInstance(name, containerId, containerType);
-                    } catch (SDataInstanceNotFoundException e) {
+                    } catch (final SDataInstanceNotFoundException e) {
                         dataInstance = handleDataNotFound(name, containerId, containerType, e);
                     }
                     results.put(dataInstance.getName(), dataInstance.getValue());
@@ -109,9 +108,8 @@ public class TransientDataExpressionExecutorStrategy extends NonEmptyContentExpr
             } catch (final SDataInstanceException e) {
                 throw new SExpressionEvaluationException("Can't read transient data", e, currentData);
             }
-        } else {
-            throw new SExpressionDependencyMissingException("The context to evaluate the data '" + dataNames + "' was not set");
         }
+        throw new SExpressionDependencyMissingException("The context to evaluate the data '" + dataNames + "' was not set");
     }
 
     protected SDataInstance handleDataNotFound(final String name, final long containerId, final String containerType, final SDataInstanceNotFoundException e)
