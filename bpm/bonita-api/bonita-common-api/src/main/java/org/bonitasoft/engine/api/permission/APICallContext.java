@@ -16,7 +16,10 @@
 package org.bonitasoft.engine.api.permission;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONException;
@@ -151,6 +154,10 @@ public class APICallContext implements Serializable {
 
     public void setResourceName(String resourceName) {
         this.resourceName = resourceName;
+    }
+
+    public List<String> getCompoundResourceId(){
+        return resourceId == null ? Collections.<String>emptyList() : Arrays.asList(resourceId.split("/"));
     }
 
     public String getResourceId() {

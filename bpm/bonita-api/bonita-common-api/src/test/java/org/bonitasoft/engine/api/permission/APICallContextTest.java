@@ -18,6 +18,7 @@ package org.bonitasoft.engine.api.permission;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONException;
@@ -45,6 +46,35 @@ public class APICallContextTest {
         Map<String, String> filters = apiCallContext.getFilters();
 
         assertThat(filters).containsOnly(entry("user_id", "104"), entry("state", "ready"));
+    }
+
+    @Test
+    public void getCompoundResourceId() throws JSONException {
+        APICallContext apiCallContext = new APICallContext();
+        apiCallContext.setResourceId("1/2/3");
+
+        List<String> compoundResourceId = apiCallContext.getCompoundResourceId();
+
+        assertThat(compoundResourceId).containsExactly("1","2","3");
+    }
+
+    @Test
+    public void getCompoundResourceId_when_single_id() throws JSONException {
+        APICallContext apiCallContext = new APICallContext();
+        apiCallContext.setResourceId("1");
+
+        List<String> compoundResourceId = apiCallContext.getCompoundResourceId();
+
+        assertThat(compoundResourceId).containsExactly("1");
+    }
+
+    @Test
+    public void getCompoundResourceId_when_no_resource_id() throws JSONException {
+        APICallContext apiCallContext = new APICallContext();
+
+        List<String> compoundResourceId = apiCallContext.getCompoundResourceId();
+
+        assertThat(compoundResourceId).isEmpty();
     }
 
     @Test
