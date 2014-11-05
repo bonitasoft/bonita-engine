@@ -5,12 +5,13 @@
 	<parent>
 		<artifactId>bonita-supervisor-mapping</artifactId>
 		<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
-		<version>6.3.7-SNAPSHOT</version>
+		<version>6.4.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-supervisor-mapping-impl</artifactId>
 
 	<name>Bonita Supervisor Mapping: Service Implementation</name>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
@@ -35,6 +36,16 @@
         <dependency>
             <groupId>org.bonitasoft.engine.log</groupId>
             <artifactId>bonita-log-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-builder</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.persistence</groupId>
+            <artifactId>bonita-persistence-read</artifactId>
             <version>${project.version}</version>
         </dependency>
 	</dependencies>

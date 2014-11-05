@@ -137,9 +137,10 @@ public class PlatformDependencyServiceImpl implements DependencyService {
 
     @Override
     public SDependency getDependency(final long id) throws SDependencyNotFoundException {
-        final SelectByIdDescriptor<SDependency> selectByIdDescriptor = new SelectByIdDescriptor<SDependency>("getPlatformDependencyById", SDependency.class, id);
+        final SelectByIdDescriptor<SPlatformDependency> selectByIdDescriptor = new SelectByIdDescriptor<SPlatformDependency>("getPlatformDependencyById",
+                SPlatformDependency.class, id);
         try {
-            final SDependency sDependency = platformPersistenceService.selectById(selectByIdDescriptor);
+            final SPlatformDependency sDependency = platformPersistenceService.selectById(selectByIdDescriptor);
             if (sDependency == null) {
                 throw new SDependencyNotFoundException("No dependency exists using id: " + id);
             }
@@ -152,8 +153,8 @@ public class PlatformDependencyServiceImpl implements DependencyService {
     private SDependency getDependency(final String name) throws SDependencyNotFoundException {
         final Map<String, Object> parameters = Collections.singletonMap("name", (Object) name);
         try {
-            final SDependency sDependency = platformPersistenceService.selectOne(new SelectOneDescriptor<SDependency>("getPlatformDependencyByName",
-                    parameters, SDependency.class));
+            final SPlatformDependency sDependency = platformPersistenceService.selectOne(new SelectOneDescriptor<SPlatformDependency>(
+                    "getPlatformDependencyByName", parameters, SPlatformDependency.class));
             if (sDependency == null) {
                 throw new SDependencyNotFoundException("No dependency exists using name: " + name);
             }
@@ -241,8 +242,8 @@ public class PlatformDependencyServiceImpl implements DependencyService {
 
     @Override
     public SDependencyMapping getDependencyMapping(final long id) throws SDependencyMappingNotFoundException {
-        final SelectByIdDescriptor<SDependencyMapping> selectByIdDescriptor = new SelectByIdDescriptor<SDependencyMapping>("getPlatformDependencyMappingById",
-                SDependencyMapping.class, id);
+        final SelectByIdDescriptor<SPlatformDependencyMapping> selectByIdDescriptor = new SelectByIdDescriptor<SPlatformDependencyMapping>(
+                "getPlatformDependencyMappingById", SPlatformDependencyMapping.class, id);
         try {
             final SDependencyMapping sDependency = platformPersistenceService.selectById(selectByIdDescriptor);
             if (sDependency == null) {
@@ -405,7 +406,7 @@ public class PlatformDependencyServiceImpl implements DependencyService {
                 }
             }
             fromIndex = fromIndex + BATCH_SIZE;
-        } while (dependencyIds.size() == BATCH_SIZE);
+        } while (dependencyIds != null && dependencyIds.size() == BATCH_SIZE);
         return resources;
     }
 

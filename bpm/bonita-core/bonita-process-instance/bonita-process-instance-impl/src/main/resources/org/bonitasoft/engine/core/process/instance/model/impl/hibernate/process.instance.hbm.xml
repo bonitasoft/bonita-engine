@@ -209,7 +209,7 @@
 	</class>
 
 	<subclass name="org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl" abstract="true" extends="SFlowNodeInstanceImpl" />
-
+	
 	<subclass name="org.bonitasoft.engine.core.process.instance.model.event.impl.SCatchEventInstanceImpl" abstract="true" extends="org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl" >
 		<property name="interrupting" column="interrupting" />
 	</subclass>
@@ -236,20 +236,17 @@
 			<key-property name="id" column="id" type="long" />
 		</composite-id>
 		<discriminator column="kind" type="string" />
-		<property name="eventInstanceId" column="eventInstanceId" />
+		
+		<property name="eventInstanceId" type="long" column="eventInstanceId" />
+		
 		<filter name="tenantFilter" />
 	</class>
 
 	<subclass name="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl" discriminator-value="timer"
 		extends="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl">
-		<property name="timerType" column="timerType">
-			<type name="org.bonitasoft.engine.persistence.GenericEnumUserType">
-				<param name="enumClass">
-					org.bonitasoft.engine.core.process.definition.model.event.trigger.STimerType
-				</param>
-			</type>
-		</property>
-		<property name="timerValue" column="timerValue" />
+		<property name="executionDate" type="long" column="executionDate" />
+		<property name="jobTriggerName" type="string" column="jobTriggerName" />
+		<property name="eventInstanceName" type="string" column="eventInstanceName" />
 	</subclass>
 
 	<subclass name="org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl" discriminator-value="throwMessage"

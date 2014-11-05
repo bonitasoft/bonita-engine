@@ -32,4 +32,21 @@ public class TimeTrackerRecords {
      * this key is used to track the whole connector execution including pooling, input, execute, output and disconnect
      */
     public static final String EXECUTE_CONNECTOR_WORK = "EXECUTE_CONNECTOR_WORK";
+
+    /**
+     * this key is used to track the whole expression evaluation including its context. See ExpressionResolver.
+     */
+    public static final String EVALUATE_EXPRESSION_INCLUDING_CONTEXT = "EVALUATE_EXPRESSION_INCLUDING_CONTEXT";
+
+    /**
+     * this key is used to track the expression evaluation "only", assuming the context is already evaluated if necessary. See ExpressionService.
+     */
+    public static final String EVALUATE_EXPRESSION = "EVALUATE_EXPRESSION";
+
+    /**
+     * this key is used to track the expression evaluation "only", assuming the context is already evaluated if necessary. Evaluates a set of expression in one
+     * measure. See ExpressionService.
+     */
+    public static final String EVALUATE_EXPRESSIONS = "EVALUATE_EXPRESSIONS";
+
 }

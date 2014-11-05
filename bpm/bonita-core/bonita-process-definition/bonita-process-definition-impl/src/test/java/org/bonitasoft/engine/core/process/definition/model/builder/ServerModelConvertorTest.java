@@ -1,16 +1,17 @@
 package org.bonitasoft.engine.core.process.definition.model.builder;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.impl.ExpressionImpl;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.expression.model.impl.SExpressionImpl;
 import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class ServerModelConvertorTest {
 
@@ -36,6 +37,12 @@ public class ServerModelConvertorTest {
         final SExpression expression = ServerModelConvertor.convertExpression(clientExpression);
 
         assertThat(expression).isEqualTo(expected);
+    }
+
+    @Test
+    public void return_null_when_converting_a_null_business_data() {
+        final SBusinessDataDefinition businessDataDefinition = ServerModelConvertor.convertBusinessDataDefinition(null);
+        assertThat(businessDataDefinition).isNull();
     }
 
 }

@@ -112,15 +112,16 @@ CREATE INDEX idx_ci_container_activation ON connector_instance (tenantid, contai
 CREATE TABLE event_trigger_instance (
 	tenantid NUMBER(19, 0) NOT NULL,
   	id NUMBER(19, 0) NOT NULL,
-  	eventInstanceId NUMBER(19, 0) NOT NULL,
   	kind VARCHAR2(15) NOT NULL,
-  	timerType VARCHAR2(10),
-  	timerValue NUMBER(19, 0),
+  	eventInstanceId NUMBER(19, 0) NOT NULL,
+  	eventInstanceName VARCHAR2(50),
   	messageName VARCHAR2(255),
   	targetProcess VARCHAR2(255),
   	targetFlowNode VARCHAR2(255),
   	signalName VARCHAR2(255),
   	errorCode VARCHAR2(255),
+  	executionDate NUMBER(19, 0), 
+  	jobTriggerName VARCHAR2(255),
   	PRIMARY KEY (tenantid, id)
 );
 
@@ -206,10 +207,30 @@ CREATE TABLE breakpoint (
 CREATE TABLE ref_biz_data_inst (
 	tenantid NUMBER(19, 0) NOT NULL,
   	id NUMBER(19, 0) NOT NULL,
+  	kind VARCHAR2(15) NOT NULL,
   	name VARCHAR2(255) NOT NULL,
-  	proc_inst_id NUMBER(19, 0) NOT NULL,
-  	data_id INT NULL,
-  	data_classname VARCHAR2(255) NOT NULL,
-  	UNIQUE (tenantid, proc_inst_id, name),
-  	PRIMARY KEY (tenantid, id)
+  	proc_inst_id NUMBER(19, 0),
+  	fn_inst_id NUMBER(19, 0),
+  	data_id NUMBER(19, 0),
+  	data_classname VARCHAR2(255) NOT NULL
 );
+
+CREATE INDEX idx_biz_data_inst1 ON ref_biz_data_inst (tenantid, proc_inst_id);
+
+CREATE INDEX idx_biz_data_inst2 ON ref_biz_data_inst (tenantid, fn_inst_id);
+
+
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT pk_ref_biz_data_inst PRIMARY KEY (tenantid, id);
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT uk_ref_biz_data_inst UNIQUE (name, proc_inst_id, fn_inst_id, tenantid);
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_proc FOREIGN KEY (tenantid, proc_inst_id) REFERENCES process_instance(tenantid, id) ON DELETE CASCADE;
+ALTER TABLE ref_biz_data_inst ADD CONSTRAINT fk_ref_biz_data_fn FOREIGN KEY (tenantid, fn_inst_id) REFERENCES flownode_instance(tenantid, id) ON DELETE CASCADE;
+
+CREATE TABLE multi_biz_data (
+	tenantid NUMBER(19, 0) NOT NULL,
+  	id NUMBER(19, 0) NOT NULL,
+  	idx NUMBER(19, 0) NOT NULL,
+  	data_id NUMBER(19, 0) NOT NULL,
+  	PRIMARY KEY (tenantid, id, data_id)
+);
+
+ALTER TABLE multi_biz_data ADD CONSTRAINT fk_rbdi_mbd FOREIGN KEY (tenantid, id) REFERENCES ref_biz_data_inst(tenantid, id) ON DELETE CASCADE;

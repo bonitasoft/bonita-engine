@@ -18,7 +18,7 @@ import java.util.List;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractUserSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchUserDescriptor;
@@ -37,12 +37,12 @@ public class SearchUsers extends AbstractUserSearchEntity {
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return identityService.getNumberOfUsers(searchOptions);
     }
 
     @Override
-    public List<SUser> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SUser> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return identityService.searchUsers(searchOptions);
     }
 

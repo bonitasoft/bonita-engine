@@ -23,7 +23,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -88,21 +87,13 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
     }
 
     @Override
-    public long getNumberOfLogs(final QueryOptions searchOptions) throws SBonitaSearchException {
-        try {
-            return persistenceService.getNumberOfEntities(SQueriableLog.class, searchOptions, null);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+    public long getNumberOfLogs(final QueryOptions searchOptions) throws SBonitaReadException {
+        return persistenceService.getNumberOfEntities(SQueriableLog.class, searchOptions, null);
     }
 
     @Override
-    public List<SQueriableLog> searchLogs(final QueryOptions searchOptions) throws SBonitaSearchException {
-        try {
-            return persistenceService.searchEntity(SQueriableLog.class, searchOptions, null);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+    public List<SQueriableLog> searchLogs(final QueryOptions searchOptions) throws SBonitaReadException {
+        return persistenceService.searchEntity(SQueriableLog.class, searchOptions, null);
     }
 
     @Override

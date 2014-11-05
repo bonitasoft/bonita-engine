@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.actor.ActorDefinition;
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
@@ -64,7 +65,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     private static final String DOUBLE_HYPHEN = "--";
 
-    private static final int MAX_CHARACTER_URL = 255;
+    private static final int MAX_CHARACTER_URL = 1024;
 
     private static final int MAX_CHARACTER_FILENAME = 255;
 
@@ -116,6 +117,22 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         validateProcess(flowElementContainer, true);
         validateEventsSubProcess();
         validateActors();
+        validateBusinessData();
+    }
+
+    protected void validateBusinessData() {
+        final FlowElementContainerDefinition processContainer = process.getProcessContainer();
+        final List<BusinessDataDefinition> businessDataDefinitions = processContainer.getBusinessDataDefinitions();
+        if (!businessDataDefinitions.isEmpty()) {
+            addError("It is not possible to use business data in the process");
+        }
+
+        for (final ActivityDefinition activity : processContainer.getActivities()) {
+            final List<BusinessDataDefinition> dataDefinitions = activity.getBusinessDataDefinitions();
+            if (!dataDefinitions.isEmpty()) {
+                addError("It is not possible to use business data in the activity " + activity.getName());
+            }
+        }
     }
 
     private void validateConnectors(final List<ConnectorDefinition> connectorDefinitions) {
@@ -304,7 +321,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
                 if (loopCharacteristics.getDataOutputItemRef() != null && !loopCharacteristics.getDataOutputItemRef().isEmpty()
                         && (loopCharacteristics.getLoopDataOutputRef() == null || loopCharacteristics.getLoopDataOutputRef().isEmpty())) {
                     designErrors
-                            .add("The multi instance has got a data output reference but does not have a loop data output on activity" + activity.getName());
+                    .add("The multi instance has got a data output reference but does not have a loop data output on activity" + activity.getName());
                 }
                 // TODO add validation on data existence
             }
@@ -313,13 +330,10 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
 
     private void validateDocuments(final FlowElementContainerDefinition processContainer) {
         for (final DocumentDefinition document : processContainer.getDocumentDefinitions()) {
-            if ((document.getFileName() == null || document.getFileName().isEmpty()) && (document.getUrl() == null || document.getUrl().isEmpty())) {
-                designErrors.add("A document definition must have a file name or an URL: " + document.getName());
-            }
-            if (document.getUrl() != null && document.getUrl().length() > 255) {
+            if (document.getUrl() != null && document.getUrl().length() > MAX_CHARACTER_URL) {
                 designErrors.add("An url can't have more than " + MAX_CHARACTER_URL + " characters.");
             }
-            if (document.getFileName() != null && document.getFileName().length() > 255) {
+            if (document.getFileName() != null && document.getFileName().length() > MAX_CHARACTER_FILENAME) {
                 designErrors.add("A file name can't have more than " + MAX_CHARACTER_FILENAME + " characters.");
             }
         }
@@ -388,13 +402,18 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
         }
     }
 
-    void addError(final String error) {
+    protected void addError(final String error) {
         designErrors.add(error);
     }
 
     @Override
     public DocumentDefinitionBuilder addDocumentDefinition(final String name) {
         return new DocumentDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name);
+    }
+
+    @Override
+    public DocumentListDefinitionBuilder addDocumentListDefinition(final String name) {
+        return new DocumentListDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name);
     }
 
     @Override
@@ -555,7 +574,7 @@ public class ProcessDefinitionBuilder implements DescriptionBuilder, ContainerBu
     public TextDataDefinitionBuilder addLongTextData(final String name, final Expression defaultValue) {
         final String className = String.class.getName();
         return new TextDataDefinitionBuilder(this, (FlowElementContainerDefinitionImpl) process.getProcessContainer(), name, className, defaultValue)
-                .isLongText();
+        .isLongText();
     }
 
     @Override

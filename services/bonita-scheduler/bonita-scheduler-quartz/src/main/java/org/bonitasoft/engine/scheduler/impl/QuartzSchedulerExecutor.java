@@ -18,15 +18,20 @@ import static org.quartz.impl.matchers.GroupMatcher.jobGroupEquals;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
+import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.trigger.CronTrigger;
 import org.bonitasoft.engine.scheduler.trigger.RepeatTrigger;
 import org.bonitasoft.engine.scheduler.trigger.Trigger;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.transaction.TransactionState;
@@ -47,6 +52,7 @@ import org.quartz.impl.matchers.GroupMatcher;
 /**
  * @author Matthieu Chaffotte
  * @author Yanyan Liu
+ * @author Celine Souchet
  */
 public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
@@ -56,18 +62,26 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
 
     private final TransactionService transactionService;
 
+    private final SessionAccessor sessionAccessor;
+
+    private final TechnicalLoggerService logger;
+
     private final boolean useOptimization;
 
     private QuartzScheduler quartzScheduler;
 
-    private final List<AbstractJobListener> jobListeners;
-
-    public QuartzSchedulerExecutor(final BonitaSchedulerFactory schedulerFactory, final List<AbstractJobListener> jobListeners,
-            final TransactionService transactionService, final boolean useOptimization) {
+    public QuartzSchedulerExecutor(final BonitaSchedulerFactory schedulerFactory, final TransactionService transactionService,
+            final SessionAccessor sessionAccessor, final TechnicalLoggerService logger, final boolean useOptimization) {
         this.transactionService = transactionService;
+        this.sessionAccessor = sessionAccessor;
+        this.logger = logger;
         this.useOptimization = useOptimization;
         this.schedulerFactory = schedulerFactory;
-        this.jobListeners = jobListeners;
+    }
+
+    @Override
+    public void setBOSSchedulerService(final SchedulerServiceImpl schedulerService) {
+        schedulerFactory.setBOSSchedulerService(schedulerService);
     }
 
     @Override
@@ -115,7 +129,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     private JobDetail getJobDetail(final long jobId, final String groupName, final String jobName, final boolean disallowConcurrentExecution) {
-        Class<? extends QuartzJob> jobClass = null;
+        Class<? extends AbstractQuartzJob> jobClass = null;
         if (disallowConcurrentExecution) {
             jobClass = NonConcurrentQuartzJob.class;
         } else {
@@ -235,12 +249,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
                 }
                 // shutdown();
             }
-            scheduler = schedulerFactory.getScheduler();
 
-            final ListenerManager listenerManager = scheduler.getListenerManager();
-            for (final AbstractJobListener jobListener : jobListeners) {
-                listenerManager.addJobListener(jobListener);
-            }
             scheduler.start();
 
             try {
@@ -279,7 +288,19 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     public boolean delete(final String jobName, final String groupName) throws SSchedulerException {
         try {
             checkSchedulerState();
-            return scheduler.deleteJob(jobKey(jobName, groupName));
+            final JobKey jobKey = jobKey(jobName, groupName);
+            return scheduler.deleteJob(jobKey);
+        } catch (final SchedulerException e) {
+            throw new SSchedulerException(e);
+        }
+    }
+
+    @Override
+    public boolean isExistingJob(final String jobName, final String groupName) throws SSchedulerException {
+        try {
+            checkSchedulerState();
+            final JobKey jobKey = jobKey(jobName, groupName);
+            return scheduler.getJobDetail(jobKey) != null;
         } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         }
@@ -325,14 +346,6 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             return jobsNames;
         } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
-        }
-    }
-
-    @Override
-    public void setBOSSchedulerService(final SchedulerServiceImpl schedulerService) {
-        schedulerFactory.setBOSSchedulerService(schedulerService);
-        for (final AbstractJobListener jobListener : jobListeners) {
-            jobListener.setBOSSchedulerService(schedulerService);
         }
     }
 
@@ -391,4 +404,44 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         }
     }
 
+    @Override
+    public Date rescheduleJob(final String triggerName, final String groupName, final Date triggerStartTime) throws SSchedulerException {
+        final TriggerKey triggerKey = new TriggerKey(triggerName, groupName);
+        try {
+            final org.quartz.Trigger oldTrigger = scheduler.getTrigger(triggerKey);
+            final org.quartz.Trigger newTrigger = oldTrigger.getTriggerBuilder().startAt(triggerStartTime).build();
+            return scheduler.rescheduleJob(triggerKey, newTrigger);
+        } catch (final SchedulerException e) {
+            throw new SSchedulerException("Can't get the trigger " + triggerKey, e);
+        }
+    }
+
+    @Override
+    public void addJobListener(final List<AbstractBonitaTenantJobListener> jobListeners, final String groupName) throws SSchedulerException {
+        try {
+            scheduler.getListenerManager().addJobListener(new TenantQuartzJobListener(jobListeners, groupName, sessionAccessor, transactionService, logger),
+                    GroupMatcher.<JobKey> groupEquals(groupName));
+        } catch (final SchedulerException e) {
+            throw new SSchedulerException(e);
+        }
+    }
+
+    @Override
+    public void addJobListener(final List<AbstractBonitaPlatormJobListener> jobListeners) throws SSchedulerException {
+        try {
+            final ListenerManager listenerManager = scheduler.getListenerManager();
+            listenerManager.addJobListener(new PlatformQuartzJobListener(jobListeners));
+        } catch (final SchedulerException e) {
+            throw new SSchedulerException(e);
+        }
+    }
+
+    @Override
+    public void initializeScheduler() throws SSchedulerException {
+        try {
+            scheduler = schedulerFactory.getScheduler();
+        } catch (final SchedulerException e) {
+            throw new SSchedulerException(e);
+        }
+    }
 }

@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.external.identity.mapping.model.SExternalIdentityMapping;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Emmanuel Duchastenier
@@ -142,9 +142,9 @@ public interface ExternalIdentityMappingService {
      * @param querySuffix
      *            The query suffix, it can be "USER", "GROUP", "ROLE", "MEMBERSHIP";
      * @return a list of SExternalIdentityMapping objects matching the criteria.
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<SExternalIdentityMapping> searchExternalIdentityMappings(String kind, QueryOptions queryOptions, String querySuffix) throws SBonitaSearchException;
+    List<SExternalIdentityMapping> searchExternalIdentityMappings(String kind, QueryOptions queryOptions, String querySuffix) throws SBonitaReadException;
 
     /**
      * Get total number of externalIdentityMappings for specific kind according to the queryOptions.
@@ -156,9 +156,9 @@ public interface ExternalIdentityMappingService {
      * @param querySuffix
      *            the query suffix, it can be "USER", "GROUP", "ROLE", "MEMBERSHIP";
      * @return number of externalIdentityMappings matching the criteria.
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfExternalIdentityMappings(String kind, QueryOptions searchOptions, String querySuffix) throws SBonitaSearchException;
+    long getNumberOfExternalIdentityMappings(String kind, QueryOptions searchOptions, String querySuffix) throws SBonitaReadException;
 
     /**
      * Search all <code>SExternalIdentityMapping</code> objects associated with the specified externalId and kind for the specific user. Use querySuffix to
@@ -175,10 +175,10 @@ public interface ExternalIdentityMappingService {
      * @param querySuffix
      *            the query suffix, it can be "USER", "GROUP", "ROLE", "MEMBERSHIP";
      * @return the list of results matching the criteria.
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
     List<SExternalIdentityMapping> searchExternalIdentityMappingsForUser(String kind, long userId, final String externalId, QueryOptions queryOptions,
-            String querySuffix) throws SBonitaSearchException;
+            String querySuffix) throws SBonitaReadException;
 
     /**
      * Get total number of <code>SExternalIdentityMapping</code> objects associated with the specified externalId and kind for the specific user. Use
@@ -196,10 +196,10 @@ public interface ExternalIdentityMappingService {
      * @param querySuffix
      *            the query suffix, it can be "USER", "GROUP", "ROLE", "MEMBERSHIP";
      * @return the number of externalIdentityMappings matching the criteria.
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
     long getNumberOfExternalIdentityMappingsForUser(String kind, long userId, final String externalId, QueryOptions searchOptions, String querySuffix)
-            throws SBonitaSearchException;
+            throws SBonitaReadException;
 
     /**
      * Search all <code>SExternalIdentityMapping</code> objects associated with the specified externalId and kind.
@@ -211,10 +211,10 @@ public interface ExternalIdentityMappingService {
      * @param queryOptions
      *            a QueryOptions object containing some query conditions
      * @return the list of results matching the criteria.
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      *             in case of search error.
      */
-    List<SExternalIdentityMapping> searchExternalIdentityMappings(String kind, String externalId, QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SExternalIdentityMapping> searchExternalIdentityMappings(String kind, String externalId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * @param mappingId

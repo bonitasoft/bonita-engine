@@ -28,7 +28,6 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.UpdateException;
-import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * Manipulates a platform command. A command can be registered, unregistered and executed with parameters.<br/>
@@ -109,7 +108,7 @@ public interface PlatformCommandAPI {
      *         occurs when an exception is thrown during command execution
      */
     Serializable execute(String name, Map<String, Serializable> parameters) throws CommandNotFoundException, CommandParameterizationException,
-    CommandExecutionException;
+            CommandExecutionException;
 
     /**
      * Deletes a command and its descriptor.

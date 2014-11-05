@@ -26,7 +26,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -82,6 +81,7 @@ import org.junit.Test;
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
+ * @author Emmanuel Duchastenier
  */
 public class BusinessArchiveTest {
 
@@ -93,10 +93,11 @@ public class BusinessArchiveTest {
 
     @Before
     public void before() throws IOException {
-        final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
-        tempFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("barFolder_" + jvmName);
+        final String barFolderName = "tmpBar";
+        tempFolder = IOUtil.createTempDirectoryInDefaultTempDirectory(barFolderName);
+        deleteDirOnExit(tempFolder);
         IOUtil.deleteDir(tempFolder);
-        barFile = IOUtil.createTempFileInDefaultTempDirectory("businessArchive", ".bar");
+        barFile = IOUtil.createTempFileInDefaultTempDirectory(barFolderName, ".bar");
         IOUtil.deleteFile(barFile, 2, 3);
     }
 
@@ -123,9 +124,7 @@ public class BusinessArchiveTest {
 
             @Override
             public void run() {
-                if (infoFile != null) {
-                    IOUtil.deleteFile(infoFile, 1, 0);
-                }
+                IOUtil.deleteFile(infoFile, 1, 0);
             }
         });
         return infoFile;
@@ -673,22 +672,22 @@ public class BusinessArchiveTest {
                 new ExpressionBuilder().createConstantIntegerExpression(5));
         final DesignProcessDefinition result = getDesignProcessDefinition(builder);
 
-        AutomaticTaskDefinition auto1 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto1");
-        MultiInstanceLoopCharacteristics multi1 = (MultiInstanceLoopCharacteristics) auto1.getLoopCharacteristics();
+        final AutomaticTaskDefinition auto1 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto1");
+        final MultiInstanceLoopCharacteristics multi1 = (MultiInstanceLoopCharacteristics) auto1.getLoopCharacteristics();
         assertEquals(false, multi1.isSequential());
         assertEquals("inputList", multi1.getLoopDataInputRef());
         assertEquals("outputList", multi1.getLoopDataOutputRef());
         assertEquals("input", multi1.getDataInputItemRef());
         assertEquals("output", multi1.getDataOutputItemRef());
 
-        AutomaticTaskDefinition auto2 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto2");
-        MultiInstanceLoopCharacteristics multi2 = (MultiInstanceLoopCharacteristics) auto2.getLoopCharacteristics();
+        final AutomaticTaskDefinition auto2 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto2");
+        final MultiInstanceLoopCharacteristics multi2 = (MultiInstanceLoopCharacteristics) auto2.getLoopCharacteristics();
         assertEquals(true, multi2.isSequential());
         assertEquals("5", multi2.getLoopCardinality().getContent());
         assertEquals("false", multi2.getCompletionCondition().getContent());
 
-        AutomaticTaskDefinition auto3 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto3");
-        StandardLoopCharacteristics loop2 = (StandardLoopCharacteristics) auto3.getLoopCharacteristics();
+        final AutomaticTaskDefinition auto3 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto3");
+        final StandardLoopCharacteristics loop2 = (StandardLoopCharacteristics) auto3.getLoopCharacteristics();
         assertEquals(true, loop2.isTestBefore());
         assertEquals("true", loop2.getLoopCondition().getContent());
         assertEquals("5", loop2.getLoopMax().getContent());
@@ -1020,7 +1019,6 @@ public class BusinessArchiveTest {
         file.delete();
         createNewFile(file);
         IOUtil.writeContentToFile(fileContent, file);
-        deleteDirOnExit();
         BusinessArchiveFactory.readBusinessArchive(tempFolder);
     }
 
@@ -1048,7 +1046,6 @@ public class BusinessArchiveTest {
         file.delete();
         createNewFile(file);
         IOUtil.writeContentToFile(fileContent, file);
-        deleteDirOnExit();
         BusinessArchiveFactory.readBusinessArchive(tempFolder);
     }
 
@@ -1058,22 +1055,20 @@ public class BusinessArchiveTest {
 
             @Override
             public void run() {
-                if (file != null) {
-                    IOUtil.deleteFile(file, 1, 0);
-                }
+                IOUtil.deleteFile(file, 1, 0);
             }
         });
     }
 
-    private void deleteDirOnExit() {
+    private void deleteDirOnExit(final File directory) {
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
             @Override
             public void run() {
-                if (tempFolder != null) {
+                if (directory != null) {
                     try {
-                        IOUtil.deleteDir(tempFolder);
-                    } catch (IOException e) {
+                        IOUtil.deleteDir(directory);
+                    } catch (final IOException e) {
                         e.printStackTrace();
                     }
                 }

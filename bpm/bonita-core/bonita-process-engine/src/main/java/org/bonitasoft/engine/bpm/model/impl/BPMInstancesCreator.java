@@ -557,7 +557,7 @@ public class BPMInstancesCreator {
                     .createNewInstance(sConnectorDefinition.getName(), container.getId(), containerType,
                             sConnectorDefinition.getConnectorId(), sConnectorDefinition.getVersion(), sConnectorDefinition.getActivationEvent(),
                             executionOrder++)
-                    .done());
+                            .done());
         }
         final CreateConnectorInstances transaction = new CreateConnectorInstances(connectorInstances, connectorInstanceService);
         transaction.execute();
@@ -651,7 +651,7 @@ public class BPMInstancesCreator {
 
     private void createDataForProcess(final SProcessInstance processInstance, final SProcessDefinition processDefinition,
             final List<SDataInstance> sDataInstances)
-            throws SDataInstanceException, SFlowNodeNotFoundException, SFlowNodeReadException {
+                    throws SDataInstanceException, SFlowNodeNotFoundException, SFlowNodeReadException {
         if (!sDataInstances.isEmpty()) {
             for (final SDataInstance sDataInstance : sDataInstances) {
                 dataInstanceService.createDataInstance(sDataInstance);
@@ -696,10 +696,8 @@ public class BPMInstancesCreator {
     }
 
     private void createDataInstances(final List<SDataDefinition> dataDefinitions, final long containerId, final DataInstanceContainer containerType,
-            final SExpressionContext expressionContext, final ExpressionResolverService expressionResolverService,
-            final DataInstanceService dataInstanceService, final TransientDataService transientDataService, final String loopDataInputRef, final int index,
-            final String dataInputRef, final long parentContainerId)
-            throws SDataInstanceException, SExpressionException {
+            final SExpressionContext expressionContext, final String loopDataInputRef, final int index, final String dataInputRef, final long parentContainerId)
+                    throws SDataInstanceException, SExpressionException {
         for (final SDataDefinition dataDefinition : dataDefinitions) {
             Serializable dataValue = null;
             if (dataDefinition.getName().equals(dataInputRef)) {
@@ -739,21 +737,17 @@ public class BPMInstancesCreator {
                 dataInstanceService.createDataInstance(dataInstance);
             }
         }
-
     }
 
     public void createDataInstances(final List<SDataDefinition> dataDefinitions, final long containerId, final DataInstanceContainer containerType,
-            final SExpressionContext expressionContext) throws SDataInstanceException,
-            SExpressionException {
-        createDataInstances(dataDefinitions, containerId, containerType, expressionContext, expressionResolverService, dataInstanceService,
-                transientDataService, null, -1, null, -1);
+            final SExpressionContext expressionContext) throws SDataInstanceException, SExpressionException {
+        createDataInstances(dataDefinitions, containerId, containerType, expressionContext, null, -1, null, -1);
     }
 
     private SDataInstance buildDataInstance(final SDataDefinition dataDefinition, final long dataContainerId, final DataInstanceContainer dataContainerType,
             final Serializable dataValue) throws SDataInstanceNotWellFormedException {
         return BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition).setContainerId(dataContainerId)
                 .setContainerType(dataContainerType.name()).setValue(dataValue).done();
-
     }
 
     public boolean createDataInstances(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
@@ -761,35 +755,46 @@ public class BPMInstancesCreator {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         final SActivityDefinition activityDefinition = (SActivityDefinition) processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
         if (activityDefinition != null) {// can be null if the activity was added in runtime
-            try {
-                final SLoopCharacteristics loopCharacteristics = activityDefinition.getLoopCharacteristics();
-                final SExpressionContext expressionContext;
-                if (sExpressionContext == null) {
-                    expressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
-                            processDefinition.getId());
-                } else {
-                    expressionContext = sExpressionContext;
-                }
-                final List<SDataDefinition> sDataDefinitions = activityDefinition.getSDataDefinitions();
-                if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics
-                        && ((SMultiInstanceLoopCharacteristics) loopCharacteristics).getDataInputItemRef() != null) {
-                    final SMultiInstanceLoopCharacteristics miLoop = (SMultiInstanceLoopCharacteristics) loopCharacteristics;
-                    createDataInstances(sDataDefinitions, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE, expressionContext,
-                            expressionResolverService, dataInstanceService, transientDataService, miLoop.getLoopDataInputRef(),
-                            flowNodeInstance.getLoopCounter(), miLoop.getDataInputItemRef(), flowNodeInstance.getParentContainerId());
-                } else {
-                    createDataInstances(sDataDefinitions, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE, expressionContext);
-                }
-                if (!sDataDefinitions.isEmpty() && logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                    final String message = "Initialized variables for flow node" + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
-                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
-                }
-                return sDataDefinitions.size() > 0;
-            } catch (final SBonitaException e) {
-                throw new SActivityStateExecutionException(e);
+            final SExpressionContext expressionContext;
+            if (sExpressionContext == null) {
+                expressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                        processDefinition.getId());
+            } else {
+                expressionContext = sExpressionContext;
             }
+            return createDataInstances(processContainer, activityDefinition, flowNodeInstance, expressionContext);
         }
         return false;
+    }
+
+    private boolean createDataInstances(final SFlowElementContainerDefinition processContainer, final SActivityDefinition activityDefinition,
+            final SFlowNodeInstance flowNodeInstance, final SExpressionContext expressionContext) throws SActivityStateExecutionException {
+        final List<SDataDefinition> sDataDefinitions = activityDefinition.getSDataDefinitions();
+        final SLoopCharacteristics loopCharacteristics = activityDefinition.getLoopCharacteristics();
+        try {
+            if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics
+                    && (((SMultiInstanceLoopCharacteristics) loopCharacteristics).getDataInputItemRef() != null
+                    || ((SMultiInstanceLoopCharacteristics) loopCharacteristics).getDataOutputItemRef() != null)) {
+                createDataInstancesForMultiInstance(activityDefinition, flowNodeInstance, expressionContext);
+            } else {
+                createDataInstances(sDataDefinitions, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE, expressionContext);
+            }
+            if (!sDataDefinitions.isEmpty() && logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                final String message = "Initialized variables for flow node" + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
+            }
+            return sDataDefinitions.size() > 0;
+        } catch (final SBonitaException e) {
+            throw new SActivityStateExecutionException(e);
+        }
+    }
+
+    protected void createDataInstancesForMultiInstance(final SActivityDefinition activityDefinition, final SFlowNodeInstance flowNodeInstance,
+            final SExpressionContext expressionContext) throws SDataInstanceException, SExpressionException {
+        final SLoopCharacteristics loopCharacteristics = activityDefinition.getLoopCharacteristics();
+        final SMultiInstanceLoopCharacteristics miLoop = (SMultiInstanceLoopCharacteristics) loopCharacteristics;
+        createDataInstances(activityDefinition.getSDataDefinitions(), flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE, expressionContext,
+                miLoop.getLoopDataInputRef(), flowNodeInstance.getLoopCounter(), miLoop.getDataInputItemRef(), flowNodeInstance.getParentContainerId());
     }
 
     public TechnicalLoggerService getLogger() {

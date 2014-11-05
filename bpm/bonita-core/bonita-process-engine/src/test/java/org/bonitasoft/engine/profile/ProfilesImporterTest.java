@@ -35,7 +35,6 @@ import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException
 import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryCreationException;
 import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
-import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
 import org.bonitasoft.engine.profile.impl.ExportedParentProfileEntry;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.profile.impl.ExportedProfileEntry;
@@ -282,10 +281,8 @@ public class ProfilesImporterTest {
         return expected;
     }
 
-    private void createImporter(final ProfileImportStategy importStrategy, final ExportedProfile... exportedProfile) throws ExecutionException,
-            SProfileEntryDeletionException,
-            SProfileMemberDeletionException,
-            SProfileUpdateException, SProfileCreationException, SProfileEntryCreationException {
+    private void createImporter(final ProfileImportStategy importStrategy, final ExportedProfile... exportedProfile) throws SProfileUpdateException,
+            SProfileCreationException, SProfileEntryCreationException {
         profilesImporter = spy(new ProfilesImporter(profileService, identityService, Arrays.asList(exportedProfile), importStrategy));
         doReturn(mock(SProfile.class)).when(profilesImporter).createSProfile(any(ExportedProfile.class), anyLong());
         doReturn(mock(SProfileEntry.class)).when(profilesImporter).createProfileEntry(any(ExportedParentProfileEntry.class), anyLong(), anyLong());

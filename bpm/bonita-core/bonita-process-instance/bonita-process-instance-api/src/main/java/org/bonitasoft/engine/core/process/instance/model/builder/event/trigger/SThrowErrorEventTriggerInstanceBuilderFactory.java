@@ -13,12 +13,16 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder.event.trigger;
 
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public interface SThrowErrorEventTriggerInstanceBuilderFactory extends SEventTriggerInstanceBuilderFactory {
 
     SThrowErrorEventTriggerInstanceBuilder createNewInstance(final long eventInstanceId, final String errorCode);
+
+    SThrowErrorEventTriggerInstanceBuilder createNewInstance(SThrowErrorEventTriggerInstance sThrowErrorEventTriggerInstance);
 
 }

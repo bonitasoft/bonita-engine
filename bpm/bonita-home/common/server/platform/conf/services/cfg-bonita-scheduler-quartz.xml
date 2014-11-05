@@ -21,31 +21,17 @@
 		</property>
 	</bean>
 
-	<bean id="loggerJobListener" class="org.bonitasoft.engine.scheduler.impl.TechnicalLoggerJobListener">
-		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-	</bean>
-
-	<bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
-		<constructor-arg name="jobService" ref="jobService" />
-		<constructor-arg name="incidentService" ref="incidentService" />
-		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
-	</bean>
-
 	<bean id="schedulerExecutor" class="org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutor">
 		<constructor-arg name="schedulerFactory" ref="quartzSchedulerFactory" />
-		<constructor-arg name="jobListeners">
-			<list>
-				<ref bean="loggerJobListener" />
-				<ref bean="jdbcJobListener" />
-			</list>
-		</constructor-arg>
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="useOptimization" value="true" />
 	</bean>
 
 	<bean id="jobService" class="org.bonitasoft.engine.scheduler.impl.JobServiceImpl">
 		<constructor-arg name="eventService" ref="eventService" />
-		<constructor-arg name="recorder" ref="recorderSync" />
+		<constructor-arg name="recorder" ref="tenantRecorderSyncForPlatform" />
 		<constructor-arg name="readPersistenceService" ref="persistenceService" />
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
@@ -62,27 +48,5 @@
 	</bean>
 
 	<bean id="servicesResolver" class="org.bonitasoft.engine.service.ProcessEngineServicesResolver" />
-
-	<bean id="db-bonita-scheduler-quartz" class="org.bonitasoft.engine.persistence.DBConfiguration">
-		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/scheduler/${db.vendor}-createQuartzTables.sql" />
-		<constructor-arg name="initTablesFile">
-			<null />
-		</constructor-arg>
-		<constructor-arg name="cleanTablesFile">
-			<null />
-		</constructor-arg>
-		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/scheduler/${db.vendor}-dropQuartzTables.sql" />
-		<constructor-arg name="filter" value="platform" />
-	</bean>
-
-	<bean id="db-bonita-scheduler" class="org.bonitasoft.engine.persistence.DBConfiguration">
-		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/scheduler/impl/db/${db.vendor}-createTables.sql" />
-		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/scheduler/impl/db/${db.vendor}-initTables.sql" />
-		<constructor-arg name="cleanTablesFile" value="/org/bonitasoft/engine/scheduler/impl/db/${db.vendor}-cleanTables.sql" />
-		<constructor-arg name="dropTablesFile" value="/org/bonitasoft/engine/scheduler/impl/db/${db.vendor}-dropTables.sql" />
-		<constructor-arg name="filter" value="journal" />
-		<constructor-arg name="deleteTenantObjectsFile" value="/org/bonitasoft/engine/scheduler/impl/db/${db.vendor}-deleteTenantObjects.sql" />
-		<constructor-arg name="deleteTenantObjectsPriority" type="int" value="5" />
-	</bean>
 
 </beans>

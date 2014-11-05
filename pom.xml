@@ -10,7 +10,7 @@
 
 	<groupId>org.bonitasoft.engine</groupId>
 	<artifactId>bonita-engine</artifactId>
-	<version>6.3.7-SNAPSHOT</version>
+	<version>6.4.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Bonita BPM Engine</name>
@@ -82,6 +82,7 @@
 		<jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
 		<!-- Tells Sonar where the Jacoco coverage result file is located for Integration Tests -->
 		<sonar.jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</sonar.jacoco.itReportPath>
+        <sonar.exclusions>**/*BuilderImpl.java,**/*FactoryImpl.java</sonar.exclusions>
 	</properties>
 
 	<dependencyManagement>
@@ -382,6 +383,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+				<module>bonita-integration-tests</module>
 			</modules>
 			<properties>
 				<maven.test.skip>false</maven.test.skip>
@@ -409,6 +411,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+				<module>bonita-integration-tests</module>
 			</modules>
 			<properties>
 				<skipTests>true</skipTests>
@@ -423,6 +426,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+				<module>bonita-integration-tests</module>
 			</modules>
 			<build>
 				<plugins>
@@ -446,6 +450,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+				<module>bonita-integration-tests</module>
 			</modules>
 			<properties>
 				<skipTests>true</skipTests>
@@ -475,6 +480,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+				<module>bonita-integration-tests</module>
 			</modules>
 			<build>
 				<plugins>
@@ -537,6 +543,10 @@
 							<includes>
 								<include>org.bonitasoft.engine.*</include>
 							</includes>
+                            <excludes>
+                                <excludes>**/*BuilderImpl.java</excludes>
+                                <excludes>**/*FactoryImpl.java</excludes>
+                            </excludes>
 						</configuration>
 						<executions>
 							<!-- Prepares a variable, jacoco.agent.ut.arg, that contains the info to be passed to the JVM hosting the code being tested. -->

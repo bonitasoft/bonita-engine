@@ -55,7 +55,6 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -329,22 +328,14 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     }
 
     @Override
-    public long getNumberOfConnectorInstances(final QueryOptions searchOptions) throws SBonitaSearchException {
-        try {
-            return persistenceService.getNumberOfEntities(SConnectorInstance.class, searchOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+    public long getNumberOfConnectorInstances(final QueryOptions searchOptions) throws SBonitaReadException {
+        return persistenceService.getNumberOfEntities(SConnectorInstance.class, searchOptions, null);
     }
 
     // charles
     @Override
-    public List<SConnectorInstance> searchConnectorInstances(final QueryOptions searchOptions) throws SBonitaSearchException {
-        try {
-            return persistenceService.searchEntity(SConnectorInstance.class, searchOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+    public List<SConnectorInstance> searchConnectorInstances(final QueryOptions searchOptions) throws SBonitaReadException {
+        return persistenceService.searchEntity(SConnectorInstance.class, searchOptions, null);
     }
 
     @Override
@@ -379,22 +370,14 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
 
     @Override
     public long getNumberArchivedConnectorInstance(final QueryOptions searchOptions, final ReadPersistenceService persistenceService)
-            throws SBonitaSearchException {
-        try {
-            return persistenceService.getNumberOfEntities(SAConnectorInstance.class, searchOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+            throws SBonitaReadException {
+        return persistenceService.getNumberOfEntities(SAConnectorInstance.class, searchOptions, null);
     }
 
     @Override
     public List<SAConnectorInstance> searchArchivedConnectorInstance(final QueryOptions searchOptions, final ReadPersistenceService persistenceService)
-            throws SBonitaSearchException {
-        try {
-            return persistenceService.searchEntity(SAConnectorInstance.class, searchOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+            throws SBonitaReadException {
+        return persistenceService.searchEntity(SAConnectorInstance.class, searchOptions, null);
     }
 
     @Override
@@ -409,7 +392,7 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
     }
 
     @Override
-    public void deleteArchivedConnectorInstances(final long containerId, final String containerType) throws SBonitaSearchException,
+    public void deleteArchivedConnectorInstances(final long containerId, final String containerType) throws SBonitaReadException,
             SConnectorInstanceDeletionException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final List<FilterOption> filters = buildFiltersForConnectors(containerId, containerType, true);
@@ -422,7 +405,7 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
             for (final SAConnectorInstance sConnectorInstance : connectorInstances) {
                 deleteArchivedConnectorInstance(sConnectorInstance);
             }
-        } while (connectorInstances != null && !connectorInstances.isEmpty());
+        } while (!connectorInstances.isEmpty());
 
     }
 

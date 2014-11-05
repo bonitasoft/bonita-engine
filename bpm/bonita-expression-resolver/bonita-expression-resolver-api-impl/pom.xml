@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-expression-resolver</artifactId>
 		<groupId>org.bonitasoft.engine.core</groupId>
-		<version>6.3.7-SNAPSHOT</version>
+		<version>6.4.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-expression-resolver-api-impl</artifactId>
@@ -19,8 +19,8 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bonitasoft.engine.data.instance</groupId>
-			<artifactId>bonita-data-instance-api</artifactId>
+			<groupId>org.bonitasoft.engine.expression</groupId>
+			<artifactId>bonita-expression-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -33,5 +33,20 @@
 			<artifactId>bonita-classloader-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-time-tracker</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.api</groupId>
+            <artifactId>bonita-common-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 	</dependencies>
 </project>

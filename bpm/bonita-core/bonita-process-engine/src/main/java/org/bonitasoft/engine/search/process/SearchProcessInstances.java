@@ -19,7 +19,7 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractProcessInstanceSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchProcessInstanceDescriptor;
@@ -38,12 +38,12 @@ public class SearchProcessInstances extends AbstractProcessInstanceSearchEntity 
     }
 
     @Override
-    public long executeCount(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions queryOptions) throws SBonitaReadException {
         return processInstanceService.getNumberOfProcessInstances(queryOptions);
     }
 
     @Override
-    public List<SProcessInstance> executeSearch(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SProcessInstance> executeSearch(final QueryOptions queryOptions) throws SBonitaReadException {
         return processInstanceService.searchProcessInstances(queryOptions);
     }
 

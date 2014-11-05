@@ -77,7 +77,6 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
@@ -154,17 +153,15 @@ public class IdentityServiceImpl implements IdentityService {
     private SInsertEvent getInsertEvent(final Object object, final String type) {
         if (eventService.hasHandlers(type, EventActionType.CREATED)) {
             return (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(type).setObject(object).done();
-        } else {
-            return null;
         }
+        return null;
     }
 
     private SDeleteEvent getDeleteEvent(final Object object, final String type) {
         if (eventService.hasHandlers(type, EventActionType.DELETED)) {
             return (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(type).setObject(object).done();
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override
@@ -190,7 +187,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     private void throwExceptionIfAlreadyExists(final SCustomUserInfoDefinition customUserInfo) throws SBonitaReadException,
-    SCustomUserInfoDefinitionAlreadyExistsException {
+            SCustomUserInfoDefinitionAlreadyExistsException {
         final SCustomUserInfoDefinition storedDef = getCustomUserInfoDefinitionWithoutCheck(customUserInfo.getName());
         if (storedDef != null) {
             throw new SCustomUserInfoDefinitionAlreadyExistsException(customUserInfo.getName());
@@ -198,8 +195,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     private SCustomUserInfoDefinitionCreationException handleCustomUserInfoDefinitionCreationFailure(final SCustomUserInfoDefinition customUserInfo,
-            final String methodName, final SCustomUserInfoDefinitionLogBuilder logBuilder, final SBonitaException exception)
-                    throws SCustomUserInfoDefinitionCreationException {
+            final String methodName, final SCustomUserInfoDefinitionLogBuilder logBuilder, final SBonitaException exception) {
         logOnExceptionMethod(methodName, exception);
         initiateLogBuilder(customUserInfo.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
         return new SCustomUserInfoDefinitionCreationException(customUserInfo.getName(), exception);
@@ -800,7 +796,7 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public long getNumberOfCustomUserInfoValue(final QueryOptions options) throws SBonitaSearchException {
+    public long getNumberOfCustomUserInfoValue(final QueryOptions options) throws SBonitaReadException {
         final String methodName = "getNumberOfCustomUserInfoValue";
         logBeforeMethod(methodName);
         try {
@@ -809,7 +805,7 @@ public class IdentityServiceImpl implements IdentityService {
             return number;
         } catch (final SBonitaReadException e) {
             logOnExceptionMethod(methodName, e);
-            throw new SBonitaSearchException(e);
+            throw new SBonitaReadException(e);
         }
     }
 
@@ -953,7 +949,8 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<Long> getUserIdsWithCustomUserInfo(final String userInfoName, String userInfoValue, final boolean usePartialMatch, final int fromIndex, final int maxResults) throws SIdentityException {
+    public List<Long> getUserIdsWithCustomUserInfo(final String userInfoName, String userInfoValue, final boolean usePartialMatch, final int fromIndex,
+            final int maxResults) throws SIdentityException {
         final String methodName = "getUserIdsWithCustomUserInfo";
         logBeforeMethod(methodName);
         try {
@@ -1701,87 +1698,57 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public long getNumberOfUsers(final QueryOptions options) throws SBonitaSearchException {
+    public long getNumberOfUsers(final QueryOptions options) throws SBonitaReadException {
         final String methodName = "getNumberOfUsers";
         logBeforeMethod(methodName);
-        try {
-            final long number = persistenceService.getNumberOfEntities(SUser.class, options, null);
-            logAfterMethod(methodName);
-            return number;
-        } catch (final SBonitaReadException bre) {
-            logOnExceptionMethod(methodName, bre);
-            throw new SBonitaSearchException(bre);
-        }
+        final long number = persistenceService.getNumberOfEntities(SUser.class, options, null);
+        logAfterMethod(methodName);
+        return number;
     }
 
     @Override
-    public List<SUser> searchUsers(final QueryOptions options) throws SBonitaSearchException {
+    public List<SUser> searchUsers(final QueryOptions options) throws SBonitaReadException {
         final String methodName = "searchUsers";
         logBeforeMethod(methodName);
-        try {
-            final List<SUser> listsSUsers = persistenceService.searchEntity(SUser.class, options, null);
-            logAfterMethod(methodName);
-            return listsSUsers;
-        } catch (final SBonitaReadException bre) {
-            logOnExceptionMethod(methodName, bre);
-            throw new SBonitaSearchException(bre);
-        }
+        final List<SUser> listsSUsers = persistenceService.searchEntity(SUser.class, options, null);
+        logAfterMethod(methodName);
+        return listsSUsers;
     }
 
     @Override
-    public long getNumberOfRoles(final QueryOptions options) throws SBonitaSearchException {
+    public long getNumberOfRoles(final QueryOptions options) throws SBonitaReadException {
         final String methodName = "getNumberOfRoles";
         logBeforeMethod(methodName);
-        try {
-            final long number = persistenceService.getNumberOfEntities(SRole.class, options, null);
-            logAfterMethod(methodName);
-            return number;
-        } catch (final SBonitaReadException bre) {
-            logOnExceptionMethod(methodName, bre);
-            throw new SBonitaSearchException(bre);
-        }
+        final long number = persistenceService.getNumberOfEntities(SRole.class, options, null);
+        logAfterMethod(methodName);
+        return number;
     }
 
     @Override
-    public List<SRole> searchRoles(final QueryOptions options) throws SBonitaSearchException {
+    public List<SRole> searchRoles(final QueryOptions options) throws SBonitaReadException {
         final String methodName = "searchRoles";
         logBeforeMethod(methodName);
-        try {
-            final List<SRole> listsRoles = persistenceService.searchEntity(SRole.class, options, null);
-            logAfterMethod(methodName);
-            return listsRoles;
-        } catch (final SBonitaReadException bre) {
-            logOnExceptionMethod(methodName, bre);
-            throw new SBonitaSearchException(bre);
-        }
+        final List<SRole> listsRoles = persistenceService.searchEntity(SRole.class, options, null);
+        logAfterMethod(methodName);
+        return listsRoles;
     }
 
     @Override
-    public long getNumberOfGroups(final QueryOptions options) throws SBonitaSearchException {
+    public long getNumberOfGroups(final QueryOptions options) throws SBonitaReadException {
         final String methodName = "getNumberOfGroups";
         logBeforeMethod(methodName);
-        try {
-            final long number = persistenceService.getNumberOfEntities(SGroup.class, options, null);
-            logAfterMethod(methodName);
-            return number;
-        } catch (final SBonitaReadException bre) {
-            logOnExceptionMethod(methodName, bre);
-            throw new SBonitaSearchException(bre);
-        }
+        final long number = persistenceService.getNumberOfEntities(SGroup.class, options, null);
+        logAfterMethod(methodName);
+        return number;
     }
 
     @Override
-    public List<SGroup> searchGroups(final QueryOptions options) throws SBonitaSearchException {
+    public List<SGroup> searchGroups(final QueryOptions options) throws SBonitaReadException {
         final String methodName = "searchGroups";
         logBeforeMethod(methodName);
-        try {
-            final List<SGroup> listsGroups = persistenceService.searchEntity(SGroup.class, options, null);
-            logAfterMethod(methodName);
-            return listsGroups;
-        } catch (final SBonitaReadException bre) {
-            logOnExceptionMethod(methodName, bre);
-            throw new SBonitaSearchException(bre);
-        }
+        final List<SGroup> listsGroups = persistenceService.searchEntity(SGroup.class, options, null);
+        logAfterMethod(methodName);
+        return listsGroups;
     }
 
     private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String methodName) {
@@ -1843,17 +1810,12 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     @Override
-    public List<SCustomUserInfoValue> searchCustomUserInfoValue(final QueryOptions options) throws SBonitaSearchException {
+    public List<SCustomUserInfoValue> searchCustomUserInfoValue(final QueryOptions options) throws SBonitaReadException {
         final String methodName = "searchCustomUserInfoValue";
         logBeforeMethod(methodName);
-        try {
-            final List<SCustomUserInfoValue> result = persistenceService.searchEntity(SCustomUserInfoValue.class, options, null);
-            logAfterMethod(methodName);
-            return result;
-        } catch (final SBonitaReadException bre) {
-            logOnExceptionMethod(methodName, bre);
-            throw new SBonitaSearchException(bre);
-        }
+        final List<SCustomUserInfoValue> result = persistenceService.searchEntity(SCustomUserInfoValue.class, options, null);
+        logAfterMethod(methodName);
+        return result;
     }
 
 }

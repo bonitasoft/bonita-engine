@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-persistence</artifactId>
 		<groupId>org.bonitasoft.engine.persistence</groupId>
-		<version>6.3.7-SNAPSHOT</version>
+		<version>6.4.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-persistence-api</artifactId>
@@ -17,11 +17,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.persistence</groupId>
 			<artifactId>bonita-persistence-read</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.transaction</groupId>
-			<artifactId>bonita-transaction-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

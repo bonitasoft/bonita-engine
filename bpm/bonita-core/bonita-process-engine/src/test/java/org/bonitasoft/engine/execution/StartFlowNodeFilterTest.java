@@ -32,7 +32,7 @@ public class StartFlowNodeFilterTest {
     @Mock
     SFlowNodeDefinition flowNode;
 
-    StartFlowNodeFilter filter = new StartFlowNodeFilter();
+    final StartFlowNodeFilter filter = new StartFlowNodeFilter();
 
     @Test
     public void select_should_return_false_if_flow_node_is_not_startable() {

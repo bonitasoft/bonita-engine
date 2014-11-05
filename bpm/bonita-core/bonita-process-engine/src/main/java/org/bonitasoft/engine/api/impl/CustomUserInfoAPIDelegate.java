@@ -29,46 +29,43 @@ import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.service.ModelConvertor;
 
 /**
  * @author Vincent Elcrin
  */
 public class CustomUserInfoAPIDelegate {
 
-    private IdentityService service;
+    private final IdentityService service;
 
-    private final CustomUserInfoConverter converter = new CustomUserInfoConverter();
-
-    public CustomUserInfoAPIDelegate(IdentityService service) {
+    public CustomUserInfoAPIDelegate(final IdentityService service) {
         this.service = service;
     }
 
-    public List<CustomUserInfo> list(long userId, int startIndex, int maxResult) throws SIdentityException, SBonitaSearchException {
+    public List<CustomUserInfo> list(final long userId, final int startIndex, final int maxResult) throws SIdentityException, SBonitaReadException {
         List<SCustomUserInfoDefinition> definitions = service.getCustomUserInfoDefinitions(startIndex, maxResult);
-        if(definitions.size() == 0) {
+        if (definitions.size() == 0) {
             return Collections.emptyList();
         }
         Map<Long, CustomUserInfoValue> values = transform(searchCorrespondingValues(userId, definitions));
         List<CustomUserInfo> info = new ArrayList<CustomUserInfo>();
         for (SCustomUserInfoDefinition definition : definitions) {
-            info.add(new CustomUserInfo(
-                    userId,
-                    converter.convert(definition),
-                    values.get(definition.getId())));
+            info.add(new CustomUserInfo(userId, ModelConvertor.convert(definition), values.get(definition.getId())));
         }
         return info;
     }
 
-    private Map<Long, CustomUserInfoValue> transform(List<SCustomUserInfoValue> values) {
+    private Map<Long, CustomUserInfoValue> transform(final List<SCustomUserInfoValue> values) {
         Map<Long, CustomUserInfoValue> map = new HashMap<Long, CustomUserInfoValue>();
         for (SCustomUserInfoValue value : values) {
-            map.put(value.getDefinitionId(), converter.convert(value));
+            map.put(value.getDefinitionId(), ModelConvertor.convert(value));
         }
         return map;
     }
 
-    private List<SCustomUserInfoValue> searchCorrespondingValues(long userId, List<SCustomUserInfoDefinition> definitions) throws SBonitaSearchException {
+    private List<SCustomUserInfoValue> searchCorrespondingValues(final long userId, final List<SCustomUserInfoDefinition> definitions)
+            throws SBonitaReadException {
         return service.searchCustomUserInfoValue(new QueryOptions(
                 0,
                 definitions.size(),
@@ -80,7 +77,7 @@ public class CustomUserInfoAPIDelegate {
                 null));
     }
 
-    private List<Long> getIds(List<SCustomUserInfoDefinition> definitions) {
+    private List<Long> getIds(final List<SCustomUserInfoDefinition> definitions) {
         List<Long> ids = new ArrayList<Long>(definitions.size());
         for (SCustomUserInfoDefinition definition : definitions) {
             ids.add(definition.getId());

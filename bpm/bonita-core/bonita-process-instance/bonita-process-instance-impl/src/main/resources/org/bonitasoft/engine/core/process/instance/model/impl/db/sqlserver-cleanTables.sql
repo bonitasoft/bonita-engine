@@ -1,3 +1,9 @@
+DELETE FROM multi_biz_data
+GO
+
+DELETE FROM ref_biz_data_inst
+GO
+
 DELETE FROM hidden_activity
 GO
 
@@ -26,7 +32,4 @@ DELETE FROM process_instance
 GO
 
 DELETE FROM breakpoint
-GO
-
-DELETE FROM ref_biz_data_inst
 GO

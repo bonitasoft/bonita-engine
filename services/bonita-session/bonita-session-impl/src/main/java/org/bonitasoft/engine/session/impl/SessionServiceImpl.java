@@ -43,9 +43,7 @@ public class SessionServiceImpl implements SessionService {
 
     private final TechnicalLoggerService logger;
 
-    public SessionServiceImpl(final SessionProvider sessionProvider,
-            final String applicationName,
-            final TechnicalLoggerService logger) {
+    public SessionServiceImpl(final SessionProvider sessionProvider, final String applicationName, final TechnicalLoggerService logger) {
         this.sessionProvider = sessionProvider;
         this.applicationName = applicationName;
         this.logger = logger;

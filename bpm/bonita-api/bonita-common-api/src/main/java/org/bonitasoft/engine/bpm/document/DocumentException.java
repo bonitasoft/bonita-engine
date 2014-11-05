@@ -60,7 +60,7 @@ public class DocumentException extends BonitaException {
      *            The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
      *            cause is nonexistent or unknown.)
      */
-    public DocumentException(final String message, final BonitaException cause) {
+    public DocumentException(final String message, final Exception cause) {
         super(message, cause);
     }
 

@@ -16,6 +16,7 @@ package org.bonitasoft.engine.bpm.process.impl;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.bonitasoft.engine.bpm.businessdata.impl.BusinessDataDefinitionImpl;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.ActivityDefinitionImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.FlowElementContainerDefinitionImpl;
@@ -116,7 +117,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
 
     /**
      * Sets the display description on this activity
-     * 
+     *
      * @param displayDescription
      *        expression representing the display description
      * @return
@@ -128,7 +129,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
 
     /**
      * Sets the display name on this activity. When set, the display name will replace the name in the Bonita BPM Portal
-     * 
+     *
      * @param displayName
      *        expression representing the display name
      * @return
@@ -141,7 +142,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
     /**
      * Sets the display description after completion on this activity. This will be used to updated the display description when the activity completes its
      * execution
-     * 
+     *
      * @param displayDescriptionAfterCompletion
      *        expression representing the new display description after the activity completion.
      * @return
@@ -154,7 +155,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
     /**
      * Adds an operation on this activity. Operations are executed between connectors ON_ENTER and connectors ON_FINISH. In the case of human tasks, operations
      * are executed after calling the method {@link ProcessAPI#executeFlowNode(long)}
-     * 
+     *
      * @param leftOperand
      *        operation left operand
      * @param type
@@ -177,7 +178,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
     /**
      * Adds an operation on this activity. Operations are executed between connectors ON_ENTER and connectors ON_FINISH. In the case of human tasks, operations
      * are executed after calling the method {@link ProcessAPI#executeFlowNode(long)}
-     * 
+     *
      * @param leftOperand
      *        operation left operand
      * @param type
@@ -199,7 +200,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
 
     /**
      * Adds the given operation on this activity
-     * 
+     *
      * @param operation
      *        operation to be added
      * @return
@@ -218,7 +219,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
 
     /**
      * Defines this activity as a loop. The loop will finish when the condition is evaluated to false
-     * 
+     *
      * @param testBefore
      *        true if the condition must be check before execute the first iteration; false if the condition must be checked only after the first iteration
      * @param condition
@@ -233,7 +234,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
 
     /**
      * Defines this activity as a loop. The loop will finish when the condition is evaluated to false or when the max iterations number is reached
-     * 
+     *
      * @param testBefore
      *        true if the condition must be check before execute the first iteration; false if the condition must be checked only after the first iteration
      * @param condition
@@ -276,7 +277,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
 
     /**
      * Defines this activity as a multi-instance by suppling the cardinality
-     * 
+     *
      * @param isSequential defines whether instances creation is sequential or not. If true, instances will be created iteration by iteration; otherwise all
      *        instances will be created during the activity initialization.
      * @param loopCardinality expression representing how many instances must be created. The expression return type must be Integer
@@ -288,7 +289,7 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
 
     /**
      * Defines this activity as a multi-instance by suppling a collection of elements. One instance will be created for each element in the collection.
-     * 
+     *
      * @param isSequential defines whether instances creation is sequential or not. If true, instances will be created iteration by iteration; otherwise all
      *        instances will be created during the activity initialization.
      * @param loopDataInput name of process data representing the collection of elements used to create the instances
@@ -299,6 +300,21 @@ public class ActivityDefinitionBuilder extends FlowElementContainerBuilder imple
      */
     public MultiInstanceLoopCharacteristicsBuilder addMultiInstance(final boolean isSequential, final String loopDataInput) {
         return new MultiInstanceLoopCharacteristicsBuilder(getProcessBuilder(), activity, isSequential, loopDataInput);
+    }
+
+    /**
+     * Adds a Business Data on the activity. The activity must contain a {@link MultiInstanceLoopCharacteristics} using dataInput or dataOutput.
+     *
+     * @param name the name of the business data
+     * @param className complete name of class defining the Business Data Type
+     * @param defaultValue expression representing the default value
+     * @return
+     */
+    public ActivityDefinitionBuilder addBusinessData(final String name, final String className) {
+        final BusinessDataDefinitionImpl businessData = new BusinessDataDefinitionImpl(name, null);
+        businessData.setClassName(className);
+        activity.addBusinessDataDefinition(businessData);
+        return this;
     }
 
 }

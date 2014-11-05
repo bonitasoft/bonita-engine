@@ -19,7 +19,6 @@ import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.dependency.DependencyService;
-import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.platform.command.PlatformCommandService;
@@ -50,8 +49,6 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
 
     TransactionService getTransactionService();
 
-    IdentityService getIdentityService();
-
     TenantServiceAccessor getTenantServiceAccessor(long tenantId);
 
     TransactionExecutor getTransactionExecutor();
@@ -66,7 +63,7 @@ public interface PlatformServiceAccessor extends ServiceAccessor {
 
     PlatformCommandService getPlatformCommandService();
 
-    NodeConfiguration getPlaformConfiguration();
+    NodeConfiguration getPlatformConfiguration();
 
     PlatformCacheService getPlatformCacheService();
 

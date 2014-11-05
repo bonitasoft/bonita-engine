@@ -19,7 +19,7 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractHumanTaskInstanceSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchHumanTaskInstanceDescriptor;
@@ -44,12 +44,12 @@ public class SearchAssignedAndPendingHumanTasksFor extends AbstractHumanTaskInst
     }
 
     @Override
-    public long executeCount(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions queryOptions) throws SBonitaReadException {
         return activityInstanceService.getNumberOfAssignedAndPendingHumanTasksFor(rootProcessDefinitionId, userId, queryOptions);
     }
 
     @Override
-    public List<SHumanTaskInstance> executeSearch(final QueryOptions queryOptions) throws SBonitaSearchException {
+    public List<SHumanTaskInstance> executeSearch(final QueryOptions queryOptions) throws SBonitaReadException {
         return activityInstanceService.searchAssignedAndPendingHumanTasksFor(rootProcessDefinitionId, userId, queryOptions);
     }
 

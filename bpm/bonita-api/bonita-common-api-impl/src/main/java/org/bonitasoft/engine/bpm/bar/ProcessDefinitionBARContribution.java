@@ -53,6 +53,7 @@ import org.bonitasoft.engine.bpm.bar.xml.DisplayDescriptionAfterCompletionExpres
 import org.bonitasoft.engine.bpm.bar.xml.DisplayDescriptionExpressionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.DisplayNameExpressionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.DocumentDefinitionBinding;
+import org.bonitasoft.engine.bpm.bar.xml.DocumentListDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.EndEventDefinitionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.ExpressionBinding;
 import org.bonitasoft.engine.bpm.bar.xml.FlowElementBinding;
@@ -140,6 +141,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         bindings.add(BusinessDataDefinitionBinding.class);
         bindings.add(TextDataDefinitionBinding.class);
         bindings.add(DocumentDefinitionBinding.class);
+        bindings.add(DocumentListDefinitionBinding.class);
         bindings.add(DefaultValueBinding.class);
         bindings.add(DisplayDescriptionAfterCompletionExpressionBinding.class);
         bindings.add(DisplayDescriptionExpressionBinding.class);
@@ -251,7 +253,7 @@ public class ProcessDefinitionBARContribution implements BusinessArchiveContribu
         if (!find) {
             throw new InvalidBusinessArchiveFormatException("There is no bonitasoft process namespace declaration");
         }
-        final String group = matcher.group();
+        final String group = matcher.group(1);
         if (!group.equals("3")) {
             throw new InvalidBusinessArchiveFormatException("Wrong version of your process definition, 6." + group
                     + " namespace is not compatible with your current version. Use the studio to update it.");

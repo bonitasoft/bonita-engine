@@ -86,4 +86,11 @@ public class PersistentObjectId implements Serializable {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "ID{" +
+                "id=" + id +
+                ", tenantId=" + tenantId +
+                '}';
+    }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -62,11 +62,15 @@ public interface SFlowElementContainerDefinition extends SBaseElement {
 
     List<SBusinessDataDefinition> getBusinessDataDefinitions();
 
+    SBusinessDataDefinition getBusinessDataDefinition(String name);
+
     List<SDocumentDefinition> getDocumentDefinitions();
 
     /**
-     * @param connectorDefinitionId
+     * @param name
+     *        the name of the connector definition
      * @return
+     *         the connector definition having that name
      * @since 6.1
      */
     SConnectorDefinition getConnectorDefinition(String name);
@@ -79,4 +83,15 @@ public interface SFlowElementContainerDefinition extends SBaseElement {
 
     boolean containsInclusiveGateway();
 
+    /**
+     * @return
+     * @since 6.4.0
+     */
+    Set<SSubProcessDefinition> getSubProcessDefinitions();
+
+    /**
+     * @return the document list definitions
+     * @since 6.4.0
+     */
+    List<SDocumentListDefinition> getDocumentListDefinitions();
 }

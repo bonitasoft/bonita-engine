@@ -503,7 +503,7 @@
 		SELECT s
 		FROM org.bonitasoft.engine.core.process.instance.model.event.handling.impl.SWaitingEventImpl AS s
 		WHERE s.processDefinitionId = :processDefinitionId
-		AND s.eventType = 'START_EVENT'
+		AND (s.eventType = 'START_EVENT' OR s.eventType = 'EVENT_SUB_PROCESS')
 	</query>
 
 	<query name="resetProgressMessageInstances">
@@ -578,6 +578,42 @@
 	<query name="searchSEventTriggerInstance">
 		SELECT t
 		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl AS t
+	</query>	
+	
+	<query name="getNumberOfSTimerEventTriggerInstanceByProcessInstance">
+		SELECT COUNT(t)
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl AS t,
+			 org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
+		WHERE t.eventInstanceId = e.id 
+		AND e.logicalGroup4 = :processInstanceId
+		AND e.deleted = FALSE
+	</query>
+	
+	<query name="searchSTimerEventTriggerInstanceByProcessInstance">
+		SELECT t
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl AS t,
+			 org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
+		WHERE t.eventInstanceId = e.id 
+		AND e.logicalGroup4 = :processInstanceId
+		AND e.deleted = FALSE
+	</query>	
+	
+	<query name="getNumberOfSTimerEventTriggerInstancewithSEventInstanceByProcessInstance">
+		SELECT COUNT(t)
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl AS t,
+			 org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
+		WHERE t.eventInstanceId = e.id 
+		AND e.logicalGroup4 = :processInstanceId
+		AND e.deleted = FALSE
+	</query>
+	
+	<query name="searchSTimerEventTriggerInstancewithSEventInstanceByProcessInstance">
+		SELECT t
+		FROM org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SEventTriggerInstanceImpl AS t,
+			 org.bonitasoft.engine.core.process.instance.model.event.impl.SEventInstanceImpl AS e
+		WHERE t.eventInstanceId = e.id 
+		AND e.logicalGroup4 = :processInstanceId
+		AND e.deleted = FALSE
 	</query>	
 	
 	<query name="getNumberOfSTimerEventTriggerInstance">
@@ -912,6 +948,12 @@
 		SELECT f
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
 		WHERE f.deleted = FALSE
+	</query>
+	
+	<query name="searchSCatchEventInstance">
+		SELECT e
+		FROM org.bonitasoft.engine.core.process.instance.model.event.impl.SCatchEventInstanceImpl AS e
+		WHERE e.deleted = FALSE
 	</query>
 	
 	<query name="getNumberOfSFlowNodeInstanceSupervisedBy">

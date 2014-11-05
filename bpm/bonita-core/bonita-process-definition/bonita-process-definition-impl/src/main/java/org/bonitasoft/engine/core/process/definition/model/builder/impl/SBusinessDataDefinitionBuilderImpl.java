@@ -46,6 +46,12 @@ public class SBusinessDataDefinitionBuilderImpl implements SBusinessDataDefiniti
     }
 
     @Override
+    public SBusinessDataDefinitionBuilder setMultiple(boolean isMultiple) {
+        businessDataDefinitionImpl.setMultiple(isMultiple);
+        return this;
+    }
+
+    @Override
     public SBusinessDataDefinition done() {
         return businessDataDefinitionImpl;
     }

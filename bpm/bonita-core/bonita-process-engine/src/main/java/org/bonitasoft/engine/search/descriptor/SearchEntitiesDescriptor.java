@@ -77,11 +77,13 @@ public class SearchEntitiesDescriptor {
 
     private final SearchThemeDescriptor searchThemeDescriptor;
 
+    private final SearchEventTriggerInstanceDescriptor searchEventTriggerInstanceDescriptor;
+
     public SearchEntitiesDescriptor() {
         searchUserDescriptor = new SearchUserDescriptor();
         searchRoleDescriptor = new SearchRoleDescriptor();
         searchGroupDescriptor = new SearchGroupDescriptor();
-        searchCustomUserInfoValueDescriptor  = new SearchCustomUserInfoValueDescriptor();
+        searchCustomUserInfoValueDescriptor = new SearchCustomUserInfoValueDescriptor();
         searchProcessInstanceDescriptor = new SearchProcessInstanceDescriptor();
         searchArchivedProcessInstanceDescriptor = new SearchArchivedProcessInstancesDescriptor();
         searchHumanTaskInstanceDescriptor = new SearchHumanTaskInstanceDescriptor();
@@ -106,6 +108,7 @@ public class SearchEntitiesDescriptor {
         searchProfileMemberRoleDescriptor = new SearchProfileMemberRoleDescriptor();
         searchProfileMemberRoleAndGroupDescriptor = new SearchProfileMemberRoleAndGroupDescriptor();
         searchThemeDescriptor = new SearchThemeDescriptor();
+        searchEventTriggerInstanceDescriptor = new SearchEventTriggerInstanceDescriptor();
     }
 
     public SearchUserDescriptor getSearchUserDescriptor() {
@@ -123,7 +126,6 @@ public class SearchEntitiesDescriptor {
     public SearchCustomUserInfoValueDescriptor getSearchCustomUserInfoValueDescriptor() {
         return searchCustomUserInfoValueDescriptor;
     }
-
 
     public SearchProcessInstanceDescriptor getSearchProcessInstanceDescriptor() {
         return searchProcessInstanceDescriptor;
@@ -219,6 +221,10 @@ public class SearchEntitiesDescriptor {
 
     public SearchThemeDescriptor getSearchThemeDescriptor() {
         return searchThemeDescriptor;
+    }
+
+    public SearchEventTriggerInstanceDescriptor getSearchEventTriggerInstanceDescriptor() {
+        return searchEventTriggerInstanceDescriptor;
     }
 
 }

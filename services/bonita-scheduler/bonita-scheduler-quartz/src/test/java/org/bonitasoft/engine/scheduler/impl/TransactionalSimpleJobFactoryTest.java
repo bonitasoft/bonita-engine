@@ -22,7 +22,6 @@ import org.quartz.SchedulerException;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.spi.TriggerFiredBundle;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class TransactionalSimpleJobFactoryTest {
 
@@ -48,7 +47,7 @@ public class TransactionalSimpleJobFactoryTest {
     private StatelessJob job;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         final JobDetailImpl jobDetailImpl = new JobDetailImpl();
         jobDetailImpl.setJobClass(ConcurrentQuartzJob.class);
         jobDetailImpl.setJobDataMap(jobDataMap);
@@ -70,8 +69,8 @@ public class TransactionalSimpleJobFactoryTest {
         final Job quartzJob = factory.newJob(bundle, scheduler);
 
         //then
-        assertThat(quartzJob).isInstanceOf(QuartzJob.class);
-        assertThat(((QuartzJob) quartzJob).getBosJob()).isEqualTo(job);
+        assertThat(quartzJob).isInstanceOf(AbstractQuartzJob.class);
+        assertThat(((AbstractQuartzJob) quartzJob).getBosJob()).isEqualTo(job);
     }
 
     @Test(expected = SchedulerException.class)
@@ -94,8 +93,8 @@ public class TransactionalSimpleJobFactoryTest {
 
         //when
         final Job newJob = factory.newJob(bundle, scheduler);
-        assertThat(newJob).isInstanceOf(QuartzJob.class);
-        assertThat(((QuartzJob) newJob).getBosJob()).isNull();
+        assertThat(newJob).isInstanceOf(AbstractQuartzJob.class);
+        assertThat(((AbstractQuartzJob) newJob).getBosJob()).isNull();
     }
 
 }

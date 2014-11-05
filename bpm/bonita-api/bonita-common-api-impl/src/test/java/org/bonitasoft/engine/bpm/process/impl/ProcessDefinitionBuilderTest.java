@@ -2,28 +2,16 @@ package org.bonitasoft.engine.bpm.process.impl;
 
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
-import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
  */
-@RunWith(MockitoJUnitRunner.class)
 public class ProcessDefinitionBuilderTest {
-
-    @Mock
-    private DesignProcessDefinitionImpl process;
-
-    @InjectMocks
-    private ProcessDefinitionBuilder processDefinitionBuilder;
 
     // FIXME : Split all tests after, in several unit tests
     @Test(expected = InvalidProcessDefinitionException.class)
@@ -389,7 +377,7 @@ public class ProcessDefinitionBuilderTest {
         builder.addActor("mainActor");
         builder.addUserTask("step1", "mainActor")
         .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.ASSIGNMENT, null, null, expression)
-                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.DELETION, null, null, null);
+        .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.DELETION, null, null, null);
         builder.done();
     }
 
@@ -401,7 +389,7 @@ public class ProcessDefinitionBuilderTest {
         builder.addActor("mainActor");
         builder.addUserTask("step1", "mainActor")
         .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress1"), OperatorType.ASSIGNMENT, null, null, expression)
-                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.DELETION, null, null, null);
+        .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.DELETION, null, null, null);
         builder.done();
     }
 
@@ -413,7 +401,7 @@ public class ProcessDefinitionBuilderTest {
         builder.addActor("mainActor");
         builder.addUserTask("step1", "mainActor")
         .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress1"), OperatorType.ASSIGNMENT, null, null, expression)
-                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.JAVA_METHOD, null, null, expression);
+        .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.JAVA_METHOD, null, null, expression);
         builder.done();
     }
 

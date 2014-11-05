@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
@@ -28,6 +29,7 @@ import org.bonitasoft.engine.bpm.flownode.impl.internal.StandardLoopCharacterist
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SBoundaryEventNotFoundException;
+import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
@@ -47,6 +49,8 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
 
     protected List<SDataDefinition> sDataDefinitions = new ArrayList<SDataDefinition>();
 
+    private final List<SBusinessDataDefinition> businessDataDefinitions = new ArrayList<SBusinessDataDefinition>();
+
     protected List<SOperation> sOperations = new ArrayList<SOperation>();
 
     protected SLoopCharacteristics loopCharacteristics;
@@ -57,13 +61,16 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
         super(id, name);
     }
 
-    public SActivityDefinitionImpl(final ActivityDefinition activityDefinition, 
+    public SActivityDefinitionImpl(final ActivityDefinition activityDefinition,
             final Map<String, STransitionDefinition> transitionsMap) {
         super(activityDefinition, transitionsMap);
 
         final List<DataDefinition> dataDefinitions = activityDefinition.getDataDefinitions();
         for (final DataDefinition dataDefinition : dataDefinitions) {
             sDataDefinitions.add(ServerModelConvertor.convertDataDefinition(dataDefinition));
+        }
+        for (final BusinessDataDefinition businessDataDefinition : activityDefinition.getBusinessDataDefinitions()) {
+            businessDataDefinitions.add(ServerModelConvertor.convertBusinessDataDefinition(businessDataDefinition));
         }
         final List<Operation> operations = activityDefinition.getOperations();
         for (final Operation operation : operations) {
@@ -77,7 +84,6 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
                 loopCharacteristics = new SMultiInstanceLoopCharacteristicsImpl((MultiInstanceLoopCharacteristics) loop);
             }
         }
-
         addBoundaryEvents(activityDefinition, transitionsMap);
     }
 
@@ -141,6 +147,33 @@ public abstract class SActivityDefinitionImpl extends SFlowNodeDefinitionImpl im
 
     public void setLoopCharacteristics(final SLoopCharacteristics loopCharacteristics) {
         this.loopCharacteristics = loopCharacteristics;
+    }
+
+    @Override
+    public List<SBusinessDataDefinition> getBusinessDataDefinitions() {
+        return businessDataDefinitions;
+    }
+
+    public void addBusinessDataDefinition(final SBusinessDataDefinition businessDataDefinition) {
+        businessDataDefinitions.add(businessDataDefinition);
+    }
+
+    @Override
+    public SBusinessDataDefinition getBusinessDataDefinition(final String name) {
+        if (name == null) {
+            return null;
+        }
+        boolean found = false;
+        SBusinessDataDefinition businessData = null;
+        final Iterator<SBusinessDataDefinition> iterator = businessDataDefinitions.iterator();
+        while (iterator.hasNext() && !found) {
+            final SBusinessDataDefinition currentBusinessData = iterator.next();
+            if (currentBusinessData.getName().equals(name)) {
+                found = true;
+                businessData = currentBusinessData;
+            }
+        }
+        return businessData;
     }
 
 }
