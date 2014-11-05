@@ -7,9 +7,9 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.impl.exporter;
+package com.bonitasoft.engine.business.application.exporter;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.same;
@@ -20,14 +20,14 @@ import java.net.URL;
 
 import javax.xml.bind.JAXBException;
 
-import com.bonitasoft.engine.business.application.SBonitaExportException;
-import com.bonitasoft.engine.business.application.impl.exporter.ApplicationContainerExporter;
-import com.bonitasoft.engine.business.application.model.xml.ApplicationNodeContainer;
-import com.bonitasoft.engine.io.IOUtils;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import com.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
+import com.bonitasoft.engine.io.IOUtils;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(IOUtils.class)
@@ -43,12 +43,11 @@ public class ApplicationContainerExporterTest {
         //when
         byte[] bytes = exporter.export(container);
 
-
         //then
         assertThat(new String(bytes)).isEqualTo("<applications/>");
     }
 
-    @Test(expected = SBonitaExportException.class)
+    @Test(expected = ExecutionException.class)
     public void exportApplications_should_throw_SBonitaExportException_if_marshalling_throws_exception() throws Exception {
         ApplicationContainerExporter exporter = new ApplicationContainerExporter();
         mockStatic(IOUtils.class);
@@ -57,7 +56,6 @@ public class ApplicationContainerExporterTest {
 
         //when
         exporter.export(container);
-
 
         //then exception
     }

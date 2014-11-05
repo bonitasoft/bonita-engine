@@ -7,7 +7,7 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.impl.converter;
+package com.bonitasoft.engine.business.application.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -15,10 +15,8 @@ import static org.mockito.Mockito.mock;
 
 import java.util.Date;
 
-import com.bonitasoft.engine.business.application.SBonitaExportException;
-import com.bonitasoft.engine.business.application.impl.converter.ApplicationNodeConverter;
-import com.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfile;
@@ -29,9 +27,10 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
-import com.bonitasoft.engine.business.application.model.xml.ApplicationNode;
+import com.bonitasoft.engine.business.application.xml.ApplicationNode;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationNodeConverterTest {
@@ -87,7 +86,7 @@ public class ApplicationNodeConverterTest {
         assertThat(applicationNode.getProfile()).isEqualTo("admin");
     }
 
-    @Test(expected = SBonitaExportException.class)
+    @Test(expected = ExecutionException.class)
     public void toNode_should_throw_SBonitaExportException_when_profileService_throws_exception() throws Exception {
         //given
         SApplication application = mock(SApplication.class);
@@ -120,7 +119,7 @@ public class ApplicationNodeConverterTest {
         assertThat(applicationNode.getHomePage()).isEqualTo("home");
     }
 
-    @Test (expected = SBonitaExportException.class)
+    @Test(expected = ExecutionException.class)
     public void toNode_should_throw_SBonitaExportException_when_applicationService_throws_exception() throws Exception {
         //given
         SApplication application = mock(SApplication.class);
@@ -133,6 +132,69 @@ public class ApplicationNodeConverterTest {
 
         //when
         converter.toNode(application);
+
+        //then exception
+    }
+
+    @Test
+    public void toSApplication_should_map_all_fields_except_home_page() throws Exception {
+        //given
+        ApplicationNode node = new ApplicationNode();
+        node.setDisplayName("My app");
+        node.setDescription("This is my app");
+        node.setHomePage("home");
+        node.setVersion("1.0");
+        node.setToken("app");
+        node.setIconPath("/icon.jpg");
+        node.setProfile("admin");
+        node.setState("ENABLED");
+
+        SProfile profile = mock(SProfile.class);
+        given(profile.getId()).willReturn(8L);
+
+        given(profileService.getProfileByName("admin")).willReturn(profile);
+
+        //when
+        SApplication application = converter.toSApplication(node, 1L);
+
+        //then
+        assertThat(application).isNotNull();
+        assertThat(application.getDisplayName()).isEqualTo("My app");
+        assertThat(application.getDescription()).isEqualTo("This is my app");
+        assertThat(application.getHomePageId()).isNull();
+        assertThat(application.getVersion()).isEqualTo("1.0");
+        assertThat(application.getToken()).isEqualTo("app");
+        assertThat(application.getIconPath()).isEqualTo("/icon.jpg");
+        assertThat(application.getProfileId()).isEqualTo(8L);
+        assertThat(application.getState()).isEqualTo("ENABLED");
+        assertThat(application.getCreatedBy()).isEqualTo(1L);
+
+    }
+
+    @Test
+    public void toSApplication_should_return_application_with_null_profile_id_when_node_has_no_profile() throws Exception {
+        //given
+        ApplicationNode node = new ApplicationNode();
+        node.setProfile(null);
+
+        //when
+        SApplication application = converter.toSApplication(node, 1L);
+
+        //then
+        assertThat(application).isNotNull();
+        assertThat(application.getProfileId()).isNull();
+    }
+
+    @Test(expected = ExecutionException.class)
+    public void toSApplication_should_throw_SBonitaImportException_when_profile_service_throws_exception() throws Exception {
+        //given
+        ApplicationNode node = new ApplicationNode();
+        node.setProfile("admin");
+
+        given(profileService.getProfileByName("admin")).willThrow(new SProfileNotFoundException(""));
+
+        //when
+        converter.toSApplication(node, 1L);
 
         //then exception
     }

@@ -7,14 +7,15 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.impl.exporter;
+package com.bonitasoft.engine.business.application.exporter;
 
 import java.util.List;
 
-import com.bonitasoft.engine.business.application.SBonitaExportException;
-import com.bonitasoft.engine.business.application.impl.converter.ApplicationContainerConverter;
+import org.bonitasoft.engine.exception.ExecutionException;
+
+import com.bonitasoft.engine.business.application.converter.ApplicationContainerConverter;
 import com.bonitasoft.engine.business.application.model.SApplication;
-import com.bonitasoft.engine.business.application.model.xml.ApplicationNodeContainer;
+import com.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -29,7 +30,7 @@ public class ApplicationsExporter {
         this.exporter = exporter;
     }
 
-    public byte[] export(List<SApplication> applications) throws SBonitaExportException {
+    public byte[] export(List<SApplication> applications) throws ExecutionException {
         ApplicationNodeContainer container = converter.toNode(applications);
         return exporter.export(container);
     }

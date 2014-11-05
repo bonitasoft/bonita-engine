@@ -7,13 +7,14 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.impl.converter;
+package com.bonitasoft.engine.business.application.converter;
 
 import java.util.List;
 
-import com.bonitasoft.engine.business.application.SBonitaExportException;
+import org.bonitasoft.engine.exception.ExecutionException;
+
 import com.bonitasoft.engine.business.application.model.SApplication;
-import com.bonitasoft.engine.business.application.model.xml.ApplicationNodeContainer;
+import com.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -26,7 +27,7 @@ public class ApplicationContainerConverter {
         this.applicationNodeConverter = applicationNodeConverter;
     }
 
-    public ApplicationNodeContainer toNode(List<SApplication> applications) throws SBonitaExportException {
+    public ApplicationNodeContainer toNode(List<SApplication> applications) throws ExecutionException {
         ApplicationNodeContainer container = new ApplicationNodeContainer();
         for (SApplication application : applications) {
             container.addApplication(applicationNodeConverter.toNode(application));

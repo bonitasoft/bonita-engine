@@ -11,10 +11,14 @@ package com.bonitasoft.engine.api.impl;
 import java.util.Collections;
 import java.util.List;
 
-import com.bonitasoft.engine.api.impl.application.ApplicationExporterDeletegate;
+import com.bonitasoft.engine.api.impl.application.ApplicationExporterDelegate;
 import com.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import com.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import com.bonitasoft.engine.business.application.ApplicationPageUpdater;
+import com.bonitasoft.engine.business.application.converter.ApplicationContainerConverter;
+import com.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
+import com.bonitasoft.engine.business.application.exporter.ApplicationContainerExporter;
+import com.bonitasoft.engine.business.application.exporter.ApplicationsExporter;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -113,9 +117,13 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         return delegate;
     }
 
-    private ApplicationExporterDeletegate getApplicationExporterDelegate() {
+    private ApplicationExporterDelegate getApplicationExporterDelegate() {
         TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        return new ApplicationExporterDeletegate(tenantAccessor.getApplicationExportService());
+        ApplicationNodeConverter applicationNodeConverter = new ApplicationNodeConverter(tenantAccessor.getProfileService(), tenantAccessor.getApplicationService());
+        ApplicationContainerConverter applicationContainerConverter = new ApplicationContainerConverter(applicationNodeConverter);
+        ApplicationContainerExporter applicationContainerExporter = new ApplicationContainerExporter();
+        ApplicationsExporter applicationsExporter = new ApplicationsExporter(applicationContainerConverter, applicationContainerExporter);
+        return new ApplicationExporterDelegate(tenantAccessor.getApplicationService(), applicationsExporter);
     }
 
     @Override

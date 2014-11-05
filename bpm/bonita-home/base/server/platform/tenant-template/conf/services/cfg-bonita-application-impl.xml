@@ -7,25 +7,4 @@
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
 	</bean>
 
-    <bean id="applicationNodeConverter" class="com.bonitasoft.engine.business.application.impl.converter.ApplicationNodeConverter">
-		<constructor-arg name="profileService" ref="profileService" />
-		<constructor-arg name="applicationService" ref="applicationService" />
-	</bean>
-
-    <bean id="applicationContainerConverter" class="com.bonitasoft.engine.business.application.impl.converter.ApplicationContainerConverter">
-		<constructor-arg name="applicationNodeConverter" ref="applicationNodeConverter" />
-	</bean>
-
-    <bean id="applicationContainerExporter" class="com.bonitasoft.engine.business.application.impl.exporter.ApplicationContainerExporter"/>
-
-     <bean id="applicationsExporter" class="com.bonitasoft.engine.business.application.impl.exporter.ApplicationsExporter">
-		<constructor-arg name="converter" ref="applicationContainerConverter" />
-		<constructor-arg name="exporter" ref="applicationContainerExporter" />
-	</bean>
-
-    <bean id="applicationExportService" class="com.bonitasoft.engine.business.application.impl.ApplicationExportServiceImpl">
-        <constructor-arg name="applicationService" ref="applicationService" />
-        <constructor-arg name="exporter" ref="applicationsExporter" />
-    </bean>
-
 </beans>

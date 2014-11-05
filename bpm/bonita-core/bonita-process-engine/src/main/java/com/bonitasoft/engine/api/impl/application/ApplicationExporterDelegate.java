@@ -7,41 +7,39 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.impl;
+package com.bonitasoft.engine.api.impl.application;
 
 import java.util.List;
 
-import com.bonitasoft.engine.business.application.ApplicationExportService;
-import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.SBonitaExportException;
-import com.bonitasoft.engine.business.application.impl.exporter.ApplicationsExporter;
-import com.bonitasoft.engine.business.application.impl.filter.ApplicationsWithIdsFilterBuilder;
-import com.bonitasoft.engine.business.application.model.SApplication;
 import org.apache.commons.lang3.ArrayUtils;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+
+import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.exporter.ApplicationsExporter;
+import com.bonitasoft.engine.business.application.filter.ApplicationsWithIdsFilterBuilder;
+import com.bonitasoft.engine.business.application.model.SApplication;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationExportServiceImpl implements ApplicationExportService {
+public class ApplicationExporterDelegate {
 
     private final ApplicationService applicationService;
     private final ApplicationsExporter exporter;
 
-    public ApplicationExportServiceImpl(ApplicationService applicationService, ApplicationsExporter exporter) {
+    public ApplicationExporterDelegate(ApplicationService applicationService, ApplicationsExporter exporter) {
         this.applicationService = applicationService;
         this.exporter = exporter;
     }
 
-
-    @Override
-    public byte[] exportApplications(long... applicationIds) throws SBonitaExportException {
+    public byte[] exportApplications(long... applicationIds) throws ExecutionException {
         ApplicationsWithIdsFilterBuilder filterBuilder = new ApplicationsWithIdsFilterBuilder(ArrayUtils.toObject(applicationIds));
         try {
             List<SApplication> applications = applicationService.searchApplications(filterBuilder.buildQueryOptions());
             return exporter.export(applications);
         } catch (SBonitaReadException e) {
-            throw new SBonitaExportException(e);
+            throw new ExecutionException(e);
         }
     }
 

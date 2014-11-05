@@ -276,6 +276,16 @@ public interface ApplicationAPI {
      */
     byte[] exportApplications(long... applicationIds) throws ExecutionException;
 
+    /**
+     * Imports {@link com.bonitasoft.engine.business.application.Application}s based on a XML file content
+     * @param xmlContent a byte array representing the content of XML file containing the applications to be imported.
+     * @param policy the {@link com.bonitasoft.engine.business.application.ApplicationImportPolicy} used to execute the import
+     * @return a {@link java.util.List} of {@link org.bonitasoft.engine.api.ImportStatus} representing the {@code ImportStatus} for each imported {@code Application}
+     * @throws ExecutionException if an error occurs during the import
+     * @see com.bonitasoft.engine.business.application.Application
+     * @see com.bonitasoft.engine.business.application.ApplicationImportPolicy
+     * @see org.bonitasoft.engine.api.ImportStatus
+     */
     List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy) throws ExecutionException;
 
 }

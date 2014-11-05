@@ -7,17 +7,21 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.impl.converter;
+package com.bonitasoft.engine.business.application.converter;
 
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.profile.ProfileService;
+import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfile;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.SBonitaExportException;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
-import com.bonitasoft.engine.business.application.model.xml.ApplicationNode;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationBuilder;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationBuilderFactory;
+import com.bonitasoft.engine.business.application.xml.ApplicationNode;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -32,7 +36,7 @@ public class ApplicationNodeConverter {
         this.applicationService = applicationService;
     }
 
-    public ApplicationNode toNode(SApplication application) throws SBonitaExportException {
+    public ApplicationNode toNode(SApplication application) throws ExecutionException {
         ApplicationNode applicationNode = new ApplicationNode();
         applicationNode.setToken(application.getToken());
         applicationNode.setDisplayName(application.getDisplayName());
@@ -45,25 +49,49 @@ public class ApplicationNodeConverter {
         return applicationNode;
     }
 
-    private void setHomePage(SApplication application, ApplicationNode applicationNode) throws SBonitaExportException {
+    private void setHomePage(SApplication application, ApplicationNode applicationNode) throws ExecutionException {
         if (application.getHomePageId() != null) {
             try {
                 SApplicationPage homePage = applicationService.getApplicationPage(application.getHomePageId());
                 applicationNode.setHomePage(homePage.getToken());
             } catch (SBonitaException e) {
-                throw new SBonitaExportException(e);
+                throw new ExecutionException(e);
             }
         }
     }
 
-    private void setProfile(SApplication application, ApplicationNode applicationNode) throws SBonitaExportException {
+    private void setProfile(SApplication application, ApplicationNode applicationNode) throws ExecutionException {
         try {
             if (application.getProfileId() != null) {
                 SProfile profile = profileService.getProfile(application.getProfileId());
                 applicationNode.setProfile(profile.getName());
             }
         } catch (SBonitaException e) {
-            throw new SBonitaExportException(e);
+            throw new ExecutionException(e);
+        }
+    }
+
+    public SApplication toSApplication(ApplicationNode applicationNode, long createdBy) throws ExecutionException {
+
+
+        SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(applicationNode.getToken(), applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy);
+        builder.setIconPath(applicationNode.getIconPath());
+        builder.setDescription(applicationNode.getDescription());
+        builder.setState(applicationNode.getState());
+
+        setProfile(applicationNode, builder);
+
+        return builder.done();
+    }
+
+    private void setProfile(ApplicationNode applicationNode, SApplicationBuilder builder) throws ExecutionException {
+        if(applicationNode.getProfile() != null) {
+            try {
+                SProfile profile = profileService.getProfileByName(applicationNode.getProfile());
+                builder.setProfileId(profile.getId());
+            } catch (SProfileNotFoundException e) {
+                throw new ExecutionException(e);
+            }
         }
     }
 

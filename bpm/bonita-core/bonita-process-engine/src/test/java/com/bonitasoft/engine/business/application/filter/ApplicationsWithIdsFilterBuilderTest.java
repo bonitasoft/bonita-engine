@@ -7,17 +7,18 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.impl.filter;
+package com.bonitasoft.engine.business.application.filter;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bonitasoft.engine.business.application.model.SApplication;
-import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationBuilderFactoryImpl;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.junit.Test;
+
+import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationBuilderFactoryImpl;
 
 public class ApplicationsWithIdsFilterBuilderTest {
 
@@ -29,7 +30,6 @@ public class ApplicationsWithIdsFilterBuilderTest {
 
         //when
         QueryOptions queryOptions = builder.buildQueryOptions();
-
 
         //then
         assertThat(queryOptions).isNotNull();

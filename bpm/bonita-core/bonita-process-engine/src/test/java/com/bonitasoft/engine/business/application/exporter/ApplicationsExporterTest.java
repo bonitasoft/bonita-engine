@@ -7,25 +7,24 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.impl.exporter;
+package com.bonitasoft.engine.business.application.exporter;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 import java.util.List;
 
-import com.bonitasoft.engine.business.application.impl.converter.ApplicationContainerConverter;
-import com.bonitasoft.engine.business.application.impl.exporter.ApplicationContainerExporter;
-import com.bonitasoft.engine.business.application.impl.exporter.ApplicationsExporter;
-import com.bonitasoft.engine.business.application.model.SApplication;
-import com.bonitasoft.engine.business.application.model.xml.ApplicationNodeContainer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.bonitasoft.engine.business.application.converter.ApplicationContainerConverter;
+import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationsExporterTest {
@@ -50,7 +49,6 @@ public class ApplicationsExporterTest {
 
         //when
         byte[] exportedApplications = applicationsExporter.export(applications);
-
 
         //then
         assertThat(new String(exportedApplications)).isEqualTo("<applications/>");

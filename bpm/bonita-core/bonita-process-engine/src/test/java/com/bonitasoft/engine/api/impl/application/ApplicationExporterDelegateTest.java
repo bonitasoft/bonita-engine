@@ -7,9 +7,9 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.impl;
+package com.bonitasoft.engine.api.impl.application;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -17,11 +17,7 @@ import static org.mockito.Mockito.mock;
 import java.util.Arrays;
 import java.util.List;
 
-import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.SBonitaExportException;
-import com.bonitasoft.engine.business.application.impl.exporter.ApplicationsExporter;
-import com.bonitasoft.engine.business.application.impl.filter.ApplicationsWithIdsFilterBuilder;
-import com.bonitasoft.engine.business.application.model.SApplication;
+import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.junit.Test;
@@ -30,8 +26,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.exporter.ApplicationsExporter;
+import com.bonitasoft.engine.business.application.filter.ApplicationsWithIdsFilterBuilder;
+import com.bonitasoft.engine.business.application.model.SApplication;
+
 @RunWith(MockitoJUnitRunner.class)
-public class ApplicationExportServiceImplTest {
+public class ApplicationExporterDelegateTest {
 
     @Mock
     private ApplicationsExporter exporter;
@@ -40,7 +41,7 @@ public class ApplicationExportServiceImplTest {
     private ApplicationService applicationService;
 
     @InjectMocks
-    private ApplicationExportServiceImpl exportService;
+    private ApplicationExporterDelegate delegate;
 
     @Test
     public void exportApplications_should_return_result_of_ApplicationsExporter() throws Exception {
@@ -51,19 +52,19 @@ public class ApplicationExportServiceImplTest {
         given(exporter.export(applications)).willReturn("<applications/>".getBytes());
 
         //when
-        byte[] exportApplications = exportService.exportApplications(5);
+        byte[] exportApplications = delegate.exportApplications(5);
 
         //then
         assertThat(new String(exportApplications)).isEqualTo("<applications/>");
     }
 
-    @Test(expected = SBonitaExportException.class)
+    @Test(expected = ExecutionException.class)
     public void exportApplications_should_throw_SBonitaExportException_when_applicationService_throwsSBonitaReadException() throws Exception {
         //given
         given(applicationService.searchApplications(any(QueryOptions.class))).willThrow(new SBonitaReadException(""));
 
         //when
-        exportService.exportApplications(5);
+        delegate.exportApplications(5);
 
         //then exception
     }

@@ -7,12 +7,13 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.impl.exporter;
+package com.bonitasoft.engine.business.application.exporter;
 
 import java.net.URL;
 
-import com.bonitasoft.engine.business.application.SBonitaExportException;
-import com.bonitasoft.engine.business.application.model.xml.ApplicationNodeContainer;
+import org.bonitasoft.engine.exception.ExecutionException;
+
+import com.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import com.bonitasoft.engine.io.IOUtils;
 
 /**
@@ -20,12 +21,12 @@ import com.bonitasoft.engine.io.IOUtils;
  */
 public class ApplicationContainerExporter {
 
-    public byte[] export(ApplicationNodeContainer applicationNodeContainer) throws SBonitaExportException {
+    public byte[] export(ApplicationNodeContainer applicationNodeContainer) throws ExecutionException {
         final URL resource = ApplicationNodeContainer.class.getResource("/applications.xsd");
         try {
             return IOUtils.marshallObjectToXML(applicationNodeContainer, resource);
         } catch (Exception e) {
-            throw new SBonitaExportException(e);
+            throw new ExecutionException(e);
         }
     }
 

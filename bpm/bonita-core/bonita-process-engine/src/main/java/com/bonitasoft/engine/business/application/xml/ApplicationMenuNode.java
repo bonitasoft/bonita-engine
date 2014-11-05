@@ -7,7 +7,7 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.model.xml;
+package com.bonitasoft.engine.business.application.xml;
 
 import java.util.ArrayList;
 import java.util.List;
