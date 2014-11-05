@@ -32,7 +32,6 @@ import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor;
-import com.bonitasoft.engine.business.application.ApplicationPageUpdater;
 import com.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.page.Page;
@@ -123,21 +122,6 @@ public interface ApplicationAPI {
      * @see Page
      */
     ApplicationPage createApplicationPage(long applicationId, long pagedId, String token) throws AlreadyExistsException, CreationException;
-
-    /**
-     * Updates an {@link com.bonitasoft.engine.business.application.ApplicationPage} based on the information supplied by the
-     * {@link com.bonitasoft.engine.business.application.ApplicationPageUpdater}
-     *
-     * @param applicationPageId the {@code ApplicationPage} identifier
-     * @param updater the {@code ApplicationPageUpdater} describing the fields to be updated.
-     * @return the {@code ApplicationPage} up to date
-     * @throws ApplicationPageNotFoundException if no {@code ApplicationPage} is found for the given identifier
-     * @throws UpdateException if an exception occurs during the update
-     * @throws AlreadyExistsException if the token is updated and the new value is already used by another <code>ApplicationPage</code> on this
-     *         <code>Application</code>
-     */
-    ApplicationPage updateApplicationPage(long applicationPageId, ApplicationPageUpdater updater) throws ApplicationPageNotFoundException, UpdateException,
-            AlreadyExistsException;
 
     /**
      * Retrieves the {@link ApplicationPage} for the given {@code Application} token and {@code ApplicationPage} token
@@ -269,6 +253,7 @@ public interface ApplicationAPI {
 
     /**
      * Exports the {@link com.bonitasoft.engine.business.application.Application}s which identifier is in {@code applicationIds}
+     * 
      * @param applicationIds the identifiers of {@code Application}s to be exported
      * @return a byte array representing the content of XML file containing the exported {@code Application}s
      * @throws ExecutionException if an exception occurs during the export.
@@ -278,9 +263,11 @@ public interface ApplicationAPI {
 
     /**
      * Imports {@link com.bonitasoft.engine.business.application.Application}s based on a XML file content
+     * 
      * @param xmlContent a byte array representing the content of XML file containing the applications to be imported.
      * @param policy the {@link com.bonitasoft.engine.business.application.ApplicationImportPolicy} used to execute the import
-     * @return a {@link java.util.List} of {@link org.bonitasoft.engine.api.ImportStatus} representing the {@code ImportStatus} for each imported {@code Application}
+     * @return a {@link java.util.List} of {@link org.bonitasoft.engine.api.ImportStatus} representing the {@code ImportStatus} for each imported
+     *         {@code Application}
      * @throws ExecutionException if an error occurs during the import
      * @see com.bonitasoft.engine.business.application.Application
      * @see com.bonitasoft.engine.business.application.ApplicationImportPolicy

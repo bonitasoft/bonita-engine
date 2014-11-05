@@ -11,14 +11,6 @@ package com.bonitasoft.engine.api.impl;
 import java.util.Collections;
 import java.util.List;
 
-import com.bonitasoft.engine.api.impl.application.ApplicationExporterDelegate;
-import com.bonitasoft.engine.business.application.ApplicationImportPolicy;
-import com.bonitasoft.engine.business.application.ApplicationMenuUpdater;
-import com.bonitasoft.engine.business.application.ApplicationPageUpdater;
-import com.bonitasoft.engine.business.application.converter.ApplicationContainerConverter;
-import com.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
-import com.bonitasoft.engine.business.application.exporter.ApplicationContainerExporter;
-import com.bonitasoft.engine.business.application.exporter.ApplicationsExporter;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -34,6 +26,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.ApplicationAPI;
 import com.bonitasoft.engine.api.impl.application.ApplicationAPIDelegate;
+import com.bonitasoft.engine.api.impl.application.ApplicationExporterDelegate;
 import com.bonitasoft.engine.api.impl.application.ApplicationMenuAPIDelegate;
 import com.bonitasoft.engine.api.impl.application.ApplicationPageAPIDelegate;
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
@@ -45,14 +38,20 @@ import com.bonitasoft.engine.api.impl.transaction.application.SearchApplications
 import com.bonitasoft.engine.api.impl.validator.ApplicationMenuCreatorValidator;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
+import com.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import com.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
+import com.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
+import com.bonitasoft.engine.business.application.converter.ApplicationContainerConverter;
+import com.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
+import com.bonitasoft.engine.business.application.exporter.ApplicationContainerExporter;
+import com.bonitasoft.engine.business.application.exporter.ApplicationsExporter;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationMenuDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationPageDescriptor;
@@ -60,10 +59,8 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class ApplicationAPIImpl implements ApplicationAPI {
 
@@ -119,7 +116,8 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     private ApplicationExporterDelegate getApplicationExporterDelegate() {
         TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        ApplicationNodeConverter applicationNodeConverter = new ApplicationNodeConverter(tenantAccessor.getProfileService(), tenantAccessor.getApplicationService());
+        ApplicationNodeConverter applicationNodeConverter = new ApplicationNodeConverter(tenantAccessor.getProfileService(),
+                tenantAccessor.getApplicationService());
         ApplicationContainerConverter applicationContainerConverter = new ApplicationContainerConverter(applicationNodeConverter);
         ApplicationContainerExporter applicationContainerExporter = new ApplicationContainerExporter();
         ApplicationsExporter applicationsExporter = new ApplicationsExporter(applicationContainerConverter, applicationContainerExporter);
@@ -137,7 +135,8 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException, AlreadyExistsException {
+    public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException,
+            AlreadyExistsException {
         return getApplicationAPIDelegate().updateApplication(applicationId, updater);
     }
 
@@ -157,18 +156,14 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String token) throws AlreadyExistsException, CreationException {
+    public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String token) throws AlreadyExistsException,
+            CreationException {
         return getApplicationPageAPIDelegate().createApplicationPage(applicationId, pagedId, token);
     }
 
     @Override
     public ApplicationPage getApplicationPage(final String applicationName, final String applicationPageToken) throws ApplicationPageNotFoundException {
         return getApplicationPageAPIDelegate().getApplicationPage(applicationName, applicationPageToken);
-    }
-
-    @Override
-    public ApplicationPage updateApplicationPage(long applicationPageId, ApplicationPageUpdater updater) throws ApplicationPageNotFoundException, UpdateException, AlreadyExistsException {
-        return null;
     }
 
     @Override
@@ -202,7 +197,8 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public ApplicationMenu updateApplicationMenu(long applicationMenuId, ApplicationMenuUpdater updater) throws ApplicationMenuNotFoundException, UpdateException {
+    public ApplicationMenu updateApplicationMenu(long applicationMenuId, ApplicationMenuUpdater updater) throws ApplicationMenuNotFoundException,
+            UpdateException {
         return getApplicationMenuAPIDelegate().updateApplicationMenu(applicationMenuId, updater);
     }
 
