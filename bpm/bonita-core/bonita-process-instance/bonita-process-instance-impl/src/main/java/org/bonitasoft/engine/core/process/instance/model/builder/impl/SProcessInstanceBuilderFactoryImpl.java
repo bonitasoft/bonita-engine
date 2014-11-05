@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder.impl;
 
+import java.util.Date;
+
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
@@ -60,16 +62,15 @@ public class SProcessInstanceBuilderFactoryImpl implements SProcessInstanceBuild
         NullCheckingUtil.checkArgsNotNull(name, processDefinitionId);
         final SProcessInstanceImpl entity = new SProcessInstanceImpl(name, processDefinitionId);
         entity.setStateCategory(SStateCategory.NORMAL);
+        entity.setStartDate(new Date().getTime());
         return new SProcessInstanceBuilderImpl(entity);
     }
 
     @Override
     public SProcessInstanceBuilder createNewInstance(final String name, final long processDefinitionId, final String description) {
-        NullCheckingUtil.checkArgsNotNull(name, processDefinitionId);
-        final SProcessInstanceImpl entity = new SProcessInstanceImpl(name, processDefinitionId);
-        entity.setStateCategory(SStateCategory.NORMAL);
-        entity.setDescription(description);
-        return new SProcessInstanceBuilderImpl(entity);
+        final SProcessInstanceBuilder builder = createNewInstance(name, processDefinitionId);
+        builder.setDescription(description);
+        return builder;
     }
 
     @Override
