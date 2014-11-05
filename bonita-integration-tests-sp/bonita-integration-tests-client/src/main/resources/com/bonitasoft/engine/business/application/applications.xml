@@ -9,10 +9,10 @@
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <applications xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.0">
-    <application state="DEACTIVATED" version="2.0" token="HR-dashboard">
+    <application state="ACTIVATED" version="2.0" token="HR-dashboard">
         <displayName>My HR dashboard</displayName>
     </application>
-    <application state="DEACTIVATED" version="2.0" token="My">
+    <application state="ACTIVATED" version="2.0" token="My">
         <displayName>Marketing</displayName>
     </application>
 </applications>

@@ -70,12 +70,12 @@ public class ApplicationConvertorTest {
         assertThat(application.getCreationDate()).isGreaterThanOrEqualTo(before);
         assertThat(application.getUpdatedBy()).isEqualTo(userId);
         assertThat(application.getLastUpdateDate()).isEqualTo(application.getCreationDate());
-        assertThat(application.getState()).isEqualTo(SApplicationState.DEACTIVATED.name());
+        assertThat(application.getState()).isEqualTo(SApplicationState.ACTIVATED.name());
         assertThat(application.getProfileId()).isEqualTo(PROFILE_ID);
     }
 
     @Test
-    public void toAppplication_must_map_all_server_fields() throws Exception {
+    public void toApplication_must_map_all_server_fields() throws Exception {
         //given
         final long currentDate = System.currentTimeMillis();
         final String state = SApplicationState.DEACTIVATED.name();
