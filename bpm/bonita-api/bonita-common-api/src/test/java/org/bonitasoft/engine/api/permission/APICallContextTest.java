@@ -55,7 +55,7 @@ public class APICallContextTest {
 
         List<String> compoundResourceId = apiCallContext.getCompoundResourceId();
 
-        assertThat(compoundResourceId).containsExactly("1","2","3");
+        assertThat(compoundResourceId).containsExactly("1", "2", "3");
     }
 
     @Test
@@ -129,5 +129,82 @@ public class APICallContextTest {
         assertThat(filters).isEmpty();
         assertThat(body).isEqualTo(null);
     }
+
+    @Test
+    public void should_isGETMethod_return_true() throws JSONException {
+        APICallContext apiCallContext = new APICallContext();
+        apiCallContext.setMethod("GET");
+
+        boolean getMethod = apiCallContext.isGET();
+
+        assertThat(getMethod).isTrue();
+    }
+
+    @Test
+    public void should_isGETMethod_return_false() throws JSONException {
+        APICallContext apiCallContext = new APICallContext();
+
+        boolean getMethod = apiCallContext.isGET();
+
+        assertThat(getMethod).isFalse();
+    }
+
+    @Test
+    public void should_isPOSTMethod_return_true() throws JSONException {
+        APICallContext apiCallContext = new APICallContext();
+        apiCallContext.setMethod("POST");
+
+        boolean getMethod = apiCallContext.isPOST();
+
+        assertThat(getMethod).isTrue();
+    }
+
+    @Test
+    public void should_isPOSTMethod_return_false() throws JSONException {
+        APICallContext apiCallContext = new APICallContext();
+
+        boolean getMethod = apiCallContext.isPOST();
+
+        assertThat(getMethod).isFalse();
+    }
+
+    @Test
+    public void should_isPUTMethod_return_true() throws JSONException {
+        APICallContext apiCallContext = new APICallContext();
+        apiCallContext.setMethod("PUT");
+
+        boolean getMethod = apiCallContext.isPUT();
+
+        assertThat(getMethod).isTrue();
+    }
+
+    @Test
+    public void should_isPUTMethod_return_false() throws JSONException {
+        APICallContext apiCallContext = new APICallContext();
+
+        boolean getMethod = apiCallContext.isPUT();
+
+        assertThat(getMethod).isFalse();
+    }
+
+    @Test
+    public void should_isDELETEMethod_return_true() throws JSONException {
+        APICallContext apiCallContext = new APICallContext();
+        apiCallContext.setMethod("DELETE");
+
+        boolean getMethod = apiCallContext.isDELETE();
+
+        assertThat(getMethod).isTrue();
+    }
+
+    @Test
+    public void should_isDELETEMethod_return_false() throws JSONException {
+        APICallContext apiCallContext = new APICallContext();
+
+        boolean getMethod = apiCallContext.isDELETE();
+
+        assertThat(getMethod).isFalse();
+    }
+
 
 }

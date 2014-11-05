@@ -136,6 +136,34 @@ public class APICallContext implements Serializable {
         return method;
     }
 
+    /**
+     * @return true if method is GET
+     */
+    public boolean isGET() {
+        return "GET".equals(method);
+    }
+
+    /**
+     * @return true if method is PUT
+     */
+    public boolean isPUT() {
+        return "PUT".equals(method);
+    }
+
+    /**
+     * @return true if method is POST
+     */
+    public boolean isPOST() {
+        return "POST".equals(method);
+    }
+
+    /**
+     * @return true if method is DELETE
+     */
+    public boolean isDELETE() {
+        return "DELETE".equals(method);
+    }
+
     public void setMethod(String method) {
         this.method = method;
     }
@@ -156,8 +184,8 @@ public class APICallContext implements Serializable {
         this.resourceName = resourceName;
     }
 
-    public List<String> getCompoundResourceId(){
-        return resourceId == null ? Collections.<String>emptyList() : Arrays.asList(resourceId.split("/"));
+    public List<String> getCompoundResourceId() {
+        return resourceId == null ? Collections.<String> emptyList() : Arrays.asList(resourceId.split("/"));
     }
 
     public String getResourceId() {
