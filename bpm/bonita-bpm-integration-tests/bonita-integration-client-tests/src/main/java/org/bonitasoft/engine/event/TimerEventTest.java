@@ -1,6 +1,10 @@
 package org.bonitasoft.engine.event;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -128,40 +132,35 @@ public class TimerEventTest extends CommonAPITest {
         disableAndDeleteProcess(definition);
     }
 
+    //    uncomment to repeat random test
+    //    @Rule
+    //    public RepeatRule repeatRule = new RepeatRule();
+    //
+    //    @Repeat(times = 100)
     @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Start event", "User task" }, story = "Execute a process with a start event with a timer cycle type.", jira = "")
     @Test
     public void timerStartEventCycle() throws Exception {
-        final Expression timerExpression = new ExpressionBuilder().createConstantStringExpression("*/4 * * * * ?"); // new instance created every 3 seconds
+        final Expression timerExpression = new ExpressionBuilder().createConstantStringExpression("*/1 * * * * ?"); // new instance created every second
         final String stepName = "step1";
         final ProcessDefinition definition = deployProcessWithTimerStartEventAndUserTask(TimerType.CYCLE, timerExpression, stepName);
 
-        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
-        // the job will execute the first time at when the second change. If this arrive just after the schedule the instance can already be created
-        assertTrue("There should be between 0 and 1 process, but was <" + processInstances.size() + ">",
-                1 == processInstances.size() || 0 == processInstances.size());
+        //when
+        Thread.sleep(2000);
 
-        // wait for process instance creation
-        Thread.sleep(4500);
+        //then
+        final List<ProcessInstance> firstProcessInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
+        assertThat(firstProcessInstances).as("should have started first instance").isNotEmpty();
 
-        processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
-        assertTrue("There should be between 1 and 2 process, but was <" + processInstances.size() + ">",
-                processInstances.size() >= 1 && processInstances.size() <= 2);
+        //when
+        Thread.sleep(2000);
 
-        // wait for process instance creation
-        Thread.sleep(4500);
+        //then
+        final List<ProcessInstance> secondProcessInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
+        assertThat(secondProcessInstances).as("should have started another instance").isNotEmpty();
+        assertThat(secondProcessInstances.size()).as("should have started another instance").isGreaterThan(firstProcessInstances.size());
 
-        processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
-        assertTrue("There should be between 2 and 3 process, but was <" + processInstances.size() + ">",
-                processInstances.size() >= 2 && processInstances.size() <= 3);
-
-        // wait for process instance creation
-        Thread.sleep(4500);
-
-        processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
-        assertTrue("There should be between 3 and 4 process, but was <" + processInstances.size() + ">",
-                processInstances.size() >= 3 && processInstances.size() <= 4);
-
-        waitForUserTask(stepName, processInstances.get(processInstances.size() - 1));
+        //cleanup
+        waitForUserTask(stepName, secondProcessInstances.get(secondProcessInstances.size() - 1));
         disableAndDeleteProcess(definition);
     }
 
