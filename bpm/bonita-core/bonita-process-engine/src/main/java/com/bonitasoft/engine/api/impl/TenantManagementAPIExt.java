@@ -32,11 +32,8 @@ import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilder;
 import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 import com.bonitasoft.engine.api.TenantManagementAPI;
 import com.bonitasoft.engine.api.impl.transaction.PauseServiceStrategy;
@@ -172,7 +169,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
 
     private void beforeServiceStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformServiceAccessor, final long tenantId)
             throws RestartException {
-        final NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlaformConfiguration();
+        final NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlatformConfiguration();
         final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
         final List<TenantRestartHandler> tenantRestartHandlers = nodeConfiguration.getTenantRestartHandlers();
         for (final TenantRestartHandler tenantRestartHandler : tenantRestartHandlers) {
@@ -181,7 +178,7 @@ public class TenantManagementAPIExt implements TenantManagementAPI {
     }
 
     private void afterServiceStartOfRestartHandlersOfTenant(final PlatformServiceAccessor platformServiceAccessor, final long tenantId) throws RestartException {
-        final NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlaformConfiguration();
+        final NodeConfiguration nodeConfiguration = platformServiceAccessor.getPlatformConfiguration();
         final TenantServiceAccessor tenantServiceAccessor = platformServiceAccessor.getTenantServiceAccessor(tenantId);
         STenant tenant;
         try {
