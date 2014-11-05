@@ -52,9 +52,18 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstan
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.impl.SBoundaryEventInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.impl.SIntermediateCatchEventInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.event.impl.SStartEventInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SGatewayInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SLoopActivityInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SManualTaskInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SReceiveTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SSubProcessActivityInstanceImpl;
+import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -62,6 +71,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.Before;
@@ -97,9 +107,6 @@ public class ProcessInstanceServiceImplTest {
     private EventInstanceService eventInstanceService;
 
     @Mock
-    private EventService eventService;
-
-    @Mock
     private Recorder recorder;
 
     @Mock
@@ -107,6 +114,9 @@ public class ProcessInstanceServiceImplTest {
 
     @Mock
     private ReadPersistenceService readPersistenceService;
+
+    @Mock
+    private EventService eventService;
 
     @Mock
     private ActivityInstanceService activityInstanceService;
@@ -157,7 +167,7 @@ public class ProcessInstanceServiceImplTest {
     }
 
     @Test
-    public void deleteParentPIAndElementsOnAbsentProcessShouldBeIgnored() throws Exception {
+    public void deleteParentProcessInstanceAndElementsOnAbsentProcessShouldBeIgnored() throws Exception {
         // given:
         doThrow(SProcessInstanceModificationException.class).when(processInstanceService).deleteProcessInstance(processInstance);
         doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService).getProcessInstance(processInstanceId);
@@ -171,7 +181,7 @@ public class ProcessInstanceServiceImplTest {
     }
 
     @Test(expected = SBonitaException.class)
-    public void exceptionInDeleteParentPIAndElementsOnStillExistingProcessShouldRaiseException() throws Exception {
+    public void deleteParentProcessInstanceAndElementsOnStillExistingProcessShouldRaiseException() throws Exception {
         // given:
         doThrow(SProcessInstanceModificationException.class).when(processInstanceService).deleteProcessInstance(processInstance);
         // getProcessInstance normally returns:
@@ -187,7 +197,22 @@ public class ProcessInstanceServiceImplTest {
     }
 
     @Test
-    public void deleteParentArchivedPIAndElementsOnAbsentProcessShouldBeIgnored() throws Exception {
+    public void deleteParentArchivedProcessInstanceAndElementsOnAbsentProcessShouldBeIgnored() throws Exception {
+        // given:
+        doThrow(new SProcessInstanceModificationException(new Exception())).when(processInstanceService).deleteArchivedProcessInstanceElements(anyLong(),
+                anyLong());
+        doReturn(null).when(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
+        doNothing().when(processInstanceService).logArchivedProcessInstanceNotFound(any(SProcessInstanceModificationException.class));
+
+        // when:
+        processInstanceService.deleteParentArchivedProcessInstanceAndElements(aProcessInstance);
+
+        // then:
+        verify(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
+    }
+
+    @Test
+    public void deleteParentArchivedProcessInstanceAndElements_should_be_ignored_when_error_to_getArchivedProcessInstance() throws Exception {
         // given:
         doThrow(SProcessInstanceModificationException.class).when(processInstanceService).deleteArchivedProcessInstanceElements(anyLong(), anyLong());
         doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
@@ -200,8 +225,8 @@ public class ProcessInstanceServiceImplTest {
         verify(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
     }
 
-    @Test(expected = SBonitaException.class)
-    public void exceptionInDeleteParentArchivedPIAndElementsOnStillExistingProcessShouldRaiseException() throws Exception {
+    @Test(expected = SProcessInstanceModificationException.class)
+    public void deleteParentArchivedProcessInstanceAndElementsOnStillExistingProcessShouldRaiseException() throws Exception {
         // given:
         doThrow(SProcessInstanceModificationException.class).when(processInstanceService).deleteArchivedProcessInstanceElements(anyLong(), anyLong());
         // getProcessInstance normally returns:
@@ -261,103 +286,6 @@ public class ProcessInstanceServiceImplTest {
         verify(processInstanceService, times(1)).deleteProcessInstanceElements(sProcessInstance);
         verify(processInstanceService, times(1)).deleteArchivedProcessInstanceElements(sProcessInstance.getId(), sProcessInstance.getProcessDefinitionId());
         verify(processInstanceService, times(1)).deleteArchivedFlowNodeInstances(sProcessInstance.getId());
-    }
-
-    @Test
-    public void getArchivedProcessInstance_should_return_archived_process_instance() throws Exception {
-        // Given
-        final long archivedProcessInstanceId = 41L;
-        final Map<String, Object> parameters = Collections.singletonMap("id", (Object) archivedProcessInstanceId);
-        final SelectOneDescriptor<SAProcessInstance> selectOneDescriptor = new SelectOneDescriptor<SAProcessInstance>(
-                "getArchivedProcessInstance", parameters, SAProcessInstance.class);
-        final SAProcessInstance saProcessInstance = mock(SAProcessInstance.class);
-        doReturn(saProcessInstance).when(readPersistenceService).selectOne(selectOneDescriptor);
-
-        // When
-        final SAProcessInstance archivedProcessInstance = processInstanceService.getArchivedProcessInstance(archivedProcessInstanceId);
-
-        // Then
-        assertEquals("The result should be equals to the list returned by the mock.", saProcessInstance, archivedProcessInstance);
-        verify(readPersistenceService).selectOne(selectOneDescriptor);
-    }
-
-    @Test(expected = SProcessInstanceReadException.class)
-    public void getArchivedProcessInstance_should_throw_exception_when_there_is_problem() throws Exception {
-        // Given
-        final long archivedProcessInstanceId = 41L;
-        final Map<String, Object> parameters = Collections.singletonMap("id", (Object) archivedProcessInstanceId);
-        final SelectOneDescriptor<SAProcessInstance> selectOneDescriptor = new SelectOneDescriptor<SAProcessInstance>(
-                "getArchivedProcessInstance", parameters, SAProcessInstance.class);
-        doThrow(new SBonitaReadException("plop")).when(readPersistenceService).selectOne(selectOneDescriptor);
-
-        // When
-        processInstanceService.getArchivedProcessInstance(archivedProcessInstanceId);
-    }
-
-    @Test
-    public void deleteFlowNodeInstanceElements_should_delete_child_process_instance_when_flownode_is_sub_process() throws Exception {
-        final SFlowNodeInstance flowNodeInstance = new SSubProcessActivityInstanceImpl();
-
-        deleteFlowNodeInstanceElements_should_delete_child_process_instance(flowNodeInstance);
-    }
-
-    @Test
-    public void deleteFlowNodeInstanceElements_should_delete_child_process_instance_when_flownode_is_call_activity() throws Exception {
-        final SFlowNodeInstance flowNodeInstance = new SCallActivityInstanceImpl();
-
-        deleteFlowNodeInstanceElements_should_delete_child_process_instance(flowNodeInstance);
-    }
-
-    private void deleteFlowNodeInstanceElements_should_delete_child_process_instance(final SFlowNodeInstance flowNodeInstance)
-            throws SBonitaException {
-        // Given
-        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
-        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
-        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
-        final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
-        doReturn(sProcessInstance).when(processInstanceService).getChildOfActivity(flowNodeInstance.getId());
-        doNothing().when(processInstanceService).deleteProcessInstance(sProcessInstance);
-
-        // When
-        processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
-
-        // Then
-        verify(processInstanceService).deleteProcessInstance(sProcessInstance);
-    }
-
-    @Test
-    public void deleteFlowNodeInstanceElements_should_log_exception_when_getChildOfActivity_failed_and_log_is_active() throws Exception {
-        // Given
-        final SFlowNodeInstance flowNodeInstance = new SSubProcessActivityInstanceImpl();
-        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
-        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
-        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
-        final SProcessInstanceNotFoundException exception = new SProcessInstanceNotFoundException(6);
-        doThrow(exception).when(processInstanceService).getChildOfActivity(flowNodeInstance.getId());
-
-        // When
-        processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
-
-        // Then
-        verify(technicalLoggerService).log((Class<?>) any(), eq(TechnicalLogSeverity.DEBUG), eq(exception));
-    }
-
-    @Test
-    public void deleteFlowNodeInstanceElements_should_do_nothing_when_getChildOfActivity_failed_and_no_log() throws Exception {
-        // Given
-        final SFlowNodeInstance flowNodeInstance = new SCallActivityInstanceImpl();
-        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
-        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
-        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
-        final SProcessInstanceNotFoundException exception = new SProcessInstanceNotFoundException(6);
-        doThrow(exception).when(processInstanceService).getChildOfActivity(flowNodeInstance.getId());
-        doReturn(false).when(technicalLoggerService).isLoggable((Class<?>) any(), eq(TechnicalLogSeverity.DEBUG));
-
-        // When
-        processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
-
-        // Then
-        verify(technicalLoggerService, never()).log((Class<?>) any(), eq(TechnicalLogSeverity.DEBUG), eq(exception));
     }
 
     @Test
@@ -579,6 +507,265 @@ public class ProcessInstanceServiceImplTest {
 
         // When
         processInstanceService.searchOpenProcessInstancesInvolvingUsersManagedBy(userId, queryOptions);
+    }
+
+    @Test
+    public void getArchivedProcessInstancesInAllStates_should_return_list_of_archived_process_instance() throws Exception {
+        // Given
+        final List<Long> archivedProcessInstanceIds = Arrays.asList(41L);
+        final Map<String, Object> parameters = Collections.singletonMap("sourceObjectIds", (Object) archivedProcessInstanceIds);
+        final SelectListDescriptor<SAProcessInstance> selectListDescriptor = new SelectListDescriptor<SAProcessInstance>(
+                "getArchivedProcessInstancesInAllStates", parameters, SAProcessInstance.class, new QueryOptions(0, archivedProcessInstanceIds.size()));
+        final List<SAProcessInstance> saProcessInstances = Arrays.asList(mock(SAProcessInstance.class));
+        doReturn(saProcessInstances).when(readPersistenceService).selectList(selectListDescriptor);
+
+        // When
+        final List<SAProcessInstance> archivedProcessInstances = processInstanceService.getArchivedProcessInstancesInAllStates(archivedProcessInstanceIds);
+
+        // Then
+        assertEquals("The result should be equals to the list returned by the mock.", saProcessInstances, archivedProcessInstances);
+        verify(readPersistenceService).selectList(selectListDescriptor);
+    }
+
+    @Test(expected = SProcessInstanceReadException.class)
+    public void getArchivedProcessInstancesInAllStates_should_throw_exception_when_there_is_problem() throws Exception {
+        // Given
+        final List<Long> archivedProcessInstanceIds = Arrays.asList(41L);
+        final Map<String, Object> parameters = Collections.singletonMap("sourceObjectIds", (Object) archivedProcessInstanceIds);
+        final SelectListDescriptor<SAProcessInstance> selectListDescriptor = new SelectListDescriptor<SAProcessInstance>(
+                "getArchivedProcessInstancesInAllStates", parameters, SAProcessInstance.class, new QueryOptions(0, archivedProcessInstanceIds.size()));
+        doThrow(new SBonitaReadException("plop")).when(readPersistenceService).selectList(selectListDescriptor);
+
+        // When
+        processInstanceService.getArchivedProcessInstancesInAllStates(archivedProcessInstanceIds);
+    }
+
+    @Test
+    public void getArchivedProcessInstance_should_return_archived_process_instance() throws Exception {
+        // Given
+        final long archivedProcessInstanceId = 41L;
+        final Map<String, Object> parameters = Collections.singletonMap("id", (Object) archivedProcessInstanceId);
+        final SelectOneDescriptor<SAProcessInstance> selectOneDescriptor = new SelectOneDescriptor<SAProcessInstance>(
+                "getArchivedProcessInstance", parameters, SAProcessInstance.class);
+        final SAProcessInstance saProcessInstance = mock(SAProcessInstance.class);
+        doReturn(saProcessInstance).when(readPersistenceService).selectOne(selectOneDescriptor);
+
+        // When
+        final SAProcessInstance archivedProcessInstance = processInstanceService.getArchivedProcessInstance(archivedProcessInstanceId);
+
+        // Then
+        assertEquals("The result should be equals to the list returned by the mock.", saProcessInstance, archivedProcessInstance);
+        verify(readPersistenceService).selectOne(selectOneDescriptor);
+    }
+
+    @Test(expected = SProcessInstanceReadException.class)
+    public void getArchivedProcessInstance_should_throw_exception_when_there_is_problem() throws Exception {
+        // Given
+        final long archivedProcessInstanceId = 41L;
+        final Map<String, Object> parameters = Collections.singletonMap("id", (Object) archivedProcessInstanceId);
+        final SelectOneDescriptor<SAProcessInstance> selectOneDescriptor = new SelectOneDescriptor<SAProcessInstance>(
+                "getArchivedProcessInstance", parameters, SAProcessInstance.class);
+        doThrow(new SBonitaReadException("plop")).when(readPersistenceService).selectOne(selectOneDescriptor);
+
+        // When
+        processInstanceService.getArchivedProcessInstance(archivedProcessInstanceId);
+    }
+
+    @Test
+    public void deleteFlowNodeInstanceElements_should_delete_child_process_instance_when_flownode_is_sub_process() throws Exception {
+        final SFlowNodeInstance flowNodeInstance = new SSubProcessActivityInstanceImpl();
+
+        deleteFlowNodeInstanceElements_should_delete_child_process_instance(flowNodeInstance);
+    }
+
+    @Test
+    public void deleteFlowNodeInstanceElements_should_delete_child_process_instance_when_flownode_is_call_activity() throws Exception {
+        final SFlowNodeInstance flowNodeInstance = new SCallActivityInstanceImpl();
+
+        deleteFlowNodeInstanceElements_should_delete_child_process_instance(flowNodeInstance);
+    }
+
+    private void deleteFlowNodeInstanceElements_should_delete_child_process_instance(final SFlowNodeInstance flowNodeInstance)
+            throws SBonitaException {
+        // Given
+        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
+        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
+        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
+        final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
+        doReturn(sProcessInstance).when(processInstanceService).getChildOfActivity(flowNodeInstance.getId());
+        doNothing().when(processInstanceService).deleteProcessInstance(sProcessInstance);
+
+        // When
+        processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
+
+        // Then
+        verify(processInstanceService).deleteProcessInstance(sProcessInstance);
+    }
+
+    @Test
+    public void deleteFlowNodeInstanceElements_should_log_exception_when_getChildOfActivity_failed_and_log_is_active() throws Exception {
+        // Given
+        final SFlowNodeInstance flowNodeInstance = new SSubProcessActivityInstanceImpl();
+        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
+        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
+        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
+        final SProcessInstanceNotFoundException exception = new SProcessInstanceNotFoundException(6);
+        doThrow(exception).when(processInstanceService).getChildOfActivity(flowNodeInstance.getId());
+
+        // When
+        processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
+
+        // Then
+        verify(technicalLoggerService).log((Class<?>) any(), eq(TechnicalLogSeverity.DEBUG), eq(exception));
+    }
+
+    @Test
+    public void deleteFlowNodeInstanceElements_should_do_nothing_when_getChildOfActivity_failed_and_no_log() throws Exception {
+        // Given
+        final SFlowNodeInstance flowNodeInstance = new SCallActivityInstanceImpl();
+        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
+        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
+        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
+        final SProcessInstanceNotFoundException exception = new SProcessInstanceNotFoundException(6);
+        doThrow(exception).when(processInstanceService).getChildOfActivity(flowNodeInstance.getId());
+        doReturn(false).when(technicalLoggerService).isLoggable((Class<?>) any(), eq(TechnicalLogSeverity.DEBUG));
+
+        // When
+        processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
+
+        // Then
+        verify(technicalLoggerService, never()).log((Class<?>) any(), eq(TechnicalLogSeverity.DEBUG), eq(exception));
+    }
+
+    @Test
+    public void deleteFlowNodeInstanceElements_should_call_deleteWaitingEvents_and_deleteEventTriggerInstances_when_flownode_is_type_INTERMEDIATE_CATCH_EVENT()
+            throws Exception {
+        // Given
+        final SFlowNodeInstance flowNodeInstance = new SIntermediateCatchEventInstanceImpl();
+        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
+        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
+        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
+
+        // When
+        processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
+
+        // Then
+        verify(eventInstanceService).deleteWaitingEvents(flowNodeInstance);
+        verify(eventInstanceService).deleteEventTriggerInstances(flowNodeInstance.getId());
+    }
+
+    @Test
+    public void deleteFlowNodeInstanceElements_should_call_deleteWaitingEvents_when_flownode_is_type_RECEIVE_TASK() throws Exception {
+        // Given
+        final SFlowNodeInstance flowNodeInstance = new SReceiveTaskInstanceImpl();
+        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
+        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
+        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
+
+        // When
+        processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
+
+        // Then
+        verify(eventInstanceService).deleteWaitingEvents(flowNodeInstance);
+    }
+
+    @Test
+    public void deleteFlowNodeInstanceElements_should_call_deleteWaitingEvents_when_flownode_is_type_START_EVENT() throws Exception {
+        // Given
+        final SFlowNodeInstance flowNodeInstance = new SStartEventInstanceImpl();
+        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
+        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
+        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
+
+        // When
+        processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
+
+        // Then
+        verify(eventInstanceService).deleteWaitingEvents(flowNodeInstance);
+    }
+
+    @Test
+    public void deleteFlowNodeInstanceElements_should_call_deleteWaitingEvents_and_deleteEventTriggerInstances_when_flownode_is_type_BOUNDARY_EVENT()
+            throws Exception {
+        // Given
+        final SFlowNodeInstance flowNodeInstance = new SBoundaryEventInstanceImpl();
+        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
+        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
+        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
+
+        // When
+        processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
+
+        // Then
+        verify(eventInstanceService).deleteWaitingEvents(flowNodeInstance);
+        verify(eventInstanceService).deleteEventTriggerInstances(flowNodeInstance.getId());
+    }
+
+    @Test
+    public void deleteFlowNodeInstanceElements_should_call_deleteHiddenTasksForActivity_and_deletePendingMappings_when_flownode_is_type_USER_TASK()
+            throws Exception {
+        // Given
+        final SFlowNodeInstance flowNodeInstance = new SUserTaskInstanceImpl("name", 3L, 6L, 9L, 12L, STaskPriority.ABOVE_NORMAL, 7L, 8L);
+        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
+        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
+        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
+
+        // When
+        processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
+
+        // Then
+        verify(activityInstanceService).deleteHiddenTasksForActivity(flowNodeInstance.getId());
+        verify(activityInstanceService).deletePendingMappings(flowNodeInstance.getId());
+    }
+
+    @Test
+    public void deleteFlowNodeInstanceElements_should_call_deleteHiddenTasksForActivity_and_deletePendingMappings_when_flownode_is_type_MANUAL_TASK()
+            throws Exception {
+        // Given
+        final SFlowNodeInstance flowNodeInstance = new SManualTaskInstanceImpl("name", 1L, 2L, 3L, 4L, STaskPriority.ABOVE_NORMAL, 5L, 6L);
+        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
+        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
+        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
+
+        // When
+        processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
+
+        // Then
+        verify(activityInstanceService).deleteHiddenTasksForActivity(flowNodeInstance.getId());
+        verify(activityInstanceService).deletePendingMappings(flowNodeInstance.getId());
+    }
+
+    @Test
+    public void deleteFlowNodeInstanceElements_should_just_deleteDataInstancesIfNecessary_and_deleteConnectorInstancesIfNecessary_when_flownode_is_loop()
+            throws Exception {
+        // Given
+        final SFlowNodeInstance flowNodeInstance = new SLoopActivityInstanceImpl();
+        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
+        doNothing().when(processInstanceService).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
+        doNothing().when(processInstanceService).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
+
+        // When
+        processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
+
+        // Then
+        verify(activityInstanceService, never()).deleteHiddenTasksForActivity(flowNodeInstance.getId());
+        verify(activityInstanceService, never()).deletePendingMappings(flowNodeInstance.getId());
+        verify(processInstanceService, never()).deleteSubProcess(flowNodeInstance, processDefinition);
+    }
+
+    @Test
+    public void deleteFlowNodeInstanceElements_should_do_nothing_when_flownode_is_gateway()
+            throws Exception {
+        // Given
+        final SFlowNodeInstance flowNodeInstance = new SGatewayInstanceImpl();
+        final SProcessDefinition processDefinition = mock(SProcessDefinition.class);
+
+        // When
+        processInstanceService.deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
+
+        // Then
+        verify(processInstanceService, never()).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
+        verify(processInstanceService, never()).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
     }
 
 }

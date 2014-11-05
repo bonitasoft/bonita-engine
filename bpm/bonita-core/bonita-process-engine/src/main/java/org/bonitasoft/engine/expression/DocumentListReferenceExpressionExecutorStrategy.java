@@ -50,17 +50,14 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
     private final DocumentService documentService;
 
     private final ActivityInstanceService flowNodeInstanceService;
+
     private final DocumentHelper documentHelper;
-    private final ProcessInstanceService processInstanceService;
-    private final ProcessDefinitionService processDefinitionService;
 
     public DocumentListReferenceExpressionExecutorStrategy(final DocumentService documentService,
-            final ActivityInstanceService flowNodeInstanceService, ProcessDefinitionService processDefinitionService,
-            ProcessInstanceService processInstanceService) {
+            final ActivityInstanceService flowNodeInstanceService, final ProcessDefinitionService processDefinitionService,
+            final ProcessInstanceService processInstanceService) {
         this.documentService = documentService;
         this.flowNodeInstanceService = flowNodeInstanceService;
-        this.processDefinitionService = processDefinitionService;
-        this.processInstanceService = processInstanceService;
         documentHelper = new DocumentHelper(documentService, processDefinitionService, processInstanceService);
     }
 
@@ -82,7 +79,7 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
         final String containerType = (String) context.get(CONTAINER_TYPE_KEY);
 
         try {
-            Long time = (Long) context.get("time");
+            final Long time = (Long) context.get("time");
             final long processInstanceId = getProcessInstance(containerId, containerType, time != null);
             final ArrayList<Object> results = new ArrayList<Object>(expressions.size());
             for (final SExpression expression : expressions) {
@@ -97,25 +94,25 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
     }
 
     List<Document> getDocumentList(final long processInstanceId, final String name, final Long time) throws SBonitaReadException {
-        List<SMappedDocument> documentList = getAllDocumentOfTheList(processInstanceId, name, time);
+        final List<SMappedDocument> documentList = getAllDocumentOfTheList(processInstanceId, name, time);
         try {
             if (documentList.isEmpty()
                     && !documentHelper.isListDefinedInDefinition(name, processInstanceId)) {
                 return null;
             }
-        } catch (SObjectNotFoundException e) {
+        } catch (final SObjectNotFoundException e) {
             return null;
         }
         return ModelConvertor.toDocuments(documentList, documentService);
     }
 
-    private List<SMappedDocument> getAllDocumentOfTheList(long processInstanceId, String name, Long time) throws SBonitaReadException {
-        if(time != null){
-            return documentService.getDocumentList(name,processInstanceId,time);
+    private List<SMappedDocument> getAllDocumentOfTheList(final long processInstanceId, final String name, final Long time) throws SBonitaReadException {
+        if (time != null) {
+            return documentService.getDocumentList(name, processInstanceId, time);
         }
         QueryOptions queryOptions = new QueryOptions(0, 100);
         List<SMappedDocument> mappedDocuments;
-        List<SMappedDocument> result = new ArrayList<SMappedDocument>();
+        final List<SMappedDocument> result = new ArrayList<SMappedDocument>();
         do {
             mappedDocuments = documentService.getDocumentList(name, processInstanceId, queryOptions.getFromIndex(), queryOptions.getNumberOfResults());
             result.addAll(mappedDocuments);
@@ -124,7 +121,8 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
         return result;
     }
 
-    private long getProcessInstance(final Long containerId, final String containerType, boolean flowNodeIsArchived) throws SFlowNodeNotFoundException, SFlowNodeReadException,
+    private long getProcessInstance(final Long containerId, final String containerType, final boolean flowNodeIsArchived) throws SFlowNodeNotFoundException,
+            SFlowNodeReadException,
             SExpressionDependencyMissingException, SActivityInstanceNotFoundException {
         if (containerId == null || containerType == null) {
             throw new SExpressionDependencyMissingException("The context to retrieve the document is not set.");
@@ -132,11 +130,10 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
         if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(containerType)) {
             return containerId;
         }
-        if(flowNodeIsArchived){
+        if (flowNodeIsArchived) {
             return flowNodeInstanceService.getMostRecentArchivedActivityInstance(containerId).getParentProcessInstanceId();
-        }else{
-            return flowNodeInstanceService.getFlowNodeInstance(containerId).getParentProcessInstanceId();
         }
+        return flowNodeInstanceService.getFlowNodeInstance(containerId).getParentProcessInstanceId();
     }
 
     @Override

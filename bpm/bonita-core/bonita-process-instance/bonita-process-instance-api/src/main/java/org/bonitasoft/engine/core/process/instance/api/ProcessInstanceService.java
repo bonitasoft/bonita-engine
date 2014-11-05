@@ -120,6 +120,16 @@ public interface ProcessInstanceService {
             SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
+     * Delete the specified process instance, and its elements archived and not, if are not a subProcess
+     *
+     * @param processInstance
+     *        The {@link SProcessInstance} to delete
+     * @since 6.4.0
+     */
+    void deleteParentProcessInstanceAndElements(SProcessInstance processInstance) throws SFlowNodeReadException, SProcessInstanceHierarchicalDeletionException,
+            SProcessInstanceModificationException;
+
+    /**
      * Get process instance by its id
      *
      * @param processInstanceId
@@ -182,6 +192,19 @@ public interface ProcessInstanceService {
             SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
+     * Delete the specified archived process instance
+     *
+     * @param saProcessInstance
+     *        The archived process instances to delete
+     * @throws SProcessInstanceModificationException
+     * @throws SProcessInstanceHierarchicalDeletionException
+     * @throws SFlowNodeReadException
+     * @since 6.4.0
+     */
+    void deleteParentArchivedProcessInstanceAndElements(SAProcessInstance saProcessInstance) throws SFlowNodeReadException,
+            SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
+
+    /**
      * Delete all archived elements related to the specified process instance, even the archived process instances
      *
      * @param processInstanceId
@@ -234,6 +257,17 @@ public interface ProcessInstanceService {
     long getNumberOfChildInstancesOfProcessInstance(long processInstanceId) throws SProcessInstanceReadException;
 
     /**
+     * Get the archived process instances corresponding to the identifiers
+     *
+     * @param archivedProcessInstanceIds
+     *        Identifier of the {@link SAProcessInstance}s
+     * @return The list of {@link SAProcessInstance}
+     * @throws SProcessInstanceReadException
+     * @since 6.4.0
+     */
+    List<SAProcessInstance> getArchivedProcessInstancesInAllStates(List<Long> processInstanceIds) throws SProcessInstanceReadException;
+
+    /**
      * Get total number of archived process instances according to specific criteria
      *
      * @param queryOptions
@@ -261,9 +295,8 @@ public interface ProcessInstanceService {
      * @param persistenceService
      * @return an SAProcessInstance object
      * @throws SProcessInstanceReadException
-     * @throws SProcessInstanceNotFoundException
      */
-    SAProcessInstance getArchivedProcessInstance(long archivedProcessInstanceId) throws SProcessInstanceReadException, SProcessInstanceNotFoundException;
+    SAProcessInstance getArchivedProcessInstance(long archivedProcessInstanceId) throws SProcessInstanceReadException;
 
     /**
      * Get total number of process instances

@@ -20,7 +20,6 @@ import java.util.Map;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.persistence.SRetryableException;
 
 /**
  * @author Charles Souillard
@@ -32,7 +31,7 @@ public interface PersistenceService extends ReadPersistenceService {
 
     /**
      * Create structure, execute SQL create tenant tables.
-     * 
+     *
      * @throws SPersistenceException
      * @throws IOException
      * @throws SRetryableException
@@ -43,7 +42,7 @@ public interface PersistenceService extends ReadPersistenceService {
     /**
      * Called after the create structure to execute script after the tables are created
      * e.g. to add indexes and constraints
-     * 
+     *
      * @throws SPersistenceException
      * @throws IOException
      * @throws SRetryableException
@@ -54,7 +53,7 @@ public interface PersistenceService extends ReadPersistenceService {
     /**
      * Called before the drop structure to execute script before the tables are deleted
      * e.g. to add indexes and constraints
-     * 
+     *
      * @throws SPersistenceException
      * @throws IOException
      * @throws SRetryableException
@@ -64,7 +63,7 @@ public interface PersistenceService extends ReadPersistenceService {
 
     /**
      * Clean structure, execute SQL clean tables.
-     * 
+     *
      * @throws SPersistenceException
      * @throws IOException
      * @throws SRetryableException
@@ -74,7 +73,7 @@ public interface PersistenceService extends ReadPersistenceService {
 
     /**
      * Delete structure, execute SQL drop tenant tables.
-     * 
+     *
      * @throws SPersistenceException
      * @throws IOException
      * @throws SRetryableException
@@ -84,7 +83,7 @@ public interface PersistenceService extends ReadPersistenceService {
 
     /**
      * Initialize structure, execute SQL init tenant tables.
-     * 
+     *
      * @throws SPersistenceException
      * @throws IOException
      * @throws SRetryableException
@@ -104,7 +103,7 @@ public interface PersistenceService extends ReadPersistenceService {
     // else keep the already set id
     /**
      * Add a record into the table by given persistentObject.
-     * 
+     *
      * @param entity
      * @throws SPersistenceException
      * @throws SRetryableException
@@ -121,7 +120,7 @@ public interface PersistenceService extends ReadPersistenceService {
 
     /**
      * Delete a record from the table by given persistentObject.
-     * 
+     *
      * @param entity
      * @throws SPersistenceException
      * @throws SRetryableException
@@ -131,7 +130,7 @@ public interface PersistenceService extends ReadPersistenceService {
 
     /**
      * Delete elements that are marked to be deleted
-     * 
+     *
      * @throws SPersistenceException
      * @throws SRetryableException
      */
@@ -139,9 +138,9 @@ public interface PersistenceService extends ReadPersistenceService {
 
     /**
      * Delete elements that are marked to be deleted
-     * 
+     *
      * @param classToPurge
-     *            the class to purge
+     *        the class to purge
      * @throws SPersistenceException
      * @throws SRetryableException
      */
@@ -149,9 +148,9 @@ public interface PersistenceService extends ReadPersistenceService {
 
     /**
      * Delete all records belong to the given entity class from the table.
-     * 
+     *
      * @param entityClass
-     *            The class which extends persistentObject
+     *        The class which extends persistentObject
      * @throws SPersistenceException
      * @throws SRetryableException
      * @since 6.0
@@ -160,18 +159,18 @@ public interface PersistenceService extends ReadPersistenceService {
 
     /**
      * Executes a query update.
-     * 
+     *
      * @param updateQueryName
-     *            the name of the declared query that represent the update.
+     *        the name of the declared query that represent the update.
      * @return the number of updated rows, as returned by the underlining persistence implementation.
      * @throws SPersistenceException
-     *             if a persistence problem occurs when executing the update query.
+     *         if a persistence problem occurs when executing the update query.
      */
     int update(final String updateQueryName) throws SPersistenceException;
 
     /**
      * Executes a query update.
-     * 
+     *
      * @param updateQueryName
      * @param inputParameters
      * @return
@@ -181,7 +180,7 @@ public interface PersistenceService extends ReadPersistenceService {
 
     /**
      * Delete all elements of a specific table for a specific tenant
-     * 
+     *
      * @param entityClass
      *        Entity class corresponding to the table to empty
      * @param filters
@@ -206,11 +205,11 @@ public interface PersistenceService extends ReadPersistenceService {
 
     /**
      * Delete a record from the table by id and its class type.
-     * 
+     *
      * @param id
-     *            entity's id
+     *        entity's id
      * @param entityClass
-     *            The class which extends persistentObject
+     *        The class which extends persistentObject
      * @throws SPersistenceException
      * @throws SRetryableException
      * @since 6.0
@@ -219,11 +218,11 @@ public interface PersistenceService extends ReadPersistenceService {
 
     /**
      * Delete records from the table.
-     * 
+     *
      * @param ids
-     *            A list contains entity ids
+     *        A list contains entity ids
      * @param entityClass
-     *            The class which extends persistentObject
+     *        The class which extends persistentObject
      * @throws SPersistenceException
      * @throws SRetryableException
      * @since 6.0

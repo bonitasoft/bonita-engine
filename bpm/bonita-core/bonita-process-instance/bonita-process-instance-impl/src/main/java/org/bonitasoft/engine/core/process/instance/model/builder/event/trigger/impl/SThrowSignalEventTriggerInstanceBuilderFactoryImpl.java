@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,16 +15,27 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.
 
 import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowSignalEventTriggerInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowSignalEventTriggerInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowSignalEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowSignalEventTriggerInstanceImpl;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
-public class SThrowSignalEventTriggerInstanceBuilderFactoryImpl extends SEventTriggerInstanceBuilderFactoryImpl implements SThrowSignalEventTriggerInstanceBuilderFactory {
+public class SThrowSignalEventTriggerInstanceBuilderFactoryImpl extends SEventTriggerInstanceBuilderFactoryImpl implements
+        SThrowSignalEventTriggerInstanceBuilderFactory {
 
     @Override
     public SThrowSignalEventTriggerInstanceBuilder createNewInstance(final long eventInstanceId, final String signalName) {
         final SThrowSignalEventTriggerInstanceImpl entity = new SThrowSignalEventTriggerInstanceImpl(eventInstanceId, signalName);
+        return new SThrowSignalEventTriggerInstanceBuilderImpl(entity);
+    }
+
+    @Override
+    public SThrowSignalEventTriggerInstanceBuilder createNewInstance(final SThrowSignalEventTriggerInstance sThrowSignalEventTriggerInstance) {
+        final SThrowSignalEventTriggerInstanceImpl entity = new SThrowSignalEventTriggerInstanceImpl(sThrowSignalEventTriggerInstance.getId(),
+                sThrowSignalEventTriggerInstance.getSignalName());
+        entity.setId(sThrowSignalEventTriggerInstance.getId());
         return new SThrowSignalEventTriggerInstanceBuilderImpl(entity);
     }
 

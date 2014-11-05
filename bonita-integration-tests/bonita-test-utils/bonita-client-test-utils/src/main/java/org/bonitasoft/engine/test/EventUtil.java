@@ -32,7 +32,7 @@ import org.bonitasoft.engine.session.APISession;
 
 /**
  * Utility methods to get maps that match process as wanted
- * 
+ *
  * @author Baptiste Mesta
  */
 public class EventUtil {
@@ -106,9 +106,8 @@ public class EventUtil {
         } catch (final CommandExecutionException e) {
             if (e.getMessage().toLowerCase().contains("timeout")) {
                 throw new TimeoutException("Timeout (" + defaultTimeout + "ms)looking for element: " + event);
-            } else {
-                throw e;
             }
+            throw e;
         }
     }
 

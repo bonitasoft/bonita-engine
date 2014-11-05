@@ -25,7 +25,7 @@ import org.quartz.JobExecutionException;
  * @author Baptsite Mesta
  * @author Celine Souchet
  */
-public abstract class QuartzJob implements org.quartz.Job {
+public abstract class AbstractQuartzJob implements org.quartz.Job {
 
     private StatelessJob bosJob;
 

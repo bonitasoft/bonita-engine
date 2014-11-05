@@ -13,7 +13,7 @@ import org.mockito.Mockito;
 public class AbstractHibernatePersistenceServiceTest {
 
     @Test
-    public void should_getQueryFilters_append_OR_clause_when_wordSearch_is_enabled() throws Exception {
+    public void should_getQueryFilters_append_OR_clause_when_wordSearch_is_enabled() {
         // We can't call the constructor as Hibernate currently tries to instantiate a Connection
         final AbstractHibernatePersistenceService persistenceService = mock(AbstractHibernatePersistenceService.class);
         doCallRealMethod().when(persistenceService).buildLikeClauseForOneFieldOneTerm(Mockito.any(StringBuilder.class), anyString(), anyString(), anyBoolean());
@@ -28,7 +28,7 @@ public class AbstractHibernatePersistenceServiceTest {
     }
 
     @Test
-    public void should_getQueryFilters_append_OR_clause_when_wordSearch_is_not_enabled() throws Exception {
+    public void should_getQueryFilters_append_OR_clause_when_wordSearch_is_not_enabled() {
         // We can't call the constructor as Hibernate currently tries to instantiate a Connection
         final AbstractHibernatePersistenceService persistenceService = mock(AbstractHibernatePersistenceService.class);
         doCallRealMethod().when(persistenceService).buildLikeClauseForOneFieldOneTerm(Mockito.any(StringBuilder.class), anyString(), anyString(), anyBoolean());

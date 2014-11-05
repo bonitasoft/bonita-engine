@@ -210,9 +210,9 @@ public class OperationBuilder {
      * create an operation that update a document list
      *
      * @param docName
-     *            the name of the document list
+     *        the name of the document list
      * @param expression
-     *            the expression that returns a list of {@link DocumentValue}
+     *        the expression that returns a list of {@link DocumentValue}
      * @return the newly created <code>Operation</code>.
      */
     public Operation createSetDocumentList(final String docName, final Expression expression) {

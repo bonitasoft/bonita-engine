@@ -227,7 +227,7 @@ public class ImportOrganizationMergeDuplicatesStrategy implements ImportOrganiza
 
     @Override
     public void foundExistingCustomUserInfoDefinition(final SCustomUserInfoDefinition existingUserInfoDefinition,
-            final CustomUserInfoDefinitionCreator newUserInfoDefinition) throws ImportDuplicateInOrganizationException, SIdentityException {
+            final CustomUserInfoDefinitionCreator newUserInfoDefinition) throws SIdentityException {
         // only description is updated as it only matches if they have the same name
         final EntityUpdateDescriptor updateDescriptor = getUpdateDescriptor(newUserInfoDefinition.getDescription());
         identityService.updateCustomUserInfoDefinition(existingUserInfoDefinition, updateDescriptor);

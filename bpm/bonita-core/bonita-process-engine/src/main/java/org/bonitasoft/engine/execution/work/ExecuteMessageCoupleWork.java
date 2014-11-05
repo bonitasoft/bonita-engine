@@ -17,11 +17,9 @@ import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SMessageInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory;
@@ -55,7 +53,7 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
     }
 
     private void resetWaitingMessage(final long waitingMessageId, final EventInstanceService eventInstanceService) throws SWaitingEventModificationException,
-            SWaitingEventNotFoundException, SWaitingEventReadException {
+            SWaitingEventReadException {
         final SWaitingMessageEvent waitingMsg = eventInstanceService.getWaitingMessage(waitingMessageId);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor
@@ -64,7 +62,7 @@ public class ExecuteMessageCoupleWork extends TenantAwareBonitaWork {
     }
 
     private void resetMessageInstance(final long messageInstanceId, final EventInstanceService eventInstanceService) throws SMessageModificationException,
-            SMessageInstanceNotFoundException, SMessageInstanceReadException {
+            SMessageInstanceReadException {
         final SMessageInstance messageInstance = eventInstanceService.getMessageInstance(messageInstanceId);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
         descriptor.addField(BuilderFactory.get(SMessageInstanceBuilderFactory.class).getHandledKey(), false);
