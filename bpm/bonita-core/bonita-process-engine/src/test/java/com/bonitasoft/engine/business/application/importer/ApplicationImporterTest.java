@@ -9,6 +9,7 @@
 
 package com.bonitasoft.engine.business.application.importer;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -16,7 +17,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.Arrays;
+import java.util.List;
 
+import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.junit.Test;
@@ -49,37 +52,49 @@ public class ApplicationImporterTest {
     private ApplicationImporter applicationImporter;
 
     @Test
-    public void importApplications_should_create_applications_contained_in_xml_file() throws Exception {
+    public void importApplications_should_create_applications_contained_in_xml_file_and_return_status() throws Exception {
         //given
         long createdBy = 5L;
         SApplication app1 = mock(SApplication.class);
         SApplication app2 = mock(SApplication.class);
 
+        ImportResult importResult1 = mock(ImportResult.class);
+        given(importResult1.getApplication()).willReturn(app1);
+        given(importResult1.getImportStatus()).willReturn(mock(ImportStatus.class));
+
+        ImportResult importResult2 = mock(ImportResult.class);
+        given(importResult2.getApplication()).willReturn(app2);
+        given(importResult2.getImportStatus()).willReturn(mock(ImportStatus.class));
+
         ApplicationNodeContainer nodeContainer = mock(ApplicationNodeContainer.class);
         given(containerImporter.importXML("<applications/>".getBytes())).willReturn(nodeContainer);
-        given(containerConverter.toSApplications(nodeContainer, createdBy)).willReturn(Arrays.asList(app1, app2));
+        given(containerConverter.toSApplications(nodeContainer, createdBy)).willReturn(Arrays.asList(importResult1, importResult2));
 
         //when
-        applicationImporter.importApplications("<applications/>".getBytes(), createdBy);
+        List<ImportStatus> importStatus = applicationImporter.importApplications("<applications/>".getBytes(), createdBy);
 
         //then
+        assertThat(importStatus).containsExactly(importResult1.getImportStatus(), importResult2.getImportStatus());
         verify(applicationService, times(1)).createApplication(app1);
         verify(applicationService, times(1)).createApplication(app2);
         verifyZeroInteractions(strategy);
     }
 
     @Test
-        public void importApplications_should_call_importStrategy_when_application_alredy_exists() throws Exception {
+    public void importApplications_should_call_importStrategy_when_application_already_exists() throws Exception {
         //given
         long createdBy = 5L;
         SApplication appToBeImported = mock(SApplication.class);
         given(appToBeImported.getToken()).willReturn("application");
 
+        ImportResult importResult = mock(ImportResult.class);
+        given(importResult.getApplication()).willReturn(appToBeImported);
+
         SApplication appInConflict = mock(SApplication.class);
 
         ApplicationNodeContainer nodeContainer = mock(ApplicationNodeContainer.class);
         given(containerImporter.importXML("<applications/>".getBytes())).willReturn(nodeContainer);
-        given(containerConverter.toSApplications(nodeContainer, createdBy)).willReturn(Arrays.asList(appToBeImported));
+        given(containerConverter.toSApplications(nodeContainer, createdBy)).willReturn(Arrays.asList(importResult));
         given(applicationService.getApplicationByToken("application")).willReturn(appInConflict);
 
         //when
@@ -96,9 +111,12 @@ public class ApplicationImporterTest {
         long createdBy = 5L;
         SApplication app1 = mock(SApplication.class);
 
+        ImportResult importResult = mock(ImportResult.class);
+        given(importResult.getApplication()).willReturn(app1);
+
         ApplicationNodeContainer nodeContainer = mock(ApplicationNodeContainer.class);
         given(containerImporter.importXML("<applications/>".getBytes())).willReturn(nodeContainer);
-        given(containerConverter.toSApplications(nodeContainer, createdBy)).willReturn(Arrays.asList(app1));
+        given(containerConverter.toSApplications(nodeContainer, createdBy)).willReturn(Arrays.asList(importResult));
 
         given(applicationService.createApplication(app1)).willThrow(new SObjectCreationException(""));
 

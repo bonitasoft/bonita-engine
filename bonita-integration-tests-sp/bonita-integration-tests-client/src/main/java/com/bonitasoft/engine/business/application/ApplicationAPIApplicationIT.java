@@ -11,8 +11,11 @@ package com.bonitasoft.engine.business.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.util.xml.XmlStringPrettyFormatter;
+import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.ServerAPIException;
@@ -388,7 +391,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "import" })
     @Test
-    public void importApplications_should_return_create_all_applications_contained_by_xml_file() throws Exception {
+    public void importApplications_should_create_all_applications_contained_by_xml_file_and_return_status_ok_() throws Exception {
         //given
         final Profile profile = getProfileAPI().createProfile("ApplicationProfile", "Profile for applications");
 
@@ -396,9 +399,19 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
                 .getResourceAsStream("applications.xml"));
 
         //when
-        applicationAPI.importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
+        List<ImportStatus> importStatus = applicationAPI.importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
 
         //then
+        assertThat(importStatus).hasSize(2);
+        assertThat(importStatus.get(0).getName()).isEqualTo("HR-dashboard");
+        assertThat(importStatus.get(0).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        assertThat(importStatus.get(0).getErrors()).isEmpty();
+
+        assertThat(importStatus.get(1).getName()).isEqualTo("My");
+        assertThat(importStatus.get(1).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        assertThat(importStatus.get(1).getErrors()).isEmpty();
+
+        // check applications ware created
         final SearchResult<Application> searchResult = applicationAPI.searchApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(2);
         final Application app1 = searchResult.getResult().get(0);

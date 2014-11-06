@@ -19,6 +19,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import com.bonitasoft.engine.business.application.importer.ImportResult;
+import org.bonitasoft.engine.api.ImportError;
+import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -182,7 +185,7 @@ public class ApplicationNodeConverterTest {
     }
 
     @Test
-    public void toSApplication_should_map_all_fields_except_home_page() throws Exception {
+    public void toSApplication_should_return_ImportResult_with_no_errors_and_application_with_all_fields_except_home_page() throws Exception {
         //given
         final ApplicationNode node = new ApplicationNode();
         node.setDisplayName("My app");
@@ -200,10 +203,12 @@ public class ApplicationNodeConverterTest {
         given(profileService.getProfileByName("admin")).willReturn(profile);
 
         //when
-        final SApplication application = converter.toSApplication(node, 1L);
+        ImportResult importResult = converter.toSApplication(node, 1L);
 
         //then
-        assertThat(application).isNotNull();
+        assertThat(importResult).isNotNull();
+
+        SApplication application = importResult.getApplication();
         assertThat(application.getDisplayName()).isEqualTo("My app");
         assertThat(application.getDescription()).isEqualTo("This is my app");
         assertThat(application.getHomePageId()).isNull();
@@ -214,6 +219,11 @@ public class ApplicationNodeConverterTest {
         assertThat(application.getState()).isEqualTo("ENABLED");
         assertThat(application.getCreatedBy()).isEqualTo(1L);
 
+        ImportStatus importStatus = importResult.getImportStatus();
+        assertThat(importStatus.getName()).isEqualTo("app");
+        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        assertThat(importStatus.getErrors()).isEmpty();
+
     }
 
     @Test
@@ -223,25 +233,34 @@ public class ApplicationNodeConverterTest {
         node.setProfile(null);
 
         //when
-        final SApplication application = converter.toSApplication(node, 1L);
+        ImportResult importResult = converter.toSApplication(node, 1L);
 
         //then
-        assertThat(application).isNotNull();
-        assertThat(application.getProfileId()).isNull();
+        assertThat(importResult).isNotNull();
+        assertThat(importResult.getApplication().getProfileId()).isNull();
     }
 
-    @Test(expected = ExecutionException.class)
-    public void toSApplication_should_throw_ExecutionException_when_profile_service_throws_exception() throws Exception {
+    @Test
+    public void toSApplication_should_return_Import_result_with_errors_and_profile_not_set_when_profile_is_not_found() throws Exception {
         //given
         final ApplicationNode node = new ApplicationNode();
         node.setProfile("admin");
+        node.setVersion("1.0");
+        node.setToken("app");
+        node.setState("ENABLED");
 
         given(profileService.getProfileByName("admin")).willThrow(new SProfileNotFoundException(""));
 
         //when
-        converter.toSApplication(node, 1L);
+        ImportResult importResult = converter.toSApplication(node, 1L);
 
-        //then exception
+        //then
+        assertThat(importResult.getApplication().getProfileId()).isNull();
+
+        ImportStatus importStatus = importResult.getImportStatus();
+        assertThat(importStatus.getName()).isEqualTo("app");
+        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        assertThat(importStatus.getErrors()).containsExactly(new ImportError("admin", ImportError.Type.PROFILE));
     }
 
 }

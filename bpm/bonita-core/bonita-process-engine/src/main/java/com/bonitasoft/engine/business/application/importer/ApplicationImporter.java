@@ -9,6 +9,7 @@
 
 package com.bonitasoft.engine.business.application.importer;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,12 +42,14 @@ public class ApplicationImporter {
 
     public List<ImportStatus> importApplications(final byte[] xmlContent, long createdBy) throws ExecutionException {
         ApplicationNodeContainer applicationNodeContainer = importer.importXML(xmlContent);
-        List<SApplication> applications = containerConverter.toSApplications(applicationNodeContainer, createdBy);
+        List<ImportResult> importResults = containerConverter.toSApplications(applicationNodeContainer, createdBy);
+        ArrayList<ImportStatus> importStatus = new ArrayList<ImportStatus>(importResults.size());
         try {
-            for (SApplication applicationToBeImported : applications) {
-                importApplication(applicationToBeImported);
+            for (ImportResult importResult : importResults) {
+                importApplication(importResult.getApplication());
+                importStatus.add(importResult.getImportStatus());
             }
-            return Collections.emptyList();
+            return importStatus;
         } catch (SBonitaException e) {
             throw new ExecutionException(e);
         }

@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import java.util.Arrays;
 import java.util.List;
 
+import com.bonitasoft.engine.business.application.importer.ImportResult;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -56,7 +57,7 @@ public class ApplicationContainerConverterTest {
     }
 
     @Test
-    public void toSApplications_should_return_a_list_of_all_contained_applications() throws Exception {
+    public void toSApplications_should_return_a_ImportResult_for_each_contained_application() throws Exception {
         //given
         ApplicationNode appNode1 = mock(ApplicationNode.class);
         ApplicationNode appNode2 = mock(ApplicationNode.class);
@@ -64,18 +65,18 @@ public class ApplicationContainerConverterTest {
         ApplicationNodeContainer container = mock(ApplicationNodeContainer.class);
         given(container.getApplications()).willReturn(Arrays.asList(appNode1, appNode2));
 
-        SApplication app1 = mock(SApplication.class);
-        SApplication app2 = mock(SApplication.class);
+        ImportResult importResult1 = mock(ImportResult.class);
+        ImportResult importResult2 = mock(ImportResult.class);
 
         long createdBy = 4L;
 
-        given(applicationNodeConverter.toSApplication(appNode1, createdBy)).willReturn(app1);
-        given(applicationNodeConverter.toSApplication(appNode2, createdBy)).willReturn(app2);
+        given(applicationNodeConverter.toSApplication(appNode1, createdBy)).willReturn(importResult1);
+        given(applicationNodeConverter.toSApplication(appNode2, createdBy)).willReturn(importResult2);
 
         //when
-        List<SApplication> applications = applicationContainerConverter.toSApplications(container, createdBy);
+        List<ImportResult> applications = applicationContainerConverter.toSApplications(container, createdBy);
 
         //then
-        assertThat(applications).containsExactly(app1, app2);
+        assertThat(applications).containsExactly(importResult1, importResult2);
     }
 }

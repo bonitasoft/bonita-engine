@@ -12,6 +12,8 @@ package com.bonitasoft.engine.business.application.converter;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.api.ImportError;
+import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.ExecutionException;
@@ -24,6 +26,7 @@ import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException
 import org.bonitasoft.engine.profile.model.SProfile;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.importer.ImportResult;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationBuilder;
@@ -107,28 +110,35 @@ public class ApplicationNodeConverter {
         }
     }
 
-    public SApplication toSApplication(final ApplicationNode applicationNode, final long createdBy) throws ExecutionException {
+    public ImportResult toSApplication(ApplicationNode applicationNode, long createdBy) throws ExecutionException {
+        ImportStatus importStatus = new ImportStatus(applicationNode.getToken());
 
-        final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(applicationNode.getToken(),
+        SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(applicationNode.getToken(),
                 applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy);
         builder.setIconPath(applicationNode.getIconPath());
         builder.setDescription(applicationNode.getDescription());
         builder.setState(applicationNode.getState());
 
-        setProfile(applicationNode, builder);
+        ImportError importError = setProfile(applicationNode, builder);
+        if (importError != null) {
+            importStatus.addError(importError);
+        }
 
-        return builder.done();
+        SApplication application = builder.done();
+        return new ImportResult(application, importStatus);
     }
 
-    private void setProfile(final ApplicationNode applicationNode, final SApplicationBuilder builder) throws ExecutionException {
+    private ImportError setProfile(final ApplicationNode applicationNode, final SApplicationBuilder builder) throws ExecutionException {
+        ImportError importError = null;
         if (applicationNode.getProfile() != null) {
             try {
                 final SProfile profile = profileService.getProfileByName(applicationNode.getProfile());
                 builder.setProfileId(profile.getId());
             } catch (final SProfileNotFoundException e) {
-                throw new ExecutionException(e);
+                importError = new ImportError(applicationNode.getProfile(), ImportError.Type.PROFILE);
             }
         }
+        return importError;
     }
 
 }
