@@ -113,7 +113,7 @@ public class TenantManagementAPIExtTest {
         when(platformServiceAccessor.getBroadcastService()).thenReturn(broadcastService);
         when(platformServiceAccessor.getSchedulerService()).thenReturn(schedulerService);
         when(platformServiceAccessor.getPlatformService()).thenReturn(platformService);
-        when(platformServiceAccessor.getPlaformConfiguration()).thenReturn(nodeConfiguration);
+        when(platformServiceAccessor.getPlatformConfiguration()).thenReturn(nodeConfiguration);
         when(platformServiceAccessor.getSessionService()).thenReturn(sessionService);
         when(platformServiceAccessor.getTechnicalLoggerService()).thenReturn(technicalLoggerService);
         when(platformServiceAccessor.getTenantServiceAccessor(tenantId)).thenReturn(tenantServiceAccessor);
