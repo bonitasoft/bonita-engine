@@ -24,37 +24,39 @@ import org.bonitasoft.engine.bpm.DescriptionElement;
 public interface FlowNodeInstance extends DescriptionElement, BaseElement {
 
     /**
-     * Returns the task's direct container ID. For a sub-task for CallActivity, would point to the containing activity ID of the current element.
-     * For a normal Task / Activity, would point to its containing process instance ID.
-     * 
+     * Returns the task's direct container ID. For a sub-task or CallActivity, would point to the containing activity ID of the current element.
+     * For a normal Task / Activity, would point to the ID of the process instance containing the task / activity.
+     * For a multi-instanciated task, each task has its parentContainerId pointing to the containing multi-instance task (basic container for all task
+     * instances).
+     *
      * @return the ID of the direct containing element (activity instance of process instance).
      */
     long getParentContainerId();
 
     /**
      * Returns the root container ID. It is the ID of the root-level containing process instance.
-     * 
+     *
      * @return the root container ID.
      */
     long getRootContainerId();
 
     /**
      * Returns the ID of the process definition where this <code>FlowNodeInstance</code> is defined.
-     * 
+     *
      * @return the ID of the process definition.
      */
     long getProcessDefinitionId();
 
     /**
      * Always returns the directly containing process instance ID (at the lower level, if several levels of containing processes).
-     * 
+     *
      * @return the ID of the lowest-level containing process instance.
      */
     long getParentProcessInstanceId();
 
     /**
      * Returns a String representation of this FlowNodeInstance state.
-     * 
+     *
      * @return this FlowNodeInstance state
      */
     String getState();
@@ -63,7 +65,7 @@ public interface FlowNodeInstance extends DescriptionElement, BaseElement {
 
     /**
      * Returns the <code>FlowNodeType</code> that precises the concrete type of this <code>FlowNodeInstance</code>.
-     * 
+     *
      * @return the <code>FlowNodeType</code>
      */
     FlowNodeType getType();
@@ -94,7 +96,7 @@ public interface FlowNodeInstance extends DescriptionElement, BaseElement {
 
     /**
      * Returns the ID of the flow node definition of this instance.
-     * 
+     *
      * @return the ID of the flow node definition that this <code>FlowNodeInstance</code> is an instance of.
      */
     long getFlownodeDefinitionId();
