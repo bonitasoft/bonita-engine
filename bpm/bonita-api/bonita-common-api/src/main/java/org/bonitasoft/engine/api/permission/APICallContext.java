@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -211,6 +212,10 @@ public class APICallContext implements Serializable {
 
     public JSONObject getBodyAsJSON() throws JSONException {
         return new JSONObject(body);
+    }
+
+    public JSONArray getBodyAsJSONArray() throws JSONException {
+        return new JSONArray(body);
     }
 
     public void setBody(String body) {

@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.entry;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -36,6 +37,16 @@ public class APICallContextTest {
 
         assertThat(body.getString("a")).isEqualTo("b");
         assertThat(body.getLong("c")).isEqualTo(1l);
+    }
+    @Test
+    public void getBodyAsJSonArray() throws JSONException {
+        APICallContext apiCallContext = new APICallContext();
+        apiCallContext.setBody("[{\"a\":\"b\",\"c\":\"1\"}]");
+
+        JSONArray body = apiCallContext.getBodyAsJSONArray();
+
+        assertThat(body.getJSONObject(0).getString("a")).isEqualTo("b");
+        assertThat(body.getJSONObject(0).getLong("c")).isEqualTo(1l);
     }
 
     @Test
