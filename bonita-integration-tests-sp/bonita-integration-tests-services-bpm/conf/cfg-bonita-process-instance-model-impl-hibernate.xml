@@ -38,6 +38,7 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstanceImpl" value="e" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance" value="e" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance" value="e" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance" value="e" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance" value="t" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance" value="t" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance" value="t" />
