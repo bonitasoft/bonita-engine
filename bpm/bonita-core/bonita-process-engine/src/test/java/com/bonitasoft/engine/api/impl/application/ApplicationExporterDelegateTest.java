@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import java.util.Arrays;
 import java.util.List;
 
+import com.bonitasoft.engine.business.application.exporter.ApplicationExporter;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -27,7 +28,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.exporter.ApplicationsExporter;
 import com.bonitasoft.engine.business.application.filter.ApplicationsWithIdsFilterBuilder;
 import com.bonitasoft.engine.business.application.model.SApplication;
 
@@ -35,7 +35,7 @@ import com.bonitasoft.engine.business.application.model.SApplication;
 public class ApplicationExporterDelegateTest {
 
     @Mock
-    private ApplicationsExporter exporter;
+    private ApplicationExporter exporter;
 
     @Mock
     private ApplicationService applicationService;

@@ -27,7 +27,7 @@ import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ApplicationsExporterTest {
+public class ApplicationExporterTest {
 
     @Mock
     private ApplicationContainerConverter converter;
@@ -36,7 +36,7 @@ public class ApplicationsExporterTest {
     private ApplicationContainerExporter containerExporter;
 
     @InjectMocks
-    private ApplicationsExporter applicationsExporter;
+    private ApplicationExporter applicationExporter;
 
     @Test
     public void export_should_return_result_of_ApplicationContainerExporter() throws Exception {
@@ -48,7 +48,7 @@ public class ApplicationsExporterTest {
         given(containerExporter.export(container)).willReturn("<applications/>".getBytes());
 
         //when
-        byte[] exportedApplications = applicationsExporter.export(applications);
+        byte[] exportedApplications = applicationExporter.export(applications);
 
         //then
         assertThat(new String(exportedApplications)).isEqualTo("<applications/>");

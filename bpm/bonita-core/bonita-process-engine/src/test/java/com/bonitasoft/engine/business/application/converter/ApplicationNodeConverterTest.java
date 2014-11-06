@@ -87,7 +87,7 @@ public class ApplicationNodeConverterTest {
     }
 
     @Test(expected = ExecutionException.class)
-    public void toNode_should_throw_SBonitaExportException_when_profileService_throws_exception() throws Exception {
+    public void toNode_should_throw_ExecutionException_when_profileService_throws_exception() throws Exception {
         //given
         SApplication application = mock(SApplication.class);
         given(application.getProfileId()).willReturn(7L);
@@ -120,7 +120,7 @@ public class ApplicationNodeConverterTest {
     }
 
     @Test(expected = ExecutionException.class)
-    public void toNode_should_throw_SBonitaExportException_when_applicationService_throws_exception() throws Exception {
+    public void toNode_should_throw_ExecutionException_when_applicationService_throws_exception() throws Exception {
         //given
         SApplication application = mock(SApplication.class);
         given(application.getHomePageId()).willReturn(8L);
@@ -186,7 +186,7 @@ public class ApplicationNodeConverterTest {
     }
 
     @Test(expected = ExecutionException.class)
-    public void toSApplication_should_throw_SBonitaImportException_when_profile_service_throws_exception() throws Exception {
+    public void toSApplication_should_throw_ExecutionException_when_profile_service_throws_exception() throws Exception {
         //given
         ApplicationNode node = new ApplicationNode();
         node.setProfile("admin");

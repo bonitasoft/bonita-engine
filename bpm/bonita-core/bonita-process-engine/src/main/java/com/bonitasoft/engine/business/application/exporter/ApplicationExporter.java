@@ -20,12 +20,12 @@ import com.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationsExporter {
+public class ApplicationExporter {
 
     private final ApplicationContainerConverter converter;
     private final ApplicationContainerExporter exporter;
 
-    public ApplicationsExporter(ApplicationContainerConverter converter, ApplicationContainerExporter exporter) {
+    public ApplicationExporter(ApplicationContainerConverter converter, ApplicationContainerExporter exporter) {
         this.converter = converter;
         this.exporter = exporter;
     }

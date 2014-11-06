@@ -41,6 +41,8 @@ public interface ApplicationService {
 
     SApplication getApplication(long applicationId) throws SBonitaReadException, SObjectNotFoundException;
 
+    SApplication getApplicationByToken(String token) throws SBonitaReadException;
+
     void deleteApplication(long applicationId) throws SObjectModificationException, SObjectNotFoundException;
 
     SApplication updateApplication(long applicationId, EntityUpdateDescriptor updateDescriptor) throws SObjectModificationException, SInvalidTokenException,

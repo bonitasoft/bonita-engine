@@ -160,7 +160,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                             + applicationToken
                             + "': the token can not be null or empty and should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'");
         }
-        if (hasApplicationWithName(applicationToken)) {
+        if (hasApplicationWithToken(applicationToken)) {
             throw new SObjectAlreadyExistsException("An application already exists with token '" + applicationToken + "'.");
         }
     }
@@ -184,11 +184,15 @@ public class ApplicationServiceImpl implements ApplicationService {
         throw new SObjectModificationException(e);
     }
 
-    public boolean hasApplicationWithName(final String name) throws SBonitaReadException {
-        final SApplication application = persistenceService.selectOne(new SelectOneDescriptor<SApplication>("getApplicationByToken", Collections
-                .<String, Object> singletonMap("token",
-                        name), SApplication.class));
+    public boolean hasApplicationWithToken(final String name) throws SBonitaReadException {
+        final SApplication application = getApplicationByToken(name);
         return application != null;
+    }
+
+    public SApplication getApplicationByToken(String token) throws SBonitaReadException {
+        return persistenceService.selectOne(new SelectOneDescriptor<SApplication>("getApplicationByToken", Collections
+                    .<String, Object> singletonMap("token",
+                            token), SApplication.class));
     }
 
     private <T extends SLogBuilder & HasCRUDEAction> void initializeLogBuilder(final T logBuilder, final String message, final ActionType actionType) {

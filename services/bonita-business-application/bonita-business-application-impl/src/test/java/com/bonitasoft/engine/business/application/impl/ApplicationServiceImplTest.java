@@ -212,9 +212,8 @@ public class ApplicationServiceImplTest {
     @Test
     public void createApplication_should_throw_SObjectAlreadyExistsException_when_an_application_with_the_same_name_already_exists() throws Exception {
         //given
-        final String name = APPLICATION_TOKEN;
         given(persistenceService.selectOne(new SelectOneDescriptor<SApplication>("getApplicationByToken", Collections.<String, Object>singletonMap("name",
-                name), SApplication.class))).willReturn(application);
+                APPLICATION_TOKEN), SApplication.class))).willReturn(application);
 
         final SApplication newApp = buildApplication(APPLICATION_TOKEN, APPLICATION_DISP_NAME);
 
@@ -224,14 +223,14 @@ public class ApplicationServiceImplTest {
             fail("Exception expected");
         } catch (final SObjectAlreadyExistsException e) {
             //then
-            assertThat(e.getMessage()).isEqualTo("An application already exists with token '" + name + "'.");
+            assertThat(e.getMessage()).isEqualTo("An application already exists with token '" + APPLICATION_TOKEN + "'.");
             verify(recorder, never()).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
         }
 
     }
 
     @Test
-    public void getApplication_should_return_result_of_persitence_service_selectById() throws Exception {
+    public void getApplication_should_return_result_of_persistence_service_selectById() throws Exception {
         //given
         given(persistenceService.selectById(new SelectByIdDescriptor<SApplication>("getApplicationById", SApplication.class, 10L))).willReturn(application);
 
@@ -265,6 +264,20 @@ public class ApplicationServiceImplTest {
         applicationServiceDisabled.getApplication(15L);
 
         //then exception
+    }
+
+    @Test
+    public void getApplicationByToken_should_return_result_of_persitence_service_getApplicationByToken() throws Exception {
+        //given
+        given(persistenceService.selectOne(new SelectOneDescriptor<SApplication>("getApplicationByToken", Collections.<String, Object>singletonMap("name",
+                APPLICATION_TOKEN), SApplication.class))).willReturn(application);
+
+        //when
+        SApplication retriedApplication = applicationServiceActive.getApplicationByToken(APPLICATION_TOKEN);
+
+        //then
+        assertThat(retriedApplication).isEqualTo(application);
+
     }
 
     @Test
@@ -696,7 +709,7 @@ public class ApplicationServiceImplTest {
 
         final int applicationId = 17;
         doReturn(application).when(applicationService).getApplication(applicationId);
-        doReturn(true).when(applicationService).hasApplicationWithName("newToken");
+        doReturn(true).when(applicationService).hasApplicationWithToken("newToken");
 
         //when
         applicationService.updateApplication(applicationId, updateDescriptor);

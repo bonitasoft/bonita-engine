@@ -10,6 +10,7 @@
 package com.bonitasoft.engine.business.application.xml;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -122,7 +123,7 @@ public class ApplicationNode {
     }
 
     public List<ApplicationPageNode> getApplicationPages() {
-        return applicationPages;
+        return applicationPages == null? Collections.<ApplicationPageNode>emptyList() : Collections.unmodifiableList(applicationPages);
     }
 
     public void addApplicationPage(ApplicationPageNode applicationPage) {
@@ -133,7 +134,7 @@ public class ApplicationNode {
     }
 
     public List<ApplicationMenuNode> getApplicationMenus() {
-        return applicationMenus;
+        return applicationMenus == null? Collections.<ApplicationMenuNode>emptyList() : Collections.unmodifiableList(applicationMenus);
     }
 
     public void addApplicationMenu(ApplicationMenuNode applicationMenu) {

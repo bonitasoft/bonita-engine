@@ -11,6 +11,10 @@ package com.bonitasoft.engine.api.impl;
 import java.util.Collections;
 import java.util.List;
 
+import com.bonitasoft.engine.business.application.exporter.ApplicationExporter;
+import com.bonitasoft.engine.business.application.importer.ApplicationContainerImporter;
+import com.bonitasoft.engine.business.application.importer.ApplicationImporter;
+import com.bonitasoft.engine.business.application.importer.StrategySelector;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -51,7 +55,6 @@ import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.business.application.converter.ApplicationContainerConverter;
 import com.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
 import com.bonitasoft.engine.business.application.exporter.ApplicationContainerExporter;
-import com.bonitasoft.engine.business.application.exporter.ApplicationsExporter;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationMenuDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationPageDescriptor;
@@ -120,8 +123,18 @@ public class ApplicationAPIImpl implements ApplicationAPI {
                 tenantAccessor.getApplicationService());
         ApplicationContainerConverter applicationContainerConverter = new ApplicationContainerConverter(applicationNodeConverter);
         ApplicationContainerExporter applicationContainerExporter = new ApplicationContainerExporter();
-        ApplicationsExporter applicationsExporter = new ApplicationsExporter(applicationContainerConverter, applicationContainerExporter);
-        return new ApplicationExporterDelegate(tenantAccessor.getApplicationService(), applicationsExporter);
+        ApplicationExporter applicationExporter = new ApplicationExporter(applicationContainerConverter, applicationContainerExporter);
+        return new ApplicationExporterDelegate(tenantAccessor.getApplicationService(), applicationExporter);
+    }
+
+    private ApplicationImporter getApplicationImporter(ApplicationImportPolicy policy) {
+        TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        StrategySelector strategySelector = new StrategySelector();
+        ApplicationContainerImporter containerImporter = new ApplicationContainerImporter();
+        ApplicationNodeConverter applicationNodeConverter = new ApplicationNodeConverter(tenantAccessor.getProfileService(), tenantAccessor.getApplicationService());
+        ApplicationContainerConverter containerConverter = new ApplicationContainerConverter(applicationNodeConverter);
+        ApplicationImporter applicationImporter = new ApplicationImporter(tenantAccessor.getApplicationService(), strategySelector.selectStrategy(policy), containerImporter, containerConverter);
+        return  applicationImporter;
     }
 
     @Override
@@ -224,7 +237,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     @Override
     public List<ImportStatus> importApplications(byte[] xmlContent, ApplicationImportPolicy policy) throws ExecutionException {
-        return Collections.emptyList();
+        return getApplicationImporter(policy).importApplications(xmlContent, SessionInfos.getUserIdFromSession());
     }
 
 }

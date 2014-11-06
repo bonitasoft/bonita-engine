@@ -9,8 +9,11 @@
 
 package com.bonitasoft.engine.business.application.converter;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import com.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 import com.bonitasoft.engine.business.application.model.SApplication;
@@ -33,6 +36,14 @@ public class ApplicationContainerConverter {
             container.addApplication(applicationNodeConverter.toNode(application));
         }
         return container;
+    }
+
+    public List<SApplication> toSApplications(ApplicationNodeContainer applicationContainer, long createdBy) throws ExecutionException {
+        List<SApplication> applications = new ArrayList<SApplication>();
+        for (ApplicationNode applicationNode : applicationContainer.getApplications()) {
+            applications.add(applicationNodeConverter.toSApplication(applicationNode, createdBy));
+        }
+        return applications;
     }
 
 }
