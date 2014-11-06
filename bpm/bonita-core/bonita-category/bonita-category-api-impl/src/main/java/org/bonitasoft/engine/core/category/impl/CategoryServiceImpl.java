@@ -43,7 +43,6 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -138,7 +137,7 @@ public class CategoryServiceImpl implements CategoryService {
         SSession session;
         try {
             session = sessionService.getSession(sessionAccessor.getSessionId());
-        } catch (SessionIdNotSetException e) {
+        } catch (final SessionIdNotSetException e) {
             // no session, it is system
             return -1;
         }

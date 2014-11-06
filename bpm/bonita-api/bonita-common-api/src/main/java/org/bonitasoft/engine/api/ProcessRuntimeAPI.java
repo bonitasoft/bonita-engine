@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.actor.ActorMember;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.connector.ArchivedConnectorInstance;
@@ -47,6 +46,8 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.SendEventException;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
+import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
+import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
@@ -60,20 +61,16 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
-import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionEvaluationException;
-import org.bonitasoft.engine.filter.UserFilter;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
-import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * <code>ProcessRuntimeAPI</code> deals with Process runtime notions such as starting a new instance of a process, retrieving and executing tasks, accessing to
@@ -100,7 +97,7 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user for whom to list the hidden tasks.
      * @param searchOptions
-     *        The search criterion.
+     *        The search criterion. See {@link HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return The list of hidden tasks for the specified user.
      * @throws SearchException
      *         If an exception occurs when getting the list of tasks.
@@ -112,7 +109,7 @@ public interface ProcessRuntimeAPI {
      * List all open root process instances.
      *
      * @param searchOptions
-     *        The search criterion.
+     *        The search criterion. See {@link ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return A processInstance object.
      * @throws SearchException
      *         If an exception occurs when getting the list of tasks.
@@ -124,7 +121,7 @@ public interface ProcessRuntimeAPI {
      * List all process instances.
      *
      * @param searchOptions
-     *        The search criterion.
+     *        The search criterion. See {@link ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return A processInstance object.
      * @throws SearchException
      *         If an exception occurs when getting the list of tasks.
@@ -139,7 +136,7 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search criterion.
+     *        The search criterion. See {@link ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return The list of process instances supervised by the specified user.
      * @throws SearchException
      *         If an exception occurs when getting the list of process instances.
@@ -345,6 +342,34 @@ public interface ProcessRuntimeAPI {
     long deleteArchivedProcessInstances(long processDefinitionId, int startIndex, int maxResults) throws DeletionException;
 
     /**
+     * Delete all archived process instance (different states) of the source identifier list.
+     * Passing {@link Integer#MAX_VALUE} identifiers is discouraged as the amount of operations may be large and may thus result in timeout operation.
+     *
+     * @param processInstanceIds
+     *        Identifiers corresponding to {@link ArchivedProcessInstance#getSourceObjectId()}.
+     * @return The number of {@link ArchivedProcessInstance}s that have been deleted in any state. For example, process instance can be archived is several
+     *         states: Cancelled, Aborted, Completed, Failed
+     * @throws DeletionException
+     *         If a process instance can't be deleted because of a parent that is still active
+     * @since 6.4.0
+     */
+    long deleteArchivedProcessInstancesInAllStates(List<Long> sourceProcessInstanceIds) throws DeletionException;
+
+    /**
+     * Delete all archived process instance (different states) corresponding to the source identifier.
+     * Passing {@link Integer#MAX_VALUE} identifiers is discouraged as the amount of operations may be large and may thus result in timeout operation.
+     *
+     * @param processInstanceId
+     *        Identifier corresponding to {@link ArchivedProcessInstance#getSourceObjectId()}.
+     * @return The number of {@link ArchivedProcessInstance}s that have been deleted in any state. For example, process instance can be archived is several
+     *         states: Cancelled, Aborted, Completed, Failed
+     * @throws DeletionException
+     *         If a process instance can't be deleted because of a parent that is still active
+     * @since 6.4.0
+     */
+    long deleteArchivedProcessInstancesInAllStates(long sourceProcessInstanceId) throws DeletionException;
+
+    /**
      * Start an instance of the process with the specified process definition, using the current session user.
      *
      * @param processDefinitionId
@@ -379,7 +404,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.1
      */
     ProcessInstance startProcess(long processDefinitionId, Map<String, Serializable> initialVariables) throws ProcessDefinitionNotFoundException,
-    ProcessActivationException, ProcessExecutionException;
+            ProcessActivationException, ProcessExecutionException;
 
     /**
      * Start an instance of the process with the specified process definition id, and set the initial values of the data with the given operations.
@@ -421,7 +446,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     ProcessInstance startProcess(long userId, long processDefinitionId) throws UserNotFoundException, ProcessDefinitionNotFoundException,
-    ProcessActivationException, ProcessExecutionException;
+            ProcessActivationException, ProcessExecutionException;
 
     /**
      * Start an instance of the process with the specified process definition id on behalf of a given user, and set the initial values of the data with the
@@ -813,8 +838,7 @@ public interface ProcessRuntimeAPI {
      * Update the value of a named data instance in a specified activity instance.<br>
      * <br>
      * <b>WARNING</b>: this method is not supported for updating a Custom Data Instance variable with a remote Engine API connection,
-     * because the custom data type is not present in the remote classloader that deserializes the API call parameters.
-     * <br>
+     * because the custom data type is not present in the remote classloader that deserializes the API call parameters. <br>
      * use {@link ProcessRuntimeAPI#updateActivityInstanceVariables(List, long, Map)} instead
      *
      * @param dataName
@@ -982,7 +1006,7 @@ public interface ProcessRuntimeAPI {
      * @since 6.0
      */
     long getOneAssignedUserTaskInstanceOfProcessDefinition(long processDefinitionId, long userId) throws ProcessDefinitionNotFoundException,
-    UserNotFoundException;
+            UserNotFoundException;
 
     /**
      * Get the state of a specified activity instance.
@@ -1152,7 +1176,7 @@ public interface ProcessRuntimeAPI {
      */
     Map<String, Serializable> executeConnectorOnProcessDefinition(String connectorDefinitionId, String connectorDefinitionVersion,
             Map<String, Expression> connectorInputParameters, Map<String, Map<String, Serializable>> inputValues, long processDefinitionId)
-                    throws ConnectorExecutionException, ConnectorNotFoundException;
+            throws ConnectorExecutionException, ConnectorNotFoundException;
 
     /**
      * Execute a connector in a specified processDefinition with operations.
@@ -1188,7 +1212,9 @@ public interface ProcessRuntimeAPI {
      * Search the archived human tasks for tasks that match the search options.
      *
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results.
+     *        The search conditions and the options for sorting and paging the results. See {@link ArchivedHumanTaskInstanceSearchDescriptor} for valid
+     *        fields
+     *        for searching and sorting.
      * @return The archived human tasks that match the search conditions.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -1204,7 +1230,8 @@ public interface ProcessRuntimeAPI {
      * @param managerUserId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results.
+     *        The search conditions and the options for sorting and paging the results. See {@link HumanTaskInstanceSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The assigned human tasks that match the search conditions and are supervised by the user.
      * @throws SearchException
      *         If there is an error in the search conditions.
@@ -1218,7 +1245,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results.
+     *        The search conditions and the options for sorting and paging the results. See {@link HumanTaskInstanceSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The pending human tasks that match the search conditions and are supervised by the user.
      * @throws SearchException
      *         If there is an error in the search conditions.
@@ -1232,7 +1260,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results.
+     *        The search conditions and the options for sorting and paging the results. See {@link HumanTaskInstanceSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The pending human tasks that match the search conditions and are available to the user.
      * @throws SearchException
      *         If there is an error in the search conditions.
@@ -1246,7 +1275,8 @@ public interface ProcessRuntimeAPI {
      * @param managerUserId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results.
+     *        The search conditions and the options for sorting and paging the results. See {@link HumanTaskInstanceSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The pending human tasks that match the search conditions and are managed by the user.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1264,9 +1294,11 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results.
+     *        The search conditions and the options for sorting and paging the results. See {@link HumanTaskInstanceSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The assigned and pending human tasks
      * @throws SearchException
+     *         If there is an error in the search conditions.
      * @since 6.3.3
      */
     SearchResult<HumanTaskInstance> searchAssignedAndPendingHumanTasksFor(final long rootProcessDefinitionId, final long userId,
@@ -1278,9 +1310,11 @@ public interface ProcessRuntimeAPI {
      * @param rootProcessDefinitionId
      *        The identifier of the root process definition
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results.
+     *        The search conditions and the options for sorting and paging the results. See {@link HumanTaskInstanceSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The assigned and pending human tasks
      * @throws SearchException
+     *         If there is an error in the search conditions.
      * @since 6.3.3
      */
     SearchResult<HumanTaskInstance> searchAssignedAndPendingHumanTasks(final long rootProcessDefinitionId, final SearchOptions searchOptions)
@@ -1531,7 +1565,8 @@ public interface ProcessRuntimeAPI {
      * Search for connector instances.
      *
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results.
+     *        The search conditions and the options for sorting and paging the results. See {@link ConnectorInstancesSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The {@link SearchResult} containing the <code>ConnectorInstance</code>s matching the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1545,7 +1580,7 @@ public interface ProcessRuntimeAPI {
      * Search for archived connector instances.
      *
      * @param searchOptions
-     *        The search options parameters
+     *        The search options parameters. See {@link ArchiveConnectorInstancesSearchDescriptor} for valid fields for searching and sorting.
      * @return The {@link SearchResult} containing the <code>ArchivedConnectorInstance</code>s matching the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1593,7 +1628,9 @@ public interface ProcessRuntimeAPI {
      * Search for archived activity instances in terminal states. Archived activity instances in intermediate states are not considered.
      *
      * @param searchOptions
-     *        The criterion used to search for archived activity instances.
+     *        The criterion used to search for archived activity instances. See {@link ArchivedActivityInstanceSearchDescriptor} for valid fields for
+     *        searching
+     *        and sorting.
      * @return A {@link SearchResult} containing the search result.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1607,7 +1644,7 @@ public interface ProcessRuntimeAPI {
      * Search for activity instances.
      *
      * @param searchOptions
-     *        The criterion used to search for activity instances.
+     *        The criterion used to search for activity instances. See {@link ActivityInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return A {@link SearchResult} containing the search result.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1621,7 +1658,7 @@ public interface ProcessRuntimeAPI {
      * Search for flow node instances (activities, gateways and events).
      *
      * @param searchOptions
-     *        The criterion used to search for flow node instances.
+     *        The criterion used to search for flow node instances. See {@link FlowNodeInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return A {@link SearchResult} containing the search result
      * @throws InvalidSessionException
      *         If the ession is invalid, e.g session has expired.
@@ -1635,7 +1672,8 @@ public interface ProcessRuntimeAPI {
      * Search for archived flow node instances (activities, gateways and events)
      *
      * @param searchOptions
-     *        The options used to search for flow node instances.
+     *        The options used to search for flow node instances. See {@link ArchivedFlowNodeInstanceSearchDescriptor} for valid fields for searching and
+     *        sorting.
      * @return A {@link SearchResult} containing the search result.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g session has expired.
@@ -1654,7 +1692,7 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user for whom the tasks are available.
      * @param searchOptions
-     *        The options used to search for tasks.
+     *        The options used to search for tasks. See {@link HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return The list of tasks matching the search options.
      * @throws InvalidSessionException
      *         If the current session is invalid.
@@ -1668,7 +1706,7 @@ public interface ProcessRuntimeAPI {
      * Search for comments related to the specified process instance.
      *
      * @param searchOptions
-     *        The options used to search for comments.
+     *        The options used to search for comments. See {@link SearchCommentsDescriptor} for valid fields for searching and sorting.
      * @return The matching comments.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1734,7 +1772,7 @@ public interface ProcessRuntimeAPI {
      * @param managerUserId
      *        The identifier of the user.
      * @param searchOptions
-     *        The options used to search for comments.
+     *        The options used to search for comments. See {@link SearchCommentsDescriptor} for valid fields for searching and sorting.
      * @return The comments managed by the user that match the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1750,7 +1788,7 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The options used to search for comments.
+     *        The options used to search for comments. See {@link SearchCommentsDescriptor} for valid fields for searching and sorting.
      * @return The comments on process instances that the user can access.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1850,7 +1888,7 @@ public interface ProcessRuntimeAPI {
      * Search for archived comments.
      *
      * @param searchOptions
-     *        The options used to search for comments.
+     *        The options used to search for comments. See {@link ArchivedCommentsSearchDescriptor} for valid fields for searching and sorting.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @return The <code>ArchivedComment</code> items that match the search options.
@@ -1866,7 +1904,7 @@ public interface ProcessRuntimeAPI {
      * @param managerUserId
      *        The identifier of the user manager,
      * @param searchOptions
-     *        The options used to search for tasks.
+     *        The options used to search for tasks. See {@link ArchivedHumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return The archived humanTask instances managed by the specified user that match the search options.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -1880,7 +1918,7 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The options used to search for process instance.
+     *        The options used to search for process instance. See {@link ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return The <code>ProcessInstance</code>s that match the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1896,7 +1934,7 @@ public interface ProcessRuntimeAPI {
      * @param managerUserId
      *        The identifier of the user manager.
      * @param searchOptions
-     *        The search options (pagination, filter, order sort).
+     *        The search options (pagination, filter, order sort). See {@link ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return The <code>ProcessInstance</code>s that match the search options.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -1911,7 +1949,8 @@ public interface ProcessRuntimeAPI {
      *
      * @param searchOptions
      *        The search options (pagination, filter, order sort).
-     * @return The archived process instances that match the search options.
+     * @return The archived process instances that match the search options. See {@link ArchivedProcessInstancesSearchDescriptor} for valid fields for searching
+     *         and sorting.
      * @throws SearchException
      *         If the search could not be fullfilled correctly
      * @throws InvalidSessionException
@@ -1926,7 +1965,8 @@ public interface ProcessRuntimeAPI {
      * retrieved for a single ProcessInstance (one for each reached state).
      *
      * @param searchOptions
-     *        The search options (pagination, filter, order sort).
+     *        The search options (pagination, filter, order sort). See {@link ArchivedProcessInstancesSearchDescriptor} for valid fields for searching and
+     *        sorting.
      * @return The archived process instances in all states that match the search options.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -1940,7 +1980,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search options (pagination, filter, order sort).
+     *        The search options (pagination, filter, order sort). See {@link ArchivedProcessInstancesSearchDescriptor} for valid fields for searching and
+     *        sorting.
      * @return The archived process instances supervised by the user that match the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1956,7 +1997,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search options (pagination, filter, order sort).
+     *        The search options (pagination, filter, order sort). See {@link ArchivedProcessInstancesSearchDescriptor} for valid fields for searching and
+     *        sorting.
      * @return The archived process instances that the user can access that match the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1970,7 +2012,8 @@ public interface ProcessRuntimeAPI {
      * Search for human task instances.
      *
      * @param searchOptions
-     *        The search options (pagination, filter, order sort).
+     *        The search options (pagination, filter, order sort). See {@link HumanTaskInstanceSearchDescriptor} for valid fields for searching and
+     *        sorting.
      * @return The human task instances that match the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1986,7 +2029,8 @@ public interface ProcessRuntimeAPI {
      * @param supervisorId
      *        The identifier of supervising user.
      * @param searchOptions
-     *        The search options (pagination, filter, order sort).
+     *        The search options (pagination, filter, order sort). See {@link HumanTaskInstanceSearchDescriptor} for valid fields for searching and
+     *        sorting.
      * @return The human task instances that match the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -2002,7 +2046,8 @@ public interface ProcessRuntimeAPI {
      * @param supervisorId
      *        The identifier of the supervising user.
      * @param searchOptions
-     *        The search options (pagination, filter, order sort).
+     *        The search options (pagination, filter, order sort). See {@link ArchivedHumanTaskInstanceSearchDescriptor} for valid fields for searching and
+     *        sorting.
      * @return The archived human task instances that match the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -2257,7 +2302,7 @@ public interface ProcessRuntimeAPI {
      * @param humanTaskInstanceId
      *        The identifier of the human task instance
      * @param searchOptions
-     *        the search options
+     *        the search options. See {@link UserSearchDescriptor} for valid fields for searching and sorting.
      * @return The list of users.
      * @throws InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
@@ -2274,7 +2319,7 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search criterion.
+     *        The search criterion. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
      * @return The list of process definitions
      * @throws SearchException
      *         if an exception occurs when getting the process deployment information.
@@ -2287,10 +2332,10 @@ public interface ProcessRuntimeAPI {
      * Search process definitions supervised by a specific user, that have instances with assigned or pending human tasks.
      * The tasks are in stable state, not in terminal/executing state.
      *
-     * @param userId
+     * @param supervisorId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search criterion.
+     *        The search criterion. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
      * @return The list of process definitions
      * @throws SearchException
      *         if an exception occurs when getting the process deployment information.
@@ -2303,15 +2348,42 @@ public interface ProcessRuntimeAPI {
      * Search process definitions that have instances with assigned or pending human tasks.
      * The tasks are in stable state, not in terminal/executing state.
      *
-     * @param userId
-     *        The identifier of the user.
      * @param searchOptions
-     *        The search criterion.
+     *        The search criterion. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
      * @return The list of process definitions
      * @throws SearchException
-     *         if an exception occurs when getting the process deployment information.
+     *         If an exception occurs when getting the process deployment information.
      * @since 6.3.3
      */
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Search the {@link TimerEventTriggerInstance} on the specific {@link ProcessInstance}.
+     *
+     * @param searchOptions
+     *        The search criterion.
+     * @return The list of the timer event triggers
+     * @throws SearchException
+     *         If an exception occurs when getting the timer event triggers.
+     * @since 6.4.0
+     */
+    SearchResult<TimerEventTriggerInstance> searchTimerEventTriggerInstances(long processInstanceId, SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Change the date of the execution of a specific {@link TimerEventTriggerInstance}.
+     *
+     * @param timerEventTriggerInstanceId
+     *        The identifier of the {@link TimerEventTriggerInstance} to update
+     * @param executionDate
+     *        The new date of the execution of the {@link TimerEventTriggerInstance}
+     * @return The first fire time of the newly scheduled trigger is returned
+     * @throws TimerEventTriggerInstanceNotFoundException
+     *         If the {@link TimerEventTriggerInstance} doesn't exist
+     * @throws UpdateException
+     *         If an exception occurs when updating the {@link TimerEventTriggerInstance}
+     * @since 6.4.0
+     */
+    Date updateExecutionDateOfTimerEventTriggerInstance(long timerEventTriggerInstanceId, Date executionDate)
+            throws TimerEventTriggerInstanceNotFoundException, UpdateException;
 
 }

@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.bpm.process;
 
-import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
@@ -42,7 +41,7 @@ public class ProcessEnablementException extends ExecutionException {
 
     /**
      * Constructs a new exception with the specified detail cause.
-     * 
+     *
      * @param cause
      *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
      *        cause is nonexistent or unknown.)

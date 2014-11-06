@@ -12,7 +12,7 @@ import org.junit.Test;
 public class ObjectSeekerTest {
 
     @Test
-    public void seekANamedElementObject() throws Exception {
+    public void seekANamedElementObject() {
         final List<DataDefinition> dataDefinitions = new ArrayList<DataDefinition>();
         final DataDefinitionImpl dataDefinitionImpl = new DataDefinitionImpl("var1", null);
         dataDefinitions.add(dataDefinitionImpl);
@@ -24,7 +24,7 @@ public class ObjectSeekerTest {
     }
 
     @Test
-    public void seekANullObjectReturnsNull() throws Exception {
+    public void seekANullObjectReturnsNull() {
         final List<DataDefinition> dataDefinitions = new ArrayList<DataDefinition>();
         dataDefinitions.add(new DataDefinitionImpl("var1", null));
         dataDefinitions.add(new DataDefinitionImpl("var2", null));
@@ -34,9 +34,8 @@ public class ObjectSeekerTest {
         assertThat(dataDefinition).isNull();
     }
 
-
     @Test
-    public void seekAnUnknownObjectReturnsNull() throws Exception {
+    public void seekAnUnknownObjectReturnsNull() {
         final List<DataDefinition> dataDefinitions = new ArrayList<DataDefinition>();
         dataDefinitions.add(new DataDefinitionImpl("var1", null));
         dataDefinitions.add(new DataDefinitionImpl("var2", null));
@@ -47,14 +46,14 @@ public class ObjectSeekerTest {
     }
 
     @Test
-    public void seekAObjectInANullListReturnsNull() throws Exception {
+    public void seekAObjectInANullListReturnsNull() {
         final DataDefinition dataDefinition = ObjectSeeker.getNamedElement(null, "var1");
 
         assertThat(dataDefinition).isNull();
     }
 
     @Test
-    public void seekAnObjectInAnEmptyListReturnNull() throws Exception {
+    public void seekAnObjectInAnEmptyListReturnNull() {
         final List<DataDefinition> dataDefinitions = new ArrayList<DataDefinition>();
 
         final DataDefinition dataDefinition = ObjectSeeker.getNamedElement(dataDefinitions, "var3");

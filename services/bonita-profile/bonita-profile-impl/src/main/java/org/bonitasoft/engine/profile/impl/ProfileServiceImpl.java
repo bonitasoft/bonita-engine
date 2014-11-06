@@ -34,15 +34,12 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
-import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilder;
-import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilderFactory;
 import org.bonitasoft.engine.profile.builder.impl.SProfileLogBuilderImpl;
 import org.bonitasoft.engine.profile.builder.impl.SProfileMemberLogBuilderImpl;
 import org.bonitasoft.engine.profile.exception.profile.SProfileCreationException;
@@ -272,7 +269,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void deleteProfile(final long profileId) throws SProfileNotFoundException, SProfileDeletionException, SProfileEntryDeletionException,
-    SProfileMemberDeletionException {
+            SProfileMemberDeletionException {
         logBeforeMethod("deleteProfile");
         final SProfile profile = getProfile(profileId);
         deleteProfile(profile);
@@ -726,7 +723,7 @@ public class ProfileServiceImpl implements ProfileService {
         long userId;
         try {
             userId = getSessionUserId();
-            Map<String, Object> params = new HashMap<String, Object>();
+            final Map<String, Object> params = new HashMap<String, Object>();
             params.put("lastUpdateDate", System.currentTimeMillis());
             params.put("lastUpdatedBy", userId);
             params.put("id", profileId);
@@ -740,12 +737,6 @@ public class ProfileServiceImpl implements ProfileService {
     private long getSessionUserId() throws SSessionNotFoundException, SessionIdNotSetException {
         final long userId = sessionService.getSession(sessionAccessor.getSessionId()).getUserId();
         return userId;
-    }
-
-    private SProfileUpdateBuilder getUpdateBuilder() {
-        final SProfileUpdateBuilder updateBuilder;
-        updateBuilder = BuilderFactory.get(SProfileUpdateBuilderFactory.class).createNewInstance();
-        return updateBuilder;
     }
 
 }

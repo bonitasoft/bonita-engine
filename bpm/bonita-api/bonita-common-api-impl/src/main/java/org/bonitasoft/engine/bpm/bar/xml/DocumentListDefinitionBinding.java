@@ -1,5 +1,4 @@
 /*
- *
  * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -12,15 +11,12 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.bonitasoft.engine.bpm.bar.xml;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentListDefinition;
-import org.bonitasoft.engine.bpm.document.impl.DocumentDefinitionImpl;
 import org.bonitasoft.engine.bpm.document.impl.DocumentListDefinitionImpl;
 import org.bonitasoft.engine.expression.Expression;
 
@@ -33,7 +29,6 @@ public class DocumentListDefinitionBinding extends NamedElementBinding {
     private String description;
 
     private Expression expression;
-
 
     @Override
     public void setAttributes(final Map<String, String> attributes) {

@@ -21,7 +21,6 @@ import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Hongwen Zang
@@ -37,9 +36,9 @@ public interface SCommentService {
 
     /**
      * List all comments related to the specified query options.
-     * 
+     *
      * @param options
-     *            a QueryOptions object, containing some query conditions
+     *        a QueryOptions object, containing some query conditions
      * @return a list of SComment objects corresponding to the criteria
      * @throws SBonitaReadException
      */
@@ -47,9 +46,9 @@ public interface SCommentService {
 
     /**
      * Number of all comments related to the specified query options.
-     * 
+     *
      * @param queryOptions
-     *            a QueryOptions object, containing some query conditions
+     *        a QueryOptions object, containing some query conditions
      * @return number of all comments corresponding to the criteria.
      * @throws SBonitaReadException
      */
@@ -57,34 +56,34 @@ public interface SCommentService {
 
     /**
      * Add a comment on process instance
-     * 
+     *
      * @param processInstanceId
-     *            identifier of processInstance
+     *        identifier of processInstance
      * @param comment
-     *            the comment you want to add
+     *        the comment you want to add
      * @throws SCommentAddException
      */
     SComment addComment(long processInstanceId, String comment) throws SCommentAddException;
 
     /**
      * Add a system comment on process instance
-     * 
+     *
      * @param processInstanceId
-     *            identifier of processInstance
+     *        identifier of processInstance
      * @param comment
-     *            the comment you want to add
+     *        the comment you want to add
      * @throws SCommentAddException
      */
     SComment addSystemComment(long processInstanceId, String comment) throws SCommentAddException;
 
     /**
      * Get the first 20 comments for the given processInstance
-     * 
+     *
      * @param processInstanceId
-     *            identifier of processInstance
+     *        identifier of processInstance
      * @return a list of SComment object
      * @throws SBonitaReadException
-     *             in case of read error
+     *         in case of read error
      * @see {@link QueryOptions#DEFAULT_NUMBER_OF_RESULTS}
      * @deprecated use {@link #getComments(long, QueryOptions)} instead
      */
@@ -93,51 +92,51 @@ public interface SCommentService {
 
     /**
      * Get comments for the given processInstance
-     * 
+     *
      * @param processInstanceId
-     *            identifier of processInstance
+     *        identifier of processInstance
      * @param queryOptions
-     *            the query options to filter the results
+     *        the query options to filter the results
      * @return a list of SComment object
      * @throws SBonitaReadException
-     *             in case of read error
+     *         in case of read error
      * @since 6.1
      */
     List<SComment> getComments(long processInstanceId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Search number of Comment for a specific supervisor
-     * 
+     *
      * @param supervisorId
-     *            the identifier of supervisor
+     *        the identifier of supervisor
      * @param queryOptions
-     *            a map of specific parameters of a query
+     *        a map of specific parameters of a query
      * @return number of Comment for a specific supervisor
      * @throws SBonitaReadException
-     *             if a Read exception occurs
+     *         if a Read exception occurs
      */
     long getNumberOfCommentsSupervisedBy(long supervisorId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Search an Comment for a specific supervisor
-     * 
+     *
      * @param supervisorId
-     *            the identifier of supervisor
+     *        the identifier of supervisor
      * @param queryOptions
-     *            a map of specific parameters of a query
+     *        a map of specific parameters of a query
      * @return an Comment for a specific supervisor
      * @throws SBonitaReadException
-     *             if a Read exception occurs
+     *         if a Read exception occurs
      */
     List<SComment> searchCommentsSupervisedBy(long supervisorId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Search number of all the comments on process instants that the user can access
-     * 
+     *
      * @param userId
-     *            identifier of user
+     *        identifier of user
      * @param searchOptions
-     *            a QueryOptions object, containing some query conditions
+     *        a QueryOptions object, containing some query conditions
      * @return number of all the comments on process instants that the user can access
      * @throws SBonitaReadException
      */
@@ -145,11 +144,11 @@ public interface SCommentService {
 
     /**
      * List all the comments on process instants that the user can access
-     * 
+     *
      * @param userId
-     *            identifier of user
+     *        identifier of user
      * @param queryOptions
-     *            a QueryOptions object, containing some query conditions
+     *        a QueryOptions object, containing some query conditions
      * @return a list of comments on process instants that the user can access
      * @throws SBonitaReadException
      */
@@ -157,11 +156,11 @@ public interface SCommentService {
 
     /**
      * Search number of the comments visible by delegates of managerUserId
-     * 
+     *
      * @param managerUserId
-     *            identifier of a manager user
+     *        identifier of a manager user
      * @param searchOptions
-     *            a QueryOptions object, containing some query conditions
+     *        a QueryOptions object, containing some query conditions
      * @return number of the comments visible by delegates of managerUserId
      * @throws SBonitaReadException
      */
@@ -169,11 +168,11 @@ public interface SCommentService {
 
     /**
      * Search comments visible by delegates of managerUserId
-     * 
+     *
      * @param managerUserId
-     *            identifier of a manager user
+     *        identifier of a manager user
      * @param searchOptions
-     *            a QueryOptions object, containing some query conditions
+     *        a QueryOptions object, containing some query conditions
      * @return a list of comments visible by delegates of managerUserId
      * @throws SBonitaReadException
      */
@@ -181,7 +180,7 @@ public interface SCommentService {
 
     /**
      * Search number of archived Comments
-     * 
+     *
      * @param searchOptions
      * @throws SBonitaReadException
      */
@@ -189,9 +188,9 @@ public interface SCommentService {
 
     /**
      * Search archived Comments
-     * 
+     *
      * @param searchOptions
-     *            a QueryOptions object, containing some query conditions
+     *        a QueryOptions object, containing some query conditions
      * @return a list with archived Comments
      * @throws SBonitaReadException
      */
@@ -199,9 +198,9 @@ public interface SCommentService {
 
     /**
      * Returning true if the system comments are enabled for the specific SystemCommentType.
-     * 
+     *
      * @param sct
-     *            A Enum for system comments
+     *        A Enum for system comments
      * @return Returning true if the system comments are enabled for the specific SystemCommentType.
      * @since 6.0
      */
@@ -209,7 +208,7 @@ public interface SCommentService {
 
     /**
      * Delete the comment
-     * 
+     *
      * @param comment
      * @throws SCommentDeletionException
      */
@@ -224,7 +223,7 @@ public interface SCommentService {
 
     /**
      * Delete archived comments for a specified process instance
-     * 
+     *
      * @param processInstanceId
      * @throws SBonitaException
      * @since 6.1
@@ -233,7 +232,7 @@ public interface SCommentService {
 
     /**
      * Delete comments for a specified process instance
-     * 
+     *
      * @param processInstanceId
      * @throws SBonitaException
      * @since 6.1

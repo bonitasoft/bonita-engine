@@ -9,14 +9,12 @@ import javax.xml.validation.Schema;
 import org.junit.Before;
 import org.junit.Test;
 
-
-
 public class SchemaLoaderTest {
 
     private SchemaLoader loader;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         loader = new SchemaLoader();
     }
 

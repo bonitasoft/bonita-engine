@@ -35,7 +35,7 @@ public class SJobLogDeletionException extends SSchedulerException {
     }
 
     public SJobLogDeletionException(final long id) {
-        super("Can't find job descriptor with id = " + id);
+        super("Can't delete job log with id = " + id);
     }
 
 }

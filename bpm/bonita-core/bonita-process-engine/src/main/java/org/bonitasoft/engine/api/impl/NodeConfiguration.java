@@ -18,6 +18,7 @@ import java.util.List;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
 
 /**
  * This class allow to provide a configuration for the current node
@@ -25,6 +26,7 @@ import org.bonitasoft.engine.execution.work.TenantRestartHandler;
  * 
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface NodeConfiguration {
 
@@ -68,5 +70,7 @@ public interface NodeConfiguration {
      *         true if the sessions should be cleaned when the node is stopped
      */
     boolean shouldClearSessions();
+
+    List<AbstractBonitaPlatormJobListener> getJobListeners();
 
 }

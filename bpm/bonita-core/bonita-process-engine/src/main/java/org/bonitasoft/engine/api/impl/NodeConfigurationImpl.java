@@ -19,11 +19,13 @@ import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Laurent Vaills
+ * @author Celine Souchet
  */
 public class NodeConfigurationImpl implements NodeConfiguration {
 
@@ -38,6 +40,8 @@ public class NodeConfigurationImpl implements NodeConfiguration {
     private List<TenantRestartHandler> tenantRestartHandlers;
 
     private List<PlatformLifecycleService> lifecycleServices;
+
+    private List<AbstractBonitaPlatormJobListener> jobListeners;
 
     @Override
     public boolean shouldStartScheduler() {
@@ -96,6 +100,15 @@ public class NodeConfigurationImpl implements NodeConfiguration {
 
     public void setLifecycleServices(final List<PlatformLifecycleService> lifecycleServices) {
         this.lifecycleServices = lifecycleServices;
+    }
+
+    @Override
+    public List<AbstractBonitaPlatormJobListener> getJobListeners() {
+        return jobListeners;
+    }
+
+    public void setJobListeners(final List<AbstractBonitaPlatormJobListener> jobListeners) {
+        this.jobListeners = jobListeners;
     }
 
 }

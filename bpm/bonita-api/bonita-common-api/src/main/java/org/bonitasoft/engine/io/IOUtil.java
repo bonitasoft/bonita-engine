@@ -530,9 +530,7 @@ public class IOUtil {
             if (out != null) {
                 out.close();
             }
-            if (fileOutput != null) {
-                fileOutput.close();
-            }
+            fileOutput.close();
         }
     }
 

@@ -29,15 +29,15 @@ import org.junit.Test;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class NonInterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEventTest {
+public class NonInterruptingTimerBoundaryEventTest extends AbstractEventTest {
 
     @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary event", "Timer",
             "Non-interrupting" }, story = "Execute non-interrupting timer boundary event triggered.", jira = "ENGINE-1042")
     @Test
-    public void testNonInterruptTimerBoundaryEventTriggered() throws Exception {
+    public void nonInterruptTimerBoundaryEventTriggered() throws Exception {
         // deploy process with non-interrupting boundary event
         final long timerDuration = 1000;
-        final ProcessDefinition processDefinition = deployProcessWithTimerBoundaryEvent(timerDuration, false, "step1", "exceptionStep", "step2");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEvent(timerDuration, false, "step1", "exceptionStep", "step2");
 
         // start the process and wait for timer to trigger
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -63,19 +63,16 @@ public class NonInterruptingTimerBoundaryEventTest extends AbstractTimerBoundary
     @Cover(classes = { EventInstance.class, CallActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Interrupting",
             "Timer", "Call Activity" }, story = "Execute timer boundary event triggered on call activity.", jira = "ENGINE-1042")
     @Test
-    public void testNonInterruptTimerBoundaryEventTriggeredOnCallActivity() throws Exception {
+    public void nonInterruptTimerBoundaryEventTriggeredOnCallActivity() throws Exception {
         final long timerDuration = 2000;
         final String simpleProcessName = "targetProcess";
         final String simpleTaskName = "stepCA";
-        final String normalUserTaskName = "step2";
-        final String exceptionFlowTaskName = "exceptionStep";
 
         // deploy a simple process p1
         final ProcessDefinition targetProcessDefinition = deployAndEnableSimpleProcess(simpleProcessName, simpleTaskName);
 
         // deploy a process, p2, with a call activity calling p1. The call activity has a non-interrupting timer boundary event
-        final ProcessDefinition processDefinition = deployAndEnbleProcessWithTimerBoundaryEventOnCallActivity(timerDuration, false, simpleProcessName,
-                normalUserTaskName, exceptionFlowTaskName);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(timerDuration, false, simpleProcessName);
 
         // start the root process and wait for boundary event triggering
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -83,11 +80,11 @@ public class NonInterruptingTimerBoundaryEventTest extends AbstractTimerBoundary
         Thread.sleep(timerDuration); // wait timer trigger
 
         // check that the exception flow was taken
-        final ActivityInstance exceptionFlowStep = waitForUserTask(exceptionFlowTaskName, processInstance.getId());
+        final ActivityInstance exceptionFlowStep = waitForUserTask(EXCEPTION_STEP, processInstance.getId());
 
         // execute the user task of p1 and check that the normal flow also was taken
         assignAndExecuteStep(stepCA, getUser().getId());
-        final ActivityInstance normalFlowStep = waitForUserTask(normalUserTaskName, processInstance.getId());
+        final ActivityInstance normalFlowStep = waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance.getId());
 
         // execute exception flow and normal flow and verify that the process completes
         assignAndExecuteStep(exceptionFlowStep, getUser().getId());
@@ -102,14 +99,15 @@ public class NonInterruptingTimerBoundaryEventTest extends AbstractTimerBoundary
     @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary",
             "Non-interrupting", "Timer", "MultiInstance", "Sequential" }, story = "Execute non-interrupting timer boundary event triggered on sequential multi-instance.", jira = "ENGINE-1042")
     @Test
-    public void testNonInterruptTimerBoundaryEventTriggeredOnSequentialMultiInstance() throws Exception {
+    public void nonInterruptTimerBoundaryEventTriggeredOnSequentialMultiInstance() throws Exception {
         // deploy a process with a non-interrupting timer boundary event attached to a sequential multi-instance
         final long timerDuration = 1000;
         final String multiTaskName = "step1";
         final String exceptionFlowTaskName = "exceptionStep";
         final int loopCardinality = 2;
         final String normalFlowTaskName = "step2";
-        final ProcessDefinition processDefinition = deployProcessMultiInstanceWithBoundaryEvent(timerDuration, false, multiTaskName, loopCardinality, true,
+        final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration, false, multiTaskName, loopCardinality,
+                true,
                 normalFlowTaskName, exceptionFlowTaskName);
 
         // start the process and wait the timer to trigger
@@ -137,13 +135,14 @@ public class NonInterruptingTimerBoundaryEventTest extends AbstractTimerBoundary
     @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary",
             "Non-interrupting", "Timer", "MultiInstance", "Parallel" }, story = "Non-interrupting timer boundary event attached to parallel multi-instance.", jira = "ENGINE-1042")
     @Test
-    public void testNonInterruptTimerBoundaryEventTriggeredOnParallelMultiInstance() throws Exception {
+    public void nonInterruptTimerBoundaryEventTriggeredOnParallelMultiInstance() throws Exception {
         final long timerDuration = 1000;
         final int loopCardinality = 2;
         // deploy a process with a interrupting timer boundary event attached to a parallel multi-instance
         final String multiTaskName = "step1";
         final String normalTaskName = "step2";
-        final ProcessDefinition processDefinition = deployProcessMultiInstanceWithBoundaryEvent(timerDuration, false, multiTaskName, loopCardinality, false,
+        final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration, false, multiTaskName, loopCardinality,
+                false,
                 normalTaskName, "exceptionStep");
 
         // start the process and wait for process to be triggered
@@ -170,13 +169,13 @@ public class NonInterruptingTimerBoundaryEventTest extends AbstractTimerBoundary
     @Cover(classes = { EventInstance.class, LoopActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Non-interrupging",
             "Timer", "Loop activity", "Exception flow" }, story = "Non-interrupting timer boundary event triggered on loop activity", jira = "ENGINE-1042")
     @Test
-    public void testNonInterruptTimerBoundaryEventTriggeredOnLoopActivity() throws Exception {
+    public void nonInterruptTimerBoundaryEventTriggeredOnLoopActivity() throws Exception {
         final long timerDuration = 1000;
         final int loopMax = 2;
         final String loopActivityName = "step1";
         final String normalFlowStepName = "step2";
         final String exceptionFlowStepName = "exceptionStep";
-        final ProcessDefinition processDefinition = deployProcessWithBoundaryEventOnLoopActivity(timerDuration, false, loopMax, loopActivityName,
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEventOnLoopActivity(timerDuration, false, loopMax, loopActivityName,
                 normalFlowStepName, exceptionFlowStepName);
 
         // start the process and wait timer to trigger

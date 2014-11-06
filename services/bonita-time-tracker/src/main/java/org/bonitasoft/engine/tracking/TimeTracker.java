@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -63,13 +62,13 @@ public class TimeTracker implements TenantLifecycleService {
                     "Time tracker is activated for some records. This may not be used in production as performances may be strongly impacted: "
                             + activatedRecords);
         }
-        this.flushThread = new FlushThread(clock, flushIntervalInSeconds, this, logger);
+        flushThread = new FlushThread(clock, flushIntervalInSeconds, this, logger);
 
-        this.records = new CircularFifoQueue<Record>(maxSize);
+        records = new CircularFifoQueue<Record>(maxSize);
     }
 
     public boolean isTrackable(final String recordName) {
-        return started && this.activatedRecords.contains(recordName);
+        return started && activatedRecords.contains(recordName);
     }
 
     public void track(final String recordName, final String recordDescription, final long duration) {
@@ -82,7 +81,7 @@ public class TimeTracker implements TenantLifecycleService {
 
     public void track(final Record record) {
         if (isTrackable(record.getName())) {
-            if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
                 logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Tracking record: " + record);
             }
             // TODO needs a synchro?
@@ -91,7 +90,7 @@ public class TimeTracker implements TenantLifecycleService {
     }
 
     public List<FlushResult> flush() {
-        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Flushing...");
         }
         final List<Record> records = getRecords();
@@ -103,62 +102,62 @@ public class TimeTracker implements TenantLifecycleService {
         final FlushEvent flushEvent = new FlushEvent(records);
 
         final List<FlushResult> flushResults = new ArrayList<FlushResult>();
-        if (this.flushEventListeners != null) {
-            for (final FlushEventListener listener : this.flushEventListeners) {
+        if (flushEventListeners != null) {
+            for (final FlushEventListener listener : flushEventListeners) {
                 try {
                     flushResults.add(listener.flush(flushEvent));
-                } catch (Exception e) {
-                    if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                } catch (final Exception e) {
+                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
                         logger.log(getClass(), TechnicalLogSeverity.WARNING, "Exception while flushing: " + flushEvent + " on listener " + listener);
                     }
                 }
             }
         }
-        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Flush finished: " + flushEvent);
         }
         return flushResults;
     }
 
     public List<Record> getRecords() {
-        return Arrays.asList(this.records.toArray(new Record[] {}));
+        return Arrays.asList(records.toArray(new Record[] {}));
     }
 
     @Override
-    public void start() throws SBonitaException {
-        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+    public void start() {
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Starting TimeTracker...");
         }
-        if (this.startFlushThread && !this.flushThread.isAlive()) {
-            this.flushThread.start();
+        if (startFlushThread && !flushThread.isAlive()) {
+            flushThread.start();
         }
-        this.started = true;
-        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+        started = true;
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(getClass(), TechnicalLogSeverity.INFO, "TimeTracker started.");
         }
     }
 
     @Override
-    public void stop() throws SBonitaException {
-        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+    public void stop() {
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Stopping TimeTracker...");
         }
-        if (this.flushThread.isAlive()) {
-            this.flushThread.interrupt();
+        if (flushThread.isAlive()) {
+            flushThread.interrupt();
         }
-        this.started = false;
-        if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+        started = false;
+        if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(getClass(), TechnicalLogSeverity.INFO, "TimeTracker stopped.");
         }
     }
 
     @Override
-    public void pause() throws SBonitaException {
+    public void pause() {
         // nothing to do as this service is not for production, we don't want to spend time on this
     }
 
     @Override
-    public void resume() throws SBonitaException {
+    public void resume() {
         // nothing to do as this service is not for production, we don't want to spend time on this
     }
 
@@ -167,6 +166,6 @@ public class TimeTracker implements TenantLifecycleService {
     }
 
     public boolean isFlushThreadAlive() {
-        return this.flushThread.isAlive();
+        return flushThread.isAlive();
     }
 }

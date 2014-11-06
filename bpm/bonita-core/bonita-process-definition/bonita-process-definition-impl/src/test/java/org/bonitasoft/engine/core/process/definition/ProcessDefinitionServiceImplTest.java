@@ -46,7 +46,6 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -69,7 +68,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
- *
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessDefinitionServiceImplTest {

@@ -50,7 +50,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     }
 
     @Test
-    public void isTrackable() throws Exception {
+    public void isTrackable() {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         tracker = new TimeTracker(logger, false, null, 10, 2, "rec1", "rec2");
         tracker.start();
@@ -61,7 +61,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     }
 
     @Test
-    public void trackRecords() throws Exception {
+    public void trackRecords() {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         tracker = new TimeTracker(logger, false, null, 10, 2, "rec1", "rec2");
         tracker.start();
@@ -134,7 +134,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     }
 
     @Test
-    public void should_start_start_flush_thread_if_startFlushThread_is_true() throws Exception {
+    public void should_start_start_flush_thread_if_startFlushThread_is_true() {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         tracker = new TimeTracker(logger, true, null, 10, 2);
         tracker.start();
@@ -143,7 +143,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     }
 
     @Test
-    public void should_start_do_not_start_flush_thread_if_startFlushThread_is_false() throws Exception {
+    public void should_start_do_not_start_flush_thread_if_startFlushThread_is_false() {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         tracker = new TimeTracker(logger, false, null, 10, 2);
         tracker.start();
@@ -152,7 +152,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     }
 
     @Test
-    public void should_stop_stop_flush_thread_if_running() throws Exception {
+    public void should_stop_stop_flush_thread_if_running() {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         tracker = new TimeTracker(logger, false, null, 10, 2);
         tracker.start();
@@ -161,7 +161,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     }
 
     @Test
-    public void should_stop_stop_silently_if_flush_thread_is_running() throws Exception {
+    public void should_stop_stop_silently_if_flush_thread_is_running() {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         tracker = new TimeTracker(logger, false, null, 10, 2);
         tracker.start();
@@ -218,7 +218,7 @@ public class TimeTrackerTest extends AbstractTimeTrackerTest {
     }
 
     @Test
-    public void rollingRecords() throws Exception {
+    public void rollingRecords() {
         final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         tracker = new TimeTracker(logger, false, null, 2, 2, "rec");
         tracker.start();

@@ -20,14 +20,10 @@ import java.util.List;
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 
 /**
- * 
  * Transform an exception having causes in one single exception with merged stack trace
- * 
  * This is done in order to avoid to throw to client server side exception with unknown class in client side
- * 
- * 
+ *
  * @author Baptiste Mesta
- * 
  */
 public class StackTraceTransformer {
 
@@ -39,9 +35,9 @@ public class StackTraceTransformer {
         try {
             field = Throwable.class.getDeclaredField("cause");
             field.setAccessible(true);
-        } catch (NoSuchFieldException e) {
+        } catch (final NoSuchFieldException e) {
             e.printStackTrace();
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             e.printStackTrace();
         }
     }
@@ -51,16 +47,15 @@ public class StackTraceTransformer {
     }
 
     /**
-     * 
      * @param e
-     *            the ServerWrappedException given by the server api
+     *        the ServerWrappedException given by the server api
      * @return
      *         a safe to throw to client ServerWrappedException
      */
     public static ServerWrappedException mergeStackTraces(final ServerWrappedException e) {
         try {
             return new StackTraceTransformer(e).merge();
-        } catch (Exception e1) {
+        } catch (final Exception e1) {
             System.err.println("Unable to throw the root exception: " + e1.getClass().getName() + ": " + e1.getMessage());
             e1.printStackTrace();
             return new ServerWrappedException(new BonitaRuntimeException(
@@ -69,9 +64,9 @@ public class StackTraceTransformer {
     }
 
     public static void addStackTo(final Throwable e, final StackTraceElement[] clientStackTrace) {
-        StackTraceElement[] causeStack = e.getStackTrace();
+        final StackTraceElement[] causeStack = e.getStackTrace();
 
-        StackTraceElement[] newStack = new StackTraceElement[causeStack.length + clientStackTrace.length + 1];
+        final StackTraceElement[] newStack = new StackTraceElement[causeStack.length + clientStackTrace.length + 1];
 
         System.arraycopy(clientStackTrace, 0, newStack, 0, clientStackTrace.length);
         newStack[clientStackTrace.length] = new StackTraceElement("\t< ========== Beginning of the server stack trace ========== >", " ", " ", -3);
@@ -80,21 +75,20 @@ public class StackTraceTransformer {
     }
 
     private ServerWrappedException merge() throws Exception {
-        Throwable cause = e.getCause();
+        final Throwable cause = e.getCause();
         if (field != null) {
             transfertStack(cause, cause);
             field.set(cause, null);
             return e;
-        } else {
-            Throwable newCause;
-            if (cause.getMessage() != null) {
-                newCause = cause.getClass().getConstructor(String.class).newInstance(e.getMessage());
-            } else {
-                newCause = cause.getClass().newInstance();
-            }
-            transfertStack(newCause, cause);
-            return new ServerWrappedException(newCause);
         }
+        Throwable newCause;
+        if (cause.getMessage() != null) {
+            newCause = cause.getClass().getConstructor(String.class).newInstance(e.getMessage());
+        } else {
+            newCause = cause.getClass().newInstance();
+        }
+        transfertStack(newCause, cause);
+        return new ServerWrappedException(newCause);
     }
 
     private void transfertStack(final Throwable mergeStackInside, final Throwable cause) {
@@ -105,7 +99,7 @@ public class StackTraceTransformer {
         }
         final StackTraceElement[] currentStack = cause.getStackTrace();
         final List<StackTraceElement[]> causesStacks = new ArrayList<StackTraceElement[]>();
-        List<Integer> framesInCommons = new ArrayList<Integer>();
+        final List<Integer> framesInCommons = new ArrayList<Integer>();
         final List<Throwable> exceptions = new ArrayList<Throwable>();
         int causeslength = 0;
         StackTraceElement[] lastStack = currentStack;
@@ -120,7 +114,7 @@ public class StackTraceTransformer {
                 m--;
                 n--;
             }
-            int framesInCommon = trace.length - 1 - m;
+            final int framesInCommon = trace.length - 1 - m;
             framesInCommons.add(framesInCommon);
             lastStack = trace;
             // add remove the frames in common to the total length but add one to put the "...23 more" if there is some in common
@@ -131,7 +125,7 @@ public class StackTraceTransformer {
         int current = currentStack.length;
         int i = 0;
         for (final StackTraceElement[] stackTraceElements : causesStacks) {
-            Integer framesInCommon = framesInCommons.get(i);
+            final Integer framesInCommon = framesInCommons.get(i);
             mergedStackTrace[current] = new StackTraceElement("\tCaused by: " + exceptions.get(i).getClass().getName(), ": "
                     + exceptions.get(i).getMessage() + " ", " ",
                     -3);

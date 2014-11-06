@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,17 +15,30 @@ package org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.
 
 import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowMessageEventTriggerInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowMessageEventTriggerInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.SThrowMessageEventTriggerInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
-public class SThrowMessageEventTriggerInstanceBuilderFactoryImpl extends SEventTriggerInstanceBuilderFactoryImpl implements SThrowMessageEventTriggerInstanceBuilderFactory {
+public class SThrowMessageEventTriggerInstanceBuilderFactoryImpl extends SEventTriggerInstanceBuilderFactoryImpl implements
+        SThrowMessageEventTriggerInstanceBuilderFactory {
 
     @Override
     public SThrowMessageEventTriggerInstanceBuilder createNewInstance(final long eventInstanceId, final String messageName, final String targetProcess,
             final String targetFlowNode) {
-        final SThrowMessageEventTriggerInstanceImpl entity = new SThrowMessageEventTriggerInstanceImpl(eventInstanceId, messageName, targetProcess, targetFlowNode);
+        final SThrowMessageEventTriggerInstanceImpl entity = new SThrowMessageEventTriggerInstanceImpl(eventInstanceId, messageName, targetProcess,
+                targetFlowNode);
+        return new SThrowMessageEventTriggerInstanceBuilderImpl(entity);
+    }
+
+    @Override
+    public SThrowMessageEventTriggerInstanceBuilder createNewInstance(final SThrowMessageEventTriggerInstance sThrowMessageEventTriggerInstance) {
+        final SThrowMessageEventTriggerInstanceImpl entity = new SThrowMessageEventTriggerInstanceImpl(sThrowMessageEventTriggerInstance.getEventInstanceId(),
+                sThrowMessageEventTriggerInstance.getMessageName(), sThrowMessageEventTriggerInstance.getTargetProcess(),
+                sThrowMessageEventTriggerInstance.getTargetFlowNode());
+        entity.setId(entity.getId());
         return new SThrowMessageEventTriggerInstanceBuilderImpl(entity);
     }
 

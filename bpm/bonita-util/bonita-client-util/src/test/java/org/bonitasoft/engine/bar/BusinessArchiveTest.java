@@ -124,9 +124,7 @@ public class BusinessArchiveTest {
 
             @Override
             public void run() {
-                if (infoFile != null) {
-                    IOUtil.deleteFile(infoFile, 1, 0);
-                }
+                IOUtil.deleteFile(infoFile, 1, 0);
             }
         });
         return infoFile;
@@ -674,22 +672,22 @@ public class BusinessArchiveTest {
                 new ExpressionBuilder().createConstantIntegerExpression(5));
         final DesignProcessDefinition result = getDesignProcessDefinition(builder);
 
-        AutomaticTaskDefinition auto1 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto1");
-        MultiInstanceLoopCharacteristics multi1 = (MultiInstanceLoopCharacteristics) auto1.getLoopCharacteristics();
+        final AutomaticTaskDefinition auto1 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto1");
+        final MultiInstanceLoopCharacteristics multi1 = (MultiInstanceLoopCharacteristics) auto1.getLoopCharacteristics();
         assertEquals(false, multi1.isSequential());
         assertEquals("inputList", multi1.getLoopDataInputRef());
         assertEquals("outputList", multi1.getLoopDataOutputRef());
         assertEquals("input", multi1.getDataInputItemRef());
         assertEquals("output", multi1.getDataOutputItemRef());
 
-        AutomaticTaskDefinition auto2 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto2");
-        MultiInstanceLoopCharacteristics multi2 = (MultiInstanceLoopCharacteristics) auto2.getLoopCharacteristics();
+        final AutomaticTaskDefinition auto2 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto2");
+        final MultiInstanceLoopCharacteristics multi2 = (MultiInstanceLoopCharacteristics) auto2.getLoopCharacteristics();
         assertEquals(true, multi2.isSequential());
         assertEquals("5", multi2.getLoopCardinality().getContent());
         assertEquals("false", multi2.getCompletionCondition().getContent());
 
-        AutomaticTaskDefinition auto3 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto3");
-        StandardLoopCharacteristics loop2 = (StandardLoopCharacteristics) auto3.getLoopCharacteristics();
+        final AutomaticTaskDefinition auto3 = (AutomaticTaskDefinition) result.getProcessContainer().getFlowNode("auto3");
+        final StandardLoopCharacteristics loop2 = (StandardLoopCharacteristics) auto3.getLoopCharacteristics();
         assertEquals(true, loop2.isTestBefore());
         assertEquals("true", loop2.getLoopCondition().getContent());
         assertEquals("5", loop2.getLoopMax().getContent());
@@ -1057,9 +1055,7 @@ public class BusinessArchiveTest {
 
             @Override
             public void run() {
-                if (file != null) {
-                    IOUtil.deleteFile(file, 1, 0);
-                }
+                IOUtil.deleteFile(file, 1, 0);
             }
         });
     }
@@ -1072,7 +1068,7 @@ public class BusinessArchiveTest {
                 if (directory != null) {
                     try {
                         IOUtil.deleteDir(directory);
-                    } catch (IOException e) {
+                    } catch (final IOException e) {
                         e.printStackTrace();
                     }
                 }

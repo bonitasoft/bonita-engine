@@ -21,7 +21,7 @@ import org.junit.Test;
 public class SearchArchivedHumanTaskInstanceDescriptorTest {
 
     @Test
-    public void getEntityKey_should_map_process_instance_to_the_logical_group_2_which_is_the_root_process_instance() throws Exception {
+    public void getEntityKey_should_map_process_instance_to_the_logical_group_2_which_is_the_root_process_instance() {
         final SearchArchivedHumanTaskInstanceDescriptor descriptor = new SearchArchivedHumanTaskInstanceDescriptor();
 
         final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys().get(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID);
@@ -30,7 +30,7 @@ public class SearchArchivedHumanTaskInstanceDescriptorTest {
     }
 
     @Test
-    public void getEntityKey_should_map_root_process_instance_to_the_logical_group_2_which_is_the_root_process_instance() throws Exception {
+    public void getEntityKey_should_map_root_process_instance_to_the_logical_group_2_which_is_the_root_process_instance() {
         final SearchArchivedHumanTaskInstanceDescriptor descriptor = new SearchArchivedHumanTaskInstanceDescriptor();
 
         final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys().get(ArchivedHumanTaskInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID);
@@ -39,7 +39,7 @@ public class SearchArchivedHumanTaskInstanceDescriptorTest {
     }
 
     @Test
-    public void getEntityKey_should_map_parent_process_instance_to_the_logical_group_2_which_is_the_parent_process_instance() throws Exception {
+    public void getEntityKey_should_map_parent_process_instance_to_the_logical_group_2_which_is_the_parent_process_instance() {
         final SearchArchivedHumanTaskInstanceDescriptor descriptor = new SearchArchivedHumanTaskInstanceDescriptor();
 
         final FieldDescriptor fieldDescriptor = descriptor.getEntityKeys().get(ArchivedHumanTaskInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID);
