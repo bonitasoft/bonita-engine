@@ -14,6 +14,12 @@
  */
 package org.bonitasoft.engine.core.document.api.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -39,12 +45,10 @@ import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
-import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -53,12 +57,6 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Nicolas Chabanoles
@@ -73,10 +71,10 @@ public class DocumentServiceImpl implements DocumentService {
     private final ArchiveService archiveService;
     private final Recorder recorder;
     private final ReadPersistenceService persistenceService;
-    private ReadPersistenceService definitiveArchiveReadPersistenceService;
+    private final ReadPersistenceService definitiveArchiveReadPersistenceService;
 
     public DocumentServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService,
-                               final SDocumentDownloadURLProvider urlProvider, EventService eventService, TechnicalLoggerService technicalLogger, ArchiveService archiveService) {
+            final SDocumentDownloadURLProvider urlProvider, final EventService eventService, final ArchiveService archiveService) {
         this.recorder = recorder;
         this.persistenceService = persistenceService;
         this.urlProvider = urlProvider;
@@ -87,11 +85,11 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public SMappedDocument attachDocumentToProcessInstance(final SDocument document, long processInstanceId, String name, String description)
+    public SMappedDocument attachDocumentToProcessInstance(final SDocument document, final long processInstanceId, final String name, final String description)
             throws SObjectCreationException {
         try {
             insertDocument(document);
-            SDocumentMapping documentMapping = create(document.getId(), processInstanceId, name, description, -1);
+            final SDocumentMapping documentMapping = create(document.getId(), processInstanceId, name, description, -1);
             return new SMappedDocumentImpl(documentMapping, document);
         } catch (final SBonitaException e) {
             throw new SObjectCreationException(e.getMessage(), e);
@@ -99,38 +97,39 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public SMappedDocument attachDocumentToProcessInstance(final SDocument document, long processInstanceId, String name, String description, int index)
+    public SMappedDocument attachDocumentToProcessInstance(final SDocument document, final long processInstanceId, final String name, final String description,
+            final int index)
             throws SObjectCreationException, SObjectAlreadyExistsException {
         try {
             if (index == -1) {
-                SMappedDocument mappedDocumentInternal = getMappedDocumentInternal(processInstanceId, name);
+                final SMappedDocument mappedDocumentInternal = getMappedDocumentInternal(processInstanceId, name);
                 if (mappedDocumentInternal != null) {
                     throw new SObjectAlreadyExistsException("A document already exists with name " + name + " and process instance id " + processInstanceId);
                 }
             }
             insertDocument(document);
-            SDocumentMapping documentMapping = create(document.getId(), processInstanceId, name, description, index);
+            final SDocumentMapping documentMapping = create(document.getId(), processInstanceId, name, description, index);
             return new SMappedDocumentImpl(documentMapping, document);
-        } catch (SObjectAlreadyExistsException e) {
+        } catch (final SObjectAlreadyExistsException e) {
             throw new SObjectAlreadyExistsException(e);
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new SObjectCreationException(e);
         }
     }
 
     @Override
-    public void updateDocumentOfList(final SMappedDocument mappedDocument, final SDocument document, int index) throws SObjectModificationException {
+    public void updateDocumentOfList(final SMappedDocument mappedDocument, final SDocument document, final int index) throws SObjectModificationException {
         updateDocument(mappedDocument, document, index);
     }
 
     @Override
-    public void updateDocumentIndex(final SMappedDocument mappedDocument, int index) throws SObjectModificationException {
-        Map<String, Object> params = new HashMap<String, Object>(2);
+    public void updateDocumentIndex(final SMappedDocument mappedDocument, final int index) throws SObjectModificationException {
+        final Map<String, Object> params = new HashMap<String, Object>(2);
         params.put("index", index);
         updateFields(mappedDocument, params);
     }
 
-    private void updateFields(SDocumentMapping mappedDocument, Map<String, Object> params) throws SObjectModificationException {
+    private void updateFields(final SDocumentMapping mappedDocument, final Map<String, Object> params) throws SObjectModificationException {
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(mappedDocument,
                 params);
         SUpdateEvent updateEvent = null;
@@ -140,13 +139,14 @@ public class DocumentServiceImpl implements DocumentService {
         }
         try {
             recorder.recordUpdate(updateRecord, updateEvent);
-        } catch (SRecorderException e) {
+        } catch (final SRecorderException e) {
             throw new SObjectModificationException(e);
         }
     }
 
-    private void updateMapping(long documentId, SDocumentMapping sDocumentMapping, String description, int index) throws SObjectModificationException {
-        Map<String, Object> params = new HashMap<String, Object>(2);
+    private void updateMapping(final long documentId, final SDocumentMapping sDocumentMapping, final String description, final int index)
+            throws SObjectModificationException {
+        final Map<String, Object> params = new HashMap<String, Object>(2);
         params.put("documentId", documentId);
         params.put("description", description);
         params.put("version", incrementVersion(sDocumentMapping.getVersion()));
@@ -154,12 +154,12 @@ public class DocumentServiceImpl implements DocumentService {
         updateFields(sDocumentMapping, params);
     }
 
-    private String incrementVersion(String version) {
-        Integer intVersion = Integer.valueOf(version);
+    private String incrementVersion(final String version) {
+        final Integer intVersion = Integer.valueOf(version);
         return String.valueOf(intVersion + 1);
     }
 
-    private SDocument insertDocument(SDocument document) throws SRecorderException {
+    private SDocument insertDocument(final SDocument document) throws SRecorderException {
         final InsertRecord insertRecord = new InsertRecord(document);
         SInsertEvent insertEvent = null;
         if (eventService.hasHandlers(DOCUMENT, EventActionType.CREATED)) {
@@ -176,7 +176,7 @@ public class DocumentServiceImpl implements DocumentService {
         do {
             mappedDocuments = persistenceService.selectList(SelectDescriptorBuilder.getDocumentMappingsForProcessInstance(
                     processInstanceId, 0, 100, null, null));
-            for (SMappedDocument mappedDocument : mappedDocuments) {
+            for (final SMappedDocument mappedDocument : mappedDocuments) {
                 removeDocument(mappedDocument);
             }
         } while (!mappedDocuments.isEmpty());
@@ -196,7 +196,7 @@ public class DocumentServiceImpl implements DocumentService {
                 throw new SObjectNotFoundException("Document not found with identifier: " + archivedProcessDocumentId);
             }
             return docMapping;
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new SObjectNotFoundException(e);
         }
     }
@@ -204,7 +204,8 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public SAMappedDocument getArchivedVersionOfProcessDocument(final long documentId) throws SObjectNotFoundException {
         try {
-            SAMappedDocument aDocMapping = definitiveArchiveReadPersistenceService.selectOne(SelectDescriptorBuilder.getArchivedVersionOdDocument(documentId));
+            final SAMappedDocument aDocMapping = definitiveArchiveReadPersistenceService.selectOne(SelectDescriptorBuilder
+                    .getArchivedVersionOdDocument(documentId));
             if (aDocMapping == null) {
                 throw new SObjectNotFoundException(documentId);
             }
@@ -225,7 +226,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public SMappedDocument getMappedDocument(long processInstanceId, String documentName) throws SObjectNotFoundException, SBonitaReadException {
+    public SMappedDocument getMappedDocument(final long processInstanceId, final String documentName) throws SObjectNotFoundException, SBonitaReadException {
         final SMappedDocument document = getMappedDocumentInternal(processInstanceId, documentName);
         if (document == null) {
             throw new SObjectNotFoundException("Document not found: " + documentName + " for process instance: " + processInstanceId);
@@ -233,11 +234,12 @@ public class DocumentServiceImpl implements DocumentService {
         return document;
     }
 
-    private SMappedDocument getMappedDocumentInternal(long processInstanceId, String documentName) throws SBonitaReadException {
+    private SMappedDocument getMappedDocumentInternal(final long processInstanceId, final String documentName) throws SBonitaReadException {
         final Map<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("processInstanceId", processInstanceId);
         parameters.put("name", documentName);
-        SelectOneDescriptor<SMappedDocument> selectOneDescriptor = new SelectOneDescriptor<SMappedDocument>("getSMappedDocumentOfProcessWithName", parameters,
+        final SelectOneDescriptor<SMappedDocument> selectOneDescriptor = new SelectOneDescriptor<SMappedDocument>("getSMappedDocumentOfProcessWithName",
+                parameters,
                 SDocument.class);
         return persistenceService.selectOne(selectOneDescriptor);
     }
@@ -251,25 +253,24 @@ public class DocumentServiceImpl implements DocumentService {
                         documentName, time));
         if (docMapping.isEmpty()) {
             return getMappedDocument(processInstanceId, documentName);
-        } else {
-            return docMapping.get(0);
         }
+        return docMapping.get(0);
     }
 
     @Override
     public byte[] getDocumentContent(final String documentId) throws SObjectNotFoundException {
         try {
-            Long id = Long
+            final Long id = Long
                     .valueOf(documentId);
             return getDocumentWithContent(id).getContent();
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             throw new SObjectNotFoundException("Identifier " + documentId + " is not valid, it must be a long");
         } catch (final SBonitaReadException e) {
             throw new SObjectNotFoundException(e);
         }
     }
 
-    private SDocument getDocumentWithContent(Long id) throws SBonitaReadException, SObjectNotFoundException {
+    private SDocument getDocumentWithContent(final Long id) throws SBonitaReadException, SObjectNotFoundException {
         final SDocument document = persistenceService.selectById(new SelectByIdDescriptor<SDocument>("geDocumentById", SDocument.class, id));
         if (document == null) {
             throw new SObjectNotFoundException("Document with id " + id + " not found");
@@ -278,7 +279,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public SMappedDocument getMappedDocument(long mappingId) throws SObjectNotFoundException, SBonitaReadException {
+    public SMappedDocument getMappedDocument(final long mappingId) throws SObjectNotFoundException, SBonitaReadException {
         final SMappedDocument document = persistenceService.selectById(new SelectByIdDescriptor<SMappedDocument>("getSMappedDocumentById",
                 SMappedDocument.class,
                 mappingId));
@@ -290,7 +291,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<SMappedDocument> getDocumentsOfProcessInstance(final long processInstanceId, final int fromIndex, final int numberPerPage, final String field,
-                                                               final OrderByType order) throws SBonitaReadException {
+            final OrderByType order) throws SBonitaReadException {
         return persistenceService.selectList(SelectDescriptorBuilder.getDocumentMappingsForProcessInstance(
                 processInstanceId, fromIndex, numberPerPage, field, order));
     }
@@ -322,7 +323,8 @@ public class DocumentServiceImpl implements DocumentService {
         return persistenceService.getNumberOfEntities(SMappedDocument.class, SUPERVISED_BY, queryOptions, parameters);
     }
 
-    public void removeCurrentVersion(SMappedDocument document) throws SObjectNotFoundException, SObjectModificationException {
+    @Override
+    public void removeCurrentVersion(final SMappedDocument document) throws SObjectModificationException {
         archive(document, System.currentTimeMillis());
         removeDocument(document);
 
@@ -332,7 +334,7 @@ public class DocumentServiceImpl implements DocumentService {
     public void removeCurrentVersion(final long processInstanceId, final String documentName) throws SObjectNotFoundException, SObjectModificationException {
         try {
             removeCurrentVersion(getMappedDocument(processInstanceId, documentName));
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new SObjectModificationException(e);
         }
     }
@@ -344,15 +346,15 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public void deleteDocument(SLightDocument document) throws SObjectModificationException {
+    public void deleteDocument(final SLightDocument document) throws SObjectModificationException {
         try {
             delete(document);
-        } catch (SRecorderException e) {
+        } catch (final SRecorderException e) {
             throw new SObjectModificationException(e);
         }
     }
 
-    private void delete(SLightDocument document) throws SRecorderException {
+    private void delete(final SLightDocument document) throws SRecorderException {
         final DeleteRecord deleteDocRecord = new DeleteRecord(document);
         final SDeleteEvent deleteDocEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent("SDocument")
                 .setObject(document)
@@ -360,7 +362,7 @@ public class DocumentServiceImpl implements DocumentService {
         recorder.recordDelete(deleteDocRecord, deleteDocEvent);
     }
 
-    private void delete(SADocumentMapping mappedDocument) throws SRecorderException {
+    private void delete(final SADocumentMapping mappedDocument) throws SRecorderException {
         final DeleteRecord deleteRecord = new DeleteRecord(mappedDocument);
         final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent("SADocumentMapping")
                 .setObject(mappedDocument)
@@ -399,7 +401,7 @@ public class DocumentServiceImpl implements DocumentService {
     public List<SMappedDocument> searchDocuments(final QueryOptions queryOptions) throws SBonitaReadException {
         try {
             return persistenceService.searchEntity(SMappedDocument.class, queryOptions, null);
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new SBonitaReadException(e);
         }
     }
@@ -409,7 +411,7 @@ public class DocumentServiceImpl implements DocumentService {
         try {
             final Map<String, Object> parameters = Collections.singletonMap("userId", (Object) userId);
             return persistenceService.searchEntity(SMappedDocument.class, SUPERVISED_BY, queryOptions, parameters);
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new SBonitaReadException(e);
         }
     }
@@ -433,8 +435,9 @@ public class DocumentServiceImpl implements DocumentService {
         }
     }
 
-    private SDocumentMapping create(long documentId, long processInstanceId, String name, String description, int index) throws SRecorderException {
-        SDocumentMappingImpl documentMapping = new SDocumentMappingImpl(documentId, processInstanceId, name);
+    private SDocumentMapping create(final long documentId, final long processInstanceId, final String name, final String description, final int index)
+            throws SRecorderException {
+        final SDocumentMappingImpl documentMapping = new SDocumentMappingImpl(documentId, processInstanceId, name);
         documentMapping.setDescription(description);
         documentMapping.setVersion("1");
         documentMapping.setIndex(index);
@@ -451,28 +454,30 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public void archive(final SDocumentMapping docMapping, final long archiveDate) throws SObjectModificationException {
         if (archiveService.isArchivable(SDocumentMapping.class)) {
-            final SADocumentMappingImpl saDocumentMapping = new SADocumentMappingImpl(docMapping.getDocumentId(), docMapping.getProcessInstanceId(), archiveDate,
+            final SADocumentMappingImpl saDocumentMapping = new SADocumentMappingImpl(docMapping.getDocumentId(), docMapping.getProcessInstanceId(),
+                    archiveDate,
                     docMapping.getId(), docMapping.getName(), docMapping.getDescription(), docMapping.getVersion());
             saDocumentMapping.setIndex(docMapping.getIndex());
             final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saDocumentMapping);
             try {
                 archiveService.recordInsert(archiveDate, insertRecord);
-            } catch (SBonitaException e) {
+            } catch (final SBonitaException e) {
                 throw new SObjectModificationException("Unable to archive the document with id = <" + docMapping.getId() + ">", e);
             }
         }
     }
 
     @Override
-    public List<SMappedDocument> getDocumentList(String documentName, long processInstanceId, int fromIndex, int numberOfResult) throws SBonitaReadException {
+    public List<SMappedDocument> getDocumentList(final String documentName, final long processInstanceId, final int fromIndex, final int numberOfResult)
+            throws SBonitaReadException {
         return persistenceService.selectList(SelectDescriptorBuilder.getDocumentList(documentName, processInstanceId, new QueryOptions(fromIndex,
                 numberOfResult)));
     }
 
     @Override
-    public void deleteContentOfArchivedDocument(long documentId) throws SObjectNotFoundException, SBonitaReadException, SRecorderException {
-        SAMappedDocument archivedDocument = getArchivedDocument(documentId);
-        SDocument document = getDocumentWithContent(archivedDocument.getDocumentId());
+    public void deleteContentOfArchivedDocument(final long documentId) throws SObjectNotFoundException, SBonitaReadException, SRecorderException {
+        final SAMappedDocument archivedDocument = getArchivedDocument(documentId);
+        final SDocument document = getDocumentWithContent(archivedDocument.getDocumentId());
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(document, Collections.singletonMap("content", null));
         SUpdateEvent updateEvent = null;
         if (eventService.hasHandlers(DOCUMENT, EventActionType.UPDATED)) {
@@ -483,22 +488,23 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public SMappedDocument updateDocument(long documentId, SDocument sDocument) throws SBonitaReadException, SObjectNotFoundException,
+    public SMappedDocument updateDocument(final long documentId, final SDocument sDocument) throws SBonitaReadException, SObjectNotFoundException,
             SObjectModificationException {
-        SDocumentMapping sDocumentMapping = getMappedDocument(documentId);
+        final SDocumentMapping sDocumentMapping = getMappedDocument(documentId);
         return updateDocument(sDocumentMapping, sDocument);
     }
 
     @Override
-    public SMappedDocument updateDocument(SDocumentMapping documentToUpdate, SDocument sDocument) throws SObjectModificationException {
+    public SMappedDocument updateDocument(final SDocumentMapping documentToUpdate, final SDocument sDocument) throws SObjectModificationException {
         return updateDocument(documentToUpdate, sDocument, documentToUpdate.getIndex());
     }
 
-    private SMappedDocument updateDocument(SDocumentMapping documentToUpdate, SDocument sDocument, int index) throws SObjectModificationException {
+    private SMappedDocument updateDocument(final SDocumentMapping documentToUpdate, final SDocument sDocument, final int index)
+            throws SObjectModificationException {
         //insert new document
         try {
             insertDocument(sDocument);
-        } catch (SRecorderException e) {
+        } catch (final SRecorderException e) {
             throw new SObjectModificationException(e);
         }
         //update mapping
@@ -508,15 +514,17 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<SMappedDocument> getDocumentList(String documentName, long processInstanceId, long time) throws SBonitaReadException {
-        List<SAMappedDocument> archivedList = persistenceService.selectList(SelectDescriptorBuilder.getArchivedDocumentList(documentName, processInstanceId, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS), time));
-        List<SMappedDocument> elementsInJournal = persistenceService.selectList(SelectDescriptorBuilder.getDocumentListCreatedBefore(documentName, processInstanceId, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS), time));
+    public List<SMappedDocument> getDocumentList(final String documentName, final long processInstanceId, final long time) throws SBonitaReadException {
+        final List<SAMappedDocument> archivedList = persistenceService.selectList(SelectDescriptorBuilder.getArchivedDocumentList(documentName,
+                processInstanceId, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS), time));
+        final List<SMappedDocument> elementsInJournal = persistenceService.selectList(SelectDescriptorBuilder.getDocumentListCreatedBefore(documentName,
+                processInstanceId, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS), time));
 
-        List<SMappedDocument> result = new ArrayList<SMappedDocument>(archivedList.size() + elementsInJournal.size());
-        for (SAMappedDocument mappedDocument : archivedList) {
+        final List<SMappedDocument> result = new ArrayList<SMappedDocument>(archivedList.size() + elementsInJournal.size());
+        for (final SAMappedDocument mappedDocument : archivedList) {
             result.add(mappedDocument);
         }
-        for (SMappedDocument mappedDocument : elementsInJournal) {
+        for (final SMappedDocument mappedDocument : elementsInJournal) {
             result.add(mappedDocument);
         }
         return result;

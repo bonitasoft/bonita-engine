@@ -34,7 +34,6 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.TenantHibernatePersistenceService;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 

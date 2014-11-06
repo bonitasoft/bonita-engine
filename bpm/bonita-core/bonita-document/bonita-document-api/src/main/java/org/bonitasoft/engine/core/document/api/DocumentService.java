@@ -14,6 +14,8 @@
  */
 package org.bonitasoft.engine.core.document.api;
 
+import java.util.List;
+
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -26,10 +28,7 @@ import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
-
-import java.util.List;
 
 /**
  * @author Nicolas Chabanoles
@@ -46,7 +45,7 @@ public interface DocumentService {
     /**
      * Save a document
      *
-     * @param document          the document to store
+     * @param document the document to store
      * @param processInstanceId the process instance id to attach the document to
      * @param name
      * @param description
@@ -59,11 +58,11 @@ public interface DocumentService {
     /**
      * Save a document
      *
-     * @param document          the document to store
+     * @param document the document to store
      * @param processInstanceId the process instance id to attach the document to
      * @param name
      * @param description
-     * @param index             the index in the list of document
+     * @param index the index in the list of document
      * @return The document image from database
      * @throws SObjectCreationException when the storage has failed
      */
@@ -78,10 +77,9 @@ public interface DocumentService {
      * </p>
      *
      * @param document the document mapping to remove
-     * @throws SObjectNotFoundException
      * @throws SObjectModificationException
      */
-    void removeCurrentVersion(SMappedDocument document) throws SObjectNotFoundException, SObjectModificationException;
+    void removeCurrentVersion(SMappedDocument document) throws SObjectModificationException;
 
     /**
      * Remove the document with the specified process instance and name
@@ -91,7 +89,7 @@ public interface DocumentService {
      * </p>
      *
      * @param processInstanceId id of the process having the document
-     * @param documentName      name of the document
+     * @param documentName name of the document
      * @throws SObjectNotFoundException
      * @throws SObjectModificationException
      */
@@ -128,7 +126,7 @@ public interface DocumentService {
      * Get document with mapping by its name in the specific process instance
      *
      * @param processInstanceId identifier of process instance
-     * @param documentName      name of process document
+     * @param documentName name of process document
      * @return the corresponding SDocumentMapping object
      * @throws SObjectNotFoundException
      */
@@ -138,8 +136,8 @@ public interface DocumentService {
      * Get a list of documents for specific process instance, this can be used for pagination
      *
      * @param processInstanceId identifier of process instance
-     * @param fromIndex         Index of the record to be retrieved from. First record has index 0
-     * @param numberPerPage     Number of result we want to get. Maximum number of result returned
+     * @param fromIndex Index of the record to be retrieved from. First record has index 0
+     * @param numberPerPage Number of result we want to get. Maximum number of result returned
      * @param order
      * @param field
      * @return a list of SDocumentMapping objects
@@ -160,8 +158,8 @@ public interface DocumentService {
      * Get name specified document archived in a certain time in the process instance
      *
      * @param processInstanceId identifier of process instance
-     * @param documentName      name of document
-     * @param time              the archived time of document
+     * @param documentName name of document
+     * @param time the archived time of document
      * @return an SDocumentMapping object archived in the specific time or not archived
      * @throws SObjectNotFoundException
      */
@@ -188,7 +186,7 @@ public interface DocumentService {
     /**
      * Get total number of documents for the specific supervisor
      *
-     * @param userId       identifier of supervisor user
+     * @param userId identifier of supervisor user
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return number of documents for the specific supervisor
      * @throws SBonitaReadException
@@ -198,7 +196,7 @@ public interface DocumentService {
     /**
      * Search all documents for the specific supervisor
      *
-     * @param userId       identifier of supervisor user
+     * @param userId identifier of supervisor user
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return a list of SDocumentMapping objects
      * @throws SBonitaReadException
@@ -228,7 +226,7 @@ public interface DocumentService {
     /**
      * Get total number of archived documents for the specific supervisor
      *
-     * @param userId       identifier of supervisor user
+     * @param userId identifier of supervisor user
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return number of archived documents for the specific supervisor
      * @throws SBonitaReadException
@@ -238,7 +236,7 @@ public interface DocumentService {
     /**
      * Search all archived documents for the specific supervisor
      *
-     * @param userId       identifier of supervisor user
+     * @param userId identifier of supervisor user
      * @param queryOptions a QueryOptions object containing some query conditions
      * @return a list of SADocumentMapping objects
      * @throws SBonitaReadException
@@ -267,7 +265,6 @@ public interface DocumentService {
 
     void deleteDocument(SLightDocument document) throws SObjectModificationException;
 
-
     /**
      * Delete documents from a specified process instance
      *
@@ -289,7 +286,7 @@ public interface DocumentService {
      * archive the specific document mapping in the archive date
      *
      * @param documentMapping document mapping will be archived
-     * @param archiveDate     the archive time
+     * @param archiveDate the archive time
      * @throws org.bonitasoft.engine.commons.exceptions.SObjectModificationException
      * @since 6.4.0
      */
@@ -297,8 +294,8 @@ public interface DocumentService {
 
     /**
      * @param mappedDocument the document to update
-     * @param document       the new content
-     * @param index          the new index
+     * @param document the new content
+     * @param index the new index
      * @throws org.bonitasoft.engine.commons.exceptions.SObjectModificationException
      * @since 6.4.0
      */
@@ -308,7 +305,7 @@ public interface DocumentService {
      * update the index of a document inside the list
      *
      * @param mappedDocument the document to update
-     * @param index          the new index
+     * @param index the new index
      * @throws org.bonitasoft.engine.commons.exceptions.SObjectModificationException
      * @since 6.4.0
      */
@@ -317,10 +314,10 @@ public interface DocumentService {
     /**
      * Get a list of document. if there is no document in the list returns an empty list
      *
-     * @param documentName      the name of the document list
+     * @param documentName the name of the document list
      * @param processInstanceId the id of the process instance that contains the list
-     * @param fromIndex         pagination parameter
-     * @param numberOfResult    pagination parameter
+     * @param fromIndex pagination parameter
+     * @param numberOfResult pagination parameter
      * @return the list of document
      * @since 6.4.0
      */
@@ -328,7 +325,7 @@ public interface DocumentService {
 
     /**
      * @param documentToUpdate the document mapping to udpate
-     * @param sDocument        the value to set th emapping with
+     * @param sDocument the value to set th emapping with
      * @return the updated document mapping
      * @throws SRecorderException
      * @throws org.bonitasoft.engine.commons.exceptions.SObjectModificationException
@@ -341,9 +338,9 @@ public interface DocumentService {
      * elements are taken from archive and from non archived mapping if the process is still running
      * </p>
      *
-     * @param documentName      the name of the document list
+     * @param documentName the name of the document list
      * @param processInstanceId the id of the process instance that contains the list
-     * @param time              time when the list was like that
+     * @param time time when the list was like that
      * @return the list of document
      * @since 6.4.0
      */
@@ -364,8 +361,9 @@ public interface DocumentService {
 
     /**
      * update the document having the documentId with this new version
-     *  @param documentId the id of the document to update
-     * @param sDocument  the new version of the document @return
+     * 
+     * @param documentId the id of the document to update
+     * @param sDocument the new version of the document @return
      */
     SMappedDocument updateDocument(long documentId, SDocument sDocument) throws SObjectNotFoundException, SObjectModificationException, SBonitaReadException;
 }

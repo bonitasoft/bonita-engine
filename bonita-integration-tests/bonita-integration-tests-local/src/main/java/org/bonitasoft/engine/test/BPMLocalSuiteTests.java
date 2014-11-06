@@ -12,6 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
+        JobExecutionTest.class,
         BPMLocalTest.class,
         ConnectorExecutionsTestsLocal.class,
         ProcessWithExpressionTestLocal.class,
@@ -20,7 +21,6 @@ import org.junit.runners.Suite.SuiteClasses;
         LocalInterruptingTimerBoundaryEventTest.class,
         DataInstanceIntegrationLocalTest.class,
         GatewayExecutionLocalTest.class,
-        JobExecutionTest.class,
         ThemeTest.class,
         PermissionAPIIT.class
 })

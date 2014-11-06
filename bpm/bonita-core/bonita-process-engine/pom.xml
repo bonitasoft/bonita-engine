@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -324,14 +325,16 @@
             <artifactId>powermock-api-mockito</artifactId>
         </dependency>
         <dependency>
-			<!-- because we need the builderfactory impl and it does not make sense to mock them -->
+			<!-- because we need the builderfactory impl and it does not make sense 
+				to mock them -->
             <groupId>org.bonitasoft.engine.core.process.instance</groupId>
             <artifactId>bonita-process-instance-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
                 <dependency>
-			<!-- because we need the builderfactory impl and it does not make sense to mock them -->
+			<!-- because we need the builderfactory impl and it does not make sense 
+				to mock them -->
             <groupId>org.bonitasoft.engine.expression</groupId>
             <artifactId>bonita-expression-api-impl</artifactId>
             <version>${project.version}</version>
@@ -374,6 +377,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+			<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
+			<artifactId>bonita-supervisor-mapping-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
         	<groupId>com.google.guava</groupId>
         	<artifactId>guava</artifactId>
         	<version>16.0.1</version>

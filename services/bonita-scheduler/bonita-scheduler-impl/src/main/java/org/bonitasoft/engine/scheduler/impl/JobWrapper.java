@@ -28,29 +28,14 @@ import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
-import org.bonitasoft.engine.transaction.TransactionState;
 
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
 public class JobWrapper implements StatelessJob {
-
-    private final class BonitaTransactionSynchronizationImplementation implements BonitaTransactionSynchronization {
-
-        @Override
-        public void beforeCommit() {
-            // Nothing to do
-        }
-
-        @Override
-        public void afterCompletion(final TransactionState txState) {
-            sessionAccessor.deleteTenantId();
-        }
-    }
 
     private static final long serialVersionUID = 7145451610635400449L;
 
@@ -122,7 +107,7 @@ public class JobWrapper implements StatelessJob {
                 eventService.fireEvent(jobCompleted);
             }
             try {
-                transactionService.registerBonitaSynchronization(new BonitaTransactionSynchronizationImplementation());
+                transactionService.registerBonitaSynchronization(new BonitaTransactionSynchronizationImpl(sessionAccessor));
             } catch (final STransactionNotFoundException e) {
                 e.printStackTrace();
             }

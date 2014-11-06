@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.profile;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilder;
 import org.bonitasoft.engine.profile.builder.SProfileUpdateBuilderFactory;
 import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
@@ -34,14 +33,13 @@ public class ReplaceDuplicateImportStrategy extends ProfileImportStategy {
     }
 
     @Override
-    public void beforeImport() throws ExecutionException {
+    public void beforeImport() {
 
     }
 
     @Override
     public SProfile whenProfileExists(final long importerId, final ExportedProfile exportedProfile, final SProfile existingProfile)
-            throws ExecutionException,
-            SProfileEntryDeletionException, SProfileMemberDeletionException, SProfileUpdateException {
+            throws SProfileEntryDeletionException, SProfileMemberDeletionException, SProfileUpdateException {
         getProfileService().deleteAllProfileMembersOfProfile(existingProfile);
         // update profile
         if (exportedProfile.isDefault() || existingProfile.isDefault()) {

@@ -100,12 +100,12 @@ public enum ProcessInstanceState {
         return map.get(id);
     }
 
-    private static ProcessInstanceState fromIdToProcessInstanceState(final int id) {
-        for (ProcessInstanceState state : values()) {
-            if (id == state.getId()) {
-                return state;
-            }
-        }
-        return null;
-    }
+	private static ProcessInstanceState fromIdToProcessInstanceState(final int id) {
+		for (final ProcessInstanceState state : values()) {
+			if (id == state.getId()) {
+				return state;
+			}
+		}
+		return null;
+	}
 }

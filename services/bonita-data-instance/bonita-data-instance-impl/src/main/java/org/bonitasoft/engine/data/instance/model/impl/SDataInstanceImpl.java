@@ -202,9 +202,9 @@ public abstract class SDataInstanceImpl implements SDataInstance {
 
     /**
      * Check if the data is well formed
-     * 
+     *
      * @throws org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException
-     *             thrown if the data is not well formed
+     *         thrown if the data is not well formed
      */
     public void validate() throws SDataInstanceNotWellFormedException {
     }

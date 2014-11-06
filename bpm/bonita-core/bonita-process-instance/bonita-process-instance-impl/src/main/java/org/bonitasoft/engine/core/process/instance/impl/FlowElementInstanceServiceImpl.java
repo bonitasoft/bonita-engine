@@ -17,11 +17,9 @@ import java.util.List;
 
 import org.bonitasoft.engine.core.process.instance.api.FlowElementInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowElementInstance;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.Recorder;
 
@@ -61,16 +59,16 @@ public abstract class FlowElementInstanceServiceImpl implements FlowElementInsta
         return persistenceRead;
     }
 
-    @Override
-    public List<SAFlowElementInstance> searchArchivedFlowElementInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions searchOptions) {
-        // FIXME Implement me!
-        return null;
-    }
-
-    @Override
-    public long getNumberOfArchivedFlowElementInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions countOptions) {
-        // FIXME Implement me!
-        return 0;
-    }
+    //    @Override
+    //    public List<SAFlowElementInstance> searchArchivedFlowElementInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions searchOptions) {
+    //        // FIXME Implement me!
+    //        return null;
+    //    }
+    //
+    //    @Override
+    //    public long getNumberOfArchivedFlowElementInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions countOptions) {
+    //        // FIXME Implement me!
+    //        return 0;
+    //    }
 
 }

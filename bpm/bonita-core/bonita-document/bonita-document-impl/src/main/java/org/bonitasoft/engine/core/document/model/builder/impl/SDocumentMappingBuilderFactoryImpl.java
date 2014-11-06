@@ -14,7 +14,6 @@
  */
 package org.bonitasoft.engine.core.document.model.builder.impl;
 
-import org.bonitasoft.engine.core.document.model.SDocumentMapping;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingBuilder;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentMappingBuilderFactory;
 import org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl;
@@ -46,7 +45,6 @@ public class SDocumentMappingBuilderFactoryImpl implements SDocumentMappingBuild
 
     static final String DOCUMENT_URL = "documentURL";
 
-
     @Override
     public SDocumentMappingBuilder createNewInstance() {
         final SDocumentMappingImpl documentMapping = new SDocumentMappingImpl();
@@ -67,7 +65,5 @@ public class SDocumentMappingBuilderFactoryImpl implements SDocumentMappingBuild
     public String getDocumentIdKey() {
         return DOCUMENT_NAME;
     }
-
-
 
 }

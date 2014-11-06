@@ -13,6 +13,15 @@
  **/
 package org.bonitasoft.engine.core.process.instance.impl;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -37,6 +46,7 @@ import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SAProcessInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
@@ -75,7 +85,6 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -84,15 +93,6 @@ import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -227,9 +227,9 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         deleteParentProcessInstanceAndElements(sProcessInstance);
     }
 
-    protected void deleteParentProcessInstanceAndElements(final SProcessInstance sProcessInstance) throws SFlowNodeReadException,
+    @Override
+    public void deleteParentProcessInstanceAndElements(final SProcessInstance sProcessInstance) throws SFlowNodeReadException,
             SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
-
         checkIfCallerIsNotActive(sProcessInstance.getCallerId());
 
         try {
@@ -240,9 +240,9 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 getProcessInstance(sProcessInstance.getId());
                 // process is still here, that's not normal. The problem must be raised:
                 throw e;
-            } catch (SProcessInstanceReadException e1) {
+            } catch (final SProcessInstanceReadException e1) {
                 logProcessInstanceNotFound(e);
-            } catch (SProcessInstanceNotFoundException e1) {
+            } catch (final SProcessInstanceNotFoundException e1) {
                 logProcessInstanceNotFound(e);
             }
         }
@@ -271,7 +271,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         return nbDeleted;
     }
 
-    protected void deleteParentArchivedProcessInstanceAndElements(final SAProcessInstance saProcessInstance) throws SFlowNodeReadException,
+    @Override
+    public void deleteParentArchivedProcessInstanceAndElements(final SAProcessInstance saProcessInstance) throws SFlowNodeReadException,
             SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException {
         checkIfCallerIsNotActive(saProcessInstance.getCallerId());
         try {
@@ -279,12 +280,15 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             deleteArchivedProcessInstance(saProcessInstance);
         } catch (final SProcessInstanceModificationException e) {
             try {
-                getArchivedProcessInstance(saProcessInstance.getId());
-                // archived process is still here, that's not normal. The problem must be raised:
+                final SAProcessInstance saProcessInstance2 = getArchivedProcessInstance(saProcessInstance.getId());
+                if (saProcessInstance2 != null) {
+                    // archived process is still here, that's not normal. The problem must be raised:
+                    throw e;
+                }
+                logArchivedProcessInstanceNotFound(new SAProcessInstanceNotFoundException(saProcessInstance.getId()));
+            } catch (final SProcessInstanceModificationException e1) {
                 throw e;
-            } catch (SProcessInstanceReadException e1) {
-                logArchivedProcessInstanceNotFound(e);
-            } catch (SProcessInstanceNotFoundException e1) {
+            } catch (final SBonitaException e1) {
                 logArchivedProcessInstanceNotFound(e);
             }
         }
@@ -443,6 +447,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         documentService.deleteDocumentsFromProcessInstance(processInstance.getId());
         deleteConnectorInstancesIfNecessary(processInstance, processDefinition);
         commentService.deleteComments(processInstance.getId());
+
     }
 
     private void deleteConnectorInstancesIfNecessary(final SProcessInstance processInstance, final SProcessDefinition processDefinition)
@@ -452,7 +457,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
     }
 
-    private void deleteConnectorInstancesIfNecessary(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition)
+    void deleteConnectorInstancesIfNecessary(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition)
             throws SConnectorInstanceReadException, SConnectorInstanceDeletionException {
         if (hasConnectors(flowNodeInstance, processDefinition)) {
             connectorInstanceService.deleteConnectors(flowNodeInstance.getId(), SConnectorInstance.FLOWNODE_TYPE);
@@ -518,41 +523,47 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             deleteFlowNodeInstanceElements(flowNodeInstance, processDefinition);
             activityService.deleteFlowNodeInstance(flowNodeInstance);
         } catch (final SBonitaException e) {
+            setExceptionContext(processDefinition, flowNodeInstance, e);
             throw new SProcessInstanceModificationException(e);
         }
     }
 
-    private void deleteFlowNodeInstanceElements(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition) throws SBonitaException {
-        if (flowNodeInstance.getType().equals(SFlowNodeType.INTERMEDIATE_CATCH_EVENT)) {
+    void deleteFlowNodeInstanceElements(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition) throws SBonitaException {
+        final SFlowNodeType type = flowNodeInstance.getType();
+        if (type.equals(SFlowNodeType.INTERMEDIATE_CATCH_EVENT) || type.equals(SFlowNodeType.BOUNDARY_EVENT) || type.equals(SFlowNodeType.RECEIVE_TASK)
+                || type.equals(SFlowNodeType.START_EVENT)) {
             bpmEventInstanceService.deleteWaitingEvents(flowNodeInstance);
         }
         if (flowNodeInstance instanceof SEventInstance) {
             bpmEventInstanceService.deleteEventTriggerInstances(flowNodeInstance.getId());
         } else if (flowNodeInstance instanceof SActivityInstance) {
-            deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
-            deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
-            if (SFlowNodeType.USER_TASK.equals(flowNodeInstance.getType()) || SFlowNodeType.MANUAL_TASK.equals(flowNodeInstance.getType())) {
-                activityService.deleteHiddenTasksForActivity(flowNodeInstance.getId());
-                try {
-                    activityService.deletePendingMappings(flowNodeInstance.getId());
-                } catch (final SActivityModificationException e) {
-                    setExceptionContext(processDefinition, flowNodeInstance, e);
-                    throw new SFlowNodeReadException(e);
-                }
-            } else if (SFlowNodeType.CALL_ACTIVITY.equals(flowNodeInstance.getType()) || SFlowNodeType.SUB_PROCESS.equals(flowNodeInstance.getType())) {
-                // in the case of a call activity or subprocess activity delete the child process instance
-                try {
-                    deleteProcessInstance(getChildOfActivity(flowNodeInstance.getId()));
-                } catch (final SProcessInstanceNotFoundException e) {
-                    setExceptionContext(processDefinition, flowNodeInstance, e);
+            deleteActivityInstanceElements(flowNodeInstance, processDefinition);
+        }
+    }
 
-                    // if the child process is not found, it's because it has already finished and archived or it was not created
-                    if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-                        logger.log(getClass(), TechnicalLogSeverity.DEBUG,
-                                "Can't find the process instance called by the activity. This process may be already finished.");
-                        logger.log(getClass(), TechnicalLogSeverity.DEBUG, e);
-                    }
-                }
+    private void deleteActivityInstanceElements(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition) throws SBonitaException {
+        deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
+        deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
+        if (SFlowNodeType.USER_TASK.equals(flowNodeInstance.getType()) || SFlowNodeType.MANUAL_TASK.equals(flowNodeInstance.getType())) {
+            activityService.deleteHiddenTasksForActivity(flowNodeInstance.getId());
+            activityService.deletePendingMappings(flowNodeInstance.getId());
+        } else if (SFlowNodeType.CALL_ACTIVITY.equals(flowNodeInstance.getType()) || SFlowNodeType.SUB_PROCESS.equals(flowNodeInstance.getType())) {
+            // in the case of a call activity or subprocess activity delete the child process instance
+            deleteSubProcess(flowNodeInstance, processDefinition);
+        }
+    }
+
+    void deleteSubProcess(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition) throws SBonitaException {
+        try {
+            deleteProcessInstance(getChildOfActivity(flowNodeInstance.getId()));
+        } catch (final SProcessInstanceNotFoundException e) {
+            setExceptionContext(processDefinition, flowNodeInstance, e);
+
+            // if the child process is not found, it's because it has already finished and archived or it was not created
+            if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG,
+                        "Can't find the process instance called by the activity. This process may be already finished.");
+                logger.log(getClass(), TechnicalLogSeverity.DEBUG, e);
             }
         }
     }
@@ -573,7 +584,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         e.setFlowNodeNameOnContext(flowNodeInstance.getName());
     }
 
-    private void deleteDataInstancesIfNecessary(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition)
+    void deleteDataInstancesIfNecessary(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition)
             throws SDataInstanceException {
         boolean dataPresent = true;
         if (processDefinition != null) {
@@ -590,7 +601,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     public void setState(final SProcessInstance processInstance, final ProcessInstanceState state) throws SProcessInstanceModificationException {
         // Let's archive the process instance before changing the state (to keep a track of state change):
         archiveProcessInstance(processInstance);
-        int previousStateId = processInstance.getStateId();
+        final int previousStateId = processInstance.getStateId();
         setProcessState(processInstance, state);
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
             logger.log(getClass(), TechnicalLogSeverity.DEBUG, MessageFormat.format("[{0} with id {1}]{2}->{3}(new={4})", processInstance.getClass()
@@ -708,33 +719,21 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public long getNumberOfOpenProcessInstancesSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
-        try {
-            final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
-            return persistenceRead.getNumberOfEntities(SProcessInstance.class, SUPERVISED_BY, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaReadException(e);
-        }
+        final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
+        return persistenceRead.getNumberOfEntities(SProcessInstance.class, SUPERVISED_BY, queryOptions, parameters);
     }
 
     @Override
     public List<SProcessInstance> searchOpenProcessInstancesSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
-        try {
-            final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
-            return persistenceRead.searchEntity(SProcessInstance.class, SUPERVISED_BY, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaReadException(e);
-        }
+        final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
+        return persistenceRead.searchEntity(SProcessInstance.class, SUPERVISED_BY, queryOptions, parameters);
     }
 
     @Override
     public long getNumberOfOpenProcessInstancesInvolvingUser(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
-        try {
-            final Map<String, Object> parameters = new HashMap<String, Object>(1);
-            parameters.put(USER_ID, userId);
-            return persistenceRead.getNumberOfEntities(SProcessInstance.class, INVOLVING_USER, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaReadException(e);
-        }
+        final Map<String, Object> parameters = new HashMap<String, Object>(1);
+        parameters.put(USER_ID, userId);
+        return persistenceRead.getNumberOfEntities(SProcessInstance.class, INVOLVING_USER, queryOptions, parameters);
     }
 
     @Override
@@ -788,13 +787,9 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     @Override
     public long getNumberOfArchivedProcessInstancesInvolvingUser(final long userId, final QueryOptions countOptions) throws SBonitaReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-        try {
-            final Map<String, Object> parameters = new HashMap<String, Object>(2);
-            parameters.put(USER_ID, userId);
-            return persistenceService.getNumberOfEntities(SAProcessInstance.class, INVOLVING_USER, countOptions, parameters);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaReadException(bre);
-        }
+        final Map<String, Object> parameters = new HashMap<String, Object>(2);
+        parameters.put(USER_ID, userId);
+        return persistenceService.getNumberOfEntities(SAProcessInstance.class, INVOLVING_USER, countOptions, parameters);
     }
 
     @Override
@@ -813,13 +808,10 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     public List<SAProcessInstance> searchArchivedProcessInstancesInvolvingUser(final long userId, final QueryOptions queryOptions)
             throws SBonitaReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-        try {
-            final Map<String, Object> parameters = new HashMap<String, Object>(1);
-            parameters.put(USER_ID, userId);
-            return persistenceService.searchEntity(SAProcessInstance.class, INVOLVING_USER, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaReadException(e);
-        }
+
+        final Map<String, Object> parameters = new HashMap<String, Object>(1);
+        parameters.put(USER_ID, userId);
+        return persistenceService.searchEntity(SAProcessInstance.class, INVOLVING_USER, queryOptions, parameters);
     }
 
     @Override
@@ -838,17 +830,25 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
-    public SAProcessInstance getArchivedProcessInstance(final long archivedProcessInstanceId) throws SProcessInstanceReadException,
-            SProcessInstanceNotFoundException {
+    public SAProcessInstance getArchivedProcessInstance(final long archivedProcessInstanceId) throws SProcessInstanceReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             final Map<String, Object> parameters = Collections.singletonMap("id", (Object) archivedProcessInstanceId);
-            final SAProcessInstance saProcessInstance = persistenceService.selectOne(new SelectOneDescriptor<SAProcessInstance>("getArchivedProcessInstance",
+            return persistenceService.selectOne(new SelectOneDescriptor<SAProcessInstance>("getArchivedProcessInstance",
                     parameters, SAProcessInstance.class));
-            if (saProcessInstance == null) {
-                throw new SProcessInstanceNotFoundException(archivedProcessInstanceId);
-            }
-            return saProcessInstance;
+        } catch (final SBonitaReadException e) {
+            throw new SProcessInstanceReadException(e);
+        }
+    }
+
+    @Override
+    public List<SAProcessInstance> getArchivedProcessInstancesInAllStates(final List<Long> processInstanceIds) throws SProcessInstanceReadException {
+        final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap("sourceObjectIds", (Object) processInstanceIds);
+            final SelectListDescriptor<SAProcessInstance> saProcessInstances = new SelectListDescriptor<SAProcessInstance>(
+                    "getArchivedProcessInstancesInAllStates", parameters, SAProcessInstance.class, QueryOptions.countQueryOptions());
+            return persistenceService.selectList(saProcessInstances);
         } catch (final SBonitaReadException e) {
             throw new SProcessInstanceReadException(e);
         }
@@ -857,7 +857,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     @Override
     public List<SProcessInstance> getProcessInstancesInStates(final QueryOptions queryOptions, final ProcessInstanceState... states)
             throws SProcessInstanceReadException {
-        Set<Integer> stateIds = getStateIdsFromStates(states);
+        final Set<Integer> stateIds = getStateIdsFromStates(states);
         final Map<String, Object> inputParameters = new HashMap<String, Object>(1);
         inputParameters.put("stateIds", stateIds);
         final SelectListDescriptor<SProcessInstance> selectProcessInstancesInStates = new SelectListDescriptor<SProcessInstance>("getProcessInstancesInStates",
@@ -873,7 +873,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         if (states.length < 1) {
             throw new IllegalArgumentException("ProcessInstanceServiceImpl.getProcessInstancesInStates() must have at least one state as parameter");
         }
-        Set<Integer> stateIds = new HashSet<Integer>(states.length);
+        final Set<Integer> stateIds = new HashSet<Integer>(states.length);
         for (int i = 0; i < states.length; i++) {
             stateIds.add(states[i].getId());
         }
@@ -906,7 +906,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
-    public SAProcessInstance getLastArchivedProcessInstance(long processInstanceId) throws SBonitaReadException {
+    public SAProcessInstance getLastArchivedProcessInstance(final long processInstanceId) throws SBonitaReadException {
         final SAProcessInstanceBuilderFactory processInstanceBuilderFact = BuilderFactory.get(SAProcessInstanceBuilderFactory.class);
         final FilterOption filterOption = new FilterOption(SAProcessInstance.class, processInstanceBuilderFact.getSourceObjectIdKey(), processInstanceId);
         final List<OrderByOption> orderByOptions = new ArrayList<OrderByOption>();

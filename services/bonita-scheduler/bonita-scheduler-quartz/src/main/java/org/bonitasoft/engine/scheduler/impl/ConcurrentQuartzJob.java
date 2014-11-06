@@ -13,6 +13,6 @@
  */
 package org.bonitasoft.engine.scheduler.impl;
 
-public class ConcurrentQuartzJob extends QuartzJob {
+public class ConcurrentQuartzJob extends AbstractQuartzJob {
 
 }

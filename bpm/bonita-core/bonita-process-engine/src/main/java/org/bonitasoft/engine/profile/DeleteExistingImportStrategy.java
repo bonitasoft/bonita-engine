@@ -23,15 +23,11 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
-import org.bonitasoft.engine.profile.exception.profile.SProfileUpdateException;
-import org.bonitasoft.engine.profile.exception.profileentry.SProfileEntryDeletionException;
-import org.bonitasoft.engine.profile.exception.profilemember.SProfileMemberDeletionException;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.profile.model.SProfile;
 
 /**
  * @author Baptiste Mesta
- * 
  */
 public class DeleteExistingImportStrategy extends ProfileImportStategy {
 
@@ -59,8 +55,7 @@ public class DeleteExistingImportStrategy extends ProfileImportStategy {
     }
 
     @Override
-    public SProfile whenProfileExists(final long importerId, final ExportedProfile exportedProfile, final SProfile existingProfile) throws ExecutionException,
-            SProfileEntryDeletionException, SProfileMemberDeletionException, SProfileUpdateException {
+    public SProfile whenProfileExists(final long importerId, final ExportedProfile exportedProfile, final SProfile existingProfile) {
         // nothing to do because we deleted all profiles
         return null;
     }

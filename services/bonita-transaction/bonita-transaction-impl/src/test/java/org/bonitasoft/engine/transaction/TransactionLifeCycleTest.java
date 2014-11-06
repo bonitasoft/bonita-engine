@@ -20,6 +20,7 @@ public abstract class TransactionLifeCycleTest {
         txService = getTxService();
     }
 
+    @SuppressWarnings("deprecation")
     @After
     public void closeTransactions() throws Exception {
         // Do not forget to close the transaction

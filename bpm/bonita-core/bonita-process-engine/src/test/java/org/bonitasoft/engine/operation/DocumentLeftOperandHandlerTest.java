@@ -1,3 +1,16 @@
+/**
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
+ * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * This library is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU Lesser General Public License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+ * Floor, Boston, MA 02110-1301, USA.
+ **/
 package org.bonitasoft.engine.operation;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -5,7 +18,12 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 
@@ -79,7 +97,7 @@ public class DocumentLeftOperandHandlerTest {
     public void should_update_check_the_type() throws Exception {
         exception.expect(SOperationExecutionException.class);
         exception.expectMessage("Document operation only accepts an expression returning a DocumentValue and not java.util.HashMap");
-        handler.update(new SLeftOperandImpl(), new HashMap(), 45l, "container");
+        handler.update(new SLeftOperandImpl(), new HashMap<Object, Object>(), 45l, "container");
     }
 
     @Test
@@ -101,29 +119,27 @@ public class DocumentLeftOperandHandlerTest {
     @Test
     public void should_update_update_doc_if_exists() throws Exception {
         //given
-        SMappedDocument sMappedDocument = mock(SMappedDocument.class);
+        final SMappedDocument sMappedDocument = mock(SMappedDocument.class);
         doReturn(sMappedDocument).when(documentService).getMappedDocument(45l, "myDoc");
         //when
         handler.update(createLeftOperand("myDoc"), new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 45l, "PROCESS_INSTANCE");
         //then
-        verify(documentService).updateDocument(eq(sMappedDocument),any(SDocument.class));
+        verify(documentService).updateDocument(eq(sMappedDocument), any(SDocument.class));
     }
 
     public void should_update_find_process_id() throws Exception {
         //given
-        FlowNodeInstance flowNodeInstance = mock(FlowNodeInstance.class);
+        final FlowNodeInstance flowNodeInstance = mock(FlowNodeInstance.class);
         doReturn(45l).when(flowNodeInstance).getParentProcessInstanceId();
         doReturn(flowNodeInstance).when(activityInstanceService).getFlowNodeInstance(12l);
-        SMappedDocument sMappedDocument = mock(SMappedDocument.class);
+        final SMappedDocument sMappedDocument = mock(SMappedDocument.class);
         doReturn(sMappedDocument).when(documentService).getMappedDocument(45l, "myDoc");
         //when
         handler.update(createLeftOperand("myDoc"), new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 12l, "notProcess");
         //then
-        verify(documentService).updateDocument(eq(sMappedDocument),any(SDocument.class));
+        verify(documentService).updateDocument(eq(sMappedDocument), any(SDocument.class));
 
     }
-
-
 
     @Test
     public void should_not_update_if_has_change_is_false() throws Exception {
@@ -132,7 +148,7 @@ public class DocumentLeftOperandHandlerTest {
         //when
         handler.update(createLeftOperand("myDoc"), new DocumentValue(123l), 45l, "PROCESS_INSTANCE");
         //then
-        verify(documentService,times(0)).updateDocument(any(SMappedDocument.class),any(SDocument.class));
+        verify(documentService, times(0)).updateDocument(any(SMappedDocument.class), any(SDocument.class));
     }
 
 }

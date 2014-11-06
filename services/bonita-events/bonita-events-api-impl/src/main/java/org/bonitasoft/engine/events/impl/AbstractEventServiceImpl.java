@@ -21,7 +21,7 @@ public abstract class AbstractEventServiceImpl implements EventService {
     protected static TechnicalLoggerService logger;
 
     protected AbstractEventServiceImpl(final TechnicalLoggerService logger) {
-        this.logger = logger;
+        AbstractEventServiceImpl.logger = logger;
     }
 
     /**
@@ -119,9 +119,8 @@ public abstract class AbstractEventServiceImpl implements EventService {
                         LogUtil.getLogOnExceptionMethod(this.getClass(), "removeAllHandlers", "Unable to remove a null event"));
             }
             throw new HandlerUnregistrationException();
-        } else {
-            removeAllHandlersFor(handler);
         }
+        removeAllHandlersFor(handler);
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeAllHandlers"));
         }

@@ -54,8 +54,6 @@ public class DOMWriter implements XMLWriter {
 
     private final XMLSchemaValidator validator;
 
-    private Source xsdSource;
-
     public DOMWriter(final XMLSchemaValidator validator) throws TransformerConfigurationException, ParserConfigurationException {
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
@@ -167,7 +165,9 @@ public class DOMWriter implements XMLWriter {
             throw new SBonitaRuntimeException(e);
         } finally {
             try {
-                openStream.close();
+                if (openStream != null) {
+                    openStream.close();
+                }
             } catch (final IOException e) {
                 throw new SBonitaRuntimeException(e);
             }

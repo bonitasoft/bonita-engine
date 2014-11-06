@@ -93,6 +93,8 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
 
     private final Set<SActivityDefinition> activities;
 
+    private final Set<SSubProcessDefinition> subProcessDefinitions;
+
     private final Set<STransitionDefinition> transitions;
 
     private final Set<SGatewayDefinition> gateways;
@@ -125,6 +127,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
 
     public SFlowElementContainerDefinitionImpl() {
         activities = new HashSet<SActivityDefinition>();
+        subProcessDefinitions = new HashSet<SSubProcessDefinition>(0);
         transitions = new HashSet<STransitionDefinition>();
         transitionsMap = new HashMap<String, STransitionDefinition>();
         gateways = new HashSet<SGatewayDefinition>();
@@ -163,6 +166,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         final List<ActivityDefinition> activities2 = container.getActivities();
         sBoundaryEvents = new ArrayList<SBoundaryEventDefinition>();
         activities = new HashSet<SActivityDefinition>(activities2.size());
+        subProcessDefinitions = new HashSet<SSubProcessDefinition>(0);
         initializeActivities(activities2);
 
         final List<GatewayDefinition> gateways2 = container.getGatewaysList();
@@ -177,7 +181,7 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         }
 
         final List<ConnectorDefinition> connectors2 = container.getConnectors();
-        final ArrayList<SConnectorDefinition> mConnectors = new ArrayList<SConnectorDefinition>(connectors2.size());
+        final List<SConnectorDefinition> mConnectors = new ArrayList<SConnectorDefinition>(connectors2.size());
         connectorsMap = new HashMap<ConnectorEvent, List<SConnectorDefinition>>(2);
         connectorsMap.put(ConnectorEvent.ON_ENTER, new ArrayList<SConnectorDefinition>());
         connectorsMap.put(ConnectorEvent.ON_FINISH, new ArrayList<SConnectorDefinition>());
@@ -195,20 +199,20 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         sEndEvents = initializeEndEvents(container.getEndEvents(), transitionsMap);
 
         final List<BusinessDataDefinition> businessDataDefinitions = container.getBusinessDataDefinitions();
-        final ArrayList<SBusinessDataDefinition> mBusinessDataDefinitions = new ArrayList<SBusinessDataDefinition>(businessDataDefinitions.size());
+        final List<SBusinessDataDefinition> mBusinessDataDefinitions = new ArrayList<SBusinessDataDefinition>(businessDataDefinitions.size());
         for (final BusinessDataDefinition businessDataDefinition : businessDataDefinitions) {
             mBusinessDataDefinitions.add(ServerModelConvertor.convertBusinessDataDefinition(businessDataDefinition));
         }
         sBusinessDataDefinitions = Collections.unmodifiableList(mBusinessDataDefinitions);
 
         final List<DataDefinition> processDataDefinitions = container.getDataDefinitions();
-        final ArrayList<SDataDefinition> mDataDefinitions = new ArrayList<SDataDefinition>(processDataDefinitions.size());
+        final List<SDataDefinition> mDataDefinitions = new ArrayList<SDataDefinition>(processDataDefinitions.size());
         for (final DataDefinition dataDefinition : processDataDefinitions) {
             mDataDefinitions.add(ServerModelConvertor.convertDataDefinition(dataDefinition));
         }
         sDataDefinitions = Collections.unmodifiableList(mDataDefinitions);
         final List<DocumentDefinition> documentDefinitions2 = container.getDocumentDefinitions();
-        final ArrayList<SDocumentDefinition> mDocumentDefinitions = new ArrayList<SDocumentDefinition>(documentDefinitions2.size());
+        final List<SDocumentDefinition> mDocumentDefinitions = new ArrayList<SDocumentDefinition>(documentDefinitions2.size());
         for (final DocumentDefinition documentDefinition : documentDefinitions2) {
             mDocumentDefinitions.add(new SDocumentDefinitionImpl(documentDefinition));
         }
@@ -272,13 +276,13 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
 
     private List<SStartEventDefinition> initializeStartEvents(final List<StartEventDefinition> startEvents,
             final Map<String, STransitionDefinition> transitionsMap) {
-        final ArrayList<SStartEventDefinition> sStartEvents = new ArrayList<SStartEventDefinition>(startEvents.size());
+        final List<SStartEventDefinition> sStartEvents = new ArrayList<SStartEventDefinition>(startEvents.size());
         for (final StartEventDefinition startEventDefinition : startEvents) {
-            final SStartEventDefinitionImpl sStartEvent = new SStartEventDefinitionImpl(startEventDefinition, transitionsMap);
-            sStartEvents.add(sStartEvent);
-            allElements.add(sStartEvent);
-            allElementsMap.put(sStartEvent.getId(), sStartEvent);
-            allElementsMapString.put(sStartEvent.getName(), sStartEvent);
+            final SStartEventDefinitionImpl sStartEventDefinitionImpl = new SStartEventDefinitionImpl(startEventDefinition, transitionsMap);
+            sStartEvents.add(sStartEventDefinitionImpl);
+            allElements.add(sStartEventDefinitionImpl);
+            allElementsMap.put(sStartEventDefinitionImpl.getId(), sStartEventDefinitionImpl);
+            allElementsMapString.put(sStartEventDefinitionImpl.getName(), sStartEventDefinitionImpl);
         }
         return sStartEvents;
     }
@@ -329,6 +333,14 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
         allElements.add(activity);
         allElementsMap.put(activity.getId(), activity);
         allElementsMapString.put(activity.getName(), activity);
+
+        if (activity instanceof SSubProcessDefinition) {
+            addSubProcess((SSubProcessDefinition) activity);
+        }
+    }
+
+    public void addSubProcess(final SSubProcessDefinition sSubProcessDefinition) {
+        subProcessDefinitions.add(sSubProcessDefinition);
     }
 
     public void addGateway(final SGatewayDefinition gateway) {
@@ -574,6 +586,11 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
     }
 
     @Override
+    public Set<SSubProcessDefinition> getSubProcessDefinitions() {
+        return subProcessDefinitions;
+    }
+
+    @Override
     public Set<STransitionDefinition> getTransitions() {
         return transitions;
     }
@@ -624,6 +641,5 @@ public class SFlowElementContainerDefinitionImpl extends SBaseElementImpl implem
     public void addDocumentListDefinition(final SDocumentListDefinition documentListDefinition) {
         sDocumentListDefinitions.add(documentListDefinition);
     }
-
 
 }

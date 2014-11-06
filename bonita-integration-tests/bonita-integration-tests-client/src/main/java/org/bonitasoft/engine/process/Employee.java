@@ -41,13 +41,11 @@ public class Employee implements Comparable<Object>, Serializable {
         final Employee empl = (Employee) obj;
         if (experience != empl.experience) {
             return experience - empl.experience;
-        } else {
-            if (!name.equals(empl.name)) {
-                return name.compareTo(empl.name);
-            } else {
-                return firstName.compareTo(empl.firstName);
-            }
         }
+        if (!name.equals(empl.name)) {
+            return name.compareTo(empl.name);
+        }
+        return firstName.compareTo(empl.firstName);
     }
 
     @Override

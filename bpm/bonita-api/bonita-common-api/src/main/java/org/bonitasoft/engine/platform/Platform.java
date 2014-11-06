@@ -15,8 +15,6 @@ package org.bonitasoft.engine.platform;
 
 import java.io.Serializable;
 
-import org.bonitasoft.engine.api.PlatformAPI;
-
 /**
  * Contains information about the <code>Bonita BPM Platform</code>.
  * <p>

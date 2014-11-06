@@ -13,8 +13,6 @@
  **/
 package org.bonitasoft.engine.identity;
 
-import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
-
 /**
  * Identity related exception indicating that the {@link SCustomUserInfoDefinition} already exists
  *

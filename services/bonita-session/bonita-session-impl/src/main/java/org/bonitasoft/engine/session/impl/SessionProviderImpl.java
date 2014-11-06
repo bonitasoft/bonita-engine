@@ -16,15 +16,13 @@ package org.bonitasoft.engine.session.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.session.SessionProvider;
 import org.bonitasoft.engine.session.model.SSession;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
  */
-public final class SessionProviderImpl extends
-        AbstractSessionProvider implements SessionProvider {
+public final class SessionProviderImpl extends AbstractSessionProvider {
 
     static Map<Long, SSession> sessions = new HashMap<Long, SSession>();
 

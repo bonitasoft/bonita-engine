@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,34 +13,30 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.impl;
 
-import org.bonitasoft.engine.core.process.definition.model.event.trigger.STimerType;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.STimerEventTriggerInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.STimerEventTriggerInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.impl.STimerEventTriggerInstanceImpl;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
  */
 public class STimerEventTriggerInstanceBuilderFactoryImpl extends SEventTriggerInstanceBuilderFactoryImpl implements STimerEventTriggerInstanceBuilderFactory {
 
-    private static final String TIMER_VALUE_KEY = "timerValue";
-
-    private static final String TIMER_TYPE_KEY = "timerType";
-
     @Override
-    public STimerEventTriggerInstanceBuilder createNewTimerEventTriggerInstance(final long eventInstanceId, final STimerType timerType, final long timerValue) {
-        final STimerEventTriggerInstanceImpl entity = new STimerEventTriggerInstanceImpl(eventInstanceId, timerType, timerValue);
+    public STimerEventTriggerInstanceBuilder createNewTimerEventTriggerInstance(final long eventInstanceId, final String eventInstanceName,
+            final long executionDate, final String jobTriggerName) {
+        final STimerEventTriggerInstanceImpl entity = new STimerEventTriggerInstanceImpl(eventInstanceId, eventInstanceName, executionDate, jobTriggerName);
         return new STimerEventTriggerInstanceBuilderImpl(entity);
     }
 
     @Override
-    public String getTimerTypeKey() {
-        return TIMER_TYPE_KEY;
+    public STimerEventTriggerInstanceBuilder createNewInstance(final STimerEventTriggerInstance sTimerEventTriggerInstance) {
+        final STimerEventTriggerInstanceImpl entity = new STimerEventTriggerInstanceImpl(sTimerEventTriggerInstance.getEventInstanceId(),
+                sTimerEventTriggerInstance.getEventInstanceName(), sTimerEventTriggerInstance.getExecutionDate(),
+                sTimerEventTriggerInstance.getJobTriggerName());
+        entity.setId(sTimerEventTriggerInstance.getId());
+        return new STimerEventTriggerInstanceBuilderImpl(entity);
     }
-
-    @Override
-    public String getTimerValueKey() {
-        return TIMER_VALUE_KEY;
-    }
-
 }

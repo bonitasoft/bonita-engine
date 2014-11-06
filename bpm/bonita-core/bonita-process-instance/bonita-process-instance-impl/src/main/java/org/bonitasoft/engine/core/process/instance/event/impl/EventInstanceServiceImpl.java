@@ -15,30 +15,31 @@ package org.bonitasoft.engine.core.process.instance.event.impl;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceCreationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.SEventInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceDeletionException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceCreationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SMessageModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventModificationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SWaitingEventReadException;
 import org.bonitasoft.engine.core.process.instance.impl.FlowNodeInstancesServiceImpl;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SMessageInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingMessageEventBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowErrorEventTriggerInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowMessageEventTriggerInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.SThrowSignalEventTriggerInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.event.trigger.STimerEventTriggerInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.SEventInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageEventCouple;
@@ -48,6 +49,10 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowMessageEventTriggerInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowSignalEventTriggerInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
@@ -61,7 +66,6 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -228,26 +232,21 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     }
 
     @Override
-    public void deleteWaitingEvents(final SFlowNodeInstance flowNodeInstance) throws SWaitingEventModificationException, SFlowNodeReadException {
+    public void deleteWaitingEvents(final SFlowNodeInstance flowNodeInstance) throws SWaitingEventModificationException, SBonitaReadException {
         final OrderByOption orderByOption = new OrderByOption(SWaitingEvent.class, BuilderFactory.get(SWaitingMessageEventBuilderFactory.class)
                 .getFlowNodeNameKey(), OrderByType.ASC);
         final FilterOption filterOption = new FilterOption(SWaitingEvent.class, BuilderFactory.get(SWaitingMessageEventBuilderFactory.class)
                 .getFlowNodeInstanceIdKey(), flowNodeInstance.getId());
         final List<FilterOption> filters = Collections.singletonList(filterOption);
-        try {
-            QueryOptions queryOptions = new QueryOptions(0, 10, Collections.singletonList(orderByOption), filters, null);
-            List<SWaitingEvent> waitingEvents = searchWaitingEvents(SWaitingEvent.class, queryOptions);
+        final QueryOptions queryOptions = new QueryOptions(0, 100, Collections.singletonList(orderByOption), filters, null);
 
-            do {
-                for (final SWaitingEvent sWaitingEvent : waitingEvents) {
-                    deleteWaitingEvent(sWaitingEvent);
-                }
-                queryOptions = new QueryOptions(0, 10, Collections.singletonList(orderByOption), filters, null);
-                waitingEvents = searchWaitingEvents(SWaitingEvent.class, queryOptions);
-            } while (waitingEvents.size() > 0);
-        } catch (final SBonitaReadException e) {
-            throw new SFlowNodeReadException(e); // To change body of catch statement use File | Settings | File Templates.
-        }
+        List<SWaitingEvent> waitingEvents = searchWaitingEvents(SWaitingEvent.class, queryOptions);
+        do {
+            for (final SWaitingEvent sWaitingEvent : waitingEvents) {
+                deleteWaitingEvent(sWaitingEvent);
+            }
+            waitingEvents = searchWaitingEvents(SWaitingEvent.class, queryOptions);
+        } while (waitingEvents.size() > 0);
     }
 
     @Override
@@ -274,7 +273,7 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
         SWaitingErrorEvent waitingError = null;
         try {
             final List<SWaitingErrorEvent> selectList = getPersistenceService().selectList(selectDescriptor);
-            if ((selectList != null) && !selectList.isEmpty()) {
+            if (selectList != null && !selectList.isEmpty()) {
                 if (selectList.size() == 1) {
                     waitingError = selectList.get(0);
                 } else {
@@ -293,20 +292,6 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     }
 
     @Override
-    public SEventInstance getEventInstance(final long eventInstanceId) throws SEventInstanceNotFoundException, SEventInstanceReadException {
-        SEventInstance selectOne;
-        try {
-            selectOne = getPersistenceService().selectById(SelectDescriptorBuilder.getElementById(SEventInstance.class, "SEventInstance", eventInstanceId));
-        } catch (final SBonitaReadException e) {
-            throw new SEventInstanceReadException(e);
-        }
-        if (selectOne == null) {
-            throw new SEventInstanceNotFoundException(eventInstanceId);
-        }
-        return selectOne;
-    }
-
-    @Override
     public List<SEventInstance> getEventInstances(final long rootContainerId, final int fromIndex, final int maxResults, final String fieldName,
             final OrderByType orderByType) throws SEventInstanceReadException {
         final SelectListDescriptor<SEventInstance> selectDescriptor = SelectDescriptorBuilder.getEventsFromRootContainer(rootContainerId, fromIndex,
@@ -319,19 +304,14 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     }
 
     @Override
-    public SEventTriggerInstance getEventTriggerInstance(final long eventTriggerInstanceId) throws SEventTriggerInstanceNotFoundException,
-            SEventTriggerInstanceReadException {
-        SEventTriggerInstance selectOne;
+    public <T extends SEventTriggerInstance> T getEventTriggerInstance(final Class<T> entityClass, final long eventTriggerInstanceId)
+            throws SEventTriggerInstanceReadException {
         try {
-            selectOne = getPersistenceService().selectById(
-                    SelectDescriptorBuilder.getElementById(SEventTriggerInstance.class, "EventTriggerInstance", eventTriggerInstanceId));
+            return getPersistenceService().selectById(
+                    SelectDescriptorBuilder.getElementById(entityClass, entityClass.getSimpleName(), eventTriggerInstanceId));
         } catch (final SBonitaReadException e) {
             throw new SEventTriggerInstanceReadException(e);
         }
-        if (selectOne == null) {
-            throw new SEventTriggerInstanceNotFoundException(eventTriggerInstanceId);
-        }
-        return selectOne;
     }
 
     @Override
@@ -346,22 +326,10 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     }
 
     @Override
-    public List<SEventTriggerInstance> getEventTriggerInstances(final long eventInstanceId, final int fromIndex, final int maxResults, final String fieldName,
-            final OrderByType orderByType) throws SEventTriggerInstanceReadException {
-        final SelectListDescriptor<SEventTriggerInstance> selectDescriptor = SelectDescriptorBuilder.getEventTriggers(eventInstanceId, fromIndex, maxResults,
-                fieldName, orderByType);
-        try {
-            return getPersistenceService().selectList(selectDescriptor);
-        } catch (final SBonitaReadException e) {
-            throw new SEventTriggerInstanceReadException(e);
-        }
-    }
-
-    @Override
     public int resetProgressMessageInstances() throws SMessageModificationException {
         try {
             return getPersistenceService().update(QUERY_RESET_PROGRESS_MESSAGE_INSTANCES);
-        } catch (SPersistenceException e) {
+        } catch (final SPersistenceException e) {
             throw new SMessageModificationException(e);
         }
     }
@@ -370,7 +338,7 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     public int resetInProgressWaitingEvents() throws SWaitingEventModificationException {
         try {
             return getPersistenceService().update(QUERY_RESET_IN_PROGRESS_WAITING_EVENTS);
-        } catch (SPersistenceException e) {
+        } catch (final SPersistenceException e) {
             throw new SWaitingEventModificationException(e);
         }
     }
@@ -386,24 +354,13 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     }
 
     @Override
-    public SMessageInstance getMessageInstance(final long messageInstanceId) throws SMessageInstanceNotFoundException, SMessageInstanceReadException {
-        SMessageInstance selectOne;
+    public SMessageInstance getMessageInstance(final long messageInstanceId) throws SMessageInstanceReadException {
         try {
-            selectOne = getPersistenceService()
+            return getPersistenceService()
                     .selectById(SelectDescriptorBuilder.getElementById(SMessageInstance.class, "MessageInstance", messageInstanceId));
         } catch (final SBonitaReadException e) {
             throw new SMessageInstanceReadException(e);
         }
-        if (selectOne == null) {
-            throw new SMessageInstanceNotFoundException(messageInstanceId);
-        }
-        return selectOne;
-    }
-
-    @Override
-    public long getNumberOfEventTriggerInstances(final Class<? extends SEventTriggerInstance> entityClass, final QueryOptions countOptions)
-            throws SBonitaReadException {
-        return getPersistenceService().getNumberOfEntities(entityClass, countOptions, null);
     }
 
     @Override
@@ -418,32 +375,13 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     }
 
     @Override
-    public SWaitingEvent getWaitingEvent(final Long waitingEvent) throws SWaitingEventNotFoundException, SWaitingEventReadException {
-        SWaitingEvent selectOne;
+    public SWaitingMessageEvent getWaitingMessage(final long waitingMessageId) throws SWaitingEventReadException {
         try {
-            selectOne = getPersistenceService().selectById(SelectDescriptorBuilder.getElementById(SWaitingEvent.class, "WaitingEvent", waitingEvent));
-        } catch (final SBonitaReadException e) {
-            throw new SWaitingEventReadException(e);
-        }
-        if (selectOne == null) {
-            throw new SWaitingEventNotFoundException(waitingEvent);
-        }
-        return selectOne;
-    }
-
-    @Override
-    public SWaitingMessageEvent getWaitingMessage(final long waitingMessageId) throws SWaitingEventNotFoundException, SWaitingEventReadException {
-        SWaitingMessageEvent selectOne;
-        try {
-            selectOne = getPersistenceService().selectById(
+            return getPersistenceService().selectById(
                     SelectDescriptorBuilder.getElementById(SWaitingMessageEvent.class, "WaitingMessageEvent", waitingMessageId));
         } catch (final SBonitaReadException e) {
             throw new SWaitingEventReadException(e);
         }
-        if (selectOne == null) {
-            throw new SWaitingEventNotFoundException(waitingMessageId);
-        }
-        return selectOne;
     }
 
     @Override
@@ -458,9 +396,28 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
     }
 
     @Override
+    public long getNumberOfEventTriggerInstances(final Class<? extends SEventTriggerInstance> entityClass, final QueryOptions countOptions)
+            throws SBonitaReadException {
+        return getPersistenceService().getNumberOfEntities(entityClass, countOptions, null);
+    }
+
+    @Override
     public <T extends SEventTriggerInstance> List<T> searchEventTriggerInstances(final Class<T> entityClass, final QueryOptions searchOptions)
             throws SBonitaReadException {
         return getPersistenceService().searchEntity(entityClass, searchOptions, null);
+    }
+
+    @Override
+    public long getNumberOfTimerEventTriggerInstances(final long processInstanceId, final QueryOptions queryOptions) throws SBonitaReadException {
+        final Map<String, Object> parameters = Collections.singletonMap("processInstanceId", (Object) processInstanceId);
+        return getPersistenceService().getNumberOfEntities(STimerEventTriggerInstance.class, "ByProcessInstance", queryOptions, parameters);
+    }
+
+    @Override
+    public List<STimerEventTriggerInstance> searchTimerEventTriggerInstances(final long processInstanceId, final QueryOptions queryOptions)
+            throws SBonitaReadException {
+        final Map<String, Object> parameters = Collections.singletonMap("processInstanceId", (Object) processInstanceId);
+        return getPersistenceService().searchEntity(STimerEventTriggerInstance.class, "ByProcessInstance", queryOptions, parameters);
     }
 
     @Override
@@ -502,4 +459,44 @@ public class EventInstanceServiceImpl extends FlowNodeInstancesServiceImpl imple
             throw new SWaitingEventModificationException(e);
         }
     }
+
+    @Override
+    public void updateEventTriggerInstance(final SEventTriggerInstance sEventTriggerInstance, final EntityUpdateDescriptor descriptor)
+            throws SEventTriggerInstanceModificationException {
+        try {
+            final SEventTriggerInstance oldEventTriggerInstance = buildOldEventTriggerInstance(sEventTriggerInstance);
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(sEventTriggerInstance, descriptor);
+            SUpdateEvent updateEvent = null;
+            if (eventService.hasHandlers(EVENT_TRIGGER_INSTANCE, EventActionType.UPDATED)) {
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(EVENT_TRIGGER_INSTANCE)
+                        .setObject(sEventTriggerInstance).done();
+                updateEvent.setOldObject(oldEventTriggerInstance);
+            }
+            getRecorder().recordUpdate(updateRecord, updateEvent);
+        } catch (final SRecorderException e) {
+            throw new SEventTriggerInstanceModificationException(e);
+        }
+    }
+
+    private SEventTriggerInstance buildOldEventTriggerInstance(final SEventTriggerInstance sEventTriggerInstance) {
+        SEventTriggerInstance oldEventTriggerInstance = null;
+
+        if (sEventTriggerInstance != null) {
+            if (sEventTriggerInstance instanceof STimerEventTriggerInstance) {
+                oldEventTriggerInstance = BuilderFactory.get(STimerEventTriggerInstanceBuilderFactory.class)
+                        .createNewInstance((STimerEventTriggerInstance) sEventTriggerInstance).done();
+            } else if (sEventTriggerInstance instanceof SThrowSignalEventTriggerInstance) {
+                oldEventTriggerInstance = BuilderFactory.get(SThrowSignalEventTriggerInstanceBuilderFactory.class)
+                        .createNewInstance((SThrowSignalEventTriggerInstance) sEventTriggerInstance).done();
+            } else if (sEventTriggerInstance instanceof SThrowErrorEventTriggerInstance) {
+                oldEventTriggerInstance = BuilderFactory.get(SThrowErrorEventTriggerInstanceBuilderFactory.class)
+                        .createNewInstance((SThrowErrorEventTriggerInstance) sEventTriggerInstance).done();
+            } else if (sEventTriggerInstance instanceof SThrowMessageEventTriggerInstance) {
+                oldEventTriggerInstance = BuilderFactory.get(SThrowMessageEventTriggerInstanceBuilderFactory.class)
+                        .createNewInstance((SThrowMessageEventTriggerInstance) sEventTriggerInstance).done();
+            }
+        }
+        return oldEventTriggerInstance;
+    }
+
 }

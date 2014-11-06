@@ -36,7 +36,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -91,7 +90,8 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
             final InsertRecord insertRecord = new InsertRecord(externalIdentityMapping);
             SInsertEvent insertEvent = null;
             if (eventService.hasHandlers(EXTERNAL_IDENTITY_MAPPING, EventActionType.CREATED)) {
-                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(EXTERNAL_IDENTITY_MAPPING).setObject(externalIdentityMapping).done();
+                insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(EXTERNAL_IDENTITY_MAPPING)
+                        .setObject(externalIdentityMapping).done();
             }
             recorder.recordInsert(insertRecord, insertEvent);
             initiateLogBuilder(externalIdentityMapping.getId(), SQueriableLog.STATUS_OK, logBuilder, "createExternalIdentityMapping");
@@ -189,7 +189,8 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
         }
         SDeleteEvent deleteEvent = null;
         if (eventService.hasHandlers(EXTERNAL_IDENTITY_MAPPING, EventActionType.DELETED)) {
-            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(EXTERNAL_IDENTITY_MAPPING).setObject(externalIdentityMapping).done();
+            deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(EXTERNAL_IDENTITY_MAPPING)
+                    .setObject(externalIdentityMapping).done();
         }
         final DeleteRecord record = new DeleteRecord(externalIdentityMapping);
         final SExternalIdentityMappingLogBuilder queriableLog = getQueriableLog(ActionType.DELETED, "deleting external identity mapping");

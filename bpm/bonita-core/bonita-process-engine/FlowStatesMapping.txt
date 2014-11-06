@@ -3,10 +3,13 @@ WARNING: If some states change, it requires migration
 PROCESS
 0 InitializingProcessInstanceStateImpl
 1 StartedProcessInstanceStateImpl
+2 SuspendedProcessInstanceStateImpl
 3 CancelledProcessInstanceStateImpl
 4 AbortedProcessInstanceStateImpl
+5 CompletingProcessInstanceStateImpl
 6 CompletedProcessInstanceStateImpl
 7 FailedProcessInstanceStateImpl
+11 AbortingProcessInstanceStateImpl
 12 ToMigrateProcessInstanceStateImpl
 
 ACTIVITY
