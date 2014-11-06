@@ -440,7 +440,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
 
-            final NodeConfiguration nodeConfiguration = platformAccessor.getPlaformConfiguration();
+            final NodeConfiguration nodeConfiguration = platformAccessor.getPlatformConfiguration();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
 

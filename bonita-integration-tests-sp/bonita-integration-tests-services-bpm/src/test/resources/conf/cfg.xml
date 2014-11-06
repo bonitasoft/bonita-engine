@@ -190,9 +190,29 @@
 	</bean>
 
 	<bean id="nodeConfiguration" class="org.bonitasoft.engine.api.impl.NodeConfigurationImpl" autowire="byType">
-        <property name="shouldStartScheduler" value="true"/>
-        <property name="shouldRestartElements" value="true"/>
-        <property name="shouldStartEventHandlingJob" value="true"/>
+		<property name="shouldStartScheduler" value="true" />
+		<property name="shouldRestartElements" value="true" />
+		<property name="shouldStartEventHandlingJob" value="true" />
+		<property name="jobListeners">
+			<list>
+				<ref bean="loggerJobListener" />
+				<ref bean="jdbcJobListener" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
+		<constructor-arg name="schedulerService" ref="scheduler" />
+		<constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
+		<constructor-arg name="jobService" ref="jobService" />
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="transactionService" ref="transactionService" />
+		<constructor-arg name="incidentService" ref="incidentService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+	</bean>
+
+	<bean id="loggerJobListener" class="org.bonitasoft.engine.scheduler.impl.TechnicalLoggerJobListener">
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
 	</bean>
 
 	<bean id="dependencyResolver" class="org.bonitasoft.engine.api.impl.resolver.DependencyResolver">
