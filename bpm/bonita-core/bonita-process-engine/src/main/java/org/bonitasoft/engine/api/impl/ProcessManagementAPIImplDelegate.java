@@ -20,12 +20,14 @@ import org.bonitasoft.engine.api.impl.transaction.process.DeleteProcess;
 import org.bonitasoft.engine.api.impl.transaction.process.DisableProcess;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
+import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.RetrieveException;
@@ -35,6 +37,7 @@ import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
@@ -104,10 +107,16 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
     }
 
     public void disableProcess(final long processId) throws SProcessDefinitionNotFoundException, SBonitaException {
+
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final PlatformServiceAccessor platformAccessor = getPlatformServiceAccessor();
-        final String userName = SessionInfos.getUserNameFromSession();
-        final DisableProcess disableProcess = new DisableProcess(tenantAccessor, platformAccessor, processId, userName);
+        final PlatformServiceAccessor platformServiceAccessor = getPlatformServiceAccessor();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
+        final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
+        final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
+        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processId, eventInstanceService, schedulerService, logger,
+                SessionInfos.getUserNameFromSession(), classLoaderService);
         disableProcess.execute();
     }
 

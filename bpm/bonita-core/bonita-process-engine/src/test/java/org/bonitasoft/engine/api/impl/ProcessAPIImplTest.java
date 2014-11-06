@@ -1,8 +1,10 @@
 package org.bonitasoft.engine.api.impl;
 
 import static java.util.Arrays.asList;
+import static junit.framework.TestCase.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
@@ -177,10 +179,7 @@ public class ProcessAPIImplTest {
     @Mock
     private FlowNodeStateManager flowNodeStateManager;
 
-    @Spy
-    @InjectMocks
-    @Mock
-    private ActorMappingService actorMappingService;
+
 
     @Mock
     private DocumentAPI documentAPI;
@@ -235,8 +234,8 @@ public class ProcessAPIImplTest {
             processAPI.cancelProcessInstance(processInstanceId);
             fail("The process instance does not exists");
         } catch (final ProcessInstanceNotFoundException pinfe) {
-            verify(lockService).lock(processInstanceId, SFlowElementsContainerType.PROCESS.name(), tenantId);
-            verify(lockService).unlock(any(BonitaLock.class), eq(tenantId));
+            verify(lockService).lock(processInstanceId, SFlowElementsContainerType.PROCESS.name(), TENANT_ID);
+            verify(lockService).unlock(any(BonitaLock.class), eq(TENANT_ID));
         }
     }
 
