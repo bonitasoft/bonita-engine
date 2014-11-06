@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.process.instance.impl;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -30,17 +33,8 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
-import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
-import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Zhao Na
@@ -60,12 +54,12 @@ public class TransitionServiceImpl implements TransitionService {
 
     @Override
     public long getNumberOfArchivedTransitionInstances(final QueryOptions countOptions) throws SBonitaReadException {
-        return this.persistenceRead.getNumberOfEntities(SATransitionInstance.class, countOptions, null);
+        return persistenceRead.getNumberOfEntities(SATransitionInstance.class, countOptions, null);
     }
 
     @Override
     public List<SATransitionInstance> searchArchivedTransitionInstances(final QueryOptions queryOptions) throws SBonitaReadException {
-        return this.persistenceRead.searchEntity(SATransitionInstance.class, queryOptions, null);
+        return persistenceRead.searchEntity(SATransitionInstance.class, queryOptions, null);
     }
 
     @Override
@@ -84,14 +78,14 @@ public class TransitionServiceImpl implements TransitionService {
 
     private void archiveTransitionInstanceInsertRecord(final SATransitionInstance saTransitionInstance, final long archiveDate) throws SRecorderException {
         final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saTransitionInstance);
-        this.archiveService.recordInsert(archiveDate, insertRecord);
+        archiveService.recordInsert(archiveDate, insertRecord);
     }
 
     @Override
     public void delete(final SATransitionInstance saTransitionInstance) throws STransitionDeletionException {
         final DeleteRecord deleteRecord = new DeleteRecord(saTransitionInstance);
         try {
-            this.archiveService.recordDelete(deleteRecord);
+            archiveService.recordDelete(deleteRecord);
         } catch (final SRecorderException e) {
             throw new STransitionDeletionException(e);
         }

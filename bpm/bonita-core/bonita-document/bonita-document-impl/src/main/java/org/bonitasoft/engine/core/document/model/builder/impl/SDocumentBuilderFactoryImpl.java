@@ -14,7 +14,6 @@
  */
 package org.bonitasoft.engine.core.document.model.builder.impl;
 
-import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilder;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
 
@@ -88,11 +87,6 @@ public class SDocumentBuilderFactoryImpl implements SDocumentBuilderFactory {
     @Override
     public SDocumentBuilder createNewInstance() {
         return new SDocumentBuilderImpl();
-    }
-
-    @Override
-    public SDocumentBuilder createNewInstance(SDocument documentMapping) {
-        return null;
     }
 
     @Override

@@ -28,14 +28,16 @@ public class DBConfigurationsProvider {
 
     public void setTenantConfigurations(final List<DBConfiguration> tenantConfigurations) {
         this.tenantConfigurations = tenantConfigurations;
-        Collections.sort(this.tenantConfigurations, new Comparator<DBConfiguration>(){
-            public int compare(DBConfiguration dbConfiguration1, DBConfiguration dbConfiguration2) {
+        Collections.sort(this.tenantConfigurations, new Comparator<DBConfiguration>() {
+
+            @Override
+            public int compare(final DBConfiguration dbConfiguration1, final DBConfiguration dbConfiguration2) {
                 final int priority1 = dbConfiguration1.getDeleteTenantObjectsPriority();
                 final int priority2 = dbConfiguration2.getDeleteTenantObjectsPriority();
-                
+
                 return priority1 - priority2;
             }
-          });
+        });
     }
 
     public List<DBConfiguration> getTenantConfigurations() {
@@ -45,9 +47,8 @@ public class DBConfigurationsProvider {
     public List<DBConfiguration> getMatchingTenantConfigurations(final String filter) {
         if (filter == null || filter.isEmpty()) {
             return getTenantConfigurations();
-        } else {
-            return filterTenantConfiguration(filter);
         }
+        return filterTenantConfiguration(filter);
     }
 
     private List<DBConfiguration> filterTenantConfiguration(final String filter) {

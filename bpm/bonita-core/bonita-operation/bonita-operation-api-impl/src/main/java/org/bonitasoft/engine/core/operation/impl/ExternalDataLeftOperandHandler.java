@@ -19,7 +19,6 @@ import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Baptiste Mesta
@@ -33,8 +32,7 @@ public class ExternalDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object update(final SLeftOperand leftOperand, final Object newValue, final long containerId, final String containerType)
-            throws SOperationExecutionException {
+    public Object update(final SLeftOperand leftOperand, final Object newValue, final long containerId, final String containerType) {
         // nothing to do, the value is already changed in the context
         return newValue;
     }
@@ -45,7 +43,7 @@ public class ExternalDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) throws SBonitaReadException {
+    public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) {
         return expressionContext.getInputValues().get(sLeftOperand.getName());
     }
 

@@ -13,27 +13,24 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.LoopActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.Test;
 
-public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEventTest {
+public class InterruptingTimerBoundaryEventTest extends AbstractEventTest {
 
     @Cover(classes = { EventInstance.class, BoundaryEventInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
             "Interrupting" }, story = "Execute timer boundary event triggerd.", jira = "ENGINE-500")
     @Test
     public void timerBoundaryEventTriggered() throws Exception {
         final int timerDuration = 1000;
-        final ProcessDefinition processDefinition = deployProcessWithTimerBoundaryEvent(timerDuration, true, "step1", "exceptionStep", "step2");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEvent(timerDuration, true, "step1", "exceptionStep", "step2");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -51,7 +48,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
     }
 
     @Test
-    public void testTimerBoundaryEventWithScriptThatFail() throws Exception {
+    public void timerBoundaryEventWithScriptThatFail() throws Exception {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("pTimerBoundary", "2.0");
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addStartEvent("start");
@@ -75,15 +72,12 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         final int timerDuration = 2000;
         final String simpleProcessName = "targetProcess";
         final String simpleTaskName = "stepCA";
-        final String parentUserTaskName = "step2";
-        final String exceptionFlowTaskName = "exceptionStep";
 
         // deploy a simple process p1
         final ProcessDefinition targetProcessDefinition = deployAndEnableSimpleProcess(simpleProcessName, simpleTaskName);
 
         // deploy a process, p2, with a call activity calling p1. The call activity has an interrupting timer boundary event
-        final ProcessDefinition processDefinition = deployAndEnbleProcessWithTimerBoundaryEventOnCallActivity(timerDuration, true, simpleProcessName,
-                parentUserTaskName, exceptionFlowTaskName);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(timerDuration, true, simpleProcessName);
 
         // start the root process and wait for boundary event trigger
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -97,7 +91,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         final ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStepCA.getId());
         assertEquals(TestStates.ABORTED.getStateName(), archActivityInst.getState());
 
-        checkFlowNodeWasntExecuted(processInstance.getId(), parentUserTaskName);
+        checkFlowNodeWasntExecuted(processInstance.getId(), PARENT_PROCESS_USER_TASK_NAME);
 
         disableAndDeleteProcess(processDefinition);
         disableAndDeleteProcess(targetProcessDefinition);
@@ -110,7 +104,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         // deploy a process with a interrupting timer boundary event attached to a sequential multi-instance
         final int timerDuration = 1000;
         final String multiTaskName = "step1";
-        final ProcessDefinition processDefinition = deployProcessMultiInstanceWithBoundaryEvent(timerDuration, true, multiTaskName, 4, true, "step2",
+        final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration, true, multiTaskName, 4, true, "step2",
                 "exceptionStep");
 
         // start the process and wait the timer to trigger
@@ -137,7 +131,8 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         final boolean isSequential = false;
 
         // deploy a process with a interrupting timer boundary event attached to a parallel multi-instance
-        final ProcessDefinition processDefinition = deployProcessMultiInstanceWithBoundaryEvent(timerDuration, true, "step1", loopCardinality, isSequential,
+        final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration, true, "step1", loopCardinality,
+                isSequential,
                 "step2", "exceptionStep");
 
         // start the process and wait for process to be triggered
@@ -164,7 +159,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         final String loopActivityName = "step1";
         final String normalFlowStepName = "step2";
         final String exceptionFlowStepName = "exceptionStep";
-        final ProcessDefinition processDefinition = deployProcessWithBoundaryEventOnLoopActivity(timerDuration, true, loopMax, loopActivityName,
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEventOnLoopActivity(timerDuration, true, loopMax, loopActivityName,
                 normalFlowStepName, exceptionFlowStepName);
 
         // start the process and wait timer to trigger
@@ -189,7 +184,7 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
     @Test
     public void timerBoundaryEventTriggeredAndLongData() throws Exception {
         final int timerDuration = 1000;
-        final ProcessDefinition processDefinition = deployProcessWithTimerEventOnHumanTask(timerDuration, true);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEventOnHumanTask(timerDuration, true);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // Wait and execute the step1 with a timer boundary event
@@ -204,32 +199,6 @@ public class InterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEve
         waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
 
         disableAndDeleteProcess(processDefinition);
-    }
-
-    private ProcessDefinition deployProcessWithTimerEventOnHumanTask(final long timerValue, final boolean withData) throws BonitaException,
-            InvalidProcessDefinitionException {
-        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("pTimerBoundary", "2.0");
-        processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addStartEvent("start");
-        final UserTaskDefinitionBuilder userTaskDefinitionBuilder = processDefinitionBuilder.addUserTask("step1", ACTOR_NAME);
-
-        final Expression timerExpr;
-        if (withData) {
-            processDefinitionBuilder.addData("timer", Long.class.getName(), new ExpressionBuilder().createConstantLongExpression(timerValue));
-            timerExpr = new ExpressionBuilder().createDataExpression("timer", Long.class.getName());
-        } else {
-            timerExpr = new ExpressionBuilder().createConstantLongExpression(timerValue);
-        }
-        userTaskDefinitionBuilder.addBoundaryEvent("Boundary timer").addTimerEventTriggerDefinition(TimerType.DURATION, timerExpr);
-        userTaskDefinitionBuilder.addUserTask("exceptionStep", ACTOR_NAME);
-        userTaskDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
-        processDefinitionBuilder.addEndEvent("end");
-        processDefinitionBuilder.addTransition("start", "step1");
-        processDefinitionBuilder.addTransition("step1", "step2");
-        processDefinitionBuilder.addTransition("Boundary timer", "exceptionStep");
-        processDefinitionBuilder.addTransition("exceptionStep", "end");
-
-        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, getUser());
     }
 
 }

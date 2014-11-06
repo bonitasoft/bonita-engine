@@ -15,7 +15,6 @@ package org.bonitasoft.engine.identity;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.api.GroupAPI;
 import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**

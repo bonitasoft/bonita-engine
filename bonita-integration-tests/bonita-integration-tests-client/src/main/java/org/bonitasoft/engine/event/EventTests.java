@@ -16,7 +16,8 @@ import org.junit.runners.Suite.SuiteClasses;
         SignalBoundaryEventTest.class,
         ErrorBoundaryEventTest.class,
         SignalEventSubProcessTest.class,
-        ErrorEventSubProcessTest.class
+        ErrorEventSubProcessTest.class,
+        EventTriggerTest.class
 })
 public class EventTests {
 

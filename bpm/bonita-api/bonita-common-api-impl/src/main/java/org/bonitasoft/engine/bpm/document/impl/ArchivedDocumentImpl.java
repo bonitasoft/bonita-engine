@@ -31,7 +31,7 @@ public class ArchivedDocumentImpl extends DocumentImpl implements ArchivedDocume
         super();
     }
 
-    public ArchivedDocumentImpl(String name) {
+    public ArchivedDocumentImpl(final String name) {
         super();
         setName(name);
     }
@@ -76,29 +76,34 @@ public class ArchivedDocumentImpl extends DocumentImpl implements ArchivedDocume
         return sourceObjectId;
     }
 
-    public void setArchiveDate(Date archiveDate) {
+    public void setArchiveDate(final Date archiveDate) {
         this.archiveDate = archiveDate;
     }
 
-    public void setSourceObjectId(long sourceObjectId) {
+    public void setSourceObjectId(final long sourceObjectId) {
         this.sourceObjectId = sourceObjectId;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
+    public boolean equals(final Object o) {
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
-        if (!super.equals(o))
+        }
+        if (!super.equals(o)) {
             return false;
+        }
 
-        ArchivedDocumentImpl that = (ArchivedDocumentImpl) o;
+        final ArchivedDocumentImpl that = (ArchivedDocumentImpl) o;
 
-        if (sourceObjectId != that.sourceObjectId)
+        if (sourceObjectId != that.sourceObjectId) {
             return false;
-        if (archiveDate != null ? !archiveDate.equals(that.archiveDate) : that.archiveDate != null)
+        }
+        if (archiveDate != null ? !archiveDate.equals(that.archiveDate) : that.archiveDate != null) {
             return false;
+        }
 
         return true;
     }
@@ -107,7 +112,7 @@ public class ArchivedDocumentImpl extends DocumentImpl implements ArchivedDocume
     public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + (archiveDate != null ? archiveDate.hashCode() : 0);
-        result = 31 * result + (int) (sourceObjectId ^ (sourceObjectId >>> 32));
+        result = 31 * result + (int) (sourceObjectId ^ sourceObjectId >>> 32);
         return result;
     }
 

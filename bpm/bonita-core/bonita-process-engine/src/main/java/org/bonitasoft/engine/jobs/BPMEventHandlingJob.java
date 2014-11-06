@@ -154,7 +154,7 @@ public class BPMEventHandlingJob extends InternalJob {
         setAttributes(tenantServiceAccessor, attributes);
     }
 
-    void setAttributes(final TenantServiceAccessor tenantServiceAccessor, final Map<String, Serializable> attributes) throws SJobConfigurationException {
+    void setAttributes(final TenantServiceAccessor tenantServiceAccessor, final Map<String, Serializable> attributes) {
         eventInstanceService = tenantServiceAccessor.getEventInstanceService();
         workService = tenantServiceAccessor.getWorkService();
         transactionService = tenantServiceAccessor.getUserTransactionService();

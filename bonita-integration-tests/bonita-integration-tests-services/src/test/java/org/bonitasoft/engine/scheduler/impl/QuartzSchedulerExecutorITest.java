@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.scheduler.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -14,6 +15,7 @@ import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
 import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
+import org.bonitasoft.engine.scheduler.job.IncrementItselfJob;
 import org.bonitasoft.engine.scheduler.job.ReleaseWaitersJob;
 import org.bonitasoft.engine.scheduler.job.VariableStorage;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
@@ -65,15 +67,16 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
     }
 
     @Test
-    public void testCanRestartTheSchedulerAfterShutdown() throws Exception {
+    public void canRestartTheSchedulerAfterShutdown() throws Exception {
         schedulerService.stop();
         assertTrue(schedulerService.isStopped());
+        schedulerService.initializeScheduler();
         schedulerService.start();
         assertTrue(schedulerService.isStarted());
     }
 
     @Test
-    public void testDoNotExecuteAFutureJob() throws Exception {
+    public void doNotExecuteAFutureJob() throws Exception {
         final Date future = new Date(System.currentTimeMillis() + 10000000);
         final String variableName = "myVar";
         final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
@@ -91,7 +94,7 @@ public class QuartzSchedulerExecutorITest extends CommonServiceTest {
     }
 
     @Test
-    public void testDoNotThrowAnExceptionWhenDeletingAnUnknownJob() throws Exception {
+    public void doNotThrowAnExceptionWhenDeletingAnUnknownJob() throws Exception {
         getTransactionService().begin();
         final boolean deleted = schedulerService.delete("MyJob");
         getTransactionService().complete();

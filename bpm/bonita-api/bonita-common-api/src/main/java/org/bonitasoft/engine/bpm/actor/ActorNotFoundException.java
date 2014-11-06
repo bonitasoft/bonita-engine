@@ -13,16 +13,16 @@
  **/
 package org.bonitasoft.engine.bpm.actor;
 
+import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
  * Thrown when it's not possible to find an actor mapping.
- * 
  * The class ActorNotFoundException is a form of Throwable that indicates conditions that a reasonable application might want to catch.
  * The class ActorNotFoundException that is not also subclasses of {@link RuntimeException} are checked exceptions.
  * Checked exceptions need to be declared in a method or constructor's {@literal throws} clause if they can be thrown by the execution of the method or
  * constructor and propagate outside the method or constructor boundary.
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
@@ -32,10 +32,10 @@ public class ActorNotFoundException extends NotFoundException {
 
     /**
      * Constructs a new exception with the specified detail cause.
-     * 
+     *
      * @param cause
-     *            The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
-     *            cause is nonexistent or unknown.)
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        cause is nonexistent or unknown.)
      */
     public ActorNotFoundException(final Throwable cause) {
         super(cause);
@@ -43,12 +43,27 @@ public class ActorNotFoundException extends NotFoundException {
 
     /**
      * Constructs a new exception with the specified detail message.
-     * 
+     *
      * @param message
-     *            The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
+     *        The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
      */
     public ActorNotFoundException(final String message) {
         super(message);
+    }
+
+    /**
+     * Constructs a new exception and the specified detail message.
+     *
+     * @param actorName
+     *        The not found actor
+     * @param processDefinition
+     *        The process definition where we search the actor
+     */
+    public ActorNotFoundException(final String actorName, final ProcessDefinition processDefinition) {
+        super("Actor " + actorName + " not found");
+        setProcessDefinitionNameOnContext(processDefinition.getName());
+        setProcessDefinitionIdOnContext(processDefinition.getId());
+        setProcessDefinitionVersionOnContext(processDefinition.getVersion());
     }
 
 }

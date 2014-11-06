@@ -53,7 +53,7 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void testSearchFlowNodeInstances() throws Exception {
+    public void searchFlowNodeInstances() throws Exception {
         final SStartEventInstanceBuilderFactory startEventInstanceBuilder = BuilderFactory.get(SStartEventInstanceBuilderFactory.class);
         final SProcessInstance procInst1 = createSProcessInstance();
         final SProcessInstance procInst2 = createSProcessInstance();
@@ -82,7 +82,7 @@ public class FlowNodeInstanceServiceTest extends CommonBPMServicesTest {
     }
 
     @Test
-    public void testSearchFlowNodeInstancesWithFilter() throws Exception {
+    public void searchFlowNodeInstancesWithFilter() throws Exception {
         final SStartEventInstanceBuilderFactory startEventInstanceBuilder = BuilderFactory.get(SStartEventInstanceBuilderFactory.class);
         final SProcessInstance procInst1 = createSProcessInstance();
         final SProcessInstance procInst2 = createSProcessInstance();

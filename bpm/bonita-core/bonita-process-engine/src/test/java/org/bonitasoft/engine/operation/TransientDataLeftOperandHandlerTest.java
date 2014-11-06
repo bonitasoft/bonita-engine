@@ -169,7 +169,7 @@ public class TransientDataLeftOperandHandlerTest {
     }
 
     @Test
-    public void handlerSupportsBatchUpdate() throws Exception {
+    public void handlerSupportsBatchUpdate() {
         assertThat(transientDataLeftOperandHandler.supportBatchUpdate()).isTrue();
     }
 

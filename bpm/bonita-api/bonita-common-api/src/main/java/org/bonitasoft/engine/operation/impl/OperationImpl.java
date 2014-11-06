@@ -55,9 +55,8 @@ public class OperationImpl implements Operation {
         if (null != operatorInputType) {
             if (operator == null) {
                 throw new IllegalArgumentException("Please set 'operator' before setting 'operator input type'");
-            } else {
-                operator = operator + ":" + operatorInputType;
             }
+            operator = operator + ":" + operatorInputType;
         }
     }
 

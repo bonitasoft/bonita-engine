@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,15 +13,30 @@
  **/
 package org.bonitasoft.engine.core.process.instance.model.event.trigger;
 
-import org.bonitasoft.engine.core.process.definition.model.event.trigger.STimerType;
-
 /**
- * @author Elias Ricken de Medeiros
+ * @author Celine Souchet
+ * @version 6.4.0
+ * @since 6.4.0
  */
 public interface STimerEventTriggerInstance extends SEventTriggerInstance {
 
-    STimerType getTimerType();
+    /**
+     * @return The date of the execution of the trigger
+     * @since 6.4.0
+     */
+    long getExecutionDate();
 
-    long getTimerValue();
+    /**
+     * @return The name of the trigger of the job
+     * @see org.quartz.Trigger
+     * @since 6.4.0
+     */
+    String getJobTriggerName();
+
+    /**
+     * @return The name of the {@link org.bonitasoft.engine.core.process.instance.model.event.SEventInstance}
+     * @since 6.4.0
+     */
+    String getEventInstanceName();
 
 }

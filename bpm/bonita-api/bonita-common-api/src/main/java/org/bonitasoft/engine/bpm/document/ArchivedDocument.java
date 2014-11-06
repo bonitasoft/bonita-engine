@@ -16,14 +16,12 @@ package org.bonitasoft.engine.bpm.document;
 import java.util.Date;
 
 import org.bonitasoft.engine.bpm.ArchivedElement;
-import org.bonitasoft.engine.bpm.BaseElement;
-import org.bonitasoft.engine.bpm.NamedElement;
 
 /**
  * @author Zhang Bole
  * @author Matthieu Chaffotte
  */
-public interface ArchivedDocument extends NamedElement, BaseElement, ArchivedElement, Document {
+public interface ArchivedDocument extends ArchivedElement, Document {
 
     /**
      * @return

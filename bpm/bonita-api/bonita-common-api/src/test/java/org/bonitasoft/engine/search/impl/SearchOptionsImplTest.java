@@ -20,7 +20,7 @@ import org.junit.Test;
 public class SearchOptionsImplTest {
 
     @Test
-    public void equals_should_check_the_whole_objects() throws Exception {
+    public void equals_should_check_the_whole_objects() {
         final SearchOptionsImpl options1 = buildSearchOptions();
         final SearchOptionsImpl options2 = buildSearchOptions();
 
@@ -28,7 +28,7 @@ public class SearchOptionsImplTest {
     }
 
     @Test
-    public void hashCode_should_check_the_whole_objects() throws Exception {
+    public void hashCode_should_check_the_whole_objects() {
         final SearchOptionsImpl options1 = buildSearchOptions();
         final SearchOptionsImpl options2 = buildSearchOptions();
 

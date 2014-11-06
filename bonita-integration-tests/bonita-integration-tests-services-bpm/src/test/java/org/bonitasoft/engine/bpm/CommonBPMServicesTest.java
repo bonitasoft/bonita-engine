@@ -193,7 +193,7 @@ public class CommonBPMServicesTest {
     }
 
     @BeforeClass
-    public static void setUpClass() throws Exception {
+    public static void setUpClass() {
         // if (!platformCreated) {
         // // Call directly the API because we want the files to be copied:
         // final PlatformAPIImpl platformAPI = new PlatformAPIImpl();
@@ -204,7 +204,7 @@ public class CommonBPMServicesTest {
     }
 
     @AfterClass
-    public static void tearDownClass() throws Exception {
+    public static void tearDownClass() {
         // if (!platformCreated) {
         // TestUtil.closeTransactionIfOpen(transactionService);
         // stopScheduler();
@@ -225,14 +225,6 @@ public class CommonBPMServicesTest {
         } catch (final STransactionException e) {
             throw new CreationException(e);
         }
-    }
-
-    private static void stopScheduler() throws Exception {
-        final LoginAPIImpl loginAPI = new LoginAPIImpl();
-        final APISession session = loginAPI.login(TestUtil.getDefaultUserName(), TestUtil.getDefaultPassword());
-        sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
-        TestUtil.stopScheduler(bpmServicesBuilder.getSchedulerService(), bpmServicesBuilder.getTransactionService());
-        loginAPI.logout(session);
     }
 
     @Before

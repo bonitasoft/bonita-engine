@@ -161,7 +161,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     /**
      * @param classesToPurge
-     *            the classesToPurge to set
+     *        the classesToPurge to set
      */
     public void setClassesToPurge(final List<String> classesToPurge) {
         this.classesToPurge = classesToPurge;
@@ -735,10 +735,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                 query = session.createQuery(builtQuery);
             }
             setQueryCache(query, selectDescriptor.getQueryName());
-
-            if (selectDescriptor != null) {
-                setParameters(query, selectDescriptor.getInputParameters());
-            }
+            setParameters(query, selectDescriptor.getInputParameters());
             query.setFirstResult(selectDescriptor.getStartIndex());
             query.setMaxResults(selectDescriptor.getPageSize());
 

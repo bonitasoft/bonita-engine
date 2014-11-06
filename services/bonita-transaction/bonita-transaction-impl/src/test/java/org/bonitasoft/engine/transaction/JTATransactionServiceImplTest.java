@@ -1,6 +1,8 @@
 package org.bonitasoft.engine.transaction;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -224,6 +226,65 @@ public class JTATransactionServiceImplTest {
 
         // 2 : for the ResetCounter and DecrementNumberOfActiveTransactions
         verify(transaction, times(2)).registerSynchronization(Mockito.any(Synchronization.class));
+    }
+
+
+    private class MyBeforeCommitCallable implements Callable<Void> {
+
+        private boolean called = false;
+
+        @Override
+        public Void call() throws Exception {
+            called = true;
+
+            return null;
+        }
+
+        public boolean isCalled() {
+            return called;
+        }
+    }
+
+    @Test
+    public void testBeforeCommitCallablesAreExecutedWhileCommit() throws Exception {
+        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        Transaction transaction = new MyTransaction();
+        TransactionManager txManager = new MyTransactionManager(transaction);
+
+        final JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager);
+
+        final MyBeforeCommitCallable callable = new MyBeforeCommitCallable();
+        try {
+            txService.begin();
+            txService.registerBeforeCommitCallable(callable);
+            assertFalse(callable.isCalled());
+        } finally {
+            txService.complete();
+        }
+
+        assertTrue(callable.isCalled());
+    }
+
+    @Test
+    public void testBeforeCommitCallablesAreNotExecutedWhileMarkedAsRollback() throws Exception {
+        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        Transaction transaction = new MyTransaction();
+        TransactionManager txManager = new MyTransactionManager(transaction);
+
+        final JTATransactionServiceImpl txService = new JTATransactionServiceImpl(logger, txManager);
+
+        final MyBeforeCommitCallable callable = new MyBeforeCommitCallable();
+
+        try {
+            txService.begin();
+            txService.registerBeforeCommitCallable(callable);
+            assertFalse(callable.isCalled());
+            txService.setRollbackOnly();
+        } finally {
+            txService.complete();
+        }
+
+        assertFalse(callable.isCalled());
     }
 
 }
