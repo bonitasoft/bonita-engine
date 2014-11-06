@@ -9,13 +9,20 @@
 package com.bonitasoft.engine.business.application;
 
 /**
+ * Contains available policies during {@link Application}s import
  * @author Elias Ricken de Medeiros
- * 
+ * @see com.bonitasoft.engine.business.application.Application
  */
 public enum ApplicationImportPolicy {
 
+    /**
+     * Import will fail on import an existent {@link com.bonitasoft.engine.business.application.Application} or {@link com.bonitasoft.engine.business.application.ApplicationPage}
+     */
     FAIL_ON_DUPLICATES,
 
+    /**
+     * Import will ignore imported elements on import an existent {@link com.bonitasoft.engine.business.application.Application} or {@link com.bonitasoft.engine.business.application.ApplicationPage}
+     */
     IGNORE_DUPLICATES;
 
 }

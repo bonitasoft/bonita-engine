@@ -7,11 +7,12 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.impl;
+package com.bonitasoft.engine.business.application.impl.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
+import com.bonitasoft.engine.business.application.impl.MenuIndex;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -23,13 +24,13 @@ import com.bonitasoft.engine.business.application.model.builder.impl.SApplicatio
 import com.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MenuIndexConvertorTest {
+public class MenuIndexConverterTest {
 
     @Mock
     private ApplicationService applicationService;
 
     @InjectMocks
-    private MenuIndexConvertor convertor;
+    private MenuIndexConverter convertor;
 
     @Test
     public void toMenuIndex_should_return_a_MenuIndex_based_on_ApplicationMenu_and_set_lastUsedIndex() throws Exception {

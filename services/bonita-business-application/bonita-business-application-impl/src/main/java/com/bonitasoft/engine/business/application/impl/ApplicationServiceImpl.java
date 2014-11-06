@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bonitasoft.engine.business.application.impl.converter.MenuIndexConverter;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -83,7 +84,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final boolean active;
 
     private IndexManager indexManager;
-    private MenuIndexConvertor menuIndexConvertor;
+    private MenuIndexConverter menuIndexConverter;
     private ApplicationDestructor applicationDestructor;
     private ApplicationPageDestructor applicationPageDestructor;
     private ApplicationMenuDestructor applicationMenuDestructor;
@@ -91,7 +92,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     public ApplicationServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final QueriableLoggerService queriableLoggerService) {
         this(Manager.getInstance(), recorder, persistenceService, queriableLoggerService, null, null, null, null, null);
         this.indexManager = new IndexManager(new IndexUpdater(this, MAX_RESULTS), new MenuIndexValidator());
-        this.menuIndexConvertor = new MenuIndexConvertor(this);
+        this.menuIndexConverter = new MenuIndexConverter(this);
         ApplicationMenuCleaner applicationMenuCleaner = new ApplicationMenuCleaner(this);
         this.applicationDestructor = new ApplicationDestructor(applicationMenuCleaner);
         this.applicationPageDestructor = new ApplicationPageDestructor(applicationMenuCleaner, new HomePageChecker(this));
@@ -99,11 +100,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     ApplicationServiceImpl(final Manager manager, final Recorder recorder, final ReadPersistenceService persistenceService,
-            final QueriableLoggerService queriableLoggerService, IndexManager indexManager, MenuIndexConvertor menuIndexConvertor,
+            final QueriableLoggerService queriableLoggerService, IndexManager indexManager, MenuIndexConverter menuIndexConverter,
             ApplicationDestructor applicationDestructor, ApplicationPageDestructor applicationPageDestructor,
             ApplicationMenuDestructor applicationMenuDestructor) {
         this.indexManager = indexManager;
-        this.menuIndexConvertor = menuIndexConvertor;
+        this.menuIndexConverter = menuIndexConverter;
         this.applicationDestructor = applicationDestructor;
         this.applicationPageDestructor = applicationPageDestructor;
         this.applicationMenuDestructor = applicationMenuDestructor;
@@ -586,8 +587,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
         Integer newIndexValue = (Integer) fields.get(SApplicationMenuFields.INDEX);
         if (newIndexValue != null && organizeIndexes) {
-            MenuIndex oldIndex = menuIndexConvertor.toMenuIndex(applicationMenu);
-            MenuIndex newIndex = menuIndexConvertor.toMenuIndex(applicationMenu, updateDescriptor);
+            MenuIndex oldIndex = menuIndexConverter.toMenuIndex(applicationMenu);
+            MenuIndex newIndex = menuIndexConverter.toMenuIndex(applicationMenu, updateDescriptor);
             indexManager.organizeIndexesOnUpdate(oldIndex, newIndex);
         }
     }

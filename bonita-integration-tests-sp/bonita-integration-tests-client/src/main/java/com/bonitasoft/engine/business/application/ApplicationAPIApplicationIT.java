@@ -11,6 +11,9 @@ package com.bonitasoft.engine.business.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
+import com.bonitasoft.engine.profile.AbstractProfileSPTest;
+import org.apache.commons.io.IOUtils;
+import org.assertj.core.util.xml.XmlStringPrettyFormatter;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.ServerAPIException;
@@ -365,6 +368,31 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
         builder.sort(ApplicationSearchDescriptor.TOKEN, Order.ASC);
         return builder;
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "export"})
+    @Test
+    public void exportApplications_should_return_the_byte_content_of_xml_file_containing_selected_applications() throws Exception {
+        //given
+        final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationAPIApplicationIT.class
+                .getResourceAsStream("applications.xml"));
+        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(applicationsByteArray));
+
+        final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "My HR dashboard", "2.0");
+        final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
+        final ApplicationCreator marketingCreator = new ApplicationCreator("My", "Marketing", "2.0");
+
+        final Application hr = applicationAPI.createApplication(hrCreator);
+        final Application engineering = applicationAPI.createApplication(engineeringCreator);
+        final Application marketing = applicationAPI.createApplication(marketingCreator);
+
+        //when
+        byte[] exportedBytes = applicationAPI.exportApplications(hr.getId(), marketing.getId());
+        final String xmlPrettyFormatExported = XmlStringPrettyFormatter.xmlPrettyFormat(new String(exportedBytes));
+
+        //then
+        assertThatXmlHaveNoDifferences(xmlPrettyFormatExpected, xmlPrettyFormatExported);
+
     }
 
 }

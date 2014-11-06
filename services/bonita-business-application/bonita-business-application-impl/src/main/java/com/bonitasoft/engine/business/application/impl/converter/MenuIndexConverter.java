@@ -7,8 +7,9 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.impl;
+package com.bonitasoft.engine.business.application.impl.converter;
 
+import com.bonitasoft.engine.business.application.impl.MenuIndex;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
@@ -19,20 +20,20 @@ import com.bonitasoft.engine.business.application.model.builder.impl.SApplicatio
 /**
  * @author Elias Ricken de Medeiros
  */
-public class MenuIndexConvertor {
+public class MenuIndexConverter {
 
     private ApplicationService applicationService;
 
-    public MenuIndexConvertor(ApplicationService applicationService) {
+    public MenuIndexConverter(ApplicationService applicationService) {
         this.applicationService = applicationService;
     }
 
-    MenuIndex toMenuIndex(SApplicationMenu appMenu) throws SBonitaReadException {
+    public MenuIndex toMenuIndex(SApplicationMenu appMenu) throws SBonitaReadException {
         int lastUsedIndex = applicationService.getLastUsedIndex(appMenu.getParentId());
         return new MenuIndex(appMenu.getParentId(), appMenu.getIndex(), lastUsedIndex);
     }
 
-    MenuIndex toMenuIndex(SApplicationMenu oldAppMenu, EntityUpdateDescriptor updateDescriptor) throws SBonitaReadException {
+    public MenuIndex toMenuIndex(SApplicationMenu oldAppMenu, EntityUpdateDescriptor updateDescriptor) throws SBonitaReadException {
         Long parentId = getParentId(oldAppMenu, updateDescriptor);
         Integer indexValue = getIndexValue(oldAppMenu, updateDescriptor);
         int lastUsedIndex = applicationService.getLastUsedIndex(parentId);

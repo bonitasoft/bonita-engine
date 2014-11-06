@@ -7,12 +7,14 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.model.xml;
+package com.bonitasoft.engine.business.application.xml;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
@@ -25,7 +27,7 @@ public class ApplicationMenuNode {
     @XmlElement(required = true)
     private String displayName;
 
-    @XmlElement
+    @XmlAttribute
     private String applicationPage;
 
     @XmlElementWrapper(name = "applicationMenus")
@@ -53,6 +55,9 @@ public class ApplicationMenuNode {
     }
 
     public void addApplicationMenu(ApplicationMenuNode applicationMenu) {
+        if(applicationMenus == null) {
+            applicationMenus = new ArrayList<ApplicationMenuNode>();
+        }
         applicationMenus.add(applicationMenu);
     }
 }

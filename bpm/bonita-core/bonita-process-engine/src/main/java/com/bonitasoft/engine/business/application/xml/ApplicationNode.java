@@ -7,10 +7,9 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.model.xml;
+package com.bonitasoft.engine.business.application.xml;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -18,7 +17,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -32,32 +30,20 @@ public class ApplicationNode {
     @XmlAttribute(required = true)
     private String version;
 
-    @XmlElement
+    @XmlElement(required = true)
     private String displayName;
 
     @XmlElement
     private String description;
 
-    @XmlElement
+    @XmlAttribute
     private String profile;
 
-    @XmlElement
+    @XmlAttribute
     private String homePage;
 
-    @XmlElement
+    @XmlAttribute(required = true)
     private String state;
-
-    @XmlElement
-    private Date creationDate;
-
-    @XmlElement
-    private String createdBy;
-
-    @XmlElement
-    private Date lastUpdateDate;
-
-    @XmlElement
-    private String updatedBy;
 
     @XmlElement
     private String iconPath;
@@ -70,11 +56,6 @@ public class ApplicationNode {
     @XmlElementWrapper(name = "applicationMenus")
     @XmlElement(name = "applicationMenu")
     private List<ApplicationMenuNode> applicationMenus;
-
-    public ApplicationNode() {
-        applicationPages = new ArrayList<ApplicationPageNode>();
-        applicationMenus = new ArrayList<ApplicationMenuNode>();
-    }
 
     public String getVersion() {
         return version;
@@ -90,38 +71,6 @@ public class ApplicationNode {
 
     public void setIconPath(String iconPath) {
         this.iconPath = iconPath;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public Date getLastUpdateDate() {
-        return lastUpdateDate;
-    }
-
-    public void setLastUpdateDate(Date lastUpdateDate) {
-        this.lastUpdateDate = lastUpdateDate;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
     }
 
     public String getState() {
@@ -177,6 +126,9 @@ public class ApplicationNode {
     }
 
     public void addApplicationPage(ApplicationPageNode applicationPage) {
+        if(applicationPages == null) {
+            applicationPages = new ArrayList<ApplicationPageNode>();
+        }
         this.applicationPages.add(applicationPage);
     }
 
@@ -185,6 +137,9 @@ public class ApplicationNode {
     }
 
     public void addApplicationMenu(ApplicationMenuNode applicationMenu) {
-        this.applicationMenus.add(applicationMenu);
+        if(applicationMenus == null) {
+            applicationMenus = new ArrayList<ApplicationMenuNode>();
+        }
+        applicationMenus.add(applicationMenu);
     }
 }

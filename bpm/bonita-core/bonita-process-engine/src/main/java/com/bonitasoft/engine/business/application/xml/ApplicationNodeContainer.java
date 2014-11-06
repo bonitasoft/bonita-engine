@@ -7,7 +7,7 @@
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  ******************************************************************************/
 
-package com.bonitasoft.engine.business.application.model.xml;
+package com.bonitasoft.engine.business.application.xml;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,18 +15,16 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-@XmlRootElement
+@XmlRootElement(name = "applications")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ApplicationNodeContainer {
 
-    @XmlElementWrapper(name = "applications", required = true)
-    @XmlElement(name = "application", required = true)
+    @XmlElement(name = "application")
     private List<ApplicationNode> applications;
 
     public ApplicationNodeContainer() {

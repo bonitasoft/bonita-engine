@@ -23,7 +23,7 @@ public class SApplicationBuilderFactoryImpl implements SApplicationBuilderFactor
     @Override
     public SApplicationBuilder createNewInstance(final String token, final String displayName, final String version, final long createdBy) {
         final long currentDate = System.currentTimeMillis();
-        return new SApplicationBuilderImpl(new SApplicationImpl(token, displayName, version, currentDate, createdBy, SApplicationState.DEACTIVATED.name()));
+        return new SApplicationBuilderImpl(new SApplicationImpl(token, displayName, version, currentDate, createdBy, SApplicationState.ACTIVATED.name()));
     }
 
     @Override
