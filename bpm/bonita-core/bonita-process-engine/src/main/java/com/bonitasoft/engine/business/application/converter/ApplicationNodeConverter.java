@@ -9,9 +9,16 @@
 
 package com.bonitasoft.engine.business.application.converter;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.exception.profile.SProfileNotFoundException;
 import org.bonitasoft.engine.profile.model.SProfile;
@@ -21,6 +28,7 @@ import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationBuilderFactory;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilderFactory;
 import com.bonitasoft.engine.business.application.xml.ApplicationNode;
 
 /**
@@ -30,14 +38,17 @@ public class ApplicationNodeConverter {
 
     private final ProfileService profileService;
     private final ApplicationService applicationService;
+    private final ApplicationPageNodeConverter applicationPageNodeConverter;
 
-    public ApplicationNodeConverter(ProfileService profileService, ApplicationService applicationService) {
+    public ApplicationNodeConverter(final ProfileService profileService, final ApplicationService applicationService,
+            final ApplicationPageNodeConverter applicationPageNodeConverter) {
         this.profileService = profileService;
         this.applicationService = applicationService;
+        this.applicationPageNodeConverter = applicationPageNodeConverter;
     }
 
-    public ApplicationNode toNode(SApplication application) throws ExecutionException {
-        ApplicationNode applicationNode = new ApplicationNode();
+    public ApplicationNode toNode(final SApplication application) throws ExecutionException {
+        final ApplicationNode applicationNode = new ApplicationNode();
         applicationNode.setToken(application.getToken());
         applicationNode.setDisplayName(application.getDisplayName());
         applicationNode.setVersion(application.getVersion());
@@ -46,35 +57,60 @@ public class ApplicationNodeConverter {
         applicationNode.setIconPath(application.getIconPath());
         setProfile(application, applicationNode);
         setHomePage(application, applicationNode);
+        setPages(application.getId(), applicationNode);
         return applicationNode;
     }
 
-    private void setHomePage(SApplication application, ApplicationNode applicationNode) throws ExecutionException {
+    private void setPages(final long applicationId, final ApplicationNode applicationNode) throws ExecutionException {
+        try {
+            int startIndex = 0;
+            final int pageSize = 50;
+            List<SApplicationPage> pages;
+            do {
+                pages = applicationService.searchApplicationPages(buildApplicationPagesQueryOptions(applicationId, startIndex, pageSize));
+                for (final SApplicationPage page : pages) {
+                    applicationNode.addApplicationPage(applicationPageNodeConverter.toPage(page));
+                }
+                startIndex += pageSize;
+            } while (pages.size() > 0);
+        } catch (final SBonitaException e) {
+            throw new ExecutionException(e);
+        }
+    }
+
+    public QueryOptions buildApplicationPagesQueryOptions(final long applicationId, final int startIndex, final int pageSize) {
+        final SApplicationPageBuilderFactory factory = BuilderFactory.get(SApplicationPageBuilderFactory.class);
+        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplicationPage.class, factory.getIdKey(), OrderByType.ASC));
+        final List<FilterOption> filters = Collections.singletonList(new FilterOption(SApplicationPage.class, factory.getApplicationIdKey(), applicationId));
+        return new QueryOptions(startIndex, pageSize, orderByOptions, filters, null);
+    }
+
+    private void setHomePage(final SApplication application, final ApplicationNode applicationNode) throws ExecutionException {
         if (application.getHomePageId() != null) {
             try {
-                SApplicationPage homePage = applicationService.getApplicationPage(application.getHomePageId());
+                final SApplicationPage homePage = applicationService.getApplicationPage(application.getHomePageId());
                 applicationNode.setHomePage(homePage.getToken());
-            } catch (SBonitaException e) {
+            } catch (final SBonitaException e) {
                 throw new ExecutionException(e);
             }
         }
     }
 
-    private void setProfile(SApplication application, ApplicationNode applicationNode) throws ExecutionException {
+    private void setProfile(final SApplication application, final ApplicationNode applicationNode) throws ExecutionException {
         try {
             if (application.getProfileId() != null) {
-                SProfile profile = profileService.getProfile(application.getProfileId());
+                final SProfile profile = profileService.getProfile(application.getProfileId());
                 applicationNode.setProfile(profile.getName());
             }
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new ExecutionException(e);
         }
     }
 
-    public SApplication toSApplication(ApplicationNode applicationNode, long createdBy) throws ExecutionException {
+    public SApplication toSApplication(final ApplicationNode applicationNode, final long createdBy) throws ExecutionException {
 
-
-        SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(applicationNode.getToken(), applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy);
+        final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(applicationNode.getToken(),
+                applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy);
         builder.setIconPath(applicationNode.getIconPath());
         builder.setDescription(applicationNode.getDescription());
         builder.setState(applicationNode.getState());
@@ -84,12 +120,12 @@ public class ApplicationNodeConverter {
         return builder.done();
     }
 
-    private void setProfile(ApplicationNode applicationNode, SApplicationBuilder builder) throws ExecutionException {
-        if(applicationNode.getProfile() != null) {
+    private void setProfile(final ApplicationNode applicationNode, final SApplicationBuilder builder) throws ExecutionException {
+        if (applicationNode.getProfile() != null) {
             try {
-                SProfile profile = profileService.getProfileByName(applicationNode.getProfile());
+                final SProfile profile = profileService.getProfileByName(applicationNode.getProfile());
                 builder.setProfileId(profile.getId());
-            } catch (SProfileNotFoundException e) {
+            } catch (final SProfileNotFoundException e) {
                 throw new ExecutionException(e);
             }
         }

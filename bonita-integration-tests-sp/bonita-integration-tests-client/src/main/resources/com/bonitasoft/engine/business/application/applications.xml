@@ -4,6 +4,9 @@
         <displayName>My HR dashboard</displayName>
         <description>This is the HR dashboard.</description>
         <iconPath>/icon.jpg</iconPath>
+        <applicationPages>
+            <applicationPage customPage="custompage_mynewcustompage" token="my-new-custom-page" />
+        </applicationPages>
     </application>
     <application state="ACTIVATED" token="My" version="2.0">
         <displayName>Marketing</displayName>

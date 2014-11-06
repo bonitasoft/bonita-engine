@@ -18,7 +18,6 @@ import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -38,7 +37,7 @@ public interface PageService extends TenantLifecycleService {
 
     /**
      * add a page using the zip in parameters and the given properties
-     * 
+     *
      * @param page
      * @param content
      * @return
@@ -72,7 +71,7 @@ public interface PageService extends TenantLifecycleService {
 
     /**
      * add a page using the zip in parameters, it get all informations from the page.properties file contain inside the zip
-     * 
+     *
      * @param content
      * @param userId
      * @return
@@ -82,7 +81,6 @@ public interface PageService extends TenantLifecycleService {
      * @throws SInvalidPageTokenException
      */
     SPage addPage(final byte[] content, final String contentName, long userId) throws SObjectCreationException, SObjectAlreadyExistsException,
-            SInvalidPageZipContentException,
-            SInvalidPageTokenException;
+            SInvalidPageZipContentException, SInvalidPageTokenException;
 
 }

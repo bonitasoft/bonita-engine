@@ -11,7 +11,6 @@ package com.bonitasoft.engine.business.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
-import com.bonitasoft.engine.profile.AbstractProfileSPTest;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.util.xml.XmlStringPrettyFormatter;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -34,11 +33,10 @@ import com.bonitasoft.engine.BPMTestSPUtil;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.ApplicationAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
-
+import com.bonitasoft.engine.page.Page;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class ApplicationAPIApplicationIT extends CommonAPISPTest {
 
@@ -183,7 +181,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "no filter",
-    "no search term" })
+            "no search term" })
     @Test
     public void searchApplications_without_filter_return_all_elements_based_on_pagination() throws Exception {
         //given
@@ -213,7 +211,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "filter on name",
-    "no search term" })
+            "no search term" })
     @Test
     public void searchApplications_can_filter_on_name() throws Exception {
         //given
@@ -237,7 +235,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search",
             "filter on display name",
-    "no search term" })
+            "no search term" })
     @Test
     public void searchApplications_can_filter_on_display_name() throws Exception {
         //given
@@ -260,7 +258,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "filter on version",
-    "no search term" })
+            "no search term" })
     @Test
     public void searchApplications_can_filter_on_version() throws Exception {
         //given
@@ -283,12 +281,12 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
 
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "filter on profileId",
-            "no search term" })
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search",
+            "filter on profileId", "no search term" })
     @Test
     public void searchApplications_can_filter_on_profileId() throws Exception {
         //given
-        Profile profile = getProfileAPI().createProfile("engineering", "Engineering");
+        final Profile profile = getProfileAPI().createProfile("engineering", "Engineering");
         final ApplicationCreator hrCreator = new ApplicationCreator("HR-dashboard", "HR dash board", "1.0");
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         engineeringCreator.setProfileId(profile.getId());
@@ -314,7 +312,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9290", keywords = { "Application", "search", "no filter",
-    "search term" })
+            "search term" })
     @Test
     public void searchApplications_can_use_search_term() throws Exception {
         //given
@@ -348,11 +346,12 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         return builder;
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "export"})
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "export" })
     @Test
     public void exportApplications_should_return_the_byte_content_of_xml_file_containing_selected_applications() throws Exception {
         //given
-        Profile profile = getProfileAPI().createProfile("ApplicationProfile", "Profile for applications");
+        final Profile profile = getProfileAPI().createProfile("ApplicationProfile", "Profile for applications");
+
         final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationAPIApplicationIT.class
                 .getResourceAsStream("applications.xml"));
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(applicationsByteArray));
@@ -361,29 +360,37 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         hrCreator.setDescription("This is the HR dashboard.");
         hrCreator.setIconPath("/icon.jpg");
         hrCreator.setProfileId(profile.getId());
+
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("My", "Marketing", "2.0");
-
         final Application hr = applicationAPI.createApplication(hrCreator);
+
+        // Associate a new page to application hr (real page name is defined in zip/page.properties):
+        final Page myPage = getPageAPI().createPage("not_used",
+                IOUtils.toByteArray(ApplicationAPIApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
+        final ApplicationPage appPage = applicationAPI.createApplicationPage(hr.getId(), myPage.getId(), "my-new-custom-page");
+
         applicationAPI.createApplication(engineeringCreator);
         final Application marketing = applicationAPI.createApplication(marketingCreator);
 
         //when
-        byte[] exportedBytes = applicationAPI.exportApplications(hr.getId(), marketing.getId());
+        final byte[] exportedBytes = applicationAPI.exportApplications(hr.getId(), marketing.getId());
         final String xmlPrettyFormatExported = XmlStringPrettyFormatter.xmlPrettyFormat(new String(exportedBytes));
 
         //then
         assertThatXmlHaveNoDifferences(xmlPrettyFormatExpected, xmlPrettyFormatExported);
 
+        applicationAPI.deleteApplicationPage(appPage.getId());
+        getPageAPI().deletePage(myPage.getId());
         applicationAPI.deleteApplication(hr.getId());
         getProfileAPI().deleteProfile(profile.getId());
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "import"})
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "import" })
     @Test
     public void importApplications_should_return_create_all_applications_contained_by_xml_file() throws Exception {
         //given
-        Profile profile = getProfileAPI().createProfile("ApplicationProfile", "Profile for applications");
+        final Profile profile = getProfileAPI().createProfile("ApplicationProfile", "Profile for applications");
 
         final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationAPIApplicationIT.class
                 .getResourceAsStream("applications.xml"));
@@ -392,9 +399,9 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         applicationAPI.importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
 
         //then
-        SearchResult<Application> searchResult = applicationAPI.searchApplications(buildSearchOptions(0, 10));
+        final SearchResult<Application> searchResult = applicationAPI.searchApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(2);
-        Application app1 = searchResult.getResult().get(0);
+        final Application app1 = searchResult.getResult().get(0);
         assertThat(app1.getToken()).isEqualTo("HR-dashboard");
         assertThat(app1.getVersion()).isEqualTo("2.0");
         assertThat(app1.getDisplayName()).isEqualTo("My HR dashboard");
@@ -403,7 +410,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         assertThat(app1.getState()).isEqualTo("ACTIVATED");
         assertThat(app1.getProfileId()).isEqualTo(profile.getId());
 
-        Application app2 = searchResult.getResult().get(1);
+        final Application app2 = searchResult.getResult().get(1);
         assertThat(app2.getToken()).isEqualTo("My");
         assertThat(app2.getVersion()).isEqualTo("2.0");
         assertThat(app2.getDisplayName()).isEqualTo("Marketing");

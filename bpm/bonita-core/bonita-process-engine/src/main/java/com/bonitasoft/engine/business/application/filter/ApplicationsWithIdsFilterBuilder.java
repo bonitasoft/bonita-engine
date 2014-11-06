@@ -27,35 +27,38 @@ import com.bonitasoft.engine.business.application.model.builder.SApplicationBuil
  */
 public class ApplicationsWithIdsFilterBuilder {
 
-    private Long[] applicationIds;
+    private final Long[] applicationIds;
 
-    public ApplicationsWithIdsFilterBuilder(Long... applicationIds) {
+    public ApplicationsWithIdsFilterBuilder(final Long... applicationIds) {
         this.applicationIds = applicationIds;
     }
 
     public QueryOptions buildQueryOptions() {
-        SApplicationBuilderFactory factory = BuilderFactory.get(SApplicationBuilderFactory.class);
-        List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplication.class, factory.getIdKey(), OrderByType.ASC));
+        final SApplicationBuilderFactory factory = BuilderFactory.get(SApplicationBuilderFactory.class);
+        final List<OrderByOption> orderByOptions = Collections.singletonList(new OrderByOption(SApplication.class, factory.getIdKey(), OrderByType.ASC));
 
-        FilterOption filterOption = new FilterOption(SApplication.class, factory.getIdKey());
-        filterOption.in(applicationIds);
+        final FilterOption filterOption = new FilterOption(SApplication.class, factory.getIdKey());
+        filterOption.in((Object[]) applicationIds);
 
-        List<FilterOption> filters = Collections.singletonList(filterOption);
+        final List<FilterOption> filters = Collections.singletonList(filterOption);
 
         return new QueryOptions(0, applicationIds.length, orderByOptions, filters, null);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
+    public boolean equals(final Object o) {
+        if (this == o) {
             return true;
-        if (!(o instanceof ApplicationsWithIdsFilterBuilder))
+        }
+        if (!(o instanceof ApplicationsWithIdsFilterBuilder)) {
             return false;
+        }
 
-        ApplicationsWithIdsFilterBuilder that = (ApplicationsWithIdsFilterBuilder) o;
+        final ApplicationsWithIdsFilterBuilder that = (ApplicationsWithIdsFilterBuilder) o;
 
-        if (!Arrays.equals(applicationIds, that.applicationIds))
+        if (!Arrays.equals(applicationIds, that.applicationIds)) {
             return false;
+        }
 
         return true;
     }
