@@ -72,7 +72,7 @@ public class DisableProcessTest {
         when(processDefinitionService.getProcessDefinition(processDefinitionId)).thenReturn(processDefinition);
         when(processDefinition.getProcessContainer()).thenReturn(flowElementCOntainerDefintion);
         when(flowElementCOntainerDefintion.getStartEvents()).thenReturn(new ArrayList<SStartEventDefinition>());
-        final DisableProcess disableProcess = new DisableProcess(processDefinitionService,  processDefinitionId,eventInstanceService,scheduler,logger, "matti",classLoaderService);
+        final DisableProcess disableProcess = new DisableProcess(processDefinitionService,  processDefinitionId,eventInstanceService,scheduler,logger, "matti");
 
         disableProcess.execute();
 

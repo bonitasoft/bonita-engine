@@ -5557,7 +5557,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             final ArchivedActivityInstance activityInstance = getArchivedActivityInstance(activityInstanceId);
             // same archive time to process even if there're many activities in the process
-            final ArchivedProcessInstance lastArchivedProcessInstance = getLastArchivedProcessInstance(activityInstance.getParentContainerId());
+            final ArchivedProcessInstance lastArchivedProcessInstance = getLastArchivedProcessInstance(activityInstance.getProcessInstanceId());
 
             return evaluateExpressionsInstanceLevelAndArchived(expressions, activityInstanceId, CONTAINER_TYPE_ACTIVITY_INSTANCE,
                     lastArchivedProcessInstance.getProcessDefinitionId(), activityInstance.getArchiveDate().getTime());

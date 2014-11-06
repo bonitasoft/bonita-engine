@@ -14,8 +14,20 @@
 package org.bonitasoft.engine.core.process.instance.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,9 +39,9 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
@@ -188,7 +200,7 @@ public class ProcessInstanceServiceImplTest {
     public void deleteParentArchivedPIAndElementsOnAbsentProcessShouldBeIgnored() throws Exception {
         // given:
         doThrow(SProcessInstanceModificationException.class).when(processInstanceService).deleteArchivedProcessInstanceElements(anyLong(), anyLong());
-        doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
+        doReturn(null).when(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
         doNothing().when(processInstanceService).logArchivedProcessInstanceNotFound(any(SProcessInstanceModificationException.class));
 
         // when:
@@ -251,8 +263,8 @@ public class ProcessInstanceServiceImplTest {
 
     @Test
     public void testDeleteProcessInstance_delete_archived_activity() throws Exception {
-        SProcessInstance sProcessInstance = mock(SProcessInstance.class);
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
+        final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         when(classLoaderService.getLocalClassLoader("PROCESS", sProcessInstance.getId())).thenReturn(classLoader);
         when(archiveService.getDefinitiveArchiveReadPersistenceService()).thenReturn(mock(ReadPersistenceService.class));
         processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstance);
@@ -519,7 +531,6 @@ public class ProcessInstanceServiceImplTest {
         verify(processInstanceService, never()).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
         verify(processInstanceService, never()).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
     }
-
 
     @Test
     public void getNumberOfProcessInstances_should_call_getNumberOfEntities() throws Exception {

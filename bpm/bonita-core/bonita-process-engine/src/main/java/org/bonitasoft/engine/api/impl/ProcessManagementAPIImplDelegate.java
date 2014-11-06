@@ -116,7 +116,7 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processId, eventInstanceService, schedulerService, logger,
-                SessionInfos.getUserNameFromSession(), classLoaderService);
+                SessionInfos.getUserNameFromSession());
         disableProcess.execute();
     }
 
