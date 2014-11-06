@@ -11,11 +11,6 @@ package com.bonitasoft.engine.business.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
-import java.util.List;
-
-import org.apache.commons.io.IOUtils;
-import org.assertj.core.util.xml.XmlStringPrettyFormatter;
-import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.ServerAPIException;
@@ -36,7 +31,6 @@ import com.bonitasoft.engine.BPMTestSPUtil;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.api.ApplicationAPI;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.page.Page;
 
 /**
  * @author Elias Ricken de Medeiros

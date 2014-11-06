@@ -25,7 +25,6 @@ import com.bonitasoft.engine.api.ApplicationAPI;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
 
@@ -50,7 +49,8 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
         super.tearDown();
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu", "create", "no application page" })
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu", "create",
+            "no application page" })
     @Test
     public void createApplicationMenu_ApplicationPage_should_return_applicationMenu_based_on_creator_and_should_manage_indexes() throws Exception {
         //given
@@ -124,7 +124,7 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
 
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu", "update"})
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu", "update" })
     @Test
     public void updateApplicationMenu_should_update_application_menu_based_on_updater() throws Exception {
         //given
@@ -173,7 +173,7 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
 
     }
 
-    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu", "update", "index"})
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu", "update", "index" })
     @Test
     public void updateApplicationMenu_index_should_organize_indexes_for_elements_having_the_same_parent() throws Exception {
         //given
@@ -191,9 +191,8 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
         final ApplicationMenu childCreatedAppMenu2 = getApplicationAPI().createApplicationMenu(childCreator2);
         final ApplicationMenu childCreatedAppMenu3 = getApplicationAPI().createApplicationMenu(childCreator3);
 
-
         //when move up
-        ApplicationMenu updatedChildMenu = getApplicationAPI().updateApplicationMenu(childCreatedAppMenu3.getId(),  new ApplicationMenuUpdater().setIndex(1));
+        ApplicationMenu updatedChildMenu = getApplicationAPI().updateApplicationMenu(childCreatedAppMenu3.getId(), new ApplicationMenuUpdater().setIndex(1));
 
         //then
         assertThat(updatedChildMenu.getIndex()).isEqualTo(1);
@@ -201,7 +200,7 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
         assertThat(getApplicationAPI().getApplicationMenu(childCreatedAppMenu2.getId()).getIndex()).isEqualTo(3);
 
         //when move down
-        updatedChildMenu = getApplicationAPI().updateApplicationMenu(childCreatedAppMenu3.getId(),  new ApplicationMenuUpdater().setIndex(2));
+        updatedChildMenu = getApplicationAPI().updateApplicationMenu(childCreatedAppMenu3.getId(), new ApplicationMenuUpdater().setIndex(2));
 
         //then
         assertThat(updatedChildMenu.getIndex()).isEqualTo(2);
@@ -209,7 +208,8 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
         assertThat(getApplicationAPI().getApplicationMenu(childCreatedAppMenu2.getId()).getIndex()).isEqualTo(3);
 
         //when change parent
-        updatedChildMenu = getApplicationAPI().updateApplicationMenu(childCreatedAppMenu3.getId(), new ApplicationMenuUpdater().setParentId(parentAppMenu2.getId()));
+        updatedChildMenu = getApplicationAPI().updateApplicationMenu(childCreatedAppMenu3.getId(),
+                new ApplicationMenuUpdater().setParentId(parentAppMenu2.getId()));
 
         //then
         assertThat(updatedChildMenu.getIndex()).isEqualTo(1);
@@ -217,7 +217,6 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
         assertThat(getApplicationAPI().getApplicationMenu(childCreatedAppMenu2.getId()).getIndex()).isEqualTo(2);
 
     }
-
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application menu", "get by id" })
     @Test
@@ -250,7 +249,7 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application, Application menu",
-    "delete cascade" })
+            "delete cascade" })
     @Test
     public void deleteApplication_also_deletes_application_pages_and_applicationMenu() throws Exception {
         //given
@@ -272,14 +271,16 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9216", keywords = { "Application page, Application menu",
-    "delete cascade" })
+            "delete cascade" })
     @Test
     public void deleteApplicationPage_also_deletes_related_applicationMenu() throws Exception {
         //given
         final ApplicationPage pageToDelete = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "pageToDelete");
         final ApplicationPage pageToKeep = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "pageToKeep");
-        final ApplicationMenu menuToDelete = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "Main", pageToDelete.getId()));
-        final ApplicationMenu menuToKeep = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "Main", pageToKeep.getId()));
+        final ApplicationMenu menuToDelete = getApplicationAPI().createApplicationMenu(
+                new ApplicationMenuCreator(application.getId(), "Main", pageToDelete.getId()));
+        final ApplicationMenu menuToKeep = getApplicationAPI().createApplicationMenu(
+                new ApplicationMenuCreator(application.getId(), "Main", pageToKeep.getId()));
         final ApplicationMenu containerMenu = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "Main"));
 
         //when
@@ -427,7 +428,7 @@ public class ApplicationAPIApplicationMenuIT extends TestWithCustomPage {
             "search", "filter on parent id" })
     @Test
     public void searchApplicationMenus_can_filter_on_parentId() throws Exception {
-      //given
+        //given
         final ApplicationMenu parentMenu = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(application.getId(), "parent"));
 
         final ApplicationMenuCreator creator = new ApplicationMenuCreator(application.getId(), "child", appPage.getId());

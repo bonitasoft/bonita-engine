@@ -13,11 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import com.bonitasoft.engine.BPMTestSPUtil;
-import com.bonitasoft.engine.CommonAPISPTest;
-import com.bonitasoft.engine.api.ApplicationAPI;
-import com.bonitasoft.engine.api.TenantAPIAccessor;
-import com.bonitasoft.engine.page.Page;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.util.xml.XmlStringPrettyFormatter;
 import org.bonitasoft.engine.api.ImportStatus;
@@ -34,6 +29,12 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.bonitasoft.engine.BPMTestSPUtil;
+import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.api.ApplicationAPI;
+import com.bonitasoft.engine.api.TenantAPIAccessor;
+import com.bonitasoft.engine.page.Page;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -128,7 +129,7 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
                 .getResourceAsStream("applications.xml"));
 
         //when
-        List<ImportStatus> importStatus = applicationAPI.importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
+        final List<ImportStatus> importStatus = applicationAPI.importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
 
         //then
         assertThat(importStatus).hasSize(2);
