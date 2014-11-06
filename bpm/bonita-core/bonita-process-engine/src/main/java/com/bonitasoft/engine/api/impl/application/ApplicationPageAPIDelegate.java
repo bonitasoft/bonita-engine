@@ -8,7 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl.application;
 
-import com.bonitasoft.engine.api.impl.convertor.ApplicationPageConvertor;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -23,6 +22,7 @@ import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.SearchResult;
 
+import com.bonitasoft.engine.api.impl.convertor.ApplicationPageConvertor;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
@@ -38,7 +38,6 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class ApplicationPageAPIDelegate {
 
@@ -66,10 +65,10 @@ public class ApplicationPageAPIDelegate {
         }
     }
 
-    public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String name) throws AlreadyExistsException,
-    CreationException {
+    public ApplicationPage createApplicationPage(final long applicationId, final long pageId, final String name) throws AlreadyExistsException,
+            CreationException {
         final SApplicationPageBuilderFactory factory = BuilderFactory.get(SApplicationPageBuilderFactory.class);
-        final SApplicationPageBuilder builder = factory.createNewInstance(applicationId, pagedId, name);
+        final SApplicationPageBuilder builder = factory.createNewInstance(applicationId, pageId, name);
         SApplicationPage sAppPage;
         try {
             sAppPage = applicationService.createApplicationPage(builder.done());

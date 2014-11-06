@@ -171,9 +171,9 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     }
 
     @Override
-    public ApplicationPage createApplicationPage(final long applicationId, final long pagedId, final String token) throws AlreadyExistsException,
+    public ApplicationPage createApplicationPage(final long applicationId, final long pageId, final String token) throws AlreadyExistsException,
             CreationException {
-        return getApplicationPageAPIDelegate().createApplicationPage(applicationId, pagedId, token);
+        return getApplicationPageAPIDelegate().createApplicationPage(applicationId, pageId, token);
     }
 
     @Override

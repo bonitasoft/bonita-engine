@@ -111,7 +111,7 @@ public interface ApplicationAPI {
      *
      * @param applicationId the identifier of the {@link com.bonitasoft.engine.business.application.Application} to which the
      *        {@link com.bonitasoft.engine.page.Page} will be associated
-     * @param pagedId the identifier of <code>Page</code> to be associated to the <code>Application</code>
+     * @param pageId the identifier of <code>Page</code> to be associated to the <code>Application</code>
      * @param token the token that this <code>Page</code> will take in this <code>ApplicationPage</code>. The token must be unique for a given application and
      *        should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'.
      * @return the created {@link ApplicationPage}
@@ -121,7 +121,7 @@ public interface ApplicationAPI {
      * @see Application
      * @see Page
      */
-    ApplicationPage createApplicationPage(long applicationId, long pagedId, String token) throws AlreadyExistsException, CreationException;
+    ApplicationPage createApplicationPage(long applicationId, long pageId, String token) throws AlreadyExistsException, CreationException;
 
     /**
      * Retrieves the {@link ApplicationPage} for the given {@code Application} token and {@code ApplicationPage} token
@@ -207,7 +207,7 @@ public interface ApplicationAPI {
     /**
      * Updates an {@link com.bonitasoft.engine.business.application.ApplicationMenu} based on the information supplied by the
      * {@link com.bonitasoft.engine.business.application.ApplicationMenuUpdater}
-     * 
+     *
      * @param applicationMenuId the {@code ApplicationMenu} identifier
      * @param updater the {@code ApplicationMenuUpdater} describing the fields to be updated.
      * @return the {@code ApplicationMenu} up to date
@@ -253,7 +253,7 @@ public interface ApplicationAPI {
 
     /**
      * Exports the {@link com.bonitasoft.engine.business.application.Application}s which identifier is in {@code applicationIds}
-     * 
+     *
      * @param applicationIds the identifiers of {@code Application}s to be exported
      * @return a byte array representing the content of XML file containing the exported {@code Application}s
      * @throws ExecutionException if an exception occurs during the export.
@@ -263,7 +263,7 @@ public interface ApplicationAPI {
 
     /**
      * Imports {@link com.bonitasoft.engine.business.application.Application}s based on a XML file content
-     * 
+     *
      * @param xmlContent a byte array representing the content of XML file containing the applications to be imported.
      * @param policy the {@link com.bonitasoft.engine.business.application.ApplicationImportPolicy} used to execute the import
      * @return a {@link java.util.List} of {@link org.bonitasoft.engine.api.ImportStatus} representing the {@code ImportStatus} for each imported
