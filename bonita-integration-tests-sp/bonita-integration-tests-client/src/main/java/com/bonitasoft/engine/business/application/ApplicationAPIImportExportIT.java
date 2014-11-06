@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.util.xml.XmlStringPrettyFormatter;
+import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
@@ -164,6 +165,37 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
 
         applicationAPI.deleteApplication(app1.getId());
         getProfileAPI().deleteProfile(profile.getId());
+
+    }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "import",
+            "profile does not exist" })
+    @Test
+    public void importApplications_should_create_applications_contained_by_xml_file_and_return_error_in_status_when_profile_does_not_exist() throws Exception {
+        //given
+        final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationAPIApplicationIT.class
+                .getResourceAsStream("applicationWithWrongProfile.xml"));
+
+        //when
+        List<ImportStatus> importStatus = applicationAPI.importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
+
+        //then
+        assertThat(importStatus).hasSize(1);
+        assertThat(importStatus.get(0).getName()).isEqualTo("HR-dashboard");
+        assertThat(importStatus.get(0).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        assertThat(importStatus.get(0).getErrors()).containsExactly(new ImportError("ThisProfileNotExists", ImportError.Type.PROFILE));
+
+        // check applications ware created
+        final SearchResult<Application> searchResult = applicationAPI.searchApplications(buildSearchOptions(0, 10));
+        assertThat(searchResult.getCount()).isEqualTo(1);
+        final Application app1 = searchResult.getResult().get(0);
+        assertThat(app1.getToken()).isEqualTo("HR-dashboard");
+        assertThat(app1.getVersion()).isEqualTo("2.0");
+        assertThat(app1.getDisplayName()).isEqualTo("My HR dashboard");
+        assertThat(app1.getDescription()).isEqualTo("This is the HR dashboard.");
+        assertThat(app1.getIconPath()).isEqualTo("/icon.jpg");
+        assertThat(app1.getState()).isEqualTo("ACTIVATED");
+        assertThat(app1.getProfileId()).isNull();
 
     }
 
