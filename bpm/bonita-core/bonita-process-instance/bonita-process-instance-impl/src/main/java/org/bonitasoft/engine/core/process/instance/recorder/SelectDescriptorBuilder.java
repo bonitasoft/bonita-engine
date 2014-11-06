@@ -110,9 +110,9 @@ public class SelectDescriptorBuilder {
      * Returns the list of all activities with specific state (within a Set of states), and for a specific process instance.
      * 
      * @param clazz
-     *        the <code>Class</code> of the persistent object.
+     *            the <code>Class</code> of the persistent object.
      * @param processInstanceId
-     *        the process
+     *            the process
      * @param stateIds
      * @param queryOptions
      * @return
@@ -205,13 +205,6 @@ public class SelectDescriptorBuilder {
         final Map<String, Object> parameters = Collections.singletonMap("activityInstanceId", (Object) activityInstanceId);
         final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults);
         return new SelectListDescriptor<SBoundaryEventInstance>("getActivityBoundaryEventInstances", parameters, SBoundaryEventInstance.class, queryOptions);
-    }
-
-    public static SelectListDescriptor<SEventTriggerInstance> getEventTriggers(final long eventInstanceId, final int fromIndex, final int maxResults,
-            final String field, final OrderByType orderByType) {
-        final Map<String, Object> parameters = Collections.singletonMap("eventInstanceId", (Object) eventInstanceId);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, maxResults, SEventTriggerInstance.class, field, orderByType);
-        return new SelectListDescriptor<SEventTriggerInstance>("getEventTriggerInstances", parameters, SEventTriggerInstance.class, queryOptions);
     }
 
     public static SelectListDescriptor<SEventTriggerInstance> getEventTriggers(final long eventInstanceId, final QueryOptions queryOptions) {

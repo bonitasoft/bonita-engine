@@ -21,7 +21,6 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class QueriableLogUpdaterTest {
 
@@ -40,7 +39,7 @@ public class QueriableLogUpdaterTest {
     private QueriableLogUpdater updater;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         given(sessionProvider.getUserId()).willReturn("user");
         given(sessionProvider.getClusterNode()).willReturn("node1");
 
@@ -64,8 +63,7 @@ public class QueriableLogUpdaterTest {
     }
 
     @Test
-    public void buildFinalLog_should_add_meta_information() throws Exception {
-
+    public void buildFinalLog_should_add_meta_information() {
         //when
         final SQueriableLog finalLog = updater.buildFinalLog("class", "method", log);
 
@@ -78,7 +76,7 @@ public class QueriableLogUpdaterTest {
     }
 
     @Test
-    public void raw_message_should_be_trunked_to_255_characters() throws Exception {
+    public void raw_message_should_be_trunked_to_255_characters() {
         //given
         final String base = "base message ";
         final StringBuilder stb = new StringBuilder();

@@ -162,7 +162,7 @@ public class SpringPlatformServiceAccessor implements PlatformServiceAccessor {
     }
 
     @Override
-    public NodeConfiguration getPlaformConfiguration() {
+    public NodeConfiguration getPlatformConfiguration() {
         if (platformConfguration == null) {
             platformConfguration = SpringPlatformFileSystemBeanAccessor.getService(NodeConfiguration.class);
         }

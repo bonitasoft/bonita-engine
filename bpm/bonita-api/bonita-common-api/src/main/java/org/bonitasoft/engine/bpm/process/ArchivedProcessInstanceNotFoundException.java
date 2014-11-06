@@ -43,4 +43,15 @@ public class ArchivedProcessInstanceNotFoundException extends NotFoundException 
         super(cause);
     }
 
+    /**
+     * Constructs a new exception and its message
+     * 
+     * @param archivedProcessInstanceId
+     *            The identifier of the archived process instance not found
+     * 
+     */
+    public ArchivedProcessInstanceNotFoundException(final long archivedProcessInstanceId) {
+        super("Archived process instance with id <" + archivedProcessInstanceId + "> not found");
+    }
+
 }

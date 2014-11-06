@@ -27,8 +27,8 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * @author Charles Souillard
@@ -67,10 +67,10 @@ public abstract class AbstractSetInFailedThread extends Thread {
 
     @Override
     public void run() {
-        final SSession session = null;
+        SSession session = null;
         try {
             // execute logic
-            txExecutor.execute(new TransactionContentWithResult<SSession>() {
+            final TransactionContentWithResult<SSession> transactionContent = new TransactionContentWithResult<SSession>() {
 
                 private SSession session = null;
 
@@ -86,7 +86,9 @@ public abstract class AbstractSetInFailedThread extends Thread {
                 public SSession getResult() {
                     return session;
                 }
-            });
+            };
+            txExecutor.execute(transactionContent);
+            session = transactionContent.getResult();
         } catch (final Throwable t) {
             throwable = t;
         } finally {

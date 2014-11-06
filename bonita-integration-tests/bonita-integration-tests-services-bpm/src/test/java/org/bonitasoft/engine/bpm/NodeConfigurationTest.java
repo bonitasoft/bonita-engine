@@ -28,7 +28,7 @@ public class NodeConfigurationTest {
         } catch (Exception ex) {
             throw new BonitaException(ex);
         }
-        nodeConfiguration = platformAccessor.getPlaformConfiguration();
+        nodeConfiguration = platformAccessor.getPlatformConfiguration();
     }
 
     @Cover(classes = NodeConfiguration.class, concept = BPMNConcept.NONE, keywords = { "NodeConfiguration", "RestartHandlers" }, story = "Test set restart handlers.", jira = "ENGINE-612")

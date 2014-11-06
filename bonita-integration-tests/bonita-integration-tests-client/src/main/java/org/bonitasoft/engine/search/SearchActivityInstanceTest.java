@@ -41,7 +41,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.connectors.TestConnectorLongToExecute;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.BuildTestUtil;
@@ -82,7 +81,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
      * <li>archived activities must be found in the archive</li>
      * <li>archived activities must be deleted from the journal</li>
      * </ul>
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -468,13 +467,6 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         disableAndDeleteProcess(processDef);
     }
 
-    @Test(expected = SearchException.class)
-    public void searchHumanTaskInstancesWithSearchException() throws Exception {
-        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
-        final SearchResult<HumanTaskInstance> humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.sort("tyefv", Order.ASC).done());
-        assertEquals(0, humanTasksSearch.getCount());
-    }
-
     /**
      * @throws Exception
      */
@@ -737,7 +729,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
 
     /**
      * if you remove a process between the two calls, re-deploy it and re-instantiate it: it should get right results.
-     * 
+     *
      * @throws Exception
      */
     @Test

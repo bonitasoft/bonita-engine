@@ -36,7 +36,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -90,7 +89,7 @@ public class ThemeServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#createTheme(org.bonitasoft.engine.theme.model.STheme)}.
-     * 
+     *
      * @throws SThemeCreationException
      * @throws SRecorderException
      */
@@ -127,7 +126,7 @@ public class ThemeServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#deleteTheme(long)}.
-     * 
+     *
      * @throws SThemeDeletionException
      * @throws SThemeNotFoundException
      * @throws SRecorderException
@@ -167,7 +166,7 @@ public class ThemeServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#deleteTheme(org.bonitasoft.engine.theme.model.STheme)}.
-     * 
+     *
      * @throws SRecorderException
      * @throws SThemeDeletionException
      */
@@ -202,10 +201,9 @@ public class ThemeServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#restoreDefaultTheme(SThemeType)}.
-     * 
+     *
      * @throws SRestoreThemeException
      * @throws SRecorderException
-     * 
      */
     @Test
     public final void restoreDefaultTheme() throws SRestoreThemeException, SRecorderException {
@@ -223,7 +221,7 @@ public class ThemeServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#getCurrentTheme(org.bonitasoft.engine.theme.model.SThemeType)}.
-     * 
+     *
      * @throws SThemeNotFoundException
      * @throws SBonitaReadException
      * @throws SThemeReadException
@@ -258,7 +256,7 @@ public class ThemeServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#getDefaultTheme(org.bonitasoft.engine.theme.model.SThemeType)}.
-     * 
+     *
      * @throws SBonitaReadException
      * @throws SThemeNotFoundException
      * @throws SThemeReadException
@@ -319,7 +317,7 @@ public class ThemeServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#getLastModifiedTheme(org.bonitasoft.engine.theme.model.SThemeType)}.
-     * 
+     *
      * @throws SBonitaReadException
      * @throws SThemeNotFoundException
      * @throws SThemeReadException
@@ -393,7 +391,7 @@ public class ThemeServiceImplTest {
     /**
      * Test method for
      * {@link org.bonitasoft.engine.theme.impl.ThemeServiceImpl#updateTheme(org.bonitasoft.engine.theme.model.STheme, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
-     * 
+     *
      * @throws SBonitaReadException
      * @throws SRecorderException
      * @throws SThemeUpdateException

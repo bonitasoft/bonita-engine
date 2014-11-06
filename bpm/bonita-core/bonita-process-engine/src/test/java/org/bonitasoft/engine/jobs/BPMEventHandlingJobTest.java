@@ -281,7 +281,7 @@ public class BPMEventHandlingJobTest {
     }
 
     @Test
-    public void setAttributesShouldSetMaxCouples() throws Exception {
+    public void setAttributesShouldSetMaxCouples() {
         final TenantServiceAccessor accessor = mock(TenantServiceAccessor.class);
         final Map<String, Serializable> attributes = Collections.singletonMap(JobParameter.BATCH_SIZE.name(), (Serializable) 450);
 
@@ -291,7 +291,7 @@ public class BPMEventHandlingJobTest {
     }
 
     @Test
-    public void setAttributesShouldSetDefaultMaxCouples() throws Exception {
+    public void setAttributesShouldSetDefaultMaxCouples() {
         final TenantServiceAccessor accessor = mock(TenantServiceAccessor.class);
 
         bPMEventHandlingJob.setAttributes(accessor, Collections.<String, Serializable> emptyMap());

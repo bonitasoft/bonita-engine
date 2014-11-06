@@ -37,6 +37,7 @@ import org.quartz.spi.TriggerFiredBundle;
 public final class TransactionalSimpleJobFactory extends SimpleJobFactory {
 
     private final SchedulerServiceImpl schedulerService;
+
     private final TechnicalLoggerService logger;
 
     public TransactionalSimpleJobFactory(final SchedulerServiceImpl schedulerService, final TechnicalLoggerService logger) {
@@ -47,8 +48,8 @@ public final class TransactionalSimpleJobFactory extends SimpleJobFactory {
     @Override
     public Job newJob(final TriggerFiredBundle bundle, final Scheduler scheduler) throws SchedulerException {
         final Job newJob = super.newJob(bundle, scheduler);
-        if (newJob instanceof QuartzJob) {
-            final QuartzJob quartzJob = (QuartzJob) newJob;
+        if (newJob instanceof AbstractQuartzJob) {
+            final AbstractQuartzJob quartzJob = (AbstractQuartzJob) newJob;
             final JobDataMap jobDataMap = bundle.getJobDetail().getJobDataMap();
             final Long tenantId = Long.valueOf((String) jobDataMap.get("tenantId"));
             final Long jobId = Long.valueOf((String) jobDataMap.get("jobId"));

@@ -9,9 +9,9 @@ import org.junit.Test;
 public class SBusinessDataDefinitionBuilderFactoryImplTest {
 
     @Test
-    public void getSBusinessDataDefinitionBuilderFactoryInterfaceShouldReturnsSBusinessDataDefinitionBuilderFactoryImpl() throws Exception {
+    public void getSBusinessDataDefinitionBuilderFactoryInterfaceShouldReturnsSBusinessDataDefinitionBuilderFactoryImpl() {
         // when:
-        SBusinessDataDefinitionBuilderFactory factory = BuilderFactory.get(SBusinessDataDefinitionBuilderFactory.class);
+        final SBusinessDataDefinitionBuilderFactory factory = BuilderFactory.get(SBusinessDataDefinitionBuilderFactory.class);
         // then:
         assertThat(factory).isInstanceOf(SBusinessDataDefinitionBuilderFactoryImpl.class);
     }

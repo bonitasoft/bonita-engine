@@ -28,7 +28,7 @@ public class ExternalDataLeftOperandHandlerTest {
     }
 
     @Test
-    public void handlerSupportsBatchUpdate() throws Exception {
+    public void handlerSupportsBatchUpdate() {
         assertThat(handler.supportBatchUpdate()).isTrue();
     }
 

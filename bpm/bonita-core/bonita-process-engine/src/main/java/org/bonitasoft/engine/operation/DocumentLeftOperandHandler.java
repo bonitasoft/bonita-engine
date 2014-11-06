@@ -41,15 +41,15 @@ public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandl
 
     public DocumentLeftOperandHandler(final DocumentService documentService, final ActivityInstanceService activityInstanceService,
             final SessionAccessor sessionAccessor, final SessionService sessionService) {
-        super(activityInstanceService, sessionAccessor, sessionService, documentService);
+        super(activityInstanceService, sessionAccessor, sessionService);
         this.documentService = documentService;
-        this.documentHelper = new DocumentHelper(documentService,null,null);
+        documentHelper = new DocumentHelper(documentService, null, null);
     }
 
     @Override
     public Object update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
-        DocumentValue documentValue = toCheckedDocumentValue(newValue);
+        final DocumentValue documentValue = toCheckedDocumentValue(newValue);
         final String documentName = sLeftOperand.getName();
         long processInstanceId;
         try {
@@ -58,7 +58,7 @@ public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandl
                 // we just delete the current version
                 documentHelper.deleteDocument(documentName, processInstanceId);
             } else {
-                if(documentValue.getDocumentId() != null && !documentValue.hasChanged()){
+                if (documentValue.getDocumentId() != null && !documentValue.hasChanged()) {
                     //do not update if the document value say it did not changed
                     return newValue;
                 }

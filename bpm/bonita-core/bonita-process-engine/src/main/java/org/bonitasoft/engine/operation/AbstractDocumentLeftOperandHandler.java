@@ -15,7 +15,6 @@
 package org.bonitasoft.engine.operation;
 
 import org.bonitasoft.engine.bpm.document.DocumentValue;
-import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -37,14 +36,14 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
     private final SessionAccessor sessionAccessor;
     private final SessionService sessionService;
 
-    public AbstractDocumentLeftOperandHandler(ActivityInstanceService activityInstanceService, SessionAccessor sessionAccessor, SessionService sessionService,
-            DocumentService documentService) {
+    public AbstractDocumentLeftOperandHandler(final ActivityInstanceService activityInstanceService, final SessionAccessor sessionAccessor,
+            final SessionService sessionService) {
         this.activityInstanceService = activityInstanceService;
         this.sessionAccessor = sessionAccessor;
         this.sessionService = sessionService;
     }
 
-    protected long getProcessInstanceId(long containerId, String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException {
+    protected long getProcessInstanceId(final long containerId, final String containerType) throws SFlowNodeNotFoundException, SFlowNodeReadException {
         long processInstanceId;
         if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(containerType)) {
             processInstanceId = containerId;
@@ -55,7 +54,7 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
         return processInstanceId;
     }
 
-    protected DocumentValue toCheckedDocumentValue(Object newValue) throws SOperationExecutionException {
+    protected DocumentValue toCheckedDocumentValue(final Object newValue) throws SOperationExecutionException {
         final boolean isDocumentWithContent = newValue instanceof DocumentValue;
         if (!isDocumentWithContent && newValue != null) {
             throw new SOperationExecutionException("Document operation only accepts an expression returning a DocumentValue and not "

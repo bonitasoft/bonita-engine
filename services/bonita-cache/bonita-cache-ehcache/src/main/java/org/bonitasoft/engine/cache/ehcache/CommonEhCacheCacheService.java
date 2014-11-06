@@ -56,7 +56,7 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
         ehCacheConfig.setOverflowToDisk(!cacheConfig.isInMemoryOnly());
         ehCacheConfig.setEternal(cacheConfig.isEternal());
         if (!cacheConfig.isEternal()) {
-        ehCacheConfig.setTimeToLiveSeconds(cacheConfig.getTimeToLiveSeconds());
+            ehCacheConfig.setTimeToLiveSeconds(cacheConfig.getTimeToLiveSeconds());
         }
         return ehCacheConfig;
     }
@@ -141,12 +141,11 @@ public abstract class CommonEhCacheCacheService implements CommonCacheService {
                     logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "get"));
                 }
                 return element.getObjectValue();
-            } else {
-                if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                    logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "get"));
-                }
-                return null;
             }
+            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "get"));
+            }
+            return null;
         } catch (final IllegalStateException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "get", e));

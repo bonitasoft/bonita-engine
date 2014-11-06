@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.core.document.model.builder;
 
-import org.bonitasoft.engine.core.document.model.SDocument;
 
 /**
  * @author Nicolas Chabanoles
@@ -39,8 +38,6 @@ public interface SDocumentBuilderFactory {
     String getURLKey();
 
     SDocumentBuilder createNewInstance();
-
-    SDocumentBuilder createNewInstance(SDocument documentMapping);
 
     String getDescriptionKey();
 

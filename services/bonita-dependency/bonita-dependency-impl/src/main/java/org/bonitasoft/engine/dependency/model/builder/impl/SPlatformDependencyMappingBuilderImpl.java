@@ -13,15 +13,13 @@
  **/
 package org.bonitasoft.engine.dependency.model.builder.impl;
 
-import org.bonitasoft.engine.dependency.model.SDependencyMapping;
 import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMappingBuilder;
-import org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl;
 import org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl;
 
 public class SPlatformDependencyMappingBuilderImpl implements SPlatformDependencyMappingBuilder {
 
     private final SPlatformDependencyMappingImpl object;
-    
+
     public SPlatformDependencyMappingBuilderImpl(final SPlatformDependencyMappingImpl object) {
         super();
         this.object = object;
@@ -29,7 +27,7 @@ public class SPlatformDependencyMappingBuilderImpl implements SPlatformDependenc
 
     @Override
     public SPlatformDependencyMappingImpl done() {
-        return this.object;
+        return object;
     }
 
 }

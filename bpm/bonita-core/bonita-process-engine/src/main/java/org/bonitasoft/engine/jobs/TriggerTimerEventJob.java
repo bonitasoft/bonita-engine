@@ -14,8 +14,6 @@
 package org.bonitasoft.engine.jobs;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -23,15 +21,12 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventT
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.persistence.FilterOption;
-import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SJobConfigurationException;
 import org.bonitasoft.engine.scheduler.exception.SJobExecutionException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
-import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.bonitasoft.engine.work.WorkService;
 
 /**
@@ -68,7 +63,6 @@ public class TriggerTimerEventJob extends InternalJob {
     private transient SchedulerService schedulerService;
     private transient TechnicalLoggerService loggerService;
     private Long jobDescriptorId;
-    private UserTransactionService transactionService;
 
     @Override
     public String getName() {
@@ -84,11 +78,9 @@ public class TriggerTimerEventJob extends InternalJob {
     public void execute() throws SJobExecutionException {
         try {
             if (workService.isStopped()) {
-
                 loggerService.log(getClass(), TechnicalLogSeverity.INFO,
                         "Rescheduling Timer job " + jobDescriptorId + " because the work service was shutdown. the timer is in process definition "
-                                + processDefinitionId
-                                + " on definition element " + targetSFlowNodeDefinitionId);
+                                + processDefinitionId + " on definition element " + targetSFlowNodeDefinitionId);
                 try {
                     final SJobDescriptor sJobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
                     schedulerService.executeAgain(sJobDescriptor.getId());
@@ -128,7 +120,6 @@ public class TriggerTimerEventJob extends InternalJob {
         jobService = tenantServiceAccessor.getJobService();
         schedulerService = tenantServiceAccessor.getSchedulerService();
         loggerService = tenantServiceAccessor.getTechnicalLoggerService();
-        transactionService = tenantServiceAccessor.getUserTransactionService();
         jobDescriptorId = (Long) attributes.get(JOB_DESCRIPTOR_ID);
     }
 }

@@ -13,6 +13,17 @@
  */
 package org.bonitasoft.engine.core.document.api.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
@@ -30,18 +41,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
 
 /**
  * @author Vincent Elcrin
@@ -68,8 +70,8 @@ public class DocumentServiceImplTest {
     private DocumentServiceImpl documentService;
 
     @Before
-    public void setUp() throws Exception {
-        documentService = spy(new DocumentServiceImpl(recorder, persistenceService, urlProvider, eventService, technicalLogger, archiveService));
+    public void setUp() {
+        documentService = spy(new DocumentServiceImpl(recorder, persistenceService, urlProvider, eventService, archiveService));
     }
 
     @Test
@@ -81,10 +83,10 @@ public class DocumentServiceImplTest {
     @Test
     public void should_getDocumentList_return_the_list() throws Exception {
         //given
-        List<SMappedDocumentImpl> documentList = Arrays.asList(new SMappedDocumentImpl(), new SMappedDocumentImpl());
-        doReturn(documentList).when(persistenceService).selectList(any(SelectListDescriptor.class));
+        final List<SMappedDocumentImpl> documentList = Arrays.asList(new SMappedDocumentImpl(), new SMappedDocumentImpl());
+        doReturn(documentList).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SMappedDocument>> any());
         //when
-        List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l,0,100);
+        final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l, 0, 100);
         //then
         assertThat(theList).isEqualTo(documentList);
     }
@@ -92,11 +94,11 @@ public class DocumentServiceImplTest {
     @Test
     public void should_getDocumentList_return_the_list_with_more_than_100_elements() throws Exception {
         //given
-        List<SMappedDocument> documentList1 = constructList(100);
-        List<SMappedDocument> documentList2 = constructList(50);
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(documentList1, documentList2);
+        final List<SMappedDocument> documentList1 = constructList(100);
+        final List<SMappedDocument> documentList2 = constructList(50);
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SMappedDocument>> any())).thenReturn(documentList1).thenReturn(documentList2);
         //when
-        List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l,0,100);
+        final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l, 0, 100);
         //then
         documentList1.addAll(documentList2);
         assertThat(theList).isEqualTo(documentList1);
@@ -105,17 +107,17 @@ public class DocumentServiceImplTest {
     @Test
     public void should_getDocumentList_return_the_list_with_100_elements() throws Exception {
         //given
-        List<SMappedDocument> documentList1 = constructList(100);
-        List<SMappedDocument> documentList2 = constructList(0);
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(documentList1, documentList2);
+        final List<SMappedDocument> documentList1 = constructList(100);
+        final List<SMappedDocument> documentList2 = constructList(0);
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SMappedDocument>> any())).thenReturn(documentList1).thenReturn(documentList2);
         //when
-        List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l,0,100);
+        final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l, 0, 100);
         //then
         assertThat(theList).isEqualTo(documentList1);
     }
 
-    private List<SMappedDocument> constructList(int size) {
-        ArrayList<SMappedDocument> list = new ArrayList<SMappedDocument>();
+    private List<SMappedDocument> constructList(final int size) {
+        final ArrayList<SMappedDocument> list = new ArrayList<SMappedDocument>();
         for (int i = 0; i < size; i++) {
             list.add(new SMappedDocumentImpl());
         }
@@ -125,9 +127,9 @@ public class DocumentServiceImplTest {
     @Test
     public void should_getDocumentList_return_empty_list() throws Exception {
         //given
-        doReturn(Collections.emptyList()).when(persistenceService).selectList(any(SelectListDescriptor.class));
+        doReturn(Collections.emptyList()).when(persistenceService).selectList(Matchers.<SelectListDescriptor<SMappedDocument>> any());
         //when
-        List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l,0,100);
+        final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l, 0, 100);
         //then
         assertThat(theList).isEmpty();
     }
@@ -135,14 +137,18 @@ public class DocumentServiceImplTest {
     @Test
     public void should_getDocumentList_at_give_time_get_archived() throws Exception {
         //given
-        List<SMappedDocumentImpl> sMappedDocuments = Arrays.asList(new SMappedDocumentImpl(), new SMappedDocumentImpl());
-        List<SAMappedDocumentImpl> saMappedDocuments= Arrays.asList(new SAMappedDocumentImpl(), new SAMappedDocumentImpl());
-        doReturn(saMappedDocuments).when(persistenceService).selectList(SelectDescriptorBuilder.getArchivedDocumentList("theList", 45l, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS), 123456789l));
-        doReturn(sMappedDocuments).when(persistenceService).selectList(SelectDescriptorBuilder.getDocumentListCreatedBefore("theList", 45l, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS), 123456789l));
+        final List<SMappedDocumentImpl> sMappedDocuments = Arrays.asList(new SMappedDocumentImpl(), new SMappedDocumentImpl());
+        final List<SAMappedDocumentImpl> saMappedDocuments = Arrays.asList(new SAMappedDocumentImpl(), new SAMappedDocumentImpl());
+        doReturn(saMappedDocuments).when(persistenceService).selectList(
+                SelectDescriptorBuilder.getArchivedDocumentList("theList", 45l, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS), 123456789l));
+        doReturn(sMappedDocuments).when(persistenceService)
+                .selectList(
+                        SelectDescriptorBuilder.getDocumentListCreatedBefore("theList", 45l, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS),
+                                123456789l));
         //when
-        List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l, 123456789l);
+        final List<SMappedDocument> theList = documentService.getDocumentList("theList", 45l, 123456789l);
         //then
-        ArrayList<SMappedDocument> expected = new ArrayList<SMappedDocument>(saMappedDocuments);
+        final ArrayList<SMappedDocument> expected = new ArrayList<SMappedDocument>(saMappedDocuments);
         expected.addAll(sMappedDocuments);
         assertThat(theList).isEqualTo(expected);
     }
@@ -153,6 +159,5 @@ public class DocumentServiceImplTest {
         documentService.getDocument(123456l);
         //then exception
     }
-
 
 }

@@ -4,27 +4,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-import org.bonitasoft.engine.connector.ConnectorValidationException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 
 public class AbstractUserFilterTest {
 
     private AbstractUserFilter abstractUserFilterTest;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         abstractUserFilterTest = new AbstractUserFilter() {
 
             @Override
-            public void validateInputParameters() throws ConnectorValidationException {
+            public void validateInputParameters() {
 
             }
 
             @Override
-            public List<Long> filter(final String actorName) throws UserFilterException {
+            public List<Long> filter(final String actorName) {
                 return null;
             }
 
@@ -32,7 +30,7 @@ public class AbstractUserFilterTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
     }
 
     @Test
