@@ -23,7 +23,8 @@ import com.bonitasoft.engine.TestsInitializerSP;
 @SuiteClasses({
     ApplicationAPIApplicationIT.class,
     ApplicationAPIApplicationPageIT.class,
-    ApplicationAPIApplicationMenuIT.class
+    ApplicationAPIApplicationMenuIT.class,
+    ApplicationAPIImportExportIT.class
 })
 @Initializer(TestsInitializerSP.class)
 public class ApplicationAPIITs {
