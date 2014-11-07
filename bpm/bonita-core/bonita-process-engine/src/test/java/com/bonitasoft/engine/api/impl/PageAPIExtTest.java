@@ -311,6 +311,21 @@ public class PageAPIExtTest {
     }
 
     @Test
+    public void should_getPageProperties_check_already_exists_if_check_to_true() throws Exception {
+        // given
+        byte[] content = new byte[]{1, 2, 3};
+        Properties properties = new Properties();
+        properties.setProperty(PageService.PROPERTIES_NAME, "MyPage");
+        doReturn(properties).when(pageService).readPageZip(content);
+        doReturn(null).when(pageService).getPageByName("MyPage");
+        // when
+        Properties pageProperties = pageAPIExt.getPageProperties(content, true);
+
+        // then
+        assertThat(pageProperties).isEqualTo(properties);
+    }
+
+    @Test
     public void should_getPageProperties_throw_already_exists_if_check_to_true() throws Exception {
         // given
         byte[] content = new byte[]{1, 2, 3};
