@@ -312,15 +312,7 @@ public class PageAPIExt implements PageAPI {
             AlreadyExistsException, InvalidPageZipMissingPropertiesException, InvalidPageZipMissingIndexException, InvalidPageZipInconsistentException, InvalidPageZipMissingAPropertyException {
         final PageService pageService = getTenantAccessor().getPageService();
         try {
-            Properties properties = pageService.readPageZip(content);
-            if(checkIfItAlreadyExists){
-                String name = properties.getProperty(PageService.PROPERTIES_NAME);
-                SPage pageByName = pageService.getPageByName(name);
-                if(pageByName != null){
-                    throw new AlreadyExistsException("A page with name "+name+" already exists");
-                }
-            }
-            return properties;
+            return getProperties(content, checkIfItAlreadyExists, pageService);
         } catch (SInvalidPageTokenException e) {
             throw new InvalidPageTokenException(e.getMessage());
         } catch (SBonitaReadException e) {
@@ -334,5 +326,17 @@ public class PageAPIExt implements PageAPI {
         } catch (SInvalidPageZipMissingPropertiesException e) {
             throw new InvalidPageZipMissingPropertiesException();
         }
+    }
+
+    private Properties getProperties(byte[] content, boolean checkIfItAlreadyExists, PageService pageService) throws SInvalidPageZipMissingIndexException, SInvalidPageZipMissingAPropertyException, SInvalidPageZipInconsistentException, SInvalidPageZipMissingPropertiesException, SInvalidPageTokenException, SBonitaReadException, AlreadyExistsException {
+        Properties properties = pageService.readPageZip(content);
+        if(checkIfItAlreadyExists){
+            String name = properties.getProperty(PageService.PROPERTIES_NAME);
+            SPage pageByName = pageService.getPageByName(name);
+            if(pageByName != null){
+                throw new AlreadyExistsException("A page with name "+name+" already exists");
+            }
+        }
+        return properties;
     }
 }
