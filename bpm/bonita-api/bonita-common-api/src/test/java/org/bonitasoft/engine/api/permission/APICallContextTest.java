@@ -60,6 +60,16 @@ public class APICallContextTest {
     }
 
     @Test
+    public void getFilters_with_UpperCase_in_separator() throws JSONException {
+        APICallContext apiCallContext = new APICallContext();
+        apiCallContext.setQueryString("p=0&c=10&o=priority%20DESC&f=state%3dready&f=user_id%3D104&d=processId");
+
+        Map<String, String> filters = apiCallContext.getFilters();
+
+        assertThat(filters).containsOnly(entry("user_id", "104"), entry("state", "ready"));
+    }
+
+    @Test
     public void getCompoundResourceId() throws JSONException {
         APICallContext apiCallContext = new APICallContext();
         apiCallContext.setResourceId("1/2/3");
@@ -215,6 +225,22 @@ public class APICallContextTest {
         boolean getMethod = apiCallContext.isDELETE();
 
         assertThat(getMethod).isFalse();
+    }
+
+
+    @Test
+    public void should_equals_works() throws JSONException {
+        APICallContext apiCallContext = new APICallContext();
+        apiCallContext.setMethod("GET");
+        apiCallContext.setApiName("apiName");
+        apiCallContext.setResourceName("myResource");
+        apiCallContext.setResourceId("125");
+
+
+
+        assertThat(apiCallContext).isEqualTo(new APICallContext("GET","apiName","myResource","125"));
+        assertThat(apiCallContext.hashCode()).isEqualTo(new APICallContext("GET","apiName","myResource","125").hashCode());
+        assertThat(apiCallContext.toString()).isEqualTo(new APICallContext("GET","apiName","myResource","125").toString());
     }
 
 

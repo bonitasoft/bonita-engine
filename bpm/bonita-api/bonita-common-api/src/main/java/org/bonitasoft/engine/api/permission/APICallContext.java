@@ -67,7 +67,7 @@ public class APICallContext implements Serializable {
      * body of the api call
      */
     private String body;
-    private Map<String, String> filters;
+    private Map<String, String> filters = new HashMap<String, String>();
     private String searchTerm;
 
     /**
@@ -128,7 +128,7 @@ public class APICallContext implements Serializable {
     }
 
     private void addFilter(String value) {
-        int indexOfEncodedEquals = value.indexOf("%3d");
+        int indexOfEncodedEquals = Math.max(value.indexOf("%3d"), value.indexOf("%3D"));
         if (indexOfEncodedEquals > 0 && indexOfEncodedEquals + 3 < value.length()) {
             filters.put(value.substring(0, indexOfEncodedEquals), value.substring(indexOfEncodedEquals + 3, value.length()));
         }
@@ -229,48 +229,6 @@ public class APICallContext implements Serializable {
         this.body = body;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        APICallContext that = (APICallContext) o;
-        return !checkFieldsEquals(that);
-
-    }
-
-    private boolean checkFieldsEquals(APICallContext that) {
-        if (apiName != null ? !apiName.equals(that.apiName) : that.apiName != null)
-            return true;
-        if (body != null ? !body.equals(that.body) : that.body != null)
-            return true;
-        if (filters != null ? !filters.equals(that.filters) : that.filters != null)
-            return true;
-        if (method != null ? !method.equals(that.method) : that.method != null)
-            return true;
-        if (queryString != null ? !queryString.equals(that.queryString) : that.queryString != null)
-            return true;
-        if (resourceId != null ? !resourceId.equals(that.resourceId) : that.resourceId != null)
-            return true;
-        if (resourceName != null ? !resourceName.equals(that.resourceName) : that.resourceName != null)
-            return true;
-        return searchTerm != null ? !searchTerm.equals(that.searchTerm) : that.searchTerm != null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = method != null ? method.hashCode() : 0;
-        result = 31 * result + (apiName != null ? apiName.hashCode() : 0);
-        result = 31 * result + (resourceName != null ? resourceName.hashCode() : 0);
-        result = 31 * result + (resourceId != null ? resourceId.hashCode() : 0);
-        result = 31 * result + (queryString != null ? queryString.hashCode() : 0);
-        result = 31 * result + (body != null ? body.hashCode() : 0);
-        result = 31 * result + (filters != null ? filters.hashCode() : 0);
-        result = 31 * result + (searchTerm != null ? searchTerm.hashCode() : 0);
-        return result;
-    }
-
     public Map<String, String> getFilters() {
         return filters;
     }
@@ -289,5 +247,47 @@ public class APICallContext implements Serializable {
                 ", queryString='" + queryString + '\'' +
                 ", body='" + body + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        APICallContext that = (APICallContext) o;
+
+        if (apiName != null ? !apiName.equals(that.apiName) : that.apiName != null)
+            return false;
+        if (body != null ? !body.equals(that.body) : that.body != null)
+            return false;
+        if (filters != null ? !filters.equals(that.filters) : that.filters != null)
+            return false;
+        if (method != null ? !method.equals(that.method) : that.method != null)
+            return false;
+        if (queryString != null ? !queryString.equals(that.queryString) : that.queryString != null)
+            return false;
+        if (resourceId != null ? !resourceId.equals(that.resourceId) : that.resourceId != null)
+            return false;
+        if (resourceName != null ? !resourceName.equals(that.resourceName) : that.resourceName != null)
+            return false;
+        if (searchTerm != null ? !searchTerm.equals(that.searchTerm) : that.searchTerm != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = method != null ? method.hashCode() : 0;
+        result = 31 * result + (apiName != null ? apiName.hashCode() : 0);
+        result = 31 * result + (resourceName != null ? resourceName.hashCode() : 0);
+        result = 31 * result + (resourceId != null ? resourceId.hashCode() : 0);
+        result = 31 * result + (queryString != null ? queryString.hashCode() : 0);
+        result = 31 * result + (body != null ? body.hashCode() : 0);
+        result = 31 * result + (filters != null ? filters.hashCode() : 0);
+        result = 31 * result + (searchTerm != null ? searchTerm.hashCode() : 0);
+        return result;
     }
 }
