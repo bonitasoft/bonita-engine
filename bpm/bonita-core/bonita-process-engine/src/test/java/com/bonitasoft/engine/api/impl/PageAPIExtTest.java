@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.bonitasoft.engine.commons.Pair.pair;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -20,17 +21,32 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import com.bonitasoft.engine.page.SInvalidPageTokenException;
+import com.bonitasoft.engine.page.SInvalidPageZipInconsistentException;
+import com.bonitasoft.engine.page.SInvalidPageZipMissingAPropertyException;
+import com.bonitasoft.engine.page.SInvalidPageZipMissingIndexException;
+import com.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.InvalidPageTokenException;
+import org.bonitasoft.engine.exception.InvalidPageZipInconsistentException;
+import org.bonitasoft.engine.exception.InvalidPageZipMissingAPropertyException;
+import org.bonitasoft.engine.exception.InvalidPageZipMissingIndexException;
+import org.bonitasoft.engine.exception.InvalidPageZipMissingPropertiesException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -58,6 +74,9 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PageAPIExtTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     PageService pageService;
@@ -112,6 +131,7 @@ public class PageAPIExtTest {
         doReturn(2l).when(sPage).getInstalledBy();
         doReturn(3l).when(sPage).getInstallationDate();
         doReturn(4l).when(sPage).getLastModificationDate();
+        doReturn(userId).when(pageAPIExt).getUserIdFromSessionInfos();
     }
 
     @Test
@@ -179,7 +199,6 @@ public class PageAPIExtTest {
         final PageCreator pageCreator = new PageCreator("name", "content.zip");
         final byte[] content = "content".getBytes();
 
-        doReturn(userId).when(pageAPIExt).getUserIdFromSessionInfos();
         doReturn(sPage).when(pageAPIExt).constructPage(pageCreator, userId);
         doReturn(page).when(pageAPIExt).convertToPage(any(SPage.class));
 
@@ -193,7 +212,6 @@ public class PageAPIExtTest {
     @Test
     public void testUpdatePage() throws Exception {
         final Map<PageUpdateField, String> map = new HashMap<PageUpdater.PageUpdateField, String>();
-        doReturn(userId).when(pageAPIExt).getUserIdFromSessionInfos();
         doReturn(sPage).when(pageAPIExt).constructPage(any(PageUpdater.class), anyLong());
         doReturn(page).when(pageAPIExt).convertToPage(any(SPage.class));
         doReturn(sPageUpdateBuilder).when(pageAPIExt).getPageUpdateBuilder();
@@ -214,7 +232,6 @@ public class PageAPIExtTest {
 
     @Test(expected = UpdateException.class)
     public void testUpdatePageWithEmplyUpdateFileShouldThrowExceptions() throws Exception {
-        doReturn(userId).when(pageAPIExt).getUserIdFromSessionInfos();
         doReturn(sPage).when(pageAPIExt).constructPage(any(PageUpdater.class), anyLong());
         doReturn(page).when(pageAPIExt).convertToPage(any(SPage.class));
 
@@ -280,7 +297,6 @@ public class PageAPIExtTest {
     public void testCheckPageAlreadyExists() throws Exception {
         // given
         final PageCreator pageCreator = new PageCreator("name", "content.zip");
-        doReturn(userId).when(pageAPIExt).getUserIdFromSessionInfos();
         doReturn(sPage).when(pageAPIExt).constructPage(pageCreator, userId);
         doReturn(page).when(pageAPIExt).convertToPage(any(SPage.class));
         final byte[] content = IOUtil.zip(Collections.singletonMap("Index.groovy", "content of the groovy".getBytes()));
@@ -292,5 +308,116 @@ public class PageAPIExtTest {
         // then
         // AlreadyExistsException
 
+    }
+
+    @Test
+    public void should_getPageProperties_check_already_exists_if_check_to_true() throws Exception {
+        // given
+        byte[] content = new byte[]{1, 2, 3};
+        Properties properties = new Properties();
+        properties.setProperty(PageService.PROPERTIES_NAME, "MyPage");
+        doReturn(properties).when(pageService).readPageZip(content);
+        doReturn(null).when(pageService).getPageByName("MyPage");
+        // when
+        Properties pageProperties = pageAPIExt.getPageProperties(content, true);
+
+        // then
+        assertThat(pageProperties).isEqualTo(properties);
+    }
+
+    @Test
+    public void should_getPageProperties_throw_already_exists_if_check_to_true() throws Exception {
+        // given
+        byte[] content = new byte[]{1, 2, 3};
+        Properties properties = new Properties();
+        properties.setProperty(PageService.PROPERTIES_NAME, "MyPage");
+        doReturn(properties).when(pageService).readPageZip(content);
+        doReturn(mock(SPage.class)).when(pageService).getPageByName("MyPage");
+        // when
+        expectedException.expect(AlreadyExistsException.class);
+        pageAPIExt.getPageProperties(content,true);
+
+        // then
+        // AlreadyExistsException
+    }
+    @Test
+    public void should_getPageProperties_throw_retrieve_exception() throws Exception {
+        // given
+        byte[] content = new byte[]{1, 2, 3};
+        Properties properties = new Properties();
+        properties.setProperty(PageService.PROPERTIES_NAME, "MyPage");
+        doReturn(properties).when(pageService).readPageZip(content);
+        doThrow(new SBonitaReadException(new IOException("IO issue"))).when(pageService).getPageByName("MyPage");
+        // when
+        expectedException.expect(RetrieveException.class);
+        pageAPIExt.getPageProperties(content,true);
+
+        // then
+        // AlreadyExistsException
+    }
+
+    @Test
+    public void should_getPageProperties_not_throw_already_exists_if_check_to_false() throws Exception {
+        // given
+        byte[] content = new byte[]{1, 2, 3};
+        Properties properties = new Properties();
+        properties.setProperty(PageService.PROPERTIES_NAME, "MyPage");
+        doReturn(properties).when(pageService).readPageZip(content);
+        doReturn(mock(SPage.class)).when(pageService).getPageByName("MyPage");
+        // when
+        Properties pageProperties = pageAPIExt.getPageProperties(content, false);
+
+        // then
+        assertThat(pageProperties).isEqualTo(properties);
+    }
+
+    @Test
+    public void should_getPageProperties_throw_Invalid_missing_index() throws Exception {
+        // given
+        byte[] content = new byte[]{1, 2, 3};
+        doThrow(SInvalidPageZipMissingIndexException.class).when(pageService).readPageZip(content);
+        // when
+        expectedException.expect(InvalidPageZipMissingIndexException.class);
+        pageAPIExt.getPageProperties(content, false);
+    }
+
+    @Test
+    public void should_getPageProperties_throw_Invalid_missing_properties() throws Exception {
+        // given
+        byte[] content = new byte[]{1, 2, 3};
+        doThrow(SInvalidPageZipMissingPropertiesException.class).when(pageService).readPageZip(content);
+        // when
+        expectedException.expect(InvalidPageZipMissingPropertiesException.class);
+        pageAPIExt.getPageProperties(content, false);
+    }
+
+    @Test
+    public void should_getPageProperties_throw_Invalid_missing_a_property() throws Exception {
+        // given
+        byte[] content = new byte[]{1, 2, 3};
+        doThrow(SInvalidPageZipMissingAPropertyException.class).when(pageService).readPageZip(content);
+        // when
+        expectedException.expect(InvalidPageZipMissingAPropertyException.class);
+        pageAPIExt.getPageProperties(content, false);
+    }
+
+    @Test
+    public void should_getPageProperties_throw_Invalid_inconsistent() throws Exception {
+        // given
+        byte[] content = new byte[]{1, 2, 3};
+        doThrow(SInvalidPageZipInconsistentException.class).when(pageService).readPageZip(content);
+        // when
+        expectedException.expect(InvalidPageZipInconsistentException.class);
+        pageAPIExt.getPageProperties(content, false);
+    }
+
+    @Test
+    public void should_getPageProperties_throw_Invalid_token() throws Exception {
+        // given
+        byte[] content = new byte[]{1, 2, 3};
+        doThrow(SInvalidPageTokenException.class).when(pageService).readPageZip(content);
+        // when
+        expectedException.expect(InvalidPageTokenException.class);
+        pageAPIExt.getPageProperties(content,false);
     }
 }
