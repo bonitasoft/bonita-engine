@@ -234,8 +234,7 @@ public class ServerAPIImpl implements ServerAPI {
     }
 
     private ClassLoader beforeInvokeMethodForAPISession(final SessionAccessor sessionAccessor, final ServiceAccessorFactory serviceAccessorFactory,
-            final PlatformServiceAccessor platformServiceAccessor, final Session session) throws SSchedulerException,
-            org.bonitasoft.engine.session.SSessionException, SClassLoaderException, SBonitaException, BonitaHomeNotSetException, IOException,
+            final PlatformServiceAccessor platformServiceAccessor, final Session session) throws  SBonitaException, BonitaHomeNotSetException, IOException,
             BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         final SessionService sessionService = platformServiceAccessor.getSessionService();
 

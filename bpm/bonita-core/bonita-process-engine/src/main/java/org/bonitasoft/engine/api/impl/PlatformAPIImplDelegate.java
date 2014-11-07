@@ -44,8 +44,6 @@ public class PlatformAPIImplDelegate {
 
     private final String mobileDefaultThemeFilename;
 
-    private File unzippedCssPortalThemeFolder;
-
     public PlatformAPIImplDelegate() {
         this(BONITA_PORTAL_THEME_DEFAULT, BONITA_MOBILE_THEME_DEFAULT);
     }
@@ -54,12 +52,11 @@ public class PlatformAPIImplDelegate {
         super();
         this.portalDefaultThemeFilename = portalDefaultThemeFilename;
         this.mobileDefaultThemeFilename = mobileDefaultThemeFilename;
-
-        unzipTheme();
     }
 
-    private void unzipTheme() {
+    private File unzipTheme() {
         InputStream defaultThemeCssZip = null;
+        File unzippedCssPortalThemeFolder;
         try {
             defaultThemeCssZip = getResourceAsStream(portalDefaultThemeFilename + "-css" + ZIP);
             if (defaultThemeCssZip != null) {
@@ -79,10 +76,7 @@ public class PlatformAPIImplDelegate {
                 }
             }
         }
-    }
-
-    public void cleanUnzippedFolder() throws IOException {
-        IOUtil.deleteDir(unzippedCssPortalThemeFolder);
+        return unzippedCssPortalThemeFolder;
     }
 
     public void createDefaultThemes(final TenantServiceAccessor tenantServiceAccessor) throws IOException, SThemeCreationException {
@@ -93,13 +87,16 @@ public class PlatformAPIImplDelegate {
     protected void createDefaultPortalTheme(final TenantServiceAccessor tenantServiceAccessor) throws IOException, SThemeCreationException {
         final ThemeService themeService = tenantServiceAccessor.getThemeService();
         final byte[] defaultThemeZip = getFileContent(portalDefaultThemeFilename + ZIP);
-
-        if (defaultThemeZip != null && unzippedCssPortalThemeFolder != null && defaultThemeZip.length > 0) {
-            final byte[] defaultThemeCss = IOUtil.getAllContentFrom(new File(unzippedCssPortalThemeFolder, "bonita.css"));
-            if (defaultThemeCss != null) {
-                final STheme sTheme = buildSTheme(defaultThemeZip, defaultThemeCss, SThemeType.PORTAL);
-                themeService.createTheme(sTheme);
+        File unzippedCssPortalThemeFolder = unzipTheme();
+        if (unzippedCssPortalThemeFolder != null) {
+            if (defaultThemeZip != null && defaultThemeZip.length > 0) {
+                final byte[] defaultThemeCss = IOUtil.getAllContentFrom(new File(unzippedCssPortalThemeFolder, "bonita.css"));
+                if (defaultThemeCss != null) {
+                    final STheme sTheme = buildSTheme(defaultThemeZip, defaultThemeCss, SThemeType.PORTAL);
+                    themeService.createTheme(sTheme);
+                }
             }
+            IOUtil.deleteDir(unzippedCssPortalThemeFolder);
         }
     }
 

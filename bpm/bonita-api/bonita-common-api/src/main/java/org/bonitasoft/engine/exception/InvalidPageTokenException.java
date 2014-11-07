@@ -9,4 +9,7 @@ public class InvalidPageTokenException extends CreationException {
         super(message, cause);
     }
 
+    public InvalidPageTokenException(String message) {
+        super(message);
+    }
 }

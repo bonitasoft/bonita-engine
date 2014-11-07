@@ -728,9 +728,9 @@ public class IOUtil {
         }
     }
 
-    public static byte[] getPropertyAsString(final Properties prop) throws IOException {
+    public static byte[] getPropertyAsString(final Properties prop, String comment) throws IOException {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        prop.store(out, "");
+        prop.store(out, comment);
         return out.toByteArray();
     }
 
