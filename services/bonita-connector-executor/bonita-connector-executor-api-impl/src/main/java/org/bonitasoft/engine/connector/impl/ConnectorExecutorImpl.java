@@ -27,7 +27,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.connector.SConnector;
 import org.bonitasoft.engine.connector.exception.SConnectorException;
@@ -41,7 +40,7 @@ import org.bonitasoft.engine.tracking.TimeTrackerRecords;
 
 /**
  * Execute connectors directly
- * 
+ *
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
@@ -72,22 +71,22 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
      * - If the number of threads is equal (or greater than) the corePoolSize, put the task into the queue.
      * - If the queue is full, and the number of threads is less than the maxPoolSize, create a new thread to run tasks in.
      * - If the queue is full, and the number of threads is greater than or equal to maxPoolSize, reject the task.
-     * 
+     *
      * @param queueCapacity
-     *            The maximum number of execution of connector to queue for each thread
+     *        The maximum number of execution of connector to queue for each thread
      * @param corePoolSize
-     *            the number of threads to keep in the pool, even
-     *            if they are idle, unless {@code allowCoreThreadTimeOut} is set
+     *        the number of threads to keep in the pool, even
+     *        if they are idle, unless {@code allowCoreThreadTimeOut} is set
      * @param loggerService
      * @param timeout
-     *            if the execution of the connector is above this time in milliseconds the execution will fail
+     *        if the execution of the connector is above this time in milliseconds the execution will fail
      * @param maximumPoolSize
-     *            the maximum number of threads to allow in the
-     *            pool
+     *        the maximum number of threads to allow in the
+     *        pool
      * @param keepAliveTime
-     *            when the number of threads is greater than
-     *            the core, this is the maximum time that excess idle threads
-     *            will wait for new tasks before terminating. (in seconds)
+     *        when the number of threads is greater than
+     *        the core, this is the maximum time that excess idle threads
+     *        will wait for new tasks before terminating. (in seconds)
      */
     public ConnectorExecutorImpl(final int queueCapacity, final int corePoolSize, final TechnicalLoggerService loggerService, final int maximumPoolSize,
             final long keepAliveTimeSeconds, final SessionAccessor sessionAccessor, final SessionService sessionService, final TimeTracker timeTracker) {
@@ -148,8 +147,8 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         try {
             sConnector.disconnect();
         } catch (final Exception t) {
-            if (this.loggerService.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                this.loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "An error occured while disconnecting the connector: " + sConnector, t);
+            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "An error occured while disconnecting the connector: " + sConnector, t);
             }
         }
     }
@@ -243,7 +242,7 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
         return executorService;
     }
 
-    public void setExecutorService(ExecutorService executorService) {
+    public void setExecutorService(final ExecutorService executorService) {
         this.executorService = executorService;
     }
 
@@ -263,12 +262,12 @@ public class ConnectorExecutorImpl implements ConnectorExecutor {
     }
 
     @Override
-    public void pause() throws SBonitaException {
+    public void pause() {
         stop();
     }
 
     @Override
-    public void resume() throws SBonitaException {
+    public void resume() {
         start();
     }
 }

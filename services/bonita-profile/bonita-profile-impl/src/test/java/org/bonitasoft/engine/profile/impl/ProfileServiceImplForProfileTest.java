@@ -39,7 +39,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -210,7 +209,7 @@ public class ProfileServiceImplForProfileTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getProfiles(java.util.List)}.
-     * 
+     *
      * @throws SProfileNotFoundException
      * @throws SBonitaReadException
      */
@@ -254,7 +253,7 @@ public class ProfileServiceImplForProfileTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#getProfilesOfUser(long)}.
-     * 
+     *
      * @throws SBonitaReadException
      * @throws SProfileReadException
      */
@@ -287,7 +286,7 @@ public class ProfileServiceImplForProfileTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#createProfile(org.bonitasoft.engine.profile.model.SProfile)}.
-     * 
+     *
      * @throws SProfileCreationException
      * @throws SRecorderException
      */
@@ -325,7 +324,7 @@ public class ProfileServiceImplForProfileTest {
     /**
      * Test method for
      * {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#updateProfile(org.bonitasoft.engine.profile.model.SProfile, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}
-     * 
+     *
      * @throws SBonitaReadException
      * @throws SRecorderException
      * @throws SProfileUpdateException
@@ -374,7 +373,7 @@ public class ProfileServiceImplForProfileTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#deleteProfile(long)}.
-     * 
+     *
      * @throws SProfileDeletionException
      * @throws SProfileNotFoundException
      * @throws SRecorderException
@@ -484,7 +483,7 @@ public class ProfileServiceImplForProfileTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.profile.impl.ProfileServiceImpl#deleteProfile(org.bonitasoft.engine.profile.model.SProfile)}.
-     * 
+     *
      * @throws SBonitaReadException
      * @throws SRecorderException
      * @throws SProfileDeletionException

@@ -22,6 +22,7 @@ public abstract class TransactionSynchronizationTest {
         txService = getTxService();
     }
 
+    @SuppressWarnings("deprecation")
     @After
     public void closeTransactions() throws Exception {
         if (txService.isTransactionActive()) {

@@ -14,10 +14,8 @@
  */
 package org.bonitasoft.engine.core.document.model.archive.impl;
 
-import org.bonitasoft.engine.core.document.model.SLightDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
-import org.bonitasoft.engine.core.document.model.impl.SLightDocumentImpl;
 import org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl;
 import org.bonitasoft.engine.persistence.PersistentObject;
 
@@ -26,6 +24,7 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  */
 public class SAMappedDocumentImpl extends SMappedDocumentImpl implements SAMappedDocument {
 
+    private static final long serialVersionUID = 6336775069043808864L;
     private long archiveDate;
     private long sourceObjectId;
 
@@ -34,20 +33,21 @@ public class SAMappedDocumentImpl extends SMappedDocumentImpl implements SAMappe
         return SMappedDocument.class;
     }
 
-
+    @Override
     public long getArchiveDate() {
         return archiveDate;
     }
 
-    public void setArchiveDate(long archiveDate) {
+    public void setArchiveDate(final long archiveDate) {
         this.archiveDate = archiveDate;
     }
 
+    @Override
     public long getSourceObjectId() {
         return sourceObjectId;
     }
 
-    public void setSourceObjectId(long sourceObjectId) {
+    public void setSourceObjectId(final long sourceObjectId) {
         this.sourceObjectId = sourceObjectId;
     }
 
@@ -57,22 +57,30 @@ public class SAMappedDocumentImpl extends SMappedDocumentImpl implements SAMappe
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-        SAMappedDocumentImpl that = (SAMappedDocumentImpl) o;
+        final SAMappedDocumentImpl that = (SAMappedDocumentImpl) o;
 
-        if (archiveDate != that.archiveDate) return false;
-        if (sourceObjectId != that.sourceObjectId) return false;
+        if (archiveDate != that.archiveDate) {
+            return false;
+        }
+        if (sourceObjectId != that.sourceObjectId) {
+            return false;
+        }
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (archiveDate ^ (archiveDate >>> 32));
-        result = 31 * result + (int) (sourceObjectId ^ (sourceObjectId >>> 32));
+        int result = (int) (archiveDate ^ archiveDate >>> 32);
+        result = 31 * result + (int) (sourceObjectId ^ sourceObjectId >>> 32);
         return result;
     }
 

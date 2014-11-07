@@ -1,5 +1,4 @@
 /*
- *
  * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -12,15 +11,22 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.bonitasoft.engine.execution;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.core.process.definition.model.*;
+import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
+import org.bonitasoft.engine.core.process.definition.model.STransitionDefinition;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecutionException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
@@ -33,18 +39,16 @@ import org.bonitasoft.engine.expression.exception.SExpressionTypeUnknownExceptio
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.SExpression;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public class TransitionEvaluator {
+
     private final ExpressionResolverService expressionResolverService;
-    public TransitionEvaluator(ExpressionResolverService expressionResolverService) {
+
+    public TransitionEvaluator(final ExpressionResolverService expressionResolverService) {
         this.expressionResolverService = expressionResolverService;
     }
 
     protected List<STransitionDefinition> evaluateOutgoingTransitions(final List<STransitionDefinition> outgoingTransitionDefinitions,
-                                                                      final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
+            final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
         // int nbOfTokenToMerge = 1;// may be > 1 in case of gateway
         // if is not a normal state don't create new elements
         if (!SStateCategory.NORMAL.equals(flowNodeInstance.getStateCategory())) {
@@ -61,21 +65,23 @@ public class TransitionEvaluator {
         }
     }
 
-    List<STransitionDefinition> evaluateOutgoingTransitionsForActivity(List<STransitionDefinition> outgoingTransitionDefinitions, SProcessDefinition sDefinition, SFlowNodeInstance flowNodeInstance, SExpressionContext sExpressionContext) throws SBonitaException {
+    List<STransitionDefinition> evaluateOutgoingTransitionsForActivity(final List<STransitionDefinition> outgoingTransitionDefinitions,
+            final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance, final SExpressionContext sExpressionContext)
+            throws SBonitaException {
         if (outgoingTransitionDefinitions.isEmpty()) {
             STransitionDefinition defaultTransition;
             if ((defaultTransition = getDefaultTransition(sDefinition, flowNodeInstance)) == null) {
                 return Collections.emptyList();
-            } else {
-                return Collections.singletonList(defaultTransition);
             }
-        } else {
-            return evaluateTransitionsForImplicitGateway(sDefinition, flowNodeInstance, outgoingTransitionDefinitions,
-                    sExpressionContext);
+            return Collections.singletonList(defaultTransition);
         }
+        return evaluateTransitionsForImplicitGateway(sDefinition, flowNodeInstance, outgoingTransitionDefinitions,
+                sExpressionContext);
     }
 
-    List<STransitionDefinition> evaluateOutgoingTransitionsForGateways(List<STransitionDefinition> outgoingTransitionDefinitions, SProcessDefinition sDefinition, SFlowNodeInstance flowNodeInstance, SExpressionContext sExpressionContext) throws SBonitaException {
+    List<STransitionDefinition> evaluateOutgoingTransitionsForGateways(final List<STransitionDefinition> outgoingTransitionDefinitions,
+            final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance, final SExpressionContext sExpressionContext)
+            throws SBonitaException {
         List<STransitionDefinition> chosenTransitionDefinitions;
         final SGatewayInstance gatewayInstance = (SGatewayInstance) flowNodeInstance;
         switch (gatewayInstance.getGatewayType()) {
@@ -97,7 +103,7 @@ public class TransitionEvaluator {
     }
 
     List<STransitionDefinition> evaluateTransitionsExclusively(final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance,
-                                                               final List<STransitionDefinition> outgoingTransitionDefinitions, final SExpressionContext sExpressionContext) throws SBonitaException {
+            final List<STransitionDefinition> outgoingTransitionDefinitions, final SExpressionContext sExpressionContext) throws SBonitaException {
         final List<STransitionDefinition> chosenTransitions = new ArrayList<STransitionDefinition>(outgoingTransitionDefinitions.size());
         boolean transitionFound = false;
         for (final STransitionDefinition sTransitionDefinition : outgoingTransitionDefinitions) {
@@ -117,7 +123,7 @@ public class TransitionEvaluator {
     }
 
     STransitionDefinition getDefaultTransitionIfExists(final SProcessDefinition sDefinition,
-                                                       final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
+            final SFlowNodeInstance flowNodeInstance) throws SActivityExecutionException {
         final STransitionDefinition defaultTransition = getDefaultTransition(sDefinition, flowNodeInstance);
         if (defaultTransition == null) {
             throwSActivityExecutionException(sDefinition, flowNodeInstance);
@@ -136,7 +142,7 @@ public class TransitionEvaluator {
     }
 
     List<STransitionDefinition> evaluateTransitionsInclusively(final SProcessDefinition sDefinition, final SFlowNodeInstance flowNodeInstance,
-                                                               final List<STransitionDefinition> outgoingTransitionDefinitions, final SExpressionContext sExpressionContext) throws SBonitaException {
+            final List<STransitionDefinition> outgoingTransitionDefinitions, final SExpressionContext sExpressionContext) throws SBonitaException {
         final List<STransitionDefinition> chosenTransitions = new ArrayList<STransitionDefinition>(outgoingTransitionDefinitions.size());
         for (final STransitionDefinition sTransitionDefinition : outgoingTransitionDefinitions) {
             final Boolean condition = evaluateCondition(sDefinition, sTransitionDefinition, sExpressionContext);
@@ -153,8 +159,8 @@ public class TransitionEvaluator {
     }
 
     protected List<STransitionDefinition> evaluateTransitionsForImplicitGateway(final SProcessDefinition sDefinition,
-                                                                                final SFlowNodeInstance flowNodeInstance,
-                                                                                final List<STransitionDefinition> outgoingTransitionDefinitions, final SExpressionContext sExpressionContext) throws SBonitaException {
+            final SFlowNodeInstance flowNodeInstance,
+            final List<STransitionDefinition> outgoingTransitionDefinitions, final SExpressionContext sExpressionContext) throws SBonitaException {
         final int transitionNumber = outgoingTransitionDefinitions.size();
         final List<STransitionDefinition> conditionalTransitions = new ArrayList<STransitionDefinition>(transitionNumber);
         final List<STransitionDefinition> conditionalFalseTransitions = new ArrayList<STransitionDefinition>(transitionNumber);
@@ -199,7 +205,7 @@ public class TransitionEvaluator {
     }
 
     protected Boolean evaluateCondition(final SProcessDefinition sDefinition, final STransitionDefinition sTransitionDefinition,
-                                        final SExpressionContext contextDependency) throws SExpressionEvaluationException, SExpressionTypeUnknownException,
+            final SExpressionContext contextDependency) throws SExpressionEvaluationException, SExpressionTypeUnknownException,
             SExpressionDependencyMissingException, SInvalidExpressionException {
         // TODO find a better method to get expression on transitionDef
         final SFlowElementContainerDefinition processContainer = sDefinition.getProcessContainer();
@@ -216,13 +222,13 @@ public class TransitionEvaluator {
     }
 
     FlowNodeTransitionsWrapper buildTransitionsWrapper(final SFlowNodeDefinition flowNode, final SProcessDefinition sProcessDefinition,
-                                                       final SFlowNodeInstance child) throws SBonitaException {
+            final SFlowNodeInstance child) throws SBonitaException {
         final FlowNodeTransitionsWrapper transitionsDescriptor = new FlowNodeTransitionsWrapper();
         // Retrieve all outgoing transitions
         if (flowNode == null) {
             // not in definition
             transitionsDescriptor.setInputTransitionsSize(0);
-            transitionsDescriptor.setAllOutgoingTransitionDefinitions(Collections.<STransitionDefinition>emptyList());
+            transitionsDescriptor.setAllOutgoingTransitionDefinitions(Collections.<STransitionDefinition> emptyList());
         } else {
             transitionsDescriptor.setInputTransitionsSize(flowNode.getIncomingTransitions().size());
             transitionsDescriptor.setAllOutgoingTransitionDefinitions(new ArrayList<STransitionDefinition>(flowNode.getOutgoingTransitions()));

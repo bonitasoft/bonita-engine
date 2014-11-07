@@ -55,9 +55,9 @@ public class SMessageEventTriggerDefinitionImpl extends SEventTriggerDefinitionI
         correlations = new ArrayList<SCorrelationDefinition>(1);
     }
 
-    public SMessageEventTriggerDefinitionImpl(SCatchMessageEventTriggerDefinition trigger) {
+    public SMessageEventTriggerDefinitionImpl(final SCatchMessageEventTriggerDefinition trigger) {
         messageName = trigger.getMessageName();
-        this.correlations = trigger.getCorrelations();
+        correlations = trigger.getCorrelations();
     }
 
     public SMessageEventTriggerDefinitionImpl(final MessageEventTriggerDefinition messageEventTrigger) {
@@ -91,25 +91,25 @@ public class SMessageEventTriggerDefinitionImpl extends SEventTriggerDefinitionI
         if (isXMLDataDefinition(dataDefinition)) {
             final XMLDataDefinition xmlDataDef = (XMLDataDefinition) dataDefinition;
             final SXMLDataDefinitionBuilderFactory fact = BuilderFactory.get(SXMLDataDefinitionBuilderFactory.class);
-            final SXMLDataDefinitionBuilder builder = fact.createNewXMLData(messageName).setElement(xmlDataDef.getElement()).setNamespace(xmlDataDef.getNamespace());
-            builder.setDefaultValue(ServerModelConvertor.convertExpression(dataDefinition.getDefaultValueExpression()));
-            builder.setDescription(dataDefinition.getDescription());
-            builder.setTransient(dataDefinition.isTransientData());
-            return builder.done();
-        } else {
-            final SDataDefinitionBuilderFactory fact = BuilderFactory.get(SDataDefinitionBuilderFactory.class);
-            SDataDefinitionBuilder builder = null;
-            if (isTextDataDefinition(dataDefinition)) {
-                final TextDataDefinition textDataDefinition = (TextDataDefinition) dataDefinition;
-                builder = fact.createNewTextData(dataDefinition.getName()).setAsLongText(textDataDefinition.isLongText());
-            } else {
-                builder = fact.createNewInstance(dataDefinition.getName(), dataDefinition.getClassName());
-            }
+            final SXMLDataDefinitionBuilder builder = fact.createNewXMLData(messageName).setElement(xmlDataDef.getElement())
+                    .setNamespace(xmlDataDef.getNamespace());
             builder.setDefaultValue(ServerModelConvertor.convertExpression(dataDefinition.getDefaultValueExpression()));
             builder.setDescription(dataDefinition.getDescription());
             builder.setTransient(dataDefinition.isTransientData());
             return builder.done();
         }
+        final SDataDefinitionBuilderFactory fact = BuilderFactory.get(SDataDefinitionBuilderFactory.class);
+        SDataDefinitionBuilder builder = null;
+        if (isTextDataDefinition(dataDefinition)) {
+            final TextDataDefinition textDataDefinition = (TextDataDefinition) dataDefinition;
+            builder = fact.createNewTextData(dataDefinition.getName()).setAsLongText(textDataDefinition.isLongText());
+        } else {
+            builder = fact.createNewInstance(dataDefinition.getName(), dataDefinition.getClassName());
+        }
+        builder.setDefaultValue(ServerModelConvertor.convertExpression(dataDefinition.getDefaultValueExpression()));
+        builder.setDescription(dataDefinition.getDescription());
+        builder.setTransient(dataDefinition.isTransientData());
+        return builder.done();
     }
 
     private boolean isXMLDataDefinition(final DataDefinition dataDefinition) {

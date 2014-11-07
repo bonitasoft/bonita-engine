@@ -78,7 +78,7 @@ public abstract class CommonAPITest extends APITestUtil {
 
     /**
      * FIXME: clean actors!
-     * 
+     *
      * @return
      * @throws BonitaException
      */
@@ -99,6 +99,7 @@ public abstract class CommonAPITest extends APITestUtil {
         messages.addAll(checkNoCategories());
         messages.addAll(checkNoComments());
         messages.addAll(checkNoArchivedComments());
+        messages.addAll(checkNoWaitingEvent());
 
         logoutOnTenant();
         return messages;

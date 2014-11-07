@@ -6,13 +6,11 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.identity.User;
-import org.bonitasoft.engine.test.APITestUtil;
 import org.bonitasoft.engine.test.WaitUntil;
 
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
- * 
  * @deprecated use {@link APITestUtil} .waitFor...
  */
 @Deprecated

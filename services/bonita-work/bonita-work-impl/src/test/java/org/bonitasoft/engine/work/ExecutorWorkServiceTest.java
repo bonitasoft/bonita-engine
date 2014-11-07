@@ -195,7 +195,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void checkStopStatus() throws SWorkException {
+    public void checkStopStatus() {
         // given
         workService.start();
 
@@ -242,7 +242,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void should_start_do_nothing_when_already_started() throws SWorkException {
+    public void should_start_do_nothing_when_already_started() {
         // given
         workService.start();
 
@@ -254,7 +254,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void should_stop_do_nothing_when_already_stopped() throws SWorkException {
+    public void should_stop_do_nothing_when_already_stopped() {
         // given
         workService.start();
         workService.stop();
@@ -267,7 +267,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void should_isStopped_return_true_when_only_executor_is_shutdown() throws SWorkException {
+    public void should_isStopped_return_true_when_only_executor_is_shutdown() {
         // given
         doReturn(true).when(executorService).isShutdown();
 
@@ -288,7 +288,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void should_stop_do_not_throw_exception_on_timeout() throws SWorkException, InterruptedException {
+    public void should_stop_do_not_throw_exception_on_timeout() throws InterruptedException {
         // given
         workService.start();
         doReturn(false).when(executorService).awaitTermination(anyLong(), any(TimeUnit.class));
@@ -313,7 +313,7 @@ public class ExecutorWorkServiceTest {
     }
 
     @Test
-    public void should_stop_do_not_throw_exception_on_interrupted() throws SWorkException, InterruptedException {
+    public void should_stop_do_not_throw_exception_on_interrupted() throws InterruptedException {
         // given
         workService.start();
         doThrow(InterruptedException.class).when(executorService).awaitTermination(anyLong(), any(TimeUnit.class));

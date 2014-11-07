@@ -33,103 +33,102 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  */
 public class SynchroServiceImpl extends AbstractSynchroService {
 
-	private final Map<Map<String, Serializable>, String> waiters;
+    private final Map<Map<String, Serializable>, String> waiters;
 
-	private final Map<String, Serializable> eventKeyAndIdMap;
+    private final Map<String, Serializable> eventKeyAndIdMap;
 
-	private final Map<String, Semaphore> eventSemaphores;
+    private final Map<String, Semaphore> eventSemaphores;
 
-	private final Lock lock = new SynchroServiceImplReentrantLock();
+    private final Lock lock = new SynchroServiceImplReentrantLock();
 
-	/**
-	 * @param initialCapacity
-	 *            the initial capacity of the map of fired events / waiters (default 50)
-	 * @param logger
-	 *            the technical logger service
-	 */
-	private SynchroServiceImpl(final int initialCapacity, final TechnicalLoggerService logger, final CommonCacheService cacheService) {
-		super(logger, cacheService);
-		waiters = new HashMap<Map<String, Serializable>, String>(initialCapacity);
-		eventKeyAndIdMap = new HashMap<String, Serializable>(initialCapacity);
-		eventSemaphores = new HashMap<String, Semaphore>();
-	}
-	
-	private static final class SynchroServiceImplReentrantLock extends ReentrantLock {
-	    
-	}
+    /**
+     * @param initialCapacity
+     *        the initial capacity of the map of fired events / waiters (default 50)
+     * @param logger
+     *        the technical logger service
+     */
+    private SynchroServiceImpl(final int initialCapacity, final TechnicalLoggerService logger, final CommonCacheService cacheService) {
+        super(logger, cacheService);
+        waiters = new HashMap<Map<String, Serializable>, String>(initialCapacity);
+        eventKeyAndIdMap = new HashMap<String, Serializable>(initialCapacity);
+        eventSemaphores = new HashMap<String, Semaphore>();
+    }
 
-	@Override
-	protected Map<Map<String, Serializable>, String> getWaitersMap() {
-		return waiters;
-	}
+    private static final class SynchroServiceImplReentrantLock extends ReentrantLock {
 
-	@Override
-	protected Map<String, Serializable> getEventKeyAndIdMap() {
-		return eventKeyAndIdMap;
-	}
+    }
 
-	@Override
-	protected Lock getServiceLock() {
-		return lock;
-	}
+    @Override
+    protected Map<Map<String, Serializable>, String> getWaitersMap() {
+        return waiters;
+    }
 
-	@Override
-	protected void releaseWaiter(final String semaphoreKey) {
-		Semaphore semaphore = eventSemaphores.get(semaphoreKey);
-		if (semaphore != null) {
-			semaphore.release();
-		}
-	}
+    @Override
+    protected Map<String, Serializable> getEventKeyAndIdMap() {
+        return eventKeyAndIdMap;
+    }
 
-	@Override
-	public Serializable waitForEvent(final Map<String, Serializable> event, final long timeout) throws InterruptedException, TimeoutException {
-		Serializable id = null;
-		String semaphoreKey = null;
-		Semaphore semaphore = null;
-		getServiceLock().lock();
-		try {
-			id = getFiredAndRemoveIt(event);
-			if (id == null) {
-				semaphoreKey = getSemaphoreKey(event);
-				semaphore = new Semaphore(1);
-				eventSemaphores.put(semaphoreKey, semaphore);
-				semaphore.acquire(1);
-				getWaitersMap().put(event, semaphoreKey);
-			}
-		} finally {
-			getServiceLock().unlock();
-		}
-		if (semaphore != null) {
-			try {
-				if (!semaphore.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
-					throwTimeout(event, timeout);
-				}
-			} catch (final InterruptedException e) {
-				throwTimeout(event, timeout);
-			} finally {
-				getWaitersMap().remove(event);
-			}
-			return getEventKeyAndIdMap().get(semaphoreKey);
-		} else {
-			return id;
-		}
-	}
+    @Override
+    protected Lock getServiceLock() {
+        return lock;
+    }
 
-	private String getSemaphoreKey(final Map<String, Serializable> event) {
-		final StringBuilder sb = new StringBuilder();
-		final TreeMap<String, Serializable> orderedMap = new TreeMap<String, Serializable>(event);
-		boolean first = true;
-		for (final Map.Entry<String, Serializable> entry : orderedMap.entrySet()) {
-			if (!first) {
-				sb.append(";;;;;");	
-			} else {
-				first = false;
-			}
-			sb.append(entry.getKey());
-			sb.append("=");
-			sb.append(entry.getValue());
-		}
-		return sb.toString();
-	}
+    @Override
+    protected void releaseWaiter(final String semaphoreKey) {
+        final Semaphore semaphore = eventSemaphores.get(semaphoreKey);
+        if (semaphore != null) {
+            semaphore.release();
+        }
+    }
+
+    @Override
+    public Serializable waitForEvent(final Map<String, Serializable> event, final long timeout) throws InterruptedException, TimeoutException {
+        Serializable id = null;
+        String semaphoreKey = null;
+        Semaphore semaphore = null;
+        getServiceLock().lock();
+        try {
+            id = getFiredAndRemoveIt(event);
+            if (id == null) {
+                semaphoreKey = getSemaphoreKey(event);
+                semaphore = new Semaphore(1);
+                eventSemaphores.put(semaphoreKey, semaphore);
+                semaphore.acquire(1);
+                getWaitersMap().put(event, semaphoreKey);
+            }
+        } finally {
+            getServiceLock().unlock();
+        }
+        if (semaphore != null) {
+            try {
+                if (!semaphore.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
+                    throwTimeout(event, timeout);
+                }
+            } catch (final InterruptedException e) {
+                throwTimeout(event, timeout);
+            } finally {
+                getWaitersMap().remove(event);
+            }
+            return getEventKeyAndIdMap().get(semaphoreKey);
+        }
+        return id;
+    }
+
+    private String getSemaphoreKey(final Map<String, Serializable> event) {
+        final StringBuilder sb = new StringBuilder();
+        final TreeMap<String, Serializable> orderedMap = new TreeMap<String, Serializable>(event);
+        boolean first = true;
+        for (final Map.Entry<String, Serializable> entry : orderedMap.entrySet()) {
+            if (!first) {
+                sb.append(";;;;;");
+            } else {
+                first = false;
+            }
+            sb.append(entry.getKey());
+            sb.append("=");
+            sb.append(entry.getValue());
+        }
+        return sb.toString();
+    }
 
 }

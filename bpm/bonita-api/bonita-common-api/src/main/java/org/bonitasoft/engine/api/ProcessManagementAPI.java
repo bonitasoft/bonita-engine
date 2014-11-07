@@ -1434,7 +1434,7 @@ public interface ProcessManagementAPI {
      *         If an exception occurs when getting the process deployment information.
      * @since 6.0
      * @deprecated 6.3.3
-     * @see {@link ProcessManagementAPI#searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(long, SearchOptions)}
+     * @see ProcessManagementAPI#searchProcessDeploymentInfosCanBeStartedByUsersManagedBy(long, SearchOptions)
      */
     @Deprecated
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosUsersManagedByCanStart(long managerUserId, SearchOptions searchOptions)
@@ -1742,7 +1742,7 @@ public interface ProcessManagementAPI {
      * @param startIndex
      *        The start index (the first valid value is zero)
      * @param maxResults
-     *        max number of user identifiers to be retrieved
+     *        The max number of user identifiers to be retrieved
      * @return Retrieves the list of user identifiers for the given actor and process.
      * @since 6.3.2
      */

@@ -664,6 +664,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         boundaryEvent.addErrorEventTrigger("error");
         processDefinitionBuilder.addUserTask("errorTask", ACTOR_NAME);
         processDefinitionBuilder.addTransition("errorBoundary", "errorTask");
+
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorThatThrowException(processDefinitionBuilder, ACTOR_NAME, johnUser);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         // the connector must trigger this exception step

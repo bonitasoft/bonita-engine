@@ -43,7 +43,6 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -119,7 +118,7 @@ public class SCommentServiceImpl implements SCommentService {
     @Override
     public List<SComment> getComments(final long processInstanceId) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("processInstanceId", (Object) processInstanceId);
-        OrderByOption orderByOption = new OrderByOption(SComment.class, "id", OrderByType.ASC);
+        final OrderByOption orderByOption = new OrderByOption(SComment.class, "id", OrderByType.ASC);
         final QueryOptions queryOptions = new QueryOptions(Arrays.asList(orderByOption));
         final SelectListDescriptor<SComment> selectDescriptor = new SelectListDescriptor<SComment>("getSComments", parameters, SComment.class, queryOptions);
         return persistenceService.selectList(selectDescriptor);
@@ -203,7 +202,7 @@ public class SCommentServiceImpl implements SCommentService {
         long sessionId;
         try {
             sessionId = sessionAccessor.getSessionId();
-        } catch (SessionIdNotSetException e) {
+        } catch (final SessionIdNotSetException e) {
             // system
             return -1;
         }

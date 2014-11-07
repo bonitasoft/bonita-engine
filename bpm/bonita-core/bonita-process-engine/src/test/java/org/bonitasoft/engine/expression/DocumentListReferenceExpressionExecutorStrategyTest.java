@@ -1,5 +1,4 @@
 /*
- *
  * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -12,7 +11,6 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.bonitasoft.engine.expression;
@@ -70,17 +68,17 @@ public class DocumentListReferenceExpressionExecutorStrategyTest {
     private DocumentListReferenceExpressionExecutorStrategy documentListReferenceExpressionExecutorStrategy;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
     }
 
     @Test
     public void should_getDocument_return_empty() throws Exception {
         //given
-        doReturn(Collections.emptyList()).when(documentService).getDocumentList("theList",45l,0,100);
+        doReturn(Collections.emptyList()).when(documentService).getDocumentList("theList", 45l, 0, 100);
         initDefinition("theList");
 
         //when
-        List<Document> theList = documentListReferenceExpressionExecutorStrategy.getDocumentList(45l, "theList", null);
+        final List<Document> theList = documentListReferenceExpressionExecutorStrategy.getDocumentList(45l, "theList", null);
 
         assertThat(theList).isEmpty();
 
@@ -89,11 +87,11 @@ public class DocumentListReferenceExpressionExecutorStrategyTest {
     @Test
     public void should_getDocument_return_null() throws Exception {
         //given
-        doReturn(Collections.emptyList()).when(documentService).getDocumentList("theList",45l,0,100);
+        doReturn(Collections.emptyList()).when(documentService).getDocumentList("theList", 45l, 0, 100);
         initDefinition("notTheList");
 
         //when
-        List<Document> theList = documentListReferenceExpressionExecutorStrategy.getDocumentList(45l, "theList",null);
+        final List<Document> theList = documentListReferenceExpressionExecutorStrategy.getDocumentList(45l, "theList", null);
 
         assertThat(theList).isNull();
     }
@@ -101,17 +99,17 @@ public class DocumentListReferenceExpressionExecutorStrategyTest {
     @Test
     public void should_getDocument_return_theList() throws Exception {
         //given
-        List<SMappedDocument> toBeReturned = Collections.singletonList(mock(SMappedDocument.class));
-        doReturn(toBeReturned).when(documentService).getDocumentList("theList",45l,0,100);
+        final List<SMappedDocument> toBeReturned = Collections.singletonList(mock(SMappedDocument.class));
+        doReturn(toBeReturned).when(documentService).getDocumentList("theList", 45l, 0, 100);
 
         //when
-        List<Document> theList = documentListReferenceExpressionExecutorStrategy.getDocumentList(45l, "theList", null);
+        final List<Document> theList = documentListReferenceExpressionExecutorStrategy.getDocumentList(45l, "theList", null);
 
         assertThat(theList).hasSize(1);
     }
 
-
-    private void initDefinition(String... names) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SProcessDefinitionNotFoundException,
+    private void initDefinition(final String... names) throws SProcessInstanceNotFoundException, SProcessInstanceReadException,
+            SProcessDefinitionNotFoundException,
             SProcessDefinitionReadException {
         doReturn(processInstance).when(processInstanceService).getProcessInstance(45l);
         doReturn(154l).when(processInstance).getProcessDefinitionId();
@@ -120,9 +118,9 @@ public class DocumentListReferenceExpressionExecutorStrategyTest {
         doReturn(createListOfDocumentListDefinition(names)).when(flowElementContainerDefinition).getDocumentListDefinitions();
     }
 
-    private List<SDocumentListDefinition> createListOfDocumentListDefinition(String... names) {
-        List<SDocumentListDefinition> list = new ArrayList<SDocumentListDefinition>();
-        for (String name : names) {
+    private List<SDocumentListDefinition> createListOfDocumentListDefinition(final String... names) {
+        final List<SDocumentListDefinition> list = new ArrayList<SDocumentListDefinition>();
+        for (final String name : names) {
             list.add(new SDocumentListDefinitionImpl(name));
         }
         return list;
