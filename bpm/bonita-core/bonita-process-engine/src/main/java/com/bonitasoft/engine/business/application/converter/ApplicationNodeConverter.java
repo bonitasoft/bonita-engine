@@ -42,12 +42,14 @@ public class ApplicationNodeConverter {
     private final ProfileService profileService;
     private final ApplicationService applicationService;
     private final ApplicationPageNodeConverter applicationPageNodeConverter;
+    private final ApplicationMenuNodeConverter applicationMenuNodeConverter;
 
     public ApplicationNodeConverter(final ProfileService profileService, final ApplicationService applicationService,
-            final ApplicationPageNodeConverter applicationPageNodeConverter) {
+            final ApplicationPageNodeConverter applicationPageNodeConverter, final ApplicationMenuNodeConverter applicationMenuNodeConverter) {
         this.profileService = profileService;
         this.applicationService = applicationService;
         this.applicationPageNodeConverter = applicationPageNodeConverter;
+        this.applicationMenuNodeConverter = applicationMenuNodeConverter;
     }
 
     public ApplicationNode toNode(final SApplication application) throws ExecutionException {
@@ -61,21 +63,30 @@ public class ApplicationNodeConverter {
         setProfile(application, applicationNode);
         setHomePage(application, applicationNode);
         setPages(application.getId(), applicationNode);
+        setMenus(application.getId(), applicationNode);
         return applicationNode;
+    }
+
+    private void setMenus(final long applicationId, final ApplicationNode applicationNode) throws ExecutionException {
+        try {
+            applicationMenuNodeConverter.addMenusToApplicationNode(applicationId, null, applicationNode, null);
+        } catch (final SBonitaException e) {
+            throw new ExecutionException(e);
+        }
     }
 
     private void setPages(final long applicationId, final ApplicationNode applicationNode) throws ExecutionException {
         try {
             int startIndex = 0;
-            final int pageSize = 50;
+            final int maxResults = 50;
             List<SApplicationPage> pages;
             do {
-                pages = applicationService.searchApplicationPages(buildApplicationPagesQueryOptions(applicationId, startIndex, pageSize));
+                pages = applicationService.searchApplicationPages(buildApplicationPagesQueryOptions(applicationId, startIndex, maxResults));
                 for (final SApplicationPage page : pages) {
                     applicationNode.addApplicationPage(applicationPageNodeConverter.toPage(page));
                 }
-                startIndex += pageSize;
-            } while (pages.size() > 0);
+                startIndex += maxResults;
+            } while (pages.size() == maxResults);
         } catch (final SBonitaException e) {
             throw new ExecutionException(e);
         }
@@ -110,21 +121,21 @@ public class ApplicationNodeConverter {
         }
     }
 
-    public ImportResult toSApplication(ApplicationNode applicationNode, long createdBy) throws ExecutionException {
-        ImportStatus importStatus = new ImportStatus(applicationNode.getToken());
+    public ImportResult toSApplication(final ApplicationNode applicationNode, final long createdBy) throws ExecutionException {
+        final ImportStatus importStatus = new ImportStatus(applicationNode.getToken());
 
-        SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(applicationNode.getToken(),
+        final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(applicationNode.getToken(),
                 applicationNode.getDisplayName(), applicationNode.getVersion(), createdBy);
         builder.setIconPath(applicationNode.getIconPath());
         builder.setDescription(applicationNode.getDescription());
         builder.setState(applicationNode.getState());
 
-        ImportError importError = setProfile(applicationNode, builder);
+        final ImportError importError = setProfile(applicationNode, builder);
         if (importError != null) {
             importStatus.addError(importError);
         }
 
-        SApplication application = builder.done();
+        final SApplication application = builder.done();
         return new ImportResult(application, importStatus);
     }
 

@@ -7,6 +7,16 @@
         <applicationPages>
             <applicationPage customPage="custompage_mynewcustompage" token="my-new-custom-page" />
         </applicationPages>
+        <applicationMenus>
+            <applicationMenu>
+                <displayName>HR follow-up</displayName>
+                <applicationMenus>
+                    <applicationMenu applicationPage="my-new-custom-page">
+                        <displayName>Daily HR follow-up</displayName>
+                    </applicationMenu>
+                </applicationMenus>
+            </applicationMenu>
+        </applicationMenus>
     </application>
     <application state="ACTIVATED" token="My" version="2.0">
         <displayName>Marketing</displayName>

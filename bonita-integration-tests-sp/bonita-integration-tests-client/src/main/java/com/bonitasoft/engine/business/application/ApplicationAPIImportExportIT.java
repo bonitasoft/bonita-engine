@@ -104,6 +104,12 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
                 IOUtils.toByteArray(ApplicationAPIApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
         final ApplicationPage appPage = applicationAPI.createApplicationPage(hr.getId(), myPage.getId(), "my-new-custom-page");
 
+        //Add menus:
+        final ApplicationMenu menu = applicationAPI.createApplicationMenu(new ApplicationMenuCreator(hr.getId(), "HR follow-up"));
+        final ApplicationMenuCreator subMenu = new ApplicationMenuCreator(hr.getId(), "Daily HR follow-up", appPage.getId());
+        subMenu.setParentId(menu.getId());
+        applicationAPI.createApplicationMenu(subMenu);
+
         applicationAPI.createApplication(engineeringCreator);
         final Application marketing = applicationAPI.createApplication(marketingCreator);
 
@@ -177,7 +183,7 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
                 .getResourceAsStream("applicationWithWrongProfile.xml"));
 
         //when
-        List<ImportStatus> importStatus = applicationAPI.importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
+        final List<ImportStatus> importStatus = applicationAPI.importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
 
         //then
         assertThat(importStatus).hasSize(1);

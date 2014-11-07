@@ -12,14 +12,19 @@ package com.bonitasoft.engine.business.application.converter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.bonitasoft.engine.business.application.importer.ImportResult;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
@@ -36,9 +41,11 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.importer.ImportResult;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
+import com.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import com.bonitasoft.engine.business.application.xml.ApplicationNode;
 import com.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 
@@ -53,6 +60,9 @@ public class ApplicationNodeConverterTest {
 
     @Mock
     private ApplicationPageNodeConverter pageConverter;
+
+    @Mock
+    private ApplicationMenuNodeConverter menuConverter;
 
     @InjectMocks
     private ApplicationNodeConverter converter;
@@ -150,6 +160,38 @@ public class ApplicationNodeConverterTest {
     }
 
     @Test(expected = ExecutionException.class)
+    public void toNodeShouldAddThrowExceptionAtMenuConversion() throws Exception {
+        //given
+        final SApplication application = mock(SApplication.class);
+        given(application.getProfileId()).willReturn(null);
+        given(application.getHomePageId()).willReturn(null);
+
+        doThrow(new SBonitaReadException("")).when(menuConverter).addMenusToApplicationNode(anyLong(), anyLong(), any(ApplicationNode.class),
+                any(ApplicationMenuNode.class));
+
+        converter.toNode(application);
+    }
+
+    @Test
+    public void toNodeShouldAddConvertedMenus() throws Exception {
+        //given
+        final long applicationId = 1191L;
+        final SApplication application = mock(SApplication.class);
+        given(application.getProfileId()).willReturn(null);
+        given(application.getHomePageId()).willReturn(null);
+        given(application.getId()).willReturn(applicationId);
+
+        doNothing().when(menuConverter).addMenusToApplicationNode(eq(applicationId), isNull(Long.class), any(ApplicationNode.class),
+                isNull(ApplicationMenuNode.class));
+
+        //when
+        converter.toNode(application);
+
+        //then
+        verify(menuConverter).addMenusToApplicationNode(eq(applicationId), isNull(Long.class), any(ApplicationNode.class), isNull(ApplicationMenuNode.class));
+    }
+
+    @Test(expected = ExecutionException.class)
     public void toNodeShouldAddThrowExceptionAtPageConversion() throws Exception {
         //given
         final SApplication application = mock(SApplication.class);
@@ -203,12 +245,12 @@ public class ApplicationNodeConverterTest {
         given(profileService.getProfileByName("admin")).willReturn(profile);
 
         //when
-        ImportResult importResult = converter.toSApplication(node, 1L);
+        final ImportResult importResult = converter.toSApplication(node, 1L);
 
         //then
         assertThat(importResult).isNotNull();
 
-        SApplication application = importResult.getApplication();
+        final SApplication application = importResult.getApplication();
         assertThat(application.getDisplayName()).isEqualTo("My app");
         assertThat(application.getDescription()).isEqualTo("This is my app");
         assertThat(application.getHomePageId()).isNull();
@@ -219,7 +261,7 @@ public class ApplicationNodeConverterTest {
         assertThat(application.getState()).isEqualTo("ENABLED");
         assertThat(application.getCreatedBy()).isEqualTo(1L);
 
-        ImportStatus importStatus = importResult.getImportStatus();
+        final ImportStatus importStatus = importResult.getImportStatus();
         assertThat(importStatus.getName()).isEqualTo("app");
         assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
         assertThat(importStatus.getErrors()).isEmpty();
@@ -233,7 +275,7 @@ public class ApplicationNodeConverterTest {
         node.setProfile(null);
 
         //when
-        ImportResult importResult = converter.toSApplication(node, 1L);
+        final ImportResult importResult = converter.toSApplication(node, 1L);
 
         //then
         assertThat(importResult).isNotNull();
@@ -252,12 +294,12 @@ public class ApplicationNodeConverterTest {
         given(profileService.getProfileByName("admin")).willThrow(new SProfileNotFoundException(""));
 
         //when
-        ImportResult importResult = converter.toSApplication(node, 1L);
+        final ImportResult importResult = converter.toSApplication(node, 1L);
 
         //then
         assertThat(importResult.getApplication().getProfileId()).isNull();
 
-        ImportStatus importStatus = importResult.getImportStatus();
+        final ImportStatus importStatus = importResult.getImportStatus();
         assertThat(importStatus.getName()).isEqualTo("app");
         assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
         assertThat(importStatus.getErrors()).containsExactly(new ImportError("admin", ImportError.Type.PROFILE));

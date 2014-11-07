@@ -48,6 +48,7 @@ import com.bonitasoft.engine.business.application.ApplicationPageNotFoundExcepti
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.business.application.converter.ApplicationContainerConverter;
+import com.bonitasoft.engine.business.application.converter.ApplicationMenuNodeConverter;
 import com.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
 import com.bonitasoft.engine.business.application.converter.ApplicationPageNodeConverter;
 import com.bonitasoft.engine.business.application.exporter.ApplicationContainerExporter;
@@ -119,8 +120,9 @@ public class ApplicationAPIImpl implements ApplicationAPI {
 
     private ApplicationExporterDelegate getApplicationExporterDelegate() {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ApplicationService applicationService = tenantAccessor.getApplicationService();
         final ApplicationNodeConverter applicationNodeConverter = new ApplicationNodeConverter(tenantAccessor.getProfileService(),
-                tenantAccessor.getApplicationService(), new ApplicationPageNodeConverter(tenantAccessor.getPageService()));
+                applicationService, new ApplicationPageNodeConverter(tenantAccessor.getPageService()), new ApplicationMenuNodeConverter(applicationService));
         final ApplicationContainerConverter applicationContainerConverter = new ApplicationContainerConverter(applicationNodeConverter);
         final ApplicationContainerExporter applicationContainerExporter = new ApplicationContainerExporter();
         final ApplicationExporter applicationExporter = new ApplicationExporter(applicationContainerConverter, applicationContainerExporter);
@@ -131,8 +133,9 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final StrategySelector strategySelector = new StrategySelector();
         final ApplicationContainerImporter containerImporter = new ApplicationContainerImporter();
+        final ApplicationService applicationService = tenantAccessor.getApplicationService();
         final ApplicationNodeConverter applicationNodeConverter = new ApplicationNodeConverter(tenantAccessor.getProfileService(),
-                tenantAccessor.getApplicationService(), new ApplicationPageNodeConverter(tenantAccessor.getPageService()));
+                applicationService, new ApplicationPageNodeConverter(tenantAccessor.getPageService()), new ApplicationMenuNodeConverter(applicationService));
         final ApplicationContainerConverter containerConverter = new ApplicationContainerConverter(applicationNodeConverter);
         final ApplicationImporter applicationImporter = new ApplicationImporter(tenantAccessor.getApplicationService(),
                 strategySelector.selectStrategy(policy), containerImporter, containerConverter);
