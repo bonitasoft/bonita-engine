@@ -117,6 +117,8 @@ public class PageServiceImpl implements PageService {
 
     private final ProfileService profileService;
 
+    private final boolean businessApplicationsIsActive;
+
     public PageServiceImpl(final ReadPersistenceService persistenceService, final Recorder recorder,
             final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
             final ProfileService profileService) {
@@ -127,6 +129,7 @@ public class PageServiceImpl implements PageService {
             final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
             final ProfileService profileService) {
         active = manager.isFeatureActive(Features.CUSTOM_PAGE);
+        businessApplicationsIsActive = manager.isFeatureActive(Features.BUSINESS_APPLICATIONS);
         this.persistenceService = persistenceService;
         this.eventService = eventService;
         this.recorder = recorder;
@@ -565,7 +568,9 @@ public class PageServiceImpl implements PageService {
         if (active) {
             importProvidedPage("bonita-html-page-example.zip");
             importProvidedPage("bonita-groovy-page-example.zip");
-            importProvidedPage("bonita-home-page.zip");
+            if(businessApplicationsIsActive){
+                importProvidedPage("bonita-home-page.zip");
+            }
         }
     }
 
