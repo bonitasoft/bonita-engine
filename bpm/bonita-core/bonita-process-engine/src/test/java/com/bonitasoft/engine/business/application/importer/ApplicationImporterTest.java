@@ -12,6 +12,7 @@ package com.bonitasoft.engine.business.application.importer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -19,6 +20,10 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import java.util.Arrays;
 import java.util.List;
 
+import com.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
+import com.bonitasoft.engine.business.application.xml.ApplicationNode;
+import com.bonitasoft.engine.business.application.xml.ApplicationPageNode;
+import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.exception.ExecutionException;
@@ -43,45 +48,53 @@ public class ApplicationImporterTest {
     private ApplicationImportStrategy strategy;
 
     @Mock
-    private ApplicationContainerImporter containerImporter;
+    private ApplicationNodeConverter applicationNodeConverter;
 
     @Mock
-    private ApplicationContainerConverter containerConverter;
+    private ApplicationPageImporter applicationPageImporter;
 
     @InjectMocks
     private ApplicationImporter applicationImporter;
 
     @Test
-    public void importApplications_should_create_applications_contained_in_xml_file_and_return_status() throws Exception {
+    public void importApplication_should_create_application_import_pages_and_return_status() throws Exception {
         //given
         long createdBy = 5L;
-        SApplication app1 = mock(SApplication.class);
-        SApplication app2 = mock(SApplication.class);
+        SApplication app = mock(SApplication.class);
 
-        ImportResult importResult1 = mock(ImportResult.class);
-        given(importResult1.getApplication()).willReturn(app1);
-        given(importResult1.getImportStatus()).willReturn(mock(ImportStatus.class));
+        ImportResult importResult = mock(ImportResult.class);
+        given(importResult.getApplication()).willReturn(app);
+        ImportStatus importStatus = mock(ImportStatus.class);
+        given(importResult.getImportStatus()).willReturn(importStatus);
 
-        ImportResult importResult2 = mock(ImportResult.class);
-        given(importResult2.getApplication()).willReturn(app2);
-        given(importResult2.getImportStatus()).willReturn(mock(ImportStatus.class));
+        ApplicationPageNode pageNode1 = mock(ApplicationPageNode.class);
+        ApplicationPageNode pageNode2 = mock(ApplicationPageNode.class);
 
-        ApplicationNodeContainer nodeContainer = mock(ApplicationNodeContainer.class);
-        given(containerImporter.importXML("<applications/>".getBytes())).willReturn(nodeContainer);
-        given(containerConverter.toSApplications(nodeContainer, createdBy)).willReturn(Arrays.asList(importResult1, importResult2));
+        ApplicationNode applicationNode = mock(ApplicationNode.class);
+        given(applicationNode.getApplicationPages()).willReturn(Arrays.asList(pageNode1, pageNode2));
+        given(applicationNodeConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
+
+        ImportError error = mock(ImportError.class);
+        given(applicationPageImporter.importApplicationPage(app, pageNode1)).willReturn(error);
+        given(applicationPageImporter.importApplicationPage(app, pageNode2)).willReturn(null);
+        given(applicationService.createApplication(app)).willReturn(app);
 
         //when
-        List<ImportStatus> importStatus = applicationImporter.importApplications("<applications/>".getBytes(), createdBy);
+        ImportStatus retrievedStatus = applicationImporter.importApplication(applicationNode, createdBy);
 
         //then
-        assertThat(importStatus).containsExactly(importResult1.getImportStatus(), importResult2.getImportStatus());
-        verify(applicationService, times(1)).createApplication(app1);
-        verify(applicationService, times(1)).createApplication(app2);
+        assertThat(retrievedStatus).isEqualTo(importResult.getImportStatus());
+        verify(applicationService, times(1)).createApplication(app);
         verifyZeroInteractions(strategy);
+
+        verify(applicationPageImporter, times(1)).importApplicationPage(app, pageNode1);
+        verify(applicationPageImporter, times(1)).importApplicationPage(app, pageNode2);
+        verify(importStatus, times(1)).addError(error);
+        verify(importStatus, never()).addError(null);
     }
 
     @Test
-    public void importApplications_should_call_importStrategy_when_application_already_exists() throws Exception {
+    public void importApplication_should_call_importStrategy_when_application_already_exists() throws Exception {
         //given
         long createdBy = 5L;
         SApplication appToBeImported = mock(SApplication.class);
@@ -92,13 +105,12 @@ public class ApplicationImporterTest {
 
         SApplication appInConflict = mock(SApplication.class);
 
-        ApplicationNodeContainer nodeContainer = mock(ApplicationNodeContainer.class);
-        given(containerImporter.importXML("<applications/>".getBytes())).willReturn(nodeContainer);
-        given(containerConverter.toSApplications(nodeContainer, createdBy)).willReturn(Arrays.asList(importResult));
+        ApplicationNode applicationNode = mock(ApplicationNode.class);
+        given(applicationNodeConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
         given(applicationService.getApplicationByToken("application")).willReturn(appInConflict);
 
         //when
-        applicationImporter.importApplications("<applications/>".getBytes(), createdBy);
+        applicationImporter.importApplication(applicationNode, createdBy);
 
         //then
         verify(applicationService, times(1)).createApplication(appToBeImported);
@@ -106,7 +118,7 @@ public class ApplicationImporterTest {
     }
 
     @Test(expected = ExecutionException.class)
-    public void importApplications_should_throw_ExecutionException_when_application_service_throws_exception() throws Exception {
+    public void importApplication_should_throw_ExecutionException_when_application_service_throws_exception() throws Exception {
         //given
         long createdBy = 5L;
         SApplication app1 = mock(SApplication.class);
@@ -114,14 +126,13 @@ public class ApplicationImporterTest {
         ImportResult importResult = mock(ImportResult.class);
         given(importResult.getApplication()).willReturn(app1);
 
-        ApplicationNodeContainer nodeContainer = mock(ApplicationNodeContainer.class);
-        given(containerImporter.importXML("<applications/>".getBytes())).willReturn(nodeContainer);
-        given(containerConverter.toSApplications(nodeContainer, createdBy)).willReturn(Arrays.asList(importResult));
+        ApplicationNode applicationNode = mock(ApplicationNode.class);
+        given(applicationNodeConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
 
         given(applicationService.createApplication(app1)).willThrow(new SObjectCreationException(""));
 
         //when
-        applicationImporter.importApplications("<applications/>".getBytes(), createdBy);
+        applicationImporter.importApplication(applicationNode, createdBy);
 
         //then exception
     }

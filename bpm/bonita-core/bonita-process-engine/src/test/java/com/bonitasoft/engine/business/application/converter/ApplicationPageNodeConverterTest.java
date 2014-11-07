@@ -9,9 +9,14 @@
 package com.bonitasoft.engine.business.application.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
+import com.bonitasoft.engine.business.application.importer.ApplicationPageImportResult;
+import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
+import org.bonitasoft.engine.api.ImportError;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -58,4 +63,60 @@ public class ApplicationPageNodeConverterTest {
         assertThat(convertedPage.getCustomPage()).isEqualTo(customPage);
         assertThat(convertedPage.getToken()).isEqualTo(token);
     }
+
+    @Test
+    public void toSApplication_page_should_convert_all_fields_set_applicationId_and_return_no_errors_when_custom_page_is_found() throws Exception {
+        //given
+        ApplicationPageNode node = new ApplicationPageNode();
+        node.setToken("home");
+        node.setCustomPage("customPage");
+
+        long applicationId = 11L;
+        SApplication application = mock(SApplication.class);
+        given(application.getId()).willReturn(applicationId);
+
+        long pageId = 3L;
+        SPage page = mock(SPage.class);
+        given(page.getId()).willReturn(pageId);
+        given(pageService.getPageByName("customPage")).willReturn(page);
+
+        //when
+        ApplicationPageImportResult importResult = converter.toSApplicationPage(node, application);
+
+        //then
+        assertThat(importResult).isNotNull();
+        SApplicationPage applicationPage = importResult.getApplicationPage();
+        assertThat(applicationPage.getToken()).isEqualTo("home");
+        assertThat(applicationPage.getApplicationId()).isEqualTo(applicationId);
+        assertThat(applicationPage.getPageId()).isEqualTo(pageId);
+
+        assertThat(importResult.getError()).isNull();
+    }
+
+    @Test
+    public void toSApplication_page_should_convert_available_fields_set_applicationId_and_return_errors_when_custom_page_is_not_found() throws Exception {
+        //given
+        ApplicationPageNode node = new ApplicationPageNode();
+        node.setToken("home");
+        node.setCustomPage("customPage");
+
+        long applicationId = 11L;
+        SApplication application = mock(SApplication.class);
+        given(application.getId()).willReturn(applicationId);
+
+        given(pageService.getPageByName("customPage")).willReturn(null);
+
+        //when
+        ApplicationPageImportResult importResult = converter.toSApplicationPage(node, application);
+
+        //then
+        assertThat(importResult).isNotNull();
+        SApplicationPage applicationPage = importResult.getApplicationPage();
+        assertThat(applicationPage.getToken()).isEqualTo("home");
+        assertThat(applicationPage.getApplicationId()).isEqualTo(applicationId);
+        assertThat(applicationPage.getPageId()).isEqualTo(0);
+
+        assertThat(importResult.getError()).isEqualTo(new ImportError("customPage", ImportError.Type.PAGE));
+    }
+
 }

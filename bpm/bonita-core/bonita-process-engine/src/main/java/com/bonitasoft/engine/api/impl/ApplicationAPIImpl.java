@@ -10,6 +10,8 @@ package com.bonitasoft.engine.api.impl;
 
 import java.util.List;
 
+import com.bonitasoft.engine.business.application.importer.ApplicationPageImporter;
+import com.bonitasoft.engine.business.application.importer.ApplicationsImporter;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -129,17 +131,19 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         return new ApplicationExporterDelegate(tenantAccessor.getApplicationService(), applicationExporter);
     }
 
-    private ApplicationImporter getApplicationImporter(final ApplicationImportPolicy policy) {
+    private ApplicationsImporter getApplicationImporter(final ApplicationImportPolicy policy) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final StrategySelector strategySelector = new StrategySelector();
         final ApplicationContainerImporter containerImporter = new ApplicationContainerImporter();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
+        ApplicationPageNodeConverter applicationPageNodeConverter = new ApplicationPageNodeConverter(tenantAccessor.getPageService());
         final ApplicationNodeConverter applicationNodeConverter = new ApplicationNodeConverter(tenantAccessor.getProfileService(),
-                applicationService, new ApplicationPageNodeConverter(tenantAccessor.getPageService()), new ApplicationMenuNodeConverter(applicationService));
-        final ApplicationContainerConverter containerConverter = new ApplicationContainerConverter(applicationNodeConverter);
+                applicationService, applicationPageNodeConverter, new ApplicationMenuNodeConverter(applicationService));
+        ApplicationPageImporter applicationPageImporter = new ApplicationPageImporter(tenantAccessor.getApplicationService(), applicationPageNodeConverter);
         final ApplicationImporter applicationImporter = new ApplicationImporter(tenantAccessor.getApplicationService(),
-                strategySelector.selectStrategy(policy), containerImporter, containerConverter);
-        return applicationImporter;
+                strategySelector.selectStrategy(policy), applicationNodeConverter, applicationPageImporter);
+        ApplicationsImporter applicationsImporter = new ApplicationsImporter(containerImporter, applicationImporter);
+        return applicationsImporter;
     }
 
     @Override

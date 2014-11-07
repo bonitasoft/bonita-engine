@@ -134,6 +134,10 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         //given
         final Profile profile = getProfileAPI().createProfile("ApplicationProfile", "Profile for applications");
 
+        // create page necessary to import application hr (real page name is defined in zip/page.properties):
+        final Page myPage = getPageAPI().createPage("not_used",
+                IOUtils.toByteArray(ApplicationAPIApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
+
         final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationAPIApplicationIT.class
                 .getResourceAsStream("applications.xml"));
 
@@ -142,47 +146,68 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
 
         //then
         assertThat(importStatus).hasSize(2);
-        assertThat(importStatus.get(0).getName()).isEqualTo("HR-dashboard");
-        assertThat(importStatus.get(0).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
-        assertThat(importStatus.get(0).getErrors()).isEmpty();
-
-        assertThat(importStatus.get(1).getName()).isEqualTo("My");
-        assertThat(importStatus.get(1).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
-        assertThat(importStatus.get(1).getErrors()).isEmpty();
+        assertIsAddOkStatus(importStatus.get(0), "HR-dashboard");
+        assertIsAddOkStatus(importStatus.get(1), "My");
 
         // check applications ware created
         final SearchResult<Application> searchResult = applicationAPI.searchApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(2);
-        final Application app1 = searchResult.getResult().get(0);
-        assertThat(app1.getToken()).isEqualTo("HR-dashboard");
-        assertThat(app1.getVersion()).isEqualTo("2.0");
-        assertThat(app1.getDisplayName()).isEqualTo("My HR dashboard");
-        assertThat(app1.getDescription()).isEqualTo("This is the HR dashboard.");
-        assertThat(app1.getIconPath()).isEqualTo("/icon.jpg");
-        assertThat(app1.getState()).isEqualTo("ACTIVATED");
-        assertThat(app1.getProfileId()).isEqualTo(profile.getId());
+        Application hrApp = searchResult.getResult().get(0);
+        assertIsHRApplication(profile, hrApp);
+        assertIsMarketingApplication(searchResult.getResult().get(1));
 
-        final Application app2 = searchResult.getResult().get(1);
-        assertThat(app2.getToken()).isEqualTo("My");
-        assertThat(app2.getVersion()).isEqualTo("2.0");
-        assertThat(app2.getDisplayName()).isEqualTo("Marketing");
-        assertThat(app2.getDescription()).isNull();
-        assertThat(app2.getIconPath()).isNull();
-        assertThat(app2.getState()).isEqualTo("ACTIVATED");
-        assertThat(app2.getProfileId()).isNull();
+        //check pages were created
+        SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, hrApp.getId());
+        SearchResult<ApplicationPage> pageSearchResult = applicationAPI.searchApplicationPages(builder.done());
+        assertThat(pageSearchResult.getCount()).isEqualTo(1);
+        assertIsMyNewCustomPage(myPage, hrApp, pageSearchResult.getResult().get(0));
 
-        applicationAPI.deleteApplication(app1.getId());
+        applicationAPI.deleteApplication(hrApp.getId());
         getProfileAPI().deleteProfile(profile.getId());
+        getPageAPI().deletePage(myPage.getId());
 
     }
 
+    private void assertIsMyNewCustomPage(final Page myPage, final Application hrApp, final ApplicationPage applicationPage) {
+        assertThat(applicationPage.getApplicationId()).isEqualTo(hrApp.getId());
+        assertThat(applicationPage.getToken()).isEqualTo("my-new-custom-page");
+        assertThat(applicationPage.getPageId()).isEqualTo(myPage.getId());
+    }
+
+    private void assertIsMarketingApplication(final Application app) {
+        assertThat(app.getToken()).isEqualTo("My");
+        assertThat(app.getVersion()).isEqualTo("2.0");
+        assertThat(app.getDisplayName()).isEqualTo("Marketing");
+        assertThat(app.getDescription()).isNull();
+        assertThat(app.getIconPath()).isNull();
+        assertThat(app.getState()).isEqualTo("ACTIVATED");
+        assertThat(app.getProfileId()).isNull();
+    }
+
+    private void assertIsHRApplication(final Profile profile, final Application app) {
+        assertThat(app.getToken()).isEqualTo("HR-dashboard");
+        assertThat(app.getVersion()).isEqualTo("2.0");
+        assertThat(app.getDisplayName()).isEqualTo("My HR dashboard");
+        assertThat(app.getDescription()).isEqualTo("This is the HR dashboard.");
+        assertThat(app.getIconPath()).isEqualTo("/icon.jpg");
+        assertThat(app.getState()).isEqualTo("ACTIVATED");
+        assertThat(app.getProfileId()).isEqualTo(profile.getId());
+    }
+
+    private void assertIsAddOkStatus(final ImportStatus importStatus, String expectedToken) {
+        assertThat(importStatus.getName()).isEqualTo(expectedToken);
+        assertThat(importStatus.getStatus()).isEqualTo(ImportStatus.Status.ADDED);
+        assertThat(importStatus.getErrors()).isEmpty();
+    }
+
     @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "import",
-            "profile does not exist" })
+            "profile does not exist", "custom page does not exists" })
     @Test
     public void importApplications_should_create_applications_contained_by_xml_file_and_return_error_in_status_when_profile_does_not_exist() throws Exception {
         //given
         final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationAPIApplicationIT.class
-                .getResourceAsStream("applicationWithWrongProfile.xml"));
+                .getResourceAsStream("applicationWithUnavailableInfo.xml"));
 
         //when
         final List<ImportStatus> importStatus = applicationAPI.importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
@@ -191,7 +216,9 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         assertThat(importStatus).hasSize(1);
         assertThat(importStatus.get(0).getName()).isEqualTo("HR-dashboard");
         assertThat(importStatus.get(0).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
-        assertThat(importStatus.get(0).getErrors()).containsExactly(new ImportError("ThisProfileNotExists", ImportError.Type.PROFILE));
+        ImportError profileError = new ImportError("ThisProfileNotExists", ImportError.Type.PROFILE);
+        ImportError customPageError = new ImportError("custompage_mynewcustompage", ImportError.Type.PAGE);
+        assertThat(importStatus.get(0).getErrors()).containsExactly(profileError, customPageError);
 
         // check applications ware created
         final SearchResult<Application> searchResult = applicationAPI.searchApplications(buildSearchOptions(0, 10));
