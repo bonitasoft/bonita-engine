@@ -34,6 +34,9 @@ import org.json.JSONObject;
 public class APICallContext implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    public static final String FILTER_KEY = "f";
+    public static final String SEARCH_TERM_KEY = "s";
+    public static final String DELIMITER = "&";
 
     /*
      * The http method
@@ -110,20 +113,24 @@ public class APICallContext implements Serializable {
         if (queryString == null) {
             return;
         }
-        for (String element : queryString.split("&")) {
+        for (String element : queryString.split(DELIMITER)) {
             int indexOfEquals = element.indexOf("=");
             if (indexOfEquals > 0 && indexOfEquals + 1 < element.length()) {
                 String key = element.substring(0, indexOfEquals);
                 String value = element.substring(indexOfEquals + 1, element.length());
-                if (key.equals("f")) {
-                    int indexOfEncodedEquals = value.indexOf("%3d");
-                    if (indexOfEncodedEquals > 0 && indexOfEncodedEquals + 3 < value.length()) {
-                        filters.put(value.substring(0, indexOfEncodedEquals), value.substring(indexOfEncodedEquals + 3, value.length()));
-                    }
-                } else if (key.equals("s")) {
+                if (FILTER_KEY.equals(key)) {
+                    addFilter(value);
+                } else if (SEARCH_TERM_KEY.equals(key)) {
                     searchTerm = value;
                 }
             }
+        }
+    }
+
+    private void addFilter(String value) {
+        int indexOfEncodedEquals = value.indexOf("%3d");
+        if (indexOfEncodedEquals > 0 && indexOfEncodedEquals + 3 < value.length()) {
+            filters.put(value.substring(0, indexOfEncodedEquals), value.substring(indexOfEncodedEquals + 3, value.length()));
         }
     }
 
@@ -228,31 +235,27 @@ public class APICallContext implements Serializable {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-
         APICallContext that = (APICallContext) o;
+        return !checkFieldsEquals(that);
 
+    }
+
+    private boolean checkFieldsEquals(APICallContext that) {
         if (apiName != null ? !apiName.equals(that.apiName) : that.apiName != null)
-            return false;
+            return true;
         if (body != null ? !body.equals(that.body) : that.body != null)
-            return false;
+            return true;
+        if (filters != null ? !filters.equals(that.filters) : that.filters != null)
+            return true;
         if (method != null ? !method.equals(that.method) : that.method != null)
-            return false;
+            return true;
         if (queryString != null ? !queryString.equals(that.queryString) : that.queryString != null)
-            return false;
+            return true;
         if (resourceId != null ? !resourceId.equals(that.resourceId) : that.resourceId != null)
-            return false;
+            return true;
         if (resourceName != null ? !resourceName.equals(that.resourceName) : that.resourceName != null)
-            return false;
-
-        return true;
-    }
-
-    public Map<String, String> getFilters() {
-        return filters;
-    }
-
-    public String getSearchTerm() {
-        return searchTerm;
+            return true;
+        return searchTerm != null ? !searchTerm.equals(that.searchTerm) : that.searchTerm != null;
     }
 
     @Override
@@ -263,7 +266,17 @@ public class APICallContext implements Serializable {
         result = 31 * result + (resourceId != null ? resourceId.hashCode() : 0);
         result = 31 * result + (queryString != null ? queryString.hashCode() : 0);
         result = 31 * result + (body != null ? body.hashCode() : 0);
+        result = 31 * result + (filters != null ? filters.hashCode() : 0);
+        result = 31 * result + (searchTerm != null ? searchTerm.hashCode() : 0);
         return result;
+    }
+
+    public Map<String, String> getFilters() {
+        return filters;
+    }
+
+    public String getSearchTerm() {
+        return searchTerm;
     }
 
     @Override
