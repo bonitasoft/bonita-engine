@@ -160,7 +160,7 @@ public class ApplicationNodeConverterTest {
     }
 
     @Test(expected = ExecutionException.class)
-    public void toNodeShouldAddThrowExceptionAtMenuConversion() throws Exception {
+    public void toNodeShouldThrowExceptionAtMenuConversion() throws Exception {
         //given
         final SApplication application = mock(SApplication.class);
         given(application.getProfileId()).willReturn(null);

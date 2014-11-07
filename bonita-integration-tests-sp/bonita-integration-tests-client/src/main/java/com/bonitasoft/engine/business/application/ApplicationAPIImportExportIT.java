@@ -104,11 +104,14 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
                 IOUtils.toByteArray(ApplicationAPIApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
         final ApplicationPage appPage = applicationAPI.createApplicationPage(hr.getId(), myPage.getId(), "my-new-custom-page");
 
-        //Add menus:
+        // Add menus:
         final ApplicationMenu menu = applicationAPI.createApplicationMenu(new ApplicationMenuCreator(hr.getId(), "HR follow-up"));
-        final ApplicationMenuCreator subMenu = new ApplicationMenuCreator(hr.getId(), "Daily HR follow-up", appPage.getId());
-        subMenu.setParentId(menu.getId());
-        applicationAPI.createApplicationMenu(subMenu);
+        final ApplicationMenuCreator subMenuCreator = new ApplicationMenuCreator(hr.getId(), "Daily HR follow-up", appPage.getId());
+        subMenuCreator.setParentId(menu.getId());
+        applicationAPI.createApplicationMenu(subMenuCreator);
+
+        // Add home page:
+        applicationAPI.setApplicationHomePage(hr.getId(), appPage.getId());
 
         applicationAPI.createApplication(engineeringCreator);
         final Application marketing = applicationAPI.createApplication(marketingCreator);
@@ -120,9 +123,8 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         //then
         assertThatXmlHaveNoDifferences(xmlPrettyFormatExpected, xmlPrettyFormatExported);
 
-        applicationAPI.deleteApplicationPage(appPage.getId());
-        getPageAPI().deletePage(myPage.getId());
         applicationAPI.deleteApplication(hr.getId());
+        getPageAPI().deletePage(myPage.getId());
         getProfileAPI().deleteProfile(profile.getId());
     }
 
