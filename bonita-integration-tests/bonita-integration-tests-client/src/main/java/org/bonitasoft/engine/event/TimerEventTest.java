@@ -146,13 +146,6 @@ public class TimerEventTest extends AbstractEventTest {
         disableAndDeleteProcess(definition);
     }
 
-    @Test
-    public void timerStartEventDurationloop() throws Exception {
-        while (true) {
-            timerStartEventDuration();
-        }
-    }
-
     @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Start event", "User task" }, story = "Execute a process with a start event with a timer duration type.", jira = "")
     @Test
     public void timerStartEventDuration() throws Exception {
