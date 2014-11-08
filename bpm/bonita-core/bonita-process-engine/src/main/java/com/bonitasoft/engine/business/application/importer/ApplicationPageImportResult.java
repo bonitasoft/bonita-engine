@@ -9,8 +9,9 @@
 
 package com.bonitasoft.engine.business.application.importer;
 
-import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.api.ImportError;
+
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
 
 /**
  * @author Elias Ricken de Medeiros

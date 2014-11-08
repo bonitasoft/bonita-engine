@@ -143,7 +143,7 @@ public class ApplicationMenuNodeConverter {
 
     private int getIndex(final SApplicationMenu parentMenu) throws SBonitaReadException {
         int index;
-        if(parentMenu == null) {
+        if (parentMenu == null) {
             index = applicationService.getNextAvailableIndex(null);
         } else {
             index = applicationService.getNextAvailableIndex(parentMenu.getId());

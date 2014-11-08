@@ -22,12 +22,6 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import java.util.Arrays;
 import java.util.List;
 
-import com.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
-import com.bonitasoft.engine.business.application.model.SApplicationPage;
-import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
-import com.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
-import com.bonitasoft.engine.business.application.xml.ApplicationNode;
-import com.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
@@ -42,7 +36,13 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
 import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
+import com.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
+import com.bonitasoft.engine.business.application.xml.ApplicationNode;
+import com.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationImporterTest {
@@ -174,7 +174,6 @@ public class ApplicationImporterTest {
 
         given(applicationService.getApplicationPage("app", "home")).willThrow(new SObjectNotFoundException(""));
 
-
         //when
         applicationImporter.importApplication(applicationNode, createdBy);
 
@@ -183,7 +182,6 @@ public class ApplicationImporterTest {
         verify(applicationService, never()).updateApplication(any(SApplication.class), any(EntityUpdateDescriptor.class));
         verify(importStatus, times(1)).addError(new ImportError("home", ImportError.Type.APPLICATION_PAGE));
     }
-
 
     @Test
     public void importApplication_should_call_importStrategy_when_application_already_exists() throws Exception {

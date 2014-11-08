@@ -49,7 +49,6 @@ public class ApplicationNode {
     @XmlElement
     private String iconPath;
 
-
     @XmlElementWrapper(name = "applicationPages")
     @XmlElement(name = "applicationPage")
     private List<ApplicationPageNode> applicationPages;
@@ -123,22 +122,22 @@ public class ApplicationNode {
     }
 
     public List<ApplicationPageNode> getApplicationPages() {
-        return applicationPages == null? Collections.<ApplicationPageNode>emptyList() : Collections.unmodifiableList(applicationPages);
+        return applicationPages == null ? Collections.<ApplicationPageNode> emptyList() : Collections.unmodifiableList(applicationPages);
     }
 
     public void addApplicationPage(ApplicationPageNode applicationPage) {
-        if(applicationPages == null) {
+        if (applicationPages == null) {
             applicationPages = new ArrayList<ApplicationPageNode>();
         }
         this.applicationPages.add(applicationPage);
     }
 
     public List<ApplicationMenuNode> getApplicationMenus() {
-        return applicationMenus == null? Collections.<ApplicationMenuNode>emptyList() : Collections.unmodifiableList(applicationMenus);
+        return applicationMenus == null ? Collections.<ApplicationMenuNode> emptyList() : Collections.unmodifiableList(applicationMenus);
     }
 
     public void addApplicationMenu(ApplicationMenuNode applicationMenu) {
-        if(applicationMenus == null) {
+        if (applicationMenus == null) {
             applicationMenus = new ArrayList<ApplicationMenuNode>();
         }
         applicationMenus.add(applicationMenu);

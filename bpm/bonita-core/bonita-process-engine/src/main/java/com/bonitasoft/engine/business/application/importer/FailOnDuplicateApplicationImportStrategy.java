@@ -9,13 +9,14 @@
 
 package com.bonitasoft.engine.business.application.importer;
 
-import com.bonitasoft.engine.business.application.model.SApplication;
 import org.bonitasoft.engine.exception.ExecutionException;
+
+import com.bonitasoft.engine.business.application.model.SApplication;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public class FailOnDuplicateApplicationImportStrategy implements ApplicationImportStrategy{
+public class FailOnDuplicateApplicationImportStrategy implements ApplicationImportStrategy {
 
     @Override
     public void whenApplicationExists(SApplication existing, SApplication toBeImported) throws ExecutionException {

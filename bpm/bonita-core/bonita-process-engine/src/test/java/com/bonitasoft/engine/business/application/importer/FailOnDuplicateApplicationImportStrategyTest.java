@@ -15,10 +15,9 @@ import org.bonitasoft.engine.exception.ExecutionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.application.model.SApplication;
-import com.bonitasoft.engine.business.application.xml.ApplicationNode;
-import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FailOnDuplicateApplicationImportStrategyTest {

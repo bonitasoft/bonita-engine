@@ -11,9 +11,6 @@ package com.bonitasoft.engine.business.application.importer;
 
 import java.util.List;
 
-import com.bonitasoft.engine.business.application.model.SApplicationPage;
-import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
-import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -24,6 +21,9 @@ import org.bonitasoft.engine.exception.ExecutionException;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
 import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
 import com.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import com.bonitasoft.engine.business.application.xml.ApplicationNode;
 import com.bonitasoft.engine.business.application.xml.ApplicationPageNode;
@@ -61,8 +61,9 @@ public class ApplicationImporter {
         }
     }
 
-    private void updateHomePage(final SApplication application, final ApplicationNode applicationNode, final long createdBy, final ImportResult importResult) throws SBonitaException {
-        if(applicationNode.getHomePage() != null) {
+    private void updateHomePage(final SApplication application, final ApplicationNode applicationNode, final long createdBy, final ImportResult importResult)
+            throws SBonitaException {
+        if (applicationNode.getHomePage() != null) {
             try {
                 SApplicationPage homePage = applicationService.getApplicationPage(applicationNode.getToken(), applicationNode.getHomePage());
                 SApplicationUpdateBuilder updateBuilder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(createdBy);
@@ -74,7 +75,8 @@ public class ApplicationImporter {
         }
     }
 
-    private void importApplicationMenus(final ApplicationNode applicationNode, final ImportResult importResult, final SApplication application) throws ExecutionException {
+    private void importApplicationMenus(final ApplicationNode applicationNode, final ImportResult importResult, final SApplication application)
+            throws ExecutionException {
         for (ApplicationMenuNode applicationMenuNode : applicationNode.getApplicationMenus()) {
             List<ImportError> importErrors = applicationMenuImporter.importApplicationMenu(applicationMenuNode, application, null);
             importResult.getImportStatus().addErrors(importErrors);

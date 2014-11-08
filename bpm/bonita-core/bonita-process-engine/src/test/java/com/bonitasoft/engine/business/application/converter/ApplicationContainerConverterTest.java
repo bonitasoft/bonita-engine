@@ -16,13 +16,13 @@ import static org.mockito.Mockito.mock;
 import java.util.Arrays;
 import java.util.List;
 
-import com.bonitasoft.engine.business.application.importer.ImportResult;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.bonitasoft.engine.business.application.importer.ImportResult;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.xml.ApplicationNode;
 import com.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;

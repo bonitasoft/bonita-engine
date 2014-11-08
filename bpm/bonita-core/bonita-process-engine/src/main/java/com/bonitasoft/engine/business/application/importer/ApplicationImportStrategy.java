@@ -9,9 +9,9 @@
 
 package com.bonitasoft.engine.business.application.importer;
 
-import com.bonitasoft.engine.business.application.model.SApplication;
-import com.bonitasoft.engine.business.application.xml.ApplicationNode;
 import org.bonitasoft.engine.exception.ExecutionException;
+
+import com.bonitasoft.engine.business.application.model.SApplication;
 
 /**
  * @author Elias Ricken de Medeiros

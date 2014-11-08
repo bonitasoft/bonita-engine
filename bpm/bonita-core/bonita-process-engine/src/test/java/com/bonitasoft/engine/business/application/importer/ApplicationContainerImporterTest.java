@@ -9,12 +9,10 @@
 
 package com.bonitasoft.engine.business.application.importer;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
@@ -22,15 +20,15 @@ import java.net.URL;
 
 import javax.xml.bind.JAXBException;
 
-import com.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
-import com.bonitasoft.engine.io.IOUtils;
-import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import com.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
+import com.bonitasoft.engine.io.IOUtils;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(IOUtils.class)

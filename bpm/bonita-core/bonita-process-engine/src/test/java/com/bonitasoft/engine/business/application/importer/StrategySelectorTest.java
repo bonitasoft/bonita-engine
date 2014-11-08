@@ -9,13 +9,14 @@
 
 package com.bonitasoft.engine.business.application.importer;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.bonitasoft.engine.business.application.ApplicationImportPolicy;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StrategySelectorTest {

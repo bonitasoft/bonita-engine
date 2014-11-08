@@ -13,9 +13,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import com.bonitasoft.engine.business.application.importer.ApplicationPageImportResult;
-import com.bonitasoft.engine.business.application.model.SApplication;
-import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.api.ImportError;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +20,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.bonitasoft.engine.business.application.importer.ApplicationPageImportResult;
+import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
 import com.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import com.bonitasoft.engine.page.PageService;

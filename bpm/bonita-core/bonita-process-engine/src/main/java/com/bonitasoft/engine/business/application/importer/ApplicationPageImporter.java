@@ -34,7 +34,7 @@ public class ApplicationPageImporter {
     public ImportError importApplicationPage(ApplicationPageNode applicationPageNode, SApplication application) throws ExecutionException {
         try {
             ApplicationPageImportResult importResult = applicationPageNodeConverter.toSApplicationPage(applicationPageNode, application);
-            if(importResult.getError() == null) {
+            if (importResult.getError() == null) {
                 applicationService.createApplicationPage(importResult.getApplicationPage());
             }
             return importResult.getError();

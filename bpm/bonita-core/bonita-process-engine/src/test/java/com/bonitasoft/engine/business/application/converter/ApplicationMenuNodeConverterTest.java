@@ -15,22 +15,15 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.bonitasoft.engine.business.application.importer.ApplicationMenuImportResult;
-import com.bonitasoft.engine.business.application.importer.ImportResult;
-import com.bonitasoft.engine.business.application.model.SApplication;
-import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAPersistenceObjectImpl;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -38,7 +31,10 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.importer.ApplicationMenuImportResult;
+import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
 import com.bonitasoft.engine.business.application.xml.ApplicationMenuNode;

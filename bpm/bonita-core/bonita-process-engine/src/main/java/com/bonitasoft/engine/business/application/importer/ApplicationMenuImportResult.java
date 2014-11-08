@@ -9,10 +9,9 @@
 
 package com.bonitasoft.engine.business.application.importer;
 
-import java.util.List;
+import org.bonitasoft.engine.api.ImportError;
 
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
-import org.bonitasoft.engine.api.ImportError;
 
 /**
  * @author Elias Ricken de Medeiros

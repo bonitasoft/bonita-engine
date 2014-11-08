@@ -9,7 +9,7 @@
 
 package com.bonitasoft.engine.business.application.importer;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -18,11 +18,6 @@ import static org.mockito.Mockito.verify;
 
 import java.util.List;
 
-import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.converter.ApplicationMenuNodeConverter;
-import com.bonitasoft.engine.business.application.model.SApplication;
-import com.bonitasoft.engine.business.application.model.SApplicationMenu;
-import com.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.exception.ExecutionException;
@@ -31,6 +26,12 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.converter.ApplicationMenuNodeConverter;
+import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplicationMenu;
+import com.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationMenuImporterTest {
@@ -52,7 +53,6 @@ public class ApplicationMenuImporterTest {
 
         ApplicationMenuNode menuNode = new ApplicationMenuNode();
         menuNode.addApplicationMenu(subMenuNode);
-
 
         SApplicationMenu mainMenu = mock(SApplicationMenu.class);
         ApplicationMenuImportResult mainMenuImportResult = mock(ApplicationMenuImportResult.class);
@@ -80,7 +80,6 @@ public class ApplicationMenuImporterTest {
         //given
         SApplication application = mock(SApplication.class);
         ApplicationMenuNode menuNode = new ApplicationMenuNode();
-
 
         SApplicationMenu applicationMenu = mock(SApplicationMenu.class);
         ImportError error = new ImportError("page", ImportError.Type.APPLICATION_PAGE);
@@ -129,7 +128,6 @@ public class ApplicationMenuImporterTest {
         ApplicationMenuNode menuNode = new ApplicationMenuNode();
         menuNode.addApplicationMenu(subMenuNode1);
         menuNode.addApplicationMenu(subMenuNode2);
-
 
         SApplicationMenu mainMenu = mock(SApplicationMenu.class);
         ApplicationMenuImportResult mainMenuImportResult = mock(ApplicationMenuImportResult.class);
