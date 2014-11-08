@@ -33,7 +33,7 @@ import com.bonitasoft.manager.Features;
 public class MonitoringAPIImpl implements MonitoringAPI {
 
     protected void checkLicenceAndFeature(final String feature) {
-        LicenseChecker.getInstance().checkLicenceAndFeature(feature);
+        LicenseChecker.getInstance().checkLicenseAndFeature(feature);
     }
 
     protected TenantServiceAccessor getTenantServiceAccessor() {
