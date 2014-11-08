@@ -149,4 +149,19 @@ public abstract class CommonAPITest extends APITestUtil {
         return resources;
     }
 
+
+    protected String getContentOfResource(String name) {
+        final InputStream stream = this.getClass().getResourceAsStream(name);
+        assertNotNull(stream);
+        try {
+            try {
+                return IOUtils.toString(stream);
+            } finally {
+                stream.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

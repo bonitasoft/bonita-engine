@@ -51,18 +51,13 @@ public class PlatformAPIImplDelegateTest {
         doReturn(themeService).when(tenantServiceAccessor).getThemeService();
 
         final PlatformAPIImplDelegate delegate = spy(new PlatformAPIImplDelegate());
-        try {
-            final STheme sTheme = mock(STheme.class);
-            doReturn(sTheme).when(delegate).buildSTheme(any(byte[].class), any(byte[].class), any(SThemeType.class));
+        final STheme sTheme = mock(STheme.class);
+        doReturn(sTheme).when(delegate).buildSTheme(any(byte[].class), any(byte[].class), any(SThemeType.class));
 
-            delegate.createDefaultThemes(tenantServiceAccessor);
+        delegate.createDefaultThemes(tenantServiceAccessor);
 
-            // Call 2 times : one for portal, and one for mobile
-            verify(themeService, times(2)).createTheme(any(STheme.class));
-        } finally {
-            // Clean up
-            delegate.cleanUnzippedFolder();
-        }
+        // Call 2 times : one for portal, and one for mobile
+        verify(themeService, times(2)).createTheme(any(STheme.class));
     }
 
     @Test
@@ -116,18 +111,13 @@ public class PlatformAPIImplDelegateTest {
         doReturn(themeService).when(tenantServiceAccessor).getThemeService();
 
         final PlatformAPIImplDelegate delegate = spy(new PlatformAPIImplDelegate("bonita-portal-theme", "mobile_not_in_classpath"));
-        try {
-            final STheme sTheme = mock(STheme.class);
-            doReturn(sTheme).when(delegate).buildSTheme(any(byte[].class), any(byte[].class), any(SThemeType.class));
+        final STheme sTheme = mock(STheme.class);
+        doReturn(sTheme).when(delegate).buildSTheme(any(byte[].class), any(byte[].class), any(SThemeType.class));
 
-            delegate.createDefaultThemes(tenantServiceAccessor);
+        delegate.createDefaultThemes(tenantServiceAccessor);
 
-            // Call 1 times : Portal
-            verify(themeService, times(1)).createTheme(any(STheme.class));
-        } finally {
-            // Clean up
-            delegate.cleanUnzippedFolder();
-        }
+        // Call 1 times : Portal
+        verify(themeService, times(1)).createTheme(any(STheme.class));
     }
 
     /**
