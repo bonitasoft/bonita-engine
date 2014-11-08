@@ -18,6 +18,7 @@ import java.lang.reflect.Proxy;
 import org.bonitasoft.engine.api.APIAccessor;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
@@ -91,6 +92,11 @@ public class ConnectorAPIAccessorImpl implements APIAccessor {
     @Override
     public ThemeAPI getThemeAPI() {
         return getAPI(ThemeAPI.class, getAPISession());
+    }
+
+    @Override
+    public PermissionAPI getPermissionAPI() {
+        return getAPI(PermissionAPI.class, getAPISession());
     }
 
     private static ServerAPI getServerAPI() {
