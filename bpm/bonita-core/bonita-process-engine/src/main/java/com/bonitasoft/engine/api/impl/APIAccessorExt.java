@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -11,6 +11,8 @@ package com.bonitasoft.engine.api.impl;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.api.impl.CommandAPIImpl;
+import org.bonitasoft.engine.session.SessionService;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.APIAccessor;
 import com.bonitasoft.engine.api.ApplicationAPI;
@@ -31,7 +33,11 @@ import com.bonitasoft.engine.api.ThemeAPI;
  */
 public class APIAccessorExt extends APIAccessorImpl implements APIAccessor {
 
-    private static final long serialVersionUID = -7317110051980496939L;
+    private static final long serialVersionUID = 6745423337035389065L;
+
+    public APIAccessorExt(final SessionAccessor sessionAccessor, final SessionService sessionService) {
+        super(sessionAccessor, sessionService);
+    }
 
     @Override
     public IdentityAPI getIdentityAPI() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -18,9 +18,13 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
 import com.bonitasoft.engine.service.impl.TenantServiceSingleton;
 
+/**
+ * @author Matthieu Chaffotte
+ */
 public class ProcessManagementAPIExtDelegate extends ProcessManagementAPIImplDelegate {
 
-    protected static TenantServiceAccessor getTenantAccessor() {
+    @Override
+    protected TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
@@ -31,7 +35,9 @@ public class ProcessManagementAPIExtDelegate extends ProcessManagementAPIImplDel
     }
 
     @Override
-    protected DeleteProcess instantiateDeleteProcessTransactionContent(long processId) {
+    protected DeleteProcess instantiateDeleteProcessTransactionContent(final long processId) {
         return new DeleteProcessExt(getTenantAccessor(), processId);
     }
+
+
 }
