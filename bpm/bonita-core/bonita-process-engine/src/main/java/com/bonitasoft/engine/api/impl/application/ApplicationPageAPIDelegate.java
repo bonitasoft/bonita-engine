@@ -57,9 +57,9 @@ public class ApplicationPageAPIDelegate {
     }
 
     public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException, ApplicationNotFoundException {
-        BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(loggedUserId).updateHomePageId(applicationPageId);
+        SApplicationUpdateBuilder sApplicationUpdateBuilder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(loggedUserId).updateHomePageId(applicationPageId);
         try {
-            applicationService.updateApplication(applicationId, BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(loggedUserId).done());
+            applicationService.updateApplication(applicationId, sApplicationUpdateBuilder.done());
         } catch (final SObjectNotFoundException e) {
             throw new ApplicationNotFoundException(applicationId);
         } catch (final SBonitaException e) {
