@@ -54,9 +54,16 @@ public interface APIAccessor extends Serializable {
 
     /**
      * Gives access to the <code>ThemeAPI</code>
-     * 
+     *
      * @return an <code>ThemeAPI</code>
      */
     ThemeAPI getThemeAPI();
+
+    /**
+     * Gives access to the <code>PermissionAPI</code>
+     *
+     * @return an <code>PermissionAPI</code>
+     */
+    PermissionAPI getPermissionAPI();
 
 }

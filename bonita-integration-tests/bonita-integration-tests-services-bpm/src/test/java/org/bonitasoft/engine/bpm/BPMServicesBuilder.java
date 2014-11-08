@@ -89,6 +89,7 @@ import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import org.bonitasoft.engine.service.PermissionService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.SessionAccessorAccessor;
@@ -135,6 +136,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public TimeTracker getTimeTracker() {
         return getInstanceOf(TimeTracker.class);
+    }
+
+    @Override
+    public PermissionService getPermissionService() {
+        return getInstanceOf(PermissionService.class);
     }
 
     @Override
