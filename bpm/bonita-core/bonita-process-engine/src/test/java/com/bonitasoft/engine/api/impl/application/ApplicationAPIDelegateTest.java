@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ ******************************************************************************/
 package com.bonitasoft.engine.api.impl.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,8 +77,6 @@ public class ApplicationAPIDelegateTest {
     private static final String APP_DISP_NAME = "My app";
 
     private static final String VERSION = "1.0";
-
-    private static final String PATH = "/app";
 
     private static final String DESCRIPTION = "app desc";
 
@@ -214,7 +220,7 @@ public class ApplicationAPIDelegateTest {
     }
 
     @Test
-    public void updateApplication_should_return_result_of_applicationservice_updadateApplication() throws Exception {
+    public void updateApplication_should_return_result_of_applicationservice_updateApplication() throws Exception {
         //given
         final SApplication sApplication = mock(SApplication.class);
         final Application application = mock(Application.class);
@@ -233,7 +239,7 @@ public class ApplicationAPIDelegateTest {
     }
 
     @Test(expected = UpdateException.class)
-    public void updateApplication_should_throw_UpdadateException_when_applicationservice_throws_SObjectModificationException() throws Exception {
+    public void updateApplication_should_throw_UpdateException_when_applicationservice_throws_SObjectModificationException() throws Exception {
         //given
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("new name");
@@ -248,7 +254,7 @@ public class ApplicationAPIDelegateTest {
     }
 
     @Test(expected = AlreadyExistsException.class)
-    public void updateApplication_should_throw_UpdadateException_when_applicationservice_throws_SObjectAlreadyExistsException() throws Exception {
+    public void updateApplication_should_throw_UpdateException_when_applicationservice_throws_SObjectAlreadyExistsException() throws Exception {
         //given
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("new name");

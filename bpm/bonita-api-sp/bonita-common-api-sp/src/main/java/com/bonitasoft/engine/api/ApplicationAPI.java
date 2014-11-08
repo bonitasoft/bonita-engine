@@ -117,11 +117,13 @@ public interface ApplicationAPI {
      * @return the created {@link ApplicationPage}
      * @throws AlreadyExistsException if the token is already used by another <code>ApplicationPage</code> on this <code>Application</code>
      * @throws CreationException if an error occurs during the creation
+     * @throws ApplicationNotFoundException if the referenced application does not exist.
      * @see ApplicationPage
      * @see Application
      * @see Page
      */
-    ApplicationPage createApplicationPage(long applicationId, long pageId, String token) throws AlreadyExistsException, CreationException;
+    ApplicationPage createApplicationPage(long applicationId, long pageId, String token) throws AlreadyExistsException, CreationException,
+            ApplicationNotFoundException;
 
     /**
      * Retrieves the {@link ApplicationPage} for the given {@code Application} token and {@code ApplicationPage} token

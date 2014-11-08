@@ -91,14 +91,17 @@ public class ApplicationAPIDelegate {
             AlreadyExistsException, ApplicationNotFoundException {
         try {
             SApplication sApplication;
-            sApplication = applicationService.updateApplication(applicationId, convertor.toApplicationUpdateDescriptor(updater, loggedUserId));
-
+            if (!updater.getFields().isEmpty()) {
+                sApplication = applicationService.updateApplication(applicationId, convertor.toApplicationUpdateDescriptor(updater, loggedUserId));
+            } else {
+                sApplication = applicationService.getApplication(applicationId);
+            }
             return convertor.toApplication(sApplication);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
         } catch (final SObjectNotFoundException e) {
             throw new ApplicationNotFoundException(applicationId);
-        } catch (SBonitaException e) {
+        } catch (final SBonitaException e) {
             throw new UpdateException(e);
         }
     }

@@ -10,8 +10,6 @@ package com.bonitasoft.engine.api.impl;
 
 import java.util.List;
 
-import com.bonitasoft.engine.business.application.importer.ApplicationPageImporter;
-import com.bonitasoft.engine.business.application.importer.ApplicationsImporter;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -57,6 +55,8 @@ import com.bonitasoft.engine.business.application.exporter.ApplicationContainerE
 import com.bonitasoft.engine.business.application.exporter.ApplicationExporter;
 import com.bonitasoft.engine.business.application.importer.ApplicationContainerImporter;
 import com.bonitasoft.engine.business.application.importer.ApplicationImporter;
+import com.bonitasoft.engine.business.application.importer.ApplicationPageImporter;
+import com.bonitasoft.engine.business.application.importer.ApplicationsImporter;
 import com.bonitasoft.engine.business.application.importer.StrategySelector;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationDescriptor;
 import com.bonitasoft.engine.search.descriptor.SearchApplicationMenuDescriptor;
@@ -101,8 +101,7 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
         final SearchApplicationPages searchApplicationPages = new SearchApplicationPages(applicationService, convertor, appPageSearchDescriptor,
                 searchOptions);
-        final ApplicationPageAPIDelegate delegate = new ApplicationPageAPIDelegate(tenantAccessor, convertor, searchApplicationPages);
-        return delegate;
+        return new ApplicationPageAPIDelegate(tenantAccessor, convertor, searchApplicationPages, SessionInfos.getUserIdFromSession());
     }
 
     private ApplicationMenuAPIDelegate getApplicationMenuAPIDelegate() {
@@ -116,7 +115,8 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         final SearchApplicationMenuDescriptor searchDescriptor = tenantAccessor.getSearchEntitiesDescriptor().getSearchApplicationMenuDescriptor();
         final SearchApplicationMenus searchApplicationMenus = new SearchApplicationMenus(applicationService, convertor, searchDescriptor, searchOptions);
         final ApplicationMenuCreatorValidator validator = new ApplicationMenuCreatorValidator();
-        final ApplicationMenuAPIDelegate delegate = new ApplicationMenuAPIDelegate(tenantAccessor, convertor, searchApplicationMenus, validator);
+        final ApplicationMenuAPIDelegate delegate = new ApplicationMenuAPIDelegate(tenantAccessor, convertor, searchApplicationMenus, validator,
+                SessionInfos.getUserIdFromSession());
         return delegate;
     }
 
@@ -136,14 +136,14 @@ public class ApplicationAPIImpl implements ApplicationAPI {
         final StrategySelector strategySelector = new StrategySelector();
         final ApplicationContainerImporter containerImporter = new ApplicationContainerImporter();
         final ApplicationService applicationService = tenantAccessor.getApplicationService();
-        ApplicationPageNodeConverter applicationPageNodeConverter = new ApplicationPageNodeConverter(tenantAccessor.getPageService());
+        final ApplicationPageNodeConverter applicationPageNodeConverter = new ApplicationPageNodeConverter(tenantAccessor.getPageService());
         final ApplicationNodeConverter applicationNodeConverter = new ApplicationNodeConverter(tenantAccessor.getProfileService(),
                 applicationService, applicationPageNodeConverter, new ApplicationMenuNodeConverter(applicationService));
-        ApplicationPageImporter applicationPageImporter = new ApplicationPageImporter(tenantAccessor.getApplicationService(), applicationPageNodeConverter);
+        final ApplicationPageImporter applicationPageImporter = new ApplicationPageImporter(tenantAccessor.getApplicationService(),
+                applicationPageNodeConverter);
         final ApplicationImporter applicationImporter = new ApplicationImporter(tenantAccessor.getApplicationService(),
                 strategySelector.selectStrategy(policy), applicationNodeConverter, applicationPageImporter);
-        ApplicationsImporter applicationsImporter = new ApplicationsImporter(containerImporter, applicationImporter);
-        return applicationsImporter;
+        return new ApplicationsImporter(containerImporter, applicationImporter);
     }
 
     @Override
