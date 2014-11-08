@@ -23,6 +23,15 @@ import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMapp
 import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.aProcessInstance;
 import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
 import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.test.persistence.builder.ActorBuilder.anActor;
+import static org.bonitasoft.engine.test.persistence.builder.ActorMemberBuilder.anActorMember;
+import static org.bonitasoft.engine.test.persistence.builder.CallActivityInstanceBuilder.aCallActivityInstanceBuilder;
+import static org.bonitasoft.engine.test.persistence.builder.GatewayInstanceBuilder.aGatewayInstanceBuilder;
+import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMappingBuilder.aPendingActivityMapping;
+import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.aProcessInstance;
+import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
+import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -473,6 +482,16 @@ public class ProcessInstanceQueriesTest {
         assertThat(repository.countChildrenInstanceIdsOfProcessInstance(parentPI.getId())).isEqualTo(1);
         final List<Long> piIds = repository.getChildrenInstanceIdsOfProcessInstance(parentPI.getId());
         assertThat(piIds).isNotEmpty().containsExactly(childPI.getId());
+    }
+
+    @Test
+    public void getNumberOfProcessInstances_should_return_the_number_of_running_instances_of_a_process_definition() {
+        repository.add(aProcessInstance().withProcessDefinitionId(45l).build());
+        repository.add(aProcessInstance().withProcessDefinitionId(45l).build());
+        repository.add(aProcessInstance().withProcessDefinitionId(45l).build());
+        repository.add(aProcessInstance().withProcessDefinitionId(12l).build());
+
+        assertThat(repository.getNumberOfProcessInstances(45l)).isEqualTo(3);
     }
 
     @Test

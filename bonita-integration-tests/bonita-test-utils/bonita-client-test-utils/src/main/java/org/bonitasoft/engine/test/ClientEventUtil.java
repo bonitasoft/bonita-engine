@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Utility methods to get maps that match process as wanted
- * 
+ *
  * @author Baptiste Mesta
  */
 public class ClientEventUtil {
@@ -184,6 +184,13 @@ public class ClientEventUtil {
         final HashMap<String, Serializable> map = new HashMap<String, Serializable>(3);
         map.put(TYPE, PROCESS);
         map.put(ID, processInstanceId);
+        map.put(STATE_ID, stateId);
+        return map;
+    }
+
+    public static Map<String, Serializable> getProcessInstanceInState(final int stateId) {
+        final HashMap<String, Serializable> map = new HashMap<String, Serializable>(3);
+        map.put(TYPE, PROCESS);
         map.put(STATE_ID, stateId);
         return map;
     }

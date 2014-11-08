@@ -6,7 +6,7 @@
         <property name="locations">
             <array>
                 <value>file:${bonita.home}/server/platform/conf/bonita-platform.properties</value>
-                <value>file:${bonita.services.folder}/jdbc-${sysprop.bonita.db.vendor}.xml</value>
+                <value>classpath:jdbc-${sysprop.bonita.db.vendor}.properties</value>
             </array>
         </property>
     </bean>
@@ -25,12 +25,6 @@
         <constructor-arg name="sessionService" ref="sessionService"/>
         <constructor-arg name="sessionAccessor" ref="sessionAccessor"/>
         <constructor-arg name="technicalLoggerService" ref="platformTechnicalLoggerService"/>
-    </bean>
-
-    <bean id="recorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">
-        <constructor-arg name="persistenceService" ref="persistenceService"/>
-        <constructor-arg name="eventService" ref="eventService"/>
-        <constructor-arg name="logger" ref="platformTechnicalLoggerService"/>
     </bean>
 
 	<bean id="platformRecorderSync" class="org.bonitasoft.engine.recorder.impl.RecorderImpl">

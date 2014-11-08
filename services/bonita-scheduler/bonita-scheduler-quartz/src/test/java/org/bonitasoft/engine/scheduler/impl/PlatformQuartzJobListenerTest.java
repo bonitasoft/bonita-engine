@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -58,13 +58,13 @@ import org.quartz.spi.TriggerFiredBundle;
 @RunWith(MockitoJUnitRunner.class)
 public class PlatformQuartzJobListenerTest {
 
-    private List<AbstractBonitaPlatormJobListener> bonitaJobListeners;
+    private List<AbstractBonitaPlatformJobListener> bonitaJobListeners;
 
     private PlatformQuartzJobListener platformQuartzJobListener;
 
     @Before
     public void setUp() {
-        bonitaJobListeners = Collections.singletonList(mock(AbstractBonitaPlatormJobListener.class));
+        bonitaJobListeners = Collections.singletonList(mock(AbstractBonitaPlatformJobListener.class));
         platformQuartzJobListener = new PlatformQuartzJobListener(bonitaJobListeners);
         MockitoAnnotations.initMocks(platformQuartzJobListener);
     }

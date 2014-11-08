@@ -572,4 +572,7 @@ public interface ProcessInstanceService {
      */
     List<SProcessInstance> searchFailedProcessInstances(QueryOptions queryOptions) throws SBonitaReadException;
 
+    long getNumberOfProcessInstances(long processDefinitionId) throws SBonitaReadException;
+
+
 }

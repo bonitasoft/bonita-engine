@@ -1720,5 +1720,12 @@
 			WHERE a.id = h.activityId
 			AND h.userId = user.id
 		)
-    </query>   
+    </query>
+    
+    <query name="countProcessInstancesOfProcessDefinition">
+        SELECT COUNT(DISTINCT p)
+        FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+        WHERE p.processDefinitionId = :processDefinitionId
+    </query>
+
 </hibernate-mapping>

@@ -23,6 +23,7 @@ import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -41,20 +42,33 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
+import org.bonitasoft.engine.api.DocumentAPI;
+import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementations;
+import org.bonitasoft.engine.bpm.connector.ConnectorCriterion;
+import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.impl.IntegerDataInstanceImpl;
+import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
+import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.impl.internal.ProcessInstanceImpl;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
+import org.bonitasoft.engine.core.connector.ConnectorService;
+import org.bonitasoft.engine.core.connector.exception.SConnectorException;
+import org.bonitasoft.engine.core.connector.parser.JarDependencies;
+import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.operation.model.SOperation;
@@ -101,6 +115,8 @@ import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
+import org.bonitasoft.engine.persistence.OrderAndField;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
@@ -127,7 +143,13 @@ import com.google.common.collect.Lists;
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessAPIImplTest {
 
-    final long tenantId = 1;
+    private static final ConnectorCriterion CONNECTOR_CRITERION_DEFINITION_ID_ASC = ConnectorCriterion.DEFINITION_ID_ASC;
+
+    private static final int MAX_RESULT = 10;
+
+    private static final int START_INDEX = 0;
+
+    private static final long TENANT_ID = 1;
 
     private static final long ACTOR_ID = 100;
 
@@ -174,6 +196,18 @@ public class ProcessAPIImplTest {
     @Mock
     private FlowNodeStateManager flowNodeStateManager;
 
+    @Mock
+    private DocumentAPI documentAPI;
+
+    @Mock
+    ProcessManagementAPIImplDelegate managementAPIImplDelegate;
+
+    @Mock
+    private ConnectorService connectorService;
+
+    @Mock
+    private GetConnectorImplementations getConnectorImplementation;
+
     @Spy
     @InjectMocks
     private ProcessAPIImpl processAPI;
@@ -181,7 +215,7 @@ public class ProcessAPIImplTest {
     @Before
     public void setup() {
         doReturn(tenantAccessor).when(processAPI).getTenantAccessor();
-        when(tenantAccessor.getTenantId()).thenReturn(tenantId);
+        when(tenantAccessor.getTenantId()).thenReturn(TENANT_ID);
         when(tenantAccessor.getTransientDataService()).thenReturn(transientDataService);
         when(tenantAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
         when(tenantAccessor.getClassLoaderService()).thenReturn(classLoaderService);
@@ -190,6 +224,7 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getDataInstanceService()).thenReturn(dataInstanceService);
         when(tenantAccessor.getOperationService()).thenReturn(operationService);
         when(tenantAccessor.getActorMappingService()).thenReturn(actorMappingService);
+        when(tenantAccessor.getConnectorService()).thenReturn(connectorService);
         when(tenantAccessor.getSchedulerService()).thenReturn(schedulerService);
         when(tenantAccessor.getSearchEntitiesDescriptor()).thenReturn(searchEntitiesDescriptor);
         when(tenantAccessor.getEventInstanceService()).thenReturn(eventInstanceService);
@@ -213,8 +248,8 @@ public class ProcessAPIImplTest {
             processAPI.cancelProcessInstance(processInstanceId);
             fail("The process instance does not exists");
         } catch (final ProcessInstanceNotFoundException pinfe) {
-            verify(lockService).lock(processInstanceId, SFlowElementsContainerType.PROCESS.name(), tenantId);
-            verify(lockService).unlock(any(BonitaLock.class), eq(tenantId));
+            verify(lockService).lock(processInstanceId, SFlowElementsContainerType.PROCESS.name(), TENANT_ID);
+            verify(lockService).unlock(any(BonitaLock.class), eq(TENANT_ID));
         }
     }
 
@@ -790,5 +825,124 @@ public class ProcessAPIImplTest {
 
         final SearchResult<HumanTaskInstance> humanTasksSearch = processAPI.searchHumanTaskInstances(searchOptionsBuilder.sort("tyefv", Order.ASC).done());
         assertEquals(0, humanTasksSearch.getCount());
+    }
+
+    @Test
+    public void getPendingHumanTaskInstances_should_return_user_tasks_of_enabled_and_disabled_processes() throws Exception {
+        final Set<Long> actorIds = new HashSet<Long>();
+        actorIds.add(454545L);
+        final long userId = 1983L;
+        final List<Long> processDefinitionIds = new ArrayList<Long>();
+        processDefinitionIds.add(7897987L);
+        when(processDefinitionService.getProcessDefinitionIds(0, Integer.MAX_VALUE)).thenReturn(processDefinitionIds);
+        final List<SActor> actors = new ArrayList<SActor>();
+        final SActor actor = mock(SActor.class);
+        actors.add(actor);
+        when(actor.getId()).thenReturn(454545L);
+        when(actorMappingService.getActors(new HashSet<Long>(processDefinitionIds), userId)).thenReturn(actors);
+        final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForActivityInstance(ActivityInstanceCriterion.NAME_DESC);
+
+        processAPI.getPendingHumanTaskInstances(userId, 0, 100, ActivityInstanceCriterion.NAME_DESC);
+
+        verify(processDefinitionService).getProcessDefinitionIds(0, Integer.MAX_VALUE);
+        verify(actorMappingService).getActors(anySet(), eq(userId));
+        verify(activityInstanceService).getPendingTasks(eq(userId), anySet(), eq(0), eq(100), eq(orderAndField.getField()), eq(orderAndField.getOrder()));
+    }
+
+    @Test(expected = RetrieveException.class)
+    public void getConnectorsImplementations_should_throw__exception() throws Exception {
+        //given
+        final SConnectorException sConnectorException = new SConnectorException("message");
+        doThrow(sConnectorException).when(connectorService).getConnectorImplementations(anyLong(), anyLong(),
+                anyInt(), anyInt(), anyString(),
+                any(OrderByType.class));
+
+        //when then exception
+        processAPI.getConnectorImplementations(PROCESS_DEFINITION_ID, START_INDEX, MAX_RESULT, CONNECTOR_CRITERION_DEFINITION_ID_ASC);
+
+    }
+
+    @Test(expected = RetrieveException.class)
+    public void getNumberOfConnectorImplementations_should_throw__exception() throws Exception {
+        //given
+        final SConnectorException sConnectorException = new SConnectorException("message");
+        doThrow(sConnectorException).when(connectorService).getNumberOfConnectorImplementations(anyLong(), anyLong());
+
+        //when then exception
+        processAPI.getNumberOfConnectorImplementations(PROCESS_DEFINITION_ID);
+
+    }
+
+    @Test
+    public void getConnectorsImplementations_should_return_list() throws Exception {
+        //given
+        final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = createConnectorList();
+
+        doReturn(sConnectorImplementationDescriptors).when(connectorService).getConnectorImplementations(anyLong(), anyLong(),
+                anyInt(), anyInt(), anyString(),
+                any(OrderByType.class));
+
+        //when
+        final List<ConnectorImplementationDescriptor> connectorImplementations = processAPI.getConnectorImplementations(PROCESS_DEFINITION_ID, START_INDEX,
+                MAX_RESULT, CONNECTOR_CRITERION_DEFINITION_ID_ASC);
+
+        //then
+        assertThat(connectorImplementations).as("should return connectore implementation").hasSameSizeAs(sConnectorImplementationDescriptors);
+    }
+
+    @Test
+    public void getNumberOfConnectorImplementations_should_return_count() throws Exception {
+        //given
+        final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = createConnectorList();
+
+        doReturn((long) sConnectorImplementationDescriptors.size()).when(connectorService)
+                .getNumberOfConnectorImplementations(PROCESS_DEFINITION_ID, TENANT_ID);
+
+        //when
+        final long numberOfConnectorImplementations = processAPI.getNumberOfConnectorImplementations(PROCESS_DEFINITION_ID);
+
+        //then
+        assertThat(numberOfConnectorImplementations).as("should return count").isEqualTo(sConnectorImplementationDescriptors.size());
+    }
+
+    private List<SConnectorImplementationDescriptor> createConnectorList() {
+        final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = new ArrayList<SConnectorImplementationDescriptor>();
+        final SConnectorImplementationDescriptor sConnectorImplementationDescriptor = new SConnectorImplementationDescriptor("className", "id", "version",
+                "definitionId", "definitionVersion", new JarDependencies(Arrays.asList("dep1", "dep2")));
+        sConnectorImplementationDescriptors.add(sConnectorImplementationDescriptor);
+        sConnectorImplementationDescriptors.add(sConnectorImplementationDescriptor);
+        sConnectorImplementationDescriptors.add(sConnectorImplementationDescriptor);
+        return sConnectorImplementationDescriptors;
+    }
+
+    @Test
+    public void evaluateExpressionsOnCompletedActivityInstance_should_call_getLastArchivedProcessInstance_using_parentProcessInstanceId() throws Exception {
+        //given
+        final long processInstanceId = 21L;
+        final long activityInstanceId = 5L;
+        final ArchivedActivityInstance activityInstance = mock(ArchivedActivityInstance.class);
+        when(activityInstance.getProcessInstanceId()).thenReturn(processInstanceId);
+        when(activityInstance.getArchiveDate()).thenReturn(new Date());
+        doReturn(activityInstance).when(processAPI).getArchivedActivityInstance(activityInstanceId);
+
+        final ArchivedProcessInstance procInst = mock(ArchivedProcessInstance.class);
+        when(procInst.getProcessDefinitionId()).thenReturn(1000L);
+        doReturn(procInst).when(processAPI).getLastArchivedProcessInstance(anyLong());
+
+        //when
+        processAPI.evaluateExpressionsOnCompletedActivityInstance(activityInstanceId, new HashMap<Expression, Map<String, Serializable>>());
+
+        //then
+        verify(processAPI).getLastArchivedProcessInstance(processInstanceId);
+        verify(activityInstance, never()).getParentContainerId();
+        verify(activityInstance, never()).getParentActivityInstanceId();
+        verify(activityInstance, never()).getRootContainerId();
+    }
+
+    @Test
+    public void purgeClassLoader_should_call_delegate() throws Exception {
+        processAPI.purgeClassLoader(45L);
+
+        verify(managementAPIImplDelegate).purgeClassLoader(45L);
     }
 }

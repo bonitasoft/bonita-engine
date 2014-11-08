@@ -17,9 +17,6 @@ import java.io.Serializable;
 
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
-
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -54,14 +51,12 @@ public final class SXMLObjectDataInstanceImpl extends SDataInstanceImpl {
     }
 
     private String convert(final Serializable value) {
-        final XStream xStream = new XStream(new StaxDriver());
-        return xStream.toXML(value);
+        return XStreamFactory.getXStream().toXML(value);
     }
 
     private Serializable revert(final String value) {
         if (value != null) {
-            final XStream xstream = new XStream(new StaxDriver());
-            return (Serializable) xstream.fromXML(value);
+            return (Serializable) XStreamFactory.getXStream().fromXML(value);
         }
         return null;
     }
