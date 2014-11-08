@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api;
 
+import java.util.List;
+
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
@@ -200,5 +202,19 @@ public interface ApplicationAPI {
      * @throws SearchException if an error occurs during search
      */
     SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions) throws SearchException;
+
+
+    /**
+     *
+     * Return all pages names that can be accessed by the profile through applications.
+     *
+     * The portal use this method to calculate all permissions for a user.
+     *
+     * @param profileId
+     *      the id of the profile
+     * @return
+     *      list of page name accessible by the profile through applications
+     */
+    List<String> getAllPagesForProfile(long profileId);
 
 }
