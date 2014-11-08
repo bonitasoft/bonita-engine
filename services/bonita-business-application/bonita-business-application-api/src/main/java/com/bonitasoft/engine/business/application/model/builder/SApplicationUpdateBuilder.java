@@ -12,7 +12,6 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public interface SApplicationUpdateBuilder {
 
@@ -33,7 +32,5 @@ public interface SApplicationUpdateBuilder {
     public SApplicationUpdateBuilder updateProfileId(final Long profileId);
 
     public SApplicationUpdateBuilder updateHomePageId(final Long homePageId);
-
-    public SApplicationUpdateBuilder updateUpdatedBy(final Long updaterUserId);
 
 }

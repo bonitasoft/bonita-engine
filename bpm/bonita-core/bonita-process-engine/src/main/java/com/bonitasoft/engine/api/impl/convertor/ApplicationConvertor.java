@@ -29,10 +29,8 @@ import com.bonitasoft.engine.business.application.model.builder.SApplicationBuil
 import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class ApplicationConvertor {
 
@@ -75,7 +73,7 @@ public class ApplicationConvertor {
     }
 
     public EntityUpdateDescriptor toApplicationUpdateDescriptor(final ApplicationUpdater updater, final long updaterUserId) {
-        final SApplicationUpdateBuilder builder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance();
+        final SApplicationUpdateBuilder builder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(updaterUserId);
         for (final Entry<ApplicationField, Serializable> entry : updater.getFields().entrySet()) {
             switch (entry.getKey()) {
                 case TOKEN:
@@ -111,10 +109,6 @@ public class ApplicationConvertor {
                 default:
                     break;
             }
-        }
-
-        if (builder.done().getFields().size() > 0) {
-            builder.updateUpdatedBy(updaterUserId);
         }
 
         return builder.done();

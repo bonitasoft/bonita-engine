@@ -25,11 +25,10 @@ import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationState;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
-import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationState;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
-
 
 public class ApplicationConvertorTest {
 
@@ -111,8 +110,10 @@ public class ApplicationConvertorTest {
     @Test
     public void toApplicationList_should_call_toApplition_for_each_element_in_the_list_and_return_the_list_of_converted_values() throws Exception {
         //given
-        final SApplicationImpl sApp1 = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, System.currentTimeMillis(), CREATOR_ID, SApplicationState.DEACTIVATED.name());
-        final SApplicationImpl sApp2 = new SApplicationImpl("app2", " my app2", APP_VERSION, System.currentTimeMillis(), CREATOR_ID, SApplicationState.DEACTIVATED.name());
+        final SApplicationImpl sApp1 = new SApplicationImpl(APP_NAME, APP_DISPLAY_NAME, APP_VERSION, System.currentTimeMillis(), CREATOR_ID,
+                SApplicationState.DEACTIVATED.name());
+        final SApplicationImpl sApp2 = new SApplicationImpl("app2", " my app2", APP_VERSION, System.currentTimeMillis(), CREATOR_ID,
+                SApplicationState.DEACTIVATED.name());
         final ApplicationImpl app1 = new ApplicationImpl(APP_NAME, APP_VERSION, APP_DESC);
         final ApplicationImpl app2 = new ApplicationImpl("app2", APP_VERSION, APP_DESC);
         final ApplicationConvertor convertorMock = spy(convertor);
@@ -139,14 +140,13 @@ public class ApplicationConvertorTest {
         updater.setState(ApplicationState.ACTIVATED.name());
         updater.setHomePageId(11L);
 
-
         //when
         final EntityUpdateDescriptor updateDescriptor = convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID);
 
         //then
         assertThat(updateDescriptor).isNotNull();
         final Map<String, Object> fields = updateDescriptor.getFields();
-        assertThat(fields).hasSize(9);
+        assertThat(fields).hasSize(10); // field lastUpdateDate cannot be checked:
         assertThat(fields.get(SApplicationFields.TOKEN)).isEqualTo("My-updated-app");
         assertThat(fields.get(SApplicationFields.DISPLAY_NAME)).isEqualTo("Updated display name");
         assertThat(fields.get(SApplicationFields.VERSION)).isEqualTo("1.1");
@@ -169,7 +169,7 @@ public class ApplicationConvertorTest {
         //then
         assertThat(updateDescriptor).isNotNull();
         final Map<String, Object> fields = updateDescriptor.getFields();
-        assertThat(fields).isEmpty();
+        assertThat(fields).hasSize(2);
     }
 
 }

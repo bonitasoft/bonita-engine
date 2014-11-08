@@ -5,7 +5,7 @@
  * For commercial licensing information, contact:
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
- *******************************************************************************/
+ ******************************************************************************/
 package com.bonitasoft.engine.api.impl.application;
 
 import java.util.List;
@@ -46,20 +46,20 @@ public class ApplicationPageAPIDelegate {
     private final ApplicationPageConvertor convertor;
     private final ApplicationService applicationService;
     private final SearchApplicationPages searchApplicationPages;
+    private final long loggedUserId;
 
     public ApplicationPageAPIDelegate(final TenantServiceAccessor accessor, final ApplicationPageConvertor convertor,
-            final SearchApplicationPages searchApplicationPages) {
+            final SearchApplicationPages searchApplicationPages, final long loggedUserId) {
         this.searchApplicationPages = searchApplicationPages;
         applicationService = accessor.getApplicationService();
         this.convertor = convertor;
+        this.loggedUserId = loggedUserId;
     }
 
     public void setApplicationHomePage(final long applicationId, final long applicationPageId) throws UpdateException, ApplicationNotFoundException {
-        final SApplicationUpdateBuilder updateBuilder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance();
-        updateBuilder.updateHomePageId(applicationPageId);
+        BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(loggedUserId).updateHomePageId(applicationPageId);
         try {
-            applicationService.updateApplication(applicationId, updateBuilder.done());
-
+            applicationService.updateApplication(applicationId, BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(loggedUserId).done());
         } catch (final SObjectNotFoundException e) {
             throw new ApplicationNotFoundException(applicationId);
         } catch (final SBonitaException e) {
@@ -70,10 +70,11 @@ public class ApplicationPageAPIDelegate {
     public ApplicationPage createApplicationPage(final long applicationId, final long pageId, final String name) throws AlreadyExistsException,
             CreationException {
         final SApplicationPageBuilderFactory factory = BuilderFactory.get(SApplicationPageBuilderFactory.class);
-        final SApplicationPageBuilder builder = factory.createNewInstance(applicationId, pageId, name);
+        final SApplicationPageBuilder pageBuilder = factory.createNewInstance(applicationId, pageId, name);
         SApplicationPage sAppPage;
         try {
-            sAppPage = applicationService.createApplicationPage(builder.done());
+            sAppPage = applicationService.createApplicationPage(pageBuilder.done());
+            applicationService.updateApplication(applicationId, BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(loggedUserId).done());
             return convertor.toApplicationPage(sAppPage);
         } catch (final SObjectCreationException e) {
             throw new CreationException(e);
@@ -81,6 +82,8 @@ public class ApplicationPageAPIDelegate {
             throw new AlreadyExistsException(e.getMessage());
         } catch (final SInvalidTokenException e) {
             throw new CreationException(e.getMessage());
+        } catch (final SBonitaException e) {
+            throw new CreationException(e);
         }
     }
 
@@ -106,9 +109,11 @@ public class ApplicationPageAPIDelegate {
         }
     }
 
-    public void deleteApplicationPage(final long applicationpPageId) throws DeletionException {
+    public void deleteApplicationPage(final long applicationPageId) throws DeletionException {
         try {
-            applicationService.deleteApplicationPage(applicationpPageId);
+            final SApplicationPage deletedApplicationPage = applicationService.deleteApplicationPage(applicationPageId);
+            final SApplicationUpdateBuilder appBbuilder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(loggedUserId);
+            applicationService.updateApplication(deletedApplicationPage.getApplicationId(), appBbuilder.done());
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }

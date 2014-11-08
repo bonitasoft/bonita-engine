@@ -8,13 +8,10 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.application.model.builder;
 
-
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public interface SApplicationUpdateBuilderFactory {
 
-    SApplicationUpdateBuilder createNewInstance();
+    SApplicationUpdateBuilder createNewInstance(long updaterUserId);
 }

@@ -13,37 +13,34 @@
  **/
 package com.bonitasoft.engine.business.application.model.builder.impl;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class SApplicationFields {
 
-    public static String ID = "id";
+    public static final String ID = "id";
 
-    public static String TOKEN = "token";
+    public static final String TOKEN = "token";
 
-    public static String DISPLAY_NAME = "displayName";
+    public static final String DISPLAY_NAME = "displayName";
 
-    public static String VERSION = "version";
+    public static final String VERSION = "version";
 
-    public static String DESCRIPTION = "description";
+    public static final String DESCRIPTION = "description";
 
-    public static String ICON_PATH = "iconPath";
+    public static final String ICON_PATH = "iconPath";
 
-    public static String CREATION_DATE = "creationDate";
+    public static final String CREATION_DATE = "creationDate";
 
-    public static String CREATED_BY = "createdBy";
+    public static final String CREATED_BY = "createdBy";
 
-    public static String LAST_UPDATE_DATE = "lastUpdateDate";
+    public static final String LAST_UPDATE_DATE = "lastUpdateDate";
 
-    public static String UPDATED_BY = "updatedBy";
+    public static final String UPDATED_BY = "updatedBy";
 
-    public static String STATE = "state";
+    public static final String STATE = "state";
 
-    public static String HOME_PAGE_ID = "homePageId";
+    public static final String HOME_PAGE_ID = "homePageId";
 
-    public static String PROFILE_ID = "profileId";
-
+    public static final String PROFILE_ID = "profileId";
 }

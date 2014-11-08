@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -34,7 +36,7 @@ import com.bonitasoft.engine.business.application.ApplicationPageNotFoundExcepti
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.SInvalidTokenException;
 import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
-import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -71,7 +73,7 @@ public class ApplicationPageAPIDelegateTest {
     @Before
     public void setUp() throws Exception {
         given(accessor.getApplicationService()).willReturn(applicationService);
-        delegate = new ApplicationPageAPIDelegate(accessor, convertor, searchApplicationPages);
+        delegate = new ApplicationPageAPIDelegate(accessor, convertor, searchApplicationPages, 9999L);
     }
 
     @Test
@@ -80,9 +82,7 @@ public class ApplicationPageAPIDelegateTest {
         delegate.setApplicationHomePage(APPLICATION_ID, APPLICATION_PAGE_ID);
 
         //then
-        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-        updateDescriptor.addField(SApplicationFields.HOME_PAGE_ID, APPLICATION_PAGE_ID);
-        verify(applicationService, times(1)).updateApplication(APPLICATION_ID, updateDescriptor);
+        verify(applicationService, times(1)).updateApplication(eq(APPLICATION_ID), any(EntityUpdateDescriptor.class));
     }
 
     @Test(expected = UpdateException.class)
@@ -109,6 +109,29 @@ public class ApplicationPageAPIDelegateTest {
 
         //then
         assertThat(createdAppPage).isEqualTo(appPage);
+    }
+
+    @Test
+    public void createApplicationPage_should_update_application() throws Exception {
+        //when
+        delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
+
+        //then
+        verify(applicationService).updateApplication(eq(APPLICATION_ID), any(EntityUpdateDescriptor.class));
+    }
+
+    @Test
+    public void deleteApplicationPage_should_update_application() throws Exception {
+        // given
+        final SApplicationPage appPage = mock(SApplicationPage.class);
+        given(appPage.getApplicationId()).willReturn(APPLICATION_ID);
+        given(applicationService.deleteApplicationPage(APPLICATION_PAGE_ID)).willReturn(appPage);
+
+        //when
+        delegate.deleteApplicationPage(APPLICATION_PAGE_ID);
+
+        //then
+        verify(applicationService).updateApplication(eq(APPLICATION_ID), any(EntityUpdateDescriptor.class));
     }
 
     @Test(expected = CreationException.class)
@@ -225,6 +248,11 @@ public class ApplicationPageAPIDelegateTest {
 
     @Test
     public void deleteApplicationPage_should_call_applicationService_deleteApplicationPage() throws Exception {
+        // given
+        final SApplicationPage appPage = mock(SApplicationPage.class);
+        given(appPage.getApplicationId()).willReturn(APPLICATION_ID);
+        given(applicationService.deleteApplicationPage(APPLICATION_PAGE_ID)).willReturn(appPage);
+
         //when
         delegate.deleteApplicationPage(APPLICATION_PAGE_ID);
 
