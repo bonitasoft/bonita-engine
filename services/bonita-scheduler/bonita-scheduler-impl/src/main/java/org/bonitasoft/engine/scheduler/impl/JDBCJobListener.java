@@ -28,7 +28,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
@@ -49,7 +49,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  */
-public class JDBCJobListener extends AbstractBonitaPlatormJobListener {
+public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
 
     private static final long serialVersionUID = -5060516371371295271L;
 

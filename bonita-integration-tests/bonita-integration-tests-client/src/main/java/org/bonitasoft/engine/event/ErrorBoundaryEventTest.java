@@ -101,7 +101,7 @@ public class ErrorBoundaryEventTest extends AbstractEventTest {
         assignAndExecuteStep(calledStep2, donaBenta.getId());
 
         waitForProcessToFinish(calledProcessInstance);
-        waitForArchivedActivity(calledStep1.getId(), TestStates.ABORTED);
+        waitForFlowNodeInState(processInstance, "calledStep1", TestStates.ABORTED, true);
 
         final ActivityInstance executionStep = waitForUserTask("step2", processInstance.getId());
         assignAndExecuteStep(executionStep, donaBenta.getId());

@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.process;
 
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 
 import org.bonitasoft.engine.classloader.ClassLoaderService;
@@ -22,13 +25,14 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SStartEventDefinition;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
-import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.service.PlatformServiceAccessor;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -48,25 +52,31 @@ public class DisableProcessTest {
     private SProcessDefinition processDefinition;
     @Mock
     private SFlowElementContainerDefinition flowElementCOntainerDefintion;
+    @Mock
+    private PlatformServiceAccessor platformServiceAccessor;
+    @Mock
+    private TenantServiceAccessor tenantServiceAccessor;
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.api.impl.transaction.process.DisableProcess#execute()}.
-     * Make sure we will always think to clean ClassloaderSrvice when disabling a process.
-     * 
-     * @throws SBonitaException
-     */
+    @Before
+    public void setUp() {
+        when(platformServiceAccessor.getSchedulerService()).thenReturn(scheduler);
+        when(tenantServiceAccessor.getClassLoaderService()).thenReturn(classLoaderService);
+        when(tenantServiceAccessor.getProcessDefinitionService()).thenReturn(processDefinitionService);
+        when(tenantServiceAccessor.getEventInstanceService()).thenReturn(eventInstanceService);
+        when(tenantServiceAccessor.getTechnicalLoggerService()).thenReturn(logger);
+    }
+
     @Test
-    public void testClassloaderClearedWhenExecuteCalled() throws SBonitaException {
+    public void execute_should_not_clean_the_classLoader_due_to_its_use_for_running_instances() throws SBonitaException {
         final long processDefinitionId = 1;
-        Mockito.when(processDefinitionService.getProcessDefinition(processDefinitionId)).thenReturn(processDefinition);
-        Mockito.when(processDefinition.getProcessContainer()).thenReturn(flowElementCOntainerDefintion);
-        Mockito.when(flowElementCOntainerDefintion.getStartEvents()).thenReturn(new ArrayList<SStartEventDefinition>());
-        final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processDefinitionId, eventInstanceService, scheduler, logger,
-                "testUserName", classLoaderService);
+        when(processDefinitionService.getProcessDefinition(processDefinitionId)).thenReturn(processDefinition);
+        when(processDefinition.getProcessContainer()).thenReturn(flowElementCOntainerDefintion);
+        when(flowElementCOntainerDefintion.getStartEvents()).thenReturn(new ArrayList<SStartEventDefinition>());
+        final DisableProcess disableProcess = new DisableProcess(processDefinitionService,  processDefinitionId,eventInstanceService,scheduler,logger, "matti");
 
         disableProcess.execute();
 
-        Mockito.verify(classLoaderService).removeLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
+        verifyZeroInteractions(classLoaderService);
     }
 
 }
