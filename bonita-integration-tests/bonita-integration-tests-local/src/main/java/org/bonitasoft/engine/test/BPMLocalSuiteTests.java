@@ -21,7 +21,8 @@ import org.junit.runners.Suite.SuiteClasses;
         LocalInterruptingTimerBoundaryEventTest.class,
         DataInstanceIntegrationLocalTest.class,
         GatewayExecutionLocalTest.class,
-        ThemeTest.class
+        ThemeTest.class,
+        PermissionAPIIT.class
 })
 @Initializer(TestsInitializer.class)
 public class BPMLocalSuiteTests {

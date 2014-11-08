@@ -16,6 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import org.bonitasoft.engine.api.APIAccessor;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
+import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
@@ -28,6 +29,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
+ * @author Baptiste Mesta
  */
 public class APIAccessorImpl implements APIAccessor {
 
@@ -70,4 +72,8 @@ public class APIAccessorImpl implements APIAccessor {
         return new ThemeAPIImpl();
     }
 
+    @Override
+    public PermissionAPI getPermissionAPI() {
+        return new PermissionAPIImpl();
+    }
 }

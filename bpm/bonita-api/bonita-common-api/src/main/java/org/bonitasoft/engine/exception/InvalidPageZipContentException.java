@@ -9,4 +9,7 @@ public class InvalidPageZipContentException extends CreationException {
         super(message, cause);
     }
 
+    public InvalidPageZipContentException(String message) {
+        super(message);
+    }
 }
