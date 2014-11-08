@@ -24,7 +24,7 @@ public class ImportError implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public enum Type {
-        USER, GROUP, ROLE, PAGE, PROFILE
+        USER, GROUP, ROLE, PAGE, PROFILE, APPLICATION_PAGE
     }
 
     private final String name;
