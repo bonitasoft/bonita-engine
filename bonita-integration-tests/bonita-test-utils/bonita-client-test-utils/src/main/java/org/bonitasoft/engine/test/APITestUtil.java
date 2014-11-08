@@ -568,7 +568,7 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder,
             final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies) throws BonitaException {
         final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil.buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
-                connectorImplementations, generateConnectorDependencies, Collections.<BarResource>emptyList());
+                connectorImplementations, generateConnectorDependencies, Collections.<BarResource> emptyList());
         return deployAndEnableProcess(businessArchiveBuilder.done());
     }
 
@@ -615,7 +615,7 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithActorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
             final User user, final List<BarResource> generateFilterDependencies, final List<BarResource> userFilters)
             throws BonitaException {
-        return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource>emptyList(),
+        return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource> emptyList(),
                 generateFilterDependencies, userFilters);
     }
 
@@ -850,6 +850,11 @@ public class APITestUtil extends PlatformTestUtil {
 
     public void waitForProcessToBeInState(final long processInstanceId, final ProcessInstanceState state) throws Exception {
         ClientEventUtil.executeWaitServerCommand(getCommandAPI(), ClientEventUtil.getProcessInstanceInState(processInstanceId, state.getId()),
+                DEFAULT_TIMEOUT);
+    }
+
+    public void waitForInitializingProcess() throws Exception {
+        ClientEventUtil.executeWaitServerCommand(getCommandAPI(), ClientEventUtil.getProcessInstanceInState(ProcessInstanceState.INITIALIZING.getId()),
                 DEFAULT_TIMEOUT);
     }
 
@@ -1538,7 +1543,7 @@ public class APITestUtil extends PlatformTestUtil {
         return permissionAPI;
     }
 
-    public void setPermissionAPI(PermissionAPI permissionAPI) {
+    public void setPermissionAPI(final PermissionAPI permissionAPI) {
         this.permissionAPI = permissionAPI;
     }
 
