@@ -15,6 +15,7 @@ package org.bonitasoft.engine.execution.work;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -35,6 +36,7 @@ import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDep
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
 import org.bonitasoft.engine.execution.SIllegalStateTransition;
+import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
@@ -51,7 +53,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
- * 
+ *
  */
 @SuppressWarnings("javadoc")
 @RunWith(MockitoJUnitRunner.class)
@@ -248,6 +250,30 @@ public class FailureHandlingBonitaWorkTest {
         doThrow(e).when(wrappedWork).work(context);
         txBonitawork.work(context);
         verify(wrappedWork, times(1)).handleFailure(e, context);
+    }
+
+    @Test
+    public void work_should_log_in_error_level_when_an_exception_occurs_in_wrapped_work() throws Throwable {
+        final Map<String, Object> context = new HashMap<String, Object>();
+        final SExpressionEvaluationException seee = new SExpressionEvaluationException("message", "expressionName");
+        doThrow(seee).when(wrappedWork).work(context);
+        when(loggerService.isLoggable(any(Class.class), eq(TechnicalLogSeverity.ERROR))).thenReturn(true);
+
+        txBonitawork.work(context);
+
+        verify(loggerService).log(any(Class.class), eq(TechnicalLogSeverity.ERROR), eq(seee.getClass().getName() + " : \"message\""));
+    }
+
+    @Test
+    public void handleFailure_should_log_in_error_level_when_an_exception_occurs_in_wrapped_work() throws Throwable {
+        final Map<String, Object> context = new HashMap<String, Object>();
+        final SExpressionEvaluationException seee = new SExpressionEvaluationException("message", "expressionName");
+        doThrow(seee).when(wrappedWork).work(context);
+        when(loggerService.isLoggable(any(Class.class), eq(TechnicalLogSeverity.ERROR))).thenReturn(true);
+
+        txBonitawork.handleFailure(seee, context);
+
+        verify(loggerService, times(2)).log(any(Class.class), eq(TechnicalLogSeverity.ERROR), anyString());
     }
 
 }

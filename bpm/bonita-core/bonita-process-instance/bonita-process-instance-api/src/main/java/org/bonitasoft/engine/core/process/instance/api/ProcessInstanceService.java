@@ -547,4 +547,6 @@ public interface ProcessInstanceService {
      */
     SAProcessInstance getLastArchivedProcessInstance(long sourceObjectProcessInstanceId) throws SBonitaReadException;
 
+    long getNumberOfProcessInstances(long processDefinitionId) throws SBonitaReadException;
+
 }

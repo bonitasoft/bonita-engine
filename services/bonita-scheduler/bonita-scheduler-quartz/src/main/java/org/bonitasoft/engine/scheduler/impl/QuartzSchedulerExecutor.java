@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -427,7 +427,7 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
     }
 
     @Override
-    public void addJobListener(final List<AbstractBonitaPlatormJobListener> jobListeners) throws SSchedulerException {
+    public void addJobListener(final List<AbstractBonitaPlatformJobListener> jobListeners) throws SSchedulerException {
         try {
             final ListenerManager listenerManager = scheduler.getListenerManager();
             listenerManager.addJobListener(new PlatformQuartzJobListener(jobListeners));

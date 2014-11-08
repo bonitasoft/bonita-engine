@@ -16,7 +16,7 @@ package org.bonitasoft.engine.scheduler;
 /**
  * @author Celine Souchet
  */
-public abstract class AbstractBonitaPlatormJobListener extends AbstractBonitaJobListener {
+public abstract class AbstractBonitaPlatformJobListener extends AbstractBonitaJobListener {
 
     private static final long serialVersionUID = 4115044015337726803L;
 
