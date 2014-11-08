@@ -70,7 +70,7 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
 
     private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
-        builder.sort(ApplicationSearchDescriptor.TOKEN, Order.ASC);
+        builder.sort(ApplicationSearchDescriptor.ID, Order.ASC);
         return builder;
     }
 
@@ -109,6 +109,8 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         final ApplicationMenuCreator subMenuCreator = new ApplicationMenuCreator(hr.getId(), "Daily HR follow-up", appPage.getId());
         subMenuCreator.setParentId(menu.getId());
         applicationAPI.createApplicationMenu(subMenuCreator);
+
+        applicationAPI.createApplicationMenu(new ApplicationMenuCreator(hr.getId(), "Empty menu"));
 
         // Add home page:
         applicationAPI.setApplicationHomePage(hr.getId(), appPage.getId());
@@ -161,12 +163,45 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, hrApp.getId());
         SearchResult<ApplicationPage> pageSearchResult = applicationAPI.searchApplicationPages(builder.done());
         assertThat(pageSearchResult.getCount()).isEqualTo(1);
-        assertIsMyNewCustomPage(myPage, hrApp, pageSearchResult.getResult().get(0));
+        ApplicationPage myNewCustomPage = pageSearchResult.getResult().get(0);
+        assertIsMyNewCustomPage(myPage, hrApp, myNewCustomPage);
+
+        //check menu is created
+        builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, hrApp.getId());
+        SearchResult<ApplicationMenu> menuSearchResult = applicationAPI.searchApplicationMenus(builder.done());
+        assertThat(menuSearchResult.getCount()).isEqualTo(3);
+        ApplicationMenu hrFollowUpMenu = menuSearchResult.getResult().get(0);
+        assertIsHrFollowUpMenu(hrFollowUpMenu);
+        assertIsDailyHrFollowUpMenu(menuSearchResult.getResult().get(1), hrFollowUpMenu, myNewCustomPage);
+        assertIsEmptyMenu(menuSearchResult.getResult().get(2));
+
 
         applicationAPI.deleteApplication(hrApp.getId());
         getProfileAPI().deleteProfile(profile.getId());
         getPageAPI().deletePage(myPage.getId());
 
+    }
+
+    private void assertIsHrFollowUpMenu(final ApplicationMenu applicationMenu) {
+        assertThat(applicationMenu.getIndex()).isEqualTo(1);
+        assertThat(applicationMenu.getParentId()).isNull();
+        assertThat(applicationMenu.getDisplayName()).isEqualTo("HR follow-up");
+        assertThat(applicationMenu.getApplicationPageId()).isNull();
+    }
+
+    private void assertIsDailyHrFollowUpMenu(final ApplicationMenu applicationMenu, ApplicationMenu hrFollowUpMenu, ApplicationPage myNewCustomPage) {
+        assertThat(applicationMenu.getIndex()).isEqualTo(1);
+        assertThat(applicationMenu.getParentId()).isEqualTo(hrFollowUpMenu.getId());
+        assertThat(applicationMenu.getDisplayName()).isEqualTo("Daily HR follow-up");
+        assertThat(applicationMenu.getApplicationPageId()).isEqualTo(myNewCustomPage.getId());
+    }
+
+    private void assertIsEmptyMenu(final ApplicationMenu applicationMenu) {
+        assertThat(applicationMenu.getIndex()).isEqualTo(2);
+        assertThat(applicationMenu.getParentId()).isNull();
+        assertThat(applicationMenu.getDisplayName()).isEqualTo("Empty menu");
+        assertThat(applicationMenu.getApplicationPageId()).isNull();
     }
 
     private void assertIsMyNewCustomPage(final Page myPage, final Application hrApp, final ApplicationPage applicationPage) {
@@ -204,10 +239,14 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
     @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "import",
             "profile does not exist", "custom page does not exists" })
     @Test
-    public void importApplications_should_create_applications_contained_by_xml_file_and_return_error_in_status_when_profile_does_not_exist() throws Exception {
+    public void importApplications_should_create_applications_contained_by_xml_file_and_return_error_in_there_is_unavailable_info() throws Exception {
         //given
         final byte[] applicationsByteArray = IOUtils.toByteArray(ApplicationAPIApplicationIT.class
                 .getResourceAsStream("applicationWithUnavailableInfo.xml"));
+
+        // create page necessary to import application hr (real page name is defined in zip/page.properties):
+        final Page myPage = getPageAPI().createPage("not_used",
+                IOUtils.toByteArray(ApplicationAPIApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
 
         //when
         final List<ImportStatus> importStatus = applicationAPI.importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
@@ -217,8 +256,10 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         assertThat(importStatus.get(0).getName()).isEqualTo("HR-dashboard");
         assertThat(importStatus.get(0).getStatus()).isEqualTo(ImportStatus.Status.ADDED);
         ImportError profileError = new ImportError("ThisProfileNotExists", ImportError.Type.PROFILE);
-        ImportError customPageError = new ImportError("custompage_mynewcustompage", ImportError.Type.PAGE);
-        assertThat(importStatus.get(0).getErrors()).containsExactly(profileError, customPageError);
+        ImportError customPageError = new ImportError("custompage_notexists", ImportError.Type.PAGE);
+        ImportError appPageError1 = new ImportError("will-not-be-imported", ImportError.Type.APPLICATION_PAGE);
+        ImportError appPageError2 = new ImportError("never-existed", ImportError.Type.APPLICATION_PAGE);
+        assertThat(importStatus.get(0).getErrors()).containsExactly(profileError, customPageError, appPageError1, appPageError2);
 
         // check applications ware created
         final SearchResult<Application> searchResult = applicationAPI.searchApplications(buildSearchOptions(0, 10));
@@ -231,6 +272,29 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         assertThat(app1.getIconPath()).isEqualTo("/icon.jpg");
         assertThat(app1.getState()).isEqualTo("ACTIVATED");
         assertThat(app1.getProfileId()).isNull();
+
+        //check only one application page was created
+        SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, app1.getId());
+        SearchResult<ApplicationPage> pageSearchResult = applicationAPI.searchApplicationPages(builder.done());
+        assertThat(pageSearchResult.getCount()).isEqualTo(1);
+        assertThat(pageSearchResult.getResult().get(0).getToken()).isEqualTo("my-new-custom-page");
+
+        builder = getDefaultBuilder(0, 10);
+        builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, app1.getId());
+
+        //check three menus were created
+        SearchResult<ApplicationMenu> menuSearchResult = applicationAPI.searchApplicationMenus(builder.done());
+        assertThat(menuSearchResult.getCount()).isEqualTo(3);
+        assertThat(menuSearchResult.getResult().get(0).getDisplayName()).isEqualTo("HR follow-up");
+        assertThat(menuSearchResult.getResult().get(0).getIndex()).isEqualTo(1);
+        assertThat(menuSearchResult.getResult().get(1).getDisplayName()).isEqualTo("Daily HR follow-up");
+        assertThat(menuSearchResult.getResult().get(1).getIndex()).isEqualTo(1);
+        assertThat(menuSearchResult.getResult().get(2).getDisplayName()).isEqualTo("Empty menu");
+        assertThat(menuSearchResult.getResult().get(1).getIndex()).isEqualTo(1);
+
+        applicationAPI.deleteApplication(app1.getId());
+        getPageAPI().deletePage(myPage.getId());
 
     }
 

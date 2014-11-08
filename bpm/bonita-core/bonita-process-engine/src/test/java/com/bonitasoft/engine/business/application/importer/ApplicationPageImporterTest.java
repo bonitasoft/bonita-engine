@@ -20,11 +20,9 @@ import static org.mockito.Mockito.verify;
 import com.bonitasoft.engine.business.application.converter.ApplicationPageNodeConverter;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
-import com.bonitasoft.engine.page.SPage;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.exception.ExecutionException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -33,7 +31,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.xml.ApplicationPageNode;
-import com.bonitasoft.engine.page.PageService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationPageImporterTest {
@@ -58,7 +55,7 @@ public class ApplicationPageImporterTest {
         given(converter.toSApplicationPage(applicationPageNode, application)).willReturn(importResult);
 
         //when
-        ImportError importError = importer.importApplicationPage(application, applicationPageNode);
+        ImportError importError = importer.importApplicationPage(applicationPageNode, application);
 
         //then
         verify(applicationService, times(1)).createApplicationPage(applicationPage);
@@ -77,7 +74,7 @@ public class ApplicationPageImporterTest {
         given(converter.toSApplicationPage(applicationPageNode, application)).willReturn(importResult);
 
         //when
-        ImportError importError = importer.importApplicationPage(application, applicationPageNode);
+        ImportError importError = importer.importApplicationPage(applicationPageNode, application);
 
         //then
         verify(applicationService, never()).createApplicationPage(any(SApplicationPage.class));
@@ -96,7 +93,7 @@ public class ApplicationPageImporterTest {
         given(applicationService.createApplicationPage(applicationPage)).willThrow(new SObjectCreationException(""));
 
         //when
-        importer.importApplicationPage(application, applicationPageNode);
+        importer.importApplicationPage(applicationPageNode, application);
 
         //then exception
     }

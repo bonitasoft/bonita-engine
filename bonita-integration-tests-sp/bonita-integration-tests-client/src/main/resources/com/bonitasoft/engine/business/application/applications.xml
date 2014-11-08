@@ -16,6 +16,9 @@
                     </applicationMenu>
                 </applicationMenus>
             </applicationMenu>
+            <applicationMenu>
+                <displayName>Empty menu</displayName>
+            </applicationMenu>
         </applicationMenus>
     </application>
     <application state="ACTIVATED" token="My" version="2.0">

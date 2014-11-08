@@ -31,7 +31,7 @@ public class ApplicationPageImporter {
         this.applicationPageNodeConverter = applicationPageNodeConverter;
     }
 
-    public ImportError importApplicationPage(SApplication application, ApplicationPageNode applicationPageNode) throws ExecutionException {
+    public ImportError importApplicationPage(ApplicationPageNode applicationPageNode, SApplication application) throws ExecutionException {
         try {
             ApplicationPageImportResult importResult = applicationPageNodeConverter.toSApplicationPage(applicationPageNode, application);
             if(importResult.getError() == null) {

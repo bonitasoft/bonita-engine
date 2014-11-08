@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
+import com.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import com.bonitasoft.engine.business.application.xml.ApplicationNode;
 import com.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 import org.bonitasoft.engine.api.ImportError;
@@ -34,9 +35,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.converter.ApplicationContainerConverter;
 import com.bonitasoft.engine.business.application.model.SApplication;
-import com.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationImporterTest {
@@ -53,11 +52,14 @@ public class ApplicationImporterTest {
     @Mock
     private ApplicationPageImporter applicationPageImporter;
 
+    @Mock
+    private ApplicationMenuImporter applicationMenuImporter;
+
     @InjectMocks
     private ApplicationImporter applicationImporter;
 
     @Test
-    public void importApplication_should_create_application_import_pages_and_return_status() throws Exception {
+    public void importApplication_should_create_application_import_pages_and_menus_and_return_status() throws Exception {
         //given
         long createdBy = 5L;
         SApplication app = mock(SApplication.class);
@@ -70,13 +72,19 @@ public class ApplicationImporterTest {
         ApplicationPageNode pageNode1 = mock(ApplicationPageNode.class);
         ApplicationPageNode pageNode2 = mock(ApplicationPageNode.class);
 
+        ApplicationMenuNode menu1 = new ApplicationMenuNode();
+        ApplicationMenuNode menu2 = new ApplicationMenuNode();
+
         ApplicationNode applicationNode = mock(ApplicationNode.class);
         given(applicationNode.getApplicationPages()).willReturn(Arrays.asList(pageNode1, pageNode2));
+        given(applicationNode.getApplicationMenus()).willReturn(Arrays.asList(menu1, menu2));
         given(applicationNodeConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
 
-        ImportError error = mock(ImportError.class);
-        given(applicationPageImporter.importApplicationPage(app, pageNode1)).willReturn(error);
-        given(applicationPageImporter.importApplicationPage(app, pageNode2)).willReturn(null);
+        ImportError errorPage = mock(ImportError.class);
+        List<ImportError> errorsMenu = Arrays.asList(mock(ImportError.class));
+        given(applicationPageImporter.importApplicationPage(pageNode1, app)).willReturn(errorPage);
+        given(applicationMenuImporter.importApplicationMenu(menu1, app, null)).willReturn(errorsMenu);
+
         given(applicationService.createApplication(app)).willReturn(app);
 
         //when
@@ -87,9 +95,13 @@ public class ApplicationImporterTest {
         verify(applicationService, times(1)).createApplication(app);
         verifyZeroInteractions(strategy);
 
-        verify(applicationPageImporter, times(1)).importApplicationPage(app, pageNode1);
-        verify(applicationPageImporter, times(1)).importApplicationPage(app, pageNode2);
-        verify(importStatus, times(1)).addError(error);
+        verify(applicationPageImporter, times(1)).importApplicationPage(pageNode1, app);
+        verify(applicationPageImporter, times(1)).importApplicationPage(pageNode2, app);
+        verify(importStatus, times(1)).addError(errorPage);
+
+        verify(applicationMenuImporter, times(1)).importApplicationMenu(menu1, app, null);
+        verify(applicationMenuImporter, times(1)).importApplicationMenu(menu2, app, null);
+        verify(importStatus, times(1)).addErrors(errorsMenu);
         verify(importStatus, never()).addError(null);
     }
 

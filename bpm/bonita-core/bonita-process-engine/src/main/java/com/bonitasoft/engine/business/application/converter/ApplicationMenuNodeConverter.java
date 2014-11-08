@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.persistence.FilterOption;
@@ -21,7 +22,11 @@ import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.importer.ApplicationMenuImportResult;
+import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilderFactory;
 import com.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import com.bonitasoft.engine.business.application.xml.ApplicationNode;
@@ -108,4 +113,52 @@ public class ApplicationMenuNodeConverter {
             startIndex += maxResults;
         } while (menus.size() == maxResults);
     }
+
+    /**
+     * Convert an {@link com.bonitasoft.engine.business.application.xml.ApplicationMenuNode} to
+     * {@link com.bonitasoft.engine.business.application.model.SApplicationMenu}
+     * 
+     * @param applicationMenuNode the XML node to convert
+     * @param application the application where the menu will be attached to
+     * @param parentMenu the parent menu. Null if no parent
+     * @return the application where the menu will be attached to
+     * @throws SBonitaReadException
+     */
+    public ApplicationMenuImportResult toSApplicationMenu(ApplicationMenuNode applicationMenuNode, SApplication application, SApplicationMenu parentMenu)
+            throws SBonitaReadException {
+        Long appPageId = null;
+        ImportError error = null;
+        if (applicationMenuNode.getApplicationPage() != null) {
+            try {
+                SApplicationPage applicationPage = applicationService.getApplicationPage(application.getToken(), applicationMenuNode.getApplicationPage());
+                appPageId = applicationPage.getId();
+            } catch (SObjectNotFoundException e) {
+                error = new ImportError(applicationMenuNode.getApplicationPage(), ImportError.Type.APPLICATION_PAGE);
+            }
+        }
+        int index = getIndex(parentMenu);
+        SApplicationMenu applicationMenu = buildApplicationMenu(applicationMenuNode, application, parentMenu, appPageId, index);
+        return new ApplicationMenuImportResult(error, applicationMenu);
+    }
+
+    private int getIndex(final SApplicationMenu parentMenu) throws SBonitaReadException {
+        int index;
+        if(parentMenu == null) {
+            index = applicationService.getNextAvailableIndex(null);
+        } else {
+            index = applicationService.getNextAvailableIndex(parentMenu.getId());
+        }
+        return index;
+    }
+
+    private SApplicationMenu buildApplicationMenu(final ApplicationMenuNode applicationMenuNode, final SApplication application,
+            final SApplicationMenu parentMenu, final Long appPageId, final int index) {
+        SApplicationMenuBuilderFactory factory = BuilderFactory.get(SApplicationMenuBuilderFactory.class);
+        SApplicationMenuBuilder builder = factory.createNewInstance(applicationMenuNode.getDisplayName(), application.getId(), appPageId, index);
+        if (parentMenu != null) {
+            builder.setParentId(parentMenu.getId());
+        }
+        return builder.done();
+    }
+
 }

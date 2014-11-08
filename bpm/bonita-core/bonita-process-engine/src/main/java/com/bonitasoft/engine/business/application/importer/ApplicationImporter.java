@@ -9,6 +9,8 @@
 
 package com.bonitasoft.engine.business.application.importer;
 
+import java.util.List;
+
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -17,6 +19,7 @@ import org.bonitasoft.engine.exception.ExecutionException;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.converter.ApplicationNodeConverter;
 import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.xml.ApplicationMenuNode;
 import com.bonitasoft.engine.business.application.xml.ApplicationNode;
 import com.bonitasoft.engine.business.application.xml.ApplicationPageNode;
 
@@ -29,32 +32,43 @@ public class ApplicationImporter {
     private final ApplicationImportStrategy strategy;
     private ApplicationNodeConverter applicationNodeConverter;
     private ApplicationPageImporter applicationPageImporter;
+    private ApplicationMenuImporter applicationMenuImporter;
 
     public ApplicationImporter(ApplicationService applicationService, ApplicationImportStrategy strategy, ApplicationNodeConverter applicationNodeConverter,
-            ApplicationPageImporter applicationPageImporter) {
+            ApplicationPageImporter applicationPageImporter, ApplicationMenuImporter applicationMenuImporter) {
         this.applicationService = applicationService;
         this.strategy = strategy;
         this.applicationNodeConverter = applicationNodeConverter;
         this.applicationPageImporter = applicationPageImporter;
+        this.applicationMenuImporter = applicationMenuImporter;
     }
 
     public ImportStatus importApplication(ApplicationNode applicationNode, long createdBy) throws ExecutionException {
         ImportResult importResult = applicationNodeConverter.toSApplication(applicationNode, createdBy);
         try {
             SApplication application = importApplication(importResult.getApplication());
-            for (ApplicationPageNode applicationPageNode : applicationNode.getApplicationPages()) {
-                importApplicationPage(importResult, application, applicationPageNode);
-            }
+            importApplicationPages(applicationNode, importResult, application);
+            importApplicationMenus(applicationNode, importResult, application);
             return importResult.getImportStatus();
         } catch (SBonitaException e) {
             throw new ExecutionException(e);
         }
     }
 
-    private void importApplicationPage(final ImportResult importResult, final SApplication application, final ApplicationPageNode applicationPageNode) throws ExecutionException {
-        ImportError importError = applicationPageImporter.importApplicationPage(application, applicationPageNode);
-        if(importError != null) {
-            importResult.getImportStatus().addError(importError);
+    private void importApplicationMenus(final ApplicationNode applicationNode, final ImportResult importResult, final SApplication application) throws ExecutionException {
+        for (ApplicationMenuNode applicationMenuNode : applicationNode.getApplicationMenus()) {
+            List<ImportError> importErrors = applicationMenuImporter.importApplicationMenu(applicationMenuNode, application, null);
+            importResult.getImportStatus().addErrors(importErrors);
+        }
+    }
+
+    private void importApplicationPages(final ApplicationNode applicationNode, final ImportResult importResult, final SApplication application)
+            throws ExecutionException {
+        for (ApplicationPageNode applicationPageNode : applicationNode.getApplicationPages()) {
+            ImportError importError = applicationPageImporter.importApplicationPage(applicationPageNode, application);
+            if (importError != null) {
+                importResult.getImportStatus().addError(importError);
+            }
         }
     }
 
