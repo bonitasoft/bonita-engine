@@ -29,7 +29,7 @@ public class ProtectedReport extends DefaultReport {
 
     @Override
     public void deploy(String reportPath, ReportDeployer deployer) throws Exception {
-        checker.checkLicenceAndFeature(feature);
+        checker.checkLicenseAndFeature(feature);
         super.deploy(reportPath, deployer);
     }
 }

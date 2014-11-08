@@ -24,8 +24,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
+import org.bonitasoft.engine.api.impl.DocumentAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
-import org.bonitasoft.engine.api.impl.ProcessManagementAPIImplDelegate;
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsDefinitionLevel;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevel;
@@ -165,7 +165,6 @@ import com.bonitasoft.manager.Features;
  */
 public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
-
     protected static TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
@@ -176,14 +175,13 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    @Override
-    protected ProcessManagementAPIImplDelegate instantiateProcessManagementAPIDelegate() {
-        return new ProcessManagementAPIExtDelegate();
+    public ProcessAPIExt() {
+        super(new ProcessManagementAPIExtDelegate(), new DocumentAPIImpl());
     }
 
     @Override
     public void importParameters(final long processDefinitionId, final byte[] parameters) throws ImportParameterException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_PARAMETER);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.CREATE_PARAMETER);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         SProcessDefinition sDefinition = null;
         if (processDefinitionId > 0) {
@@ -350,7 +348,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ManualTaskInstance addManualUserTask(final ManualTaskCreator creator) throws CreationException, AlreadyExistsException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_MANUAL_TASK);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.CREATE_MANUAL_TASK);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
@@ -409,7 +407,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void deleteManualUserTask(final long manualTaskId) throws DeletionException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_MANUAL_TASK);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.CREATE_MANUAL_TASK);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
@@ -520,7 +518,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws UpdateException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.SET_CONNECTOR_STATE);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.SET_CONNECTOR_STATE);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         try {
@@ -546,7 +544,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public void setConnectorImplementation(final long processDefinitionId, final String connectorId, final String connectorVersion,
             final byte[] connectorImplementationArchive) throws InvalidConnectorImplementationException, UpdateException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.POST_DEPLOY_CONFIG);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.POST_DEPLOY_CONFIG);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
@@ -577,7 +575,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public void replayActivity(final long activityInstanceId, final Map<Long, ConnectorStateReset> connectorsToReset) throws ActivityExecutionException,
     ActivityInstanceNotFoundException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.REPLAY_ACTIVITY);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.REPLAY_ACTIVITY);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -989,7 +987,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 || processDefinition.getStringIndexValue(3) != null || processDefinition.getStringIndexLabel(3) != null
                 || processDefinition.getStringIndexValue(4) != null || processDefinition.getStringIndexLabel(4) != null
                 || processDefinition.getStringIndexValue(5) != null || processDefinition.getStringIndexLabel(5) != null) {
-            LicenseChecker.getInstance().checkLicenceAndFeature(Features.SEARCH_INDEX);
+            LicenseChecker.getInstance().checkLicenseAndFeature(Features.SEARCH_INDEX);
         }
 
         return super.deploy(businessArchive);
@@ -1052,7 +1050,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public ConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInformation(final long connectorInstanceId)
             throws ConnectorInstanceNotFoundException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.REPLAY_ACTIVITY);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.REPLAY_ACTIVITY);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         SConnectorInstanceWithFailureInfo serverObject;
