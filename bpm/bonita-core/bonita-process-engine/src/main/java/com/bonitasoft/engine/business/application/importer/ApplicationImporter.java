@@ -11,9 +11,14 @@ package com.bonitasoft.engine.business.application.importer;
 
 import java.util.List;
 
+import com.bonitasoft.engine.business.application.model.SApplicationPage;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
+import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
@@ -49,9 +54,23 @@ public class ApplicationImporter {
             SApplication application = importApplication(importResult.getApplication());
             importApplicationPages(applicationNode, importResult, application);
             importApplicationMenus(applicationNode, importResult, application);
+            updateHomePage(application, applicationNode, createdBy, importResult);
             return importResult.getImportStatus();
         } catch (SBonitaException e) {
             throw new ExecutionException(e);
+        }
+    }
+
+    private void updateHomePage(final SApplication application, final ApplicationNode applicationNode, final long createdBy, final ImportResult importResult) throws SBonitaException {
+        if(applicationNode.getHomePage() != null) {
+            try {
+                SApplicationPage homePage = applicationService.getApplicationPage(applicationNode.getToken(), applicationNode.getHomePage());
+                SApplicationUpdateBuilder updateBuilder = BuilderFactory.get(SApplicationUpdateBuilderFactory.class).createNewInstance(createdBy);
+                updateBuilder.updateHomePageId(homePage.getId());
+                applicationService.updateApplication(application, updateBuilder.done());
+            } catch (SObjectNotFoundException e) {
+                importResult.getImportStatus().addError(new ImportError(applicationNode.getHomePage(), ImportError.Type.APPLICATION_PAGE));
+            }
         }
     }
 

@@ -166,6 +166,9 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         ApplicationPage myNewCustomPage = pageSearchResult.getResult().get(0);
         assertIsMyNewCustomPage(myPage, hrApp, myNewCustomPage);
 
+        //check home page
+        assertThat(hrApp.getHomePageId()).isEqualTo(myNewCustomPage.getId());
+
         //check menu is created
         builder = getDefaultBuilder(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, hrApp.getId());
@@ -297,5 +300,38 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         getPageAPI().deletePage(myPage.getId());
 
     }
+
+    @Cover(classes = { ApplicationAPI.class }, concept = Cover.BPMNConcept.APPLICATION, jira = "BS-9215", keywords = { "Application", "import" })
+    @Test
+    public void export_after_import_should_return_the_same_xml_file() throws Exception {
+        //given
+        final Profile profile = getProfileAPI().createProfile("ApplicationProfile", "Profile for applications");
+
+        // create page necessary to import application hr (real page name is defined in zip/page.properties):
+        final Page myPage = getPageAPI().createPage("not_used",
+                IOUtils.toByteArray(ApplicationAPIApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
+
+        final byte[] importedByteArray = IOUtils.toByteArray(ApplicationAPIApplicationIT.class
+                .getResourceAsStream("applications.xml"));
+
+        applicationAPI.importApplications(importedByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
+        final SearchResult<Application> searchResult = applicationAPI.searchApplications(buildSearchOptions(0, 10));
+        assertThat(searchResult.getCount()).isEqualTo(2);
+
+        //when
+        Application hrApplication = searchResult.getResult().get(0);
+        byte[] exportedByteArray = applicationAPI.exportApplications(hrApplication.getId(), searchResult.getResult().get(1).getId());
+
+        //then
+        final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(importedByteArray));
+        final String xmlPrettyFormatActual = XmlStringPrettyFormatter.xmlPrettyFormat(new String(exportedByteArray));
+        assertThatXmlHaveNoDifferences(xmlPrettyFormatExpected, xmlPrettyFormatActual);
+
+        applicationAPI.deleteApplication(hrApplication.getId());
+        getProfileAPI().deleteProfile(profile.getId());
+        getPageAPI().deletePage(myPage.getId());
+
+    }
+
 
 }

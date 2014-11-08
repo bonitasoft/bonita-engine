@@ -9,16 +9,12 @@
 
 package com.bonitasoft.engine.business.application.importer;
 
-import java.io.IOException;
 import java.net.URL;
 
-import javax.xml.bind.JAXBException;
+import org.bonitasoft.engine.exception.ExecutionException;
 
-import com.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import com.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import com.bonitasoft.engine.io.IOUtils;
-import org.bonitasoft.engine.exception.ExecutionException;
-import org.xml.sax.SAXException;
 
 /**
  * @author Elias Ricken de Medeiros
