@@ -59,7 +59,7 @@ public class TimerEventTest extends CommonAPITest {
         final String step2Name = "step2";
         final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(1000); // the timer intermediate catch event will wait one
                                                                                                        // second
-        final ProcessDefinition definition = deployAndEnableProcessWithIntermediateCatchTimerEventAndUserTask(TimerType.DURATION, timerExpression, step1Name,
+        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEventAndUserTask(TimerType.DURATION, timerExpression, step1Name,
                 step2Name);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
@@ -95,7 +95,7 @@ public class TimerEventTest extends CommonAPITest {
         final Expression timerExpression = new ExpressionBuilder().createGroovyScriptExpression("testTimerIntermediateCatchEventDate", "return new Date("
                 + expectedDate + "l)", Date.class.getName()); // the timer intermediate catch
         // event will wait one second
-        final ProcessDefinition definition = deployAndEnableProcessWithIntermediateCatchTimerEventAndUserTask(TimerType.DATE, timerExpression, step1Name,
+        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEventAndUserTask(TimerType.DATE, timerExpression, step1Name,
                 step2Name);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
@@ -171,7 +171,7 @@ public class TimerEventTest extends CommonAPITest {
     public void timerStartEventDuration() throws Exception {
         final String stepName = "step1";
         final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(1500); // the new instance must be created in one second
-        final ProcessDefinition definition = deployAndEnableProcessWithStartTimerEventAndUserTask(TimerType.DURATION, timerExpression, stepName);
+        final ProcessDefinition definition = deployProcessWithTimerStartEventAndUserTask(TimerType.DURATION, timerExpression, stepName);
         waitForInitializingProcess();
 
         waitForUserTask(stepName);
