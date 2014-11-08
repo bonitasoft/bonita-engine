@@ -58,7 +58,7 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     @Test
     public void setApplicationHomePage_should_update_the_application_homePage() throws Exception {
         //given
-        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
+        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0"));
         final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
 
         //when
