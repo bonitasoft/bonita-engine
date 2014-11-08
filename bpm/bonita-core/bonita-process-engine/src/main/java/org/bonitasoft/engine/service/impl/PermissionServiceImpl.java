@@ -15,6 +15,8 @@
 
 package org.bonitasoft.engine.service.impl;
 
+import groovy.lang.GroovyClassLoader;
+
 import java.io.File;
 
 import org.bonitasoft.engine.api.impl.APIAccessorImpl;
@@ -33,8 +35,6 @@ import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
-import groovy.lang.GroovyClassLoader;
-
 /**
  *
  * Permission service implementation
@@ -48,11 +48,11 @@ public class PermissionServiceImpl implements PermissionService {
     private final SessionAccessor sessionAccessor;
     private final SessionService sessionService;
     private final String scriptFolder;
-    private long tenantId;
+    private final long tenantId;
     private GroovyClassLoader groovyClassLoader;
 
-    public PermissionServiceImpl(ClassLoaderService classLoaderService, TechnicalLoggerService logger,
-            SessionAccessor sessionAccessor, SessionService sessionService, String scriptFolder, long tenantId) {
+    public PermissionServiceImpl(final ClassLoaderService classLoaderService, final TechnicalLoggerService logger,
+            final SessionAccessor sessionAccessor, final SessionService sessionService, final String scriptFolder, final long tenantId) {
         this.classLoaderService = classLoaderService;
         this.logger = logger;
         this.sessionAccessor = sessionAccessor;
@@ -62,7 +62,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public boolean checkAPICallWithScript(String className, APICallContext context, boolean reload) throws SExecutionException, ClassNotFoundException {
+    public boolean checkAPICallWithScript(final String className, final APICallContext context, final boolean reload) throws SExecutionException, ClassNotFoundException {
         checkStarted();
         SSession session;
         //groovy class loader load class from files and cache then when loaded, no need to do some lazy loading or load all class on start
@@ -78,12 +78,16 @@ public class PermissionServiceImpl implements PermissionService {
         }
         try {
             session = sessionService.getSession(sessionAccessor.getSessionId());
-            APISession apiSession = ModelConvertor.toAPISession(session, null);
-            PermissionRule permissionRule = (PermissionRule) aClass.newInstance();
-            return permissionRule.check(apiSession, context, new APIAccessorImpl(sessionAccessor,sessionService), new ServerLoggerWrapper(permissionRule.getClass(), logger));
-        } catch (Throwable e) {
+            final APISession apiSession = ModelConvertor.toAPISession(session, null);
+            final PermissionRule permissionRule = (PermissionRule) aClass.newInstance();
+            return permissionRule.check(apiSession, context, createAPIAccessorImpl(), new ServerLoggerWrapper(permissionRule.getClass(), logger));
+        } catch (final Throwable e) {
             throw new SExecutionException("The permission rule thrown an exception",e);
         }
+    }
+
+    protected APIAccessorImpl createAPIAccessorImpl() {
+        return new APIAccessorImpl(sessionAccessor,sessionService);
     }
 
     private void checkStarted() throws SExecutionException {
@@ -97,7 +101,7 @@ public class PermissionServiceImpl implements PermissionService {
         groovyClassLoader = new GroovyClassLoader(classLoaderService.getLocalClassLoader(ScopeType.TENANT.name(), tenantId));
         groovyClassLoader.setShouldRecompile(true);
 
-        File file = new File(scriptFolder);
+        final File file = new File(scriptFolder);
         if (file.exists() && file.isDirectory()) {
             groovyClassLoader.addClasspath(file.getAbsolutePath());
         } else {
