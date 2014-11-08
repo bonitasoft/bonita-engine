@@ -168,7 +168,7 @@ public class ProfilesImporterExt extends ProfilesImporter {
         }
         for (final String feature : featuresToCheck) {
             try {
-                LicenseChecker.getInstance().checkLicenceAndFeature(feature);
+                LicenseChecker.getInstance().checkLicenseAndFeature(feature);
             } catch (final IllegalStateException e) {
                 return false;
             }
