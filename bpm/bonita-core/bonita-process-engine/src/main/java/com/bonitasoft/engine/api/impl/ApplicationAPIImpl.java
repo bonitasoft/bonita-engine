@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.bonitasoft.engine.business.application.importer.ApplicationPageImporter;
@@ -237,6 +238,11 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions) throws SearchException {
         return getApplicationMenuAPIDelegate(searchOptions).searchApplicationMenus();
+    }
+
+    @Override
+    public List<String> getAllPagesForProfile(long profileId) {
+        return getApplicationPageAPIDelegate().getAllPagesForProfile(profileId);
     }
 
     @Override

@@ -91,6 +91,8 @@ public interface ApplicationService {
 
     List<SApplicationMenu> searchApplicationMenus(QueryOptions options) throws SBonitaReadException;
 
+    List<String> getAllPagesForProfile(long profileId) throws SBonitaReadException;
+
     int getNextAvailableIndex(Long parentMenuId) throws SBonitaReadException;
 
     int getLastUsedIndex(Long parentMenuId) throws SBonitaReadException;

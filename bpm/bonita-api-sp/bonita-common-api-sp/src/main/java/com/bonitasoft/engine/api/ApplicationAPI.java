@@ -251,6 +251,20 @@ public interface ApplicationAPI {
      */
     SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions) throws SearchException;
 
+
+    /**
+     *
+     * Return all pages names that can be accessed by the profile through applications.
+     *
+     * The portal use this method to calculate all permissions for a user.
+     *
+     * @param profileId
+     *      the id of the profile
+     * @return
+     *      list of page name accessible by the profile through applications
+     */
+    List<String> getAllPagesForProfile(long profileId);
+
     /**
      * Exports the {@link com.bonitasoft.engine.business.application.Application}s which identifier is in {@code applicationIds}
      *

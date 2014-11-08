@@ -91,4 +91,16 @@
         WHERE parentId = :parentId
     </query>
 
+
+    <query name="getAllPagesForProfile">
+        SELECT DISTINCT page.name
+        FROM com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl as applicationPage,
+        com.bonitasoft.engine.business.application.model.impl.SApplicationImpl as application,
+        com.bonitasoft.engine.page.impl.SPageImpl as page
+        WHERE applicationPage.applicationId = application.id
+        AND application.profileId = :profileId
+        AND applicationPage.pageId = page.id
+        ORDER BY page.name
+    </query>
+
 </hibernate-mapping>

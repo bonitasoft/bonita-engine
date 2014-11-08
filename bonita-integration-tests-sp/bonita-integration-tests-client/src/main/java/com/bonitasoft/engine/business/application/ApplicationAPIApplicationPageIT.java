@@ -11,6 +11,10 @@ package com.bonitasoft.engine.business.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.bonitasoft.engine.profile.Profile;
 import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -25,6 +29,8 @@ import com.bonitasoft.engine.page.Page;
 
 /**
  * @author Elias Ricken de Medeiros
+ * @author Baptiste Mesta
+ *
  */
 public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
 
@@ -52,7 +58,7 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     @Test
     public void setApplicationHomePage_should_update_the_application_homePage() throws Exception {
         //given
-        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0"));
+        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
         final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
 
         //when
@@ -315,6 +321,44 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
         builder.sort(ApplicationPageSearchDescriptor.TOKEN, Order.ASC);
         return builder;
+    }
+
+
+    @Test
+    public void getAllAccessiblePageForAProfile() throws Exception {
+        //given
+        //profile1
+        Profile profile1 = getProfileAPI().createProfile("profile1", "My profile1");
+        //app1
+        final Application app1 = getApplicationAPI().createApplication(new ApplicationCreator("app1", "My app1", "1.0").setProfileId(profile1.getId()));
+        final Page page1 = createPage("custompage_page1");
+        getApplicationAPI().createApplicationPage(app1.getId(), page1.getId(), "appPage1");
+        final Page page2 = createPage("custompage_page2");
+        getApplicationAPI().createApplicationPage(app1.getId(), page2.getId(), "appPage2");
+        //app2
+        final Application app2 = getApplicationAPI().createApplication(new ApplicationCreator("app2", "My app2", "1.0").setProfileId(profile1.getId()));
+        final Page page3 = createPage("custompage_page3");
+        getApplicationAPI().createApplicationPage(app2.getId(), page3.getId(), "appPage1");
+
+        //profile2
+        Profile profile2 = getProfileAPI().createProfile("profile2", "My profile2");
+        //app3
+        final Application app3 = getApplicationAPI().createApplication(new ApplicationCreator("app3", "My app3", "1.0").setProfileId(profile2.getId()));
+        final Page page4 = createPage("custompage_page4");
+        getApplicationAPI().createApplicationPage(app3.getId(), page4.getId(), "appPage1");
+
+
+        //when
+        List<String> allPagesForProfile1 = getApplicationAPI().getAllPagesForProfile(profile1.getId());
+        List<String> allPagesForProfile2 = getApplicationAPI().getAllPagesForProfile(profile2.getId());
+
+        //then
+        assertThat(allPagesForProfile1).isEqualTo(Arrays.asList("custompage_page1","custompage_page2","custompage_page3"));
+        assertThat(allPagesForProfile2).isEqualTo(Arrays.asList("custompage_page4"));
+
+        getApplicationAPI().deleteApplication(app1.getId());
+        getApplicationAPI().deleteApplication(app2.getId());
+        getApplicationAPI().deleteApplication(app3.getId());
     }
 
 }

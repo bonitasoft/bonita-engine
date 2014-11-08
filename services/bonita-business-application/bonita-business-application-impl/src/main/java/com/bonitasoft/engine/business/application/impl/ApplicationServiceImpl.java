@@ -28,7 +28,9 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -651,6 +653,12 @@ public class ApplicationServiceImpl implements ApplicationService {
     public List<SApplicationMenu> searchApplicationMenus(final QueryOptions options) throws SBonitaReadException {
         checkLicense();
         return persistenceService.searchEntity(SApplicationMenu.class, options, null);
+    }
+
+    @Override
+    public List<String> getAllPagesForProfile(long profileId) throws SBonitaReadException {
+        SelectListDescriptor<String> selectList = new SelectListDescriptor<String>("getAllPagesForProfile",Collections.<String, Object>singletonMap("profileId",profileId),SApplicationPage.class, new QueryOptions(0,QueryOptions.UNLIMITED_NUMBER_OF_RESULTS));
+        return persistenceService.selectList(selectList);
     }
 
     public int getNextAvailableIndex(Long parentMenuId) throws SBonitaReadException {

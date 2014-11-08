@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl.application;
 
+import java.util.List;
+
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -133,4 +135,11 @@ public class ApplicationPageAPIDelegate {
         }
     }
 
+    public List<String> getAllPagesForProfile(long profileId) {
+        try {
+            return applicationService.getAllPagesForProfile(profileId);
+        } catch (SBonitaReadException e) {
+            throw new RetrieveException(e);
+        }
+    }
 }
