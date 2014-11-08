@@ -596,6 +596,16 @@ public class ProcessInstanceQueriesTest {
     }
 
     @Test
+    public void getNumberOfProcessInstances_should_return_the_number_of_running_instances_of_a_process_definition() {
+        repository.add(aProcessInstance().withProcessDefinitionId(45l).build());
+        repository.add(aProcessInstance().withProcessDefinitionId(45l).build());
+        repository.add(aProcessInstance().withProcessDefinitionId(45l).build());
+        repository.add(aProcessInstance().withProcessDefinitionId(12l).build());
+
+        assertThat(repository.getNumberOfProcessInstances(45l)).isEqualTo(3);
+    }
+
+    @Test
     public void getArchivedProcessInstancesInAllStates_should_return_archived_process_instances_when_exist() {
         // Given
         final SAProcessInstance saProcessInstance1 = repository.add(buildSAProcessInstance(1L));

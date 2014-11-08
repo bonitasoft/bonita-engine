@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.platform.model.STenant;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -54,7 +54,7 @@ public class PlatformAPIImplTest {
 
     private final List<AbstractBonitaTenantJobListener> tenantJobListeners = Collections.singletonList(mock(AbstractBonitaTenantJobListener.class));
 
-    private final List<AbstractBonitaPlatormJobListener> platformJobListeners = Collections.singletonList(mock(AbstractBonitaPlatormJobListener.class));
+    private final List<AbstractBonitaPlatformJobListener> platformJobListeners = Collections.singletonList(mock(AbstractBonitaPlatformJobListener.class));
 
     @Spy
     @InjectMocks
@@ -112,7 +112,7 @@ public class PlatformAPIImplTest {
 
         // Then
         verify(schedulerService).initializeScheduler();
-        verify(schedulerService).addJobListener(anyListOf(AbstractBonitaPlatormJobListener.class));
+        verify(schedulerService).addJobListener(anyListOf(AbstractBonitaPlatformJobListener.class));
         verify(schedulerService).addJobListener(anyListOf(AbstractBonitaTenantJobListener.class), anyString());
     }
 
@@ -159,6 +159,6 @@ public class PlatformAPIImplTest {
 
         // Then
         verify(schedulerService).initializeScheduler();
-        verify(schedulerService, never()).addJobListener(anyListOf(AbstractBonitaPlatormJobListener.class));
+        verify(schedulerService, never()).addJobListener(anyListOf(AbstractBonitaPlatformJobListener.class));
     }
 }

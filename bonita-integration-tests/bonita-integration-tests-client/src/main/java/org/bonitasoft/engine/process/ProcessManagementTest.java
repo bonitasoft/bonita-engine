@@ -34,6 +34,7 @@ import java.util.Set;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
+import org.bonitasoft.engine.api.ProcessManagementAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -750,8 +751,8 @@ public class ProcessManagementTest extends CommonAPITest {
     public void updateActivityInstanceVariables() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
 
-        ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        UserTaskDefinitionBuilder addUserTask = processDefinitionBuilder
+        final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        final UserTaskDefinitionBuilder addUserTask = processDefinitionBuilder
                 .addActor(ACTOR_NAME)
                 .addDescription("Delivery all day and night long")
                 .addUserTask("step1", ACTOR_NAME);
@@ -766,21 +767,21 @@ public class ProcessManagementTest extends CommonAPITest {
         addUserTask.addShortTextData("g", new ExpressionBuilder().createConstantStringExpression("gacti")).isTransient();
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.getProcess(), ACTOR_NAME, user);
-        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
 
         List<DataInstance> dataInstances = getProcessAPI().getActivityDataInstances(step1.getId(), 0, 10);
         assertThat(dataInstances).hasSize(6);
-        ArrayList<String> names = new ArrayList<String>(6);
+        final ArrayList<String> names = new ArrayList<String>(6);
         ArrayList<String> values = new ArrayList<String>(6);
-        for (DataInstance dataInstance2 : dataInstances) {
+        for (final DataInstance dataInstance2 : dataInstances) {
             names.add(dataInstance2.getName());
             values.add((String) dataInstance2.getValue());
         }
         assertThat(names).contains("a", "b", "c", "d", "e", "f");
         assertThat(values).contains("aacti", "bprocess", "cprocess", "dprocess", "eprocess", "facti");
         final List<Operation> operations = new ArrayList<Operation>();
-        for (DataInstance dataInstance2 : dataInstances) {
+        for (final DataInstance dataInstance2 : dataInstances) {
             final Operation stringOperation = BuildTestUtil.buildStringOperation(dataInstance2.getName(), dataInstance2.getValue() + "+up", false);
             operations.add(stringOperation);
         }
@@ -789,7 +790,7 @@ public class ProcessManagementTest extends CommonAPITest {
         dataInstances = getProcessAPI().getActivityDataInstances(step1.getId(), 0, 10);
         assertThat(dataInstances).hasSize(6);
         values = new ArrayList<String>(6);
-        for (DataInstance dataInstance2 : dataInstances) {
+        for (final DataInstance dataInstance2 : dataInstances) {
             values.add((String) dataInstance2.getValue());
         }
         assertThat(values).contains("aacti+up", "bprocess+up", "cprocess+up", "dprocess+up", "eprocess+up", "facti+up");
@@ -1639,6 +1640,24 @@ public class ProcessManagementTest extends CommonAPITest {
         assertEquals(Double.valueOf(3.14), dataInstance.getValue());
 
         disableAndDeleteProcess(processDefinition);
+        deleteUser(jack.getId());
+    }
+
+    @Cover(jira = "BS-10584", classes = { ClassLoader.class, ProcessDefinition.class, ProcessInstance.class }, concept = BPMNConcept.PROCESS, keywords = {
+            "clean classlaoder", "disable process" })
+    @Test
+    public void purgeClassLoader_should_clean_the_classloader_of_the_process_definition_when_it_is_disabled_without_a_running_instance() throws Exception {
+        final User jack = createUserAndLogin(USERNAME, USERNAME);
+
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("cantResolveDataInExpressionInDataDefaultValue", "1");
+        processBuilder.addActor(ACTOR_NAME);
+        processBuilder.addUserTask("step1", ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, jack);
+        getProcessAPI().disableProcess(processDefinition.getId());
+
+        getProcessAPI().purgeClassLoader(processDefinition.getId());
+
+        deleteProcess(processDefinition.getId());
         deleteUser(jack.getId());
     }
 

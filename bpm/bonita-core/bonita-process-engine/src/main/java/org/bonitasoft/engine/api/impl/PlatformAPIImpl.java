@@ -87,7 +87,7 @@ import org.bonitasoft.engine.profile.ImportPolicy;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.ProfilesImporter;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -383,7 +383,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     }
 
     private void addPlatformJobListener(final SchedulerService schedulerService, final NodeConfiguration platformConfiguration) throws SSchedulerException {
-        final List<AbstractBonitaPlatormJobListener> jobListeners = platformConfiguration.getJobListeners();
+        final List<AbstractBonitaPlatformJobListener> jobListeners = platformConfiguration.getJobListeners();
         if (!jobListeners.isEmpty()) {
             schedulerService.addJobListener(jobListeners);
         }

@@ -290,7 +290,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 logArchivedProcessInstanceNotFound(new SAProcessInstanceNotFoundException(saProcessInstance.getId()));
             } catch (final SProcessInstanceModificationException e1) {
                 throw e;
-            } catch (final SBonitaException e1) {
+            } catch (final SProcessInstanceReadException e1) {
                 logArchivedProcessInstanceNotFound(e);
             }
         }
@@ -449,7 +449,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         documentService.deleteDocumentsFromProcessInstance(processInstance.getId());
         deleteConnectorInstancesIfNecessary(processInstance, processDefinition);
         commentService.deleteComments(processInstance.getId());
-
     }
 
     private void deleteConnectorInstancesIfNecessary(final SProcessInstance processInstance, final SProcessDefinition processDefinition)
@@ -459,7 +458,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
     }
 
-    void deleteConnectorInstancesIfNecessary(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition)
+    protected void deleteConnectorInstancesIfNecessary(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition)
             throws SConnectorInstanceReadException, SConnectorInstanceDeletionException {
         if (hasConnectors(flowNodeInstance, processDefinition)) {
             connectorInstanceService.deleteConnectors(flowNodeInstance.getId(), SConnectorInstance.FLOWNODE_TYPE);
@@ -539,19 +538,15 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         if (flowNodeInstance instanceof SEventInstance) {
             bpmEventInstanceService.deleteEventTriggerInstances(flowNodeInstance.getId());
         } else if (flowNodeInstance instanceof SActivityInstance) {
-            deleteActivityInstanceElements(flowNodeInstance, processDefinition);
-        }
-    }
-
-    private void deleteActivityInstanceElements(final SFlowNodeInstance flowNodeInstance, final SProcessDefinition processDefinition) throws SBonitaException {
-        deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
-        deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
-        if (SFlowNodeType.USER_TASK.equals(flowNodeInstance.getType()) || SFlowNodeType.MANUAL_TASK.equals(flowNodeInstance.getType())) {
-            activityService.deleteHiddenTasksForActivity(flowNodeInstance.getId());
-            activityService.deletePendingMappings(flowNodeInstance.getId());
-        } else if (SFlowNodeType.CALL_ACTIVITY.equals(flowNodeInstance.getType()) || SFlowNodeType.SUB_PROCESS.equals(flowNodeInstance.getType())) {
-            // in the case of a call activity or subprocess activity delete the child process instance
-            deleteSubProcess(flowNodeInstance, processDefinition);
+            deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
+            deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
+            if (SFlowNodeType.USER_TASK.equals(flowNodeInstance.getType()) || SFlowNodeType.MANUAL_TASK.equals(flowNodeInstance.getType())) {
+                activityService.deleteHiddenTasksForActivity(flowNodeInstance.getId());
+                activityService.deletePendingMappings(flowNodeInstance.getId());
+            } else if (SFlowNodeType.CALL_ACTIVITY.equals(flowNodeInstance.getType()) || SFlowNodeType.SUB_PROCESS.equals(flowNodeInstance.getType())) {
+                // in the case of a call activity or subprocess activity delete the child process instance
+                deleteSubProcess(flowNodeInstance, processDefinition);
+            }
         }
     }
 
@@ -721,21 +716,33 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public long getNumberOfOpenProcessInstancesSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
-        return persistenceRead.getNumberOfEntities(SProcessInstance.class, SUPERVISED_BY, queryOptions, parameters);
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
+            return persistenceRead.getNumberOfEntities(SProcessInstance.class, SUPERVISED_BY, queryOptions, parameters);
+        } catch (final SBonitaReadException e) {
+            throw new SBonitaReadException(e);
+        }
     }
 
     @Override
     public List<SProcessInstance> searchOpenProcessInstancesSupervisedBy(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
-        return persistenceRead.searchEntity(SProcessInstance.class, SUPERVISED_BY, queryOptions, parameters);
+        try {
+            final Map<String, Object> parameters = Collections.singletonMap(USER_ID, (Object) userId);
+            return persistenceRead.searchEntity(SProcessInstance.class, SUPERVISED_BY, queryOptions, parameters);
+        } catch (final SBonitaReadException e) {
+            throw new SBonitaReadException(e);
+        }
     }
 
     @Override
     public long getNumberOfOpenProcessInstancesInvolvingUser(final long userId, final QueryOptions queryOptions) throws SBonitaReadException {
-        final Map<String, Object> parameters = new HashMap<String, Object>(1);
-        parameters.put(USER_ID, userId);
-        return persistenceRead.getNumberOfEntities(SProcessInstance.class, INVOLVING_USER, queryOptions, parameters);
+        try {
+            final Map<String, Object> parameters = new HashMap<String, Object>(1);
+            parameters.put(USER_ID, userId);
+            return persistenceRead.getNumberOfEntities(SProcessInstance.class, INVOLVING_USER, queryOptions, parameters);
+        } catch (final SBonitaReadException e) {
+            throw new SBonitaReadException(e);
+        }
     }
 
     @Override
@@ -789,9 +796,13 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     @Override
     public long getNumberOfArchivedProcessInstancesInvolvingUser(final long userId, final QueryOptions countOptions) throws SBonitaReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-        final Map<String, Object> parameters = new HashMap<String, Object>(2);
-        parameters.put(USER_ID, userId);
-        return persistenceService.getNumberOfEntities(SAProcessInstance.class, INVOLVING_USER, countOptions, parameters);
+        try {
+            final Map<String, Object> parameters = new HashMap<String, Object>(2);
+            parameters.put(USER_ID, userId);
+            return persistenceService.getNumberOfEntities(SAProcessInstance.class, INVOLVING_USER, countOptions, parameters);
+        } catch (final SBonitaReadException bre) {
+            throw new SBonitaReadException(bre);
+        }
     }
 
     @Override
@@ -810,10 +821,13 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     public List<SAProcessInstance> searchArchivedProcessInstancesInvolvingUser(final long userId, final QueryOptions queryOptions)
             throws SBonitaReadException {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-
-        final Map<String, Object> parameters = new HashMap<String, Object>(1);
-        parameters.put(USER_ID, userId);
-        return persistenceService.searchEntity(SAProcessInstance.class, INVOLVING_USER, queryOptions, parameters);
+        try {
+            final Map<String, Object> parameters = new HashMap<String, Object>(1);
+            parameters.put(USER_ID, userId);
+            return persistenceService.searchEntity(SAProcessInstance.class, INVOLVING_USER, queryOptions, parameters);
+        } catch (final SBonitaReadException e) {
+            throw new SBonitaReadException(e);
+        }
     }
 
     @Override
@@ -836,8 +850,9 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             final Map<String, Object> parameters = Collections.singletonMap("id", (Object) archivedProcessInstanceId);
-            return persistenceService.selectOne(new SelectOneDescriptor<SAProcessInstance>("getArchivedProcessInstance",
+            final SAProcessInstance saProcessInstance = persistenceService.selectOne(new SelectOneDescriptor<SAProcessInstance>("getArchivedProcessInstance",
                     parameters, SAProcessInstance.class));
+            return saProcessInstance;
         } catch (final SBonitaReadException e) {
             throw new SProcessInstanceReadException(e);
         }
@@ -930,6 +945,15 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     @Override
     public List<SProcessInstance> searchFailedProcessInstances(final QueryOptions queryOptions) throws SBonitaReadException {
         return persistenceRead.searchEntity(SProcessInstance.class, FAILED, queryOptions, null);
+    }
+
+    @Override
+    public long getNumberOfProcessInstances(final long processDefinitionId) throws SBonitaReadException {
+        final Map<String, Object> inputParameters = new HashMap<String, Object>();
+        inputParameters.put("processDefinitionId", processDefinitionId);
+        final SelectOneDescriptor<Long> countDescriptor = new SelectOneDescriptor<Long>("countProcessInstancesOfProcessDefinition", inputParameters,
+                SProcessInstance.class);
+        return persistenceRead.selectOne(countDescriptor);
     }
 
 }
