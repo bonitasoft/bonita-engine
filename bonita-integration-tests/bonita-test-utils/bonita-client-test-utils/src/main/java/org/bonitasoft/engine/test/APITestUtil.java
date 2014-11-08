@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.LoginAPI;
+import org.bonitasoft.engine.api.PermissionAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.TenantAPIAccessor;
@@ -173,6 +174,8 @@ public class APITestUtil extends PlatformTestUtil {
 
     private ThemeAPI themeAPI;
 
+    private PermissionAPI permissionAPI;
+
     static {
         final String strTimeout = System.getProperty("sysprop.bonita.default.test.timeout");
         if (strTimeout != null) {
@@ -211,6 +214,7 @@ public class APITestUtil extends PlatformTestUtil {
         setCommandAPI(TenantAPIAccessor.getCommandAPI(getSession()));
         setProfileAPI(TenantAPIAccessor.getProfileAPI(getSession()));
         setThemeAPI(TenantAPIAccessor.getThemeAPI(getSession()));
+        setPermissionAPI(TenantAPIAccessor.getPermissionAPI(getSession()));
     }
 
     public void logoutOnTenant() throws BonitaException {
@@ -222,6 +226,7 @@ public class APITestUtil extends PlatformTestUtil {
         setCommandAPI(null);
         setProfileAPI(null);
         setThemeAPI(null);
+        setPermissionAPI(null);
     }
 
     public void logoutThenlogin() throws BonitaException {
@@ -563,7 +568,7 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithConnector(final ProcessDefinitionBuilder processDefinitionBuilder,
             final List<BarResource> connectorImplementations, final List<BarResource> generateConnectorDependencies) throws BonitaException {
         final BusinessArchiveBuilder businessArchiveBuilder = BuildTestUtil.buildBusinessArchiveWithConnectorAndUserFilter(processDefinitionBuilder,
-                connectorImplementations, generateConnectorDependencies, Collections.<BarResource> emptyList());
+                connectorImplementations, generateConnectorDependencies, Collections.<BarResource>emptyList());
         return deployAndEnableProcess(businessArchiveBuilder.done());
     }
 
@@ -610,7 +615,7 @@ public class APITestUtil extends PlatformTestUtil {
     public ProcessDefinition deployAndEnableProcessWithActorAndUserFilter(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,
             final User user, final List<BarResource> generateFilterDependencies, final List<BarResource> userFilters)
             throws BonitaException {
-        return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource> emptyList(),
+        return deployAndEnableProcessWithActorAndConnectorAndUserFilter(processDefinitionBuilder, actorName, user, Collections.<BarResource>emptyList(),
                 generateFilterDependencies, userFilters);
     }
 
@@ -1527,6 +1532,14 @@ public class APITestUtil extends PlatformTestUtil {
 
     public void setThemeAPI(final ThemeAPI themeAPI) {
         this.themeAPI = themeAPI;
+    }
+
+    public PermissionAPI getPermissionAPI() {
+        return permissionAPI;
+    }
+
+    public void setPermissionAPI(PermissionAPI permissionAPI) {
+        this.permissionAPI = permissionAPI;
     }
 
     public void setSession(final APISession session) {
