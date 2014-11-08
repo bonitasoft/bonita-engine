@@ -40,7 +40,7 @@ import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.InjectedService;
 import org.bonitasoft.engine.scheduler.JobIdentifier;
@@ -422,7 +422,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void addJobListener(final List<AbstractBonitaPlatormJobListener> jobListeners) throws SSchedulerException {
+    public void addJobListener(final List<AbstractBonitaPlatformJobListener> jobListeners) throws SSchedulerException {
         schedulerExecutor.addJobListener(jobListeners);
     }
 

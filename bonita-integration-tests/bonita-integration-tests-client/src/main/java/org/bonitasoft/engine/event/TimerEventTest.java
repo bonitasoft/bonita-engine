@@ -1,5 +1,6 @@
 package org.bonitasoft.engine.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -9,23 +10,47 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.EventCriterion;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
 import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
+import org.bonitasoft.engine.bpm.process.ActivationState;
+import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
-public class TimerEventTest extends AbstractEventTest {
+public class TimerEventTest extends CommonAPITest {
+
+    private User user;
+
+    @After
+    public void afterTest() throws BonitaException {
+        deleteUser(user.getId());
+        logoutOnTenant();
+    }
+
+    @Before
+    public void beforeTest() throws BonitaException {
+         loginOnDefaultTenantWithDefaultTechnicalUser();
+        user = createUser(USERNAME, PASSWORD);
+        logoutThenloginAs(USERNAME, PASSWORD);
+    }
 
     @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Intermediate catch event", "User task" }, story = "Execute process with an intermediate catch event with a timer duration type.", jira = "")
     @Test
@@ -51,7 +76,7 @@ public class TimerEventTest extends AbstractEventTest {
         // BS-9586 : for mysql, we wait longer
         while (cnt < 10 && eventInstance != null) {
             Thread.sleep(1000);
-            eventInstance = getEventInstance(processInstanceId, "intermediateCatchEvent");
+        eventInstance = getEventInstance(processInstanceId, "intermediateCatchEvent");
             cnt++;
         }
         assertNull(eventInstance);// finished
@@ -98,7 +123,7 @@ public class TimerEventTest extends AbstractEventTest {
         final Expression timerExpression = new ExpressionBuilder().createGroovyScriptExpression("testTimerStartEventDate", "return new Date(" + expectedDate
                 + "l);", Date.class.getName()); // the new instance must be
         // created in one second
-        final ProcessDefinition definition = deployAndEnableProcessWithStartTimerEventAndUserTask(TimerType.DATE, timerExpression, stepName);
+        final ProcessDefinition definition = deployProcessWithTimerStartEventAndUserTask(TimerType.DATE, timerExpression, stepName);
 
         final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
         assertTrue(processInstances.isEmpty());
@@ -109,40 +134,35 @@ public class TimerEventTest extends AbstractEventTest {
         disableAndDeleteProcess(definition);
     }
 
+    //    uncomment to repeat random test
+    //    @Rule
+    //    public RepeatRule repeatRule = new RepeatRule();
+    //
+    //    @Repeat(times = 100)
     @Cover(classes = EventInstance.class, concept = BPMNConcept.EVENTS, keywords = { "Event", "Timer event", "Start event", "User task" }, story = "Execute a process with a start event with a timer cycle type.", jira = "")
     @Test
     public void timerStartEventCycle() throws Exception {
-        final Expression timerExpression = new ExpressionBuilder().createConstantStringExpression("*/4 * * * * ?"); // new instance created every 3 seconds
+        final Expression timerExpression = new ExpressionBuilder().createConstantStringExpression("*/1 * * * * ?"); // new instance created every second
         final String stepName = "step1";
-        final ProcessDefinition definition = deployAndEnableProcessWithStartTimerEventAndUserTask(TimerType.CYCLE, timerExpression, stepName);
+        final ProcessDefinition definition = deployProcessWithTimerStartEventAndUserTask(TimerType.CYCLE, timerExpression, stepName);
 
-        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
-        // the job will execute the first time at when the second change. If this arrive just after the schedule the instance can already be created
-        assertTrue("There should be between 0 and 1 process, but was <" + processInstances.size() + ">",
-                1 == processInstances.size() || 0 == processInstances.size());
+        //when
+        Thread.sleep(2000);
 
-        // wait for process instance creation
-        Thread.sleep(4500);
+        //then
+        final List<ProcessInstance> firstProcessInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
+        assertThat(firstProcessInstances).as("should have started first instance").isNotEmpty();
 
-        processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
-        assertTrue("There should be between 1 and 2 process, but was <" + processInstances.size() + ">",
-                processInstances.size() >= 1 && processInstances.size() <= 2);
+        //when
+        Thread.sleep(2000);
 
-        // wait for process instance creation
-        Thread.sleep(4500);
+        //then
+        final List<ProcessInstance> secondProcessInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
+        assertThat(secondProcessInstances).as("should have started another instance").isNotEmpty();
+        assertThat(secondProcessInstances.size()).as("should have started another instance").isGreaterThan(firstProcessInstances.size());
 
-        processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
-        assertTrue("There should be between 2 and 3 process, but was <" + processInstances.size() + ">",
-                processInstances.size() >= 2 && processInstances.size() <= 3);
-
-        // wait for process instance creation
-        Thread.sleep(4500);
-
-        processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
-        assertTrue("There should be between 3 and 4 process, but was <" + processInstances.size() + ">",
-                processInstances.size() >= 3 && processInstances.size() <= 4);
-
-        waitForUserTask(stepName, processInstances.get(processInstances.size() - 1));
+        //cleanup
+        waitForUserTask(stepName, secondProcessInstances.get(secondProcessInstances.size() - 1));
         disableAndDeleteProcess(definition);
     }
 
@@ -179,6 +199,36 @@ public class TimerEventTest extends AbstractEventTest {
     private void checkEventInstance(final EventInstance eventInstance, final String eventName, final TestStates state) {
         assertEquals(eventName, eventInstance.getName());
         assertEquals(state.getStateName(), eventInstance.getState());
+        // if(TestStates.getNormalFinalState(eventInstance).equals(state)) {
+        // assertTrue(eventInstance.getEndDate() > 0);
+        // }
+    }
+
+    private ProcessDefinition deployProcessWithTimerIntermediateCatchEventAndUserTask(final TimerType timerType, final Expression timerValue,
+            final String step1Name, final String step2Name) throws BonitaException {
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("My Process with start event", "1.0")
+                .addActor(ACTOR_NAME).addDescription("Delivery all day and night long").addStartEvent("startEvent").addUserTask(step1Name, ACTOR_NAME)
+                .addIntermediateCatchEvent("intermediateCatchEvent").addTimerEventTriggerDefinition(timerType, timerValue).addUserTask(step2Name, ACTOR_NAME)
+                .addEndEvent("endEvent").addTransition("startEvent", step1Name).addTransition(step1Name, "intermediateCatchEvent")
+                .addTransition("intermediateCatchEvent", step2Name).addTransition(step2Name, "endEvent").getProcess();
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
+        return definition;
+    }
+
+    private ProcessDefinition deployProcessWithTimerStartEventAndUserTask(final TimerType timerType, final Expression timerValue, final String stepName)
+            throws BonitaException {
+        final String delivery = "Delivery men";
+        final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("My Process with start event", "1.0")
+                .addActor(delivery).addDescription("Delivery all day and night long").addStartEvent("startEvent")
+                .addTimerEventTriggerDefinition(timerType, timerValue).addUserTask(stepName, delivery).addEndEvent("endEvent")
+                .addTransition("startEvent", stepName).addTransition(stepName, "endEvent").getProcess();
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, delivery, user);
+        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(definition.getId());
+        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
+        return definition;
     }
 
 }
