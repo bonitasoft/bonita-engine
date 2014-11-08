@@ -20,7 +20,7 @@ public class IncrementItselfJob extends GroupJob {
     @Override
     public void execute() {
         value++;
-        getExecutionDates().add(new Date(System.currentTimeMillis()));
+        addToExecutionDates(new Date(System.currentTimeMillis()));
     }
 
     public static int getValue() {
@@ -32,8 +32,11 @@ public class IncrementItselfJob extends GroupJob {
         executionDates = new ArrayList<Date>();
     }
 
-    public static List<Date> getExecutionDates() {
-        return executionDates;
+    public static synchronized List<Date> getExecutionDates() {
+        return new ArrayList<Date>(executionDates);
+    }
+    synchronized void addToExecutionDates(Date date) {
+        executionDates.add(date);
     }
 
     @Override
