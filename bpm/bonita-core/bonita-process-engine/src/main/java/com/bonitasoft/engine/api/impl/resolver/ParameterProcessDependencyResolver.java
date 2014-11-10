@@ -48,7 +48,7 @@ public class ParameterProcessDependencyResolver implements ProcessDependencyReso
         if (parameters.isEmpty()) {
             return resolved;
         }
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_PARAMETER);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.CREATE_PARAMETER);
         final ParameterService parameterService = ((com.bonitasoft.engine.service.TenantServiceAccessor) tenantAccessor).getParameterService();
         final Map<String, String> defaultParamterValues = businessArchive.getParameters();
         final Map<String, String> storedParameters = new HashMap<String, String>();

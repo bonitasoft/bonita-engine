@@ -32,7 +32,7 @@ public class PlatformMonitoringAPIImplTest {
         doReturn(licenceChecker).when(monitoringAPIImpl).getLicenseChecker();
         doReturn(platformMonitoringService).when(monitoringAPIImpl).getPlatformMonitoringService();
 
-        doNothing().when(licenceChecker).checkLicenceAndFeature(Features.SERVICE_MONITORING);
+        doNothing().when(licenceChecker).checkLicenseAndFeature(Features.SERVICE_MONITORING);
     }
 
     @Test
