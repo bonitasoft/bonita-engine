@@ -79,7 +79,6 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.businessdata.BusinessDataReference;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
-import com.bonitasoft.engine.command.GetBusinessDataByIdCommand;
 
 public class BDRepositoryIT extends CommonAPISPTest {
 
@@ -1113,10 +1112,10 @@ public class BDRepositoryIT extends CommonAPISPTest {
                 processInstanceId);
 
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, businessDataReference.getStorageId());
-        parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, EMPLOYEE_QUALIF_CLASSNAME);
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "address");
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put("businessDataId", businessDataReference.getStorageId());
+        parameters.put("entityClassName", EMPLOYEE_QUALIF_CLASSNAME);
+        parameters.put("businessDataChildName", "address");
+        parameters.put("businessDataURIPattern", "/businessdata/{className}/{id}/{field}");
         final String result = (String) getCommandAPI().execute("getBusinessDataById", parameters);
 
         assertThat(result).as("Address should have the right street and city").contains("\"street\" : \"32, rue Gustave Eiffel\"")
