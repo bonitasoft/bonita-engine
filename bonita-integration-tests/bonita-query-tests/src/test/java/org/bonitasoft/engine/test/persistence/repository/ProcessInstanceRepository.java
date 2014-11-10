@@ -2,6 +2,7 @@ package org.bonitasoft.engine.test.persistence.repository;
 
 import java.util.List;
 
+import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -12,7 +13,7 @@ import org.hibernate.SessionFactory;
 
 public class ProcessInstanceRepository extends TestRepository {
 
-    public ProcessInstanceRepository(SessionFactory sessionFactory) {
+    public ProcessInstanceRepository(final SessionFactory sessionFactory) {
         super(sessionFactory);
     }
 
@@ -54,13 +55,26 @@ public class ProcessInstanceRepository extends TestRepository {
         return namedQuery.list();
     }
 
+    public long getNumberOfSProcessInstanceFailed() {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        final Query namedQuery = getNamedQuery("getNumberOfSProcessInstanceFailed");
+        return ((Number) namedQuery.uniqueResult()).longValue();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<SProcessInstance> searchSProcessInstanceFailed() {
+        getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        final Query namedQuery = getNamedQuery("searchSProcessInstanceFailed");
+        return namedQuery.list();
+    }
+
+
     public long getNumberOfProcessInstances(final long processDefinitionId) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         final Query namedQuery = getNamedQuery("countProcessInstancesOfProcessDefinition");
         namedQuery.setParameter("processDefinitionId", processDefinitionId);
         return (Long) namedQuery.uniqueResult();
     }
-
 
     @SuppressWarnings("unchecked")
     public List<SAProcessInstance> getArchivedProcessInstancesInAllStates(final List<Long> sourceProcessInstanceIds) {
