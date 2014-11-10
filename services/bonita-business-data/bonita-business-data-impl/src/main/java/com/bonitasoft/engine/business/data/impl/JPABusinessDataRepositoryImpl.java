@@ -238,8 +238,9 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         return null;
     }
 
-    public Entity unproxy(final Entity proxied) {
-        Entity entity = proxied;
+    @Override
+    public Entity unwrap(final Entity wrapped) {
+        Entity entity = wrapped;
         if (entity != null && entity instanceof HibernateProxy) {
             Hibernate.initialize(entity);
             entity = (Entity) ((HibernateProxy) entity).getHibernateLazyInitializer().getImplementation();

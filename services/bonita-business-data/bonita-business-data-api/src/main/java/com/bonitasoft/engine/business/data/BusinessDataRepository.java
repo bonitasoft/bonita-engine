@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013-2014 BonitaSoft S.A.
+ * Copyright (C) 2013, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -108,7 +108,12 @@ public interface BusinessDataRepository extends TenantLifecycleService {
      */
     Set<String> getEntityClassNames();
 
-
-    Entity unproxy(final Entity proxied);
+    /**
+     * Unwraps the Entity if necessary.
+     *
+     * @param wrapped the potential wrapped entity
+     * @return the unwrapped entity
+     */
+    Entity unwrap(final Entity wrapped);
 
 }

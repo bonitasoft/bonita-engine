@@ -154,7 +154,7 @@ public class GetBusinessDataByIdCommand extends TenantCommand {
         }
 
         if (invoke instanceof Entity) {
-            final Entity child = businessDataRepository.unproxy((Entity) invoke);
+            final Entity child = businessDataRepository.unwrap((Entity) invoke);
             return serializeResult(child, businessDataURIPattern);
         } else {
             if (invoke instanceof List) {

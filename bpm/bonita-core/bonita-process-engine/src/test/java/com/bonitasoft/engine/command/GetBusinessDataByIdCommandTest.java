@@ -149,7 +149,7 @@ public class GetBusinessDataByIdCommandTest {
         final Product pencil = new Product(687L, 1L, "Pencil");
         final CommandLine commandLine = new CommandLine(864L, 78L, pencil, 5);
         when(bdrService.findById(CommandLine.class, 864L)).thenReturn(commandLine);
-        when(bdrService.unproxy(pencil)).thenReturn(pencil);
+        when(bdrService.unwrap(pencil)).thenReturn(pencil);
 
         final String json = (String) command.execute(parameters, tenantServiceAccessor);
 
