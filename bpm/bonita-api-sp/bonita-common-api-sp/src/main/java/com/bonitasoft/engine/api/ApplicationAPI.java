@@ -14,7 +14,8 @@ import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.ExportException;
+import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.search.SearchOptions;
@@ -253,17 +254,14 @@ public interface ApplicationAPI {
      */
     SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions) throws SearchException;
 
-
     /**
-     *
      * Return all pages names that can be accessed by the profile through applications.
-     *
      * The portal use this method to calculate all permissions for a user.
      *
      * @param profileId
-     *      the id of the profile
+     *        the id of the profile
      * @return
-     *      list of page name accessible by the profile through applications
+     *         list of page name accessible by the profile through applications
      */
     List<String> getAllPagesForProfile(long profileId);
 
@@ -272,10 +270,10 @@ public interface ApplicationAPI {
      *
      * @param applicationIds the identifiers of {@code Application}s to be exported
      * @return a byte array representing the content of XML file containing the exported {@code Application}s
-     * @throws ExecutionException if an exception occurs during the export.
+     * @throws ExportException if an exception occurs during the export.
      * @see com.bonitasoft.engine.business.application.Application
      */
-    byte[] exportApplications(long... applicationIds) throws ExecutionException;
+    byte[] exportApplications(long... applicationIds) throws ExportException;
 
     /**
      * Imports {@link com.bonitasoft.engine.business.application.Application}s based on a XML file content
@@ -284,11 +282,13 @@ public interface ApplicationAPI {
      * @param policy the {@link com.bonitasoft.engine.business.application.ApplicationImportPolicy} used to execute the import
      * @return a {@link java.util.List} of {@link org.bonitasoft.engine.api.ImportStatus} representing the {@code ImportStatus} for each imported
      *         {@code Application}
-     * @throws ExecutionException if an error occurs during the import
+     * @throws ImportException if an error occurs during the import
+     * @throws org.bonitasoft.engine.exception.AlreadyExistsException if one of applications being imported already exists and the policy
+     *         {@code ApplicationImportPolicy.FAIL_ON_DUPLICATES} is used
      * @see com.bonitasoft.engine.business.application.Application
      * @see com.bonitasoft.engine.business.application.ApplicationImportPolicy
      * @see org.bonitasoft.engine.api.ImportStatus
      */
-    List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy) throws ExecutionException;
+    List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy) throws ImportException, AlreadyExistsException;
 
 }

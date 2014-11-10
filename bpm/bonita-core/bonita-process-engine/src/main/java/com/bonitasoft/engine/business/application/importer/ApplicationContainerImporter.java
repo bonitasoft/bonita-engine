@@ -11,7 +11,7 @@ package com.bonitasoft.engine.business.application.importer;
 
 import java.net.URL;
 
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.ImportException;
 
 import com.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import com.bonitasoft.engine.io.IOUtils;
@@ -21,12 +21,12 @@ import com.bonitasoft.engine.io.IOUtils;
  */
 public class ApplicationContainerImporter {
 
-    public ApplicationNodeContainer importXML(final byte[] xmlContent) throws ExecutionException {
+    public ApplicationNodeContainer importXML(final byte[] xmlContent) throws ImportException {
         final URL resource = ApplicationNodeContainer.class.getResource("/applications.xsd");
         try {
             return IOUtils.unmarshallXMLtoObject(xmlContent, ApplicationNodeContainer.class, resource);
         } catch (Exception e) {
-            throw new ExecutionException(e);
+            throw new ImportException(e);
         }
     }
 

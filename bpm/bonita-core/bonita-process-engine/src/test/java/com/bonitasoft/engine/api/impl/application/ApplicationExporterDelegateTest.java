@@ -17,8 +17,7 @@ import static org.mockito.Mockito.mock;
 import java.util.Arrays;
 import java.util.List;
 
-import com.bonitasoft.engine.business.application.exporter.ApplicationExporter;
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.ExportException;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.junit.Test;
@@ -28,6 +27,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.exporter.ApplicationExporter;
 import com.bonitasoft.engine.business.application.filter.ApplicationsWithIdsFilterBuilder;
 import com.bonitasoft.engine.business.application.model.SApplication;
 
@@ -58,7 +58,7 @@ public class ApplicationExporterDelegateTest {
         assertThat(new String(exportApplications)).isEqualTo("<applications/>");
     }
 
-    @Test(expected = ExecutionException.class)
+    @Test(expected = ExportException.class)
     public void exportApplications_should_throw_SBonitaExportException_when_applicationService_throwsSBonitaReadException() throws Exception {
         //given
         given(applicationService.searchApplications(any(QueryOptions.class))).willThrow(new SBonitaReadException(""));

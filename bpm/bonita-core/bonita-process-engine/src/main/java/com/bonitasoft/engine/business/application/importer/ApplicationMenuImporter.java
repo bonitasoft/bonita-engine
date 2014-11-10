@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.ImportException;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.converter.ApplicationMenuNodeConverter;
@@ -36,7 +36,7 @@ public class ApplicationMenuImporter {
     }
 
     public List<ImportError> importApplicationMenu(ApplicationMenuNode applicationMenuNode, SApplication application, SApplicationMenu parentMenu)
-            throws ExecutionException {
+            throws ImportException {
         List<ImportError> errors = new ArrayList<ImportError>();
         try {
             ApplicationMenuImportResult importResult = converter.toSApplicationMenu(applicationMenuNode, application, parentMenu);
@@ -50,7 +50,7 @@ public class ApplicationMenuImporter {
             }
             return errors;
         } catch (SBonitaException e) {
-            throw new ExecutionException(e);
+            throw new ImportException(e);
         }
     }
 }

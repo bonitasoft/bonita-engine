@@ -9,7 +9,7 @@
 
 package com.bonitasoft.engine.business.application.importer;
 
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 
 import com.bonitasoft.engine.business.application.model.SApplication;
 
@@ -19,8 +19,8 @@ import com.bonitasoft.engine.business.application.model.SApplication;
 public class FailOnDuplicateApplicationImportStrategy implements ApplicationImportStrategy {
 
     @Override
-    public void whenApplicationExists(SApplication existing, SApplication toBeImported) throws ExecutionException {
-        throw new ExecutionException("An application with token '" + existing.getToken() + "' already exists");
+    public void whenApplicationExists(SApplication existing, SApplication toBeImported) throws AlreadyExistsException {
+        throw new AlreadyExistsException("An application with token '" + existing.getToken() + "' already exists", existing.getToken());
     }
 
 }

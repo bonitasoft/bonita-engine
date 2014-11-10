@@ -9,7 +9,7 @@
 
 package com.bonitasoft.engine.business.application.importer;
 
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 
 import com.bonitasoft.engine.business.application.model.SApplication;
 
@@ -18,6 +18,6 @@ import com.bonitasoft.engine.business.application.model.SApplication;
  */
 public interface ApplicationImportStrategy {
 
-    void whenApplicationExists(SApplication existing, SApplication toBeImported) throws ExecutionException;
+    void whenApplicationExists(SApplication existing, SApplication toBeImported) throws AlreadyExistsException;
 
 }

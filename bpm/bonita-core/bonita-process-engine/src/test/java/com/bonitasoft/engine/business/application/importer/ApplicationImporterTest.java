@@ -26,7 +26,7 @@ import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -207,7 +207,7 @@ public class ApplicationImporterTest {
         verify(strategy, times(1)).whenApplicationExists(appInConflict, appToBeImported);
     }
 
-    @Test(expected = ExecutionException.class)
+    @Test(expected = ImportException.class)
     public void importApplication_should_throw_ExecutionException_when_application_service_throws_exception() throws Exception {
         //given
         long createdBy = 5L;

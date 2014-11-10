@@ -20,7 +20,7 @@ import java.net.URL;
 
 import javax.xml.bind.JAXBException;
 
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.ImportException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,7 +56,7 @@ public class ApplicationContainerImporterTest {
         assertThat(importedContainer).isEqualTo(container);
     }
 
-    @Test(expected = ExecutionException.class)
+    @Test(expected = ImportException.class)
     public void importXML_should_throw_ExecutionException_when_unmarshall_throws_exception() throws Exception {
         //given
         mockStatic(IOUtils.class);

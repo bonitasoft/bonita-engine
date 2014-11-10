@@ -11,7 +11,7 @@ package com.bonitasoft.engine.business.application.exporter;
 
 import java.util.List;
 
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.ExportException;
 
 import com.bonitasoft.engine.business.application.converter.ApplicationContainerConverter;
 import com.bonitasoft.engine.business.application.model.SApplication;
@@ -30,7 +30,7 @@ public class ApplicationExporter {
         this.exporter = exporter;
     }
 
-    public byte[] export(List<SApplication> applications) throws ExecutionException {
+    public byte[] export(List<SApplication> applications) throws ExportException {
         ApplicationNodeContainer container = converter.toNode(applications);
         return exporter.export(container);
     }

@@ -19,7 +19,7 @@ import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.ImportException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -81,8 +81,8 @@ public class ApplicationPageImporterTest {
         assertThat(importError).isEqualTo(error);
     }
 
-    @Test(expected = ExecutionException.class)
-    public void importApplicationPage_should_throw_ExecutionException_when_create_applicationPage_throws_exception() throws Exception {
+    @Test(expected = ImportException.class)
+    public void importApplicationPage_should_throw_Exception_when_create_applicationPage_throws_exception() throws Exception {
         //given
         SApplication application = mock(SApplication.class);
         ApplicationPageNode applicationPageNode = mock(ApplicationPageNode.class);

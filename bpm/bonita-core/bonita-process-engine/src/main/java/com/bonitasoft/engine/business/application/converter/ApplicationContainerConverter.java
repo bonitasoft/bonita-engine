@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.ExportException;
 
 import com.bonitasoft.engine.business.application.importer.ImportResult;
 import com.bonitasoft.engine.business.application.model.SApplication;
@@ -30,7 +31,7 @@ public class ApplicationContainerConverter {
         this.applicationNodeConverter = applicationNodeConverter;
     }
 
-    public ApplicationNodeContainer toNode(List<SApplication> applications) throws ExecutionException {
+    public ApplicationNodeContainer toNode(List<SApplication> applications) throws ExportException {
         ApplicationNodeContainer container = new ApplicationNodeContainer();
         for (SApplication application : applications) {
             container.addApplication(applicationNodeConverter.toNode(application));

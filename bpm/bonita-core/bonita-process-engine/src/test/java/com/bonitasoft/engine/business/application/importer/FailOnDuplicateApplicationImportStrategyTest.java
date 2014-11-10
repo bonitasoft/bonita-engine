@@ -11,7 +11,7 @@ package com.bonitasoft.engine.business.application.importer;
 
 import static org.mockito.Mockito.mock;
 
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -25,8 +25,8 @@ public class FailOnDuplicateApplicationImportStrategyTest {
     @InjectMocks
     private FailOnDuplicateApplicationImportStrategy strategy;
 
-    @Test(expected = ExecutionException.class)
-    public void whenApplicationExists_shold_throw() throws Exception {
+    @Test(expected = AlreadyExistsException.class)
+    public void whenApplicationExists_should_throw_AlreadyExistsException() throws Exception {
         //given
         SApplication existingApplication = mock(SApplication.class);
         SApplication toBeImported = mock(SApplication.class);

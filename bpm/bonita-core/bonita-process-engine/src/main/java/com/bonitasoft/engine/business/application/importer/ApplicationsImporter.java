@@ -13,7 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bonitasoft.engine.api.ImportStatus;
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.ImportException;
 
 import com.bonitasoft.engine.business.application.xml.ApplicationNode;
 import com.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
@@ -31,7 +32,7 @@ public class ApplicationsImporter {
         this.applicationImporter = applicationImporter;
     }
 
-    public List<ImportStatus> importApplications(final byte[] xmlContent, long createdBy) throws ExecutionException {
+    public List<ImportStatus> importApplications(final byte[] xmlContent, long createdBy) throws ImportException, AlreadyExistsException {
         ApplicationNodeContainer applicationNodeContainer = containerImporter.importXML(xmlContent);
         ArrayList<ImportStatus> importStatus = new ArrayList<ImportStatus>(applicationNodeContainer.getApplications().size());
         for (ApplicationNode applicationNode : applicationNodeContainer.getApplications()) {

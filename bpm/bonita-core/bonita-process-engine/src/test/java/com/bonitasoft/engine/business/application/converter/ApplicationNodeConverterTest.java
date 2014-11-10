@@ -28,7 +28,7 @@ import java.util.List;
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.ExportException;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileService;
@@ -109,8 +109,8 @@ public class ApplicationNodeConverterTest {
         assertThat(applicationNode.getProfile()).isEqualTo("admin");
     }
 
-    @Test(expected = ExecutionException.class)
-    public void toNode_should_throw_ExecutionException_when_profileService_throws_exception() throws Exception {
+    @Test(expected = ExportException.class)
+    public void toNode_should_throw_ExportException_when_profileService_throws_exception() throws Exception {
         //given
         final SApplication application = mock(SApplication.class);
         given(application.getProfileId()).willReturn(7L);
@@ -142,8 +142,8 @@ public class ApplicationNodeConverterTest {
         assertThat(applicationNode.getHomePage()).isEqualTo("home");
     }
 
-    @Test(expected = ExecutionException.class)
-    public void toNode_should_throw_ExecutionException_when_applicationService_throws_exception() throws Exception {
+    @Test(expected = ExportException.class)
+    public void toNode_should_throw_ExportException_when_applicationService_throws_exception() throws Exception {
         //given
         final SApplication application = mock(SApplication.class);
         given(application.getHomePageId()).willReturn(8L);
@@ -159,7 +159,7 @@ public class ApplicationNodeConverterTest {
         //then exception
     }
 
-    @Test(expected = ExecutionException.class)
+    @Test(expected = ExportException.class)
     public void toNodeShouldThrowExceptionAtMenuConversion() throws Exception {
         //given
         final SApplication application = mock(SApplication.class);
@@ -191,7 +191,7 @@ public class ApplicationNodeConverterTest {
         verify(menuConverter).addMenusToApplicationNode(eq(applicationId), isNull(Long.class), any(ApplicationNode.class), isNull(ApplicationMenuNode.class));
     }
 
-    @Test(expected = ExecutionException.class)
+    @Test(expected = ExportException.class)
     public void toNodeShouldAddThrowExceptionAtPageConversion() throws Exception {
         //given
         final SApplication application = mock(SApplication.class);

@@ -20,7 +20,7 @@ import java.net.URL;
 
 import javax.xml.bind.JAXBException;
 
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.ExportException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -47,7 +47,7 @@ public class ApplicationContainerExporterTest {
         assertThat(new String(bytes)).isEqualTo("<applications/>");
     }
 
-    @Test(expected = ExecutionException.class)
+    @Test(expected = ExportException.class)
     public void exportApplications_should_throw_SBonitaExportException_if_marshalling_throws_exception() throws Exception {
         ApplicationContainerExporter exporter = new ApplicationContainerExporter();
         mockStatic(IOUtils.class);

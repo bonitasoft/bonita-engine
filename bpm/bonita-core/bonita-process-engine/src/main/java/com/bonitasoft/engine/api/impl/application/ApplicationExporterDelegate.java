@@ -11,12 +11,12 @@ package com.bonitasoft.engine.api.impl.application;
 
 import java.util.List;
 
-import com.bonitasoft.engine.business.application.exporter.ApplicationExporter;
 import org.apache.commons.lang3.ArrayUtils;
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.ExportException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
+import com.bonitasoft.engine.business.application.exporter.ApplicationExporter;
 import com.bonitasoft.engine.business.application.filter.ApplicationsWithIdsFilterBuilder;
 import com.bonitasoft.engine.business.application.model.SApplication;
 
@@ -33,13 +33,13 @@ public class ApplicationExporterDelegate {
         this.exporter = exporter;
     }
 
-    public byte[] exportApplications(long... applicationIds) throws ExecutionException {
+    public byte[] exportApplications(long... applicationIds) throws ExportException {
         ApplicationsWithIdsFilterBuilder filterBuilder = new ApplicationsWithIdsFilterBuilder(ArrayUtils.toObject(applicationIds));
         try {
             List<SApplication> applications = applicationService.searchApplications(filterBuilder.buildQueryOptions());
             return exporter.export(applications);
         } catch (SBonitaReadException e) {
-            throw new ExecutionException(e);
+            throw new ExportException(e);
         }
     }
 

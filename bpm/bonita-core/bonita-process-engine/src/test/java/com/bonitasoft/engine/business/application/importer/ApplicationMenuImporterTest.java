@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.ImportException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -98,8 +98,8 @@ public class ApplicationMenuImporterTest {
 
     }
 
-    @Test(expected = ExecutionException.class)
-    public void importApplicationMenu_should_throw_ExecutionException_when_menu_creation_throws_exception() throws Exception {
+    @Test(expected = ImportException.class)
+    public void importApplicationMenu_should_throw_Exception_when_menu_creation_throws_exception() throws Exception {
         //given
         SApplication application = mock(SApplication.class);
         ApplicationMenuNode menuNode = new ApplicationMenuNode();

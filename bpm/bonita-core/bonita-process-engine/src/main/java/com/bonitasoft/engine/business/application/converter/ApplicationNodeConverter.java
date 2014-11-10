@@ -16,7 +16,7 @@ import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.ExportException;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -52,7 +52,7 @@ public class ApplicationNodeConverter {
         this.applicationMenuNodeConverter = applicationMenuNodeConverter;
     }
 
-    public ApplicationNode toNode(final SApplication application) throws ExecutionException {
+    public ApplicationNode toNode(final SApplication application) throws ExportException {
         final ApplicationNode applicationNode = new ApplicationNode();
         applicationNode.setToken(application.getToken());
         applicationNode.setDisplayName(application.getDisplayName());
@@ -67,15 +67,15 @@ public class ApplicationNodeConverter {
         return applicationNode;
     }
 
-    private void setMenus(final long applicationId, final ApplicationNode applicationNode) throws ExecutionException {
+    private void setMenus(final long applicationId, final ApplicationNode applicationNode) throws ExportException {
         try {
             applicationMenuNodeConverter.addMenusToApplicationNode(applicationId, null, applicationNode, null);
         } catch (final SBonitaException e) {
-            throw new ExecutionException(e);
+            throw new ExportException(e);
         }
     }
 
-    private void setPages(final long applicationId, final ApplicationNode applicationNode) throws ExecutionException {
+    private void setPages(final long applicationId, final ApplicationNode applicationNode) throws ExportException {
         try {
             int startIndex = 0;
             final int maxResults = 50;
@@ -88,7 +88,7 @@ public class ApplicationNodeConverter {
                 startIndex += maxResults;
             } while (pages.size() == maxResults);
         } catch (final SBonitaException e) {
-            throw new ExecutionException(e);
+            throw new ExportException(e);
         }
     }
 
@@ -99,29 +99,29 @@ public class ApplicationNodeConverter {
         return new QueryOptions(startIndex, pageSize, orderByOptions, filters, null);
     }
 
-    private void setHomePage(final SApplication application, final ApplicationNode applicationNode) throws ExecutionException {
+    private void setHomePage(final SApplication application, final ApplicationNode applicationNode) throws ExportException {
         if (application.getHomePageId() != null) {
             try {
                 final SApplicationPage homePage = applicationService.getApplicationPage(application.getHomePageId());
                 applicationNode.setHomePage(homePage.getToken());
             } catch (final SBonitaException e) {
-                throw new ExecutionException(e);
+                throw new ExportException(e);
             }
         }
     }
 
-    private void setProfile(final SApplication application, final ApplicationNode applicationNode) throws ExecutionException {
+    private void setProfile(final SApplication application, final ApplicationNode applicationNode) throws ExportException {
         try {
             if (application.getProfileId() != null) {
                 final SProfile profile = profileService.getProfile(application.getProfileId());
                 applicationNode.setProfile(profile.getName());
             }
         } catch (final SBonitaException e) {
-            throw new ExecutionException(e);
+            throw new ExportException(e);
         }
     }
 
-    public ImportResult toSApplication(final ApplicationNode applicationNode, final long createdBy) throws ExecutionException {
+    public ImportResult toSApplication(final ApplicationNode applicationNode, final long createdBy) {
         final ImportStatus importStatus = new ImportStatus(applicationNode.getToken());
 
         final SApplicationBuilder builder = BuilderFactory.get(SApplicationBuilderFactory.class).createNewInstance(applicationNode.getToken(),
@@ -139,7 +139,7 @@ public class ApplicationNodeConverter {
         return new ImportResult(application, importStatus);
     }
 
-    private ImportError setProfile(final ApplicationNode applicationNode, final SApplicationBuilder builder) throws ExecutionException {
+    private ImportError setProfile(final ApplicationNode applicationNode, final SApplicationBuilder builder) {
         ImportError importError = null;
         if (applicationNode.getProfile() != null) {
             try {

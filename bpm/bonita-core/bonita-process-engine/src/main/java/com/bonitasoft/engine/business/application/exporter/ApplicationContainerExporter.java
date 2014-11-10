@@ -11,7 +11,7 @@ package com.bonitasoft.engine.business.application.exporter;
 
 import java.net.URL;
 
-import org.bonitasoft.engine.exception.ExecutionException;
+import org.bonitasoft.engine.exception.ExportException;
 
 import com.bonitasoft.engine.business.application.xml.ApplicationNodeContainer;
 import com.bonitasoft.engine.io.IOUtils;
@@ -21,12 +21,12 @@ import com.bonitasoft.engine.io.IOUtils;
  */
 public class ApplicationContainerExporter {
 
-    public byte[] export(ApplicationNodeContainer applicationNodeContainer) throws ExecutionException {
+    public byte[] export(ApplicationNodeContainer applicationNodeContainer) throws ExportException {
         final URL resource = ApplicationNodeContainer.class.getResource("/applications.xsd");
         try {
             return IOUtils.marshallObjectToXML(applicationNodeContainer, resource);
         } catch (Exception e) {
-            throw new ExecutionException(e);
+            throw new ExportException(e);
         }
     }
 
