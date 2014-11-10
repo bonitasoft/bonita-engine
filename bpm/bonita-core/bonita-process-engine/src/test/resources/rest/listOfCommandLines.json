@@ -1,0 +1,17 @@
+[ {
+  "persistenceId" : 864,
+  "persistenceVersion" : 78,
+  "quantity" : 5,
+  "links" : [ {
+    "rel" : "product",
+    "href" : "/businessdata/com.bonitasoft.engine.pojo.CommandLine/864/product"
+  } ]
+}, {
+  "persistenceId" : 964,
+  "persistenceVersion" : 7,
+  "quantity" : 10,
+  "links" : [ {
+    "rel" : "product",
+    "href" : "/businessdata/com.bonitasoft.engine.pojo.CommandLine/964/product"
+  } ]
+} ]
