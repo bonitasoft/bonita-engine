@@ -8,6 +8,9 @@
  *******************************************************************************/
 package com.bonitasoft.engine.api.impl;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -188,6 +191,11 @@ public class ApplicationAPIImpl implements ApplicationAPI {
     @Override
     public SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions) throws SearchException {
         return getApplicationMenuAPIDelegate(searchOptions).searchApplicationMenus();
+    }
+
+    @Override
+    public List<String> getAllPagesForProfile(long profileId) {
+        return getApplicationPageAPIDelegate().getAllPagesForProfile(profileId);
     }
 
 }
