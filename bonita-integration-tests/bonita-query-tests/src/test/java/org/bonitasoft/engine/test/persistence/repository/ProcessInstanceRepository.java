@@ -68,13 +68,13 @@ public class ProcessInstanceRepository extends TestRepository {
         return namedQuery.list();
     }
 
+
     public long getNumberOfProcessInstances(final long processDefinitionId) {
         getSession().enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         final Query namedQuery = getNamedQuery("countProcessInstancesOfProcessDefinition");
         namedQuery.setParameter("processDefinitionId", processDefinitionId);
         return (Long) namedQuery.uniqueResult();
     }
-
 
     @SuppressWarnings("unchecked")
     public List<SAProcessInstance> getArchivedProcessInstancesInAllStates(final List<Long> sourceProcessInstanceIds) {
