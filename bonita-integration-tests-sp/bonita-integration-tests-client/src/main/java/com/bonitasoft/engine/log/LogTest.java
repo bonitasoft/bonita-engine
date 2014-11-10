@@ -88,25 +88,34 @@ public class LogTest extends CommonAPISPTest {
         final int before = getLogAPI().getNumberOfLogs();
 
         // add user: add one log
-        final User userOld = getIdentityAPI().createUser("old", "oldPassword");
+        String usernameLongPrefix = "";
+        for (int i = 1; i < 250; i++) {
+            usernameLongPrefix += "a";
+        }
+        final User userOld = getIdentityAPI().createUser(usernameLongPrefix+"old", "oldPassword");
 
         int actual = getLogAPI().getNumberOfLogs();
         assertEquals(before + 1, actual);
+        logoutOnTenant();
+        loginOnDefaultTenantWith(usernameLongPrefix+"old","oldPassword");
+
+        actual = getLogAPI().getNumberOfLogs();
+        assertEquals(before + 2, actual);
 
         // update user: add one log
         final UserUpdater updateDescriptor = new UserUpdater();
-        updateDescriptor.setUserName("new");
+        updateDescriptor.setUserName(usernameLongPrefix+"new");
         updateDescriptor.setPassword("newPassword");
         getIdentityAPI().updateUser(userOld.getId(), updateDescriptor);
 
         actual = getLogAPI().getNumberOfLogs();
-        assertEquals(before + 2, actual);
+        assertEquals(before + 3, actual);
 
         // delete user: add one log
         getIdentityAPI().deleteUser(userOld.getId());
 
         actual = getLogAPI().getNumberOfLogs();
-        assertEquals(before + 3, actual);
+        assertEquals(before + 4, actual);
     }
 
     @Test
