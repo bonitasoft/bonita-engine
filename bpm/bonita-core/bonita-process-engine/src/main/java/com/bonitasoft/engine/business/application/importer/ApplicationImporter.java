@@ -16,6 +16,7 @@ import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.ImportException;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
@@ -48,7 +49,7 @@ public class ApplicationImporter {
         this.applicationMenuImporter = applicationMenuImporter;
     }
 
-    public ImportStatus importApplication(ApplicationNode applicationNode, long createdBy) throws ImportException {
+    public ImportStatus importApplication(ApplicationNode applicationNode, long createdBy) throws ImportException, AlreadyExistsException {
         ImportResult importResult = applicationNodeConverter.toSApplication(applicationNode, createdBy);
         try {
             SApplication application = importApplication(importResult.getApplication());
@@ -93,14 +94,10 @@ public class ApplicationImporter {
         }
     }
 
-    private SApplication importApplication(SApplication applicationToBeImported) throws SBonitaException, ImportException {
+    private SApplication importApplication(SApplication applicationToBeImported) throws SBonitaException, AlreadyExistsException {
         SApplication conflictingApplication = applicationService.getApplicationByToken(applicationToBeImported.getToken());
         if (conflictingApplication != null) {
-            try {
-                strategy.whenApplicationExists(conflictingApplication, applicationToBeImported);
-            } catch (org.bonitasoft.engine.exception.AlreadyExistsException e) {
-                e.printStackTrace();
-            }
+            strategy.whenApplicationExists(conflictingApplication, applicationToBeImported);
         }
         return applicationService.createApplication(applicationToBeImported);
     }

@@ -13,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -26,6 +27,7 @@ import org.bonitasoft.engine.api.ImportError;
 import org.bonitasoft.engine.api.ImportStatus;
 import org.bonitasoft.engine.commons.exceptions.SObjectCreationException;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.ImportException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.junit.Test;
@@ -205,6 +207,29 @@ public class ApplicationImporterTest {
         //then
         verify(applicationService, times(1)).createApplication(appToBeImported);
         verify(strategy, times(1)).whenApplicationExists(appInConflict, appToBeImported);
+    }
+
+    @Test(expected = AlreadyExistsException.class)
+    public void importApplication_should_throw_alreadyExistsException_when_stratege_throws_AlreadyExistsException() throws Exception {
+        //given
+        long createdBy = 5L;
+        SApplication appToBeImported = mock(SApplication.class);
+        given(appToBeImported.getToken()).willReturn("application");
+
+        ImportResult importResult = mock(ImportResult.class);
+        given(importResult.getApplication()).willReturn(appToBeImported);
+
+        SApplication appInConflict = mock(SApplication.class);
+
+        ApplicationNode applicationNode = mock(ApplicationNode.class);
+        given(applicationNodeConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
+        given(applicationService.getApplicationByToken("application")).willReturn(appInConflict);
+        doThrow(new AlreadyExistsException("")).when(strategy).whenApplicationExists(appInConflict, appToBeImported);
+
+        //when
+        applicationImporter.importApplication(applicationNode, createdBy);
+
+        //then exception
     }
 
     @Test(expected = ImportException.class)
