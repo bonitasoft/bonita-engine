@@ -31,6 +31,9 @@ public interface RefBusinessDataService {
     SRefBusinessDataInstance getRefBusinessDataInstance(String name, long processInstanceId)
             throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException;
 
+    List<SRefBusinessDataInstance> getRefBusinessDataInstances(long processInstanceId, int startIndex, int maxResults)
+            throws SBonitaReadException;
+
     SRefBusinessDataInstance getFlowNodeRefBusinessDataInstance(String name, long flowNodeInstanceId)
             throws SRefBusinessDataInstanceNotFoundException, SBonitaReadException;
 

@@ -45,6 +45,7 @@
 				<ref bean="getBreakpointsCommand" />
                 <ref bean="advancedStartProcessCommand" />
                 <ref bean="executeBDMQuery" />
+                <ref bean="getBusinessDataByIdCommand" />
 			</list>
 		</property>
 	</bean>
@@ -455,4 +456,17 @@
             <value>org.bonitasoft.engine.command.AdvancedStartProcessCommand</value>
         </constructor-arg>
     </bean>
+
+    <bean id="getBusinessDataByIdCommand" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
+        <constructor-arg name="name">
+            <value>getBusinessDataById</value>
+        </constructor-arg>
+        <constructor-arg name="description">
+            <value>Get the business data via its identifier and class name, and returns its Json representation.</value>
+        </constructor-arg>
+        <constructor-arg name="implementation">
+            <value>com.bonitasoft.engine.command.GetBusinessDataByIdCommand</value>
+        </constructor-arg>
+    </bean>
+
 </beans>

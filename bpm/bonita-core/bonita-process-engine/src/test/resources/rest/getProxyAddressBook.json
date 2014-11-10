@@ -1,0 +1,11 @@
+{
+  "persistenceId" : 1983,
+  "persistenceVersion" : 46587646,
+  "links" : [ {
+    "rel" : "address",
+    "href" : "/businessdata/com.bonitasoft.engine.pojo.AddressBook/1983/address"
+  }, {
+    "rel" : "addresses",
+    "href" : "/businessdata/com.bonitasoft.engine.pojo.AddressBook/1983/addresses"
+  } ]
+}
