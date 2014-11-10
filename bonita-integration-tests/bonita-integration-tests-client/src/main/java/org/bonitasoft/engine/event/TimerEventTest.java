@@ -59,7 +59,8 @@ public class TimerEventTest extends CommonAPITest {
         final String step2Name = "step2";
         final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(1000); // the timer intermediate catch event will wait one
                                                                                                        // second
-        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEventAndUserTask(TimerType.DURATION, timerExpression, step1Name, step2Name);
+        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEventAndUserTask(TimerType.DURATION, timerExpression, step1Name,
+                step2Name);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final ActivityInstance userTask = waitForUserTask(step1Name, processInstance);
@@ -94,7 +95,8 @@ public class TimerEventTest extends CommonAPITest {
         final Expression timerExpression = new ExpressionBuilder().createGroovyScriptExpression("testTimerIntermediateCatchEventDate", "return new Date("
                 + expectedDate + "l)", Date.class.getName()); // the timer intermediate catch
         // event will wait one second
-        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEventAndUserTask(TimerType.DATE, timerExpression, step1Name, step2Name);
+        final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEventAndUserTask(TimerType.DATE, timerExpression, step1Name,
+                step2Name);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         final ActivityInstance userTask = waitForUserTask(step1Name, processInstance);
@@ -170,17 +172,9 @@ public class TimerEventTest extends CommonAPITest {
         final String stepName = "step1";
         final Expression timerExpression = new ExpressionBuilder().createConstantLongExpression(1500); // the new instance must be created in one second
         final ProcessDefinition definition = deployProcessWithTimerStartEventAndUserTask(TimerType.DURATION, timerExpression, stepName);
+        waitForInitializingProcess();
 
-        List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
-        assertTrue(processInstances.isEmpty());
-
-        // wait for process instance creation
-        Thread.sleep(4000);
-
-        processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.CREATION_DATE_DESC);
-        assertEquals(1, processInstances.size());
-
-        waitForUserTask(stepName, processInstances.get(0));
+        waitForUserTask(stepName);
         disableAndDeleteProcess(definition);
     }
 
