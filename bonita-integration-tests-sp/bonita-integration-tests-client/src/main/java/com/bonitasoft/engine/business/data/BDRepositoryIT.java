@@ -79,6 +79,7 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.businessdata.BusinessDataReference;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
+import com.bonitasoft.engine.command.GetBusinessDataByIdCommand;
 
 public class BDRepositoryIT extends CommonAPISPTest {
 
@@ -116,6 +117,14 @@ public class BDRepositoryIT extends CommonAPISPTest {
         address.setNullable(Boolean.TRUE);
         address.setReference(addressBO);
 
+        final RelationField saddress = new RelationField();
+        saddress.setType(Type.AGGREGATION);
+        saddress.setFetchType(FetchType.LAZY);
+        saddress.setName("address");
+        saddress.setCollection(Boolean.FALSE);
+        saddress.setNullable(Boolean.TRUE);
+        saddress.setReference(addressBO);
+
         final SimpleField firstName = new SimpleField();
         firstName.setName("firstName");
         firstName.setType(FieldType.STRING);
@@ -138,6 +147,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         employee.addField(lastName);
         employee.addField(phoneNumbers);
         employee.addField(address);
+        employee.addField(saddress);
         employee.setDescription("Describe a simple employee");
         employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
@@ -1026,8 +1036,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
     }
 
     @Test
-    public void testName() throws Exception {
-
+    public void should_return_the_list_of_entities_from_the_multiple_instance() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployees", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';"
                 + " Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; [jane, john]", List.class.getName());
@@ -1071,6 +1080,49 @@ public class BDRepositoryIT extends CommonAPISPTest {
         assertThat(((SimpleBusinessDataReference) references.get(0)).getStorageId()).isNotNull();
 
         disableAndDeleteProcess(definition);
+    }
+
+    @Test
+    public void commandGetBusinessData_should_return_a_simple_lazy_child() throws Exception {
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
+                + "; import org.bonita.pojo.Address; Employee e = new Employee(); e.firstName = 'Alphonse';"
+                + " e.lastName = 'Dupond'; e.setAddress(myAddress); return e;", EMPLOYEE_QUALIF_CLASSNAME,
+                new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIF_NAME));
+        final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
+                "import org.bonita.pojo.Address; Address a = new Address(); a.street='32, rue Gustave Eiffel'; a.city='Grenoble'; return a;",
+                ADDRESS_QUALIF_NAME);
+
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
+                "shouldBeAbleToRunDAOCallThroughGroovy", "6.3.1");
+        final String bizDataName = "myEmployee";
+        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIF_CLASSNAME, null);
+        processDefinitionBuilder.addBusinessData("myAddress", ADDRESS_QUALIF_NAME, null);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addAutomaticTask("step1")
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.ASSIGNMENT, null, null, addressExpression)
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName), OperatorType.ASSIGNMENT, null, null, employeeExpression);
+        processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
+        processDefinitionBuilder.addTransition("step1", "step2");
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final long processInstanceId = getProcessAPI().startProcess(definition.getId()).getId();
+
+        waitForUserTask("step2", processInstanceId);
+
+        final SimpleBusinessDataReference businessDataReference = (SimpleBusinessDataReference) getProcessAPI().getProcessBusinessDataReference(bizDataName,
+                processInstanceId);
+
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, businessDataReference.getStorageId());
+        parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, EMPLOYEE_QUALIF_CLASSNAME);
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "address");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        final String result = (String) getCommandAPI().execute("getBusinessDataById", parameters);
+
+        assertThat(result).as("Address should have the right street and city").contains("\"street\" : \"32, rue Gustave Eiffel\"")
+                .contains("\"city\" : \"Grenoble\"");
+
+        disableAndDeleteProcess(definition.getId());
     }
 
 }

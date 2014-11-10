@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 
 /**
  * @author Matthieu Chaffotte
@@ -54,6 +55,9 @@ public class GetBusinessDataByIdCommand extends TenantCommand {
     public GetBusinessDataByIdCommand() {
         mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        final Hibernate4Module hbm = new Hibernate4Module();
+        hbm.enable(Hibernate4Module.Feature.FORCE_LAZY_LOADING);
+        mapper.registerModule(hbm);
     }
 
     protected GetBusinessDataByIdCommand(final ObjectMapper mapper) {
