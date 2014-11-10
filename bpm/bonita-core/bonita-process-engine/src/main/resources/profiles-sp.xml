@@ -57,6 +57,13 @@
 						<type>link</type>
 						<page>processlistingadmin</page>
 					</profileEntry>
+					<profileEntry name="Monitoring" isCustom="false">
+						<parentName>BPM</parentName>
+						<index>6</index>
+						<description>Monitoring of all processes</description>
+						<type>link</type>
+						<page>monitoringadmin</page>
+					</profileEntry>
 				</childrenEntries>
 			</parentProfileEntry>
 			<parentProfileEntry name="Organization" isCustom="false">

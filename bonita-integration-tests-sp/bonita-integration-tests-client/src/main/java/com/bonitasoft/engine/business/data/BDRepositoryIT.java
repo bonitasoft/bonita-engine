@@ -76,7 +76,9 @@ import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.businessdata.BusinessDataReference;
 import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
+import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
 
 public class BDRepositoryIT extends CommonAPISPTest {
 
@@ -95,16 +97,32 @@ public class BDRepositoryIT extends CommonAPISPTest {
     private File clientFolder;
 
     private BusinessObjectModel buildBOM() {
+        final SimpleField name = new SimpleField();
+        name.setName("name");
+        name.setType(FieldType.STRING);
+        final BusinessObject countryBO = new BusinessObject();
+        countryBO.setQualifiedName("org.bonita.pojo.Country");
+        countryBO.addField(name);
+
         final SimpleField street = new SimpleField();
         street.setName("street");
         street.setType(FieldType.STRING);
         final SimpleField city = new SimpleField();
         city.setName("city");
         city.setType(FieldType.STRING);
+        final RelationField country = new RelationField();
+        country.setType(Type.AGGREGATION);
+        country.setFetchType(FetchType.LAZY);
+        country.setName("country");
+        country.setCollection(Boolean.FALSE);
+        country.setNullable(Boolean.TRUE);
+        country.setReference(countryBO);
+
         final BusinessObject addressBO = new BusinessObject();
         addressBO.setQualifiedName(ADDRESS_QUALIF_NAME);
         addressBO.addField(street);
         addressBO.addField(city);
+        addressBO.addField(country);
 
         final RelationField address = new RelationField();
         address.setType(Type.AGGREGATION);
@@ -113,6 +131,14 @@ public class BDRepositoryIT extends CommonAPISPTest {
         address.setCollection(Boolean.TRUE);
         address.setNullable(Boolean.TRUE);
         address.setReference(addressBO);
+
+        final RelationField saddress = new RelationField();
+        saddress.setType(Type.AGGREGATION);
+        saddress.setFetchType(FetchType.LAZY);
+        saddress.setName("address");
+        saddress.setCollection(Boolean.FALSE);
+        saddress.setNullable(Boolean.TRUE);
+        saddress.setReference(addressBO);
 
         final SimpleField firstName = new SimpleField();
         firstName.setName("firstName");
@@ -136,6 +162,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         employee.addField(lastName);
         employee.addField(phoneNumbers);
         employee.addField(address);
+        employee.addField(saddress);
         employee.setDescription("Describe a simple employee");
         employee.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
@@ -168,6 +195,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         model.addBusinessObject(employee);
         model.addBusinessObject(person);
         model.addBusinessObject(addressBO);
+        model.addBusinessObject(countryBO);
         return model;
     }
 
@@ -1024,8 +1052,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
     }
 
     @Test
-    public void testName() throws Exception {
-
+    public void should_return_the_list_of_entities_from_the_multiple_instance() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployees", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';"
                 + " Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; [jane, john]", List.class.getName());
@@ -1055,6 +1082,66 @@ public class BDRepositoryIT extends CommonAPISPTest {
         assertThat(dataInstance.getValue().toString()).isEqualTo("[Doe, Doe]");
 
         disableAndDeleteProcess(processDefinition);
+    }
+
+    public void getProcessBusinessDataReferencesShoulReturnTheListOfReferences() throws Exception {
+        final String taskName = "step";
+        final ProcessDefinition definition = buildProcessThatUpdateBizDataInsideConnector(taskName);
+        final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
+        waitForUserTask(taskName, instance.getId());
+
+        final List<BusinessDataReference> references = getProcessAPI().getProcessBusinessDataReferences(instance.getId(), 0, 10);
+
+        assertThat(references).hasSize(1);
+        assertThat(((SimpleBusinessDataReference) references.get(0)).getStorageId()).isNotNull();
+
+        disableAndDeleteProcess(definition);
+    }
+
+    @Test
+    public void commandGetBusinessData_should_return_a_simple_lazy_child() throws Exception {
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
+                + "; import org.bonita.pojo.Address; Employee e = new Employee(); e.firstName = 'Alphonse';"
+                + " e.lastName = 'Dupond'; e.setAddress(myAddress); return e;", EMPLOYEE_QUALIF_CLASSNAME,
+                new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIF_NAME));
+        final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
+                "import org.bonita.pojo.Address; import org.bonita.pojo.Country; "
+                        + "Country c = new Country(); c.name='France'; "
+                        + "Address a = new Address(); a.street='32, rue Gustave Eiffel'; a.city='Grenoble'; a.country = c; a;",
+                ADDRESS_QUALIF_NAME);
+
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
+                "rest", "1.0");
+        final String bizDataName = "myEmployee";
+        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIF_CLASSNAME, null);
+        processDefinitionBuilder.addBusinessData("myAddress", ADDRESS_QUALIF_NAME, null);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addAutomaticTask("step1")
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.ASSIGNMENT, null, null, addressExpression)
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName), OperatorType.ASSIGNMENT, null, null, employeeExpression);
+        processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
+        processDefinitionBuilder.addTransition("step1", "step2");
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final long processInstanceId = getProcessAPI().startProcess(definition.getId()).getId();
+
+        waitForUserTask("step2", processInstanceId);
+
+        final SimpleBusinessDataReference businessDataReference = (SimpleBusinessDataReference) getProcessAPI().getProcessBusinessDataReference(bizDataName,
+                processInstanceId);
+
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put("businessDataId", businessDataReference.getStorageId());
+        parameters.put("entityClassName", EMPLOYEE_QUALIF_CLASSNAME);
+        parameters.put("businessDataChildName", "address");
+        parameters.put("businessDataURIPattern", "/businessdata/{className}/{id}/{field}");
+        final String result = (String) getCommandAPI().execute("getBusinessDataById", parameters);
+
+        assertThat(result).as("Address should have the right street and city").contains("\"street\" : \"32, rue Gustave Eiffel\"")
+                .contains("\"city\" : \"Grenoble\"")
+                .contains("\"rel\" : \"country\"");
+
+        disableAndDeleteProcess(definition.getId());
     }
 
 }
