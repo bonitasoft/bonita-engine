@@ -40,6 +40,8 @@ public interface SProcessInstanceBuilder {
 
     SProcessInstanceBuilder setRootProcessInstanceId(long rootProcessInstanceId);
 
+    SProcessInstanceBuilder setDescription(String description);
+
     SProcessInstance done();
 
 }

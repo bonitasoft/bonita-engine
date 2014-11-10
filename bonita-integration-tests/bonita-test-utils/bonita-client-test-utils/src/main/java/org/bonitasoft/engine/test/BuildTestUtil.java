@@ -150,6 +150,16 @@ public class BuildTestUtil {
         return builder;
     }
 
+    public static ProcessDefinitionBuilder buildProcessDefinitionWithFailedConnector(final String processName) throws InvalidExpressionException {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
+        final ConnectorDefinitionBuilder connectorDefinitionBuilder = builder.addConnector("testConnectorThatThrowException",
+                "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_ENTER).throwErrorEventWhenFailed("errorCode");
+        connectorDefinitionBuilder.addInput("kind", new ExpressionBuilder().createConstantStringExpression("plop"));
+        builder.addStartEvent("start").addAutomaticTask("AutomaticStep").addEndEvent("end");
+        builder.addTransition("start", "AutomaticStep").addTransition("AutomaticStep", "end");
+        return builder;
+    }
+
     public static ProcessDefinitionBuilder buildProcessDefinitionWithAutomaticTaskAndFailedConnector(final String processName)
             throws InvalidExpressionException {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
