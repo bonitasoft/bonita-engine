@@ -476,6 +476,16 @@ public class ProcessInstanceQueriesTest {
     }
 
     @Test
+    public void getNumberOfProcessInstances_should_return_the_number_of_running_instances_of_a_process_definition() {
+        repository.add(aProcessInstance().withProcessDefinitionId(45l).build());
+        repository.add(aProcessInstance().withProcessDefinitionId(45l).build());
+        repository.add(aProcessInstance().withProcessDefinitionId(45l).build());
+        repository.add(aProcessInstance().withProcessDefinitionId(12l).build());
+
+        assertThat(repository.getNumberOfProcessInstances(45l)).isEqualTo(3);
+    }
+
+    @Test
     public void getNumberOfSProcessInstanceFailed_should_return_number_of_distinct_process_instances() {
         // Given
         repository.add(buildFailedProcessInstance(1));
@@ -593,16 +603,6 @@ public class ProcessInstanceQueriesTest {
         sProcessInstance.setStateId(7);
         sProcessInstance.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
         return sProcessInstance;
-    }
-
-    @Test
-    public void getNumberOfProcessInstances_should_return_the_number_of_running_instances_of_a_process_definition() {
-        repository.add(aProcessInstance().withProcessDefinitionId(45l).build());
-        repository.add(aProcessInstance().withProcessDefinitionId(45l).build());
-        repository.add(aProcessInstance().withProcessDefinitionId(45l).build());
-        repository.add(aProcessInstance().withProcessDefinitionId(12l).build());
-
-        assertThat(repository.getNumberOfProcessInstances(45l)).isEqualTo(3);
     }
 
     @Test
