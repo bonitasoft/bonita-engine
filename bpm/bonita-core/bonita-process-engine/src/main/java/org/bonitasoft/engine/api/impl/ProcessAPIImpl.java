@@ -5895,7 +5895,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         documentAPIImpl.deleteContentOfArchivedDocument(documentId);
     }
 
-    TenantServiceAccessor getTenantAccessor() {
+    protected TenantServiceAccessor getTenantAccessor() {
         return APIUtils.getTenantAccessor();
     }
 
