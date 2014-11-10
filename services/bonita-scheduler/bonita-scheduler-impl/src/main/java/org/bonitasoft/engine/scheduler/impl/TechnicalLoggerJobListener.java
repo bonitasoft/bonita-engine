@@ -23,14 +23,14 @@ import java.util.Map;
 
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.model.SJobData;
 
 /**
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  */
-public class TechnicalLoggerJobListener extends AbstractBonitaPlatormJobListener {
+public class TechnicalLoggerJobListener extends AbstractBonitaPlatformJobListener {
 
     private static final long serialVersionUID = 2830540082890033377L;
 

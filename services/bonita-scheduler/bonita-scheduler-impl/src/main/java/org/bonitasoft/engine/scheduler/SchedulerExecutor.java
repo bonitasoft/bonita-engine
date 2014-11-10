@@ -106,14 +106,14 @@ public interface SchedulerExecutor {
     void addJobListener(List<AbstractBonitaTenantJobListener> jobListeners, String groupName) throws SSchedulerException;
 
     /**
-     * Add the given <code>{@link AbstractBonitaPlatormJobListener}s</code> to the <code>Scheduler</code>, and register it to receive events for all Jobs.
+     * Add the given <code>{@link AbstractBonitaPlatformJobListener}s</code> to the <code>Scheduler</code>, and register it to receive events for all Jobs.
      *
      * @param jobListeners
      *        The job listeners to add to the scheduler
      * @throws SSchedulerException
      * @since 6.4.0
      */
-    void addJobListener(List<AbstractBonitaPlatormJobListener> jobListeners) throws SSchedulerException;
+    void addJobListener(List<AbstractBonitaPlatformJobListener> jobListeners) throws SSchedulerException;
 
     /**
      * Initialize the scheduler if this method has not be previously called (after shutdown); otherwise, do nothing.

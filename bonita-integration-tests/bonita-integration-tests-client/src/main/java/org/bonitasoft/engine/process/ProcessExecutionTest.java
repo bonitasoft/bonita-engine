@@ -330,9 +330,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         assignFirstActorToMe(processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        assertTrue("Expected an activity", new CheckNbOfActivities(getProcessAPI(), 50, 1000, true, processInstance, 1, TestStates.READY).waitUntil());
-        final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
-        final ActivityInstance step1 = activities.get(0);
+        final HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
         final long before = new Date().getTime();
         assignAndExecuteStep(step1, user.getId());
         waitForProcessToFinish(processInstance);

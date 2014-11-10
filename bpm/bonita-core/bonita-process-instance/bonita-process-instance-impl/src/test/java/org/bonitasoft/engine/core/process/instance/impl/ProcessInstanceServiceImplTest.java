@@ -15,8 +15,10 @@ package org.bonitasoft.engine.core.process.instance.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
@@ -30,10 +32,12 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.archive.ArchiveService;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -105,7 +109,7 @@ public class ProcessInstanceServiceImplTest {
     private EventInstanceService eventInstanceService;
 
     @Mock
-    private Recorder mock;
+    private Recorder recorder;
 
     @Mock
     private ArchiveService archiveService;
@@ -149,10 +153,10 @@ public class ProcessInstanceServiceImplTest {
 
     @Before
     public void setUp() throws SBonitaException {
-        doCallRealMethod().when(processInstanceService).deleteParentProcessInstanceAndElements(anyList());
+        doCallRealMethod().when(processInstanceService).deleteParentProcessInstanceAndElements(anyListOf(SProcessInstance.class));
         doCallRealMethod().when(processInstanceService).deleteParentProcessInstanceAndElements(any(SProcessInstance.class));
 
-        doCallRealMethod().when(processInstanceService).deleteParentArchivedProcessInstancesAndElements(anyList());
+        doCallRealMethod().when(processInstanceService).deleteParentArchivedProcessInstancesAndElements(anyListOf(SAProcessInstance.class));
         doCallRealMethod().when(processInstanceService).deleteParentArchivedProcessInstanceAndElements(any(SAProcessInstance.class));
 
         when(processInstance.getId()).thenReturn(processInstanceId);
@@ -165,7 +169,7 @@ public class ProcessInstanceServiceImplTest {
     }
 
     @Test
-    public void deleteParentProcessInstanceAndElementsOnAbsentProcessShouldBeIgnored() throws Exception {
+    public void deleteParentPIAndElementsOnAbsentProcessShouldBeIgnored() throws Exception {
         // given:
         doThrow(SProcessInstanceModificationException.class).when(processInstanceService).deleteProcessInstance(processInstance);
         doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService).getProcessInstance(processInstanceId);
@@ -179,7 +183,7 @@ public class ProcessInstanceServiceImplTest {
     }
 
     @Test(expected = SBonitaException.class)
-    public void deleteParentProcessInstanceAndElementsOnStillExistingProcessShouldRaiseException() throws Exception {
+    public void exceptionInDeleteParentPIAndElementsOnStillExistingProcessShouldRaiseException() throws Exception {
         // given:
         doThrow(SProcessInstanceModificationException.class).when(processInstanceService).deleteProcessInstance(processInstance);
         // getProcessInstance normally returns:
@@ -195,26 +199,10 @@ public class ProcessInstanceServiceImplTest {
     }
 
     @Test
-    public void deleteParentArchivedProcessInstanceAndElementsOnAbsentProcessShouldBeIgnored() throws Exception {
+    public void deleteParentArchivedPIAndElementsOnAbsentProcessShouldBeIgnored() throws Exception {
         // given:
-        doThrow(new SProcessInstanceModificationException(new Exception())).when(processInstanceService).deleteArchivedProcessInstanceElements(anyLong(),
-                anyLong());
+        doThrow(SProcessInstanceModificationException.class).when(processInstanceService).deleteArchivedProcessInstanceElements(anyLong(), anyLong());
         doReturn(null).when(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
-        doNothing().when(processInstanceService).logArchivedProcessInstanceNotFound(any(SProcessInstanceModificationException.class));
-
-        // when:
-        processInstanceService.deleteParentArchivedProcessInstanceAndElements(aProcessInstance);
-
-        // then:
-        verify(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
-    }
-
-    @Test
-    public void deleteParentArchivedProcessInstanceAndElements_should_be_ignored_when_error_to_getArchivedProcessInstance() throws Exception {
-        // given:
-        doThrow(new SProcessInstanceModificationException(new Exception())).when(processInstanceService).deleteArchivedProcessInstanceElements(anyLong(),
-                anyLong());
-        doThrow(new SProcessInstanceReadException(new Exception())).when(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
         doNothing().when(processInstanceService).logArchivedProcessInstanceNotFound(any(SProcessInstanceModificationException.class));
 
         // when:
@@ -276,7 +264,7 @@ public class ProcessInstanceServiceImplTest {
     }
 
     @Test
-    public void deleteProcessInstance_delete_archived_activity() throws Exception {
+    public void testDeleteProcessInstance_delete_archived_activity() throws Exception {
         final SProcessInstance sProcessInstance = mock(SProcessInstance.class);
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         when(classLoaderService.getLocalClassLoader("PROCESS", sProcessInstance.getId())).thenReturn(classLoader);
@@ -285,6 +273,227 @@ public class ProcessInstanceServiceImplTest {
         verify(processInstanceService, times(1)).deleteProcessInstanceElements(sProcessInstance);
         verify(processInstanceService, times(1)).deleteArchivedProcessInstanceElements(sProcessInstance.getId(), sProcessInstance.getProcessDefinitionId());
         verify(processInstanceService, times(1)).deleteArchivedFlowNodeInstances(sProcessInstance.getId());
+    }
+
+    @Test
+    public void getNumberOfFailedProcessInstances_should_return_number_of_failed_process_instance() throws Exception {
+        // Given
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
+        final long number = 2L;
+        doReturn(number).when(readPersistenceService).getNumberOfEntities(SProcessInstance.class, "Failed", queryOptions, null);
+
+        // When
+        final long result = processInstanceService.getNumberOfFailedProcessInstances(queryOptions);
+
+        // Then
+        assertEquals("The result should be equals to the number returned by the mock.", number, result);
+    }
+
+    @Test(expected = SBonitaReadException.class)
+    public void getNumberOfFailedProcessInstances_should_throw_exception_when_persistence_service_failed() throws Exception {
+        // Given
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
+        doThrow(new SBonitaReadException("plop")).when(readPersistenceService).getNumberOfEntities(SProcessInstance.class, "Failed", queryOptions, null);
+
+        // When
+        processInstanceService.getNumberOfFailedProcessInstances(queryOptions);
+    }
+
+    @Test
+    public void searchFailedProcessInstances_should_return_list_of_failed_process_instance() throws Exception {
+        // Given
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
+        final List<ProcessInstance> list = Arrays.asList(mock(ProcessInstance.class));
+        doReturn(list).when(readPersistenceService).searchEntity(SProcessInstance.class, "Failed", queryOptions, null);
+
+        // When
+        final List<SProcessInstance> result = processInstanceService.searchFailedProcessInstances(queryOptions);
+
+        // Then
+        assertEquals("The result should be equals to the list returned by the mock.", list, result);
+    }
+
+    @Test(expected = SBonitaReadException.class)
+    public void searchFailedProcessInstances_should_throw_exception_when_persistence_service_failed() throws Exception {
+        // Given
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
+        doThrow(new SBonitaReadException("plop")).when(readPersistenceService).searchEntity(SProcessInstance.class, "Failed", queryOptions, null);
+
+        // When
+        processInstanceService.searchFailedProcessInstances(queryOptions);
+    }
+
+    @Test
+    public void getNumberOfOpenProcessInstancesSupervisedBy_should_return_number_of_open_process_instance_supervised_by() throws Exception {
+        // Given
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
+        final long userId = 198L;
+        final long number = 2L;
+        doReturn(number).when(readPersistenceService).getNumberOfEntities(eq(SProcessInstance.class), eq("SupervisedBy"), eq(queryOptions),
+                anyMapOf(String.class, Object.class));
+
+        // When
+        final long result = processInstanceService.getNumberOfOpenProcessInstancesSupervisedBy(userId, queryOptions);
+
+        // Then
+        assertEquals("The result should be equals to the number returned by the mock.", number, result);
+    }
+
+    @Test(expected = SBonitaReadException.class)
+    public void getNumberOfOpenProcessInstancesSupervisedBy_should_throw_exception_when_persistence_service_failed() throws Exception {
+        // Given
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
+        final long userId = 198L;
+        doThrow(new SBonitaReadException("plop")).when(readPersistenceService).getNumberOfEntities(eq(SProcessInstance.class), eq("SupervisedBy"),
+                eq(queryOptions),
+                anyMapOf(String.class, Object.class));
+
+        // When
+        processInstanceService.getNumberOfOpenProcessInstancesSupervisedBy(userId, queryOptions);
+    }
+
+    @Test
+    public void searchOpenProcessInstancesSupervisedBy_should_return_list_of_open_process_instance_supervised_by() throws Exception {
+        // Given
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
+        final long userId = 198L;
+        final List<ProcessInstance> list = Arrays.asList(mock(ProcessInstance.class));
+        doReturn(list).when(readPersistenceService).searchEntity(eq(SProcessInstance.class), eq("SupervisedBy"), eq(queryOptions),
+                anyMapOf(String.class, Object.class));
+
+        // When
+        final List<SProcessInstance> result = processInstanceService.searchOpenProcessInstancesSupervisedBy(userId, queryOptions);
+
+        // Then
+        assertEquals("The result should be equals to the list returned by the mock.", list, result);
+    }
+
+    @Test(expected = SBonitaReadException.class)
+    public void searchOpenProcessInstancesSupervisedBy_should_throw_exception_when_persistence_service_failed() throws Exception {
+        // Given
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
+        final long userId = 198L;
+        doThrow(new SBonitaReadException("plop")).when(readPersistenceService).searchEntity(eq(SProcessInstance.class), eq("SupervisedBy"), eq(queryOptions),
+                anyMapOf(String.class, Object.class));
+
+        // When
+        processInstanceService.searchOpenProcessInstancesSupervisedBy(userId, queryOptions);
+    }
+
+    @Test
+    public void getNumberOfOpenProcessInstancesInvolvingUser_should_return_number_of_open_process_instance_involving_user() throws Exception {
+        // Given
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
+        final long userId = 198L;
+        final long number = 2L;
+        doReturn(number).when(readPersistenceService).getNumberOfEntities(eq(SProcessInstance.class), eq("InvolvingUser"), eq(queryOptions),
+                anyMapOf(String.class, Object.class));
+
+        // When
+        final long result = processInstanceService.getNumberOfOpenProcessInstancesInvolvingUser(userId, queryOptions);
+
+        // Then
+        assertEquals("The result should be equals to the number returned by the mock.", number, result);
+    }
+
+    @Test(expected = SBonitaReadException.class)
+    public void getNumberOfOpenProcessInstancesInvolvingUser_should_throw_exception_when_persistence_service_failed() throws Exception {
+        // Given
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
+        final long userId = 198L;
+        doThrow(new SBonitaReadException("plop")).when(readPersistenceService).getNumberOfEntities(eq(SProcessInstance.class), eq("InvolvingUser"),
+                eq(queryOptions),
+                anyMapOf(String.class, Object.class));
+
+        // When
+        processInstanceService.getNumberOfOpenProcessInstancesInvolvingUser(userId, queryOptions);
+    }
+
+    @Test
+    public void searchOpenProcessInstancesInvolvingUser_should_return_list_of_open_process_instance_involving_user() throws Exception {
+        // Given
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
+        final long userId = 198L;
+        final List<ProcessInstance> list = Arrays.asList(mock(ProcessInstance.class));
+        doReturn(list).when(readPersistenceService).searchEntity(eq(SProcessInstance.class), eq("InvolvingUser"), eq(queryOptions),
+                anyMapOf(String.class, Object.class));
+
+        // When
+        final List<SProcessInstance> result = processInstanceService.searchOpenProcessInstancesInvolvingUser(userId, queryOptions);
+
+        // Then
+        assertEquals("The result should be equals to the list returned by the mock.", list, result);
+    }
+
+    @Test(expected = SBonitaReadException.class)
+    public void searchOpenProcessInstancesInvolvingUser_should_throw_exception_when_persistence_service_failed() throws Exception {
+        // Given
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
+        final long userId = 198L;
+        doThrow(new SBonitaReadException("plop")).when(readPersistenceService).searchEntity(eq(SProcessInstance.class), eq("InvolvingUser"), eq(queryOptions),
+                anyMapOf(String.class, Object.class));
+
+        // When
+        processInstanceService.searchOpenProcessInstancesInvolvingUser(userId, queryOptions);
+    }
+
+    @Test
+    public void getNumberOfOpenProcessInstancesInvolvingUsersManagedBy_should_return_number_of_open_process_instance_involving_users_managed_by()
+            throws Exception {
+        // Given
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
+        final long userId = 198L;
+        final long number = 2L;
+        doReturn(number).when(readPersistenceService).getNumberOfEntities(eq(SProcessInstance.class), eq("InvolvingUsersManagedBy"), eq(queryOptions),
+                anyMapOf(String.class, Object.class));
+
+        // When
+        final long result = processInstanceService.getNumberOfOpenProcessInstancesInvolvingUsersManagedBy(userId, queryOptions);
+
+        // Then
+        assertEquals("The result should be equals to the number returned by the mock.", number, result);
+    }
+
+    @Test(expected = SBonitaReadException.class)
+    public void getNumberOfOpenProcessInstancesInvolvingUsersManagedBy_should_throw_exception_when_persistence_service_failed() throws Exception {
+        // Given
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
+        final long userId = 198L;
+        doThrow(new SBonitaReadException("plop")).when(readPersistenceService).getNumberOfEntities(eq(SProcessInstance.class), eq("InvolvingUsersManagedBy"),
+                eq(queryOptions),
+                anyMapOf(String.class, Object.class));
+
+        // When
+        processInstanceService.getNumberOfOpenProcessInstancesInvolvingUsersManagedBy(userId, queryOptions);
+    }
+
+    @Test
+    public void searchOpenProcessInstancesInvolvingUsersManagedBy_should_return_list_of_open_process_instance_involving_users_managed_by() throws Exception {
+        // Given
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
+        final long userId = 198L;
+        final List<ProcessInstance> list = Arrays.asList(mock(ProcessInstance.class));
+        doReturn(list).when(readPersistenceService).searchEntity(eq(SProcessInstance.class), eq("InvolvingUsersManagedBy"), eq(queryOptions),
+                anyMapOf(String.class, Object.class));
+
+        // When
+        final List<SProcessInstance> result = processInstanceService.searchOpenProcessInstancesInvolvingUsersManagedBy(userId, queryOptions);
+
+        // Then
+        assertEquals("The result should be equals to the list returned by the mock.", list, result);
+    }
+
+    @Test(expected = SBonitaReadException.class)
+    public void searchOpenProcessInstancesInvolvingUsersManagedBy_should_throw_exception_when_persistence_service_failed() throws Exception {
+        // Given
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
+        final long userId = 198L;
+        doThrow(new SBonitaReadException("plop")).when(readPersistenceService).searchEntity(eq(SProcessInstance.class), eq("InvolvingUsersManagedBy"),
+                eq(queryOptions),
+                anyMapOf(String.class, Object.class));
+
+        // When
+        processInstanceService.searchOpenProcessInstancesInvolvingUsersManagedBy(userId, queryOptions);
     }
 
     @Test
@@ -544,6 +753,26 @@ public class ProcessInstanceServiceImplTest {
         // Then
         verify(processInstanceService, never()).deleteDataInstancesIfNecessary(flowNodeInstance, processDefinition);
         verify(processInstanceService, never()).deleteConnectorInstancesIfNecessary(flowNodeInstance, processDefinition);
+    }
+
+    @Test
+    public void getNumberOfProcessInstances_should_call_getNumberOfEntities() throws Exception {
+        final Map<String, Object> inputParameters = new HashMap<String, Object>();
+        inputParameters.put("processDefinitionId", 45L);
+        final SelectOneDescriptor<Long> countDescriptor = new SelectOneDescriptor<Long>("countProcessInstancesOfProcessDefinition", inputParameters,
+                SProcessInstance.class);
+        when(readPersistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(4L);
+
+        processInstanceService.getNumberOfProcessInstances(45L);
+
+        verify(readPersistenceService).selectOne(argThat(new SelectOneDescriptorMatcher(countDescriptor)));
+    }
+
+    @Test(expected = SBonitaReadException.class)
+    public void getNumberOfProcessInstances_should_throw_a_read_exception_if_getNumberOfEntities_does_it() throws Exception {
+        when(readPersistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException("error"));
+
+        processInstanceService.getNumberOfProcessInstances(45L);
     }
 
 }
