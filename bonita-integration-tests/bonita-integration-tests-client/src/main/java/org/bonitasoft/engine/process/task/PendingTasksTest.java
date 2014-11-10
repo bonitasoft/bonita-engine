@@ -1,10 +1,12 @@
 package org.bonitasoft.engine.process.task;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -430,7 +432,7 @@ public class PendingTasksTest extends CommonAPITest {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
 
-        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
         assertEquals(1, searchResult.getCount());
         final List<User> possibleUsers = searchResult.getResult();
         assertEquals(1, possibleUsers.size());
@@ -463,7 +465,7 @@ public class PendingTasksTest extends CommonAPITest {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
 
-        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
         assertEquals(1, searchResult.getCount());
         final List<User> possibleUsers = searchResult.getResult();
         assertEquals(1, possibleUsers.size());
@@ -496,7 +498,7 @@ public class PendingTasksTest extends CommonAPITest {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
 
-        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
         assertEquals(1, searchResult.getCount());
         final List<User> possibleUsers = searchResult.getResult();
         assertEquals(1, possibleUsers.size());
@@ -518,14 +520,14 @@ public class PendingTasksTest extends CommonAPITest {
         final int USER_LIST_SIZE = 21;
         final List<User> users = new ArrayList<User>(USER_LIST_SIZE);
         for (int i = 0; i < USER_LIST_SIZE; i++) {
-            User newUser = createUser("user_" + i, "pwd");
+            final User newUser = createUser("user_" + i, "pwd");
             users.add(newUser);
             createUserMembership(newUser.getUserName(), role.getName(), group.getName());
         }
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("getPossible_pagination", "1.1");
-        String actorName = "major";
-        String activityName = "step1";
+        final String actorName = "major";
+        final String activityName = "step1";
         designProcessDefinition.addActor(actorName);
         designProcessDefinition.addUserTask(activityName, actorName);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), actorName, users);
@@ -534,7 +536,7 @@ public class PendingTasksTest extends CommonAPITest {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 30);
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
 
-        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
         assertEquals(21, searchResult.getCount());
         final List<User> possibleUsers = searchResult.getResult();
         // make sure the list is not limited to 20:
@@ -622,7 +624,7 @@ public class PendingTasksTest extends CommonAPITest {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 2);
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
 
-        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
         assertEquals(1, searchResult.getCount());
         final List<User> possibleUsers = searchResult.getResult();
 
@@ -691,10 +693,48 @@ public class PendingTasksTest extends CommonAPITest {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
 
-        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(-156l, builder.done());
+        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(-156l, builder.done());
         assertEquals(0, searchResult.getCount());
         final List<User> possibleUsers = searchResult.getResult();
         assertTrue(CollectionUtils.isEmpty(possibleUsers));
+    }
+
+    @Test
+    public void test() throws Exception {
+        final Group mainGroup = createGroup("main");
+        final Role member = createRole("member");
+        final UserMembership m1 = getIdentityAPI().addUserMembership(john.getId(), mainGroup.getId(), member.getId());
+
+        final ProcessDefinition processDefinition = deployProcessMappedToGroup(mainGroup);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("Request", processInstance.getId());
+
+        final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTaskAndExecuteIt("Request", startProcess, john);
+
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("secondProcess", "1.0");
+        processBuilder.addActor("myActor").addActor("myActor2");
+        processBuilder.addUserTask("Request1", "myActor2");
+        processBuilder.addUserTask("Request2", "myActor");
+        processBuilder.addTransition("Request2", "Request1");
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processBuilder.done(), Arrays.asList("myActor", "myActor2"),
+                Arrays.asList(john, jack));
+        final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
+        waitForUserTaskAndAssigneIt("Request2", instance, john);
+
+        List<HumanTaskInstance> pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
+        assertThat(pendingHumanTaskInstances).hasSize(1);
+
+        getProcessAPI().disableProcess(processDefinition.getId());
+        pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
+        assertThat(pendingHumanTaskInstances).hasSize(1);
+
+        disableAndDeleteProcess(definition);
+        deleteProcess(processDefinition);
+        deleteUserMembership(m1.getId());
+        deleteGroups(mainGroup);
+        deleteRoles(member);
     }
 
 }

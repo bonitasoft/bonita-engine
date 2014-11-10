@@ -538,12 +538,8 @@
 								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>
-											org.apache.maven.plugins
-										</groupId>
-										<artifactId>
-											maven-dependency-plugin
-										</artifactId>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-dependency-plugin</artifactId>
 										<versionRange>[2.7,)</versionRange>
 										<goals>
 											<goal>unpack</goal>
@@ -589,9 +585,15 @@
 						</goals>
 						<configuration>
 							<target name="copy-bpm-test-conf">
-								<copy todir="${project.build.directory}/conf" overwrite="true">
-									<fileset dir="${basedir}/src/test/resources/conf" />
-								</copy>
+                                <copy todir="${project.build.directory}/conf">
+                                    <fileset dir="${project.build.directory}/server/conf/service" />
+                                </copy>
+                                <copy todir="${project.build.directory}/conf" overwrite="true">
+                                    <fileset dir="${project.build.directory}/server/conf/bpm" />
+                                </copy>
+<!-- 								<copy todir="${project.build.directory}/conf" overwrite="true"> -->
+<!-- 									<fileset dir="${basedir}/src/test/resources/conf" /> -->
+<!-- 								</copy> -->
 							</target>
 						</configuration>
 					</execution>
@@ -616,7 +618,7 @@
 									<type>zip</type>
 								</artifactItem>
 							</artifactItems>
-							<outputDirectory>${project.build.directory}</outputDirectory>
+							<outputDirectory>${project.build.directory}/server</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>

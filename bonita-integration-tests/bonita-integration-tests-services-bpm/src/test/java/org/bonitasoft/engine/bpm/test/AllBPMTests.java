@@ -1,6 +1,5 @@
 package org.bonitasoft.engine.bpm.test;
 
-import org.bonitasoft.engine.bpm.APIAccessorTest;
 import org.bonitasoft.engine.bpm.ActorMappingServiceTest;
 import org.bonitasoft.engine.bpm.CategoryServiceIntegrationTest;
 import org.bonitasoft.engine.bpm.CommentServiceTest;
@@ -35,7 +34,6 @@ import org.junit.runners.Suite.SuiteClasses;
         FlowNodeInstanceServiceTest.class,
         SupervisorServiceTest.class,
         NodeConfigurationTest.class,
-        APIAccessorTest.class,
         ConnectorInstanceServiceIntegrationTests.class,
         PlatformLoginServiceTest.class
 })

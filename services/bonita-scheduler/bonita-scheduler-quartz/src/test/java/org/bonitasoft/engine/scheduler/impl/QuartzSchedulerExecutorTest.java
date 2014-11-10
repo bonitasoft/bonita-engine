@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.scheduler.trigger.OneShotTrigger;
@@ -752,7 +752,7 @@ public class QuartzSchedulerExecutorTest {
     @Test(expected = SSchedulerException.class)
     public void addJobListener_should_throw_exception_when_addJobListener_failed_for_platform() throws Exception {
         // Given
-        final List<AbstractBonitaPlatormJobListener> jobListeners = Collections.emptyList();
+        final List<AbstractBonitaPlatformJobListener> jobListeners = Collections.emptyList();
         final ListenerManager listenerManager = mock(ListenerManager.class);
         doReturn(listenerManager).when(scheduler).getListenerManager();
         doThrow(SchedulerException.class).when(listenerManager).addJobListener(any(JobListener.class));
@@ -764,7 +764,7 @@ public class QuartzSchedulerExecutorTest {
     @Test
     public void addJobListener_should_addJobListener_for_platform() throws Exception {
         // Given
-        final List<AbstractBonitaPlatormJobListener> jobListeners = Collections.emptyList();
+        final List<AbstractBonitaPlatformJobListener> jobListeners = Collections.emptyList();
         final ListenerManager listenerManager = mock(ListenerManager.class);
         doReturn(listenerManager).when(scheduler).getListenerManager();
 

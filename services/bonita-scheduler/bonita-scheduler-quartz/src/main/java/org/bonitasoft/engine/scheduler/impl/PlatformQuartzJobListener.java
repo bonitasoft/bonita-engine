@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.scheduler.AbstractBonitaJobListener;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -32,9 +32,9 @@ import org.quartz.TriggerKey;
  */
 public class PlatformQuartzJobListener extends AbstractQuartzJobListener {
 
-    private final List<AbstractBonitaPlatormJobListener> bonitaJobListeners;
+    private final List<AbstractBonitaPlatformJobListener> bonitaJobListeners;
 
-    public PlatformQuartzJobListener(final List<AbstractBonitaPlatormJobListener> jobListeners) {
+    public PlatformQuartzJobListener(final List<AbstractBonitaPlatformJobListener> jobListeners) {
         bonitaJobListeners = jobListeners;
     }
 

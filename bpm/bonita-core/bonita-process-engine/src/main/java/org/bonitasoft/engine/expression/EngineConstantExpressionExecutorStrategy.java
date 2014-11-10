@@ -49,8 +49,8 @@ import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
@@ -64,17 +64,16 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
 
     private final ProcessInstanceService processInstanceService;
 
-    protected final ReadSessionAccessor sessionAccessor;
+    private final SessionAccessor sessionAccessor;
 
-    protected final SessionService sessionService;
+    private final SessionService sessionService;
 
     public EngineConstantExpressionExecutorStrategy(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
-            final SessionService sessionService, final ReadSessionAccessor sessionAccessor) {
+            final SessionService sessionService, final SessionAccessor sessionAccessor) {
         this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
-
     }
 
     @Override
@@ -131,13 +130,13 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         } catch (final SActivityInstanceNotFoundException e) {
             throw new SExpressionEvaluationException("Error retrieving activity instance while building EngineExecutionContext as EngineConstantExpression", e,
                     expressionName);
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new SExpressionEvaluationException("Error while building EngineExecutionContext as EngineConstantExpression", e, expressionName);
         }
     }
 
-    protected APIAccessorImpl getApiAccessor() {
-        return new APIAccessorImpl();
+    protected APIAccessor getApiAccessor() {
+        return new APIAccessorImpl(sessionAccessor, sessionService);
     }
 
     protected APIAccessor getConnectorApiAccessor() throws STenantIdNotSetException {
@@ -347,6 +346,14 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
     @Override
     public boolean mustPutEvaluatedExpressionInContext() {
         return true;
+    }
+
+    public SessionAccessor getSessionAccessor() {
+        return sessionAccessor;
+    }
+
+    public SessionService getSessionService() {
+        return sessionService;
     }
 
 }

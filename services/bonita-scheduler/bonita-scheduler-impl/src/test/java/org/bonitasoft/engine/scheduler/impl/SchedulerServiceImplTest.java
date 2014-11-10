@@ -31,7 +31,7 @@ import org.bonitasoft.engine.events.model.builders.SEventBuilder;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatormJobListener;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.InjectedService;
 import org.bonitasoft.engine.scheduler.JobService;
@@ -363,7 +363,7 @@ public class SchedulerServiceImplTest {
     @Test
     public void addJobListener_for_PlatormJobListener_should_call_addJobListener_for_PlatormJobListener() throws SSchedulerException {
         // Given
-        final List<AbstractBonitaPlatormJobListener> jobListeners = Collections.emptyList();
+        final List<AbstractBonitaPlatformJobListener> jobListeners = Collections.emptyList();
 
         // When
         schedulerService.addJobListener(jobListeners);
