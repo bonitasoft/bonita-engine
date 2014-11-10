@@ -109,4 +109,6 @@ public interface BusinessDataRepository extends TenantLifecycleService {
     Set<String> getEntityClassNames();
 
 
+    Entity unproxy(final Entity proxied);
+
 }

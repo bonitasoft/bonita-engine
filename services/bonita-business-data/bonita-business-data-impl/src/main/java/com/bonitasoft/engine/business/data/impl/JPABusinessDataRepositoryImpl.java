@@ -27,6 +27,8 @@ import javax.persistence.metamodel.EntityType;
 
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.hibernate.Hibernate;
+import org.hibernate.proxy.HibernateProxy;
 
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -234,6 +236,15 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             return getEntityManager().merge(entity);
         }
         return null;
+    }
+
+    public Entity unproxy(final Entity proxied) {
+        Entity entity = proxied;
+        if (entity != null && entity instanceof HibernateProxy) {
+            Hibernate.initialize(entity);
+            entity = (Entity) ((HibernateProxy) entity).getHibernateLazyInitializer().getImplementation();
+        }
+        return entity;
     }
 
 }

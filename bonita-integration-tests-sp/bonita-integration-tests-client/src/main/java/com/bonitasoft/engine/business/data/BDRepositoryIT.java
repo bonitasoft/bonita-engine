@@ -97,16 +97,32 @@ public class BDRepositoryIT extends CommonAPISPTest {
     private File clientFolder;
 
     private BusinessObjectModel buildBOM() {
+        final SimpleField name = new SimpleField();
+        name.setName("name");
+        name.setType(FieldType.STRING);
+        final BusinessObject countryBO = new BusinessObject();
+        countryBO.setQualifiedName("org.bonita.pojo.Country");
+        countryBO.addField(name);
+
         final SimpleField street = new SimpleField();
         street.setName("street");
         street.setType(FieldType.STRING);
         final SimpleField city = new SimpleField();
         city.setName("city");
         city.setType(FieldType.STRING);
+        final RelationField country = new RelationField();
+        country.setType(Type.AGGREGATION);
+        country.setFetchType(FetchType.LAZY);
+        country.setName("country");
+        country.setCollection(Boolean.FALSE);
+        country.setNullable(Boolean.TRUE);
+        country.setReference(countryBO);
+
         final BusinessObject addressBO = new BusinessObject();
         addressBO.setQualifiedName(ADDRESS_QUALIF_NAME);
         addressBO.addField(street);
         addressBO.addField(city);
+        addressBO.addField(country);
 
         final RelationField address = new RelationField();
         address.setType(Type.AGGREGATION);
@@ -179,6 +195,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         model.addBusinessObject(employee);
         model.addBusinessObject(person);
         model.addBusinessObject(addressBO);
+        model.addBusinessObject(countryBO);
         return model;
     }
 
@@ -1088,11 +1105,13 @@ public class BDRepositoryIT extends CommonAPISPTest {
                 + " e.lastName = 'Dupond'; e.setAddress(myAddress); return e;", EMPLOYEE_QUALIF_CLASSNAME,
                 new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIF_NAME));
         final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
-                "import org.bonita.pojo.Address; Address a = new Address(); a.street='32, rue Gustave Eiffel'; a.city='Grenoble'; return a;",
+                "import org.bonita.pojo.Address; import org.bonita.pojo.Country; "
+                        + "Country c = new Country(); c.name='France'; "
+                        + "Address a = new Address(); a.street='32, rue Gustave Eiffel'; a.city='Grenoble'; a.country = c; a;",
                 ADDRESS_QUALIF_NAME);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
-                "shouldBeAbleToRunDAOCallThroughGroovy", "6.3.1");
+                "rest", "1.0");
         final String bizDataName = "myEmployee";
         processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIF_CLASSNAME, null);
         processDefinitionBuilder.addBusinessData("myAddress", ADDRESS_QUALIF_NAME, null);
@@ -1119,7 +1138,8 @@ public class BDRepositoryIT extends CommonAPISPTest {
         final String result = (String) getCommandAPI().execute("getBusinessDataById", parameters);
 
         assertThat(result).as("Address should have the right street and city").contains("\"street\" : \"32, rue Gustave Eiffel\"")
-                .contains("\"city\" : \"Grenoble\"");
+                .contains("\"city\" : \"Grenoble\"")
+                .contains("\"rel\" : \"country\"");
 
         disableAndDeleteProcess(definition.getId());
     }

@@ -76,7 +76,7 @@ public class GetBusinessDataByIdCommand extends TenantCommand {
             final Entity entity = businessDataRepository.findById(entityClass, identifier);
             final String childName = getParameter(parameters, BUSINESS_DATA_CHILD_NAME);
             if (childName != null && !childName.isEmpty()) {
-                return serializeChildResult(entity, childName, businessDataURIPattern);
+                return serializeChildResult(entity, childName, businessDataURIPattern, businessDataRepository);
             } else {
                 return serializeResult(entity, businessDataURIPattern);
             }
@@ -141,7 +141,8 @@ public class GetBusinessDataByIdCommand extends TenantCommand {
         }
     }
 
-    private String serializeChildResult(final Entity entity, final String fieldName, final String businessDataURIPattern) throws SCommandExecutionException {
+    private String serializeChildResult(final Entity entity, final String fieldName, final String businessDataURIPattern,
+            final BusinessDataRepository businessDataRepository) throws SCommandExecutionException {
         final Method method;
         final Object invoke;
         try {
@@ -153,7 +154,8 @@ public class GetBusinessDataByIdCommand extends TenantCommand {
         }
 
         if (invoke instanceof Entity) {
-            return serializeResult((Entity) invoke, businessDataURIPattern);
+            final Entity child = businessDataRepository.unproxy((Entity) invoke);
+            return serializeResult(child, businessDataURIPattern);
         } else {
             if (invoke instanceof List) {
             final Class<?> type = (Class<?>) ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0];
