@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -16,6 +16,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorExecutionException;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.connector.ConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.bpm.connector.ConnectorNotFoundException;
+import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
@@ -36,6 +37,7 @@ import org.bonitasoft.engine.session.InvalidSessionException;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.Index;
 import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
+import com.bonitasoft.engine.businessdata.BusinessDataReference;
 
 /**
  * {@link ProcessRuntimeAPI} extends {@link org.bonitasoft.engine.api.ProcessRuntimeAPI} and adds capabilities on Manual tasks, connector execution (directly
@@ -134,22 +136,22 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * Execute connector in given activity instance.
      *
      * @param connectorDefinitionId
-     *            Identifier of connector definition
+     *        Identifier of connector definition
      * @param connectorDefinitionVersion
-     *            version of the connector definition
+     *        version of the connector definition
      * @param connectorInputParameters
-     *            all expressions related with the connector
+     *        all expressions related with the connector
      * @param inputValues
-     *            all parameters values for expression need when evalute the connector
+     *        all parameters values for expression need when evaluate the connector
      * @param activityInstanceId
-     *            Identifier of the activity instance
+     *        Identifier of the activity instance
      * @return a map with connector parameter name and parameter value object
      * @throws ConnectorExecutionException
-     *             if the connector failed to execute properly.
+     *         if the connector failed to execute properly.
      * @throws ConnectorNotFoundException
-     *             if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
+     *         if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
      * @throws InvalidSessionException
-     *             if the session is invalid, e.g. the session has expired.
+     *         if the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
     Map<String, Serializable> executeConnectorOnActivityInstance(String connectorDefinitionId, String connectorDefinitionVersion,
@@ -190,22 +192,22 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * Execute connector in given activity instance finished.
      *
      * @param connectorDefinitionId
-     *            Identifier of connector definition
+     *        Identifier of connector definition
      * @param connectorDefinitionVersion
-     *            version of the connector definition
+     *        version of the connector definition
      * @param connectorInputParameters
-     *            all expressions related with the connector
+     *        all expressions related with the connector
      * @param inputValues
-     *            all parameters values for expression need when evalute the connector
+     *        all parameters values for expression need when evaluate the connector
      * @param activityInstanceId
-     *            Identifier of the activity instance
+     *        Identifier of the activity instance
      * @return a map with connector parameter name and parameter value object
      * @throws ConnectorExecutionException
-     *             if the connector failed to execute properly.
+     *         if the connector failed to execute properly.
      * @throws ConnectorNotFoundException
-     *             if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
+     *         if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
      * @throws InvalidSessionException
-     *             if the session is invalid, e.g. the session has expired.
+     *         if the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
     Map<String, Serializable> executeConnectorOnCompletedActivityInstance(String connectorDefinitionId, String connectorDefinitionVersion,
@@ -216,26 +218,26 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * Execute connector in given activity instance finished.
      *
      * @param connectorDefinitionId
-     *            Identifier of connector definition
+     *        Identifier of connector definition
      * @param connectorDefinitionVersion
-     *            version of the connector definition
+     *        version of the connector definition
      * @param connectorInputParameters
-     *            all expressions related with the connector
+     *        all expressions related with the connector
      * @param inputValues
-     *            all parameters values for expression need when evalute the connector
+     *        all parameters values for expression need when evaluate the connector
      * @param operations
-     *            map of operations having each a special context (input values)
+     *        map of operations having each a special context (input values)
      * @param operationsInputValues
-     *            the map of input name-value pairs used by operation executions.
+     *        the map of input name-value pairs used by operation executions.
      * @param activityInstanceId
-     *            Identifier of the activity instance
+     *        Identifier of the activity instance
      * @return a map with new values of elements set by the operations
      * @throws ConnectorExecutionException
-     *             if the connector failed to execute properly.
+     *         if the connector failed to execute properly.
      * @throws ConnectorNotFoundException
-     *             if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
+     *         if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
      * @throws InvalidSessionException
-     *             if the session is invalid, e.g. the session has expired.
+     *         if the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
     Map<String, Serializable> executeConnectorOnCompletedActivityInstance(String connectorDefinitionId, String connectorDefinitionVersion,
@@ -246,22 +248,22 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * Execute connector in given process instance finished.
      *
      * @param connectorDefinitionId
-     *            Identifier of connector definition
+     *        Identifier of connector definition
      * @param connectorDefinitionVersion
-     *            version of the connector definition
+     *        version of the connector definition
      * @param connectorInputParameters
-     *            all expressions related with the connector
+     *        all expressions related with the connector
      * @param inputValues
-     *            all parameters values for expression need when evalute the connector
+     *        all parameters values for expression need when evaluate the connector
      * @param processInstanceId
-     *            Identifier of the process instance
+     *        Identifier of the process instance
      * @return a map with connector parameter name and parameter value object
      * @throws ConnectorExecutionException
-     *             if the connector failed to execute properly.
+     *         if the connector failed to execute properly.
      * @throws ConnectorNotFoundException
-     *             if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
+     *         if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
      * @throws InvalidSessionException
-     *             if the session is invalid, e.g. the session has expired.
+     *         if the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
     Map<String, Serializable> executeConnectorOnCompletedProcessInstance(String connectorDefinitionId, String connectorDefinitionVersion,
@@ -272,26 +274,26 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * Execute connector in given process instance finished with operations.
      *
      * @param connectorDefinitionId
-     *            Identifier of connector definition
+     *        Identifier of connector definition
      * @param connectorDefinitionVersion
-     *            version of the connector definition
+     *        version of the connector definition
      * @param connectorInputParameters
-     *            all expressions related with the connector
+     *        all expressions related with the connector
      * @param inputValues
-     *            all parameters values for expression need when evalute the connector
+     *        all parameters values for expression need when evaluate the connector
      * @param operations
-     *            map of operations having each a special context (input values)
+     *        map of operations having each a special context (input values)
      * @param operationsInputValues
-     *            the map of input name-value pairs used by operation executions.
+     *        the map of input name-value pairs used by operation executions.
      * @param processInstanceId
-     *            Identifier of the process instance
+     *        Identifier of the process instance
      * @return a map with new values of elements set by the operations
      * @throws ConnectorExecutionException
-     *             if the connector failed to execute properly.
+     *         if the connector failed to execute properly.
      * @throws ConnectorNotFoundException
-     *             if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
+     *         if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
      * @throws InvalidSessionException
-     *             if the session is invalid, e.g. the session has expired.
+     *         if the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
     Map<String, Serializable> executeConnectorOnCompletedProcessInstance(String connectorDefinitionId, String connectorDefinitionVersion,
@@ -302,22 +304,22 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * Execute connector in given process instance.
      *
      * @param connectorDefinitionId
-     *            Identifier of connector definition
+     *        Identifier of connector definition
      * @param connectorDefinitionVersion
-     *            version of the connector definition
+     *        version of the connector definition
      * @param connectorInputParameters
-     *            all expressions related with the connector
+     *        all expressions related with the connector
      * @param inputValues
-     *            all parameters values for expression need when evalute the connector
+     *        all parameters values for expression need when evaluate the connector
      * @param processInstanceId
-     *            Identifier of the process instance
+     *        Identifier of the process instance
      * @return a map with connector parameter name and parameter value object
      * @throws ConnectorExecutionException
-     *             if the connector failed to execute properly.
+     *         if the connector failed to execute properly.
      * @throws ConnectorNotFoundException
-     *             if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
+     *         if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
      * @throws InvalidSessionException
-     *             if the session is invalid, e.g. the session has expired.
+     *         if the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
     Map<String, Serializable> executeConnectorOnProcessInstance(String connectorDefinitionId, String connectorDefinitionVersion,
@@ -328,26 +330,26 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * Execute connector in given process instance with operations
      *
      * @param connectorDefinitionId
-     *            Identifier of connector definition
+     *        Identifier of connector definition
      * @param connectorDefinitionVersion
-     *            version of the connector definition
+     *        version of the connector definition
      * @param connectorInputParameters
-     *            all expressions related with the connector
+     *        all expressions related with the connector
      * @param inputValues
-     *            all parameters values for expression need when evalute the connector
+     *        all parameters values for expression need when evaluate the connector
      * @param processInstanceId
-     *            Identifier of the process instance
+     *        Identifier of the process instance
      * @param operations
-     *            map of operations having each a special context (input values)
+     *        map of operations having each a special context (input values)
      * @param operationsInputValues
-     *            the map of input name-value pairs used by operation executions.
+     *        the map of input name-value pairs used by operation executions.
      * @return a map with new values of elements set by the operations
      * @throws ConnectorExecutionException
-     *             if the connector failed to execute properly.
+     *         if the connector failed to execute properly.
      * @throws ConnectorNotFoundException
-     *             if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
+     *         if the connector cannot be found with the provided connectorDefinitionId + connectorDefinitionVersion
      * @throws InvalidSessionException
-     *             if the session is invalid, e.g. the session has expired.
+     *         if the session is invalid, e.g. the session has expired.
      * @since 6.0
      */
     Map<String, Serializable> executeConnectorOnProcessInstance(String connectorDefinitionId, String connectorDefinitionVersion,
@@ -451,5 +453,36 @@ public interface ProcessRuntimeAPI extends org.bonitasoft.engine.api.ProcessRunt
      * @since 6.3
      */
     SearchResult<FlowNodeInstance> searchFlowNodeInstancesSupervisedBy(long supervisorId, SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Returns the {@link BusinessDataReference} of the named business data of the process instance.
+     * The value is returned in a DataInstance object.
+     *
+     * @param businessDataName
+     *        The name of the business data
+     * @param processInstanceId
+     *        The identifier of the process instance
+     * @return the reference of the business data
+     * @throws InvalidSessionException
+     *         If the session is invalid, e.g. the session has expired.
+     * @throws DataNotFoundException
+     *         If the specified business data value cannot be found.
+     * @since 6.4
+     */
+    BusinessDataReference getProcessBusinessDataReference(String businessDataName, long processInstanceId) throws DataNotFoundException;
+
+    /**
+     * Lists the paginated @link BusinessDataReference}s of the process instance order by identifier.
+     *
+     * @param processInstanceId
+     *        The identifier of the process instance
+     * @param startIndex
+     *        the index of the first result (starting from 0).
+     * @param maxResults
+     *        the maximum number of result per page
+     * @return the paginated references of the business data
+     * @since 6.4
+     */
+    List<BusinessDataReference> getProcessBusinessDataReferences(long processInstanceId, int startIndex, int maxResults);
 
 }
