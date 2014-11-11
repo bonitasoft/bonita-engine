@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bonita-classloader</artifactId>
 		<groupId>com.bonitasoft.engine.classloader</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.4.0.alpha-01</version>
 	</parent>
 
 	<artifactId>bonita-classloader-clustered</artifactId>
