@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-supervisor-mapping</artifactId>
 		<groupId>org.bonitasoft.engine.core.supervisor.mapping</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.4.0_TEST</version>
 	</parent>
 
 	<artifactId>bonita-supervisor-mapping-api</artifactId>
