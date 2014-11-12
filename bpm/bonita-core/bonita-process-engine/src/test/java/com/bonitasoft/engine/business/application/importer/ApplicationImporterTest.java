@@ -99,7 +99,7 @@ public class ApplicationImporterTest {
         given(applicationService.getApplicationPage("app", "home")).willReturn(applicationPage);
 
         ImportError errorPage = mock(ImportError.class);
-        List<ImportError> errorsMenu = Arrays.asList(mock(ImportError.class));
+        List<ImportError> errorsMenu = Arrays.asList(mock(ImportError.class), mock(ImportError.class));
         given(applicationPageImporter.importApplicationPage(pageNode1, app)).willReturn(errorPage);
         given(applicationMenuImporter.importApplicationMenu(menu1, app, null)).willReturn(errorsMenu);
 
@@ -122,8 +122,8 @@ public class ApplicationImporterTest {
         //add menus
         verify(applicationMenuImporter, times(1)).importApplicationMenu(menu1, app, null);
         verify(applicationMenuImporter, times(1)).importApplicationMenu(menu2, app, null);
-        verify(importStatus, times(1)).addErrors(errorsMenu);
-        verify(importStatus, never()).addError(null);
+        verify(importStatus, times(1)).addError(errorsMenu.get(0));
+        verify(importStatus, times(1)).addError(errorsMenu.get(1));
 
         //set home page
         ArgumentCaptor<EntityUpdateDescriptor> updateCaptor = ArgumentCaptor.forClass(EntityUpdateDescriptor.class);
@@ -133,7 +133,40 @@ public class ApplicationImporterTest {
     }
 
     @Test
-    public void importApplication_should_not_set_home_page_when_applicationNod_does_not_have_home_page() throws Exception {
+    public void importApplication_should_not_add_error_when_error_already_exists() throws Exception {
+        //given
+        long createdBy = 5L;
+        SApplication app = mock(SApplication.class);
+
+        ImportResult importResult = mock(ImportResult.class);
+        given(importResult.getApplication()).willReturn(app);
+        ImportStatus importStatus = new ImportStatus("app");
+        ImportError errorPage = new ImportError("home", ImportError.Type.PAGE);
+        importStatus.addError(errorPage);
+
+        given(importResult.getImportStatus()).willReturn(importStatus);
+
+        ApplicationPageNode pageNode1 = mock(ApplicationPageNode.class);
+
+        ApplicationNode applicationNode = new ApplicationNode();
+        applicationNode.addApplicationPage(pageNode1);
+        given(applicationNodeConverter.toSApplication(applicationNode, createdBy)).willReturn(importResult);
+
+        given(applicationPageImporter.importApplicationPage(pageNode1, app)).willReturn(errorPage);
+
+        given(applicationService.createApplication(app)).willReturn(app);
+
+        //when
+        ImportStatus retrievedStatus = applicationImporter.importApplication(applicationNode, createdBy);
+
+        //then
+        assertThat(retrievedStatus).isEqualTo(importResult.getImportStatus());
+        assertThat(retrievedStatus.getErrors()).containsExactly(errorPage);
+
+    }
+
+    @Test
+    public void importApplication_should_not_set_home_page_when_applicationNode_does_not_have_home_page() throws Exception {
         //given
         long createdBy = 5L;
         SApplication app = mock(SApplication.class);

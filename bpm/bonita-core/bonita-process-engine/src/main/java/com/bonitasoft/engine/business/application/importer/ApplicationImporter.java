@@ -71,7 +71,7 @@ public class ApplicationImporter {
                 updateBuilder.updateHomePageId(homePage.getId());
                 applicationService.updateApplication(application, updateBuilder.done());
             } catch (SObjectNotFoundException e) {
-                importResult.getImportStatus().addError(new ImportError(applicationNode.getHomePage(), ImportError.Type.APPLICATION_PAGE));
+                addError(importResult.getImportStatus(), new ImportError(applicationNode.getHomePage(), ImportError.Type.APPLICATION_PAGE));
             }
         }
     }
@@ -80,7 +80,9 @@ public class ApplicationImporter {
             throws ImportException {
         for (ApplicationMenuNode applicationMenuNode : applicationNode.getApplicationMenus()) {
             List<ImportError> importErrors = applicationMenuImporter.importApplicationMenu(applicationMenuNode, application, null);
-            importResult.getImportStatus().addErrors(importErrors);
+            for (ImportError importError : importErrors) {
+                addError(importResult.getImportStatus(), importError);
+            }
         }
     }
 
@@ -88,9 +90,13 @@ public class ApplicationImporter {
             throws ImportException {
         for (ApplicationPageNode applicationPageNode : applicationNode.getApplicationPages()) {
             ImportError importError = applicationPageImporter.importApplicationPage(applicationPageNode, application);
-            if (importError != null) {
-                importResult.getImportStatus().addError(importError);
-            }
+            addError(importResult.getImportStatus(), importError);
+        }
+    }
+
+    private void addError(final ImportStatus importStatus, final ImportError importError) {
+        if (importError != null && !importStatus.getErrors().contains(importError)) {
+            importStatus.addError(importError);
         }
     }
 
