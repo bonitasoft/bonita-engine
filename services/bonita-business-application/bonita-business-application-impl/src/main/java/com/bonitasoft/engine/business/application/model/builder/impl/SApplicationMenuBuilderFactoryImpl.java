@@ -25,33 +25,38 @@ import com.bonitasoft.engine.business.application.model.impl.SApplicationMenuImp
 public class SApplicationMenuBuilderFactoryImpl implements SApplicationMenuBuilderFactory {
 
     @Override
-    public SApplicationMenuBuilder createNewInstance(final String displayName, final long applicationPageId, final int index) {
-        return new SApplicationMenuBuilderImpl(new SApplicationMenuImpl(displayName, applicationPageId, index));
+    public SApplicationMenuBuilder createNewInstance(final String displayName, long applicationId, final Long applicationPageId, final int index) {
+        return new SApplicationMenuBuilderImpl(new SApplicationMenuImpl(displayName, applicationId, applicationPageId, index));
     }
 
     @Override
     public String getIdKey() {
-        return "id";
+        return SApplicationMenuFields.ID;
     }
 
     @Override
     public String getDisplayNameKey() {
-        return "displayName";
+        return SApplicationMenuFields.DISPLAY_NAME;
+    }
+
+    @Override
+    public String getApplicationIdKey() {
+        return SApplicationMenuFields.APPLICAITON_ID;
     }
 
     @Override
     public String getApplicationPageIdKey() {
-        return "applicationPageId";
+        return SApplicationMenuFields.APPLICATION_PAGE_ID;
     }
 
     @Override
     public String getParentIdKey() {
-        return "parentId";
+        return SApplicationMenuFields.PARENT_ID;
     }
 
     @Override
     public String getIndexKey() {
-        return "index";
+        return SApplicationMenuFields.INDEX;
     }
 
 

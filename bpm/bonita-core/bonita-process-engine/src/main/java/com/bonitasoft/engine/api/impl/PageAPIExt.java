@@ -156,7 +156,7 @@ public class PageAPIExt implements PageAPI {
             final SPage addPage = pageService.addPage(content, contentName, userId);
             return convertToPage(addPage);
         } catch (final SObjectAlreadyExistsException e) {
-            throw new AlreadyExistsException("A page already exists with the name ");
+            throw new AlreadyExistsException("A page already exists with the name defined in page zip content");
         } catch (final SInvalidPageTokenException e) {
             throw new InvalidPageTokenException(e.getMessage(), e);
         } catch (final SInvalidPageZipException e) {
