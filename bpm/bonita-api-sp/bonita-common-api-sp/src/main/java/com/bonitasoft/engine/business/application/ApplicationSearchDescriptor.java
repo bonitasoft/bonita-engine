@@ -8,31 +8,81 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.application;
 
+import org.bonitasoft.engine.search.SearchOptions;
+
+import com.bonitasoft.engine.api.ApplicationAPI;
+
 /**
+ * Defines the fields that can be used in the {@link SearchOptions} when searching for {@link Application}s
+ *
  * @author Elias Ricken de Medeiros
+ * @since 6.4
+ * @see SearchOptions
+ * @see Application
+ * @see ApplicationAPI#searchApplications(SearchOptions)
  */
 public class ApplicationSearchDescriptor {
 
+    /**
+     * Used to filter or order by the <code>Application</code> identifier
+     */
     public static final String ID = "id";
 
-    public static final String NAME = "name";
+    /**
+     * Used to filter or order by the <code>Application</code> token
+     */
+    public static final String TOKEN = "token";
 
+    /**
+     * Used to filter or order by the <code>Application</code> display name
+     */
     public static final String DISPLAY_NAME = "displayName";
 
+    /**
+     * Used to filter or order by the <code>Application</code> version
+     */
     public static final String VERSION = "version";
 
-    public static final String PATH = "path";
-
+    /**
+     * Used to filter or order by the <code>Application</code> icon path
+     */
     public static final String ICON_PATH = "iconPath";
 
+    /**
+     * Used to filter or order by the <code>Application</code> creation date
+     */
     public static final String CREATION_DATE = "creationDate";
 
+    /**
+     * Used to filter or order by the identifier of the user that created the <code>Application</code>
+     */
     public static final String CREATED_BY = "createdBy";
 
+    /**
+     * Used to filter or order by the <code>Application</code> last update date
+     */
     public static final String LAST_UPDATE_DATE = "lastUpdateDate";
 
+    /**
+     * Used to filter or order by the identifier of the user that last updated the <code>Application</code>
+     */
     public static final String UPDATED_BY = "updatedBy";
 
+    /**
+     * Used to filter or order by the <code>Application</code> state. The possible values are {@link ApplicationState#ACTIVATED#name()} and
+     * {@link ApplicationState#DEACTIVATED
+     * #name()}
+     *
+     * @see ApplicationState
+     */
     public static final String STATE = "state";
+
+    /**
+     * Used to filter or order by the identifier of {@link org.bonitasoft.engine.profile.Profile} associated to the {@link com.bonitasoft.engine.business.application.Application}.
+     *
+     * @see org.bonitasoft.engine.profile.Profile
+     * @see com.bonitasoft.engine.business.application.Application
+     */
+    public static final String PROFILE_ID = "profileId";
 
 }

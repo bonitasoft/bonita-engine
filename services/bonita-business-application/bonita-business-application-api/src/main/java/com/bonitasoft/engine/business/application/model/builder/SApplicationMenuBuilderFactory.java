@@ -20,11 +20,13 @@ package com.bonitasoft.engine.business.application.model.builder;
  */
 public interface SApplicationMenuBuilderFactory {
 
-    SApplicationMenuBuilder createNewInstance(String displayName, long applicationPageId, int index);
+    SApplicationMenuBuilder createNewInstance(String displayName, long applicationId, Long applicationPageId, int index);
 
     String getIdKey();
 
     String getDisplayNameKey();
+
+    String getApplicationIdKey();
 
     String getApplicationPageIdKey();
 

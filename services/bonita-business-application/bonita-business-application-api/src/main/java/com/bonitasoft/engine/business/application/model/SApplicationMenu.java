@@ -24,7 +24,9 @@ public interface SApplicationMenu extends PersistentObject {
 
     String getDisplayName();
 
-    long getApplicationPageId();
+    long getApplicationId();
+
+    Long getApplicationPageId();
 
     Long getParentId();
 
