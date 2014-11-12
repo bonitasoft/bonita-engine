@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,11 +13,11 @@
  **/
 package org.bonitasoft.engine.core.document.model.builder;
 
-
 /**
  * @author Nicolas Chabanoles
  * @author Zhang Bole
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public interface SDocumentBuilderFactory {
 
@@ -37,7 +37,11 @@ public interface SDocumentBuilderFactory {
 
     String getURLKey();
 
-    SDocumentBuilder createNewInstance();
+    SDocumentBuilder createNewInstance(String fileName, String mimetype, long authorId);
+
+    SDocumentBuilder createNewProcessDocument(String fileName, String mimetype, long authorId, byte[] content);
+
+    SDocumentBuilder createNewExternalProcessDocumentReference(String fileName, String mimetype, long authorId, final String url);
 
     String getDescriptionKey();
 

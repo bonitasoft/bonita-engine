@@ -43,7 +43,7 @@ public class AbortProcessInstanceTest extends AbstractProcessInstanceTest {
         final String taskName1 = "userTask1";
         final String taskName2 = "userTask2";
         final String autoTaskName = "auto1";
-        final ProcessDefinition targetProcess = deployProcessWith2UserTasksAnd1AutoTask("delivery", taskName1, taskName2, autoTaskName);
+        final ProcessDefinition targetProcess = deployProcessWith2UserTasksAnd1AutoTask(taskName1, taskName2, autoTaskName);
         final int loopCardinality = 2;
         final ProcessDefinition parentProcess = deployProcessWithMultiInstanceCallActivity(loopCardinality, targetProcess.getName(), targetProcess.getVersion());
         final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(parentProcess.getId());

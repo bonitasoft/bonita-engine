@@ -98,11 +98,8 @@ public class DocumentHelper {
     }
 
     public SDocument createDocumentObject(final DocumentValue documentValue, final long authorId) {
-        final SDocumentBuilder processDocumentBuilder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance();
-        processDocumentBuilder.setFileName(documentValue.getFileName());
-        processDocumentBuilder.setMimeType(documentValue.getMimeType());
-        processDocumentBuilder.setAuthor(authorId);
-        processDocumentBuilder.setCreationDate(System.currentTimeMillis());
+        final SDocumentBuilder processDocumentBuilder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance(documentValue.getFileName(),
+                documentValue.getMimeType(), authorId);
         processDocumentBuilder.setHasContent(documentValue.hasContent());
         processDocumentBuilder.setURL(documentValue.getUrl());
         processDocumentBuilder.setContent(documentValue.getContent());

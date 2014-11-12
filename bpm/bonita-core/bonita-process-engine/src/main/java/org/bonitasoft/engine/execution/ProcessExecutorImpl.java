@@ -47,7 +47,6 @@ import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadExce
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
-import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilder;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -522,41 +521,17 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
             final String url, final long authorId, final String description, final int index) throws SObjectCreationException, SObjectAlreadyExistsException {
-        final SDocument attachment = buildExternalProcessDocumentReference(fileName, mimeType, authorId, url);
+        final SDocument attachment = BuilderFactory.get(SDocumentBuilderFactory.class)
+                .createNewExternalProcessDocumentReference(fileName, mimeType, authorId, url).done();
         return documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, description, index);
     }
 
     protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
             final byte[] documentContent, final long authorId, final String description, final int index) throws SObjectCreationException,
             SObjectAlreadyExistsException {
-        final SDocument attachment = buildProcessDocument(fileName, mimeType, authorId, documentContent);
+        final SDocument attachment = BuilderFactory.get(SDocumentBuilderFactory.class).createNewProcessDocument(fileName, mimeType, authorId, documentContent)
+                .done();
         return documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, description, index);
-    }
-
-    private SDocument buildExternalProcessDocumentReference(final String fileName,
-            final String mimeType, final long authorId, final String url) {
-        final SDocumentBuilder documentBuilder = initDocumentBuilder(fileName, mimeType, authorId);
-        documentBuilder.setURL(url);
-        documentBuilder.setHasContent(false);
-        return documentBuilder.done();
-    }
-
-    private SDocument buildProcessDocument(final String fileName, final String mimetype,
-            final long authorId, final byte[] content) {
-        final SDocumentBuilder documentBuilder = initDocumentBuilder(fileName, mimetype, authorId);
-        documentBuilder.setHasContent(true);
-        documentBuilder.setContent(content);
-        return documentBuilder.done();
-    }
-
-    private SDocumentBuilder initDocumentBuilder(final String fileName, final String mimetype,
-            final long authorId) {
-        final SDocumentBuilder documentBuilder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance();
-        documentBuilder.setFileName(fileName);
-        documentBuilder.setMimeType(mimetype);
-        documentBuilder.setAuthor(authorId);
-        documentBuilder.setCreationDate(System.currentTimeMillis());
-        return documentBuilder;
     }
 
     @Override

@@ -1023,19 +1023,6 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     @Deprecated
-    public WaitForStep waitForStep(final String taskName, final ProcessInstance processInstance, final TestStates states) throws Exception {
-        return waitForStep(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, taskName, processInstance, states);
-    }
-
-    @Deprecated
-    private WaitForStep waitForStep(final int repeatEach, final int timeout, final String taskName, final ProcessInstance processInstance,
-            final TestStates state) throws Exception {
-        final WaitForStep waitForStep = new WaitForStep(repeatEach, timeout, taskName, processInstance.getId(), state, getProcessAPI());
-        assertTrue("Task " + taskName + " not found", waitForStep.waitUntil());
-        return waitForStep;
-    }
-
-    @Deprecated
     public WaitForActivity waitForActivity(final String activityName, final ProcessInstance processInstance) throws Exception {
         return waitForActivity(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, activityName, processInstance);
     }

@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.execution.archive;
 
+import java.text.MessageFormat;
+import java.util.List;
+
 import org.bonitasoft.engine.SArchivingException;
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
@@ -67,9 +70,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
-
-import java.text.MessageFormat;
-import java.util.List;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -197,7 +197,7 @@ public class ProcessArchiver {
             }
             if (sComments != null) {
                 for (final SComment sComment : sComments) {
-                    archiveComment(processDefinition, processInstance, archiveService, logger, archiveDate, sComment);
+                    archiveComment(processDefinition, processInstance, archiveService, archiveDate, sComment);
                 }
             }
             startIndex += BATCH_SIZE;
@@ -205,7 +205,7 @@ public class ProcessArchiver {
     }
 
     private static void archiveComment(final SProcessDefinition processDefinition, final SProcessInstance processInstance, final ArchiveService archiveService,
-            final TechnicalLoggerService logger, final long archiveDate, final SComment sComment) throws SArchivingException {
+            final long archiveDate, final SComment sComment) throws SArchivingException {
         final SAComment saComment = BuilderFactory.get(SACommentBuilderFactory.class).createNewInstance(sComment).done();
         if (saComment != null) {
             final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saComment);
@@ -237,12 +237,10 @@ public class ProcessArchiver {
         }
     }
 
-
-
     private static void archiveFlowNodeInstance(final SFlowNodeInstance flowNodeInstance, final ArchiveService archiveService, final long archiveDate)
             throws SArchivingException {
         try {
-            SAFlowNodeInstance saFlowNodeInstance = getArchivedObject(flowNodeInstance);
+            final SAFlowNodeInstance saFlowNodeInstance = getArchivedObject(flowNodeInstance);
             if (saFlowNodeInstance != null) {
                 final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saFlowNodeInstance);
                 archiveService.recordInsert(archiveDate, insertRecord);
@@ -252,7 +250,7 @@ public class ProcessArchiver {
         }
     }
 
-    private static SAFlowNodeInstance getArchivedObject(SFlowNodeInstance flowNodeInstance) {
+    private static SAFlowNodeInstance getArchivedObject(final SFlowNodeInstance flowNodeInstance) {
         SAFlowNodeInstance saFlowNodeInstance = null;
         switch (flowNodeInstance.getType()) {// TODO archive other flow node
             case AUTOMATIC_TASK:
@@ -313,7 +311,6 @@ public class ProcessArchiver {
         return saFlowNodeInstance;
     }
 
-
     private static void deleteLocalDataInstancesFromActivityInstance(final SFlowNodeInstance flowNodeInstance, final DataInstanceService dataInstanceService)
             throws SDataInstanceException {
         List<SDataInstance> dataInstances;
@@ -369,8 +366,8 @@ public class ProcessArchiver {
 
     }
 
-    public static boolean willBeArchived(SFlowNodeInstance flowNodeInstance, ArchiveService archiveService) {
-        SFlowNodeType type = flowNodeInstance.getType();
+    public static boolean willBeArchived(final SFlowNodeInstance flowNodeInstance, final ArchiveService archiveService) {
+        final SFlowNodeType type = flowNodeInstance.getType();
         return type != SFlowNodeType.END_EVENT
                 && type != SFlowNodeType.START_EVENT
                 && type != SFlowNodeType.BOUNDARY_EVENT

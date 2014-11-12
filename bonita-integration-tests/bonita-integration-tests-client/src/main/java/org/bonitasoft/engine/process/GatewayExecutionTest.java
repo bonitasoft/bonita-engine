@@ -95,7 +95,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         // create gateway instance and transition instance and archive them
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
 
-        waitForStep("step4", processInstance, TestStates.READY);
+        waitForUserTask("step4", processInstance);
 
         // test gateway instance, gateway instance has been deleted after archive
         final SearchOptionsBuilder builder0 = new SearchOptionsBuilder(0, 10);
