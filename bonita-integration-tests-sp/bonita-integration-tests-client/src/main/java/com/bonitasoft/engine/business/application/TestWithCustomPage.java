@@ -31,10 +31,8 @@ import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.page.PageCreator;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class TestWithCustomPage extends CommonAPISPTest {
 

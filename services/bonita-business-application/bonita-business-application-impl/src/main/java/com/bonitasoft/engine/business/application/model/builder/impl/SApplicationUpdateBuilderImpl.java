@@ -1,34 +1,29 @@
-/**
+/*******************************************************************************
  * Copyright (C) 2014 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
- * This library is free software; you can redistribute it and/or modify it under the terms
- * of the GNU Lesser General Public License as published by the Free Software Foundation
- * version 2.1 of the License.
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License along with this
- * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301, USA.
- **/
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ ******************************************************************************/
 package com.bonitasoft.engine.business.application.model.builder.impl;
 
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
-import com.bonitasoft.engine.business.application.impl.SApplicationFields;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
-
 
 /**
  * @author Elias Ricken de Medeiros
- *
+ * @author Emmanuel Duchastenier
  */
 public class SApplicationUpdateBuilderImpl implements SApplicationUpdateBuilder {
 
     private final EntityUpdateDescriptor descriptor;
 
-    public SApplicationUpdateBuilderImpl(final EntityUpdateDescriptor descriptor) {
-        this.descriptor = descriptor;
+    public SApplicationUpdateBuilderImpl(final long updaterUserId) {
+        descriptor = new EntityUpdateDescriptor();
+        descriptor.addField(SApplicationFields.UPDATED_BY, updaterUserId);
+        descriptor.addField(SApplicationFields.LAST_UPDATE_DATE, System.currentTimeMillis());
     }
 
     @Override
@@ -37,14 +32,8 @@ public class SApplicationUpdateBuilderImpl implements SApplicationUpdateBuilder 
     }
 
     @Override
-    public SApplicationUpdateBuilder updateHomePageId(final long applicationPageId) {
-        descriptor.addField(SApplicationFields.HOME_PAGE_ID, applicationPageId);
-        return this;
-    }
-
-    @Override
-    public SApplicationUpdateBuilder updateName(final String name) {
-        descriptor.addField(SApplicationFields.NAME, name);
+    public SApplicationUpdateBuilder updateToken(final String token) {
+        descriptor.addField(SApplicationFields.TOKEN, token);
         return this;
     }
 
@@ -57,12 +46,6 @@ public class SApplicationUpdateBuilderImpl implements SApplicationUpdateBuilder 
     @Override
     public SApplicationUpdateBuilder updateVersion(final String version) {
         descriptor.addField(SApplicationFields.VERSION, version);
-        return this;
-    }
-
-    @Override
-    public SApplicationUpdateBuilder updatePath(final String path) {
-        descriptor.addField(SApplicationFields.PATH, path);
         return this;
     }
 
@@ -91,8 +74,8 @@ public class SApplicationUpdateBuilderImpl implements SApplicationUpdateBuilder 
     }
 
     @Override
-    public SApplicationUpdateBuilder updateUpdatedBy(final Long updaterUserId) {
-        descriptor.addField(SApplicationFields.UPDATED_BY, updaterUserId);
+    public SApplicationUpdateBuilder updateHomePageId(final Long homePageId) {
+        descriptor.addField(SApplicationFields.HOME_PAGE_ID, homePageId);
         return this;
     }
 

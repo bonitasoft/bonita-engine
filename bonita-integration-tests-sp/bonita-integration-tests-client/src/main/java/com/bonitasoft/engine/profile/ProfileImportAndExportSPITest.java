@@ -157,14 +157,6 @@ public class ProfileImportAndExportSPITest extends AbstractProfileSPTest {
         }
     }
 
-    private void assertThatXmlHaveNoDifferences(final String xmlPrettyFormatExpected, final String xmlPrettyFormatExported) throws SAXException, IOException {
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setIgnoreAttributeOrder(true);
-        final DetailedDiff diff = new DetailedDiff(XMLUnit.compareXML(xmlPrettyFormatExported, xmlPrettyFormatExpected));
-        final List<?> allDifferences = diff.getAllDifferences();
-        assertThat(allDifferences).as("should have no differences between:\n%s\n and:\n%s\n", xmlPrettyFormatExpected, xmlPrettyFormatExported).isEmpty();
-    }
-
     @Test
     public void exportImportProfile_with_custom_page() throws Exception {
         final String profileName = "custom profile";

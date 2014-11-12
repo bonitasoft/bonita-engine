@@ -17,13 +17,13 @@ import com.bonitasoft.engine.TestsInitializerSP;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-    ApplicationAPIApplicationIT.class,
-    ApplicationAPIApplicationPageIT.class,
-    ApplicationAPIApplicationMenuIT.class
+        ApplicationAPIApplicationIT.class,
+        ApplicationAPIApplicationPageIT.class,
+        ApplicationAPIApplicationMenuIT.class,
+        ApplicationAPIImportExportIT.class
 })
 @Initializer(TestsInitializerSP.class)
 public class ApplicationAPIITs {

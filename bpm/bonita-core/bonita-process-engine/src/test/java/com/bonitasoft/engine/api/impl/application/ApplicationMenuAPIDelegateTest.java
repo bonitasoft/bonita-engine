@@ -2,7 +2,10 @@ package com.bonitasoft.engine.api.impl.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -13,7 +16,9 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.search.SearchResult;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,13 +26,16 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
+import com.bonitasoft.engine.api.impl.convertor.ApplicationMenuConvertor;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationMenus;
+import com.bonitasoft.engine.api.impl.validator.ApplicationMenuCreatorValidator;
 import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import com.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
+import com.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.impl.ApplicationMenuImpl;
+import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationMenuImpl;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
@@ -38,7 +46,10 @@ public class ApplicationMenuAPIDelegateTest {
     private TenantServiceAccessor accessor;
 
     @Mock
-    private ApplicationConvertor convertor;
+    private ApplicationMenuConvertor convertor;
+
+    @Mock
+    private ApplicationMenuCreatorValidator creatorValidator;
 
     @Mock
     private SearchApplicationMenus searchApplicatonMenus;
@@ -51,21 +62,73 @@ public class ApplicationMenuAPIDelegateTest {
 
     private ApplicationMenuAPIDelegate delegate;
 
+    private static final long APPLICATION_ID = 34;
+
     private static final long APPLICATION_PAGE_ID = 35;
 
     @Before
     public void setUp() throws Exception {
         given(accessor.getApplicationService()).willReturn(applicationService);
-        delegate = new ApplicationMenuAPIDelegate(accessor, convertor, searchApplicatonMenus);
+        delegate = new ApplicationMenuAPIDelegate(accessor, convertor, searchApplicatonMenus, creatorValidator, 911L);
+        given(creatorValidator.isValid(any(ApplicationMenuCreator.class))).willReturn(true);
     }
 
     @Test
-    public void createApplicationMenu_should_call_applicationService_createApplicationMenu_and_return_created_applicationMenu() throws Exception {
+    public void createApplicationMenu_should_update_application() throws Exception {
+        // given
+        final ApplicationMenuCreator creator = new ApplicationMenuCreator(APPLICATION_ID, "Main", APPLICATION_PAGE_ID);
+        final SApplicationMenu sAppMenu = mock(SApplicationMenu.class);
+        given(sAppMenu.getApplicationId()).willReturn(APPLICATION_ID);
+        given(applicationService.getNextAvailableIndex(null)).willReturn(5);
+        given(convertor.buildSApplicationMenu(creator, 5)).willReturn(sAppMenu);
+        given(applicationService.createApplicationMenu(sAppMenu)).willReturn(sAppMenu);
+
+        //when
+        delegate.createApplicationMenu(creator);
+
+        //then
+        verify(applicationService).updateApplication(eq(APPLICATION_ID), any(EntityUpdateDescriptor.class));
+    }
+
+    @Test
+    public void updateApplicationMenu_should_update_application() throws Exception {
+        // given
+        final SApplicationMenu sAppMenu = mock(SApplicationMenu.class);
+        given(sAppMenu.getApplicationId()).willReturn(APPLICATION_ID);
+        given(sAppMenu.getId()).willReturn(9811L);
+        given(applicationService.updateApplicationMenu(eq(sAppMenu.getId()), any(EntityUpdateDescriptor.class))).willReturn(sAppMenu);
+
+        //when
+        delegate.updateApplicationMenu(sAppMenu.getId(), mock(ApplicationMenuUpdater.class));
+
+        //then
+        verify(applicationService).updateApplication(eq(APPLICATION_ID), any(EntityUpdateDescriptor.class));
+    }
+
+    @Test
+    public void deleteApplicationMenu_should_update_application() throws Exception {
+        // given
+        final SApplicationMenu sAppMenu = mock(SApplicationMenu.class);
+        given(sAppMenu.getApplicationId()).willReturn(APPLICATION_ID);
+        given(sAppMenu.getId()).willReturn(9811L);
+        given(applicationService.deleteApplicationMenu(sAppMenu.getId())).willReturn(sAppMenu);
+
+        //when
+        delegate.deleteApplicationMenu(sAppMenu.getId());
+
+        //then
+        verify(applicationService).updateApplication(eq(APPLICATION_ID), any(EntityUpdateDescriptor.class));
+    }
+
+    @Test
+    public void createApplicationMenu_with_no_parent_should_call_applicationService_createApplicationMenu_with_nexIndex_and_return_created_applicationMenu()
+            throws Exception {
         //given
-        final ApplicationMenuCreator creator = new ApplicationMenuCreator("Main", APPLICATION_PAGE_ID, 1);
-        final SApplicationMenuImpl sAppMenu = new SApplicationMenuImpl("Main", APPLICATION_PAGE_ID, 1);
-        final ApplicationMenuImpl appMenu = new ApplicationMenuImpl("Main", APPLICATION_PAGE_ID, 1);
-        given(convertor.buildSApplicationMenu(creator)).willReturn(sAppMenu);
+        final ApplicationMenuCreator creator = new ApplicationMenuCreator(APPLICATION_ID, "Main", APPLICATION_PAGE_ID);
+        final SApplicationMenuImpl sAppMenu = new SApplicationMenuImpl("Main", APPLICATION_ID, APPLICATION_PAGE_ID, 1);
+        final ApplicationMenuImpl appMenu = new ApplicationMenuImpl("Main", APPLICATION_ID, APPLICATION_PAGE_ID, 1);
+        given(applicationService.getNextAvailableIndex(null)).willReturn(5);
+        given(convertor.buildSApplicationMenu(creator, 5)).willReturn(sAppMenu);
         given(convertor.toApplicationMenu(sAppMenu)).willReturn(appMenu);
         given(applicationService.createApplicationMenu(sAppMenu)).willReturn(sAppMenu);
 
@@ -80,9 +143,10 @@ public class ApplicationMenuAPIDelegateTest {
     @Test(expected = CreationException.class)
     public void createApplicationMenu_should_throw_CreationException_when_applicationService_throws_SObjectCreationException() throws Exception {
         //given
-        final ApplicationMenuCreator creator = new ApplicationMenuCreator("Main", APPLICATION_PAGE_ID, 1);
-        final SApplicationMenuImpl sAppMenu = new SApplicationMenuImpl("Main", APPLICATION_PAGE_ID, 1);
-        given(convertor.buildSApplicationMenu(creator)).willReturn(sAppMenu);
+        final ApplicationMenuCreator creator = new ApplicationMenuCreator(APPLICATION_ID, "Main", APPLICATION_PAGE_ID);
+        final SApplicationMenuImpl sAppMenu = new SApplicationMenuImpl("Main", APPLICATION_ID, APPLICATION_PAGE_ID, 1);
+        given(applicationService.getNextAvailableIndex(null)).willReturn(1);
+        given(convertor.buildSApplicationMenu(creator, 1)).willReturn(sAppMenu);
         given(applicationService.createApplicationMenu(sAppMenu)).willThrow(new SObjectCreationException());
 
         //when
@@ -91,11 +155,75 @@ public class ApplicationMenuAPIDelegateTest {
         //then exception
     }
 
+    @Test(expected = CreationException.class)
+    public void createApplicationMenu_should_throw_CreationException_when_creator_is_not_valid() throws Exception {
+        //given
+        final ApplicationMenuCreator creator = new ApplicationMenuCreator(APPLICATION_ID, "Main", APPLICATION_PAGE_ID);
+        given(creatorValidator.isValid(creator)).willReturn(false);
+
+        //when
+        delegate.createApplicationMenu(creator);
+
+        //then exception
+    }
+
+    @Test
+    public void updateApplicationMenu_should_return_result_of_applicationService_updateApplicationMenu_converted_to_client_object() throws Exception {
+        //given
+        final ApplicationMenuUpdater updater = mock(ApplicationMenuUpdater.class);
+        final EntityUpdateDescriptor updateDescriptor = mock(EntityUpdateDescriptor.class);
+        final SApplicationMenu sApplicationMenu = mock(SApplicationMenu.class);
+        final ApplicationMenu applicationMenu = mock(ApplicationMenu.class);
+
+        given(convertor.toApplicationMenuUpdateDescriptor(updater)).willReturn(updateDescriptor);
+        given(applicationService.updateApplicationMenu(4, updateDescriptor)).willReturn(sApplicationMenu);
+        given(convertor.toApplicationMenu(sApplicationMenu)).willReturn(applicationMenu);
+
+        //when
+        final ApplicationMenu updatedMenu = delegate.updateApplicationMenu(4, updater);
+
+        //then
+        assertThat(updatedMenu).isEqualTo(applicationMenu);
+
+    }
+
+    @Test(expected = ApplicationMenuNotFoundException.class)
+    public void updateApplicationMenu_should_throw_ApplicationNotFoundException_when_applicationService_throws_SObjectNotFoundException() throws Exception {
+        //given
+        final ApplicationMenuUpdater updater = mock(ApplicationMenuUpdater.class);
+        final EntityUpdateDescriptor updateDescriptor = mock(EntityUpdateDescriptor.class);
+
+        given(convertor.toApplicationMenuUpdateDescriptor(updater)).willReturn(updateDescriptor);
+        given(applicationService.updateApplicationMenu(4, updateDescriptor)).willThrow(new SObjectNotFoundException());
+
+        //when
+        delegate.updateApplicationMenu(4, updater);
+
+        //then exception
+
+    }
+
+    @Test(expected = UpdateException.class)
+    public void updateApplicationMenu_should_throw_UpdateException_when_applicationService_throws_SObjectModificationException() throws Exception {
+        //given
+        final ApplicationMenuUpdater updater = mock(ApplicationMenuUpdater.class);
+        final EntityUpdateDescriptor updateDescriptor = mock(EntityUpdateDescriptor.class);
+
+        given(convertor.toApplicationMenuUpdateDescriptor(updater)).willReturn(updateDescriptor);
+        given(applicationService.updateApplicationMenu(4, updateDescriptor)).willThrow(new SObjectModificationException());
+
+        //when
+        delegate.updateApplicationMenu(4, updater);
+
+        //then exception
+
+    }
+
     @Test
     public void getApplicationMenu_should_return_result_of_applicationService() throws Exception {
         //given
-        final SApplicationMenuImpl sAppMenu = new SApplicationMenuImpl("Main", APPLICATION_PAGE_ID, 1);
-        final ApplicationMenuImpl appMenu = new ApplicationMenuImpl("Main", APPLICATION_PAGE_ID, 1);
+        final SApplicationMenuImpl sAppMenu = new SApplicationMenuImpl("Main", APPLICATION_ID, APPLICATION_PAGE_ID, 1);
+        final ApplicationMenuImpl appMenu = new ApplicationMenuImpl("Main", APPLICATION_ID, APPLICATION_PAGE_ID, 1);
         given(applicationService.getApplicationMenu(10)).willReturn(sAppMenu);
         given(convertor.toApplicationMenu(sAppMenu)).willReturn(appMenu);
 
@@ -131,11 +259,18 @@ public class ApplicationMenuAPIDelegateTest {
 
     @Test
     public void deleteApplicationMenu_should_call_applicationService_deleteApplicationMenu() throws Exception {
+        // given
+        final long appMenuId = 9811L;
+        final SApplicationMenu sAppMenu = mock(SApplicationMenu.class);
+        given(sAppMenu.getApplicationId()).willReturn(APPLICATION_ID);
+        given(sAppMenu.getId()).willReturn(appMenuId);
+        given(applicationService.deleteApplicationMenu(sAppMenu.getId())).willReturn(sAppMenu);
+
         //when
-        delegate.deleteApplicationMenu(15);
+        delegate.deleteApplicationMenu(sAppMenu.getId());
 
         //then
-        verify(applicationService, times(1)).deleteApplicationMenu(15);
+        verify(applicationService, times(1)).deleteApplicationMenu(appMenuId);
     }
 
     @Test(expected = DeletionException.class)

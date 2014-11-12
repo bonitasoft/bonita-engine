@@ -17,7 +17,7 @@ import org.bonitasoft.engine.search.AbstractSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
-import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
+import com.bonitasoft.engine.api.impl.convertor.ApplicationPageConvertor;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
@@ -30,9 +30,9 @@ import com.bonitasoft.engine.business.application.model.SApplicationPage;
 public class SearchApplicationPages extends AbstractSearchEntity<ApplicationPage, SApplicationPage> {
 
     private final ApplicationService applicationService;
-    private final ApplicationConvertor convertor;
+    private final ApplicationPageConvertor convertor;
 
-    public SearchApplicationPages(final ApplicationService applicationService, final ApplicationConvertor convertor,
+    public SearchApplicationPages(final ApplicationService applicationService, final ApplicationPageConvertor convertor,
             final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
         super(searchDescriptor, options);
         this.applicationService = applicationService;

@@ -42,12 +42,11 @@ import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
  */
 public class GetBusinessDataByIdCommand extends TenantCommand {
 
+    private static final String EMPTY_OBJECT = "{}";
+    
     public static final String ENTITY_CLASS_NAME = "entityClassName";
-
     public static final String BUSINESS_DATA_ID = "businessDataId";
-
     public static final String BUSINESS_DATA_URI_PATTERN = "businessDataURIPattern";
-
     public static final String BUSINESS_DATA_CHILD_NAME = "businessDataChildName";
 
     private final ObjectMapper mapper;
@@ -144,31 +143,31 @@ public class GetBusinessDataByIdCommand extends TenantCommand {
     private String serializeChildResult(final Entity entity, final String fieldName, final String businessDataURIPattern,
             final BusinessDataRepository businessDataRepository) throws SCommandExecutionException {
         final Method method;
-        final Object invoke;
+        final Object child;
         try {
             final String getterName = buildGetterMethodName(fieldName);
             method = entity.getClass().getMethod(getterName);
-            invoke = method.invoke(entity);
+            child = method.invoke(entity);
         } catch (final Exception e) {
             throw new SCommandExecutionException(fieldName + " is not a valid attribute of entity " + entity.getClass(), e);
         }
-
-        if (invoke instanceof Entity) {
-            final Entity child = businessDataRepository.unwrap((Entity) invoke);
-            return serializeResult(child, businessDataURIPattern);
-        } else {
-            if (invoke instanceof List) {
+        
+        if (child == null) {
+            return EMPTY_OBJECT;
+        } else if (child instanceof Entity) {
+            final Entity unwrap = businessDataRepository.unwrap((Entity) child);
+            return serializeResult(unwrap, businessDataURIPattern);
+        } else if (child instanceof List) {
             final Class<?> type = (Class<?>) ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0];
             if (Entity.class.isAssignableFrom(type)) {
                 final ArrayNode arrayNode = new ArrayNode(JsonNodeFactory.instance);
-                final List<Entity> entities = (List<Entity>) invoke;
+                final List<Entity> entities = (List<Entity>) child;
                 for (final Entity entity2 : entities) {
                     final List<Link> links = buildLinks(entity2, businessDataURIPattern);
                     final JsonNode jsonNode = buildJsonNode(entity2, links);
                     arrayNode.add(jsonNode);
                 }
                 return serializeResult(arrayNode);
-                }
             }
         }
         throw new SCommandExecutionException("the type of " + fieldName + " must be an instance of either " + Entity.class.getName() + " or "

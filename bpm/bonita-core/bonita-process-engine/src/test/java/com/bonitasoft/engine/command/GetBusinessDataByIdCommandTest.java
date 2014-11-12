@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.command;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Matchers.any;
@@ -250,5 +251,21 @@ public class GetBusinessDataByIdCommandTest {
 
         command.execute(parameters, tenantServiceAccessor);
     }
+    
+    @Test
+    public void should_return_empty_json_object_when_child_is_null() throws Exception {
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 864L);
+        parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, CommandLine.class.getName());
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "product");
+        final CommandLine commandLine = new CommandLine(864L, 78L, null, 5);
+        when(bdrService.findById(CommandLine.class, 864L)).thenReturn(commandLine);
+
+        final String json = (String) command.execute(parameters, tenantServiceAccessor);
+
+        assertThatJson(json).isEqualTo("{}");
+    }
+    
 
 }
