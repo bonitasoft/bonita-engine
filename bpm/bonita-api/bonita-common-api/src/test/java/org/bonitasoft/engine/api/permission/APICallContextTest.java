@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 BonitaSoft S.A.
+ * * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,121 +30,122 @@ public class APICallContextTest {
 
     @Test
     public void getBodyAsJSon() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+        final APICallContext apiCallContext = new APICallContext();
         apiCallContext.setBody("{\"a\":\"b\",\"c\":\"1\"}");
 
-        JSONObject body = apiCallContext.getBodyAsJSON();
+        final JSONObject body = apiCallContext.getBodyAsJSON();
 
         assertThat(body.getString("a")).isEqualTo("b");
         assertThat(body.getLong("c")).isEqualTo(1l);
     }
+
     @Test
     public void getBodyAsJSonArray() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+        final APICallContext apiCallContext = new APICallContext();
         apiCallContext.setBody("[{\"a\":\"b\",\"c\":\"1\"}]");
 
-        JSONArray body = apiCallContext.getBodyAsJSONArray();
+        final JSONArray body = apiCallContext.getBodyAsJSONArray();
 
         assertThat(body.getJSONObject(0).getString("a")).isEqualTo("b");
         assertThat(body.getJSONObject(0).getLong("c")).isEqualTo(1l);
     }
 
     @Test
-    public void getFilters() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void getFilters() {
+        final APICallContext apiCallContext = new APICallContext();
         apiCallContext.setQueryString("p=0&c=10&o=priority%20DESC&f=state%3dready&f=user_id%3d104&d=processId");
 
-        Map<String, String> filters = apiCallContext.getFilters();
+        final Map<String, String> filters = apiCallContext.getFilters();
 
         assertThat(filters).containsOnly(entry("user_id", "104"), entry("state", "ready"));
     }
 
     @Test
-    public void getFilters_with_UpperCase_in_separator() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void getFilters_with_UpperCase_in_separator() {
+        final APICallContext apiCallContext = new APICallContext();
         apiCallContext.setQueryString("p=0&c=10&o=priority%20DESC&f=state%3dready&f=user_id%3D104&d=processId");
 
-        Map<String, String> filters = apiCallContext.getFilters();
+        final Map<String, String> filters = apiCallContext.getFilters();
 
         assertThat(filters).containsOnly(entry("user_id", "104"), entry("state", "ready"));
     }
 
     @Test
-    public void getCompoundResourceId() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void getCompoundResourceId() {
+        final APICallContext apiCallContext = new APICallContext();
         apiCallContext.setResourceId("1/2/3");
 
-        List<String> compoundResourceId = apiCallContext.getCompoundResourceId();
+        final List<String> compoundResourceId = apiCallContext.getCompoundResourceId();
 
         assertThat(compoundResourceId).containsExactly("1", "2", "3");
     }
 
     @Test
-    public void getCompoundResourceId_when_single_id() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void getCompoundResourceId_when_single_id() {
+        final APICallContext apiCallContext = new APICallContext();
         apiCallContext.setResourceId("1");
 
-        List<String> compoundResourceId = apiCallContext.getCompoundResourceId();
+        final List<String> compoundResourceId = apiCallContext.getCompoundResourceId();
 
         assertThat(compoundResourceId).containsExactly("1");
     }
 
     @Test
-    public void getCompoundResourceId_when_no_resource_id() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void getCompoundResourceId_when_no_resource_id() {
+        final APICallContext apiCallContext = new APICallContext();
 
-        List<String> compoundResourceId = apiCallContext.getCompoundResourceId();
+        final List<String> compoundResourceId = apiCallContext.getCompoundResourceId();
 
         assertThat(compoundResourceId).isEmpty();
     }
 
     @Test
-    public void getFilters_with_corrupt_filters() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void getFilters_with_corrupt_filters() {
+        final APICallContext apiCallContext = new APICallContext();
         apiCallContext.setQueryString("p=0&c=10&o=priority%20DESC&f=state%3dready&f=user_id%3d&d=processId");
 
-        Map<String, String> filters = apiCallContext.getFilters();
+        final Map<String, String> filters = apiCallContext.getFilters();
 
         assertThat(filters).containsOnly(entry("state", "ready"));
     }
 
     @Test
-    public void getSearchTerm() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void getSearchTerm() {
+        final APICallContext apiCallContext = new APICallContext();
         apiCallContext.setQueryString("p=0&c=10&o=priority%20DESC&f=state%3dready&f=user_id%3d104&d=processId&s=toto");
 
-        String searchTerm = apiCallContext.getSearchTerm();
+        final String searchTerm = apiCallContext.getSearchTerm();
 
         assertThat(searchTerm).isEqualTo("toto");
     }
 
     @Test
-    public void getSearchTerm_with_corrupt_earch_term() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void getSearchTerm_with_corrupt_earch_term() {
+        final APICallContext apiCallContext = new APICallContext();
         apiCallContext.setQueryString("p=0&c=10&o=priority%20DESC&f=state%3dready&f=user_id%3d104&d=processId&s=");
 
-        String searchTerm = apiCallContext.getSearchTerm();
+        final String searchTerm = apiCallContext.getSearchTerm();
 
         assertThat(searchTerm).isEqualTo(null);
     }
 
     @Test
-    public void getSearchTerm_with_corrupt_query() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void getSearchTerm_with_corrupt_query() {
+        final APICallContext apiCallContext = new APICallContext();
         apiCallContext.setQueryString("p=0&c=10&o=priority%20DESC&f=state%3dready&f=user_id%3d104&d=processId&s");
 
-        String searchTerm = apiCallContext.getSearchTerm();
+        final String searchTerm = apiCallContext.getSearchTerm();
 
         assertThat(searchTerm).isEqualTo(null);
     }
 
     @Test
-    public void construct_with_null_body_and_query() throws JSONException {
-        APICallContext apiCallContext = new APICallContext("GET","identity","user","1");
+    public void construct_with_null_body_and_query() {
+        final APICallContext apiCallContext = new APICallContext("GET", "identity", "user", "1");
 
-        String searchTerm = apiCallContext.getSearchTerm();
-        Map<String, String> filters = apiCallContext.getFilters();
-        String body = apiCallContext.getBody();
+        final String searchTerm = apiCallContext.getSearchTerm();
+        final Map<String, String> filters = apiCallContext.getFilters();
+        final String body = apiCallContext.getBody();
 
         assertThat(searchTerm).isEqualTo(null);
         assertThat(filters).isEmpty();
@@ -152,96 +153,92 @@ public class APICallContextTest {
     }
 
     @Test
-    public void should_isGETMethod_return_true() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void should_isGETMethod_return_true() {
+        final APICallContext apiCallContext = new APICallContext();
         apiCallContext.setMethod("GET");
 
-        boolean getMethod = apiCallContext.isGET();
+        final boolean getMethod = apiCallContext.isGET();
 
         assertThat(getMethod).isTrue();
     }
 
     @Test
-    public void should_isGETMethod_return_false() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void should_isGETMethod_return_false() {
+        final APICallContext apiCallContext = new APICallContext();
 
-        boolean getMethod = apiCallContext.isGET();
+        final boolean getMethod = apiCallContext.isGET();
 
         assertThat(getMethod).isFalse();
     }
 
     @Test
-    public void should_isPOSTMethod_return_true() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void should_isPOSTMethod_return_true() {
+        final APICallContext apiCallContext = new APICallContext();
         apiCallContext.setMethod("POST");
 
-        boolean getMethod = apiCallContext.isPOST();
+        final boolean getMethod = apiCallContext.isPOST();
 
         assertThat(getMethod).isTrue();
     }
 
     @Test
-    public void should_isPOSTMethod_return_false() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void should_isPOSTMethod_return_false() {
+        final APICallContext apiCallContext = new APICallContext();
 
-        boolean getMethod = apiCallContext.isPOST();
+        final boolean getMethod = apiCallContext.isPOST();
 
         assertThat(getMethod).isFalse();
     }
 
     @Test
-    public void should_isPUTMethod_return_true() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void should_isPUTMethod_return_true() {
+        final APICallContext apiCallContext = new APICallContext();
         apiCallContext.setMethod("PUT");
 
-        boolean getMethod = apiCallContext.isPUT();
+        final boolean getMethod = apiCallContext.isPUT();
 
         assertThat(getMethod).isTrue();
     }
 
     @Test
-    public void should_isPUTMethod_return_false() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void should_isPUTMethod_return_false() {
+        final APICallContext apiCallContext = new APICallContext();
 
-        boolean getMethod = apiCallContext.isPUT();
+        final boolean getMethod = apiCallContext.isPUT();
 
         assertThat(getMethod).isFalse();
     }
 
     @Test
-    public void should_isDELETEMethod_return_true() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void should_isDELETEMethod_return_true() {
+        final APICallContext apiCallContext = new APICallContext();
         apiCallContext.setMethod("DELETE");
 
-        boolean getMethod = apiCallContext.isDELETE();
+        final boolean getMethod = apiCallContext.isDELETE();
 
         assertThat(getMethod).isTrue();
     }
 
     @Test
-    public void should_isDELETEMethod_return_false() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void should_isDELETEMethod_return_false() {
+        final APICallContext apiCallContext = new APICallContext();
 
-        boolean getMethod = apiCallContext.isDELETE();
+        final boolean getMethod = apiCallContext.isDELETE();
 
         assertThat(getMethod).isFalse();
     }
 
-
     @Test
-    public void should_equals_works() throws JSONException {
-        APICallContext apiCallContext = new APICallContext();
+    public void should_equals_works() {
+        final APICallContext apiCallContext = new APICallContext();
         apiCallContext.setMethod("GET");
         apiCallContext.setApiName("apiName");
         apiCallContext.setResourceName("myResource");
         apiCallContext.setResourceId("125");
 
-
-
-        assertThat(apiCallContext).isEqualTo(new APICallContext("GET","apiName","myResource","125"));
-        assertThat(apiCallContext.hashCode()).isEqualTo(new APICallContext("GET","apiName","myResource","125").hashCode());
-        assertThat(apiCallContext.toString()).isEqualTo(new APICallContext("GET","apiName","myResource","125").toString());
+        assertThat(apiCallContext).isEqualTo(new APICallContext("GET", "apiName", "myResource", "125"));
+        assertThat(apiCallContext.hashCode()).isEqualTo(new APICallContext("GET", "apiName", "myResource", "125").hashCode());
+        assertThat(apiCallContext.toString()).isEqualTo(new APICallContext("GET", "apiName", "myResource", "125").toString());
     }
-
 
 }

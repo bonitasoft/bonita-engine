@@ -30,8 +30,8 @@ public class ServerLoggerWrapperTest {
 
     @Mock
     private TechnicalLoggerService technicalLoggerService;
-    private Class<?> aClass = ServerLoggerWrapperTest.class;
-    private IllegalStateException anException = new IllegalStateException();
+    private final Class<?> aClass = ServerLoggerWrapperTest.class;
+    private final IllegalStateException anException = new IllegalStateException();
     private ServerLoggerWrapper logger;
 
     @Before
@@ -40,21 +40,21 @@ public class ServerLoggerWrapperTest {
     }
 
     @Test
-    public void testTrace() throws Exception {
+    public void testTrace() {
         logger.trace("msg");
 
         verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.TRACE, "msg");
     }
 
     @Test
-    public void testTrace1() throws Exception {
+    public void testTrace1() {
         logger.trace("msg", anException);
 
         verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.TRACE, "msg", anException);
     }
 
     @Test
-    public void testDebug() throws Exception {
+    public void testDebug() {
         logger.debug("msg");
 
         verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.DEBUG, "msg");
@@ -62,7 +62,7 @@ public class ServerLoggerWrapperTest {
     }
 
     @Test
-    public void testDebug1() throws Exception {
+    public void testDebug1() {
         logger.debug("msg", anException);
 
         verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.DEBUG, "msg", anException);
@@ -70,7 +70,7 @@ public class ServerLoggerWrapperTest {
     }
 
     @Test
-    public void testInfo() throws Exception {
+    public void testInfo() {
         logger.info("msg");
 
         verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.INFO, "msg");
@@ -78,7 +78,7 @@ public class ServerLoggerWrapperTest {
     }
 
     @Test
-    public void testInfo1() throws Exception {
+    public void testInfo1() {
         logger.info("msg", anException);
 
         verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.INFO, "msg", anException);
@@ -86,7 +86,7 @@ public class ServerLoggerWrapperTest {
     }
 
     @Test
-    public void testWarning() throws Exception {
+    public void testWarning() {
         logger.warning("msg");
 
         verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.WARNING, "msg");
@@ -94,7 +94,7 @@ public class ServerLoggerWrapperTest {
     }
 
     @Test
-    public void testWarning1() throws Exception {
+    public void testWarning1() {
         logger.warning("msg", anException);
 
         verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.WARNING, "msg", anException);
@@ -102,7 +102,7 @@ public class ServerLoggerWrapperTest {
     }
 
     @Test
-    public void testError() throws Exception {
+    public void testError() {
         logger.error("msg");
 
         verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.ERROR, "msg");
@@ -110,7 +110,7 @@ public class ServerLoggerWrapperTest {
     }
 
     @Test
-    public void testError1() throws Exception {
+    public void testError1() {
         logger.error("msg", anException);
 
         verify(technicalLoggerService).log(aClass, TechnicalLogSeverity.ERROR, "msg", anException);

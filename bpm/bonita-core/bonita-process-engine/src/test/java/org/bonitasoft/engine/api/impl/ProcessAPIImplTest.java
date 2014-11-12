@@ -654,7 +654,7 @@ public class ProcessAPIImplTest {
         final List<Long> archivedProcessInstanceIds = Arrays.asList(archivedProcessInstanceId);
         final List<SAProcessInstance> archivedProcessInstancesToDelete = Arrays.asList(mock(SAProcessInstance.class));
         doReturn(archivedProcessInstancesToDelete).when(processInstanceService).getArchivedProcessInstancesInAllStates(archivedProcessInstanceIds);
-        doReturn(1L).when(processInstanceService).deleteParentArchivedProcessInstancesAndElements(archivedProcessInstancesToDelete);
+        doReturn(1L).when(processInstanceService).deleteArchivedParentProcessInstancesAndElements(archivedProcessInstancesToDelete);
 
         // When
         final long deleteArchivedProcessInstances = processAPI.deleteArchivedProcessInstancesInAllStates(archivedProcessInstanceId);
@@ -662,7 +662,7 @@ public class ProcessAPIImplTest {
         // Then
         assertEquals("Must to return 1 deleted archived process instance.", 1L, deleteArchivedProcessInstances);
         verify(processInstanceService).getArchivedProcessInstancesInAllStates(archivedProcessInstanceIds);
-        verify(processInstanceService).deleteParentArchivedProcessInstancesAndElements(archivedProcessInstancesToDelete);
+        verify(processInstanceService).deleteArchivedParentProcessInstancesAndElements(archivedProcessInstancesToDelete);
     }
 
     @Test(expected = DeletionException.class)
@@ -684,7 +684,7 @@ public class ProcessAPIImplTest {
         final List<SAProcessInstance> archivedProcessInstancesToDelete = Arrays.asList(mock(SAProcessInstance.class));
         doReturn(archivedProcessInstancesToDelete).when(processInstanceService)
                 .getArchivedProcessInstancesInAllStates(Arrays.asList(archivedProcessInstanceId));
-        doThrow(new SProcessInstanceModificationException(new Exception())).when(processInstanceService).deleteParentArchivedProcessInstancesAndElements(
+        doThrow(new SProcessInstanceModificationException(new Exception())).when(processInstanceService).deleteArchivedParentProcessInstancesAndElements(
                 archivedProcessInstancesToDelete);
 
         // When
@@ -699,7 +699,7 @@ public class ProcessAPIImplTest {
         doReturn(archivedProcessInstancesToDelete).when(processInstanceService)
                 .getArchivedProcessInstancesInAllStates(Arrays.asList(archivedProcessInstanceId));
         doThrow(new SProcessInstanceHierarchicalDeletionException("Parent still active", archivedProcessInstanceId)).when(processInstanceService)
-                .deleteParentArchivedProcessInstancesAndElements(archivedProcessInstancesToDelete);
+                .deleteArchivedParentProcessInstancesAndElements(archivedProcessInstancesToDelete);
 
         // When
         processAPI.deleteArchivedProcessInstancesInAllStates(archivedProcessInstanceId);
@@ -716,7 +716,7 @@ public class ProcessAPIImplTest {
 
         // Then
         verify(processInstanceService).getArchivedProcessInstancesInAllStates(anyListOf(Long.class));
-        verify(processInstanceService).deleteParentArchivedProcessInstancesAndElements(anyListOf(SAProcessInstance.class));
+        verify(processInstanceService).deleteArchivedParentProcessInstancesAndElements(anyListOf(SAProcessInstance.class));
     }
 
     @Test(expected = DeletionException.class)
@@ -736,7 +736,7 @@ public class ProcessAPIImplTest {
         final long archivedProcessInstanceId = 42l;
         doReturn(Collections.singletonList(mock(SAProcessInstance.class))).when(processInstanceService).getArchivedProcessInstancesInAllStates(
                 anyListOf(Long.class));
-        doThrow(new SProcessInstanceModificationException(new Exception())).when(processInstanceService).deleteParentArchivedProcessInstancesAndElements(
+        doThrow(new SProcessInstanceModificationException(new Exception())).when(processInstanceService).deleteArchivedParentProcessInstancesAndElements(
                 anyListOf(SAProcessInstance.class));
 
         // When
@@ -750,7 +750,7 @@ public class ProcessAPIImplTest {
         doReturn(Collections.singletonList(mock(SAProcessInstance.class))).when(processInstanceService).getArchivedProcessInstancesInAllStates(
                 anyListOf(Long.class));
         doThrow(new SProcessInstanceHierarchicalDeletionException("Parent still active", archivedProcessInstanceId)).when(processInstanceService)
-                .deleteParentArchivedProcessInstancesAndElements(anyListOf(SAProcessInstance.class));
+                .deleteArchivedParentProcessInstancesAndElements(anyListOf(SAProcessInstance.class));
 
         // When
         processAPI.deleteArchivedProcessInstancesInAllStates(archivedProcessInstanceId);
