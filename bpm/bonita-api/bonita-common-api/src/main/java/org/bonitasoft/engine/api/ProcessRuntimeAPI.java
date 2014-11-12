@@ -110,7 +110,7 @@ public interface ProcessRuntimeAPI {
      *
      * @param searchOptions
      *        The search criterion. See {@link ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
-     * @return A processInstance object.
+     * @return A {@link ProcessInstance} object.
      * @throws SearchException
      *         If an exception occurs when getting the list of tasks.
      * @since 6.0
@@ -122,12 +122,24 @@ public interface ProcessRuntimeAPI {
      *
      * @param searchOptions
      *        The search criterion. See {@link ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
-     * @return A processInstance object.
+     * @return A {@link ProcessInstance} object.
      * @throws SearchException
-     *         If an exception occurs when getting the list of tasks.
+     *         If an exception occurs when getting the list of {@link ProcessInstance}.
      * @since 6.2
      */
     SearchResult<ProcessInstance> searchProcessInstances(SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * List all process instances with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR} state.
+     *
+     * @param searchOptions
+     *        The search criterion. See {@link ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
+     * @return A {@link ProcessInstance} object.
+     * @throws SearchException
+     *         If an exception occurs when getting the list of {@link ProcessInstance}.
+     * @since 6.4.0
+     */
+    SearchResult<ProcessInstance> searchFailedProcessInstances(SearchOptions searchOptions) throws SearchException;
 
     /**
      * List all open process instances supervised by a user.
