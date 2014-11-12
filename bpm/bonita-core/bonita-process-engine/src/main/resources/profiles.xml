@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <profiles:profiles xmlns:profiles="http://www.bonitasoft.org/ns/profile/6.1">
 	<profile name="User" isDefault="true">
-		<description>The user can view and perform tasks and can start a new case of an app.</description>
+		<description>The user can view and perform tasks and can start a new case of a process.</description>
 		<profileEntries>
 			<parentProfileEntry name="Tasks" isCustom="false">
 				<parentName>NULL</parentName>
@@ -17,19 +17,19 @@
 				<type>link</type>
 				<page>caselistinguser</page>
 			</parentProfileEntry>
-			<parentProfileEntry name="Apps" isCustom="false">
+			<parentProfileEntry name="Processes" isCustom="false">
 				<parentName>NULL</parentName>
 				<index>4</index>
-				<description>Manage apps</description>
+				<description>Manage processes</description>
 				<type>link</type>
 				<page>processlistinguser</page>
 			</parentProfileEntry>
 		</profileEntries>
 	</profile>
 	<profile name="Administrator" isDefault="true">
-		<description>The administrator can install an app, manage the organization, and handle some errors (for example, by replaying a task).</description>
+		<description>The administrator can install a process, manage the organization, and handle some errors (for example, by replaying a task).</description>
 		<profileEntries>
-			<parentProfileEntry name="Apps management"
+			<parentProfileEntry name="Process management"
 				isCustom="false">
 				<parentName>NULL</parentName>
 				<index>0</index>
@@ -50,7 +50,7 @@
 						<type>link</type>
 						<page>caselistingadmin</page>
 					</profileEntry>
-					<profileEntry name="Apps" isCustom="false">
+					<profileEntry name="Processes" isCustom="false">
 						<parentName>BPM</parentName>
 						<index>4</index>
 						<description>All processes</description>

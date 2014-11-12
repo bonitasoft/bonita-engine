@@ -52,4 +52,26 @@ public class OrderByOption implements Serializable {
         return "OrderByOption [clazz=" + clazz + ", fieldName=" + fieldName + ", orderByType=" + orderByType + "]";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof OrderByOption)) return false;
+
+        OrderByOption that = (OrderByOption) o;
+
+        if (clazz != null ? !clazz.equals(that.clazz) : that.clazz != null) return false;
+        if (fieldName != null ? !fieldName.equals(that.fieldName) : that.fieldName != null) return false;
+        if (orderByType != that.orderByType) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = clazz != null ? clazz.hashCode() : 0;
+        result = 31 * result + (fieldName != null ? fieldName.hashCode() : 0);
+        result = 31 * result + (orderByType != null ? orderByType.hashCode() : 0);
+        return result;
+    }
+
 }

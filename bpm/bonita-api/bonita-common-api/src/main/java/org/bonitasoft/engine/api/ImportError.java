@@ -17,7 +17,6 @@ import java.io.Serializable;
 
 /**
  * @author Baptiste Mesta
- * 
  * @since 6.3.1
  */
 public class ImportError implements Serializable {
@@ -25,7 +24,7 @@ public class ImportError implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public enum Type {
-        USER, GROUP, ROLE, PAGE
+        USER, GROUP, ROLE, PAGE, PROFILE, APPLICATION_PAGE
     }
 
     private final String name;
