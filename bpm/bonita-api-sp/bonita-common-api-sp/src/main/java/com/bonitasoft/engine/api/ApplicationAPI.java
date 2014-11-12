@@ -197,7 +197,8 @@ public interface ApplicationAPI {
     ApplicationPage getApplicationHomePage(long applicationId) throws ApplicationPageNotFoundException;
 
     /**
-     * Creates a {@link ApplicationMenu} based on the supplied {@link ApplicationMenuCreator}
+     * Creates a {@link ApplicationMenu} based on the supplied {@link ApplicationMenuCreator}. The new created {@code ApplicationMenu} will be ordered at the
+     * last position of its level with an auto generated index.
      *
      * @param applicationMenuCreator creator describing the characteristics of the {@code ApplicationMenu} to be created
      * @return the created {@code ApplicationMenu}
@@ -209,7 +210,12 @@ public interface ApplicationAPI {
 
     /**
      * Updates an {@link com.bonitasoft.engine.business.application.ApplicationMenu} based on the information supplied by the
-     * {@link com.bonitasoft.engine.business.application.ApplicationMenuUpdater}
+     * {@link com.bonitasoft.engine.business.application.ApplicationMenuUpdater}.
+     * <p>
+     * When the {@code ApplicationMenu} index is updated all other {@code ApplicationMenu}s in the same level will have indexes automatically updated in order
+     * to keep indexes coherency. For instance, when an {@code ApplicationMenu} is moved from index 4 to index 2, the {@code ApplicationMenu} previously at
+     * index 2 will be moved to index 3 and the {@code ApplicationMenu} previously at index 3 will be moved to index 4.
+     * </p>
      *
      * @param applicationMenuId the {@code ApplicationMenu} identifier
      * @param updater the {@code ApplicationMenuUpdater} describing the fields to be updated.
@@ -233,6 +239,10 @@ public interface ApplicationAPI {
 
     /**
      * Deletes an {@link ApplicationMenu} by its identifier. All children {@code ApplicationMenu} will be automatically deleted.
+     * <p>
+     * When an {@code ApplicationMenu} is deleted all others {@code ApplicationMenu}s having index greater than the index of deleted {@code ApplicationMenu} in
+     * the same level will be automatically updated in order to keep indexes coherency.
+     * </p>
      *
      * @param applicationMenuId the {@code ApplicationMenu} identifier
      * @throws DeletionException if an error occurs during the deletion
@@ -276,7 +286,19 @@ public interface ApplicationAPI {
     byte[] exportApplications(long... applicationIds) throws ExportException;
 
     /**
-     * Imports {@link com.bonitasoft.engine.business.application.Application}s based on a XML file content
+     * Imports {@link com.bonitasoft.engine.business.application.Application}s based on a XML file content.
+     * <p>
+     * Before importing {@code Application}s ensure that all {@link org.bonitasoft.engine.profile.Profile}s referenced by {@code Application}s and all
+     * {@link com.bonitasoft.engine.page.Page}s referenced by {@link com.bonitasoft.engine.business.application.ApplicationPage}s are available.
+     * <ul>
+     * <li>When the {@code Profile} does not exist the {@code Application} will be imported, but no {@code Profile} will be associated to it. An
+     * {@link org.bonitasoft.engine.api.ImportError} will be added to the {@link org.bonitasoft.engine.api.ImportStatus} related to this {@code Application}.
+     * </li>
+     * <li>When a {@code Page} does not exist the related {@code ApplicationPage} and {@link com.bonitasoft.engine.business.application.ApplicationMenu}s
+     * pointing to this {@code ApplicationPage} will not be created. An {@code ImportError} will be added to the {@code ImportStatus} related to the
+     * {@code Application} containing this {@code ApplicationPage}.</li>
+     * </ul>
+     * </p>
      *
      * @param xmlContent a byte array representing the content of XML file containing the applications to be imported.
      * @param policy the {@link com.bonitasoft.engine.business.application.ApplicationImportPolicy} used to execute the import
@@ -288,6 +310,11 @@ public interface ApplicationAPI {
      * @see com.bonitasoft.engine.business.application.Application
      * @see com.bonitasoft.engine.business.application.ApplicationImportPolicy
      * @see org.bonitasoft.engine.api.ImportStatus
+     * @see org.bonitasoft.engine.api.ImportError
+     * @See com.bonitasoft.engine.business.application.ApplicationPage
+     * @see com.bonitasoft.engine.business.application.ApplicationMenu
+     * @see org.bonitasoft.engine.profile.Profile
+     * @See com.bonitasoft.engine.page.Page
      */
     List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy) throws ImportException, AlreadyExistsException;
 
