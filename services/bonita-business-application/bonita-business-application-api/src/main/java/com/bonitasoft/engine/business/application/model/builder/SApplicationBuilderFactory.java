@@ -15,17 +15,15 @@ package com.bonitasoft.engine.business.application.model.builder;
  */
 public interface SApplicationBuilderFactory {
 
-    SApplicationBuilder createNewInstance(String name, String displayName, String version, String path, final long createdBy);
+    SApplicationBuilder createNewInstance(String token, String displayName, String version, final long createdBy);
 
     String getIdKey();
 
-    String getNameKey();
+    String getTokenKey();
 
     String getDisplayNameKey();
 
     String getVersionKey();
-
-    String getPathKey();
 
     String getDescriptionKey();
 

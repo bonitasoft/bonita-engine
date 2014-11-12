@@ -37,9 +37,9 @@ public class ApplicationRepository extends TestRepository {
         return (SApplication) namedQuery.uniqueResult();
     }
 
-    public SApplication getApplicationByName(final String name) {
-        final Query namedQuery = getNamedQuery("getApplicationByName");
-        namedQuery.setParameter("name", name);
+    public SApplication getApplicationByToken(final String token) {
+        final Query namedQuery = getNamedQuery("getApplicationByToken");
+        namedQuery.setParameter("token", token);
         return (SApplication) namedQuery.uniqueResult();
     }
 
@@ -49,17 +49,17 @@ public class ApplicationRepository extends TestRepository {
         return (SApplicationPage) namedQuery.uniqueResult();
     }
 
-    public SApplicationPage getApplicationPageByNameAndApplicationName(final String applicationName, final String applicationPageName) {
-        final Query namedQuery = getNamedQuery("getApplicationPageByNameAndApplicationName");
-        namedQuery.setParameter("applicationName", applicationName);
-        namedQuery.setParameter("applicationPageName", applicationPageName);
+    public SApplicationPage getApplicationPageByTokenAndApplicationToken(final String applicationToken, final String applicationPageToken) {
+        final Query namedQuery = getNamedQuery("getApplicationPageByTokenAndApplicationToken");
+        namedQuery.setParameter("applicationToken", applicationToken);
+        namedQuery.setParameter("applicationPageToken", applicationPageToken);
         return (SApplicationPage) namedQuery.uniqueResult();
     }
 
-    public SApplicationPage getApplicationPageByNameAndApplicationId(final long applicationId, final String applicationPageName) {
-        final Query namedQuery = getNamedQuery("getApplicationPageByNameAndApplicationId");
+    public SApplicationPage getApplicationPageByTokenAndApplicationId(final long applicationId, final String applicationPageToken) {
+        final Query namedQuery = getNamedQuery("getApplicationPageByTokenAndApplicationId");
         namedQuery.setParameter("applicationId", applicationId);
-        namedQuery.setParameter("applicationPageName", applicationPageName);
+        namedQuery.setParameter("applicationPageToken", applicationPageToken);
         return (SApplicationPage) namedQuery.uniqueResult();
     }
 
@@ -73,6 +73,17 @@ public class ApplicationRepository extends TestRepository {
         final Query namedQuery = getNamedQuery("getApplicationMenuById");
         namedQuery.setParameter("id", applicationMenuId);
         return (SApplicationMenu) namedQuery.uniqueResult();
+    }
+
+    public int getLastIndexForRootMenu() {
+        final Query namedQuery = getNamedQuery("getLastIndexForRootMenu");
+        return (Integer) namedQuery.uniqueResult();
+    }
+
+    public int getLastIndexForChildOf(long parentMenuId) {
+        final Query namedQuery = getNamedQuery("getLastIndexForChildOf");
+        namedQuery.setParameter("parentId", parentMenuId);
+        return (Integer) namedQuery.uniqueResult();
     }
 
 }

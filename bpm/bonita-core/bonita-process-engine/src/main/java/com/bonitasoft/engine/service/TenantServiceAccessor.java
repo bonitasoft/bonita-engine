@@ -45,4 +45,5 @@ public interface TenantServiceAccessor extends org.bonitasoft.engine.service.Ten
     RefBusinessDataService getRefBusinessDataService();
 
     ApplicationService getApplicationService();
+
 }
