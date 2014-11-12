@@ -26,8 +26,8 @@ public class SApplicationPageBuilderFactoryImpl implements SApplicationPageBuild
 
 
     @Override
-    public SApplicationPageBuilder createNewInstance(final long applicationId, final long pageId, final String name) {
-        return new SApplicationPageBuilderImpl(new SApplicationPageImpl(applicationId, pageId, name));
+    public SApplicationPageBuilder createNewInstance(final long applicationId, final long pageId, final String token) {
+        return new SApplicationPageBuilderImpl(new SApplicationPageImpl(applicationId, pageId, token));
     }
 
     @Override
@@ -36,8 +36,8 @@ public class SApplicationPageBuilderFactoryImpl implements SApplicationPageBuild
     }
 
     @Override
-    public String getNameKey() {
-        return "name";
+    public String getTokenKey() {
+        return "token";
     }
 
 

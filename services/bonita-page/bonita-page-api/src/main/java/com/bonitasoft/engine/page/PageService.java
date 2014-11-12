@@ -38,7 +38,7 @@ public interface PageService extends TenantLifecycleService {
 
     /**
      * add a page using the zip in parameters and the given properties
-     * 
+     *
      * @param page
      * @param content
      * @return
@@ -90,7 +90,7 @@ public interface PageService extends TenantLifecycleService {
 
     /**
      * add a page using the zip in parameters, it get all informations from the page.properties file contain inside the zip
-     * 
+     *
      * @param content
      * @param userId
      * @return

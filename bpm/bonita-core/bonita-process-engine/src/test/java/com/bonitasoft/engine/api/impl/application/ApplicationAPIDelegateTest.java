@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ ******************************************************************************/
 package com.bonitasoft.engine.api.impl.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,12 +41,11 @@ import com.bonitasoft.engine.business.application.ApplicationCreator;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
-import com.bonitasoft.engine.business.application.SInvalidNameException;
+import com.bonitasoft.engine.business.application.SInvalidTokenException;
 import com.bonitasoft.engine.business.application.impl.ApplicationImpl;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationState;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationImpl;
-import com.bonitasoft.engine.exception.InvalidNameException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -71,8 +78,6 @@ public class ApplicationAPIDelegateTest {
 
     private static final String VERSION = "1.0";
 
-    private static final String PATH = "/app";
-
     private static final String DESCRIPTION = "app desc";
 
     @Before
@@ -84,11 +89,11 @@ public class ApplicationAPIDelegateTest {
     @Test
     public void createApplication_should_call_applicationService_createApplication_and_return_created_application() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION, PATH);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION);
         creator.setDescription(DESCRIPTION);
         final SApplicationImpl sApp = getDefaultApplication();
         sApp.setDescription(DESCRIPTION);
-        final ApplicationImpl application = new ApplicationImpl(APP_NAME, VERSION, PATH, DESCRIPTION);
+        final ApplicationImpl application = new ApplicationImpl(APP_NAME, VERSION, DESCRIPTION);
         given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(convertor.toApplication(sApp)).willReturn(application);
         given(applicationService.createApplication(sApp)).willReturn(sApp);
@@ -101,15 +106,15 @@ public class ApplicationAPIDelegateTest {
     }
 
     private SApplicationImpl getDefaultApplication() {
-        final SApplicationImpl sApp = new SApplicationImpl(APP_NAME, APP_DISP_NAME, VERSION, PATH, System.currentTimeMillis(),
-                LOGGED_USER_ID, SApplicationState.DEACTIVATED.name());
+        final SApplicationImpl sApp = new SApplicationImpl(APP_NAME, APP_DISP_NAME, VERSION, System.currentTimeMillis(), LOGGED_USER_ID,
+                SApplicationState.DEACTIVATED.name());
         return sApp;
     }
 
     @Test(expected = AlreadyExistsException.class)
     public void createApplication_should_throw_AlreadyExistsException_when_applicationService_throws_SObjectAlreadyExistsException() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION, PATH);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION);
         final SApplicationImpl sApp = getDefaultApplication();
         given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(applicationService.createApplication(sApp)).willThrow(new SObjectAlreadyExistsException(""));
@@ -123,7 +128,7 @@ public class ApplicationAPIDelegateTest {
     @Test(expected = CreationException.class)
     public void createApplication_should_throw_CreationException_when_applicationService_throws_SObjectCreationException() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION, PATH);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION);
         final SApplicationImpl sApp = getDefaultApplication();
         given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
         given(applicationService.createApplication(sApp)).willThrow(new SObjectCreationException(""));
@@ -134,13 +139,13 @@ public class ApplicationAPIDelegateTest {
         //then exception
     }
 
-    @Test(expected = InvalidNameException.class)
+    @Test(expected = CreationException.class)
     public void createApplication_should_throw_InvalidNameException_when_applicationService_throws_SInvalidNameException() throws Exception {
         //given
-        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION, PATH);
+        final ApplicationCreator creator = new ApplicationCreator(APP_NAME, APP_DISP_NAME, VERSION);
         final SApplicationImpl sApp = getDefaultApplication();
         given(convertor.buildSApplication(creator, LOGGED_USER_ID)).willReturn(sApp);
-        given(applicationService.createApplication(sApp)).willThrow(new SInvalidNameException(""));
+        given(applicationService.createApplication(sApp)).willThrow(new SInvalidTokenException(""));
 
         //when
         delegate.createApplication(creator);
@@ -180,7 +185,7 @@ public class ApplicationAPIDelegateTest {
     @Test
     public void getApplication_should_return_the_application_returned_by_applicationService_coverted() throws Exception {
         final SApplicationImpl sApp = getDefaultApplication();
-        final ApplicationImpl application = new ApplicationImpl(APP_NAME, VERSION, PATH, null);
+        final ApplicationImpl application = new ApplicationImpl(APP_NAME, VERSION, null);
         given(applicationService.getApplication(APPLICATION_ID)).willReturn(sApp);
         given(convertor.toApplication(sApp)).willReturn(application);
 
@@ -215,12 +220,12 @@ public class ApplicationAPIDelegateTest {
     }
 
     @Test
-    public void updateApplication_should_return_result_of_applicationservice_updadateApplication() throws Exception {
+    public void updateApplication_should_return_result_of_applicationservice_updateApplication() throws Exception {
         //given
         final SApplication sApplication = mock(SApplication.class);
         final Application application = mock(Application.class);
         final ApplicationUpdater updater = new ApplicationUpdater();
-        updater.setName("new name");
+        updater.setToken("new name");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willReturn(sApplication);
@@ -234,16 +239,28 @@ public class ApplicationAPIDelegateTest {
     }
 
     @Test(expected = UpdateException.class)
-    public void updateApplication_should_throw_UpdadateException_when_applicationservice_throws_SObjectModificationException() throws Exception {
+    public void updateApplication_should_throw_UpdateException_when_applicationservice_throws_SObjectModificationException() throws Exception {
         //given
-        final SApplication sApplication = mock(SApplication.class);
-        final Application application = mock(Application.class);
         final ApplicationUpdater updater = new ApplicationUpdater();
-        updater.setName("new name");
+        updater.setToken("new name");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectModificationException());
-        given(convertor.toApplication(sApplication)).willReturn(application);
+
+        //when
+        delegate.updateApplication(APPLICATION_ID, updater);
+
+        //then exception
+    }
+
+    @Test(expected = AlreadyExistsException.class)
+    public void updateApplication_should_throw_UpdateException_when_applicationservice_throws_SObjectAlreadyExistsException() throws Exception {
+        //given
+        final ApplicationUpdater updater = new ApplicationUpdater();
+        updater.setToken("new name");
+        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
+        given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
+        given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectAlreadyExistsException());
 
         //when
         delegate.updateApplication(APPLICATION_ID, updater);

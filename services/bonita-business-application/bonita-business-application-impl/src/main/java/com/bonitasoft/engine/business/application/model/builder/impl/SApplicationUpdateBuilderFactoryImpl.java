@@ -13,22 +13,17 @@
  **/
 package com.bonitasoft.engine.business.application.model.builder.impl;
 
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
-
 import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationUpdateBuilderFactory;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class SApplicationUpdateBuilderFactoryImpl implements SApplicationUpdateBuilderFactory {
 
     @Override
-    public SApplicationUpdateBuilder createNewInstance() {
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        return new SApplicationUpdateBuilderImpl(descriptor);
+    public SApplicationUpdateBuilder createNewInstance(final long updaterUserId) {
+        return new SApplicationUpdateBuilderImpl(updaterUserId);
     }
 
 }

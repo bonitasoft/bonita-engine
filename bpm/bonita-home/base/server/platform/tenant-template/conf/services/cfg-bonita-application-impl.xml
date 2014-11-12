@@ -6,5 +6,5 @@
 		<constructor-arg name="persistenceService" ref="persistenceService" />
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
 	</bean>
-	
+
 </beans>

@@ -8,8 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.application.impl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
@@ -22,7 +21,7 @@ public class URLValidatorTest {
         final boolean valid = URLValidator.isValid("123name");
 
         //then
-        assertTrue(valid);
+        assertThat(valid).isTrue();
     }
 
     @Test
@@ -31,7 +30,7 @@ public class URLValidatorTest {
         final boolean valid = URLValidator.isValid("123/name");
 
         //then
-        assertFalse(valid);
+        assertThat(valid).isFalse();
     }
 
     @Test
@@ -40,7 +39,7 @@ public class URLValidatorTest {
         final boolean valid = URLValidator.isValid("my name");
 
         //then
-        assertFalse(valid);
+        assertThat(valid).isFalse();
     }
 
     @Test
@@ -49,7 +48,7 @@ public class URLValidatorTest {
         final boolean valid = URLValidator.isValid("my-name");
 
         //then
-        assertTrue(valid);
+        assertThat(valid).isTrue();
     }
 
     @Test
@@ -58,7 +57,7 @@ public class URLValidatorTest {
         final boolean valid = URLValidator.isValid("my.name");
 
         //then
-        assertTrue(valid);
+        assertThat(valid).isTrue();
     }
 
     @Test
@@ -67,7 +66,7 @@ public class URLValidatorTest {
         final boolean valid = URLValidator.isValid("my_name");
 
         //then
-        assertTrue(valid);
+        assertThat(valid).isTrue();
     }
 
     @Test
@@ -76,7 +75,7 @@ public class URLValidatorTest {
         final boolean valid = URLValidator.isValid("my~name");
 
         //then
-        assertTrue(valid);
+        assertThat(valid).isTrue();
     }
 
     @Test
@@ -85,7 +84,7 @@ public class URLValidatorTest {
         final boolean valid = URLValidator.isValid("m-y.n_a~-m.e");
 
         //then
-        assertTrue(valid);
+        assertThat(valid).isTrue();
     }
 
     @Test
@@ -94,7 +93,7 @@ public class URLValidatorTest {
         final boolean valid = URLValidator.isValid("");
 
         //then
-        assertFalse(valid);
+        assertThat(valid).isFalse();
     }
 
     @Test
@@ -103,7 +102,7 @@ public class URLValidatorTest {
         final boolean valid = URLValidator.isValid(null);
 
         //then
-        assertFalse(valid);
+        assertThat(valid).isFalse();
     }
 
 }

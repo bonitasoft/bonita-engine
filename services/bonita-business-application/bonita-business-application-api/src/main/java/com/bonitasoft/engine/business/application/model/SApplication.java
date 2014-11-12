@@ -15,13 +15,11 @@ import org.bonitasoft.engine.persistence.PersistentObject;
  */
 public interface SApplication extends PersistentObject {
 
-    String getName();
+    String getToken();
 
     String getDisplayName();
 
     String getVersion();
-
-    String getPath();
 
     String getDescription();
 
@@ -37,7 +35,7 @@ public interface SApplication extends PersistentObject {
 
     String getState();
 
-    long getHomePageId();
+    Long getHomePageId();
 
     Long getProfileId();
 
