@@ -92,6 +92,8 @@ GO
 -- business application
 ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_tenantId
 GO
+ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_appId
+GO
 ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_pageId
 GO
 ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_parentId
