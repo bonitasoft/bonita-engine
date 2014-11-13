@@ -23,6 +23,7 @@ import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
+import org.bonitasoft.engine.exception.NotFoundException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
@@ -187,6 +188,29 @@ public class ApplicationAPIDelegateTest {
         //then exception
     }
 
+    @Test(expected = CreationException.class)
+    public void createApplication_should_throw_CreationException_when_display_name_is_null() throws Exception {
+        //given
+        final ApplicationCreator creator = new ApplicationCreator(APP_TOKEN, null, VERSION);
+
+        //when
+        delegate.createApplication(creator);
+
+        //then exception
+    }
+
+    @Test(expected = CreationException.class)
+    public void createApplication_should_throw_CreationException_when_display_name_is_empty() throws Exception {
+        //given
+        final ApplicationCreator creator = new ApplicationCreator(APP_TOKEN, "", VERSION);
+
+        //when
+        delegate.createApplication(creator);
+
+        //then exception
+    }
+
+
     @Test
     public void createApplication_should_throw_CreationException_when_token_is_null() throws Exception {
         //given
@@ -288,8 +312,26 @@ public class ApplicationAPIDelegateTest {
         assertThat(updatedApplication).isEqualTo(application);
     }
 
+    @Test
+    public void updateApplication_should_return_result_of_applicationservice_getApplication_when_updater_is_empty() throws Exception {
+        //given
+        final SApplication sApplication = mock(SApplication.class);
+        final Application application = mock(Application.class);
+        final ApplicationUpdater updater = new ApplicationUpdater();
+        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
+        given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
+        given(applicationService.getApplication(APPLICATION_ID)).willReturn(sApplication);
+        given(convertor.toApplication(sApplication)).willReturn(application);
+
+        //when
+        final Application updatedApplication = delegate.updateApplication(APPLICATION_ID, updater);
+
+        //then
+        assertThat(updatedApplication).isEqualTo(application);
+    }
+
     @Test(expected = UpdateException.class)
-    public void updateApplication_should_throw_UpdateException_when_applicationservice_throws_SObjectModificationException() throws Exception {
+    public void updateApplication_should_throw_UpdateException_when_applicationService_throws_SObjectModificationException() throws Exception {
         //given
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("newToken");
@@ -304,13 +346,64 @@ public class ApplicationAPIDelegateTest {
     }
 
     @Test(expected = AlreadyExistsException.class)
-    public void updateApplication_should_throw_UpdateException_when_applicationservice_throws_SObjectAlreadyExistsException() throws Exception {
+    public void updateApplication_should_throw_UpdateException_when_applicationService_throws_SObjectAlreadyExistsException() throws Exception {
         //given
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("newToken");
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
         given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectAlreadyExistsException());
+
+        //when
+        delegate.updateApplication(APPLICATION_ID, updater);
+
+        //then exception
+    }
+
+    @Test(expected = ApplicationNotFoundException.class)
+    public void updateApplication_should_throw_ApplicationNotFoundException_when_applicationservice_throws_SObjectNotFoundException() throws Exception {
+        //given
+        final ApplicationUpdater updater = new ApplicationUpdater();
+        updater.setToken("newToken");
+        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
+        given(convertor.toApplicationUpdateDescriptor(updater, LOGGED_USER_ID)).willReturn(updateDescriptor);
+        given(applicationService.updateApplication(APPLICATION_ID, updateDescriptor)).willThrow(new SObjectNotFoundException());
+
+        //when
+        delegate.updateApplication(APPLICATION_ID, updater);
+
+        //then exception
+    }
+
+    @Test(expected = UpdateException.class)
+    public void updateApplication_should_throw_UpdateException_when_applicationService_token_is_invalid() throws Exception {
+        //given
+        final ApplicationUpdater updater = new ApplicationUpdater();
+        updater.setToken("token with spaces");
+
+        //when
+        delegate.updateApplication(APPLICATION_ID, updater);
+
+        //then exception
+    }
+
+    @Test(expected = UpdateException.class)
+    public void updateApplication_should_throw_UpdateException_when_applicationService_displayName_is_empty() throws Exception {
+        //given
+        final ApplicationUpdater updater = new ApplicationUpdater();
+        updater.setDisplayName("");
+
+        //when
+        delegate.updateApplication(APPLICATION_ID, updater);
+
+        //then exception
+    }
+
+    @Test(expected = UpdateException.class)
+    public void updateApplication_should_throw_UpdateException_when_applicationService_displayName_is_null() throws Exception {
+        //given
+        final ApplicationUpdater updater = new ApplicationUpdater();
+        updater.setDisplayName(null);
 
         //when
         delegate.updateApplication(APPLICATION_ID, updater);
