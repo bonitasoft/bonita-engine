@@ -150,9 +150,6 @@ public class TenantSequenceManagerImpl {
                             e.printStackTrace();
                             // do nothing
                         }
-                        //DEBUG
-                        t.printStackTrace();
-                        //DEBUG
                         throw t;
                     } catch (final Exception t) {
                         attempt++;
