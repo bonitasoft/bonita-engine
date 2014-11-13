@@ -14,6 +14,7 @@
 	<name>Bonita Service Integration Tests</name>
 
 	<dependencies>
+
 		<!-- Archive -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.archive</groupId>
@@ -364,6 +365,7 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
@@ -412,6 +414,19 @@
 									<version>${project.version}</version>
 									<type>zip</type>
 								</artifactItem>
+                                <artifactItem>
+									<groupId>org.bonitasoft.engine</groupId>
+									<artifactId>bonita-sql</artifactId>
+									<version>${project.version}</version>
+                                    <type>zip</type>
+                                </artifactItem>
+                                <artifactItem>
+									<groupId>org.bonitasoft.engine.test</groupId>
+									<artifactId>bonita-integration-tests-services-sql</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+									<outputDirectory>${project.build.directory}/test-classes/sql-test</outputDirectory>
+                                </artifactItem>
 							</artifactItems>
 							<outputDirectory>${project.build.directory}/server</outputDirectory>
 						</configuration>

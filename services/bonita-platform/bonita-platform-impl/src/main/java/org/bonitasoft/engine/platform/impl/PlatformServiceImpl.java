@@ -13,18 +13,28 @@
  **/
 package org.bonitasoft.engine.platform.impl;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
+
+import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.sql.DataSource;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
@@ -91,21 +101,13 @@ public class PlatformServiceImpl implements PlatformService {
 
     private static final String LOG_GET_PLATFORM = "getPlatform";
 
-    private static final String LOG_DELETE_TENANT_TABLES = "deleteTenantTables";
-
     private static final String LOG_DELETE_TENANT = "deleteTenant";
 
-    private static final String LOG_DELETE_PLATFORM_TABLES = "deletePlatformTables";
-
     private static final String LOG_DELETE_PLATFORM = "deletePlatform";
-
-    private static final String LOG_CREATE_TENANT_TABLES = "createTenantTables";
 
     private static final String LOG_CREATE_TENANT = "createTenant";
 
     private static final String LOG_CREATE_PLATFORM = "createPlatform";
-
-    private static final String LOG_CREATE_PLATFORM_TABLES = "createPlatformTables";
 
     private static final String LOG_IS_PLATFORM_CREATED = "isPlatformCreated";
 
@@ -133,41 +135,147 @@ public class PlatformServiceImpl implements PlatformService {
 
     private final Recorder recorder;
 
+    private final DataSource datasource;
+
+    // Get it from the constructor
+    final String statementDelimiter = ";";
+
+    private final List<File> sqlFolders;
+
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, final Recorder recorder,
             final List<TenantPersistenceService> tenantPersistenceServices, final TechnicalLoggerService logger,
-            final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties) {
+            final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties, final DataSource datasource, final File sqlFolder) {
+        this(platformPersistenceService, recorder, tenantPersistenceServices, logger, platformCacheService, sPlatformProperties, datasource, asList(sqlFolder));
+    }
+
+    public PlatformServiceImpl(final PersistenceService platformPersistenceService, final Recorder recorder,
+            final List<TenantPersistenceService> tenantPersistenceServices, final TechnicalLoggerService logger,
+            final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties, final DataSource datasource, final List<File> sqlFolders) {
         this.platformPersistenceService = platformPersistenceService;
         this.tenantPersistenceServices = tenantPersistenceServices;
         this.logger = logger;
         this.platformCacheService = platformCacheService;
         this.sPlatformProperties = sPlatformProperties;
         this.recorder = recorder;
+        this.datasource = datasource;
+        this.sqlFolders = sqlFolders;
+
         isTraced = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
     }
 
+    // Copied from PlatformAPIImpl
     @Override
-    public void createPlatformTables() throws SPlatformCreationException {
-        // create platform tables
-        if (isTraced) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_CREATE_PLATFORM_TABLES));
-        }
+    public void createTables() throws SPlatformCreationException {
         try {
-            platformPersistenceService.createStructure();
-            platformPersistenceService.postCreateStructure();
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_CREATE_PLATFORM_TABLES));
-            }
-        } catch (final SPersistenceException e) {
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_PLATFORM_TABLES, e));
-            }
-            throw new SPlatformCreationException("Unable to create platform tables : " + e.getMessage(), e);
-        } catch (final IOException e) {
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_PLATFORM_TABLES, e));
-            }
-            throw new SPlatformCreationException("Unable to create platform tables : " + e.getMessage(), e);
+            executeSQLResources(asList("createTables.sql", "createQuartzTables.sql", "postCreateStructure.sql"));
+        } catch (IOException e) {
+            throw new SPlatformCreationException(e);
+        } catch (SQLException e) {
+            throw new SPlatformCreationException(e);
         }
+    }
+
+    /**
+     * @param sqlFiles
+     * @throws SQLException
+     * @throws SPlatformCreationException
+     */
+    protected void executeSQLResources(final List<String> sqlFiles) throws IOException, SQLException {
+        executeSQLResources(sqlFiles, Collections.<String, String>emptyMap());
+    }
+
+    /**
+     * @param sqlFiles
+     * @throws SQLException
+     * @throws SPlatformCreationException
+     */
+    protected void executeSQLResources(final List<String> sqlFiles, final Map<String, String> replacements) throws IOException, SQLException {
+        for (final String sqlFile : sqlFiles) {
+            executeSQLResource(sqlFile, replacements);
+        }
+    }
+
+    /**
+     * @param sqlFile
+     * @throws IOException
+     * @throws SPersistenceException
+     */
+    protected void executeSQLResource(final String sqlFile, final Map<String, String> replacements) throws IOException, SQLException {
+        for (File sqlFolder : sqlFolders) {
+            File sqlResource = new File(sqlFolder, sqlFile);
+
+            if (sqlResource.exists()) {
+                final String fileContent = new String(IOUtil.getAllContentFrom(sqlResource));
+
+                if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                    logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Processing SQL resource : " + sqlResource);
+                }
+                final String regex = statementDelimiter.concat("\r?\n");
+                final List<String> commands = new ArrayList<String>(asList(fileContent.split(regex)));
+                final int lastIndex = commands.size() - 1;
+
+                // TODO : Review the algo and see if we can avoid the array.
+                String lastCommand = commands.get(lastIndex);
+                final int index = lastCommand.lastIndexOf(statementDelimiter);
+                if (index > 0) {
+                    lastCommand = lastCommand.substring(0, index);
+                    commands.remove(lastIndex);
+                    commands.add(lastCommand);
+                }
+
+                doExecuteSQLThroughJDBC(commands, replacements);
+            }
+        }
+    }
+
+    private void doExecuteSQLThroughJDBC(final List<String> commands, final Map<String, String> replacements) throws SQLException {
+        final Connection connection = getConnection();
+        connection.setAutoCommit(false);
+        try {
+            for (final String command : commands) {
+                if (command.trim().length() > 0) {
+                    final Statement stmt = connection.createStatement();
+                    try {
+                        if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
+                            logger.log(getClass(), TechnicalLogSeverity.TRACE, command);
+                        }
+                        final String filledCommand = fillTemplate(command, replacements);
+                        if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+                            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Executing the following command : " + filledCommand);
+                        }
+
+                        stmt.execute(filledCommand);
+                    } finally {
+                        stmt.close();
+                    }
+                }
+            }
+            connection.commit();
+        } catch (final SQLException sqe) {
+            connection.rollback();
+            throw sqe;
+        } finally {
+            connection.close();
+        }
+    }
+
+    private String fillTemplate(final String command, final Map<String, String> replacements) {
+        String trimmedCommand = command.trim();
+        if (trimmedCommand.isEmpty() || replacements == null) {
+            return trimmedCommand;
+        }
+
+        for (final Map.Entry<String, String> tableMapping : replacements.entrySet()) {
+            final String stringToReplace = tableMapping.getKey();
+            final String value = tableMapping.getValue();
+            trimmedCommand = trimmedCommand.replaceAll(stringToReplace, value);
+        }
+        return trimmedCommand;
+    }
+
+
+    private Connection getConnection() throws SQLException {
+        return datasource.getConnection();
     }
 
     @Override
@@ -232,56 +340,35 @@ public class PlatformServiceImpl implements PlatformService {
 
     private void initializeTenant(final STenant tenant) throws STenantCreationException {
         try {
-            final Map<String, String> replacements = new HashMap<String, String>();
-            replacements.put("tenantid", Long.toString(tenant.getId()));
-            for (final PersistenceService tenantPersistenceService : tenantPersistenceServices) {
-                tenantPersistenceService.initializeStructure(replacements);
-            }
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_CREATE_TENANT));
-            }
-        } catch (final SPersistenceException e) {
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_TENANT, e));
-            }
-            throw new STenantCreationException("Unable to create tenant tables : " + e.getMessage(), e);
-        } catch (final IOException e) {
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_TENANT, e));
-            }
-            throw new STenantCreationException("Unable to create tenant tables : " + e.getMessage(), e);
+            executeSQLResources(asList("initTenantTables.sql"), buildReplacements(tenant));
+        } catch (IOException e) {
+            throw new STenantCreationException(e);
+        } catch (SQLException e) {
+            throw new STenantCreationException(e);
+        }
+
+        if (isTraced) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_CREATE_TENANT));
         }
     }
 
-    @Override
-    public void createTenantTables() throws STenantCreationException {
-        // this is the first tenant, we should create tenant tables
-        try {
-            for (final PersistenceService tenantPersistenceService : tenantPersistenceServices) {
-                tenantPersistenceService.createStructure();
-                tenantPersistenceService.postCreateStructure();
-            }
-        } catch (final SPersistenceException e) {
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_TENANT_TABLES, e));
-            }
-            throw new STenantCreationException("Unable to create tenant tables : " + e.getMessage(), e);
-        } catch (final IOException e) {
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_CREATE_TENANT_TABLES, e));
-            }
-            throw new STenantCreationException("Unable to create tenant tables : " + e.getMessage(), e);
-        }
+    /**
+     * @param tenant
+     * @return
+     */
+    private Map<String, String> buildReplacements(final STenant tenant) {
+        return singletonMap("\\$\\{tenantid\\}", Long.toString(tenant.getId()));
     }
 
     @Override
     public void initializePlatformStructure() throws SPlatformCreationException {
+        // Read the files initTables.sql from ${bonita.home}/server/sql/${db.vendor}
         try {
-            platformPersistenceService.initializeStructure();
-        } catch (final SPersistenceException e) {
-            throw new SPlatformCreationException("Unable to initialize platform structure.", e);
-        } catch (final IOException e) {
-            throw new SPlatformCreationException("Unable to initialize platform structure.", e);
+            executeSQLResources(asList("initTables.sql"));
+        } catch (IOException e) {
+            throw new SPlatformCreationException(e);
+        } catch (SQLException e) {
+            throw new SPlatformCreationException(e);
         }
     }
 
@@ -323,29 +410,13 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
-    public void deletePlatformTables() throws SPlatformDeletionException {
-        if (isTraced) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_DELETE_PLATFORM_TABLES));
-        }
-        // delete platform tables
+    public void deleteTables() throws SPlatformDeletionException {
         try {
-            platformPersistenceService.preDropStructure();
-            platformPersistenceService.deleteStructure();
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_DELETE_PLATFORM_TABLES));
-            }
-        } catch (final SPersistenceException e) {
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_DELETE_PLATFORM_TABLES, e));
-            }
-
-            throw new SPlatformDeletionException("Unable to delete platform tables : " + e.getMessage(), e);
-        } catch (final IOException e) {
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_DELETE_PLATFORM_TABLES, e));
-            }
-
-            throw new SPlatformDeletionException("Unable to delete platform tables : " + e.getMessage(), e);
+            executeSQLResources(asList("preDropStructure.sql", "dropQuartzTables.sql", "dropTables.sql"));
+        } catch (IOException e) {
+            throw new SPlatformDeletionException(e);
+        } catch (SQLException e) {
+            throw new SPlatformDeletionException(e);
         }
     }
 
@@ -370,29 +441,6 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
-    public void deleteTenantTables() throws STenantDeletionException {
-        try {
-            for (final PersistenceService tenantPersistenceService : tenantPersistenceServices) {
-                tenantPersistenceService.preDropStructure();
-                tenantPersistenceService.deleteStructure();
-            }
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_DELETE_TENANT_TABLES));
-            }
-        } catch (final SPersistenceException e) {
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_DELETE_TENANT_TABLES, e));
-            }
-            throw new STenantDeletionException("Unable to delete tenant tables: " + e.getMessage(), e);
-        } catch (final IOException e) {
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_DELETE_TENANT_TABLES, e));
-            }
-            throw new STenantDeletionException("Unable to delete tenant tables : " + e.getMessage(), e);
-        }
-    }
-
-    @Override
     public void deleteTenantObjects(final long tenantId) throws STenantDeletionException, STenantNotFoundException, SDeletingActivatedTenantException {
         if (isTraced) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), LOG_DELETE_TENANT_OBJECTS));
@@ -401,20 +449,15 @@ public class PlatformServiceImpl implements PlatformService {
         if (tenant.getStatus().equals(STenant.ACTIVATED)) {
             throw new SDeletingActivatedTenantException();
         }
+
+        final Map<String, String> replacements = buildReplacements(tenant);
+
         try {
-            for (final TenantPersistenceService tenantPersistenceService : tenantPersistenceServices) {
-                tenantPersistenceService.deleteTenant(tenantId);
-            }
-        } catch (final SPersistenceException e) {
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_DELETE_TENANT_OBJECTS, e));
-            }
-            throw new STenantDeletionException("Unable to delete the tenant object : " + e.getMessage(), e);
-        } catch (final IOException e) {
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_DELETE_TENANT_OBJECTS, e));
-            }
-            throw new STenantDeletionException("Unable to delete the tenant object : " + e.getMessage(), e);
+            executeSQLResources(asList("deleteTenantObjects.sql"), replacements);
+        } catch (IOException e) {
+            throw new STenantDeletionException(e);
+        } catch (SQLException e) {
+            throw new STenantDeletionException(e);
         }
     }
 
@@ -612,19 +655,6 @@ public class PlatformServiceImpl implements PlatformService {
                 // Ok
             }
         }
-        // final UpdateDescriptor desc = new UpdateDescriptor(tenant);
-        // desc.addFields(descriptor.getFields());
-        // try {
-        // platformPersistenceService.update(desc);
-        // if (trace) {
-        // logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), LOG_UPDATE_TENANT));
-        // }
-        // } catch (final SPersistenceException e) {
-        // if (trace) {
-        // logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), LOG_UPDATE_TENANT, e));
-        // }
-        // throw new STenantUpdateException("Problem while updating tenant: " + tenant, e);
-        // }
 
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(tenant, descriptor);
         final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(TENANT).setObject(tenant).done();
@@ -763,18 +793,14 @@ public class PlatformServiceImpl implements PlatformService {
     @Override
     public void cleanTenantTables() throws STenantUpdateException {
         try {
-            for (final PersistenceService tenantPersistenceService : tenantPersistenceServices) {
-                tenantPersistenceService.cleanStructure();
-            }
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "cleanTenantTables"));
-            }
-        } catch (final Exception e) {
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "cleanTenantTables", e));
-            }
-            throw new STenantUpdateException("Unable to clean tenant tables : " + e.getMessage(), e);
+            // TODO Rename the file to cleanTenantTables
+            executeSQLResources(asList("cleanTables.sql"));
+        } catch (IOException e) {
+            throw new STenantUpdateException(e);
+        } catch (SQLException e) {
+            throw new STenantUpdateException(e);
         }
+
     }
 
     @Override

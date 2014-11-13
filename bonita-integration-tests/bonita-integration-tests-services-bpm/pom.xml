@@ -4,8 +4,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>bonita-integration-tests</artifactId>
 		<groupId>org.bonitasoft.engine.test</groupId>
+		<artifactId>bonita-integration-tests</artifactId>
 		<version>6.4.0</version>
 	</parent>
 
@@ -14,10 +14,19 @@
     <name>Bonita Service BPM Integration Tests</name>
 
 	<properties>
-		<bonita.home>${project.build.directory}/home</bonita.home>
+		<bonita.home>${project.build.directory}/test-classes/home</bonita.home>
 	</properties>
 
 	<dependencies>
+    
+        <dependency>
+            <groupId>org.bonitasoft.engine.test</groupId>
+            <artifactId>bonita-integration-tests-services</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
+    
 		<!-- Actor Mapping -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
@@ -139,21 +148,21 @@
 			<scope>test</scope>
 		</dependency>
 
-        <!-- Dependency -->
-        <dependency>
-            <groupId>org.bonitasoft.engine.dependency</groupId>
-            <artifactId>bonita-dependency-impl</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
+		<!-- Dependency -->
+		<dependency>
+			<groupId>org.bonitasoft.engine.dependency</groupId>
+			<artifactId>bonita-dependency-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 
-        <!-- Document -->
-        <dependency>
+		<!-- Document -->
+		<dependency>
             <groupId>org.bonitasoft.engine.core.document</groupId>
-            <artifactId>bonita-document-impl</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
+			<artifactId>bonita-document-impl</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- Engine -->
 		<dependency>
@@ -585,15 +594,12 @@
 						</goals>
 						<configuration>
 							<target name="copy-bpm-test-conf">
-                                <copy todir="${project.build.directory}/conf">
+                                <copy todir="${project.build.directory}/test-classes/conf">
                                     <fileset dir="${project.build.directory}/server/conf/service" />
                                 </copy>
-                                <copy todir="${project.build.directory}/conf" overwrite="true">
+								<copy todir="${project.build.directory}/test-classes/conf" overwrite="true">
                                     <fileset dir="${project.build.directory}/server/conf/bpm" />
-                                </copy>
-<!-- 								<copy todir="${project.build.directory}/conf" overwrite="true"> -->
-<!-- 									<fileset dir="${basedir}/src/test/resources/conf" /> -->
-<!-- 								</copy> -->
+								</copy>
 							</target>
 						</configuration>
 					</execution>
@@ -621,6 +627,24 @@
 							<outputDirectory>${project.build.directory}/server</outputDirectory>
 						</configuration>
 					</execution>
+					<execution>
+						<id>copy sql files test setup</id>
+						<phase>generate-test-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+                                <artifactItem>
+                                    <groupId>org.bonitasoft.engine</groupId>
+                                    <artifactId>bonita-sql</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                </artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -635,7 +659,7 @@
 					</properties>
 					<systemPropertyVariables>
 						<bonita.home>${bonita.home}</bonita.home>
-						<bonita.services.folder>${project.build.directory}/conf</bonita.services.folder>
+						<bonita.services.folder>${project.build.directory}/test-classes/conf</bonita.services.folder>
 						<sysprop.bonita.orderby.checking.mode>NONE</sysprop.bonita.orderby.checking.mode>
 					</systemPropertyVariables>
 					<includes>

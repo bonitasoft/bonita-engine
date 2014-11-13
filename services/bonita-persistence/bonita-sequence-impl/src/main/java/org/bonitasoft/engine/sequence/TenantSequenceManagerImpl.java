@@ -141,6 +141,19 @@ public class TenantSequenceManagerImpl {
 
                         connection.commit();
                         return;
+                    } catch (final SObjectNotFoundException t) {
+                        // Not found needs no retry.
+                        attempt = retries + 1; // To exit the loop
+                        try {
+                            connection.rollback();
+                        } catch (final SQLException e) {
+                            e.printStackTrace();
+                            // do nothing
+                        }
+                        //DEBUG
+                        t.printStackTrace();
+                        //DEBUG
+                        throw t;
                     } catch (final Exception t) {
                         attempt++;
                         try {

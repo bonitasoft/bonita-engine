@@ -12,6 +12,8 @@
 		<constructor-arg ref="platformCacheService" />
 		<constructor-arg ref="platformProperties" />
 		<constructor-arg name="recorder" ref="platformRecorderSync" />
+		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
+		<constructor-arg name="sqlFolder" value="${bonita.home}/server/sql/${db.vendor}" />
 	</bean>
 	
 	<bean id="platformProperties" class="org.bonitasoft.engine.platform.model.impl.SPlatformPropertiesImpl" />

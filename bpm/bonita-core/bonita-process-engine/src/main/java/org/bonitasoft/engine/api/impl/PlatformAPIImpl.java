@@ -33,8 +33,6 @@ import org.bonitasoft.engine.api.impl.transaction.platform.ActivateTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.CheckPlatformVersion;
 import org.bonitasoft.engine.api.impl.transaction.platform.CleanPlatformTableContent;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteAllTenants;
-import org.bonitasoft.engine.api.impl.transaction.platform.DeletePlatformContent;
-import org.bonitasoft.engine.api.impl.transaction.platform.DeletePlatformTableContent;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenant;
 import org.bonitasoft.engine.api.impl.transaction.platform.DeleteTenantObjects;
 import org.bonitasoft.engine.api.impl.transaction.platform.GetPlatformContent;
@@ -151,8 +149,7 @@ public class PlatformAPIImpl implements PlatformAPI {
         final TransactionService transactionService = platformAccessor.getTransactionService();
         try {
             final SPlatform platform = constructPlatform(platformAccessor);
-            platformService.createPlatformTables();
-            platformService.createTenantTables();
+            platformService.createTables();
 
             transactionService.begin();
             try {
@@ -573,20 +570,8 @@ public class PlatformAPIImpl implements PlatformAPI {
             throw new DeletionException(e);
         }
         final PlatformService platformService = platformAccessor.getPlatformService();
-        final TransactionExecutor transactionExecutor = platformAccessor.getTransactionExecutor();
-        final TransactionContent deletePlatformContent = new DeletePlatformContent(platformService);
         try {
-            final TransactionContent deleteTenantTables = new TransactionContent() {
-
-                @Override
-                public void execute() throws SBonitaException {
-                    platformService.deleteTenantTables();
-                }
-            };
-            transactionExecutor.execute(deletePlatformContent);
-            transactionExecutor.execute(deleteTenantTables);
-            final TransactionContent deletePlatformTableContent = new DeletePlatformTableContent(platformService);
-            transactionExecutor.execute(deletePlatformTableContent);
+            platformService.deleteTables();
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
         }

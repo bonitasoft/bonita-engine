@@ -1,0 +1,126 @@
+DROP TABLE actormember
+GO
+DROP TABLE actor
+GO
+DROP TABLE processcategorymapping
+GO
+DROP TABLE category
+GO
+DROP TABLE migration_plan
+GO
+DROP TABLE arch_process_comment
+GO
+DROP TABLE process_comment
+GO
+DROP TABLE process_definition
+GO
+DROP TABLE arch_document_mapping
+GO
+DROP TABLE document_mapping
+GO
+DROP TABLE arch_flownode_instance
+GO
+DROP TABLE arch_process_instance
+GO
+DROP TABLE arch_transition_instance
+GO
+DROP TABLE arch_connector_instance
+GO
+DROP TABLE multi_biz_data
+GO
+DROP TABLE ref_biz_data_inst
+GO
+DROP TABLE pending_mapping
+GO
+DROP TABLE connector_instance
+GO
+DROP TABLE flownode_instance
+GO
+DROP TABLE process_instance
+GO
+DROP TABLE event_trigger_instance
+GO
+DROP TABLE waiting_event
+GO
+DROP TABLE message_instance
+GO
+DROP TABLE hidden_activity
+GO
+DROP TABLE token
+GO
+DROP TABLE breakpoint
+GO
+DROP TABLE report
+GO
+DROP TABLE processsupervisor
+GO
+DROP TABLE business_app
+GO
+DROP TABLE business_app_page
+GO
+DROP TABLE command
+GO
+DROP TABLE arch_data_instance
+GO
+DROP TABLE arch_data_mapping
+GO
+DROP TABLE data_mapping
+GO
+DROP TABLE data_instance
+GO
+DROP TABLE dependencymapping
+GO
+DROP TABLE dependency
+GO
+DROP TABLE pdependencymapping
+GO
+DROP TABLE pdependency
+GO
+DROP TABLE document_content
+GO
+DROP TABLE external_identity_mapping
+GO
+DROP TABLE user_membership
+GO
+DROP TABLE custom_usr_inf_val
+GO
+DROP TABLE custom_usr_inf_def
+GO
+DROP TABLE user_contactinfo
+GO
+DROP TABLE user_
+GO
+DROP TABLE role
+GO
+DROP TABLE group_
+GO
+DROP TABLE queriablelog_p
+GO
+DROP TABLE queriable_log
+GO
+DROP TABLE page
+GO
+DROP TABLE sequence
+GO
+DROP TABLE tenant
+GO
+DROP TABLE platform
+GO
+DROP TABLE platformCommand
+GO
+DROP TABLE profilemember
+GO
+DROP TABLE profileentry
+GO
+DROP TABLE profile
+GO
+DROP TABLE job_log
+GO
+DROP TABLE job_param
+GO
+DROP TABLE job_desc
+GO
+DROP TABLE theme
+GO
+DROP TABLE blob_
+GO
