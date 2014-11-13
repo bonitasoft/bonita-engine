@@ -18,8 +18,12 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import com.bonitasoft.manager.Features;
+import com.bonitasoft.manager.Manager;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
+import org.bonitasoft.engine.commons.TenantLifecycleService;
+import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
@@ -29,7 +33,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -52,7 +55,7 @@ import com.bonitasoft.engine.core.reporting.processor.Vendor;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class ReportingServiceImpl implements ReportingService {
+public class ReportingServiceImpl implements ReportingService, TenantLifecycleService {
 
     private static final CharSequence COMMA = ",";
 
@@ -74,8 +77,17 @@ public class ReportingServiceImpl implements ReportingService {
 
     private QueryPreProcessor queryPreProcessor;
 
+    private boolean isTraceabilityActive;
+    private DefaultReportImporter defaultProfileImporter;
+
     public ReportingServiceImpl(final DataSource dataSource, final ReadPersistenceService persistenceService, final QueryPreProcessor queryPreProcessor,
             final Recorder recorder, final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService) {
+        this(dataSource, persistenceService, queryPreProcessor, recorder, eventService, logger, queriableLoggerService, Manager.getInstance(), null);
+    }
+
+    ReportingServiceImpl(final DataSource dataSource, final ReadPersistenceService persistenceService, final QueryPreProcessor queryPreProcessor,
+            final Recorder recorder, final EventService eventService, final TechnicalLoggerService logger, final QueriableLoggerService queriableLoggerService,
+            Manager manager, DefaultReportImporter defaultProfileImporter) {
         this.dataSource = dataSource;
         this.persistenceService = persistenceService;
         this.queryPreProcessor = queryPreProcessor;
@@ -83,6 +95,13 @@ public class ReportingServiceImpl implements ReportingService {
         this.recorder = recorder;
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
+        isTraceabilityActive = manager.isFeatureActive(Features.TRACEABILITY);
+        if(defaultProfileImporter == null){
+            this.defaultProfileImporter = new DefaultReportImporter(this, logger);
+        }else{
+            this.defaultProfileImporter = defaultProfileImporter;
+        }
+
     }
 
     @Override
@@ -376,4 +395,30 @@ public class ReportingServiceImpl implements ReportingService {
         }
     }
 
+    @Override
+    public void start() throws SBonitaException {
+        defaultProfileImporter.invoke("case_avg_time");
+        defaultProfileImporter.invoke("case_list");
+        defaultProfileImporter.invoke("task_list");
+        if (isTraceabilityActive) {
+            defaultProfileImporter.invoke("case_history");
+        }
+    }
+
+
+
+    @Override
+    public void stop() throws SBonitaException {
+
+    }
+
+    @Override
+    public void pause() throws SBonitaException {
+
+    }
+
+    @Override
+    public void resume() throws SBonitaException {
+
+    }
 }

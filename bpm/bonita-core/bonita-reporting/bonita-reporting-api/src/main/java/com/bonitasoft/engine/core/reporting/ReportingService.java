@@ -11,6 +11,7 @@ package com.bonitasoft.engine.core.reporting;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -18,7 +19,7 @@ import org.bonitasoft.engine.persistence.SBonitaReadException;
 /**
  * @author Matthieu Chaffotte
  */
-public interface ReportingService {
+public interface ReportingService extends TenantLifecycleService {
 
     String REPORT = "REPORT";
 
