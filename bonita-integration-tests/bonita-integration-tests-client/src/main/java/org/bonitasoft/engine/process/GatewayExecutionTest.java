@@ -852,7 +852,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        waitForGateway("gateway2", processInstance, true);
+        waitForGateway(processInstance, "gateway2");
 
         final List<HumanTaskInstance> pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10,
                 ActivityInstanceCriterion.NAME_ASC);
@@ -881,7 +881,7 @@ public class GatewayExecutionTest extends CommonAPITest {
 
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        waitForGateway("gateway2", processInstance, true);
+        waitForGateway(processInstance, "gateway2");
 
         final List<HumanTaskInstance> pendingHumanTaskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10,
                 ActivityInstanceCriterion.NAME_ASC);
@@ -1071,10 +1071,8 @@ public class GatewayExecutionTest extends CommonAPITest {
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("Step1", processInstance);
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getHumanTaskInstances(processInstance.getId(), "Step1", 0, 1);
-        assignAndExecuteStep(taskInstances.get(0).getId(), user.getId());
-        waitForUserTaskAndExecuteIt("Step3", processInstance, user.getId());
+        waitForUserTaskAndExecuteIt("Step1", processInstance, user);
+        waitForUserTaskAndExecuteIt("Step3", processInstance, user);
         waitForTaskToFail(processInstance);
         // should also get the exception...not yet in the task
         disableAndDeleteProcess(processDefinition);
@@ -1095,7 +1093,6 @@ public class GatewayExecutionTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-
         final long flowNodeInstanceId = waitForFlowNodeInState(processInstance, "join", TestStates.EXECUTING, false);
 
         logoutOnTenant();

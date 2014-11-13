@@ -226,8 +226,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
     private void getArchivedProcessInstances() throws Exception {
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
-                Arrays.asList("step1", "step2"),
-                Arrays.asList(false, false));
+                Arrays.asList("step1", "step2"), Arrays.asList(false, false));
         final ProcessDefinition processDefinition = deployAndEnableProcess(designProcessDefinition);
 
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
@@ -631,7 +630,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step1", ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, pedro);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForStep("step1", processInstance);
+        waitForUserTask("step1", processInstance);
 
         final long processInstanceId = processInstance.getId();
         processInstance = getProcessAPI().getProcessInstance(processInstanceId);
@@ -657,12 +656,12 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
         // Start process instance first time, and complete it
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("initTask1", processInstance.getId(), pedro.getId());
+        waitForUserTaskAndExecuteIt("initTask1", processInstance, pedro);
         waitForProcessToFinish(processInstance);
 
         // Start process instance second time
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("initTask1", processInstance2.getId(), pedro.getId());
+        waitForUserTaskAndExecuteIt("initTask1", processInstance2, pedro);
         waitForProcessToFinish(processInstance2);
 
         disableAndDeleteProcess(processDefinition);

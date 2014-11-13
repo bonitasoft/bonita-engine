@@ -31,6 +31,7 @@ import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.CallActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
@@ -67,7 +68,6 @@ import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.wait.WaitForActivity;
 import org.bonitasoft.engine.test.wait.WaitForFinalArchivedActivity;
 import org.junit.After;
 import org.junit.Before;
@@ -408,7 +408,7 @@ public class CallActivityTest extends CommonAPITest {
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
 
         // execute process until step1
-        waitForUserTaskAndExecuteIt("tStep1", callingProcessInstance, cebolinha.getId());
+        waitForUserTaskAndExecuteIt("tStep1", callingProcessInstance, cebolinha);
         waitForUserTask("step1", callingProcessInstance);
 
         /*
@@ -449,9 +449,8 @@ public class CallActivityTest extends CommonAPITest {
             checkNbOfProcessInstances(2, ProcessInstanceCriterion.NAME_DESC);
             final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_DESC);
             assertEquals(1, processInstances.size());
-            final WaitForActivity waitForActivity = waitForActivity("callActivity", callingProcessInstance);
-            final ActivityInstance callActivityInstance = waitForActivity.getResult();
-            assertEquals(TestStates.FAILED, callActivityInstance.getState());
+
+            waitForFlowNodeInFailedState(callingProcessInstance, "callActivity");
 
             return;
         }
@@ -470,9 +469,7 @@ public class CallActivityTest extends CommonAPITest {
             assertEquals(targetProcessDef1.getId(), targetPI.getProcessDefinitionId());
         }
 
-        final WaitForActivity waitForActivity = waitForActivity("callActivity", callingProcessInstance);
-        final ActivityInstance callActivityInstance = waitForActivity.getResult();
-        assertEquals(TestStates.EXECUTING.getStateName(), callActivityInstance.getState());
+        final FlowNodeInstance callActivityInstance = waitForFlowNodeInExecutingState(callingProcessInstance, "callActivity", true);
         assertEquals(callingProcessInstance.getId(), targetPI.getRootProcessInstanceId());
         assertEquals(callActivityInstance.getId(), targetPI.getCallerId());
 
@@ -663,7 +660,6 @@ public class CallActivityTest extends CommonAPITest {
     @Cover(classes = CallActivityInstance.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Archiving" }, jira = "")
     @Test
     public void getArchivedCallActivityInstance() throws Exception {
-
         final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
         final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "targetProcess", 0, PROCESS_VERSION);
 
@@ -671,9 +667,7 @@ public class CallActivityTest extends CommonAPITest {
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
         final ProcessInstance targetPI = getTargetProcessInstance(targetProcessDef);
 
-        final WaitForActivity waitForActivity = waitForActivity("callActivity", callingProcessInstance);
-        final ActivityInstance callActivityInstance = waitForActivity.getResult();
-        assertEquals(TestStates.EXECUTING.getStateName(), callActivityInstance.getState());
+        final FlowNodeInstance callActivityInstance = waitForFlowNodeInExecutingState(callingProcessInstance, "callActivity", true);
 
         waitForStepAndExecuteIt(callingProcessInstance, "tStep1", cebolinha, targetPI); // first loop execution
         waitForProcessToFinish(targetPI);
@@ -804,8 +798,7 @@ public class CallActivityTest extends CommonAPITest {
             final ProcessInstance targetPI = processInstances.get(0);
             assertEquals(targetPI.getProcessDefinitionId(), targetProcessDef.getId());
             assertEquals(PROCESS_VERSION, targetProcessDef.getVersion());
-            final ActivityInstance callActivityInstance = waitForActivity("callActivity", callingProcessInstance).getResult();
-            assertEquals(TestStates.EXECUTING.getStateName(), callActivityInstance.getState());
+            final FlowNodeInstance callActivityInstance = waitForFlowNodeInExecutingState(callingProcessInstance, "callActivity", true);
             assertEquals(callingProcessInstance.getId(), targetPI.getRootProcessInstanceId());
             assertEquals(callActivityInstance.getId(), targetPI.getCallerId());
             final HumanTaskInstance tStep1 = waitForUserTask("tStep1", callingProcessInstance);
@@ -855,8 +848,7 @@ public class CallActivityTest extends CommonAPITest {
             final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_DESC);
             assertEquals(2, processInstances.size()); // two instances are expected calling and target process
             final ProcessInstance targetPI = processInstances.get(0);
-            final ActivityInstance callActivityInstance = waitForActivity("callActivity", callingProcessInstance).getResult();
-            assertEquals(TestStates.EXECUTING.getStateName(), callActivityInstance.getState());
+            final FlowNodeInstance callActivityInstance = waitForFlowNodeInExecutingState(callingProcessInstance, "callActivity", true);
             assertEquals(callingProcessInstance.getId(), targetPI.getRootProcessInstanceId());
             assertEquals(callActivityInstance.getId(), targetPI.getCallerId());
             assertEquals("callActivityDisplayName", callActivityInstance.getDisplayName());

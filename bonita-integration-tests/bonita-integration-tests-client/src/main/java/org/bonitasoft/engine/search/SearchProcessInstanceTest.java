@@ -1209,12 +1209,11 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         final ProcessInstance procInst = getProcessAPI().startProcess(simpleProcess.getId());
 
         // execute it until the end
-        final long processInstanceId = procInst.getId();
-        waitForUserTaskAndExecuteIt("step1", processInstanceId, user.getId());
-        waitForProcessToFinish(processInstanceId);
+        waitForUserTaskAndExecuteIt("step1", procInst, user);
+        waitForProcessToFinish(procInst);
 
         // search archived process instances: all states must be retrieved
-        final SearchResult<ArchivedProcessInstance> searchResult = searchAchivedProcessInstancesInAllStates(processInstanceId);
+        final SearchResult<ArchivedProcessInstance> searchResult = searchAchivedProcessInstancesInAllStates(procInst.getId());
 
         assertEquals(3, searchResult.getCount());
         final List<ArchivedProcessInstance> archivedProcesses = searchResult.getResult();

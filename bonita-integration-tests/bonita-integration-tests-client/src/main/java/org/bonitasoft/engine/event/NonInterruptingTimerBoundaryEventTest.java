@@ -142,13 +142,11 @@ public class NonInterruptingTimerBoundaryEventTest extends AbstractEventTest {
         final String multiTaskName = "step1";
         final String normalTaskName = "step2";
         final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration, false, multiTaskName, loopCardinality,
-                false,
-                normalTaskName, "exceptionStep");
+                false, normalTaskName, "exceptionStep");
 
         // start the process and wait for process to be triggered
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForStep(multiTaskName, processInstance);
-        Thread.sleep(timerDuration); // wait timer trigger
+        waitForUserTask(multiTaskName, processInstance);
 
         // verify that the exception flow was taken
         final HumanTaskInstance exceptionFlowStep = waitForUserTask("exceptionStep", processInstance);
