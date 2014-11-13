@@ -52,7 +52,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
     @After
     public void afterTest() throws BonitaException {
         deleteUser(user);
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     @Before
@@ -72,9 +72,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("step2", processInstance1);
         getProcessAPI().startProcess(processDefinition.getId());
-
-        waitForStep("step2", processInstance1);
 
         final ProcessInstanceUpdater updateDescriptor = new ProcessInstanceUpdater();
         updateDescriptor.setStringIndex1("metsassa");
@@ -98,17 +97,13 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
     @Test
     public void searchOpenProcessInstancesFromStringIndex2AndUpdateIt() throws Exception {
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition();
-
         final BusinessArchive businessArchive = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
         final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive);
-
         addUserToFirstActorOfProcess(1, processDefinition);
-
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("step2", processInstance1);
         getProcessAPI().startProcess(processDefinition.getId());
-
-        waitForStep("step2", processInstance1);
 
         final ProcessInstanceUpdater updateDescriptor = new ProcessInstanceUpdater();
         updateDescriptor.setStringIndex2("metsassa");
@@ -140,9 +135,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("step2", processInstance1);
         getProcessAPI().startProcess(processDefinition.getId());
-
-        waitForStep("step2", processInstance1);
 
         final ProcessInstanceUpdater updateDescriptor = new ProcessInstanceUpdater();
         updateDescriptor.setStringIndex3("metsassa");
@@ -174,9 +168,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("step2", processInstance1);
         getProcessAPI().startProcess(processDefinition.getId());
-
-        waitForStep("step2", processInstance1);
 
         final ProcessInstanceUpdater updateDescriptor = new ProcessInstanceUpdater();
         updateDescriptor.setStringIndex4("metsassa");
@@ -208,9 +201,8 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("step2", processInstance1);
         getProcessAPI().startProcess(processDefinition.getId());
-
-        waitForStep("step2", processInstance1);
 
         final ProcessInstanceUpdater updateDescriptor = new ProcessInstanceUpdater();
         updateDescriptor.setStringIndex5("metsassa");
@@ -240,42 +232,41 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final User user3 = createUser("john3", "bpm");
         final User user4 = createUser("john4", "bpm");
 
-        final String delivery = "delivery";
-        final DesignProcessDefinition designProcessDefinition1 = createProcessDefinition("3", delivery, true, "value1", "value2", "value3", "value4", "value5")
+        final DesignProcessDefinition designProcessDefinition1 = createProcessDefinition("3", true, "value1", "value2", "value3", "value4", "value5")
                 .done();
-        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition1, delivery, user1);
+        final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition1, ACTOR_NAME, user1);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
         waitForUserTask("step1", processInstance1.getId());
-       logoutOnTenant();
+        logoutOnTenant();
 
         loginOnDefaultTenantWith("john1", "bpm");
-        final DesignProcessDefinition designProcessDefinition2 = createProcessDefinition("2", delivery, true, "value2", "value4", "value1", "value5", "value3")
+        final DesignProcessDefinition designProcessDefinition2 = createProcessDefinition("2", true, "value2", "value4", "value1", "value5", "value3")
                 .done();
-        final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(designProcessDefinition2, delivery, user2);
+        final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(designProcessDefinition2, ACTOR_NAME, user2);
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
         waitForUserTask("step1", processInstance2.getId());
-       logoutOnTenant();
+        logoutOnTenant();
 
         loginOnDefaultTenantWith("john3", "bpm");
-        final DesignProcessDefinition designProcessDefinition3 = createProcessDefinition("5", delivery, true, "value4", "value3", "value5", "value2", "value1")
+        final DesignProcessDefinition designProcessDefinition3 = createProcessDefinition("5", true, "value4", "value3", "value5", "value2", "value1")
                 .done();
-        final ProcessDefinition processDefinition3 = deployAndEnableProcessWithActor(designProcessDefinition3, delivery, user3);
+        final ProcessDefinition processDefinition3 = deployAndEnableProcessWithActor(designProcessDefinition3, ACTOR_NAME, user3);
         final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefinition3.getId());
         waitForUserTask("step1", processInstance3.getId());
-       logoutOnTenant();
+        logoutOnTenant();
 
         loginOnDefaultTenantWith("john2", "bpm");
-        final DesignProcessDefinition designProcessDefinition4 = createProcessDefinition("4", delivery, true, "value5", "value1", "value4", "value3", "value2")
+        final DesignProcessDefinition designProcessDefinition4 = createProcessDefinition("4", true, "value5", "value1", "value4", "value3", "value2")
                 .done();
-        final ProcessDefinition processDefinition4 = deployAndEnableProcessWithActor(designProcessDefinition4, delivery, user4);
+        final ProcessDefinition processDefinition4 = deployAndEnableProcessWithActor(designProcessDefinition4, ACTOR_NAME, user4);
         final ProcessInstance processInstance4 = getProcessAPI().startProcess(processDefinition4.getId());
         waitForUserTask("step1", processInstance4.getId());
-       logoutOnTenant();
+        logoutOnTenant();
 
         loginOnDefaultTenantWith("john4", "bpm");
-        final DesignProcessDefinition designProcessDefinition5 = createProcessDefinition("1", delivery, true, "value3", "value5", "value2", "value1", "value4")
+        final DesignProcessDefinition designProcessDefinition5 = createProcessDefinition("1", true, "value3", "value5", "value2", "value1", "value4")
                 .done();
-        final ProcessDefinition processDefinition5 = deployAndEnableProcessWithActor(designProcessDefinition5, delivery, user1);
+        final ProcessDefinition processDefinition5 = deployAndEnableProcessWithActor(designProcessDefinition5, ACTOR_NAME, user1);
         final ProcessInstance processInstance5 = getProcessAPI().startProcess(processDefinition5.getId());
         waitForUserTask("step1", processInstance5.getId());
 
@@ -305,41 +296,40 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         final User user3 = createUser("john3", "bpm");
         final User user4 = createUser("john4", "bpm");
 
-        final String delivery = "delivery";
-        final DesignProcessDefinition designProcessDefinition1 = createProcessDefinition("3", delivery, false, "value1", "value2", "value3", "value4", "value5")
+        final DesignProcessDefinition designProcessDefinition1 = createProcessDefinition("3", false, "value1", "value2", "value3", "value4", "value5")
                 .done();
         // final ProcessDefinition processDefinition1 = deployAndEnableWithActor(designProcessDefinition1, delivery, user1);
         final ProcessDefinition processDefinition1 = deployAndEnableProcess(designProcessDefinition1);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
         waitForProcessToFinish(processInstance1);
-       logoutOnTenant();
+        logoutOnTenant();
 
         loginOnDefaultTenantWith("john1", "bpm");
-        final DesignProcessDefinition designProcessDefinition2 = createProcessDefinition("2", delivery, false, "value2", "value4", "value1", "value5", "value3")
+        final DesignProcessDefinition designProcessDefinition2 = createProcessDefinition("2", false, "value2", "value4", "value1", "value5", "value3")
                 .done();
         final ProcessDefinition processDefinition2 = deployAndEnableProcess(designProcessDefinition2);
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
         waitForProcessToFinish(processInstance2);
-       logoutOnTenant();
+        logoutOnTenant();
 
         loginOnDefaultTenantWith("john3", "bpm");
-        final DesignProcessDefinition designProcessDefinition3 = createProcessDefinition("5", delivery, false, "value4", "value3", "value5", "value2", "value1")
+        final DesignProcessDefinition designProcessDefinition3 = createProcessDefinition("5", false, "value4", "value3", "value5", "value2", "value1")
                 .done();
         final ProcessDefinition processDefinition3 = deployAndEnableProcess(designProcessDefinition3);
         final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefinition3.getId());
         waitForProcessToFinish(processInstance3);
-       logoutOnTenant();
+        logoutOnTenant();
 
         loginOnDefaultTenantWith("john2", "bpm");
-        final DesignProcessDefinition designProcessDefinition4 = createProcessDefinition("4", delivery, false, "value5", "value1", "value4", "value3", "value2")
+        final DesignProcessDefinition designProcessDefinition4 = createProcessDefinition("4", false, "value5", "value1", "value4", "value3", "value2")
                 .done();
         final ProcessDefinition processDefinition4 = deployAndEnableProcess(designProcessDefinition4);
         final ProcessInstance processInstance4 = getProcessAPI().startProcess(processDefinition4.getId());
         waitForProcessToFinish(processInstance4);
-       logoutOnTenant();
+        logoutOnTenant();
 
         loginOnDefaultTenantWith("john4", "bpm");
-        final DesignProcessDefinition designProcessDefinition5 = createProcessDefinition("1", delivery, false, "value3", "value5", "value2", "value1", "value4")
+        final DesignProcessDefinition designProcessDefinition5 = createProcessDefinition("1", false, "value3", "value5", "value2", "value1", "value4")
                 .done();
         final ProcessDefinition processDefinition5 = deployAndEnableProcess(designProcessDefinition5);
         final ProcessInstance processInstance5 = getProcessAPI().startProcess(processDefinition5.getId());
@@ -422,14 +412,14 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         deleteUsers(user1, user2, user3, user4);
     }
 
-    private ProcessDefinitionBuilderExt createProcessDefinition(final String processName, final String delivery, final boolean withUserTask,
-            final String stringIndex1, final String stringIndex2, final String stringIndex3, final String stringIndex4, final String stringIndex5)
+    private ProcessDefinitionBuilderExt createProcessDefinition(final String processName, final boolean withUserTask, final String stringIndex1,
+            final String stringIndex2, final String stringIndex3, final String stringIndex4, final String stringIndex5)
             throws InvalidExpressionException {
         final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(processName, "17.3");
         designProcessDefinition.addDescription("Delivery all day and night long");
         if (withUserTask) {
-            designProcessDefinition.addActor(delivery);
-            designProcessDefinition.addUserTask("step1", delivery);
+            designProcessDefinition.addActor(ACTOR_NAME);
+            designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         } else {
             designProcessDefinition.addAutomaticTask("step1");
         }
