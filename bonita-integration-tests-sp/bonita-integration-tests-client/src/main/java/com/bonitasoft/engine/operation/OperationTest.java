@@ -62,17 +62,17 @@ public class OperationTest extends CommonAPITest {
 
     @After
     public void afterTest() throws BonitaException {
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWithDefaultTechnicalUser();
         deleteUser(JOHN);
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         john = createUser(JOHN, "bpm");
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith(JOHN, "bpm");
     }
 
@@ -535,7 +535,7 @@ public class OperationTest extends CommonAPITest {
         builder.setProcessDefinition(designProcessDefinition.done());
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "Workers", john);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), john.getId());
+        waitForUserTaskAndExecuteIt("step1", startProcess, john);
         waitForUserTask("step2", startProcess);
         disableAndDeleteProcess(processDefinition);
     }

@@ -115,7 +115,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
     public void beforeTest() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         businessUser = createUser(USERNAME, PASSWORD);
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
     }
 
@@ -123,7 +123,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
     public void afterTest() throws BonitaException {
         disableAndDeleteProcess(processDefinition);
         deleteUser(businessUser.getId());
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     private void createAndDeployProcess() throws Exception {
@@ -295,7 +295,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         createAndDeployProcess2();
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final long processInstanceId = processInstance.getId();
-        final ActivityInstance step1 = waitForUserTaskAndAssigneIt("step1", processInstance, getSession().getUserId());
+        final ActivityInstance step1 = waitForUserTaskAndAssigneIt("step1", processInstance, businessUser);
 
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
         fieldValues.put("field_fieldId1", "Ryan");
@@ -368,7 +368,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
         createAndDeployProcess2();
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance userTask = waitForUserTaskAndAssigneIt("step1", processInstance, getSession().getUserId());
+        final ActivityInstance userTask = waitForUserTaskAndAssigneIt("step1", processInstance, businessUser);
 
         final HashMap<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(ACTIVITY_INSTANCE_ID_KEY, userTask.getId());
@@ -521,7 +521,8 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
 
         final Map<String, Map<String, Serializable>> inputValues = getInputValues(mainInputName1, names, values);
 
-        HumanTaskInstance userTaskInstance = getProcessAPI().getPendingHumanTaskInstances(getSession().getUserId(), 0, 1, ActivityInstanceCriterion.NAME_ASC)
+        final HumanTaskInstance userTaskInstance = getProcessAPI().getPendingHumanTaskInstances(getSession().getUserId(), 0, 1,
+                ActivityInstanceCriterion.NAME_ASC)
                 .get(0);
         final long taskId = userTaskInstance.getId();
         getProcessAPI().assignUserTask(taskId, getSession().getUserId());
