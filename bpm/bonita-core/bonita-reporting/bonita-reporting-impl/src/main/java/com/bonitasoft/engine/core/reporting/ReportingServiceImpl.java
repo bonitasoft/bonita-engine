@@ -24,10 +24,13 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.events.EventActionType;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
+import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -45,7 +48,9 @@ import org.bonitasoft.engine.queriablelogger.model.builder.SPersistenceLogBuilde
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
+import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 
 import com.bonitasoft.engine.core.reporting.processor.QueryPreProcessor;
@@ -96,9 +101,9 @@ public class ReportingServiceImpl implements ReportingService, TenantLifecycleSe
         this.logger = logger;
         this.queriableLoggerService = queriableLoggerService;
         isTraceabilityActive = manager.isFeatureActive(Features.TRACEABILITY);
-        if(defaultProfileImporter == null){
+        if (defaultProfileImporter == null) {
             this.defaultProfileImporter = new DefaultReportImporter(this, logger);
-        }else{
+        } else {
             this.defaultProfileImporter = defaultProfileImporter;
         }
 
@@ -362,6 +367,13 @@ public class ReportingServiceImpl implements ReportingService, TenantLifecycleSe
         return null;
     }
 
+    private SUpdateEvent getUpdateEvent(final Object object, final String type) {
+        if (eventService.hasHandlers(type, EventActionType.UPDATED)) {
+            return (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(type).setObject(object).done();
+        }
+        return null;
+    }
+
     private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String methodName) {
         logBuilder.actionScope(String.valueOf(objectId));
         logBuilder.actionStatus(sQueriableLogStatus);
@@ -396,6 +408,24 @@ public class ReportingServiceImpl implements ReportingService, TenantLifecycleSe
     }
 
     @Override
+    public SReport update(final SReport report, final EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException {
+        final SReportLogBuilder logBuilder = getReportLog(ActionType.UPDATED, "Updating report with id " + report.getId());
+        try {
+            SSaveReportWithContent reportWithContent = persistenceService.selectById(new SelectByIdDescriptor<SSaveReportWithContent>("getReportById", SSaveReportWithContent.class, report.getId()));
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(reportWithContent,
+                    entityUpdateDescriptor);
+            final SUpdateEvent updatePageEvent = getUpdateEvent(reportWithContent, REPORT);
+            recorder.recordUpdate(updateRecord, updatePageEvent);
+            initiateLogBuilder(report.getId(), SQueriableLog.STATUS_OK, logBuilder, "update");
+            return reportWithContent;
+        } catch (SBonitaException e) {
+            initiateLogBuilder(report.getId(), SQueriableLog.STATUS_FAIL, logBuilder, "update");
+            throw new SObjectModificationException(e);
+        }
+
+    }
+
+    @Override
     public void start() throws SBonitaException {
         defaultProfileImporter.invoke("case_avg_time");
         defaultProfileImporter.invoke("case_list");
@@ -404,8 +434,6 @@ public class ReportingServiceImpl implements ReportingService, TenantLifecycleSe
             defaultProfileImporter.invoke("case_history");
         }
     }
-
-
 
     @Override
     public void stop() throws SBonitaException {
@@ -421,4 +449,6 @@ public class ReportingServiceImpl implements ReportingService, TenantLifecycleSe
     public void resume() throws SBonitaException {
 
     }
+
+
 }

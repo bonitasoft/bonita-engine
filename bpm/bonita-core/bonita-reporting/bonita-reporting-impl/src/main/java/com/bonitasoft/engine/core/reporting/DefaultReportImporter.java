@@ -17,10 +17,12 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
  * @author Baptiste Mesta
@@ -49,12 +51,27 @@ public class DefaultReportImporter {
             byte[] screenShot = getScreenShotQuietly(reportContent, reportName);
             SReport reportByName = reportingService.getReportByName(reportName);
             if (reportByName != null) {
-                if (deleteIfNotTheSame(reportContent, reportByName))
-                    return;//the content is the same so we do not replace it
+                updateIfDifferent(reportName, reportContent, reportByName, description, screenShot);
+            }else{
+                importDefaultReport(reportName, reportContent, description, screenShot);
             }
-            importDefaultReport(reportName, reportContent, description, screenShot);
-        } catch (final IOException e) {
-            logger.log(getClass(), TechnicalLogSeverity.WARNING, "Provided page " + zipName + "can't be imported");
+        } catch (final Exception e) {
+            logger.log(getClass(), TechnicalLogSeverity.WARNING, "Report "+reportName+" can't be imported");
+        }
+    }
+
+    private void updateIfDifferent(String reportName, byte[] reportContent, SReport existingReport, String description, byte[] screenShot) throws SBonitaReadException, SReportNotFoundException, SObjectModificationException {
+        final byte[] existingReportContent = reportingService.getReportContent(existingReport.getId());
+        if (reportContent.length != existingReportContent.length){
+            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Report "+reportName+" exists but the content is not up to date, updating it.");
+            EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+            entityUpdateDescriptor.addField(SReportFields.NAME,reportName);
+            entityUpdateDescriptor.addField(SReportFields.DESCRIPTION,description);
+            entityUpdateDescriptor.addField(SReportFields.SCREENSHOT,screenShot);
+            entityUpdateDescriptor.addField(SReportFields.CONTENT,screenShot);
+            reportingService.update(existingReport, entityUpdateDescriptor);
+        }else{
+            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Report "+reportName+" exists and is up to date, do nothing");
         }
     }
 
@@ -69,24 +86,10 @@ public class DefaultReportImporter {
     }
 
     private void importDefaultReport(String reportName, byte[] reportContent, String description, byte[] screenShot) throws SReportCreationException {
-        logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page was not imported, importing it.");
+        logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Report "+reportName+" was not imported, importing it.");
         final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(reportName, /* system user */-1, true,
                 description, screenShot);
         reportingService.addReport(reportBuilder.done(), reportContent);
-    }
-
-    private boolean deleteIfNotTheSame(byte[] reportContent, SReport reportByName) throws SBonitaReadException, SReportNotFoundException,
-            SReportDeletionException {
-        final byte[] pageContent = reportingService.getReportContent(reportByName.getId());
-        if (reportContent.length != pageContent.length) {
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page exists but the content is not up to date, updating it.");
-            // think of a better way to check the content are the same or not, it will almost always be the same so....
-            reportingService.deleteReport(reportByName.getId());
-        } else {
-            logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Provided page exists and is up to date, do nothing");
-            return true;
-        }
-        return false;
     }
 
     private String getDescriptionQuietly(byte[] zipContent, String name) throws IOException {

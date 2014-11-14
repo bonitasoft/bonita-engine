@@ -29,6 +29,7 @@ import java.util.HashMap;
 import org.assertj.core.data.MapEntry;
 import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Before;
@@ -38,7 +39,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DefaultProfileImporterTest {
+public class DefaultReportImporterTest {
 
     @Mock
     private ReportingServiceImpl reportingService;
@@ -102,8 +103,8 @@ public class DefaultProfileImporterTest {
         //when
         defaultReportImporter.invoke("the_report");
         //then
-        verify(reportingService).deleteReport(125l);
-        verify(reportingService).addReport(argThat(new SReportMatcher("the_report", -1, true, "The description of the report", screenshot)), eq(zipContent));
+        verify(reportingService, never()).addReport(any(SReport.class), any(byte[].class));
+        verify(reportingService).update(any(SReport.class), any(EntityUpdateDescriptor.class));
     }
 
     private InputStream stream(byte[] zip) throws IOException {
