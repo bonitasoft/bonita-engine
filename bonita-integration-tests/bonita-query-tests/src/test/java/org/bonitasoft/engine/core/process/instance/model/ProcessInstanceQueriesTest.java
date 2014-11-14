@@ -486,6 +486,34 @@ public class ProcessInstanceQueriesTest {
     }
 
     @Test
+    public void getNumberOfSProcessInstanceFailedShouldAcceptExtraFilters() {
+        // Given
+        repository.add(buildFailedProcessInstance(1, 777777L));
+        repository.add(buildFailedProcessInstance(2, 777777L));
+        repository.add(buildFailedProcessInstance(3, 888888L));
+
+        // When
+        final long numberOfSProcessInstanceFailed = repository.getNumberOfSProcessInstanceFailedForProcessDefinition(777777L);
+
+        // Then
+        assertEquals(2, numberOfSProcessInstanceFailed);
+    }
+
+    @Test
+    public void searchSProcessInstanceFailedShouldAcceptExtraFilters() {
+        // Given
+        repository.add(buildFailedProcessInstance(1, 777777L));
+        repository.add(buildFailedProcessInstance(2, 777777L));
+        repository.add(buildFailedProcessInstance(3, 888888L));
+
+        // When
+        final List<SProcessInstance> sProcessInstanceFailed = repository.searchSProcessInstanceFailedForProcessDefinition(777777L);
+
+        // Then
+        assertEquals(2, sProcessInstanceFailed.size());
+    }
+
+    @Test
     public void getNumberOfSProcessInstanceFailed_should_return_number_of_distinct_process_instances() {
         // Given
         repository.add(buildFailedProcessInstance(1));
@@ -598,7 +626,11 @@ public class ProcessInstanceQueriesTest {
     }
 
     private SProcessInstanceImpl buildFailedProcessInstance(final long processInstanceId) {
-        final SProcessInstanceImpl sProcessInstance = new SProcessInstanceImpl("process" + processInstanceId, 9L);
+        return buildFailedProcessInstance(processInstanceId, 9L);
+    }
+
+    private SProcessInstanceImpl buildFailedProcessInstance(final long processInstanceId, final long processDefinitionId) {
+        final SProcessInstanceImpl sProcessInstance = new SProcessInstanceImpl("process" + processInstanceId, processDefinitionId);
         sProcessInstance.setId(processInstanceId);
         sProcessInstance.setStateId(7);
         sProcessInstance.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
