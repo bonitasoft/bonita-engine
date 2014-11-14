@@ -76,15 +76,9 @@ import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 
 import com.bonitasoft.engine.api.PlatformAPI;
-import com.bonitasoft.engine.api.impl.reports.DefaultReportList;
-import com.bonitasoft.engine.api.impl.reports.ReportDeployer;
 import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
 import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
 import com.bonitasoft.engine.api.impl.transaction.NotifyNodeStoppedTask;
-import com.bonitasoft.engine.api.impl.transaction.reporting.AddReport;
-import com.bonitasoft.engine.core.reporting.ReportingService;
-import com.bonitasoft.engine.core.reporting.SReportBuilder;
-import com.bonitasoft.engine.core.reporting.SReportBuilderFactory;
 import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantActivationException;
@@ -180,67 +174,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
         super.createPlatform();
     }
-
-    @Override
-    @CustomTransactions
-    @AvailableOnStoppedNode
-    public void initializePlatform() throws CreationException {
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = getPlatformAccessor();
-        } catch (final Exception e) {
-            throw new CreationException(e);
-        }
-        // 1 tx to create content and default tenant
-        super.initializePlatform();
-        final TransactionService transactionService = platformAccessor.getTransactionService();
-        final long tenantId;
-        try {
-            tenantId = transactionService.executeInTransaction(new Callable<Long>() {
-
-                @Override
-                public Long call() throws Exception {
-                    return getDefaultTenant().getId();
-                }
-            });
-
-        } catch (final TenantNotFoundException e) {
-            throw new CreationException(e);
-        } catch (final Exception e) {
-            throw new CreationException(e);
-        }
-        final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-
-        long platformSessionId = -1;
-        SessionAccessor sessionAccessor = null;
-        try {
-            final ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
-            sessionAccessor = serviceAccessorFactory.createSessionAccessor();
-            final SessionService sessionService = platformAccessor.getSessionService();
-            final SSession session = sessionService.createSession(tenantId, -1L, "dummy", true);
-
-            platformSessionId = sessionAccessor.getSessionId();
-            sessionAccessor.deleteSessionId();
-
-            sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
-
-            // This part is specific to SP: reporting.
-            transactionService.executeInTransaction(new Callable<Void>() {
-
-                @Override
-                public Void call() throws Exception {
-                    deployTenantReports(tenantId, tenantServiceAccessor);
-                    return null;
-                }
-
-            });
-        } catch (final Exception e) {
-            throw new CreationException(e);
-        } finally {
-            cleanSessionAccessor(sessionAccessor, platformSessionId);
-        }
-    }
-
     private long create(final TenantCreator creator) throws CreationException {
         final Map<com.bonitasoft.engine.platform.TenantCreator.TenantField, Serializable> tenantFields = creator.getFields();
         try {
@@ -309,9 +242,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                         // Create default commands
                         createDefaultCommands(tenantServiceAccessor);
 
-                        // Create default reports
-                        deployTenantReports(tenantId, tenantServiceAccessor);
-
                         // Create default profiles
                         createDefaultProfiles(tenantServiceAccessor);
 
@@ -348,24 +278,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final SBonitaException e) {
             throw new CreationException(e);
         }
-    }
-
-    public void deployTenantReports(final long tenantId, final TenantServiceAccessor tenantAccessor) throws Exception {
-        final DefaultReportList reports = new DefaultReportList(tenantAccessor.getTechnicalLoggerService(), BonitaHomeServer.getInstance()
-                .getTenantReportFolder(tenantId));
-
-        reports.deploy(new ReportDeployer() {
-
-            @Override
-            public void deploy(final String name, final String description, final byte[] screenShot, final byte[] content) throws SBonitaException {
-                final ReportingService reportingService = tenantAccessor.getReportingService();
-                final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, /* system user */-1, true,
-                        description, screenShot);
-                final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
-                // Here we are already in a transaction, so we can call execute() directly:
-                addReport.execute();
-            }
-        });
     }
 
     // modify user name and password
@@ -455,6 +367,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService,
                     platformAccessor.getTechnicalLoggerService(), workService, nodeConfiguration, tenantServiceAccessor.getTenantConfiguration());
             transactionContent.execute();
+            //TODO remove me when bug that does not start services on tenant creation is fixed
+            tenantServiceAccessor.getReportingService().start();
             sessionService.deleteSession(sessionId);
         } catch (final TenantNotFoundException e) {
             log(platformAccessor, e, TechnicalLogSeverity.DEBUG);

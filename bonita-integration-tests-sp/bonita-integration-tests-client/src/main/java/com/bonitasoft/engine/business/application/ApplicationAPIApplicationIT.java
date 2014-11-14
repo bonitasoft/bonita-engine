@@ -35,33 +35,7 @@ import com.bonitasoft.engine.api.TenantAPIAccessor;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationAPIApplicationIT extends CommonAPISPTest {
-
-    private ApplicationAPI applicationAPI;
-
-    private static User user;
-
-    @Override
-    protected void setAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        super.setAPIs();
-        applicationAPI = TenantAPIAccessor.getApplicationAPI(getSession());
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        user = BPMTestSPUtil.createUserOnDefaultTenant("john", "bpm");
-        loginOnDefaultTenantWith("john", "bpm");
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        final SearchResult<Application> searchResult = applicationAPI.searchApplications(new SearchOptionsBuilder(0, 1000).done());
-        for (final Application app : searchResult.getResult()) {
-            applicationAPI.deleteApplication(app.getId());
-        }
-        logoutOnTenant();
-        BPMTestSPUtil.deleteUserOnDefaultTenant(user);
-    }
+public class ApplicationAPIApplicationIT extends TestWithApplication {
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9199", keywords = { "Application", "create" })
     @Test
@@ -74,7 +48,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         creator.setProfileId(profile.getId());
 
         //when
-        final Application application = applicationAPI.createApplication(creator);
+        final Application application = getApplicationAPI().createApplication(creator);
 
         //then
         assertThat(application).isNotNull();
@@ -84,12 +58,12 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         assertThat(application.getId()).isGreaterThan(0);
         assertThat(application.getDescription()).isEqualTo("This is my application");
         assertThat(application.getIconPath()).isEqualTo("/icon.jpg");
-        assertThat(application.getCreatedBy()).isEqualTo(user.getId());
-        assertThat(application.getUpdatedBy()).isEqualTo(user.getId());
+        assertThat(application.getCreatedBy()).isEqualTo(getUser().getId());
+        assertThat(application.getUpdatedBy()).isEqualTo(getUser().getId());
         assertThat(application.getHomePageId()).isNull();
         assertThat(application.getProfileId()).isEqualTo(profile.getId());
 
-        applicationAPI.deleteApplication(application.getId());
+        getApplicationAPI().deleteApplication(application.getId());
         getProfileAPI().deleteProfile(profile.getId());
     }
 
@@ -100,7 +74,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
 
         //when
-        final Application application = applicationAPI.createApplication(creator);
+        final Application application = getApplicationAPI().createApplication(creator);
 
         //then
         assertThat(application).isNotNull();
@@ -113,7 +87,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         //given
         final Profile profile = getProfileAPI().createProfile("ProfileForApp", "Profile used by the application");
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
-        final Application application = applicationAPI.createApplication(creator);
+        final Application application = getApplicationAPI().createApplication(creator);
 
         final ApplicationUpdater updater = new ApplicationUpdater();
         updater.setToken("My-updated-app");
@@ -125,7 +99,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         updater.setState(ApplicationState.ACTIVATED.name());
 
         //when
-        final Application updatedApplication = applicationAPI.updateApplication(application.getId(), updater);
+        final Application updatedApplication = getApplicationAPI().updateApplication(application.getId(), updater);
 
         //then
         assertThat(updatedApplication).isNotNull();
@@ -136,9 +110,9 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         assertThat(updatedApplication.getIconPath()).isEqualTo("/newIcon.jpg");
         assertThat(updatedApplication.getProfileId()).isEqualTo(profile.getId());
         assertThat(updatedApplication.getState()).isEqualTo(ApplicationState.ACTIVATED.name());
-        assertThat(updatedApplication).isEqualTo(applicationAPI.getApplication(application.getId()));
+        assertThat(updatedApplication).isEqualTo(getApplicationAPI().getApplication(application.getId()));
 
-        applicationAPI.deleteApplication(application.getId());
+        getApplicationAPI().deleteApplication(application.getId());
         getProfileAPI().deleteProfile(profile.getId());
     }
 
@@ -147,11 +121,11 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
     public void getApplication_returns_application_with_the_given_id() throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
-        final Application createdApp = applicationAPI.createApplication(creator);
+        final Application createdApp = getApplicationAPI().createApplication(creator);
         assertThat(createdApp).isNotNull();
 
         //when
-        final Application retrievedApp = applicationAPI.getApplication(createdApp.getId());
+        final Application retrievedApp = getApplicationAPI().getApplication(createdApp.getId());
 
         //then
         assertThat(retrievedApp).isEqualTo(createdApp);
@@ -162,15 +136,15 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
     public void deleteApplication_should_delete_application_with_the_given_id() throws Exception {
         //given
         final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
-        final Application createdApp = applicationAPI.createApplication(creator);
+        final Application createdApp = getApplicationAPI().createApplication(creator);
         assertThat(createdApp).isNotNull();
 
         //when
-        applicationAPI.deleteApplication(createdApp.getId());
+        getApplicationAPI().deleteApplication(createdApp.getId());
 
         //then
         try {
-            applicationAPI.getApplication(createdApp.getId());
+            getApplicationAPI().getApplication(createdApp.getId());
             fail("Not found exception");
         } catch (final NotFoundException e) {
             //ok
@@ -186,12 +160,12 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
 
-        final Application hr = applicationAPI.createApplication(hrCreator);
-        final Application engineering = applicationAPI.createApplication(engineeringCreator);
-        final Application marketing = applicationAPI.createApplication(marketingCreator);
+        final Application hr = getApplicationAPI().createApplication(hrCreator);
+        final Application engineering = getApplicationAPI().createApplication(engineeringCreator);
+        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final SearchResult<Application> firstPage = applicationAPI.searchApplications(buildSearchOptions(0, 2));
+        final SearchResult<Application> firstPage = getApplicationAPI().searchApplications(buildSearchOptions(0, 2));
 
         //then
         assertThat(firstPage).isNotNull();
@@ -199,7 +173,7 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         assertThat(firstPage.getResult()).containsExactly(engineering, hr);
 
         //when
-        final SearchResult<Application> secondPage = applicationAPI.searchApplications(buildSearchOptions(2, 2));
+        final SearchResult<Application> secondPage = getApplicationAPI().searchApplications(buildSearchOptions(2, 2));
 
         //then
         assertThat(secondPage).isNotNull();
@@ -216,15 +190,15 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
 
-        applicationAPI.createApplication(hrCreator);
-        final Application engineering = applicationAPI.createApplication(engineeringCreator);
-        applicationAPI.createApplication(marketingCreator);
+        getApplicationAPI().createApplication(hrCreator);
+        final Application engineering = getApplicationAPI().createApplication(engineeringCreator);
+        getApplicationAPI().createApplication(marketingCreator);
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
         builder.filter(ApplicationSearchDescriptor.TOKEN, "Engineering-dashboard");
 
-        final SearchResult<Application> applications = applicationAPI.searchApplications(builder.done());
+        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(1);
         assertThat(applications.getResult()).containsExactly(engineering);
@@ -240,15 +214,15 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
 
-        final Application hr = applicationAPI.createApplication(hrCreator);
-        applicationAPI.createApplication(engineeringCreator);
-        applicationAPI.createApplication(marketingCreator);
+        final Application hr = getApplicationAPI().createApplication(hrCreator);
+        getApplicationAPI().createApplication(engineeringCreator);
+        getApplicationAPI().createApplication(marketingCreator);
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
         builder.filter(ApplicationSearchDescriptor.DISPLAY_NAME, "HR dashboard");
 
-        final SearchResult<Application> applications = applicationAPI.searchApplications(builder.done());
+        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(1);
         assertThat(applications.getResult()).containsExactly(hr);
@@ -263,15 +237,15 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "2.0");
 
-        final Application hr = applicationAPI.createApplication(hrCreator);
-        applicationAPI.createApplication(engineeringCreator);
-        final Application marketing = applicationAPI.createApplication(marketingCreator);
+        final Application hr = getApplicationAPI().createApplication(hrCreator);
+        getApplicationAPI().createApplication(engineeringCreator);
+        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
         builder.filter(ApplicationSearchDescriptor.VERSION, "2.0");
 
-        final SearchResult<Application> applications = applicationAPI.searchApplications(builder.done());
+        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(2);
         assertThat(applications.getResult()).containsExactly(hr, marketing);
@@ -289,22 +263,22 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         engineeringCreator.setProfileId(profile.getId());
         final ApplicationCreator marketingCreator = new ApplicationCreator("Marketing-dashboard", "Marketing dashboard", "1.0");
 
-        final Application hr = applicationAPI.createApplication(hrCreator);
-        final Application engineering = applicationAPI.createApplication(engineeringCreator);
-        final Application marketing = applicationAPI.createApplication(marketingCreator);
+        final Application hr = getApplicationAPI().createApplication(hrCreator);
+        final Application engineering = getApplicationAPI().createApplication(engineeringCreator);
+        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
         builder.filter(ApplicationSearchDescriptor.PROFILE_ID, profile.getId());
 
-        final SearchResult<Application> applications = applicationAPI.searchApplications(builder.done());
+        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(1);
         assertThat(applications.getResult()).containsExactly(engineering);
 
-        applicationAPI.deleteApplication(hr.getId());
-        applicationAPI.deleteApplication(engineering.getId());
-        applicationAPI.deleteApplication(marketing.getId());
+        getApplicationAPI().deleteApplication(hr.getId());
+        getApplicationAPI().deleteApplication(engineering.getId());
+        getApplicationAPI().deleteApplication(marketing.getId());
         getProfileAPI().deleteProfile(profile.getId());
     }
 
@@ -317,15 +291,15 @@ public class ApplicationAPIApplicationIT extends CommonAPISPTest {
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("My", "Marketing", "2.0");
 
-        final Application hr = applicationAPI.createApplication(hrCreator);
-        applicationAPI.createApplication(engineeringCreator);
-        final Application marketing = applicationAPI.createApplication(marketingCreator);
+        final Application hr = getApplicationAPI().createApplication(hrCreator);
+        getApplicationAPI().createApplication(engineeringCreator);
+        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
         builder.searchTerm("My");
 
-        final SearchResult<Application> applications = applicationAPI.searchApplications(builder.done());
+        final SearchResult<Application> applications = getApplicationAPI().searchApplications(builder.done());
         assertThat(applications).isNotNull();
         assertThat(applications.getCount()).isEqualTo(2);
         assertThat(applications.getResult()).containsExactly(hr, marketing);

@@ -60,8 +60,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.SInvalidDisplayNameException;
-import com.bonitasoft.engine.business.application.SInvalidTokenException;
 import com.bonitasoft.engine.business.application.impl.cleaner.ApplicationDestructor;
 import com.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuDestructor;
 import com.bonitasoft.engine.business.application.impl.cleaner.ApplicationPageDestructor;
@@ -79,7 +77,6 @@ import com.bonitasoft.engine.business.application.model.builder.impl.SApplicatio
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuUpdateBuilderImpl;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationPageBuilderFactoryImpl;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationUpdateBuilderFactoryImpl;
-import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationUpdateBuilderImpl;
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 
@@ -95,6 +92,7 @@ public class ApplicationServiceImplTest {
     private static final String APPLICATION_TOKEN = "app";
 
     private static final String APPLICATION_DISP_NAME = "My app";
+
     public static final int MAX_RESULTS = 2;
 
     @Mock
@@ -173,38 +171,6 @@ public class ApplicationServiceImplTest {
 
         //when
         applicationServiceActive.createApplication(application);
-
-        //then exception
-    }
-
-    @Test(expected = SInvalidTokenException.class)
-    public void createApplication_should_throw_SInvalidApplicationName_when_name_is_invalid() throws Exception {
-        //when
-        applicationServiceActive.createApplication(buildApplication("name with spaces", APPLICATION_DISP_NAME));
-
-        //then exception
-    }
-
-    @Test(expected = SInvalidDisplayNameException.class)
-    public void createApplication_should_throw_SInvalidDisplayNameException_when_display_name_is_empty() throws Exception {
-        //when
-        applicationServiceActive.createApplication(buildApplication(APPLICATION_TOKEN, ""));
-
-        //then exception
-    }
-
-    @Test(expected = SInvalidDisplayNameException.class)
-    public void createApplication_should_throw_SInvalidDisplayNameException_when_displayname_is_null() throws Exception {
-        //when
-        applicationServiceActive.createApplication(buildApplication(APPLICATION_TOKEN, null));
-
-        //then exception
-    }
-
-    @Test(expected = SInvalidDisplayNameException.class)
-    public void createApplication_should_throw_SInvalidDisplayNameException_when_displayname_is_empty_after_trim() throws Exception {
-        //when
-        applicationServiceActive.createApplication(buildApplication(APPLICATION_TOKEN, " "));
 
         //then exception
     }
@@ -450,17 +416,6 @@ public class ApplicationServiceImplTest {
         //then exception
     }
 
-    @Test(expected = SInvalidTokenException.class)
-    public void createApplicationPage_should_throw_SInvalidApplicationName_when_name_is_invalid() throws Exception {
-        //given
-        final SApplicationPage applicationPage = buildApplicationPage(15, 5, 15, "name with spaces");
-
-        //when
-        applicationServiceActive.createApplicationPage(applicationPage);
-
-        //then exception
-    }
-
     @Test(expected = SObjectAlreadyExistsException.class)
     public void createApplicationPage_should_throw_SObjectAlreadyExistsException_when_an_applicationPage_with_the_same_name_in_the_same_application_exists()
             throws Exception {
@@ -694,22 +649,6 @@ public class ApplicationServiceImplTest {
         //then exception
     }
 
-    @Test(expected = SInvalidTokenException.class)
-    public void updateApplication_should_throw_SInvalidTokenException_when_token_is_invalid() throws Exception {
-        //given
-        final SApplicationUpdateBuilder builder = new SApplicationUpdateBuilderImpl(0L);
-        builder.updateToken("token with spaces");
-        final int applicationId = 17;
-
-        given(persistenceService.selectById(new SelectByIdDescriptor<SApplication>("getApplicationById", SApplication.class, applicationId))).willReturn(
-                application);
-
-        //when
-        applicationServiceActive.updateApplication(applicationId, builder.done());
-
-        //then exception
-    }
-
     @Test(expected = SObjectAlreadyExistsException.class)
     public void updateApplication_should_throw_SObjectAlreadyExistsException_when_another_application_exists_with_the_same_name() throws Exception {
         //given
@@ -733,22 +672,6 @@ public class ApplicationServiceImplTest {
         final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
         updateDescriptor.addField("name", "newName");
         applicationServiceDisabled.updateApplication(10L, updateDescriptor);
-
-        //then exception
-    }
-
-    @Test(expected = SInvalidDisplayNameException.class)
-    public void updateApplication_should_throw_SInvalidDisplayNameException_when_token_is_invalid() throws Exception {
-        //given
-        final SApplicationUpdateBuilder builder = new SApplicationUpdateBuilderImpl(0L);
-        builder.updateDisplayName(null);
-        final int applicationId = 17;
-
-        given(persistenceService.selectById(new SelectByIdDescriptor<SApplication>("getApplicationById", SApplication.class, applicationId))).willReturn(
-                application);
-
-        //when
-        applicationServiceActive.updateApplication(applicationId, builder.done());
 
         //then exception
     }

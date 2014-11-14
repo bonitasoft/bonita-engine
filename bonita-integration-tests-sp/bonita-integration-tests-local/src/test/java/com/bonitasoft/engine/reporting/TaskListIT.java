@@ -5,9 +5,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.Date;
 
+import com.bonitasoft.engine.core.reporting.SReport;
+import com.bonitasoft.engine.core.reporting.SReportBuilder;
+import com.bonitasoft.engine.core.reporting.SReportBuilderFactory;
+import com.bonitasoft.engine.core.reporting.SReportFields;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
+import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
@@ -15,6 +20,7 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceI
 import org.bonitasoft.engine.identity.model.impl.SUserImpl;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.TenantHibernatePersistenceService;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.junit.After;
 import org.junit.Before;
@@ -64,6 +70,35 @@ public class TaskListIT extends CommonAPISPTest {
 
         assertThat(csv).contains(expectedTask.getDisplayName());
         assertThat(csv).doesNotContain(deletedTask.getDisplayName());
+    }
+
+    @Test
+    public void update_report() throws Exception {
+        BitronixTransactionManager transactionManager = TransactionManagerServices.getTransactionManager();
+        transactionManager.begin();
+        final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance("myReport", /* system user */-1, true,
+                "my desc", new byte[]{1,2,3});
+        reportingService.addReport(reportBuilder.done(),new byte[]{4,5,6});
+        transactionManager.commit();
+        long beforeUpdate = System.currentTimeMillis();
+        Thread.sleep(200);
+        transactionManager.begin();
+        SReport myReport = reportingService.getReportByName("myReport");
+        EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
+        entityUpdateDescriptor.addField(SReportFields.DESCRIPTION,"new desc");
+        entityUpdateDescriptor.addField(SReportFields.CONTENT,new byte[]{8,9});
+        entityUpdateDescriptor.addField(SReportFields.SCREENSHOT,new byte[]{6,7});
+        reportingService.update(myReport, entityUpdateDescriptor);
+        transactionManager.commit();
+        transactionManager.begin();
+        SReport afterUpdateReport = reportingService.getReportByName("myReport");
+        byte[] afterUpdateContent = reportingService.getReportContent(afterUpdateReport.getId());
+        transactionManager.commit();
+        assertThat(afterUpdateReport.getName()).isEqualTo("myReport");
+        assertThat(afterUpdateReport.getDescription()).isEqualTo("new desc");
+        assertThat(afterUpdateReport.getScreenshot()).as("screenshot").containsExactly(new byte[]{6,7});
+        assertThat(afterUpdateReport.getLastModificationDate()).as("last update date").isGreaterThan(beforeUpdate);
+        assertThat(afterUpdateContent).as("Content").containsExactly(new byte[]{8,9});
     }
 
     private String executeQuery(String query) throws Exception {
