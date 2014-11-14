@@ -48,7 +48,6 @@ import com.bonitasoft.engine.tenant.TenantIT;
     ProfileSPITest.class,
     MonitoringAPITest.class,
     SearchProcessInstanceTest.class,
-    ReportingAPIIT.class,
     ReportingSQLValidityIT.class,
     PlatformMonitoringAPITest.class,
     TenantIT.class,

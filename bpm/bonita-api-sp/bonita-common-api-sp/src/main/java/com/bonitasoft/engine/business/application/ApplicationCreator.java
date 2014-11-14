@@ -50,7 +50,7 @@ public class ApplicationCreator implements Serializable {
      * @see Application
      */
     public String getToken() {
-        return fields.get(ApplicationField.TOKEN).toString();
+        return (String) fields.get(ApplicationField.TOKEN);
     }
 
     /**
