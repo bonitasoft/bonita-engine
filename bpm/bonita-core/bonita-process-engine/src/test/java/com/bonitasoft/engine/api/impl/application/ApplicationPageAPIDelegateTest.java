@@ -34,7 +34,6 @@ import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationP
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.SInvalidTokenException;
 import com.bonitasoft.engine.business.application.impl.ApplicationPageImpl;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.impl.SApplicationPageImpl;
@@ -160,12 +159,8 @@ public class ApplicationPageAPIDelegateTest {
 
     @Test(expected = CreationException.class)
     public void createApplicationPage_should_throw_InvalidNameException_when_applicationService_throws_SInvalidNameException() throws Exception {
-        //given
-        final SApplicationPageImpl sAppPage = new SApplicationPageImpl(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
-        given(applicationService.createApplicationPage(sAppPage)).willThrow(new SInvalidTokenException(""));
-
         //when
-        delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, APP_PAGE_TOKEN);
+        delegate.createApplicationPage(APPLICATION_ID, PAGE_ID, "token with spaces");
 
         //then exception
     }

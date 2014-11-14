@@ -106,6 +106,7 @@
         		<entry key="REF_BUSINESS_DATA_INSTANCE_DELETED:INTERNAL" value="true" />
         		<entry key="REPORT_CREATED:INTERNAL" value="true" />
         		<entry key="REPORT_DELETED:INTERNAL" value="true" />
+        		<entry key="REPORT_UPDATED:INTERNAL" value="true" />
         		<entry key="SCHEDULER_SCHEDULED:INTERNAL" value="false" />
         		<entry key="SUPERVISOR_CREATED:INTERNAL" value="true" />
         		<entry key="SUPERVISOR_DELETED:INTERNAL" value="true" />

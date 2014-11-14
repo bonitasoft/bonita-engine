@@ -40,33 +40,7 @@ import com.bonitasoft.engine.page.Page;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class ApplicationAPIImportExportIT extends CommonAPISPTest {
-
-    private ApplicationAPI applicationAPI;
-
-    private static User user;
-
-    @Override
-    protected void setAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        super.setAPIs();
-        applicationAPI = TenantAPIAccessor.getApplicationAPI(getSession());
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        user = BPMTestSPUtil.createUserOnDefaultTenant("john", "bpm");
-        loginOnDefaultTenantWith("john", "bpm");
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        final SearchResult<Application> searchResult = applicationAPI.searchApplications(new SearchOptionsBuilder(0, 1000).done());
-        for (final Application app : searchResult.getResult()) {
-            applicationAPI.deleteApplication(app.getId());
-        }
-        logoutOnTenant();
-        BPMTestSPUtil.deleteUserOnDefaultTenant(user);
-    }
+public class ApplicationAPIImportExportIT extends TestWithApplication {
 
     private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
@@ -97,35 +71,35 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
 
         final ApplicationCreator engineeringCreator = new ApplicationCreator("Engineering-dashboard", "Engineering dashboard", "1.0");
         final ApplicationCreator marketingCreator = new ApplicationCreator("My", "Marketing", "2.0");
-        final Application hr = applicationAPI.createApplication(hrCreator);
+        final Application hr = getApplicationAPI().createApplication(hrCreator);
 
         // Associate a new page to application hr (real page name is defined in zip/page.properties):
         final Page myPage = getPageAPI().createPage("not_used",
                 IOUtils.toByteArray(ApplicationAPIApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
-        final ApplicationPage appPage = applicationAPI.createApplicationPage(hr.getId(), myPage.getId(), "my-new-custom-page");
+        final ApplicationPage appPage = getApplicationAPI().createApplicationPage(hr.getId(), myPage.getId(), "my-new-custom-page");
 
         // Add menus:
-        final ApplicationMenu menu = applicationAPI.createApplicationMenu(new ApplicationMenuCreator(hr.getId(), "HR follow-up"));
+        final ApplicationMenu menu = getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(hr.getId(), "HR follow-up"));
         final ApplicationMenuCreator subMenuCreator = new ApplicationMenuCreator(hr.getId(), "Daily HR follow-up", appPage.getId());
         subMenuCreator.setParentId(menu.getId());
-        applicationAPI.createApplicationMenu(subMenuCreator);
+        getApplicationAPI().createApplicationMenu(subMenuCreator);
 
-        applicationAPI.createApplicationMenu(new ApplicationMenuCreator(hr.getId(), "Empty menu"));
+        getApplicationAPI().createApplicationMenu(new ApplicationMenuCreator(hr.getId(), "Empty menu"));
 
         // Add home page:
-        applicationAPI.setApplicationHomePage(hr.getId(), appPage.getId());
+        getApplicationAPI().setApplicationHomePage(hr.getId(), appPage.getId());
 
-        applicationAPI.createApplication(engineeringCreator);
-        final Application marketing = applicationAPI.createApplication(marketingCreator);
+        getApplicationAPI().createApplication(engineeringCreator);
+        final Application marketing = getApplicationAPI().createApplication(marketingCreator);
 
         //when
-        final byte[] exportedBytes = applicationAPI.exportApplications(hr.getId(), marketing.getId());
+        final byte[] exportedBytes = getApplicationAPI().exportApplications(hr.getId(), marketing.getId());
         final String xmlPrettyFormatExported = XmlStringPrettyFormatter.xmlPrettyFormat(new String(exportedBytes));
 
         //then
         assertThatXmlHaveNoDifferences(xmlPrettyFormatExpected, xmlPrettyFormatExported);
 
-        applicationAPI.deleteApplication(hr.getId());
+        getApplicationAPI().deleteApplication(hr.getId());
         getPageAPI().deletePage(myPage.getId());
         getProfileAPI().deleteProfile(profile.getId());
     }
@@ -144,7 +118,7 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
                 .getResourceAsStream("applications.xml"));
 
         //when
-        final List<ImportStatus> importStatus = applicationAPI.importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
+        final List<ImportStatus> importStatus = getApplicationAPI().importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
 
         //then
         assertThat(importStatus).hasSize(2);
@@ -152,7 +126,7 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         assertIsAddOkStatus(importStatus.get(1), "My");
 
         // check applications ware created
-        final SearchResult<Application> searchResult = applicationAPI.searchApplications(buildSearchOptions(0, 10));
+        final SearchResult<Application> searchResult = getApplicationAPI().searchApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(2);
         Application hrApp = searchResult.getResult().get(0);
         assertIsHRApplication(profile, hrApp);
@@ -161,7 +135,7 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         //check pages were created
         SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, hrApp.getId());
-        SearchResult<ApplicationPage> pageSearchResult = applicationAPI.searchApplicationPages(builder.done());
+        SearchResult<ApplicationPage> pageSearchResult = getApplicationAPI().searchApplicationPages(builder.done());
         assertThat(pageSearchResult.getCount()).isEqualTo(1);
         ApplicationPage myNewCustomPage = pageSearchResult.getResult().get(0);
         assertIsMyNewCustomPage(myPage, hrApp, myNewCustomPage);
@@ -172,7 +146,7 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         //check menu is created
         builder = getDefaultBuilder(0, 10);
         builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, hrApp.getId());
-        SearchResult<ApplicationMenu> menuSearchResult = applicationAPI.searchApplicationMenus(builder.done());
+        SearchResult<ApplicationMenu> menuSearchResult = getApplicationAPI().searchApplicationMenus(builder.done());
         assertThat(menuSearchResult.getCount()).isEqualTo(3);
         ApplicationMenu hrFollowUpMenu = menuSearchResult.getResult().get(0);
         assertIsHrFollowUpMenu(hrFollowUpMenu);
@@ -180,7 +154,7 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         assertIsEmptyMenu(menuSearchResult.getResult().get(2));
 
 
-        applicationAPI.deleteApplication(hrApp.getId());
+        getApplicationAPI().deleteApplication(hrApp.getId());
         getProfileAPI().deleteProfile(profile.getId());
         getPageAPI().deletePage(myPage.getId());
 
@@ -252,7 +226,7 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
                 IOUtils.toByteArray(ApplicationAPIApplicationIT.class.getResourceAsStream("dummy-bizapp-page.zip")));
 
         //when
-        final List<ImportStatus> importStatus = applicationAPI.importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
+        final List<ImportStatus> importStatus = getApplicationAPI().importApplications(applicationsByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
 
         //then
         assertThat(importStatus).hasSize(1);
@@ -265,7 +239,7 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         assertThat(importStatus.get(0).getErrors()).containsExactly(profileError, customPageError, appPageError1, appPageError2);
 
         // check applications ware created
-        final SearchResult<Application> searchResult = applicationAPI.searchApplications(buildSearchOptions(0, 10));
+        final SearchResult<Application> searchResult = getApplicationAPI().searchApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(1);
         final Application app1 = searchResult.getResult().get(0);
         assertThat(app1.getToken()).isEqualTo("HR-dashboard");
@@ -279,7 +253,7 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         //check only one application page was created
         SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
         builder.filter(ApplicationPageSearchDescriptor.APPLICATION_ID, app1.getId());
-        SearchResult<ApplicationPage> pageSearchResult = applicationAPI.searchApplicationPages(builder.done());
+        SearchResult<ApplicationPage> pageSearchResult = getApplicationAPI().searchApplicationPages(builder.done());
         assertThat(pageSearchResult.getCount()).isEqualTo(1);
         assertThat(pageSearchResult.getResult().get(0).getToken()).isEqualTo("my-new-custom-page");
 
@@ -287,7 +261,7 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         builder.filter(ApplicationMenuSearchDescriptor.APPLICATION_ID, app1.getId());
 
         //check three menus were created
-        SearchResult<ApplicationMenu> menuSearchResult = applicationAPI.searchApplicationMenus(builder.done());
+        SearchResult<ApplicationMenu> menuSearchResult = getApplicationAPI().searchApplicationMenus(builder.done());
         assertThat(menuSearchResult.getCount()).isEqualTo(3);
         assertThat(menuSearchResult.getResult().get(0).getDisplayName()).isEqualTo("HR follow-up");
         assertThat(menuSearchResult.getResult().get(0).getIndex()).isEqualTo(1);
@@ -296,7 +270,7 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         assertThat(menuSearchResult.getResult().get(2).getDisplayName()).isEqualTo("Empty menu");
         assertThat(menuSearchResult.getResult().get(1).getIndex()).isEqualTo(1);
 
-        applicationAPI.deleteApplication(app1.getId());
+        getApplicationAPI().deleteApplication(app1.getId());
         getPageAPI().deletePage(myPage.getId());
 
     }
@@ -314,20 +288,20 @@ public class ApplicationAPIImportExportIT extends CommonAPISPTest {
         final byte[] importedByteArray = IOUtils.toByteArray(ApplicationAPIApplicationIT.class
                 .getResourceAsStream("applications.xml"));
 
-        applicationAPI.importApplications(importedByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
-        final SearchResult<Application> searchResult = applicationAPI.searchApplications(buildSearchOptions(0, 10));
+        getApplicationAPI().importApplications(importedByteArray, ApplicationImportPolicy.FAIL_ON_DUPLICATES);
+        final SearchResult<Application> searchResult = getApplicationAPI().searchApplications(buildSearchOptions(0, 10));
         assertThat(searchResult.getCount()).isEqualTo(2);
 
         //when
         Application hrApplication = searchResult.getResult().get(0);
-        byte[] exportedByteArray = applicationAPI.exportApplications(hrApplication.getId(), searchResult.getResult().get(1).getId());
+        byte[] exportedByteArray = getApplicationAPI().exportApplications(hrApplication.getId(), searchResult.getResult().get(1).getId());
 
         //then
         final String xmlPrettyFormatExpected = XmlStringPrettyFormatter.xmlPrettyFormat(new String(importedByteArray));
         final String xmlPrettyFormatActual = XmlStringPrettyFormatter.xmlPrettyFormat(new String(exportedByteArray));
         assertThatXmlHaveNoDifferences(xmlPrettyFormatExpected, xmlPrettyFormatActual);
 
-        applicationAPI.deleteApplication(hrApplication.getId());
+        getApplicationAPI().deleteApplication(hrApplication.getId());
         getProfileAPI().deleteProfile(profile.getId());
         getPageAPI().deletePage(myPage.getId());
 
