@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -53,6 +53,7 @@ import org.bonitasoft.engine.work.WorkService;
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
+ * @author Matthieu Chaffotte
  */
 public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
 
@@ -117,7 +118,7 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
         final SFlowNodeInstance sFlowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
         final SEndEventInstanceBuilder builder = BuilderFactory.get(SEndEventInstanceBuilderFactory.class).createNewEndEventInstance(eventDefinition.getName(),
                 eventDefinition.getId(), sFlowNodeInstance.getRootContainerId(), sFlowNodeInstance.getParentContainerId(), processDefinitionId,
-                sFlowNodeInstance.getRootContainerId(), sFlowNodeInstance.getParentContainerId());
+                sFlowNodeInstance.getRootContainerId(), sFlowNodeInstance.getParentProcessInstanceId());
         builder.setParentActivityInstanceId(flowNodeInstanceId);
         final SThrowEventInstance done = (SThrowEventInstance) builder.done();
         new CreateEventInstance(done, eventInstanceService).call();

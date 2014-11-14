@@ -26,6 +26,8 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.MultiInstanceActivityInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -219,6 +221,23 @@ public class ErrorBoundaryEventTest extends AbstractEventTest {
         waitForFlowNodeInState(instance, "step1", TestStates.ABORTED, false);
 
         disableAndDeleteProcess(mainProcess, midProcess, subProcess);
+    }
+
+    @Cover(jira = "BS-9484", classes = { MultiInstanceActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "error event", "multi instance" })
+    @Test
+    public void processWithMIUserTaskWithErrorEvent_should_take_the_error_flow() throws Exception {
+        final ProcessDefinitionBuilder processDefinitionBuilder = BuildTestUtil.buildProcessDefinitionWithMultiInstanceUserTaskAndFailedConnector(PROCESS_NAME,
+                "step1");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnectorThatThrowException(processDefinitionBuilder);
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTaskAndExecuteIt("step1", donaBenta);
+        final ActivityInstance errorStep = waitForUserTask("errorFlow");
+        assignAndExecuteStep(errorStep, donaBenta.getId());
+
+        waitForProcessToFinish(processInstance);
+
+        disableAndDeleteProcess(processDefinition.getId());
     }
 
 }
