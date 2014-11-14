@@ -22,6 +22,7 @@ import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.LogUtil;
+import org.bonitasoft.engine.commons.SystemOperationUtil;
 import org.bonitasoft.engine.commons.TenantLifecycleService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
@@ -411,6 +412,7 @@ public class ReportingServiceImpl implements ReportingService, TenantLifecycleSe
     public SReport update(final SReport report, final EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException {
         final SReportLogBuilder logBuilder = getReportLog(ActionType.UPDATED, "Updating report with id " + report.getId());
         try {
+            entityUpdateDescriptor.addField("lastModificationDate", System.currentTimeMillis());
             SSaveReportWithContent reportWithContent = persistenceService.selectById(new SelectByIdDescriptor<SSaveReportWithContent>("getReportById", SSaveReportWithContent.class, report.getId()));
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(reportWithContent,
                     entityUpdateDescriptor);
