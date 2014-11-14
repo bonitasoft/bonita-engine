@@ -395,8 +395,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
     @Test
     public void getNumberOfProcessInstances() throws Exception {
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
-                Arrays.asList("step1", "step2"),
-                Arrays.asList(true, true));
+                Arrays.asList("step1", "step2"), Arrays.asList(true, true));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, pedro);
 
         final long initialProcessInstanceNb = getProcessAPI().getNumberOfProcessInstances();
