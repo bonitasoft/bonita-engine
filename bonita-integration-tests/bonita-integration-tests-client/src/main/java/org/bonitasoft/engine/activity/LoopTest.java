@@ -96,7 +96,7 @@ public class LoopTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), delivery, john);
         getProcessAPI().startProcess(processDefinition.getId());
 
-        HumanTaskInstance step1 = waitForUserTask("step1");
+        final HumanTaskInstance step1 = waitForUserTask("step1");
 
         assignAndExecuteStep(step1, john.getId());
 
@@ -137,7 +137,7 @@ public class LoopTest extends CommonAPITest {
 
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAStandardLoopUserTask", "1.0");
         builder.addActor(delivery).addDescription("Delivery all day and night long");
-        int loopMax = 3;
+        final int loopMax = 3;
         builder.addIntegerData("loopMax", new ExpressionBuilder().createConstantIntegerExpression(loopMax));
 
         builder.addUserTask("step1", delivery).addLoop(false, condition, new ExpressionBuilder().createDataExpression("loopMax", Integer.class.getName()));
@@ -233,7 +233,7 @@ public class LoopTest extends CommonAPITest {
 
         waitForUserTask(loopName, processInstance.getId());
         // when
-        waitForUserTaskAndExecuteIt(userTaskName, processInstance.getId(), john.getId());
+        waitForUserTaskAndExecuteIt(userTaskName, processInstance, john);
 
         // then
         // executing the user task will terminate the process: the loop activity must be aborted

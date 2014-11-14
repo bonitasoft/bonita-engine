@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.bonitasoft.engine.CommonAPITest;
@@ -25,7 +24,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.exception.NotFoundException;
-import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.OperationBuilder;
@@ -73,8 +71,10 @@ public class HumanTasksTest extends CommonAPITest {
         final DesignProcessDefinition designProcessDef1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("initTask1"),
                 Arrays.asList(true));
         final ProcessDefinition processDef1 = deployAndEnableProcessWithActor(designProcessDef1, ACTOR_NAME, user);
-        getProcessAPI().startProcess(processDef1.getId());
-        getProcessAPI().startProcess(processDef1.getId());
+        final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDef1.getId());
+        waitForUserTask("initTask1", processInstance1);
+        final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDef1.getId());
+        waitForUserTask("initTask1", processInstance2);
 
         final ProcessDefinitionBuilder definitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME + 2, PROCESS_VERSION);
         definitionBuilder.addStartEvent("start");
@@ -86,12 +86,14 @@ public class HumanTasksTest extends CommonAPITest {
         final DesignProcessDefinition designProcessDef2 = definitionBuilder.done();
 
         final ProcessDefinition processDef2 = deployAndEnableProcessWithActor(designProcessDef2, ACTOR_NAME, user);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDef2.getId());
-        getProcessAPI().startProcess(processDef2.getId());
-        getProcessAPI().startProcess(processDef2.getId());
-        checkNbOfHumanTasks(5);
+        final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDef2.getId());
+        waitForUserTask("initTask2", processInstance3);
+        final ProcessInstance processInstance4 = getProcessAPI().startProcess(processDef2.getId());
+        waitForUserTask("initTask2", processInstance4);
+        final ProcessInstance processInstance5 = getProcessAPI().startProcess(processDef2.getId());
+        waitForUserTask("initTask2", processInstance5);
 
-        final HumanTaskInstance taskInstance = getProcessAPI().getLastStateHumanTaskInstance(processInstance.getId(), "initTask2");
+        final HumanTaskInstance taskInstance = getProcessAPI().getLastStateHumanTaskInstance(processInstance3.getId(), "initTask2");
         assertNotNull(taskInstance);
         assertEquals("initTask2", taskInstance.getName());
 
@@ -118,7 +120,7 @@ public class HumanTasksTest extends CommonAPITest {
         getProcessAPI().assignUserTask(task.getId(), user.getId());
         try {
             getProcessAPI().executeFlowNode(task.getId());
-        } catch (FlowNodeExecutionException e) {
+        } catch (final FlowNodeExecutionException e) {
             assertTrue("wrong exception message", e.getMessage().contains("Incompatible assignment operation type"));
         }
         disableAndDeleteProcess(processDef);
@@ -150,9 +152,10 @@ public class HumanTasksTest extends CommonAPITest {
         final DesignProcessDefinition designProcessDef1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("initTask1"),
                 Arrays.asList(true));
         final ProcessDefinition processDef1 = deployAndEnableProcessWithActor(designProcessDef1, ACTOR_NAME, user);
-        // final ProcessInstance processInstance =
-        getProcessAPI().startProcess(processDef1.getId());
-        getProcessAPI().startProcess(processDef1.getId());
+        final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDef1.getId());
+        waitForUserTask("initTask1", processInstance1);
+        final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDef1.getId());
+        waitForUserTask("initTask1", processInstance2);
 
         final ProcessDefinitionBuilder definitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME + 2, PROCESS_VERSION);
         definitionBuilder.addStartEvent("start");
@@ -164,12 +167,14 @@ public class HumanTasksTest extends CommonAPITest {
         final DesignProcessDefinition designProcessDef2 = definitionBuilder.done();
 
         final ProcessDefinition processDef2 = deployAndEnableProcessWithActor(designProcessDef2, ACTOR_NAME, user);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDef2.getId());
-        getProcessAPI().startProcess(processDef2.getId());
-        getProcessAPI().startProcess(processDef2.getId());
-        checkNbOfHumanTasks(5);
+        final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDef2.getId());
+        waitForUserTask("initTask2", processInstance3);
+        final ProcessInstance processInstance4 = getProcessAPI().startProcess(processDef2.getId());
+        waitForUserTask("initTask2", processInstance4);
+        final ProcessInstance processInstance5 = getProcessAPI().startProcess(processDef2.getId());
+        waitForUserTask("initTask2", processInstance5);
 
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getHumanTaskInstances(processInstance.getId(), "initTask2", 0, 10);
+        final List<HumanTaskInstance> taskInstances = getProcessAPI().getHumanTaskInstances(processInstance3.getId(), "initTask2", 0, 10);
         assertEquals(1, taskInstances.size());
 
         disableAndDeleteProcess(processDef1);
@@ -211,10 +216,10 @@ public class HumanTasksTest extends CommonAPITest {
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDef.getId());
-        checkNbOfHumanTasks(4);
-
-        final List<ActivityInstance> activityInstances = new ArrayList<ActivityInstance>(getProcessAPI().getActivities(processInstance.getId(), 0, 10));
-        assignActivityInstanceToUser(user, activityInstances);
+        waitForUserTaskAndAssigneIt("initTask1", processInstance, user);
+        waitForUserTaskAndAssigneIt("initTask2", processInstance, user);
+        waitForUserTaskAndAssigneIt("initTask3", processInstance, user);
+        waitForUserTaskAndAssigneIt("initTask4", processInstance, user);
 
         // The task with the lowest priority is "initTask2"
         HumanTaskInstance humanTask = getProcessAPI().getAssignedHumanTaskInstances(user.getId(), 0, 1, ActivityInstanceCriterion.PRIORITY_ASC).get(0);
@@ -258,17 +263,14 @@ public class HumanTasksTest extends CommonAPITest {
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDef.getId());
-        checkNbOfHumanTasks(2);
-
-        final List<ActivityInstance> activityInstances = new ArrayList<ActivityInstance>(getProcessAPI().getActivities(processInstance.getId(), 0, 10));
-        assignActivityInstanceToUser(user, activityInstances);
+        waitForUserTaskAndAssigneIt("initTask1", processInstance, user);
+        waitForUserTaskAndAssigneIt("initTask4", processInstance, user);
 
         HumanTaskInstance humanTask = getProcessAPI().getAssignedHumanTaskInstances(user.getId(), 0, 1, ActivityInstanceCriterion.NAME_DESC).get(0);
         assertEquals("initTask4", humanTask.getName());
 
         assignAndExecuteStep(humanTask, user.getId());
-
-        getProcessAPI().assignUserTask(waitForStep("initTask5", processInstance).getResult().getId(), user.getId());
+        waitForUserTaskAndAssigneIt("initTask5", processInstance, user);
 
         humanTask = getProcessAPI().getAssignedHumanTaskInstances(user.getId(), 0, 1, ActivityInstanceCriterion.REACHED_STATE_DATE_ASC).get(0);
         assertEquals("initTask1", humanTask.getName());
@@ -320,42 +322,24 @@ public class HumanTasksTest extends CommonAPITest {
         return activityInstance;
     }
 
-    private void assignActivityInstanceToUser(final User user, final List<ActivityInstance> activityInstances) throws UpdateException {
-        final Iterator<ActivityInstance> it = activityInstances.iterator();
-        ActivityInstance activityInstance = null;
-        long activityInstanceId = 0;
-        while (it.hasNext()) {
-            activityInstance = it.next();
-            activityInstanceId = activityInstance.getId();
-            try {
-                getProcessAPI().assignUserTask(activityInstanceId, user.getId());
-            } catch (final UpdateException e) {
-                throw new UpdateException(e);
-            }
-        }
-    }
-
     @Test
     public void setTaskPriority() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step1", ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForStep("step1", pi0);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
+        assertEquals(TaskPriority.NORMAL, step1.getPriority());
 
-        final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(pi0.getId(), 0, 10);
-        final long activityInstanceId = activityInstances.get(0).getId();
-        HumanTaskInstance humanTaskInstance = getProcessAPI().getHumanTaskInstance(activityInstanceId);
-        assertEquals(TaskPriority.NORMAL, humanTaskInstance.getPriority());
+        final long step1Id = step1.getId();
+        getProcessAPI().setTaskPriority(step1Id, TaskPriority.HIGHEST);
+        step1 = getProcessAPI().getHumanTaskInstance(step1Id);
+        assertEquals(TaskPriority.HIGHEST, step1.getPriority());
 
-        getProcessAPI().setTaskPriority(activityInstanceId, TaskPriority.HIGHEST);
-        humanTaskInstance = getProcessAPI().getHumanTaskInstance(activityInstanceId);
-        assertEquals(TaskPriority.HIGHEST, humanTaskInstance.getPriority());
-
-        getProcessAPI().setTaskPriority(activityInstanceId, TaskPriority.LOWEST);
-        humanTaskInstance = getProcessAPI().getHumanTaskInstance(activityInstanceId);
-        assertEquals(TaskPriority.LOWEST, humanTaskInstance.getPriority());
+        getProcessAPI().setTaskPriority(step1Id, TaskPriority.LOWEST);
+        step1 = getProcessAPI().getHumanTaskInstance(step1Id);
+        assertEquals(TaskPriority.LOWEST, step1.getPriority());
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -366,26 +350,23 @@ public class HumanTasksTest extends CommonAPITest {
         processBuilder.addActor(ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step1", ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForStep("step1", pi0);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
+        assertEquals(ActivityStates.READY_STATE, step1.getState());
 
-        final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(pi0.getId(), 0, 10);
-        final long activityInstanceId = activityInstances.get(0).getId();
-        HumanTaskInstance humanTaskInstance = getProcessAPI().getHumanTaskInstance(activityInstanceId);
-        assertEquals(ActivityStates.READY_STATE, humanTaskInstance.getState());
-
+        final long activityInstanceId = step1.getId();
         getProcessAPI().setActivityStateById(activityInstanceId, 32);
-        humanTaskInstance = getProcessAPI().getHumanTaskInstance(activityInstanceId);
-        assertEquals(ActivityStates.INITIALIZING_STATE, humanTaskInstance.getState());
+        step1 = getProcessAPI().getHumanTaskInstance(activityInstanceId);
+        assertEquals(ActivityStates.INITIALIZING_STATE, step1.getState());
 
         // test set state by stateName
         getProcessAPI().setActivityStateByName(activityInstanceId, ActivityStates.CANCELLING_SUBTASKS_STATE);
-        humanTaskInstance = getProcessAPI().getHumanTaskInstance(activityInstanceId);
-        assertEquals(ActivityStates.CANCELLING_SUBTASKS_STATE, humanTaskInstance.getState());
+        step1 = getProcessAPI().getHumanTaskInstance(activityInstanceId);
+        assertEquals(ActivityStates.CANCELLING_SUBTASKS_STATE, step1.getState());
 
         getProcessAPI().setActivityStateByName(activityInstanceId, ActivityStates.SKIPPED_STATE);
         // will skip task and finish process
-        waitForProcessToFinish(pi0.getId());
+        waitForProcessToFinish(processInstance.getId());
 
         disableAndDeleteProcess(processDefinition);
     }

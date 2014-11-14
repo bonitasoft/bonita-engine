@@ -1,6 +1,5 @@
 package org.bonitasoft.engine.scheduler.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -15,7 +14,6 @@ import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
 import org.bonitasoft.engine.scheduler.builder.SJobParameterBuilderFactory;
-import org.bonitasoft.engine.scheduler.job.IncrementItselfJob;
 import org.bonitasoft.engine.scheduler.job.ReleaseWaitersJob;
 import org.bonitasoft.engine.scheduler.job.VariableStorage;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;

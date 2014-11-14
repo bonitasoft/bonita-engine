@@ -45,7 +45,6 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,7 +57,7 @@ public class GetUpdatedVariableValuesForProcessDefinitionTest extends CommonAPIT
 
     @Before
     public void before() throws Exception {
-         loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @After
@@ -66,6 +65,7 @@ public class GetUpdatedVariableValuesForProcessDefinitionTest extends CommonAPIT
         logoutOnTenant();
     }
 
+    @SuppressWarnings("unchecked")
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.PROCESS, keywords = { "Command", "Updated variable value", "Process definition" }, story = "Get updated variable values for process definition.", jira = "")
     @Test(expected = CommandExecutionException.class)
     public void testGetUpdatedVariableValuesForProcessDefinition() throws Exception {
@@ -86,8 +86,7 @@ public class GetUpdatedVariableValuesForProcessDefinitionTest extends CommonAPIT
         try {
             final long processDefinitionId = processDefinition.getId();
             final ProcessInstance pi = getProcessAPI().startProcess(processDefinitionId);
-            final WaitForStep waitForStep = waitForStep("step1", pi);
-            final long activityInstanceId = waitForStep.getStepId();
+            final long activityInstanceId = waitForUserTask("step1", pi).getId();
 
             // Let's update the value of data1 to 22. It should not be taken into account at process def level:
             getProcessAPI().updateActivityDataInstance(dataName1, activityInstanceId, 22);
@@ -107,10 +106,11 @@ public class GetUpdatedVariableValuesForProcessDefinitionTest extends CommonAPIT
             // First one is 'var1 = data1 + 33'
             final Expression dependencyData1 = new ExpressionBuilder().createDataExpression(dataName1, Integer.class.getName());
             final Expression expression1 = new ExpressionBuilder().createNewInstance("data1 + 33").setContent("data1 + 33")
-                    .setDependencies(Arrays.asList(dependencyData1)).setExpressionType(ExpressionType.TYPE_READ_ONLY_SCRIPT.name()).setInterpreter("GROOVY")
+                    .setDependencies(Arrays.asList(dependencyData1)).setExpressionType(ExpressionType.TYPE_READ_ONLY_SCRIPT).setInterpreter("GROOVY")
                     .setReturnType(Integer.class.getName()).done();
             final Operation integerOperation1 = new OperationBuilder().createNewInstance()
-                    .setLeftOperand(new LeftOperandBuilder().createNewInstance().setName(varName1).setExternal(true).done()).setType(OperatorType.ASSIGNMENT)
+                    .setLeftOperand(new LeftOperandBuilder().createNewInstance().setName(varName1).setType(LeftOperand.TYPE_EXTERNAL_DATA).done())
+                    .setType(OperatorType.ASSIGNMENT)
                     .setOperator("=").setRightOperand(expression1).done();
             final Map<String, Serializable> contexts = new HashMap<String, Serializable>();
             // contexts.put("processDefinitionId", processDefinition.getId()); // FIXME
@@ -120,9 +120,9 @@ public class GetUpdatedVariableValuesForProcessDefinitionTest extends CommonAPIT
             // Second one is 'var2.add("toto" + data1)'
             final Expression dependencyToto = new ExpressionBuilder().createConstantStringExpression("\"toto\"");
             final Expression expression2 = new ExpressionBuilder().createNewInstance("concat 'toto' to data1 value").setContent("\"toto\" + data1")
-                    .setDependencies(Arrays.asList(dependencyToto, dependencyData1)).setExpressionType(ExpressionType.TYPE_READ_ONLY_SCRIPT.name())
+                    .setDependencies(Arrays.asList(dependencyToto, dependencyData1)).setExpressionType(ExpressionType.TYPE_READ_ONLY_SCRIPT)
                     .setInterpreter("GROOVY").setReturnType(String.class.getName()).done();
-            final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(varName2).setExternal(true).done();
+            final LeftOperand leftOperand = new LeftOperandBuilder().createNewInstance().setName(varName2).setType(LeftOperand.TYPE_EXTERNAL_DATA).done();
             final Operation integerOperation2 = new OperationBuilder().createNewInstance().setOperator("add").setOperatorInputType(Object.class.getName())
                     .setLeftOperand(leftOperand).setType(OperatorType.JAVA_METHOD).setRightOperand(expression2).done();
             operations.add(integerOperation2);
@@ -134,7 +134,6 @@ public class GetUpdatedVariableValuesForProcessDefinitionTest extends CommonAPIT
             commandParameters.put("OPERATIONS_INPUT_KEY", (Serializable) contexts);
             commandParameters.put("CURRENT_VARIABLE_VALUES_MAP_KEY", (Serializable) currentVariables);
             commandParameters.put("PROCESS_DEFINITION_ID_KEY", processDefinitionId);
-            @SuppressWarnings("unchecked")
             final Map<String, Serializable> updatedVariable = (Map<String, Serializable>) getCommandAPI().execute(commandName, commandParameters);
 
             // FIXME: change the test so that there is no evaluation of variables at definition level:

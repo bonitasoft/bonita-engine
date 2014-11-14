@@ -39,7 +39,6 @@ public class SACommentBuilderFactoryImpl implements SACommentBuilderFactory {
 
     private static final String SOURCEOBJECTID_KEY = "sourceObjectId";
 
-    @Deprecated
     @Override
     public SACommentBuilder createNewInstance(final SComment sComment) {
         return new SACommentBuilderImpl(sComment);

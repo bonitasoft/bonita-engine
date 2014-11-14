@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -59,7 +60,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     /**
      * Assign a new value to a String Variable. Using an expression which is a constant.
      * variableName = "afterUpdate"
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -88,9 +89,10 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     /**
      * Assign a new value to a List Variable. Using an expression which is a constant.
      * variableName.add("afterUpdate");
-     * 
+     *
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void executeOperationUsingJavaMethodConstantExpression() throws Exception {
         final String dataInstanceName = "variableName";
@@ -111,7 +113,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
 
         dataInstance = getDataInstance(dataInstanceName, containerId, containerType);
         assertTrue(dataInstance.getValue() instanceof ArrayList<?>);
-        final ArrayList<String> list = (ArrayList<String>) dataInstance.getValue();
+        final List<String> list = (ArrayList<String>) dataInstance.getValue();
         assertTrue(list.contains(newConstantValue));
 
         // clean

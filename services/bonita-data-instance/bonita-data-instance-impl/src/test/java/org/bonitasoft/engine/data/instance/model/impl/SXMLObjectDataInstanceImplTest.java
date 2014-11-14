@@ -16,9 +16,8 @@ public class SXMLObjectDataInstanceImplTest {
     @Mock
     private SDataDefinition dataDefinition;
 
-
     @Test
-    public void SXMLObjectDataInstanceImpl_should_return_given_value() throws Exception {
+    public void SXMLObjectDataInstanceImpl_should_return_given_value() {
         //given
         final Serializable givenValue = new String("serializable value");
 
@@ -33,7 +32,7 @@ public class SXMLObjectDataInstanceImplTest {
     }
 
     @Test
-    public void SXMLObjectDataInstanceImpl_should_return_null_when_no_given_value() throws Exception {
+    public void SXMLObjectDataInstanceImpl_should_return_null_when_no_given_value() {
         //given
         final SXMLObjectDataInstanceImpl sxmlObjectDataInstanceImpl = new SXMLObjectDataInstanceImpl(dataDefinition);
 
@@ -45,7 +44,7 @@ public class SXMLObjectDataInstanceImplTest {
     }
 
     @Test
-    public void discriminator_should_not_be_null() throws Exception {
+    public void discriminator_should_not_be_null() {
         //given
         final SXMLObjectDataInstanceImpl sxmlObjectDataInstanceImpl = new SXMLObjectDataInstanceImpl();
 

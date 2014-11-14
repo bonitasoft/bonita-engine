@@ -24,11 +24,9 @@ public class SignalBoundaryEventTest extends AbstractEventTest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance step1 = waitForUserTask("step1", processInstance);
-        Thread.sleep(50);
         getProcessAPI().sendSignal("MySignal");
 
-        final ActivityInstance executionStep = waitForUserTask(EXCEPTION_STEP, processInstance);
-        assignAndExecuteStep(executionStep, donaBenta.getId());
+        waitForUserTaskAndExecuteIt(EXCEPTION_STEP, processInstance, donaBenta);
 
         waitForProcessToFinish(processInstance);
         waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
@@ -48,7 +46,6 @@ public class SignalBoundaryEventTest extends AbstractEventTest {
         waitForUserTaskAndExecuteIt("step1", processInstance, donaBenta);
         final ActivityInstance waitForUserTask = waitForUserTask("step2", processInstance);
 
-        // Thread.sleep(500);
         getProcessAPI().sendSignal("MySignal1");
 
         final WaitForStep waitForExceptionStep = new WaitForStep(50, 1000, EXCEPTION_STEP, processInstance.getId(), TestStates.READY,
@@ -76,9 +73,7 @@ public class SignalBoundaryEventTest extends AbstractEventTest {
         final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
 
         getProcessAPI().sendSignal("MySignal");
-
-        final ActivityInstance executionStep = waitForUserTask(EXCEPTION_STEP, processInstance);
-        assignAndExecuteStep(executionStep, donaBenta.getId());
+        waitForUserTaskAndExecuteIt(EXCEPTION_STEP, processInstance, donaBenta);
 
         waitForProcessToFinish(calledProcessInstance, TestStates.ABORTED);
         waitForProcessToFinish(processInstance);
@@ -133,11 +128,8 @@ public class SignalBoundaryEventTest extends AbstractEventTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final ActivityInstance step1 = waitForUserTask("step1", processInstance);
-        Thread.sleep(50);
         getProcessAPI().sendSignal("MySignal");
-
-        final ActivityInstance executionStep = waitForUserTask(EXCEPTION_STEP, processInstance);
-        assignAndExecuteStep(executionStep, donaBenta.getId());
+        waitForUserTaskAndExecuteIt(EXCEPTION_STEP, processInstance, donaBenta);
 
         waitForProcessToFinish(processInstance);
         waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
@@ -157,7 +149,7 @@ public class SignalBoundaryEventTest extends AbstractEventTest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         for (int i = 0; i < loopCardinality; i++) {
-            waitForUserTaskAndExecuteIt("step1", processInstance.getId(), donaBenta.getId());
+            waitForUserTaskAndExecuteIt("step1", processInstance, donaBenta);
         }
         final ActivityInstance waitForUserTask = waitForUserTask("step2", processInstance);
 
@@ -186,11 +178,8 @@ public class SignalBoundaryEventTest extends AbstractEventTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final ActivityInstance step1 = waitForUserTask("step1", processInstance);
-        Thread.sleep(50);
         getProcessAPI().sendSignal("MySignal");
-
-        final ActivityInstance executionStep = waitForUserTask(EXCEPTION_STEP, processInstance);
-        assignAndExecuteStep(executionStep, donaBenta.getId());
+        waitForUserTaskAndExecuteIt(EXCEPTION_STEP, processInstance, donaBenta);
 
         waitForProcessToFinish(processInstance);
         waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
@@ -210,7 +199,7 @@ public class SignalBoundaryEventTest extends AbstractEventTest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         for (int i = 0; i < loopCardinality; i++) {
-            waitForUserTaskAndExecuteIt("step1", processInstance.getId(), donaBenta.getId());
+            waitForUserTaskAndExecuteIt("step1", processInstance, donaBenta);
         }
         final ActivityInstance waitForUserTask = waitForUserTask("step2", processInstance);
 
@@ -238,11 +227,8 @@ public class SignalBoundaryEventTest extends AbstractEventTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final ActivityInstance step1 = waitForUserTask("step1", processInstance);
-        Thread.sleep(50);
         getProcessAPI().sendSignal("MySignal");
-
-        final ActivityInstance executionStep = waitForUserTask(EXCEPTION_STEP, processInstance);
-        assignAndExecuteStep(executionStep, donaBenta.getId());
+        waitForUserTaskAndExecuteIt(EXCEPTION_STEP, processInstance, donaBenta);
 
         waitForProcessToFinish(processInstance);
         waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
@@ -261,7 +247,7 @@ public class SignalBoundaryEventTest extends AbstractEventTest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         for (int i = 0; i < loopMax; i++) {
-            waitForUserTaskAndExecuteIt("step1", processInstance.getId(), donaBenta.getId());
+            waitForUserTaskAndExecuteIt("step1", processInstance, donaBenta);
         }
         final ActivityInstance waitForUserTask = waitForUserTask("step2", processInstance);
 

@@ -128,17 +128,17 @@ public abstract class AbstractEventTest extends CommonAPITest {
 
     /**
      * Deploy and enable a process with a human task having a timer boundary event followed by another human task without boundary
-     * 
+     *
      * @param timerValue
-     *            after how long time the boundary will be triggered
+     *        after how long time the boundary will be triggered
      * @param interrupting
-     *            define whether the boundary is interrupting or not
+     *        define whether the boundary is interrupting or not
      * @param taskWithBoundaryName
-     *            the name of user task containing the boundary event
+     *        the name of user task containing the boundary event
      * @param exceptionTaskName
-     *            the name of human task reached by exception flow
+     *        the name of human task reached by exception flow
      * @param normalFlowTaskName
-     *            name of human task following the task containing the boundary (normal flow)
+     *        name of human task following the task containing the boundary (normal flow)
      * @return
      * @throws BonitaException
      * @throws InvalidProcessDefinitionException
@@ -151,19 +151,19 @@ public abstract class AbstractEventTest extends CommonAPITest {
 
     /**
      * Deploy and enable a process with a human task having a timer boundary event followed by another human task without boundary
-     * 
+     *
      * @param timerType
-     *            the timer time
+     *        the timer time
      * @param timerValue
-     *            the timer value
+     *        the timer value
      * @param interrupting
-     *            define whether the boundary is interrupting or not
+     *        define whether the boundary is interrupting or not
      * @param taskWithBoundaryName
-     *            the name of user task containing the boundary event
+     *        the name of user task containing the boundary event
      * @param exceptionTaskName
-     *            the name of human task reached by exception flow
+     *        the name of human task reached by exception flow
      * @param normalFlowTaskName
-     *            name of human task following the task containing the boundary (normal flow)
+     *        name of human task following the task containing the boundary (normal flow)
      * @return
      * @throws BonitaException
      * @throws InvalidProcessDefinitionException
@@ -177,21 +177,21 @@ public abstract class AbstractEventTest extends CommonAPITest {
 
     /**
      * Deploy and enable a process with a human task having a timer boundary event followed by another human task without boundary
-     * 
+     *
      * @param timerType
-     *            the timer time
+     *        the timer time
      * @param timerExpr
-     *            the timer value
+     *        the timer value
      * @param interrupting
-     *            define whether the boundary is interrupting or not
+     *        define whether the boundary is interrupting or not
      * @param taskWithBoundaryName
-     *            the name of user task containing the boundary event
+     *        the name of user task containing the boundary event
      * @param exceptionTaskName
-     *            the name of human task reached by exception flow
+     *        the name of human task reached by exception flow
      * @param normalFlowTaskName
-     *            name of human task following the task containing the boundary (normal flow)
+     *        name of human task following the task containing the boundary (normal flow)
      * @param timerValue
-     *            the timer value
+     *        the timer value
      * @return
      * @throws BonitaException
      * @throws InvalidProcessDefinitionException
@@ -242,17 +242,17 @@ public abstract class AbstractEventTest extends CommonAPITest {
 
     /**
      * Deploy and enable a process containing a timer boundary event attached to a call activity
-     * 
+     *
      * @param timerDuration
-     *            after how long time the boundary will be triggered
+     *        after how long time the boundary will be triggered
      * @param interrupting
-     *            define whether the boundary is interrupting or not
+     *        define whether the boundary is interrupting or not
      * @param targetProcessName
-     *            the name of called process
+     *        the name of called process
      * @param userTaskName
-     *            the name of user task following the call activity in the normal flow
+     *        the name of user task following the call activity in the normal flow
      * @param exceptionFlowTaskName
-     *            the name of the user task reached by the exception flow
+     *        the name of the user task reached by the exception flow
      * @return
      * @throws InvalidExpressionException
      * @throws BonitaException
@@ -279,21 +279,21 @@ public abstract class AbstractEventTest extends CommonAPITest {
 
     /**
      * Deploy and enable a process with a timer boundary event attached to a multi-instance
-     * 
+     *
      * @param timerValue
-     *            after how long time the boundary will be triggered
+     *        after how long time the boundary will be triggered
      * @param interrupting
-     *            define whether the boundary is interrupting or not
+     *        define whether the boundary is interrupting or not
      * @param multiTaskName
-     *            the multi-instance name
+     *        the multi-instance name
      * @param loopCardinality
-     *            the multi-instance cardinality
+     *        the multi-instance cardinality
      * @param isSequential
-     *            define whether the multi-instance is sequential or parallel
+     *        define whether the multi-instance is sequential or parallel
      * @param normalFlowTaskName
-     *            the name of user task following the multi-instance in the normal flow
+     *        the name of user task following the multi-instance in the normal flow
      * @param exceptionFlowTaskName
-     *            the name of the user task reached by the exception flow
+     *        the name of the user task reached by the exception flow
      * @return
      * @throws BonitaException
      * @throws InvalidProcessDefinitionException
@@ -322,19 +322,19 @@ public abstract class AbstractEventTest extends CommonAPITest {
 
     /**
      * Deploy and enable a process with a timer boundary event attached to a loop activity
-     * 
+     *
      * @param timerValue
-     *            after how long time the boundary will be triggered
+     *        after how long time the boundary will be triggered
      * @param interrupting
-     *            define whether the boundary is interrupting or not
+     *        define whether the boundary is interrupting or not
      * @param loopMax
-     *            how many loops will be executed
+     *        how many loops will be executed
      * @param loopActivityName
-     *            the name of the loop activity
+     *        the name of the loop activity
      * @param normalFlowStepName
-     *            the name of the user task following the loop activity in the normal flow
+     *        the name of the user task following the loop activity in the normal flow
      * @param exceptionFlowStepName
-     *            the name of the user task reached by the exception flow
+     *        the name of the user task reached by the exception flow
      * @return
      * @throws BonitaException
      * @throws InvalidProcessDefinitionException
@@ -362,7 +362,7 @@ public abstract class AbstractEventTest extends CommonAPITest {
     protected void executeRemainingSequencialMultiInstancesOrLoop(final String taskName, final ProcessInstance processInstance, final int nbOfRemainingInstances)
             throws Exception {
         for (int i = 0; i < nbOfRemainingInstances; i++) {
-            waitForUserTaskAndExecuteIt(taskName, processInstance.getId(), getUser());
+            waitForUserTaskAndExecuteIt(taskName, processInstance, getUser());
         }
     }
 
@@ -384,11 +384,12 @@ public abstract class AbstractEventTest extends CommonAPITest {
     }
 
     public ProcessDefinition deployAndEnableProcessWithInterruptingAndNonInterruptingTimer(final long interruptTimer, final long nonInterruptingTimer,
-            final String taskWithBoundaryName, final String interruptExceptionTaskName, final String nonInterruptExceptionTaskName, String interruptTimerName,
-            String nonInterruptTimerName) throws BonitaException {
-        String normalFlowTaskName = "normalFlow";
-        Expression interruptTimerExpr = new ExpressionBuilder().createConstantLongExpression(interruptTimer);
-        Expression nonInterruptTimerExpr = new ExpressionBuilder().createConstantLongExpression(nonInterruptingTimer);
+            final String taskWithBoundaryName, final String interruptExceptionTaskName, final String nonInterruptExceptionTaskName,
+            final String interruptTimerName,
+            final String nonInterruptTimerName) throws BonitaException {
+        final String normalFlowTaskName = "normalFlow";
+        final Expression interruptTimerExpr = new ExpressionBuilder().createConstantLongExpression(interruptTimer);
+        final Expression nonInterruptTimerExpr = new ExpressionBuilder().createConstantLongExpression(nonInterruptingTimer);
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("pTimerBoundary", "2.0");
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addStartEvent("start");
@@ -674,11 +675,11 @@ public abstract class AbstractEventTest extends CommonAPITest {
 
     /**
      * Deploy and enable a simple process: start event -> user task -> end event
-     * 
+     *
      * @param processName
-     *            the process name
+     *        the process name
      * @param userTaskName
-     *            the user task name
+     *        the user task name
      * @return
      * @throws BonitaException
      * @throws InvalidProcessDefinitionException

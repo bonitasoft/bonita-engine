@@ -121,15 +121,12 @@ import org.bonitasoft.engine.test.check.CheckNbOfOpenActivities;
 import org.bonitasoft.engine.test.check.CheckNbOfProcessInstances;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.bonitasoft.engine.test.check.CheckProcessInstanceIsArchived;
-import org.bonitasoft.engine.test.wait.WaitForActivity;
 import org.bonitasoft.engine.test.wait.WaitForArchivedActivity;
 import org.bonitasoft.engine.test.wait.WaitForCompletedArchivedStep;
 import org.bonitasoft.engine.test.wait.WaitForDataValue;
 import org.bonitasoft.engine.test.wait.WaitForEvent;
 import org.bonitasoft.engine.test.wait.WaitForFinalArchivedActivity;
-import org.bonitasoft.engine.test.wait.WaitForFlowNode;
 import org.bonitasoft.engine.test.wait.WaitForPendingTasks;
-import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.bonitasoft.engine.test.wait.WaitProcessToFinishAndBeArchived;
 import org.junit.After;
 import org.slf4j.Logger;
@@ -741,9 +738,9 @@ public class APITestUtil extends PlatformTestUtil {
     private HumanTaskInstance waitForUserTask(final String taskName, final long processInstanceId, final int timeout) throws Exception {
         final Map<String, Serializable> readyTaskEvent;
         if (processInstanceId > 0) {
-            readyTaskEvent = ClientEventUtil.getReadyTaskEvent(processInstanceId, taskName);
+            readyTaskEvent = ClientEventUtil.getReadyFlowNodeEvent(processInstanceId, taskName);
         } else {
-            readyTaskEvent = ClientEventUtil.getReadyTaskEvent(taskName);
+            readyTaskEvent = ClientEventUtil.getReadyFlowNodeEvent(taskName);
         }
         final Long activityInstanceId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(), readyTaskEvent, timeout);
         final HumanTaskInstance getHumanTaskInstance = getHumanTaskInstance(activityInstanceId);
@@ -903,9 +900,9 @@ public class APITestUtil extends PlatformTestUtil {
             final int timeout) throws Exception {
         Map<String, Serializable> params;
         if (useRootProcessInstance) {
-            params = ClientEventUtil.getTaskInState(processInstanceId, state.getStateName(), flowNodeName);
+            params = ClientEventUtil.getFlowNodeInState(processInstanceId, state.getStateName(), flowNodeName);
         } else {
-            params = ClientEventUtil.getTaskInStateWithParentId(processInstanceId, state.getStateName(), flowNodeName);
+            params = ClientEventUtil.getFlowNodeInStateWithParentId(processInstanceId, state.getStateName(), flowNodeName);
         }
         return ClientEventUtil.executeWaitServerCommand(getCommandAPI(), params, timeout);
     }
@@ -946,117 +943,49 @@ public class APITestUtil extends PlatformTestUtil {
 
     public ActivityInstance waitForTaskToFail(final ProcessInstance processInstance) throws Exception {
         final Long activityId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
-                ClientEventUtil.getTaskInState(processInstance.getId(), TestStates.FAILED.getStateName()), DEFAULT_TIMEOUT);
+                ClientEventUtil.getFlowNodeInState(processInstance.getId(), TestStates.FAILED.getStateName()), DEFAULT_TIMEOUT);
         return getActivityInstance(activityId);
     }
 
     public FlowNodeInstance waitForFlowNodeInFailedState(final ProcessInstance processInstance) throws Exception {
         final Long activityId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
-                ClientEventUtil.getTaskInState(processInstance.getId(), TestStates.FAILED.getStateName()), DEFAULT_TIMEOUT);
+                ClientEventUtil.getFlowNodeInState(processInstance.getId(), TestStates.FAILED.getStateName()), DEFAULT_TIMEOUT);
         return getFlowNodeInstance(activityId);
     }
 
     public void waitForFlowNodeInFailedState(final String flowNodeInstanceName) throws Exception {
         final long failedTaskId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(),
-                ClientEventUtil.getTaskInState(TestStates.FAILED.getStateName(), flowNodeInstanceName), DEFAULT_TIMEOUT);
+                ClientEventUtil.getFlowNodeInState(TestStates.FAILED.getStateName(), flowNodeInstanceName), DEFAULT_TIMEOUT);
         assertNotNull(failedTaskId);
     }
 
-    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final long processInstanceId, final long userId) throws Exception {
-        final HumanTaskInstance humanTaskInstance = waitForUserTask(taskName, processInstanceId, DEFAULT_TIMEOUT);
-        assignAndExecuteStep(humanTaskInstance, userId);
-        return humanTaskInstance;
-    }
-
-    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final long userId) throws Exception {
-        return waitForUserTaskAndExecuteIt(taskName, processInstance.getId(), userId);
-    }
-
-    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final long processInstanceId, final User user) throws Exception {
-        return waitForUserTaskAndExecuteIt(taskName, processInstanceId, user.getId());
+    public FlowNodeInstance waitForFlowNodeInFailedState(final ProcessInstance processInstance, final String flowNodeName) throws Exception {
+        final Long flowNodeId = waitForFlowNodeInState(processInstance, flowNodeName, TestStates.FAILED, true);
+        return getFlowNodeInstance(flowNodeId);
     }
 
     public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception {
-        return waitForUserTaskAndExecuteIt(taskName, processInstance.getId(), user.getId());
-    }
-
-    public ActivityInstance waitForUserTaskAndAssigneIt(final String taskName, final long processInstanceId, final long userId) throws Exception,
-            UpdateException {
-        final ActivityInstance activityInstance = waitForUserTask(taskName, processInstanceId);
-        getProcessAPI().assignUserTask(activityInstance.getId(), userId);
-        return activityInstance;
-    }
-
-    public ActivityInstance waitForUserTaskAndAssigneIt(final String taskName, final ProcessInstance processInstance, final long userId) throws Exception,
-            UpdateException {
-        return waitForUserTaskAndAssigneIt(taskName, processInstance.getId(), userId);
+        final HumanTaskInstance humanTaskInstance = waitForUserTask(taskName, processInstance.getId(), DEFAULT_TIMEOUT);
+        assignAndExecuteStep(humanTaskInstance, user.getId());
+        return humanTaskInstance;
     }
 
     public ActivityInstance waitForUserTaskAndAssigneIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception,
             UpdateException {
-        return waitForUserTaskAndAssigneIt(taskName, processInstance.getId(), user.getId());
+        final ActivityInstance activityInstance = waitForUserTask(taskName, processInstance.getId());
+        getProcessAPI().assignUserTask(activityInstance.getId(), user.getId());
+        return activityInstance;
     }
 
-    @Deprecated
-    public GatewayInstance waitForGateway(final String name, final ProcessInstance processInstance, final boolean useRootProcessInstance) throws Exception {
-        final WaitForFlowNode waitForFlowNode = new WaitForFlowNode(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, name, processInstance.getId(),
-                useRootProcessInstance, processAPI);
-        waitForFlowNode.waitUntil();
-        final FlowNodeInstance result = waitForFlowNode.getResult();
-        assertNotNull(result);
-        if (result instanceof GatewayInstance) {
-            return (GatewayInstance) result;
+    public GatewayInstance waitForGateway(final ProcessInstance processInstance, final String name) throws Exception {
+        final Map<String, Serializable> readyTaskEvent = ClientEventUtil.getFlowNode(processInstance.getId(), name);
+        final Long activityInstanceId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(), readyTaskEvent, DEFAULT_REPEAT_EACH * DEFAULT_TIMEOUT);
+        final FlowNodeInstance flowNodeInstance = getProcessAPI().getFlowNodeInstance(activityInstanceId);
+        assertNotNull(flowNodeInstance);
+        if (flowNodeInstance instanceof GatewayInstance) {
+            return (GatewayInstance) flowNodeInstance;
         }
         return null;
-    }
-
-    @Deprecated
-    public WaitForStep waitForStep(final String taskName, final ProcessInstance processInstance) throws Exception {
-        return waitForStep(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, taskName, processInstance);
-    }
-
-    @Deprecated
-    private WaitForStep waitForStep(final int repeatEach, final int timeout, final String taskName, final ProcessInstance processInstance) throws Exception {
-        final WaitForStep waitForStep = new WaitForStep(repeatEach, timeout, taskName, processInstance.getId(), getProcessAPI());
-        assertTrue("Task " + taskName + " not found", waitForStep.waitUntil());
-        return waitForStep;
-    }
-
-    @Deprecated
-    public WaitForStep waitForStep(final String taskName, final ProcessInstance processInstance, final TestStates states) throws Exception {
-        return waitForStep(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, taskName, processInstance, states);
-    }
-
-    @Deprecated
-    private WaitForStep waitForStep(final int repeatEach, final int timeout, final String taskName, final ProcessInstance processInstance,
-            final TestStates state) throws Exception {
-        final WaitForStep waitForStep = new WaitForStep(repeatEach, timeout, taskName, processInstance.getId(), state, getProcessAPI());
-        assertTrue("Task " + taskName + " not found", waitForStep.waitUntil());
-        return waitForStep;
-    }
-
-    @Deprecated
-    public WaitForActivity waitForActivity(final String activityName, final ProcessInstance processInstance) throws Exception {
-        return waitForActivity(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, activityName, processInstance);
-    }
-
-    @Deprecated
-    private WaitForActivity waitForActivity(final int repeatEach, final int timeout, final String activityName, final ProcessInstance processInstance)
-            throws Exception {
-        return waitForActivity(repeatEach, timeout, activityName, processInstance, null);
-    }
-
-    @Deprecated
-    public WaitForActivity waitForActivity(final String activityName, final ProcessInstance processInstance, final String state) throws Exception {
-        return waitForActivity(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, activityName, processInstance, state);
-    }
-
-    @Deprecated
-    private WaitForActivity waitForActivity(final int repeatEach, final int timeout, final String activityName, final ProcessInstance processInstance,
-            final String state) throws Exception {
-        final WaitForActivity waitForActivity = new WaitForActivity(repeatEach, timeout, activityName, processInstance.getId(), state, getProcessAPI());
-        assertTrue(waitForActivity.waitUntil());
-        return waitForActivity;
     }
 
     @Deprecated

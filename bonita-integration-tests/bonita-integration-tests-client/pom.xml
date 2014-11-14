@@ -85,6 +85,7 @@
 			<scope>compile</scope>
 		</dependency>
 		
+		<!-- Just for the conf of the datasource -->
 		<dependency>
 			<groupId>org.bonitasoft.engine.test</groupId>
 			<artifactId>bonita-server-test-utils</artifactId>

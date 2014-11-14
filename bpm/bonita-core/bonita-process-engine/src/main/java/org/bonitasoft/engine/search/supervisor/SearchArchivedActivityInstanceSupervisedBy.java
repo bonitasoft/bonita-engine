@@ -18,7 +18,6 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -48,12 +47,12 @@ public class SearchArchivedActivityInstanceSupervisedBy extends AbstractSearchEn
 
     @Override
     public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
-        return activityInstanceService.getNumberOfArchivedFlowNodeInstancesSupervisedBy(supervisorId, SAFlowNodeInstance.class, searchOptions);
+        return activityInstanceService.getNumberOfArchivedFlowNodeInstancesSupervisedBy(supervisorId, SAActivityInstance.class, searchOptions);
     }
 
     @Override
     public List<SAActivityInstance> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
-        return activityInstanceService.searchArchivedActivityInstancesSupervisedBy(supervisorId, SAActivityInstance.class, searchOptions);
+        return activityInstanceService.searchArchivedFlowNodeInstancesSupervisedBy(supervisorId, SAActivityInstance.class, searchOptions);
     }
 
     @Override

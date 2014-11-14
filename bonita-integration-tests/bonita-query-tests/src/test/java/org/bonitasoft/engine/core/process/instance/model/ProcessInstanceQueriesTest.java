@@ -23,15 +23,6 @@ import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMapp
 import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.aProcessInstance;
 import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
 import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.bonitasoft.engine.test.persistence.builder.ActorBuilder.anActor;
-import static org.bonitasoft.engine.test.persistence.builder.ActorMemberBuilder.anActorMember;
-import static org.bonitasoft.engine.test.persistence.builder.CallActivityInstanceBuilder.aCallActivityInstanceBuilder;
-import static org.bonitasoft.engine.test.persistence.builder.GatewayInstanceBuilder.aGatewayInstanceBuilder;
-import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMappingBuilder.aPendingActivityMapping;
-import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.aProcessInstance;
-import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
-import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
