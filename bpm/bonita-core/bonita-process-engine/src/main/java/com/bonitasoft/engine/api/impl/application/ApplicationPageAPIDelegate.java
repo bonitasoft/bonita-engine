@@ -26,11 +26,11 @@ import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.api.impl.convertor.ApplicationPageConvertor;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplicationPages;
+import com.bonitasoft.engine.api.impl.validator.TokenValidator;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.SInvalidTokenException;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilderFactory;
@@ -68,10 +68,11 @@ public class ApplicationPageAPIDelegate {
         }
     }
 
-    public ApplicationPage createApplicationPage(final long applicationId, final long pageId, final String name) throws AlreadyExistsException,
+    public ApplicationPage createApplicationPage(final long applicationId, final long pageId, final String token) throws AlreadyExistsException,
             CreationException {
+        validateToken(token);
         final SApplicationPageBuilderFactory factory = BuilderFactory.get(SApplicationPageBuilderFactory.class);
-        final SApplicationPageBuilder pageBuilder = factory.createNewInstance(applicationId, pageId, name);
+        final SApplicationPageBuilder pageBuilder = factory.createNewInstance(applicationId, pageId, token);
         SApplicationPage sAppPage;
         try {
             sAppPage = applicationService.createApplicationPage(pageBuilder.done());
@@ -82,10 +83,15 @@ public class ApplicationPageAPIDelegate {
             throw new CreationException(e);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
-        } catch (final SInvalidTokenException e) {
-            throw new CreationException(e.getMessage());
         } catch (final SBonitaException e) {
             throw new CreationException(e);
+        }
+    }
+
+    private void validateToken(final String token) throws CreationException {
+        TokenValidator tokenValidator = new TokenValidator(token);
+        if (!tokenValidator.validate()) {
+            throw new CreationException(tokenValidator.getError());
         }
     }
 

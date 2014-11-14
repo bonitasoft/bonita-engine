@@ -22,8 +22,10 @@ import org.bonitasoft.engine.search.SearchResult;
 
 import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
 import com.bonitasoft.engine.api.impl.transaction.application.SearchApplications;
+import com.bonitasoft.engine.api.impl.validator.TokenValidator;
 import com.bonitasoft.engine.business.application.Application;
 import com.bonitasoft.engine.business.application.ApplicationCreator;
+import com.bonitasoft.engine.business.application.ApplicationField;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
@@ -50,12 +52,24 @@ public class ApplicationAPIDelegate {
 
     public Application createApplication(final ApplicationCreator applicationCreator) throws AlreadyExistsException, CreationException {
         try {
+            validateCreator(applicationCreator);
             final SApplication sApplication = applicationService.createApplication(convertor.buildSApplication(applicationCreator, loggedUserId));
             return convertor.toApplication(sApplication);
         } catch (final SObjectAlreadyExistsException e) {
             throw new AlreadyExistsException(e.getMessage());
         } catch (final SBonitaException e) {
             throw new CreationException(e);
+        }
+    }
+
+    private void validateCreator(final ApplicationCreator applicationCreator) throws CreationException {
+        TokenValidator tokenValidator = new TokenValidator(applicationCreator.getToken());
+        if (!tokenValidator.validate()) {
+            throw new CreationException(tokenValidator.getError());
+        }
+        String displayName = (String) applicationCreator.getFields().get(ApplicationField.DISPLAY_NAME);
+        if (displayName == null || displayName.trim().isEmpty()) {
+            throw new CreationException("The application display name can not be null or empty");
         }
     }
 
@@ -90,6 +104,7 @@ public class ApplicationAPIDelegate {
     public Application updateApplication(final long applicationId, final ApplicationUpdater updater) throws UpdateException,
             AlreadyExistsException, ApplicationNotFoundException {
         try {
+            validateUpdater(updater);
             SApplication sApplication;
             if (!updater.getFields().isEmpty()) {
                 sApplication = applicationService.updateApplication(applicationId, convertor.toApplicationUpdateDescriptor(updater, loggedUserId));
@@ -103,6 +118,30 @@ public class ApplicationAPIDelegate {
             throw new ApplicationNotFoundException(applicationId);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
+        }
+    }
+
+    private void validateUpdater(final ApplicationUpdater updater) throws UpdateException {
+        validateToken(updater);
+        validateDisplayName(updater);
+    }
+
+    private void validateDisplayName(final ApplicationUpdater updater) throws UpdateException {
+        if (updater.getFields().keySet().contains(ApplicationField.DISPLAY_NAME)) {
+            String displayName = (String) updater.getFields().get(ApplicationField.DISPLAY_NAME);
+            if (displayName == null || displayName.trim().isEmpty()) {
+                throw new UpdateException("The application display name can not be null or empty");
+            }
+        }
+    }
+
+    private void validateToken(final ApplicationUpdater updater) throws UpdateException {
+        if (updater.getFields().keySet().contains(ApplicationField.TOKEN)) {
+            String token = (String) updater.getFields().get(ApplicationField.TOKEN);
+            TokenValidator tokenValidator = new TokenValidator(token);
+            if (!tokenValidator.validate()) {
+                throw new UpdateException(tokenValidator.getError());
+            }
         }
     }
 

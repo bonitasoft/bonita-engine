@@ -27,7 +27,6 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -46,8 +45,6 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.SInvalidDisplayNameException;
-import com.bonitasoft.engine.business.application.SInvalidTokenException;
 import com.bonitasoft.engine.business.application.impl.cleaner.ApplicationDestructor;
 import com.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuCleaner;
 import com.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuDestructor;
@@ -118,8 +115,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public SApplication createApplication(final SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException,
-            SInvalidTokenException, SInvalidDisplayNameException {
+    public SApplication createApplication(final SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException {
         checkLicense();
         final String methodName = "createApplication";
         final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.CREATED, "Creating application named " + application.getToken());
@@ -129,10 +125,6 @@ public class ApplicationServiceImpl implements ApplicationService {
                     .setObject(application).done();
             recorder.recordInsert(new InsertRecord(application), insertEvent);
             log(application.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
-        } catch (final SInvalidTokenException e) {
-            return logAndRetrowException(application.getId(), methodName, logBuilder, e);
-        } catch (final SInvalidDisplayNameException e) {
-            return logAndRetrowException(application.getId(), methodName, logBuilder, e);
         } catch (final SObjectAlreadyExistsException e) {
             return logAndRetrowException(application.getId(), methodName, logBuilder, e);
         } catch (final SBonitaException e) {
@@ -147,29 +139,16 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
     }
 
-    private void validateApplication(final SApplication application) throws SInvalidTokenException, SBonitaReadException, SObjectAlreadyExistsException,
-            SObjectCreationException, SInvalidDisplayNameException {
+    private void validateApplication(final SApplication application) throws SBonitaReadException, SObjectAlreadyExistsException,
+            SObjectCreationException {
         final String applicationName = application.getToken();
         validateApplicationToken(applicationName);
-        validateApplicationDisplayName(application.getDisplayName());
 
     }
 
-    private void validateApplicationToken(final String applicationToken) throws SInvalidTokenException, SBonitaReadException, SObjectAlreadyExistsException {
-        if (!URLValidator.isValid(applicationToken)) {
-            throw new SInvalidTokenException(
-                    "Invalid application token '"
-                            + applicationToken
-                            + "': the token can not be null or empty and should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'");
-        }
+    private void validateApplicationToken(final String applicationToken) throws SBonitaReadException, SObjectAlreadyExistsException {
         if (hasApplicationWithToken(applicationToken)) {
             throw new SObjectAlreadyExistsException("An application already exists with token '" + applicationToken + "'.");
-        }
-    }
-
-    private void validateApplicationDisplayName(final String applicationDisplayName) throws SInvalidDisplayNameException {
-        if (applicationDisplayName == null || applicationDisplayName.trim().isEmpty()) {
-            throw new SInvalidDisplayNameException("The application display name can not be null or empty");
         }
     }
 
@@ -264,27 +243,16 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public SApplication updateApplication(final long applicationId, final EntityUpdateDescriptor updateDescriptor)
-            throws SObjectModificationException, SInvalidTokenException, SInvalidDisplayNameException, SObjectNotFoundException, SObjectAlreadyExistsException {
+            throws SObjectModificationException, SObjectAlreadyExistsException, SObjectNotFoundException {
         checkLicense();
         final String methodName = "updateApplication";
         final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.UPDATED, "Updating application with id " + applicationId);
 
         try {
-            final Long homePageId = (Long) updateDescriptor.getFields().get(SApplicationFields.HOME_PAGE_ID);
-            if (homePageId != null) {
-                final SApplicationPage applicationPage = executeGetApplicationPageById(homePageId);
-                if (applicationPage == null) {
-                    throw new SObjectModificationException("Invalid home page id: No application page found with id '" + homePageId + "'");
-                }
-            }
+            handleHomePageUpdate(updateDescriptor);
             final SApplication application = getApplication(applicationId);
             return updateApplication(application, updateDescriptor);
-
         } catch (final SObjectNotFoundException e) {
-            throw e;
-        } catch (final SInvalidTokenException e) {
-            throw e;
-        } catch (final SInvalidDisplayNameException e) {
             throw e;
         } catch (final SObjectAlreadyExistsException e) {
             throw e;
@@ -296,9 +264,19 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
     }
 
+    private void handleHomePageUpdate(final EntityUpdateDescriptor updateDescriptor) throws SBonitaReadException, SObjectModificationException {
+        final Long homePageId = (Long) updateDescriptor.getFields().get(SApplicationFields.HOME_PAGE_ID);
+        if (homePageId != null) {
+            final SApplicationPage applicationPage = executeGetApplicationPageById(homePageId);
+            if (applicationPage == null) {
+                throw new SObjectModificationException("Invalid home page id: No application page found with id '" + homePageId + "'");
+            }
+        }
+    }
+
     @Override
     public SApplication updateApplication(final SApplication application, final EntityUpdateDescriptor updateDescriptor)
-            throws SObjectModificationException, SInvalidTokenException, SInvalidDisplayNameException, SObjectAlreadyExistsException {
+            throws SObjectModificationException, SObjectAlreadyExistsException {
         checkLicense();
         final String methodName = "updateApplication";
         final long now = System.currentTimeMillis();
@@ -316,10 +294,6 @@ public class ApplicationServiceImpl implements ApplicationService {
             log(application.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             return application;
 
-        } catch (final SInvalidTokenException e) {
-            return logAndRetrowException(application.getId(), methodName, logBuilder, e);
-        } catch (final SInvalidDisplayNameException e) {
-            return logAndRetrowException(application.getId(), methodName, logBuilder, e);
         } catch (final SObjectAlreadyExistsException e) {
             return logAndRetrowException(application.getId(), methodName, logBuilder, e);
         } catch (final SBonitaException e) {
@@ -334,16 +308,11 @@ public class ApplicationServiceImpl implements ApplicationService {
         throw e;
     }
 
-    private void validateUpdatedFields(final EntityUpdateDescriptor updateDescriptor, final SApplication application) throws SInvalidTokenException,
-            SBonitaReadException,
-            SObjectAlreadyExistsException, SInvalidDisplayNameException {
+    private void validateUpdatedFields(final EntityUpdateDescriptor updateDescriptor, final SApplication application) throws SBonitaReadException,
+            SObjectAlreadyExistsException {
         if (updateDescriptor.getFields().containsKey(SApplicationFields.TOKEN)
                 && !application.getToken().equals(updateDescriptor.getFields().get(SApplicationFields.TOKEN))) {
             validateApplicationToken((String) updateDescriptor.getFields().get(SApplicationFields.TOKEN));
-        }
-        if (updateDescriptor.getFields().containsKey(SApplicationFields.DISPLAY_NAME)
-                && !application.getDisplayName().equals(updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME))) {
-            validateApplicationDisplayName((String) updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME));
         }
     }
 
@@ -360,8 +329,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public SApplicationPage createApplicationPage(final SApplicationPage applicationPage) throws SObjectCreationException, SObjectAlreadyExistsException,
-            SInvalidTokenException {
+    public SApplicationPage createApplicationPage(final SApplicationPage applicationPage) throws SObjectCreationException, SObjectAlreadyExistsException {
         checkLicense();
         final String methodName = "createApplicationPage";
         final SApplicationPageLogBuilder logBuilder = getApplicationPageLogBuilder(ActionType.CREATED,
@@ -373,8 +341,6 @@ public class ApplicationServiceImpl implements ApplicationService {
                     .setObject(applicationPage).done();
             recorder.recordInsert(new InsertRecord(applicationPage), insertEvent);
             log(applicationPage.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
-        } catch (final SInvalidTokenException e) {
-            return logAndRetrowException(applicationPage.getId(), methodName, logBuilder, e);
         } catch (final SObjectAlreadyExistsException e) {
             return logAndRetrowException(applicationPage.getId(), methodName, logBuilder, e);
         } catch (final SBonitaException e) {
@@ -383,15 +349,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         return applicationPage;
     }
 
-    private void validateApplicationPage(final SApplicationPage applicationPage) throws SInvalidTokenException, SBonitaReadException,
-            SObjectAlreadyExistsException {
+    private void validateApplicationPage(final SApplicationPage applicationPage) throws SBonitaReadException, SObjectAlreadyExistsException {
         final String applicationPageToken = applicationPage.getToken();
-        if (!URLValidator.isValid(applicationPageToken)) {
-            throw new SInvalidTokenException(
-                    "Invalid application page token'"
-                            + applicationPageToken
-                            + "': the token can not be null or empty and should contain only alpha numeric characters and the following special characters '-', '.', '_' or '~'");
-        }
         if (hasApplicationPage(applicationPage.getApplicationId(), applicationPageToken)) {
             final StringBuilder stb = new StringBuilder();
             stb.append("An application page with token '");
@@ -666,7 +625,8 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public List<String> getAllPagesForProfile(long profileId) throws SBonitaReadException {
-        SelectListDescriptor<String> selectList = new SelectListDescriptor<String>("getAllPagesForProfile",Collections.<String, Object>singletonMap("profileId",profileId),SApplicationPage.class, new QueryOptions(0,QueryOptions.UNLIMITED_NUMBER_OF_RESULTS));
+        SelectListDescriptor<String> selectList = new SelectListDescriptor<String>("getAllPagesForProfile", Collections.<String, Object> singletonMap(
+                "profileId", profileId), SApplicationPage.class, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS));
         return persistenceService.selectList(selectList);
     }
 

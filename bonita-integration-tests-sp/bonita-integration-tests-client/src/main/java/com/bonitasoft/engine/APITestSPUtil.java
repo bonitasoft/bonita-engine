@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
@@ -94,6 +95,8 @@ public class APITestSPUtil extends APITestUtil {
 
     private PageAPI pageAPI;
 
+    private ApplicationAPI applicationAPI;
+
     @Override
     public PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
         return PlatformAPIAccessor.getPlatformLoginAPI();
@@ -165,6 +168,10 @@ public class APITestSPUtil extends APITestUtil {
         return tenantManagementAPI;
     }
 
+    public ApplicationAPI getApplicationAPI() {
+        return applicationAPI;
+    }
+
     public void setTenantManagementAPI(final TenantManagementAPI tenantManagementAPI) {
         this.tenantManagementAPI = tenantManagementAPI;
     }
@@ -204,6 +211,7 @@ public class APITestSPUtil extends APITestUtil {
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
         setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
+        applicationAPI = TenantAPIAccessor.getApplicationAPI(getSession());
     }
 
     protected void setPageAPI(final PageAPI pageAPI) {
