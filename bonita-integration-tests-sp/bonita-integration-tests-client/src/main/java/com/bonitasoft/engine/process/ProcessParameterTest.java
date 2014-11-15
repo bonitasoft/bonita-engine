@@ -47,7 +47,7 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.process.ProcessManagementTest;
+import org.bonitasoft.engine.process.ProcessManagementIT;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,7 +67,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @After
     public void afterTest() throws BonitaException {
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     @Before
@@ -609,7 +609,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
     @Test
     public void testImportParameters() throws Exception {
-        final InputStream stream = ProcessManagementTest.class.getResourceAsStream("info.properties");
+        final InputStream stream = ProcessManagementIT.class.getResourceAsStream("info.properties");
         assertNotNull(stream);
         final byte[] parametersXML = IOUtils.toByteArray(stream);
         final String paraName1 = "name";
