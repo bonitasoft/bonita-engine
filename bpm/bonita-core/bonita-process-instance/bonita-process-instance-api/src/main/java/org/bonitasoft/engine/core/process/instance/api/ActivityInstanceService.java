@@ -20,7 +20,7 @@ import java.util.Set;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityCreationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityModificationException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
@@ -104,7 +104,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      *         if no activityInstance found
      * @throws SActivityReadException
      */
-    SActivityInstance getActivityInstance(long activityInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException;
+    SActivityInstance getActivityInstance(long activityInstanceId) throws SActivityInstanceNotFoundException, SBonitaReadException;
 
     /**
      * Get humanTaskInstance by its id
@@ -113,9 +113,9 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      *        identifier of humanTaskInstance
      * @return an SHumanTaskInstance object with id corresponding to the parameter
      * @throws SActivityInstanceNotFoundException
-     * @throws SActivityReadException
+     * @throws SBonitaReadException
      */
-    SHumanTaskInstance getHumanTaskInstance(long activityInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException;
+    SHumanTaskInstance getHumanTaskInstance(long activityInstanceId) throws SActivityInstanceNotFoundException, SBonitaReadException;
 
     /**
      * Get activities with specific states in the root container in specific order, this is used for pagination
@@ -133,10 +133,10 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @param stateIds
      *        Identifiers of states
      * @return a list of SActivityInstance objects
-     * @throws SActivityReadException
+     * @throws SBonitaReadException
      */
     List<SActivityInstance> getActivitiesWithStates(long rootContainerId, Set<Integer> stateIds, int fromIndex, int maxResults, String sortingField,
-            OrderByType sortingOrder) throws SActivityReadException;
+            OrderByType sortingOrder) throws SBonitaReadException;
 
     /**
      * Get the most recent archived version of a specified activity instance
@@ -144,12 +144,12 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @param activityInstanceId
      *        identifier of activity instance
      * @return an SAActivityInstance object
-     * @throws SActivityReadException
+     * @throws SBonitaReadException
      *         if a Read error occurs
      * @throws SActivityInstanceNotFoundException
      *         it the provided activityInstanceId does not refer to an existing Activity Instance
      */
-    SAActivityInstance getMostRecentArchivedActivityInstance(long activityInstanceId) throws SActivityReadException, SActivityInstanceNotFoundException;
+    SAActivityInstance getMostRecentArchivedActivityInstance(long activityInstanceId) throws SActivityInstanceNotFoundException, SBonitaReadException;
 
     /**
      * Get pending tasks for the user in specific actors. This is used for pagination
@@ -167,10 +167,10 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @param order
      *        ASC or DESC
      * @return a list of SActivityInstance objects
-     * @throws SActivityReadException
+     * @throws SBonitaReadException
      */
     List<SHumanTaskInstance> getPendingTasks(long userId, Set<Long> actorIds, int fromIndex, int maxResults, String sortFieldName, OrderByType order)
-            throws SActivityReadException;
+            throws SBonitaReadException;
 
     /**
      * Get tasks assigned to the user. This is used for pagination
@@ -186,10 +186,10 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @param order
      *        ASC or DESC
      * @return a list of SHumanTaskInstance objects
-     * @throws SActivityReadException
+     * @throws SBonitaReadException
      */
     List<SHumanTaskInstance> getAssignedUserTasks(long userId, int fromIndex, int maxResults, String sortFieldName, OrderByType order)
-            throws SActivityReadException;
+            throws SBonitaReadException;
 
     /**
      * Get archived activity instances in the specific root container.
@@ -199,9 +199,9 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @param queryOptions
      *        a map of specific parameters of a query
      * @return a list of SAActivityInstance objects
-     * @throws SActivityReadException
+     * @throws SBonitaReadException
      */
-    List<SAActivityInstance> getArchivedActivityInstances(long rootContainerId, QueryOptions queryOptions) throws SActivityReadException;
+    List<SAActivityInstance> getArchivedActivityInstances(long rootContainerId, QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Get total number of open activity instances for the specific process instance
@@ -209,9 +209,9 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @param processInstanceId
      *        identifier of process instance
      * @return the number of opened activity instances in the specific process instance
-     * @throws SActivityReadException
+     * @throws SBonitaReadException
      */
-    int getNumberOfOpenActivityInstances(long processInstanceId) throws SActivityReadException;
+    int getNumberOfOpenActivityInstances(long processInstanceId) throws SBonitaReadException;
 
     /**
      * Get all open activity instances in the specific process instance. This is used for pagination
@@ -227,10 +227,10 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @param orderbyType
      *        ASC or DESC
      * @return a list of SActivityInstance objects
-     * @throws SActivityReadException
+     * @throws SBonitaReadException
      */
     List<SActivityInstance> getOpenActivityInstances(long rootContainerId, int pageIndex, int maxResults, String sortingField, OrderByType orderbyType)
-            throws SActivityReadException;
+            throws SBonitaReadException;
 
     /**
      * Get all activity instances for the specific process instance
@@ -238,10 +238,9 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @param rootContainerId
      *        identifier of root container, the root container can be process instance
      * @return a list of SActivityInstance objects
-     * @throws SActivityReadException
+     * @throws SBonitaReadException
      */
-    List<SActivityInstance> getActivityInstances(long rootContainerId, int fromIndex, int numberOfResults)
-            throws SActivityReadException;
+    List<SActivityInstance> getActivityInstances(long rootContainerId, int fromIndex, int numberOfResults) throws SBonitaReadException;
 
     /**
      * Get all child instances for the specific parent activity instance.
@@ -253,9 +252,9 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @param numberOfResults
      *        TODO
      * @return a list of SActivityInstance objects
-     * @throws SActivityReadException
+     * @throws SBonitaReadException
      */
-    List<SActivityInstance> getChildrenOfAnActivity(long parentActivityInstanceId, int fromIndex, int numberOfResults) throws SActivityReadException;
+    List<SActivityInstance> getChildrenOfAnActivity(long parentActivityInstanceId, int fromIndex, int numberOfResults) throws SBonitaReadException;
 
     /**
      * Assign the specific human task to the user
@@ -284,7 +283,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @throws SUnhideableTaskException
      * @since 6.0
      */
-    void hideTasks(long userId, Long... activityInstanceId) throws SActivityInstanceNotFoundException, STaskVisibilityException;
+    void hideTasks(long userId, Long... activityInstanceId) throws SActivityInstanceNotFoundException, STaskVisibilityException, SBonitaReadException;
 
     /**
      * Un-hides a task from a user's view.
@@ -334,10 +333,10 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @param userId
      *        the id of the user concerned
      * @return the number of UserTask instances assigned to this specific user
-     * @throws SActivityReadException
+     * @throws SBonitaReadException
      *         if a Read exception occurs
      */
-    long getNumberOfAssignedHumanTaskInstances(long userId) throws SActivityReadException;
+    long getNumberOfAssignedHumanTaskInstances(long userId) throws SBonitaReadException;
 
     /**
      * Search UserTask instances assigned for a specific supervisor
@@ -400,12 +399,12 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      *        the state identifier
      * @param persistenceService
      * @return
-     * @throws SActivityReadException
+     * @throws SBonitaReadException
      *         if a Read exception occurs
      * @throws SActivityInstanceNotFoundException
      */
 
-    SAActivityInstance getArchivedActivityInstance(long activityInstanceId, int stateId) throws SActivityReadException, SActivityInstanceNotFoundException;
+    SAActivityInstance getArchivedActivityInstance(long activityInstanceId, int stateId) throws SActivityInstanceNotFoundException, SBonitaReadException;
 
     /**
      * Search archived human tasks according to specific search criteria
@@ -586,9 +585,9 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      *        the loopActivity
      * @param result
      *        value for max loop
-     * @throws SActivityModificationException
+     * @throws SFlowNodeModificationException
      */
-    void setLoopMax(SLoopActivityInstance loopActivity, Integer result) throws SActivityModificationException;
+    void setLoopMax(SLoopActivityInstance loopActivity, Integer result) throws SFlowNodeModificationException;
 
     /**
      * Set LoopCardinality for the specific loopActvity
@@ -597,9 +596,9 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      *        the loopActvity
      * @param intLoopCardinality
      *        value of loop cardinality
-     * @throws SActivityModificationException
+     * @throws SFlowNodeModificationException
      */
-    void setLoopCardinality(SFlowNodeInstance flowNodeInstance, int intLoopCardinality) throws SActivityModificationException;
+    void setLoopCardinality(SFlowNodeInstance flowNodeInstance, int intLoopCardinality) throws SFlowNodeModificationException;
 
     /**
      * Add number of activeInstances for the specific SMultiInstanceActivityInstance object
@@ -608,9 +607,9 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      *        an SMultiInstanceActivityInstance object
      * @param number
      *        the number will be added
-     * @throws SActivityModificationException
+     * @throws SFlowNodeModificationException
      */
-    void addMultiInstanceNumberOfActiveActivities(SMultiInstanceActivityInstance flowNodeInstance, int number) throws SActivityModificationException;
+    void addMultiInstanceNumberOfActiveActivities(SMultiInstanceActivityInstance flowNodeInstance, int number) throws SFlowNodeModificationException;
 
     /**
      * Add number of terminated activeInstances for the specific SMultiInstanceActivityInstance object
@@ -620,9 +619,9 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @param number
      *        will be added to terminated instances of flowNodeInstance
      *        the number will be added
-     * @throws SActivityModificationException
+     * @throws SFlowNodeModificationException
      */
-    void addMultiInstanceNumberOfTerminatedActivities(SMultiInstanceActivityInstance flowNodeInstance, int number) throws SActivityModificationException;
+    void addMultiInstanceNumberOfTerminatedActivities(SMultiInstanceActivityInstance flowNodeInstance, int number) throws SFlowNodeModificationException;
 
     /**
      * Add number of completed activeInstances for the specific SMultiInstanceActivityInstance object
@@ -631,9 +630,9 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      *        an SMultiInstanceActivityInstance object whose completed activity number will be updated
      * @param number
      *        the number will be added
-     * @throws SActivityModificationException
+     * @throws SFlowNodeModificationException
      */
-    void addMultiInstanceNumberOfCompletedActivities(SMultiInstanceActivityInstance flowNodeInstance, int number) throws SActivityModificationException;
+    void addMultiInstanceNumberOfCompletedActivities(SMultiInstanceActivityInstance flowNodeInstance, int number) throws SFlowNodeModificationException;
 
     /**
      * Get total number of activity instances for the specific entity class
@@ -813,7 +812,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     /**
      * @param id
      */
-    void deleteArchivedPendingMappings(long flowNodeInstanceId) throws SActivityModificationException;
+    void deleteArchivedPendingMappings(long flowNodeInstanceId);
 
     /**
      * @param activityInstance
@@ -829,40 +828,9 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @throws SActivityReadException
      * @since 6.0
      */
-    int getNumberOfActivityInstances(long processInstanceId) throws SActivityReadException;
+    int getNumberOfActivityInstances(long processInstanceId) throws SBonitaReadException;
 
-    List<Long> getPossibleUserIdsOfPendingTasks(long humanTaskInstanceId, int startIndex, int maxResults) throws SActivityReadException;
-
-    /**
-     * Retrieve the total number of the archived Activities matching the given search criteria, for a specific supervisor.
-     *
-     * @param supervisorId
-     *        The identifier of the supervisor
-     * @param entityClass
-     *        The type of the archived flow node to search for
-     * @param queryOptions
-     *        The search options to filter the results
-     * @return The number found, 0 if no matching search criteria
-     * @since 6.3
-     */
-    long getNumberOfArchivedActivityInstancesSupervisedBy(long supervisorId, Class<? extends SAActivityInstance> entityClass, QueryOptions queryOptions)
-            throws SBonitaReadException;
-
-    /**
-     * Retrieve the total number of the archived Activities matching the given search criteria, for a specific supervisor.
-     *
-     * @param supervisorId
-     *        The identifier of the supervisor
-     * @param entityClass
-     *        The type of the archived flow node to search for
-     * @param queryOptions
-     *        The search options to filter the results
-     * @return The list of paginated results, according to the QueryOptions search criteria
-     * @since 6.3
-     */
-    List<SAActivityInstance> searchArchivedActivityInstancesSupervisedBy(long supervisorId, Class<? extends SAActivityInstance> entityClass,
-            QueryOptions queryOptions)
-            throws SBonitaReadException;
+    List<Long> getPossibleUserIdsOfPendingTasks(long humanTaskInstanceId, int startIndex, int maxResults) throws SBonitaReadException;
 
     /**
      * Get total number of users according to specific query options, and who can start the task filtered with the search option
@@ -938,5 +906,14 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @since 6.3.3
      */
     List<SHumanTaskInstance> searchAssignedAndPendingHumanTasks(long rootProcessDefinitionId, QueryOptions queryOptions) throws SBonitaReadException;
+
+    /**
+     * Delete archived flow node instances and their elements
+     *
+     * @param processInstanceId
+     * @throws SFlowNodeDeletionException
+     * @since 6.4.0
+     */
+    void deleteArchivedFlowNodeInstances(long processInstanceId) throws SFlowNodeDeletionException;
 
 }

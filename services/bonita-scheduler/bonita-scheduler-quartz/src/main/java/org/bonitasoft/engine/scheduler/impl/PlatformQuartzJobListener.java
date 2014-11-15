@@ -14,18 +14,13 @@
 package org.bonitasoft.engine.scheduler.impl;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.scheduler.AbstractBonitaJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
-import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.quartz.JobKey;
-import org.quartz.Trigger;
-import org.quartz.TriggerKey;
 
 /**
  * @author Celine Souchet
@@ -68,29 +63,6 @@ public class PlatformQuartzJobListener extends AbstractQuartzJobListener {
         for (final AbstractBonitaJobListener abstractBonitaJobListener : bonitaJobListeners) {
             abstractBonitaJobListener.jobWasExecuted(mapContext, jobException);
         }
-    }
-
-    private Map<String, Serializable> buildMapContext(final JobExecutionContext context) {
-        final JobDetail jobDetail = context.getJobDetail();
-        final Trigger trigger = context.getTrigger();
-        final TriggerKey triggerKey = trigger.getKey();
-        final JobKey jobKey = jobDetail.getKey();
-
-        final Map<String, Serializable> mapContext = new HashMap<String, Serializable>();
-        mapContext.put(AbstractBonitaJobListener.BOS_JOB, getBosJob(context));
-        mapContext.put(AbstractBonitaJobListener.JOB_DESCRIPTOR_ID, getJobDescriptorId(jobDetail));
-        mapContext.put(AbstractBonitaJobListener.TENANT_ID, getTenantId(jobDetail));
-        mapContext.put(AbstractBonitaJobListener.JOB_TYPE, getJobType(context.getJobInstance()));
-        mapContext.put(AbstractBonitaJobListener.JOB_NAME, jobKey.getName());
-        mapContext.put(AbstractBonitaJobListener.JOB_GROUP, jobKey.getGroup());
-        mapContext.put(AbstractBonitaJobListener.TRIGGER_NAME, triggerKey.getName());
-        mapContext.put(AbstractBonitaJobListener.TRIGGER_GROUP, triggerKey.getGroup());
-        mapContext.put(AbstractBonitaJobListener.TRIGGER_PREVIOUS_FIRE_TIME, trigger.getPreviousFireTime());
-        mapContext.put(AbstractBonitaJobListener.TRIGGER_NEXT_FIRE_TIME, trigger.getNextFireTime());
-        mapContext.put(AbstractBonitaJobListener.REFIRE_COUNT, Integer.valueOf(context.getRefireCount()));
-        mapContext.put(AbstractBonitaJobListener.JOB_DATAS, (Serializable) getJobDataValueAndType(jobDetail));
-        mapContext.put(AbstractBonitaJobListener.JOB_RESULT, String.valueOf(context.getResult()));
-        return mapContext;
     }
 
 }

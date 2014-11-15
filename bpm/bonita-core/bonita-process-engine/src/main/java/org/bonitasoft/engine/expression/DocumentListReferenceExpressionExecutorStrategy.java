@@ -28,9 +28,6 @@ import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
@@ -49,7 +46,7 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
 
     private final DocumentService documentService;
 
-    private final ActivityInstanceService flowNodeInstanceService;
+    private final ActivityInstanceService activityInstanceService;
 
     private final DocumentHelper documentHelper;
 
@@ -57,7 +54,7 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
             final ActivityInstanceService flowNodeInstanceService, final ProcessDefinitionService processDefinitionService,
             final ProcessInstanceService processInstanceService) {
         this.documentService = documentService;
-        this.flowNodeInstanceService = flowNodeInstanceService;
+        activityInstanceService = flowNodeInstanceService;
         documentHelper = new DocumentHelper(documentService, processDefinitionService, processInstanceService);
     }
 
@@ -121,9 +118,7 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
         return result;
     }
 
-    private long getProcessInstance(final Long containerId, final String containerType, final boolean flowNodeIsArchived) throws SFlowNodeNotFoundException,
-            SFlowNodeReadException,
-            SExpressionDependencyMissingException, SActivityInstanceNotFoundException {
+    private long getProcessInstance(final Long containerId, final String containerType, final boolean flowNodeIsArchived) throws SBonitaException {
         if (containerId == null || containerType == null) {
             throw new SExpressionDependencyMissingException("The context to retrieve the document is not set.");
         }
@@ -131,9 +126,9 @@ public class DocumentListReferenceExpressionExecutorStrategy extends NonEmptyCon
             return containerId;
         }
         if (flowNodeIsArchived) {
-            return flowNodeInstanceService.getMostRecentArchivedActivityInstance(containerId).getParentProcessInstanceId();
+            return activityInstanceService.getMostRecentArchivedActivityInstance(containerId).getParentProcessInstanceId();
         }
-        return flowNodeInstanceService.getFlowNodeInstance(containerId).getParentProcessInstanceId();
+        return activityInstanceService.getFlowNodeInstance(containerId).getParentProcessInstanceId();
     }
 
     @Override

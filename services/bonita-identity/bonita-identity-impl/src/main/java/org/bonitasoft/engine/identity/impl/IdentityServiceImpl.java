@@ -238,13 +238,26 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public SUser createUser(final SUser user) throws SUserCreationException {
         final String methodName = "createUser";
+        final String hash = encrypter.hash(user.getPassword());
+        final SUser hashedUser = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance(user).setPassword(hash).done();
+
+        return createUser(user, methodName, hashedUser);
+    }
+
+    @Override
+    @Deprecated
+    public SUser createUserWithoutEncryptingPassword(final SUser user) throws SUserCreationException {
+        final String methodName = "createUserWithoutEncryptingPassword";
+        final SUser hashedUser = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance(user).done();
+
+        return createUser(user, methodName, hashedUser);
+    }
+
+    private SUser createUser(final SUser user, final String methodName, final SUser hashedUser) throws SUserCreationException {
         logBeforeMethod(methodName);
         final String message = "Adding a new user with user name " + user.getUserName() + ", first name " + user.getFirstName() + ", last name "
                 + user.getLastName();
         final SUserLogBuilder logBuilder = getUserLog(ActionType.CREATED, message);
-
-        final String hash = encrypter.hash(user.getPassword());
-        final SUser hashedUser = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance(user).setPassword(hash).done();
         try {
             final InsertRecord insertRecord = new InsertRecord(hashedUser);
             final SInsertEvent insertEvent = getInsertEvent(hashedUser, USER);
@@ -895,7 +908,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SCustomUserInfoDefinition getCustomUserInfoDefinitionByName(final String name) throws SCustomUserInfoDefinitionNotFoundException,
-    SCustomUserInfoDefinitionReadException {
+            SCustomUserInfoDefinitionReadException {
         final String methodName = "getCustomUserInfoDefinitionByName";
         SCustomUserInfoDefinition definition = null;
         try {
@@ -1011,7 +1024,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Override
     public SCustomUserInfoValue getCustomUserInfoValue(final long customUserInfoValueId) throws SCustomUserInfoValueNotFoundException,
-    SCustomUserInfoValueReadException {
+            SCustomUserInfoValueReadException {
         final String methodName = "getCustomUserInfoValue";
         logBeforeMethod(methodName);
         try {
@@ -1765,30 +1778,6 @@ public class IdentityServiceImpl implements IdentityService {
     public boolean chechCredentials(final SUser user, final String password) {
         final String hashPassword = user.getPassword();
         return encrypter.check(password, hashPassword);
-    }
-
-    @Override
-    @Deprecated
-    public SUser createUserWithoutEncryptingPassword(final SUser user) throws SUserCreationException {
-        final String methodName = "createUserWithoutEncryptingPassword";
-        logBeforeMethod(methodName);
-        final String message = "Adding a new user with user name " + user.getUserName() + ", first name " + user.getFirstName() + ", last name "
-                + user.getLastName();
-        final SUserLogBuilder logBuilder = getUserLog(ActionType.CREATED, message);
-
-        final SUser hashedUser = BuilderFactory.get(SUserBuilderFactory.class).createNewInstance(user).done();
-        try {
-            final InsertRecord insertRecord = new InsertRecord(hashedUser);
-            final SInsertEvent insertEvent = getInsertEvent(hashedUser, USER);
-            recorder.recordInsert(insertRecord, insertEvent);
-            initiateLogBuilder(hashedUser.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
-            logAfterMethod(methodName);
-            return hashedUser;
-        } catch (final SRecorderException re) {
-            logOnExceptionMethod(methodName, re);
-            initiateLogBuilder(hashedUser.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw new SUserCreationException(re);
-        }
     }
 
     private void logBeforeMethod(final String methodName) {

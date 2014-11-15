@@ -178,7 +178,7 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
 
     @Override
     public void deleteExternalIdentityMapping(final long mappingId) throws SExternalIdentityMappingNotFoundException, SExternalIdentityMappingDeletionException {
-        final SExternalIdentityMapping sExternalIdentityMapping = getExternalIdentityMappingWithoutDisplayName(mappingId);
+        final SExternalIdentityMapping sExternalIdentityMapping = getExternalIdentityMappingById(mappingId);
         deleteExternalIdentityMapping(sExternalIdentityMapping);
     }
 
@@ -343,31 +343,6 @@ public class ExternalIdentityMappingServiceImpl implements ExternalIdentityMappi
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "searchExternalIdentityMappings", bre));
             }
             throw new SBonitaReadException(bre);
-        }
-    }
-
-    @Override
-    public SExternalIdentityMapping getExternalIdentityMappingWithoutDisplayName(final long mappingId) throws SExternalIdentityMappingNotFoundException {
-        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getExternalIdentityMappingWithoutDisplayName"));
-        }
-        final SelectByIdDescriptor<SExternalIdentityMapping> selectByIdDescriptor = SelectDescriptorBuilder.getExternalIdentityMappingById(mappingId);
-        try {
-            final SExternalIdentityMapping mapping = persistenceService.selectById(selectByIdDescriptor);
-            if (mapping == null) {
-                throw new SExternalIdentityMappingNotFoundException(mappingId + " does not refer to any external identity mapping");
-            }
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
-                        LogUtil.getLogAfterMethod(this.getClass(), "getExternalIdentityMappingWithoutDisplayName"));
-            }
-            return mapping;
-        } catch (final SBonitaReadException bre) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE,
-                        LogUtil.getLogOnExceptionMethod(this.getClass(), "getExternalIdentityMappingWithoutDisplayName", bre));
-            }
-            throw new SExternalIdentityMappingNotFoundException(bre);
         }
     }
 

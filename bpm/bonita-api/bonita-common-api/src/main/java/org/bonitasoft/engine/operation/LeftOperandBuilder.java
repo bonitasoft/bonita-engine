@@ -84,7 +84,7 @@ public class LeftOperandBuilder {
     }
 
     /**
-     * @deprecated use setType(LeftOperand.EXTERNAL_DATA) instead
+     * @deprecated use setType(LeftOperand.TYPE_EXTERNAL_DATA) instead
      * @param external
      * @return this builder itself, so that calls the various exposed methods can be chained.
      */

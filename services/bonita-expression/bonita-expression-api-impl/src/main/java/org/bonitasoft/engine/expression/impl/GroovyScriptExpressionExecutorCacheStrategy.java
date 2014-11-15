@@ -19,8 +19,6 @@ import groovy.lang.GroovyShell;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.cache.CacheService;
@@ -28,9 +26,7 @@ import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.classloader.SClassLoaderException;
 import org.bonitasoft.engine.expression.ContainerState;
-import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
-import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -41,7 +37,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContentExpressionExecutorStrategy {
+public class GroovyScriptExpressionExecutorCacheStrategy extends AbstractGroovyScriptExpressionExecutorStrategy {
 
     private static final String GROOVY_SCRIPT_CACHE_NAME = "GROOVY_SCRIPT_CACHE_NAME";
 
@@ -76,7 +72,7 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
 
         // getClassLoader return the InnerClassLoader getParent return the shell classloader
         if (script != null && script.getClass().getClassLoader().getParent() != shell.getClassLoader()) {
-            ClassLoader classLoader = script.getClass().getClassLoader();
+            final ClassLoader classLoader = script.getClass().getClassLoader();
             script = null;
             cacheService.remove(GROOVY_SCRIPT_CACHE_NAME, key);
             if (debugEnabled) {
@@ -146,26 +142,6 @@ public class GroovyScriptExpressionExecutorCacheStrategy extends NonEmptyContent
             throw new SExpressionEvaluationException("Groovy script throws an exception of type " + e.getClass() + " with message = " + message
                     + System.getProperty("line.separator") + "Expression : " + expression, e, expressionName);
         }
-    }
-
-    @Override
-    public ExpressionKind getExpressionKind() {
-        return KIND_READ_ONLY_SCRIPT_GROOVY;
-    }
-
-    @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionEvaluationException {
-        final List<Object> list = new ArrayList<Object>(expressions.size());
-        for (final SExpression expression : expressions) {
-            list.add(evaluate(expression, context, resolvedExpressions, containerState));
-        }
-        return list;
-    }
-
-    @Override
-    public boolean mustPutEvaluatedExpressionInContext() {
-        return false;
     }
 
 }

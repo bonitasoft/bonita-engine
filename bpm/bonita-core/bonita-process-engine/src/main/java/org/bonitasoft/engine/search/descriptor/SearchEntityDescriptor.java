@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -31,6 +31,7 @@ import org.bonitasoft.engine.search.impl.SearchFilter;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public abstract class SearchEntityDescriptor {
 
@@ -68,24 +69,27 @@ public abstract class SearchEntityDescriptor {
     protected abstract Map<Class<? extends PersistentObject>, Set<String>> getAllFields();
 
     /**
-     * Override this method to have specific convertion behaviour from client filter value to server filter value .
-     * 
+     * Override this method to have specific conversion behavior from client filter value to server filter value .
+     *
+     * @param filterField
+     *        The field to filter
      * @param filterValue
-     *            the initial value
+     *        The initial value
      * @return the converted filter value
-     * @since 6.0
+     * @since 6.4.0
      */
-    protected Serializable convertFilterValue(final Serializable filterValue) {
+    protected Serializable convertFilterValue(final String filterField, final Serializable filterValue) {
         return filterValue;
     }
 
     public FilterOption constructFilterOption(final SearchFilter filter, final FieldDescriptor fieldDescriptor) {
         final Class<? extends PersistentObject> clazz = fieldDescriptor != null ? fieldDescriptor.getPersistentClass() : null;
         final String fieldName = fieldDescriptor != null ? fieldDescriptor.getValue() : null;
-        final Serializable value = convertFilterValue(filter.getValue());
+        final Serializable value = convertFilterValue(filter.getField(), filter.getValue());
         switch (filter.getOperation()) {
             case BETWEEN:
-                return new FilterOption(clazz, fieldName, convertFilterValue(filter.getFrom()), convertFilterValue(filter.getTo()));
+                return new FilterOption(clazz, fieldName, convertFilterValue(filter.getField(), filter.getFrom()), convertFilterValue(filter.getField(),
+                        filter.getTo()));
             case DIFFERENT:
                 return new FilterOption(clazz, fieldName, value, FilterOperationType.DIFFERENT);
             case EQUALS:

@@ -188,7 +188,7 @@ public interface ProcessInstanceService {
      * @throws SFlowNodeReadException
      * @since 6.1
      */
-    long deleteParentArchivedProcessInstancesAndElements(List<SAProcessInstance> saProcessInstances) throws SFlowNodeReadException,
+    long deleteArchivedParentProcessInstancesAndElements(List<SAProcessInstance> saProcessInstances) throws SFlowNodeReadException,
             SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
@@ -201,7 +201,7 @@ public interface ProcessInstanceService {
      * @throws SFlowNodeReadException
      * @since 6.4.0
      */
-    void deleteParentArchivedProcessInstanceAndElements(SAProcessInstance saProcessInstance) throws SFlowNodeReadException,
+    void deleteArchivedParentProcessInstanceAndElements(SAProcessInstance saProcessInstance) throws SFlowNodeReadException,
             SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**

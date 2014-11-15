@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -61,7 +61,7 @@ public class RestartFlowNodesHandler implements TenantRestartHandler {
 
             } while (ids.size() == queryOptions.getNumberOfResults());
             logInfo(logger, "Found " + flownodesToRestart.size() + " flow nodes to restart on tenant " + tenantId);
-        } catch (final SFlowNodeReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new RestartException("unable to flag elements as to be restarted", e);
         }
     }
