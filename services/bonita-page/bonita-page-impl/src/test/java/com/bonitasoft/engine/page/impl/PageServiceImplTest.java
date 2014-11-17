@@ -284,6 +284,25 @@ public class PageServiceImplTest {
     }
 
     @Test
+    public void start_should_import_provided_page_with_business_app() throws SBonitaException {
+        // given
+        // resource in the classpath bonita-groovy-example-page.zip
+        doReturn(null).when(pageServiceImpl).insertPage(any(SPage.class), any(byte[].class));
+        doReturn(true).when(manager).isFeatureActive(Features.BUSINESS_APPLICATIONS);
+        pageServiceImpl = spy(new PageServiceImpl(manager, readPersistenceService, recorder, eventService, technicalLoggerService, queriableLoggerService,
+                profileService));
+        // when
+        pageServiceImpl.start();
+
+        // then
+        verify(pageServiceImpl, times(3)).insertPage(any(SPage.class), any(byte[].class));
+        verify(pageServiceImpl, times(0)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
+        verify(pageServiceImpl, times(0)).updatePageContent(anyLong(), any(byte[].class), anyString());
+
+    }
+
+
+    @Test
     public void start_should_update_provided_page_if_different() throws SBonitaException {
         // given
         // resource in the classpath provided-page.properties and provided-page.zip

@@ -12,22 +12,49 @@ import org.bonitasoft.engine.bpm.BaseElement;
 
 
 /**
- * @author Elias Ricken de Medeiros
+ * Represents an {@link Application} menu
  *
+ * @author Elias Ricken de Medeiros
+ * @since 6.4
+ * @see Application
  */
 public interface ApplicationMenu extends BaseElement {
 
+    /**
+     * Retrieves the {@code ApplicationMenu} display name
+     *
+     * @return the {@code ApplicationMenu} display name
+     */
     String getDisplayName();
 
-    long getApplicationPageId();
+    /**
+     * Retrieves the identifier of related {@link ApplicationPage}. If the {@code ApplicationMenu} is not related to an {@code ApplicationPage}, this method will return null.
+     *
+     * @return the identifier of related {@code ApplicationPage} or null if the menu is not related to {@code ApplicationPage}
+     * @see ApplicationPage
+     */
+    Long getApplicationPageId();
 
     /**
-     * Retrieves the identifier of the parent menu. If the menu does not have a parent menu, this method will return null.
+     * Retrieves the identifier of related {@link Application}
      *
-     * @return the identifier of the parent menu or null if the menu has no parent.
+     * @return the identifier of related {@code Application}
+     * @see Application
+     */
+    long getApplicationId();
+
+    /**
+     * Retrieves the identifier of the parent {@code ApplicationMenu}. If the menu does not have a parent menu, this method will return null.
+     *
+     * @return the identifier of the parent {@code ApplicationMenu} or null if the menu has no parent.
      */
     Long getParentId();
 
+    /**
+     * Retrieves the {@code ApplicationMenu} index
+     *
+     * @return the {@code ApplicationMenu} index
+     */
     int getIndex();
 
 }

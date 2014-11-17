@@ -31,29 +31,16 @@ import com.bonitasoft.engine.api.TenantAPIAccessor;
 import com.bonitasoft.engine.page.Page;
 import com.bonitasoft.engine.page.PageCreator;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
-public class TestWithCustomPage extends CommonAPISPTest {
-
-    private ApplicationAPI applicationAPI;
-
-    private static User user;
+public class TestWithCustomPage extends TestWithApplication {
 
     private Page page;
 
-    @Override
-    protected void setAPIs() throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
-        super.setAPIs();
-        applicationAPI = TenantAPIAccessor.getApplicationAPI(getSession());
-    }
-
     @Before
     public void setUp() throws Exception {
-        user = BPMTestSPUtil.createUserOnDefaultTenant("john", "bpm");
-        loginOnDefaultTenantWith("john", "bpm");
+        super.setUp();
         try {
             page = createPage("custompage_MyPage");
         } catch (final AlreadyExistsException e) {
@@ -63,19 +50,12 @@ public class TestWithCustomPage extends CommonAPISPTest {
 
     @After
     public void tearDown() throws Exception {
-        final SearchResult<Application> searchResult = applicationAPI.searchApplications(new SearchOptionsBuilder(0, 1000).done());
-        for (final Application app : searchResult.getResult()) {
-            applicationAPI.deleteApplication(app.getId());
-        }
+        super.tearDown();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         if (page != null) {
             getPageAPI().deletePage(page.getId());
         }
         logoutOnTenant();
-        BPMTestSPUtil.deleteUserOnDefaultTenant(user);
-    }
-
-    protected ApplicationAPI getApplicationAPI() {
-        return applicationAPI;
     }
 
     public Page getPage() {

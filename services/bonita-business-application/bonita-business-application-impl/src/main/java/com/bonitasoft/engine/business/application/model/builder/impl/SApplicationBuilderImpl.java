@@ -48,4 +48,11 @@ public class SApplicationBuilderImpl implements SApplicationBuilder {
         return this;
     }
 
+    @Override
+    public SApplicationBuilder setState(String state) {
+        application.setState(state);
+        return this;
+    }
+
+
 }

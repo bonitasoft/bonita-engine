@@ -15,6 +15,7 @@ import java.util.Date;
 
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
@@ -27,7 +28,6 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -110,12 +110,7 @@ public class SPTimerBoundaryEventTest extends CommonAPISPTest {
                 manualUserTask = getProcessAPI().addManualUserTask(taskCreator);
             }
 
-            Thread.sleep(timerDuration); // wait timer trigger
-
-            final WaitForStep waitForExceptionStep = waitForStep("exceptionStep", processInstance, TestStates.READY);
-
-            // ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStep1.getStepId());
-            // assertEquals(TestStates.ABORTED, archActivityInst.getState());
+            final HumanTaskInstance exceptionStep = waitForUserTask("exceptionStep", processInstance);
 
             ArchivedActivityInstance archActivityInst = waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
             if (manualUserTask != null) {
@@ -123,7 +118,7 @@ public class SPTimerBoundaryEventTest extends CommonAPISPTest {
                 assertEquals(TestStates.ABORTED.getStateName(), archActivityInst.getState());
             }
 
-            assignAndExecuteStep(waitForExceptionStep.getResult(), donaBenta.getId());
+            assignAndExecuteStep(exceptionStep, donaBenta.getId());
             assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         } finally {
             disableAndDeleteProcess(processDefinition);

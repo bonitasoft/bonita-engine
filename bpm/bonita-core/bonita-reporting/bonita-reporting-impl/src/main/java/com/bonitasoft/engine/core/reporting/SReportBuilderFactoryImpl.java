@@ -36,31 +36,31 @@ public class SReportBuilderFactoryImpl implements SReportBuilderFactory {
 
     @Override
     public String getNameKey() {
-        return "name";
+        return SReportFields.NAME;
     }
 
     @Override
     public String getDescriptionKey() {
-        return "description";
+        return SReportFields.DESCRIPTION;
     }
 
     @Override
     public String getInstallationDateKey() {
-        return "installationDate";
+        return SReportFields.INSTALLATION_DATE;
     }
 
     @Override
     public String getInstalledByKey() {
-        return "installedBy";
+        return SReportFields.INSTALLED_BY;
     }
 
     @Override
     public String getIdKey() {
-        return "id";
+        return SReportFields.ID;
     }
 
     @Override
     public String getProvidedKey() {
-        return "provided";
+        return SReportFields.PROVIDED;
     }
 }

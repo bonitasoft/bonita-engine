@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bonitasoft.engine.profile.Profile;
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
@@ -26,7 +27,6 @@ import org.junit.Test;
 import com.bonitasoft.engine.api.ApplicationAPI;
 import com.bonitasoft.engine.page.Page;
 
-
 /**
  * @author Elias Ricken de Medeiros
  * @author Baptiste Mesta
@@ -34,12 +34,11 @@ import com.bonitasoft.engine.page.Page;
  */
 public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
 
-
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page", "create" })
     @Test
     public void createApplicationPage_returns_applicationPage_based_on_the_given_parameters() throws Exception {
         //given
-        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
+        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0"));
 
         //when
         final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
@@ -48,18 +47,18 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
         assertThat(appPage.getId()).isGreaterThan(0);
         assertThat(appPage.getApplicationId()).isEqualTo(application.getId());
         assertThat(appPage.getPageId()).isEqualTo(getPage().getId());
-        assertThat(appPage.getName()).isEqualTo("firstPage");
+        assertThat(appPage.getToken()).isEqualTo("firstPage");
 
         getApplicationAPI().deleteApplication(application.getId());
 
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application", "Application page",
-    "set home page" })
+            "set home page" })
     @Test
     public void setApplicationHomePage_should_update_the_application_homePage() throws Exception {
         //given
-        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
+        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0"));
         final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
 
         //when
@@ -73,16 +72,37 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
 
     }
 
+    @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application", "update", "home page" })
+    @Test
+    public void updateApplication_should_update_home_page() throws Exception {
+        //given
+        final ApplicationCreator creator = new ApplicationCreator("My-Application", "My application display name", "1.0");
+        final Application application = getApplicationAPI().createApplication(creator);
+        final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
+
+        final ApplicationUpdater updater = new ApplicationUpdater();
+        updater.setHomePageId(appPage.getId());
+
+        //when
+        final Application updatedApplication = getApplicationAPI().updateApplication(application.getId(), updater);
+
+        //then
+        assertThat(updatedApplication).isNotNull();
+        assertThat(updatedApplication.getHomePageId()).isEqualTo(appPage.getId());
+
+        getApplicationAPI().deleteApplication(application.getId());
+    }
+
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
-    "get by name and application name" })
+            "get by name and application name" })
     @Test
     public void getApplicationPage_byNameAndAppName_returns_the_applicationPage_corresponding_to_the_given_parameters() throws Exception {
         //given
-        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
+        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0"));
         final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
 
         //when
-        final ApplicationPage retrievedAppPage = getApplicationAPI().getApplicationPage(application.getName(), appPage.getName());
+        final ApplicationPage retrievedAppPage = getApplicationAPI().getApplicationPage(application.getToken(), appPage.getToken());
 
         //then
         assertThat(retrievedAppPage).isEqualTo(appPage);
@@ -90,11 +110,11 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
-    "get by id" })
+            "get by id" })
     @Test
     public void getApplicationPage_byId_returns_the_applicationPage_corresponding_to_the_given_Id() throws Exception {
         //given
-        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
+        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0"));
         final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
 
         //when
@@ -106,31 +126,38 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application", "Application page",
-    "delete" })
+            "delete" })
     @Test
     public void deleteApplication_should_also_delete_related_applicationPage() throws Exception {
         //given
-        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
-        final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
+        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0"));
+        final ApplicationPage homePage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
+        getApplicationAPI().setApplicationHomePage(application.getId(), homePage.getId());
+        final ApplicationPage aAppPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "secondPage");
 
         //when
         getApplicationAPI().deleteApplication(application.getId());
 
         //then
+        verifyNotExists(homePage);
+        verifyNotExists(aAppPage);
+    }
+
+    private void verifyNotExists(ApplicationPage applicationPage) {
         try {
-            getApplicationAPI().getApplicationPage(appPage.getId());
-            fail("Not found expected");
-        } catch (final ApplicationPageNotFoundException e) {
+            getApplicationAPI().getApplicationPage(applicationPage.getId()); //throws exception
+            Assertions.fail("exception expected");
+        } catch (ApplicationPageNotFoundException e) {
             //OK
         }
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application page",
-    "delete" })
+            "delete" })
     @Test
     public void deleteApplicationPage_should_delete_applicationPage_with_the_given_id() throws Exception {
         //given
-        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
+        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0"));
         final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
 
         //when
@@ -146,11 +173,11 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     }
 
     @Cover(classes = { ApplicationAPI.class }, concept = BPMNConcept.APPLICATION, jira = "BS-9212", keywords = { "Application", "Application page",
-    "set home page" })
+            "set home page" })
     @Test
     public void getApplicationHomePage_should_return_application_homePage() throws Exception {
         //given
-        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
+        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0"));
         final ApplicationPage appPage = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
         getApplicationAPI().setApplicationHomePage(application.getId(), appPage.getId());
 
@@ -169,7 +196,7 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     @Test
     public void searchApplicationPages_without_filters_and_search_term_should_return_all_applicationPages_pagged() throws Exception {
         //given
-        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
+        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0"));
         final ApplicationPage appPage1 = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
         final ApplicationPage appPage2 = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "secondPage");
         final ApplicationPage appPage3 = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "thirdPage");
@@ -195,14 +222,14 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     @Test
     public void searchApplicationPages_can_filter_on_name() throws Exception {
         //given
-        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
+        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0"));
         getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
         final ApplicationPage appPage2 = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "secondPage");
         getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "thirdPage");
 
         //when
         final SearchOptionsBuilder builder = getDefaultBuilder(0, 10);
-        builder.filter(ApplicationPageSearchDescriptor.NAME, "secondPage");
+        builder.filter(ApplicationPageSearchDescriptor.TOKEN, "secondPage");
         final SearchResult<ApplicationPage> searchResult = getApplicationAPI().searchApplicationPages(builder.done());
 
         //then
@@ -218,8 +245,8 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     @Test
     public void searchApplicationPages_can_filter_on_applicationId() throws Exception {
         //given
-        final Application application1 = getApplicationAPI().createApplication(new ApplicationCreator("app1", "My app 1", "1.0", "/app1"));
-        final Application application2 = getApplicationAPI().createApplication(new ApplicationCreator("app2", "My app 2", "1.0", "/app2"));
+        final Application application1 = getApplicationAPI().createApplication(new ApplicationCreator("app1", "My app 1", "1.0"));
+        final Application application2 = getApplicationAPI().createApplication(new ApplicationCreator("app2", "My app 2", "1.0"));
         final ApplicationPage appPage1 = getApplicationAPI().createApplicationPage(application1.getId(), getPage().getId(), "firstPage");
         getApplicationAPI().createApplicationPage(application2.getId(), getPage().getId(), "secondPage");
         final ApplicationPage appPage3 = getApplicationAPI().createApplicationPage(application1.getId(), getPage().getId(), "thirdPage");
@@ -243,7 +270,7 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     public void searchApplicationPages_can_filter_on_pageId() throws Exception {
         //given
         final Page page2 = createPage("custompage_MyPage2");
-        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
+        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0"));
         getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
         final ApplicationPage appPage2 = getApplicationAPI().createApplicationPage(application.getId(), page2.getId(), "secondPage");
         final ApplicationPage appPage3 = getApplicationAPI().createApplicationPage(application.getId(), page2.getId(), "thirdPage");
@@ -266,7 +293,7 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
     @Test
     public void searchApplicationPages_can_filter_on_id() throws Exception {
         //given
-        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0", "/app"));
+        final Application application = getApplicationAPI().createApplication(new ApplicationCreator("app", "My app", "1.0"));
         getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "firstPage");
         final ApplicationPage appPage2 = getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "secondPage");
         getApplicationAPI().createApplicationPage(application.getId(), getPage().getId(), "thirdPage");
@@ -292,7 +319,7 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
 
     private SearchOptionsBuilder getDefaultBuilder(final int startIndex, final int maxResults) {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(startIndex, maxResults);
-        builder.sort(ApplicationPageSearchDescriptor.NAME, Order.ASC);
+        builder.sort(ApplicationPageSearchDescriptor.TOKEN, Order.ASC);
         return builder;
     }
 
@@ -303,20 +330,20 @@ public class ApplicationAPIApplicationPageIT extends TestWithCustomPage {
         //profile1
         Profile profile1 = getProfileAPI().createProfile("profile1", "My profile1");
         //app1
-        final Application app1 = getApplicationAPI().createApplication(new ApplicationCreator("app1", "My app1", "1.0", "/app1").setProfileId(profile1.getId()));
+        final Application app1 = getApplicationAPI().createApplication(new ApplicationCreator("app1", "My app1", "1.0").setProfileId(profile1.getId()));
         final Page page1 = createPage("custompage_page1");
         getApplicationAPI().createApplicationPage(app1.getId(), page1.getId(), "appPage1");
         final Page page2 = createPage("custompage_page2");
         getApplicationAPI().createApplicationPage(app1.getId(), page2.getId(), "appPage2");
         //app2
-        final Application app2 = getApplicationAPI().createApplication(new ApplicationCreator("app2", "My app2", "1.0", "/app2").setProfileId(profile1.getId()));
+        final Application app2 = getApplicationAPI().createApplication(new ApplicationCreator("app2", "My app2", "1.0").setProfileId(profile1.getId()));
         final Page page3 = createPage("custompage_page3");
         getApplicationAPI().createApplicationPage(app2.getId(), page3.getId(), "appPage1");
 
         //profile2
         Profile profile2 = getProfileAPI().createProfile("profile2", "My profile2");
         //app3
-        final Application app3 = getApplicationAPI().createApplication(new ApplicationCreator("app3", "My app3", "1.0", "/app3").setProfileId(profile2.getId()));
+        final Application app3 = getApplicationAPI().createApplication(new ApplicationCreator("app3", "My app3", "1.0").setProfileId(profile2.getId()));
         final Page page4 = createPage("custompage_page4");
         getApplicationAPI().createApplicationPage(app3.getId(), page4.getId(), "appPage1");
 

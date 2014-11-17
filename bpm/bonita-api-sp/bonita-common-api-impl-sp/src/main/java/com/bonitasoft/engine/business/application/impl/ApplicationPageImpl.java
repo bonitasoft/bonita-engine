@@ -13,7 +13,7 @@
  **/
 package com.bonitasoft.engine.business.application.impl;
 
-import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
+import org.bonitasoft.engine.bpm.internal.BaseElementImpl;
 
 import com.bonitasoft.engine.business.application.ApplicationPage;
 
@@ -21,16 +21,17 @@ import com.bonitasoft.engine.business.application.ApplicationPage;
  * @author Elias Ricken de Medeiros
  *
  */
-public class ApplicationPageImpl extends NamedElementImpl implements ApplicationPage {
+public class ApplicationPageImpl extends BaseElementImpl implements ApplicationPage {
 
     private static final long serialVersionUID = -8043272410231723583L;
     private final long applicationId;
     private final long pageId;
+    private final String token;
 
-    public ApplicationPageImpl(final long applicationId, final long pageId, final String name) {
-        super(name);
+    public ApplicationPageImpl(final long applicationId, final long pageId, final String token) {
         this.applicationId = applicationId;
         this.pageId = pageId;
+        this.token = token;
     }
 
     @Override
@@ -41,6 +42,54 @@ public class ApplicationPageImpl extends NamedElementImpl implements Application
     @Override
     public long getPageId() {
         return pageId;
+    }
+
+    @Override
+    public String getToken() {
+        return token;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + (int) (applicationId ^ applicationId >>> 32);
+        result = prime * result + (int) (pageId ^ pageId >>> 32);
+        result = prime * result + (token == null ? 0 : token.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!super.equals(obj)) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ApplicationPageImpl other = (ApplicationPageImpl) obj;
+        if (applicationId != other.applicationId) {
+            return false;
+        }
+        if (pageId != other.pageId) {
+            return false;
+        }
+        if (token == null) {
+            if (other.token != null) {
+                return false;
+            }
+        } else if (!token.equals(other.token)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "ApplicationPageImpl [applicationId=" + applicationId + ", pageId=" + pageId + ", token=" + token + ", getId()=" + getId() + "]";
     }
 
 }
