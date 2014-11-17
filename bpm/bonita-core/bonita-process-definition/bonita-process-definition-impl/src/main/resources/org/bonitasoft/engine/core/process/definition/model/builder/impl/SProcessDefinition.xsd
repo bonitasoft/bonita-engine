@@ -154,6 +154,13 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="documentListDefinitions" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element type="definition:SDocumentListDefinition" name="documentListDefinition" minOccurs="0" maxOccurs="unbounded" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
         </xs:all>
     </xs:complexType>
 
@@ -552,6 +559,17 @@
                     <xs:element name="fileName" type="xs:string" minOccurs="0" />
                 </xs:all>
                 <xs:attribute name="mimeType" type="xs:string" use="required" />
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+	 <xs:complexType name="SDocumentListDefinition">
+        <xs:complexContent>
+            <xs:extension base="definition:SNamedElement">
+                <xs:all>
+                    <xs:element name="description" type="xs:string" minOccurs="0"/>
+                    <xs:element name="expression" type="definition:SExpression" minOccurs="0"/>
+                </xs:all>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
