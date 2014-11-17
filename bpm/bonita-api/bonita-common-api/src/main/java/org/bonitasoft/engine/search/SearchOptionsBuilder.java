@@ -69,7 +69,6 @@ public class SearchOptionsBuilder {
      *            final SearchOptionsBuilder optionsBuilder = new SearchOptionsBuilder(0, 10);
      *            optionsBuilder.filter(CustomUserInfoValueSearchDescriptor.DEFINITION_ID, customUserInfoDefinitionId);
      *            optionsBuilder.filter(CustomUserInfoValueSearchDescriptor.VALUE, 101);
-     *            
      * @param value
      *            the single value to filter on that field name
      * @return this builder itself
