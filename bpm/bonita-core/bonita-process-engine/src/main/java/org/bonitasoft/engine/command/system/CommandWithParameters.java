@@ -41,7 +41,11 @@ public abstract class CommandWithParameters extends TenantCommand {
 
     protected Long getLongMandadoryParameter(final Map<String, Serializable> parameters, final String field) throws SCommandParameterizationException {
         final String message = "Parameters map must contain an entry " + field + " with a long value.";
-        return getMandatoryParameter(parameters, field, message);
+        final Long mandatoryParameter = getMandatoryParameter(parameters, field, message);
+        if (mandatoryParameter == 0L) {
+            throw new SCommandParameterizationException(message);
+        }
+        return mandatoryParameter;
     }
 
     protected Integer getIntegerMandadoryParameter(final Map<String, Serializable> parameters, final String field) throws SCommandParameterizationException {

@@ -69,6 +69,10 @@ public class ImportStatus implements Serializable {
         errors.add(error);
     }
 
+    public void addErrors(final List<ImportError> errors) {
+        this.errors.addAll(errors);
+    }
+
     @Override
     public String toString() {
         return "ImportStatus [name=" + name + ", status=" + status + ", errors=" + errors + "]";

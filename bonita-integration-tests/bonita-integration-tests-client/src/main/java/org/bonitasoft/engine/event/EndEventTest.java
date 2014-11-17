@@ -92,7 +92,7 @@ public class EndEventTest extends AbstractEventTest {
         builder.addTransition("step1", "stop");
         final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, getUser());
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
-        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), getUser().getId());
+        waitForUserTaskAndExecuteIt("step1", startProcess, getUser());
         waitForProcessToFinish(startProcess);
         disableAndDeleteProcess(process);
     }
@@ -110,7 +110,7 @@ public class EndEventTest extends AbstractEventTest {
         final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, getUser());
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
         final ActivityInstance userTask = waitForUserTask("step2", startProcess.getId());
-        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), getUser().getId());
+        waitForUserTaskAndExecuteIt("step1", startProcess, getUser());
         // should finish even if we don't execute step2
         waitForProcessToFinish(startProcess);
         waitForArchivedActivity(userTask.getId(), TestStates.ABORTED);
@@ -132,7 +132,7 @@ public class EndEventTest extends AbstractEventTest {
         final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, getUser());
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
         final ActivityInstance userTask = waitForUserTask("step2", startProcess.getId());
-        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), getUser().getId());
+        waitForUserTaskAndExecuteIt("step1", startProcess, getUser());
         // should finish even if we don't execute step2
         waitForProcessToFinish(startProcess);
         waitForArchivedActivity(userTask.getId(), TestStates.ABORTED);
@@ -155,7 +155,7 @@ public class EndEventTest extends AbstractEventTest {
         final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, getUser());
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
         checkNbOfHumanTasks(14);
-        waitForUserTaskAndExecuteIt("step1", startProcess.getId(), getUser().getId());
+        waitForUserTaskAndExecuteIt("step1", startProcess, getUser());
         // should finish even if we don't execute step2
         waitForProcessToFinish(startProcess);
         disableAndDeleteProcess(process);
@@ -189,7 +189,7 @@ public class EndEventTest extends AbstractEventTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
 
         for (int i = 0; i < 3; i++) {
-            waitForUserTaskAndExecuteIt("step1", processInstance.getId(), getUser().getId());
+            waitForUserTaskAndExecuteIt("step1", processInstance, getUser());
         }
 
         waitForProcessToFinish(processInstance);

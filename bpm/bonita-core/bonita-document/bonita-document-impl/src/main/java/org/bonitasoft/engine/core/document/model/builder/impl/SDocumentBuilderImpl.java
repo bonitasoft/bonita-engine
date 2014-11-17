@@ -30,43 +30,43 @@ public class SDocumentBuilderImpl implements SDocumentBuilder {
     }
 
     @Override
-    public SDocumentBuilder setAuthor(long author) {
+    public SDocumentBuilder setAuthor(final long author) {
         entity.setAuthor(author);
         return this;
     }
 
     @Override
-    public SDocumentBuilder setCreationDate(long creationDate) {
+    public SDocumentBuilder setCreationDate(final long creationDate) {
         entity.setCreationDate(creationDate);
         return this;
     }
 
     @Override
-    public SDocumentBuilder setHasContent(boolean hasContent) {
+    public SDocumentBuilder setHasContent(final boolean hasContent) {
         entity.setHasContent(hasContent);
         return this;
     }
 
     @Override
-    public SDocumentBuilder setFileName(String fileName) {
+    public SDocumentBuilder setFileName(final String fileName) {
         entity.setFileName(fileName);
         return this;
     }
 
     @Override
-    public SDocumentBuilder setMimeType(String mimeType) {
+    public SDocumentBuilder setMimeType(final String mimeType) {
         entity.setMimeType(mimeType);
         return this;
     }
 
     @Override
-    public SDocumentBuilder setContent(byte[] content) {
+    public SDocumentBuilder setContent(final byte[] content) {
         entity.setContent(content);
         return this;
     }
 
     @Override
-    public SDocumentBuilder setURL(String url) {
+    public SDocumentBuilder setURL(final String url) {
         entity.setUrl(url);
         return this;
     }

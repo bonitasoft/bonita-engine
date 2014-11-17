@@ -48,7 +48,7 @@ public final class DisableProcess implements TransactionContent {
     private final String username;
 
     public DisableProcess(final ProcessDefinitionService processDefinitionService, final long processId, final EventInstanceService eventInstanceService,
-                          final SchedulerService scheduler, final TechnicalLoggerService logger, final String username) {
+            final SchedulerService scheduler, final TechnicalLoggerService logger, final String username) {
         this.processDefinitionService = processDefinitionService;
         this.eventInstanceService = eventInstanceService;
         processDefinitionId = processId;
@@ -71,7 +71,6 @@ public final class DisableProcess implements TransactionContent {
     private void disableStartEvents(final SProcessDefinition processDefinition) throws SBonitaException {
         deleteWaitingEvents();
         deleteJobs(processDefinition);
-
     }
 
     private void deleteJobs(final SProcessDefinition processDefinition) throws SSchedulerException {

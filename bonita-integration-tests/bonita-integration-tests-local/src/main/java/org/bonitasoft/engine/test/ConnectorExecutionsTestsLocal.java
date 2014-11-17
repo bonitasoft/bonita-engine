@@ -342,7 +342,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // wait for step containing the connector and execute it
-        final ActivityInstance step1 = waitForUserTaskAndExecuteIt(taskName, processInstance, johnUserId);
+        final ActivityInstance step1 = waitForUserTaskAndExecuteIt(taskName, processInstance, johnUser);
         waitForUserTask("step2", processInstance);
 
         // check that there are no more connector instances
@@ -393,7 +393,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // Assign human task with connector
-        final long step1Id = waitForUserTaskAndAssigneIt("step1", processInstance, johnUserId).getId();
+        final long step1Id = waitForUserTaskAndAssigneIt("step1", processInstance, johnUser).getId();
 
         // Check Ready state of human task
         final List<HumanTaskInstance> assignedTasks = getProcessAPI().getAssignedHumanTaskInstances(johnUserId, 0, 10, null);
@@ -543,7 +543,7 @@ public class ConnectorExecutionsTestsLocal extends ConnectorExecutionTest {
 
         // execute the process
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt(taskName, processInstance, johnUserId);
+        waitForUserTaskAndExecuteIt(taskName, processInstance, johnUser);
         waitForProcessToFinish(processInstance);
 
         // check there are no connector instances

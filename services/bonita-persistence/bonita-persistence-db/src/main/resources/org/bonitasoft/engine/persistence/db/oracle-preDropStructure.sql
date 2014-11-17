@@ -11,6 +11,7 @@ ALTER TABLE document_mapping DROP CONSTRAINT fk_docmap_docid;
 
 -- business application
 ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_tenantId;
+ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_appId;
 ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_pageId;
 ALTER TABLE business_app_menu DROP CONSTRAINT fk_app_menu_parentId;
 ALTER TABLE business_app_page DROP CONSTRAINT fk_app_page_tenantId;

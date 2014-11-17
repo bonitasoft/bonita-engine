@@ -219,7 +219,7 @@ public class SignalEventSubProcessTest extends WaitingEventTest {
         waitForProcessToFinish(subProcInst);
         waitForProcessToFinish(calledProcInst, TestStates.ABORTED);
 
-        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), donaBenta.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance, donaBenta);
         waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(callerProcess.getId());

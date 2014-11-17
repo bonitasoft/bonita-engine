@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 BonitaSoft S.A.
+ * * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory
 
 /**
  * @author Baptiste Mesta
+ * @author Celine Souchet
  */
 public class SDocumentBuilderFactoryImpl implements SDocumentBuilderFactory {
 
@@ -43,6 +44,32 @@ public class SDocumentBuilderFactoryImpl implements SDocumentBuilderFactory {
     static final String DESCRIPTION = "description";
 
     static final String INDEX = "index";
+
+    @Override
+    public SDocumentBuilder createNewInstance(final String fileName, final String mimetype, final long authorId) {
+        final SDocumentBuilderImpl sDocumentBuilderImpl = new SDocumentBuilderImpl();
+        sDocumentBuilderImpl.setFileName(fileName);
+        sDocumentBuilderImpl.setMimeType(mimetype);
+        sDocumentBuilderImpl.setAuthor(authorId);
+        sDocumentBuilderImpl.setCreationDate(System.currentTimeMillis());
+        return sDocumentBuilderImpl;
+    }
+
+    @Override
+    public SDocumentBuilder createNewProcessDocument(final String fileName, final String mimetype, final long authorId, final byte[] content) {
+        final SDocumentBuilder sDocumentBuilder = createNewInstance(fileName, mimetype, authorId);
+        sDocumentBuilder.setContent(content);
+        sDocumentBuilder.setHasContent(true);
+        return sDocumentBuilder;
+    }
+
+    @Override
+    public SDocumentBuilder createNewExternalProcessDocumentReference(final String fileName, final String mimetype, final long authorId, final String url) {
+        final SDocumentBuilder sDocumentBuilder = createNewInstance(fileName, mimetype, authorId);
+        sDocumentBuilder.setURL(url);
+        sDocumentBuilder.setHasContent(false);
+        return sDocumentBuilder;
+    }
 
     @Override
     public String getIdKey() {
@@ -85,11 +112,6 @@ public class SDocumentBuilderFactoryImpl implements SDocumentBuilderFactory {
     }
 
     @Override
-    public SDocumentBuilder createNewInstance() {
-        return new SDocumentBuilderImpl();
-    }
-
-    @Override
     public String getDescriptionKey() {
         return DESCRIPTION;
     }
@@ -103,4 +125,5 @@ public class SDocumentBuilderFactoryImpl implements SDocumentBuilderFactory {
     public String getIndexKey() {
         return INDEX;
     }
+
 }
