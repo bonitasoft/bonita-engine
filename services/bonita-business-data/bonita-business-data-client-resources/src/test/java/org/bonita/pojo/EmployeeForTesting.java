@@ -80,7 +80,7 @@ public class EmployeeForTesting implements com.bonitasoft.engine.bdm.Entity {
     })
     @OrderColumn
     @JsonIgnore
-    private List<org.bonita.pojo.AddressForTesting> addresses = new ArrayList<org.bonita.pojo.AddressForTesting>(10);
+    private List<AddressForTesting> addresses = new ArrayList<AddressForTesting>(10);
 
     public EmployeeForTesting() {
     }
@@ -142,7 +142,7 @@ public class EmployeeForTesting implements com.bonitasoft.engine.bdm.Entity {
     }
 
     @LazyLoaded
-    public List<org.bonita.pojo.AddressForTesting> getAddresses() {
+    public List<AddressForTesting> getAddresses() {
         return addresses;
     }
 
