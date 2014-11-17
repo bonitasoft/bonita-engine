@@ -381,8 +381,7 @@ public class ProfileAPIImpl implements ProfileAPI {
     }
 
     protected long getUserIdFromSession() {
-        final long updatedById = SessionInfos.getUserIdFromSession();
-        return updatedById;
+        return SessionInfos.getUserIdFromSession();
     }
 
 }

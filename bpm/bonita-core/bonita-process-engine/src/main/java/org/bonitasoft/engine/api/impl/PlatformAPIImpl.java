@@ -467,8 +467,7 @@ public class PlatformAPIImpl implements PlatformAPI {
     protected List<STenant> getTenants(final PlatformServiceAccessor platformAccessor) throws Exception {
         final PlatformService platformService = platformAccessor.getPlatformService();
         final TransactionService transactionService = platformAccessor.getTransactionService();
-        final List<STenant> tenantIds = transactionService.executeInTransaction(new GetTenantsCallable(platformService));
-        return tenantIds;
+        return transactionService.executeInTransaction(new GetTenantsCallable(platformService));
     }
 
     protected TenantServiceAccessor getTenantServiceAccessor(final long tenantId) throws SBonitaException, BonitaHomeNotSetException, IOException,
