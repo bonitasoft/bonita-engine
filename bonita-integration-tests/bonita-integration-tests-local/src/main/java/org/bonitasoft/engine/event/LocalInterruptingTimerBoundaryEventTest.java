@@ -119,7 +119,7 @@ public class LocalInterruptingTimerBoundaryEventTest extends AbstractEventTest {
         waitForFlowNodeInState(processInstance, "timer", TestStates.ABORTED, false);
         assertThat(containsTimerJob(getJobName(boundaryId))).isFalse();
 
-        waitForUserTaskAndExecuteIt(PARENT_PROCESS_USER_TASK_NAME, processInstance.getId(), getUser().getId());
+        waitForUserTaskAndExecuteIt(PARENT_PROCESS_USER_TASK_NAME, processInstance, getUser());
         waitForProcessToFinish(processInstance);
         checkFlowNodeWasntExecuted(processInstance.getId(), EXCEPTION_STEP);
 

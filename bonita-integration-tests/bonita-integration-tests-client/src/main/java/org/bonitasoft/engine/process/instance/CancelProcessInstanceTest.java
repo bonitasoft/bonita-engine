@@ -31,11 +31,11 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.check.CheckNbOfActivities;
-import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.Test;
 
 /**
@@ -49,23 +49,21 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
 
     @Test
     public void cancelProcessInstanceWithHumanTasks() throws Exception {
-        final String actorName = "delivery";
         final String taskName1 = "userTask1";
         final String taskName2 = "userTask2";
-        final ProcessDefinition processDefinition = deployProcessWith2UserTasksAnd1AutoTask(actorName, taskName1, taskName2, "auto1");
+        final ProcessDefinition processDefinition = deployProcessWith2UserTasksAnd1AutoTask(taskName1, taskName2, "auto1");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, true, 2, pedro);
-        assertTrue("Expected 2 pending tasks", checkNbPendingTaskOf.waitUntil());
+        final HumanTaskInstance step1 = waitForUserTask(taskName1, processInstance);
+        final HumanTaskInstance step2 = waitForUserTask(taskName2, processInstance);
 
         getProcessAPI().cancelProcessInstance(processInstance.getId());
-        waitForProcessToFinish(processInstance, TestStates.CANCELLED);
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.CANCELLED);
 
-        final List<HumanTaskInstance> pendingTasks = checkNbPendingTaskOf.getPendingHumanTaskInstances();
-        final ArchivedActivityInstance archivedTask1 = getProcessAPI().getArchivedActivityInstance(pendingTasks.get(0).getId());
+        final ArchivedActivityInstance archivedTask1 = getProcessAPI().getArchivedActivityInstance(step1.getId());
         assertEquals(TestStates.CANCELLED.getStateName(), archivedTask1.getState());
 
-        final ArchivedActivityInstance archivedTask2 = getProcessAPI().getArchivedActivityInstance(pendingTasks.get(1).getId());
+        final ArchivedActivityInstance archivedTask2 = getProcessAPI().getArchivedActivityInstance(step2.getId());
         assertEquals(TestStates.CANCELLED.getStateName(), archivedTask2.getState());
 
         disableAndDeleteProcess(processDefinition);
@@ -73,11 +71,10 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
 
     @Test
     public void cancelCallActivity() throws Exception {
-        final String actorName = "delivery";
         final String taskName1 = "userTask1";
         final String taskName2 = "userTask2";
         final String autoTaskName = "auto1";
-        final ProcessDefinition targetProcessDef = deployProcessWith2UserTasksAnd1AutoTask(actorName, taskName1, taskName2, autoTaskName);
+        final ProcessDefinition targetProcessDef = deployProcessWith2UserTasksAnd1AutoTask(taskName1, taskName2, autoTaskName);
         final ProcessDefinition callActivityProcDef = deployProcessWithCallActivity(taskName1, "callActivity", targetProcessDef.getName(),
                 targetProcessDef.getVersion(), taskName2);
         final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(callActivityProcDef.getId());
@@ -97,8 +94,8 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
 
         getProcessAPI().cancelProcessInstance(parentProcessInstance.getId());
 
-        waitForProcessToFinish(parentProcessInstance, TestStates.CANCELLED);
-        waitForProcessToFinish(targetProcessInstance, TestStates.CANCELLED);
+        waitForProcessToBeInState(parentProcessInstance, ProcessInstanceState.CANCELLED);
+        waitForProcessToBeInState(targetProcessInstance, ProcessInstanceState.CANCELLED);
 
         checkWasntExecuted(targetProcessInstance, autoTaskName);
         checkWasntExecuted(parentProcessInstance, taskName2);
@@ -116,7 +113,7 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
         final ProcessDefinition receiveProcess = deployProcessWithIntermediateCatchMessageEvent(catchMessageEvent, "m1", previousStep, nextStep);
 
         final ProcessInstance receiveProcessInstance = getProcessAPI().startProcess(receiveProcess.getId());
-        waitForEventInWaitingState(receiveProcessInstance, catchMessageEvent);
+        waitForFlowNodeInState(receiveProcessInstance, catchMessageEvent, TestStates.WAITING, true);
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.FLOW_NODE_NAME, catchMessageEvent);
@@ -128,7 +125,7 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
         assertEquals(1, searchResult.getCount());
 
         getProcessAPI().cancelProcessInstance(receiveProcessInstance.getId());
-        waitForProcessToFinish(receiveProcessInstance, TestStates.CANCELLED);
+        waitForProcessToBeInState(receiveProcessInstance, ProcessInstanceState.CANCELLED);
 
         searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
         assertEquals(0, searchResult.getCount());
@@ -147,7 +144,7 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
         final ProcessDefinition receiveProcess = deployProcessWithIntermediateCatchSignalEvent(catchMessageEvent, "s1", previousStep, nextStep);
 
         final ProcessInstance receiveProcessInstance = getProcessAPI().startProcess(receiveProcess.getId());
-        waitForEventInWaitingState(receiveProcessInstance, catchMessageEvent);
+        waitForFlowNodeInState(receiveProcessInstance, catchMessageEvent, TestStates.WAITING, true);
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.FLOW_NODE_NAME, catchMessageEvent);
@@ -159,7 +156,7 @@ public class CancelProcessInstanceTest extends AbstractProcessInstanceTest {
         assertEquals(1, searchResult.getCount());
 
         getProcessAPI().cancelProcessInstance(receiveProcessInstance.getId());
-        waitForProcessToFinish(receiveProcessInstance, TestStates.CANCELLED);
+        waitForProcessToBeInState(receiveProcessInstance, ProcessInstanceState.CANCELLED);
 
         searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
         assertEquals(0, searchResult.getCount());

@@ -21,7 +21,6 @@ import org.bonitasoft.engine.core.process.comment.model.SComment;
  */
 public interface SACommentBuilderFactory {
 
-    @Deprecated
     SACommentBuilder createNewInstance(SComment sComment);
 
     String getIdKey();

@@ -31,7 +31,6 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.xml.XMLProcessDefinition.BEntry;
 import org.bonitasoft.engine.bpm.data.DataInstance;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ArchivedReceiveTaskInstance;
@@ -65,7 +64,6 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,7 +81,7 @@ public class ReceiveTasksTest extends CommonAPITest {
 
     @Before
     public void setUp() throws Exception {
-         loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         user = getIdentityAPI().createUser("john", "bpm");
     }
 
@@ -109,7 +107,8 @@ public class ReceiveTasksTest extends CommonAPITest {
                 "delivery", user, "m1", null, null, null);
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForActivity("waitForMessage", receiveMessageProcessInstance, "waiting");
+        waitForFlowNodeInState(receiveMessageProcessInstance, "waitForMessage", TestStates.WAITING, true);
+
         // we check after that that the waiting event is still here
         forceMatchingOfEvents();
 
@@ -141,7 +140,7 @@ public class ReceiveTasksTest extends CommonAPITest {
                 "delivery", user, "m2", null, null, null);
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForActivity("waitForMessage", receiveMessageProcessInstance, "waiting");
+        waitForFlowNodeInState(receiveMessageProcessInstance, "waitForMessage", TestStates.WAITING, true);
 
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId());
@@ -257,22 +256,15 @@ public class ReceiveTasksTest extends CommonAPITest {
                 "delivery", user, "m5", null, Collections.singletonMap("name", String.class.getName()), receiveMessageOperations);
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForActivity("waitForMessage", receiveMessageProcessInstance, "waiting");
+        waitForFlowNodeInState(receiveMessageProcessInstance, "waitForMessage", TestStates.WAITING, true);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
         forceMatchingOfEvents();
+        final HumanTaskInstance step1 = waitForUserTask("userTask1", receiveMessageProcessInstance);
 
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 100, 20000, true, 1, user);
-        assertTrue("there is no pending task", checkNbPendingTaskOf.waitUntil());
-
-        final List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(1, taskInstances.size());
-        final HumanTaskInstance taskInstance = taskInstances.get(0);
-        assertEquals("userTask1", taskInstance.getName());
-
-        final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", taskInstance.getRootContainerId());
+        final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", step1.getRootContainerId());
         assertEquals("Doe", dataInstance.getValue());
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -292,7 +284,7 @@ public class ReceiveTasksTest extends CommonAPITest {
                 "delivery", user, "m1", null, null, null);
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
-        waitForActivity("waitForMessage", receiveMessageProcessInstance, "waiting");
+        waitForFlowNodeInState(receiveMessageProcessInstance, "waitForMessage", TestStates.WAITING, true);
 
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(WaitingEventSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId());

@@ -29,8 +29,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -100,7 +100,7 @@ public class ConnectorServiceImplTest {
 
     @SuppressWarnings("unchecked")
     @Before
-    public void setup() throws Exception {
+    public void setup() {
 
         fixBonitaHomeIfNotSet();
 
@@ -116,7 +116,7 @@ public class ConnectorServiceImplTest {
                 mock(ExpressionResolverService.class), mock(OperationService.class), dependencyService, null, mock(TimeTracker.class));
     }
 
-    private void fixBonitaHomeIfNotSet() throws IOException {
+    private void fixBonitaHomeIfNotSet() {
         //when test are run outside of maven
         System.setProperty("bonita.home", System.getProperty("bonita.home", IOUtil.createTempDirectoryInDefaultTempDirectory("bonita_home").getAbsolutePath()));
         System.err.println("using bonita_home:" + System.getProperty("bonita.home"));
@@ -205,14 +205,14 @@ public class ConnectorServiceImplTest {
         }
     }
 
-    private List<String> names(List<File> files) {
-        ArrayList<String> names = new ArrayList<String>();
-        for (File file : files) {
+    private List<String> names(final List<File> files) {
+        final ArrayList<String> names = new ArrayList<String>();
+        for (final File file : files) {
             names.add(file.getName());
         }
         return names;
     }
-    
+
     @Test
     public void setConnectorImplementationOverwritesExistingJars() throws Exception {
         final long tenantId = 98774L;
@@ -343,8 +343,8 @@ public class ConnectorServiceImplTest {
 
     private void checkGetConnectorImplementationUsesCache(final int givenCacheSizeToBeReturned, final int expectedNumberOfCacheStoreInvocations,
             final boolean shouldCacheContainsConnectorImplementation)
-                    throws BonitaHomeNotSetException, SXMLParseException,
-                    IOException, SConnectorException, SInvalidConnectorImplementationException, SCacheException {
+            throws BonitaHomeNotSetException, SXMLParseException,
+            IOException, SConnectorException, SInvalidConnectorImplementationException, SCacheException {
         connectorService = new ConnectorServiceImpl(cacheService, mock(ConnectorExecutor.class), parserFactory,
                 mock(ReadSessionAccessor.class),
                 mock(ExpressionResolverService.class), mock(OperationService.class), dependencyService, null, mock(TimeTracker.class));
@@ -383,7 +383,7 @@ public class ConnectorServiceImplTest {
             connectorService.setConnectorImplementation(sProcessDef, tenantId, connectorDefId, connectorDefVersion, zip1);
 
             //given
-            doReturn(givenCacheSizeToBeReturned).when(cacheService).getCacheSize(connectorService.CONNECTOR_CACHE_NAME);
+            doReturn(givenCacheSizeToBeReturned).when(cacheService).getCacheSize(ConnectorServiceImpl.CONNECTOR_CACHE_NAME);
 
             List<String> cacheContentKeys = Collections.emptyList();
             final String buildConnectorImplementationKey = connectorService
@@ -391,8 +391,8 @@ public class ConnectorServiceImplTest {
             if (shouldCacheContainsConnectorImplementation) {
                 cacheContentKeys = Arrays.asList(buildConnectorImplementationKey);
             }
-            doReturn(cacheContentKeys).when(cacheService).getKeys(connectorService.CONNECTOR_CACHE_NAME);
-            doReturn(connectorImplDescriptor).when(cacheService).get(connectorService.CONNECTOR_CACHE_NAME, buildConnectorImplementationKey);
+            doReturn(cacheContentKeys).when(cacheService).getKeys(ConnectorServiceImpl.CONNECTOR_CACHE_NAME);
+            doReturn(connectorImplDescriptor).when(cacheService).get(ConnectorServiceImpl.CONNECTOR_CACHE_NAME, buildConnectorImplementationKey);
 
             //when
             connectorService.getConnectorImplementations(processDefId, tenantId, 0,

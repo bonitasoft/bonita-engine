@@ -150,7 +150,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorWithOutput(processDefinitionBuilder, ACTOR_NAME, johnUser);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals(defaultValue, getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue());
-        waitForUserTaskAndExecuteIt("step0", startProcess, johnUserId);
+        waitForUserTaskAndExecuteIt("step0", startProcess, johnUser);
 
         waitForUserTask("step2", startProcess);
 
@@ -192,7 +192,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // wait for the first Multi-instance and execute it: the connector must be executed
-        waitForUserTaskAndExecuteIt(multiTaskName, processInstance, johnUserId);
+        waitForUserTaskAndExecuteIt(multiTaskName, processInstance, johnUser);
 
         // wait for the second Multi-instance
         final ActivityInstance multiInstance = waitForUserTask(multiTaskName, processInstance);
@@ -302,7 +302,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorWithOutput(processDefinitionBuilder, ACTOR_NAME, johnUser);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals(defaultValue, getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue());
-        waitForUserTaskAndExecuteIt("step0", startProcess, johnUserId);
+        waitForUserTaskAndExecuteIt("step0", startProcess, johnUser);
         waitForUserTask("step2", startProcess);
 
         final String value = (String) getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue();
@@ -1310,7 +1310,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployProcWithConnectorEngineExecContext(dataName, step1, step2);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt(step1, processInstance, johnUserId);
+        waitForUserTaskAndExecuteIt(step1, processInstance, johnUser);
         waitForUserTask(step2, processInstance);
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstance.getId());

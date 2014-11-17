@@ -41,7 +41,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.CoreMatchers;
@@ -79,13 +78,12 @@ public class PermissionServiceImplTest {
     private PermissionServiceImpl permissionService;
 
     @Before
-    public void before() throws IOException, SClassLoaderException, SSessionNotFoundException, STenantIdNotSetException {
+    public void before() throws IOException, SClassLoaderException, SSessionNotFoundException {
         scriptFolder = temporaryFolder.newFolder().getAbsolutePath();
         doReturn(Thread.currentThread().getContextClassLoader()).when(classLoaderService).getLocalClassLoader(anyString(), anyLong());
         permissionService = spy(new PermissionServiceImpl(classLoaderService, logger, sessionAccessor, sessionService, scriptFolder, 1));
         doReturn(apiIAccessorImpl).when(permissionService).createAPIAccessorImpl();
         doReturn(mock(SSession.class)).when(sessionService).getSession(anyLong());
-
     }
 
     @Test
@@ -101,7 +99,7 @@ public class PermissionServiceImplTest {
     }
 
     @Test
-    public void should_resume_call_start() throws SBonitaException, ClassNotFoundException {
+    public void should_resume_call_start() throws SBonitaException {
         //when
         permissionService.resume();
         //then
@@ -109,7 +107,7 @@ public class PermissionServiceImplTest {
     }
 
     @Test
-    public void should_pause_call_stop() throws SBonitaException, ClassNotFoundException {
+    public void should_pause_call_stop() throws SBonitaException {
         //given
         permissionService.start();
 
@@ -121,14 +119,14 @@ public class PermissionServiceImplTest {
     }
 
     @Test
-    public void should_pause_call_stop_tow_times() throws SBonitaException, ClassNotFoundException {
+    public void should_pause_call_stop_tow_times() {
         //when
         permissionService.stop();
         permissionService.stop();
     }
 
     @Test
-    public void should_start_with_no_folder_log() throws SBonitaException, ClassNotFoundException, IOException {
+    public void should_start_with_no_folder_log() throws SBonitaException, IOException {
         //given
         FileUtils.deleteDirectory(new File(scriptFolder));
         //when
@@ -218,7 +216,7 @@ public class PermissionServiceImplTest {
      */
 
     @Test
-    public void should_checkAPICallWithScript_reload_classes() throws SBonitaException, ClassNotFoundException, IOException, InterruptedException {
+    public void should_checkAPICallWithScript_reload_classes() throws SBonitaException, ClassNotFoundException, IOException {
         //given
         permissionService.start();
         FileUtils.writeStringToFile(new File(scriptFolder, "MyCustomRule.groovy"), "" +

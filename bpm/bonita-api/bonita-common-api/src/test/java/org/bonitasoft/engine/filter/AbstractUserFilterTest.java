@@ -21,6 +21,7 @@ public class AbstractUserFilterTest {
 
             }
 
+            @SuppressWarnings("unused")
             @Override
             public List<Long> filter(final String actorName) {
                 return null;

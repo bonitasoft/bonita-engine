@@ -20,7 +20,6 @@ import org.bonitasoft.engine.api.impl.transaction.process.DeleteProcess;
 import org.bonitasoft.engine.api.impl.transaction.process.DisableProcess;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
@@ -107,14 +106,12 @@ public class ProcessManagementAPIImplDelegate /* implements ProcessManagementAPI
     }
 
     public void disableProcess(final long processId) throws SProcessDefinitionNotFoundException, SBonitaException {
-
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final PlatformServiceAccessor platformServiceAccessor = getPlatformServiceAccessor();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
         final EventInstanceService eventInstanceService = tenantAccessor.getEventInstanceService();
         final SchedulerService schedulerService = platformServiceAccessor.getSchedulerService();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final DisableProcess disableProcess = new DisableProcess(processDefinitionService, processId, eventInstanceService, schedulerService, logger,
                 SessionInfos.getUserNameFromSession());
         disableProcess.execute();

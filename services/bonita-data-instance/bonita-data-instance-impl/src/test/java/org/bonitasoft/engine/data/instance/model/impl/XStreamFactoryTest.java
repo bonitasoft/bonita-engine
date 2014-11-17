@@ -9,7 +9,7 @@ import com.thoughtworks.xstream.XStream;
 public class XStreamFactoryTest {
 
     @Test
-    public void should_provide_xstream() throws Exception {
+    public void should_provide_xstream() {
         //when
         final XStream xStream = XStreamFactory.getXStream();
 
@@ -18,7 +18,7 @@ public class XStreamFactoryTest {
     }
 
     @Test
-    public void should_create_xstream_only_once_in_same_classLoader() throws Exception {
+    public void should_create_xstream_only_once_in_same_classLoader() {
         //when
         final XStream xStream = XStreamFactory.getXStream();
         final XStream xStream2 = XStreamFactory.getXStream();

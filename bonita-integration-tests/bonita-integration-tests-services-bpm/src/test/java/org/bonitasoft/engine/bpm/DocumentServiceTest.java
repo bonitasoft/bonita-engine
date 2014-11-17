@@ -1,5 +1,4 @@
 /*
- *
  * Copyright (C) 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
@@ -12,7 +11,6 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.bonitasoft.engine.bpm;
 
@@ -53,7 +51,7 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
     private static String documentNameKey;
 
     static {
-        BPMServicesBuilder bpmServicesBuilder = new BPMServicesBuilder();
+        final BPMServicesBuilder bpmServicesBuilder = new BPMServicesBuilder();
         documentService = bpmServicesBuilder.getDocumentService();
         transactionService = bpmServicesBuilder.getTransactionService();
         documentNameKey = BuilderFactory.get(SDocumentBuilderFactory.class).getNameKey();
@@ -64,7 +62,7 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
     public void attachDocumentToProcessInstanceWithContentTest() throws SBonitaException {
         transactionService.begin();
         final SDocument document = buildProcessDocumentWithContent(1, "theContent".getBytes());
-        SMappedDocument result = documentService.attachDocumentToProcessInstance(document, processInstanceId, "documentName", "the description");
+        final SMappedDocument result = documentService.attachDocumentToProcessInstance(document, processInstanceId, "documentName", "the description");
         transactionService.complete();
 
         assertEquals(document.getAuthor(), result.getAuthor());
@@ -101,14 +99,15 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         // Clean up
         delete(result);
     }
+
     @Cover(classes = { DocumentService.class }, concept = BPMNConcept.DOCUMENT, keywords = { "Attach", "ProcessInstance", "Document" }, jira = "")
     @Test
     public void attachDocumentToProcessInList() throws SBonitaException {
         transactionService.begin();
         final SDocument document0 = buildProcessDocumentWithUrl(1);
         final SDocument document1 = buildProcessDocumentWithUrl(1);
-        final SMappedDocument result0 = documentService.attachDocumentToProcessInstance(document0, processInstanceId, "documentName", "the description",0);
-        final SMappedDocument result1 = documentService.attachDocumentToProcessInstance(document1, processInstanceId, "documentName", "the description",1);
+        final SMappedDocument result0 = documentService.attachDocumentToProcessInstance(document0, processInstanceId, "documentName", "the description", 0);
+        final SMappedDocument result1 = documentService.attachDocumentToProcessInstance(document1, processInstanceId, "documentName", "the description", 1);
         transactionService.complete();
 
         assertEquals(document0.getAuthor(), result0.getAuthor());
@@ -205,24 +204,16 @@ public class DocumentServiceTest extends CommonBPMServicesTest {
         delete(list);
     }
 
-    private SDocument buildProcessDocumentWithContent(final int i, byte[] documentContent) {
-        final SDocumentBuilder builder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance();
-        builder.setAuthor(i);
-        builder.setCreationDate(System.currentTimeMillis());
-        builder.setFileName("getContentTest.txt");
+    private SDocument buildProcessDocumentWithContent(final int i, final byte[] documentContent) {
+        final SDocumentBuilder builder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance("getContentTest.txt", "text/plain", i);
         builder.setHasContent(true);
-        builder.setMimeType("text/plain");
         builder.setContent(documentContent);
         return builder.done();
     }
 
     private SDocument buildProcessDocumentWithUrl(final int i) {
-        final SDocumentBuilder builder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance();
-        builder.setAuthor(i);
-        builder.setCreationDate(System.currentTimeMillis());
-        builder.setFileName("getContentTest.txt");
+        final SDocumentBuilder builder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance("getContentTest.txt", "text/plain", i);
         builder.setHasContent(false);
-        builder.setMimeType("text/plain");
         builder.setURL("theUrl");
         return builder.done();
     }

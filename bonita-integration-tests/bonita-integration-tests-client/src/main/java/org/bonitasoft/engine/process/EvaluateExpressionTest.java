@@ -74,7 +74,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
 
     @Before
     public void before() throws Exception {
-         loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         user = createUser(USERNAME, PASSWORD);
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
@@ -230,7 +230,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Completed activity" }, story = "Evaluate an expression on completed activity instance.", jira = "")
     @Test
     public void evaluateExpressionsOnCompletedActivityInstance() throws Exception {
-        final HumanTaskInstance userTaskInstance = waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance.getId(), user);
+        final HumanTaskInstance userTaskInstance = waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnCompletedActivityInstance(userTaskInstance.getId(), expressions);
         assertEquals("Word-Excel", result.get("StringScript"));
         assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
@@ -250,8 +250,8 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Completed process instance" }, story = "Evaluate an expression on completed process instance.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnCompletedProcessInstance() throws Exception {
-        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance.getId(), user);
-        waitForUserTaskAndExecuteIt(STEP2_NAME, processInstance.getId(), user);
+        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
+        waitForUserTaskAndExecuteIt(STEP2_NAME, processInstance, user);
         waitForProcessToFinish(processInstance);
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions);
@@ -267,9 +267,9 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Completed process instance", "Updated data" }, story = "Evaluate an expression on completed process instance with variable update.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnCompletedProcessInstanceAfterVariableUpdate() throws Exception {
-        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance.getId(), user);
+        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
         getProcessAPI().updateProcessDataInstance("stringData", processInstance.getId(), "Plop");
-        waitForUserTaskAndExecuteIt(STEP2_NAME, processInstance.getId(), user);
+        waitForUserTaskAndExecuteIt(STEP2_NAME, processInstance, user);
         waitForProcessToFinish(processInstance);
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions);
@@ -324,7 +324,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Process instance", "Initial value" }, story = "Evalute an expression on process intance with initial values.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnProcessInstanceWithInitialValues() throws Exception {
-        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance.getId(), user);
+        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
         getProcessAPI().updateProcessDataInstance("stringData", processInstance.getId(), "Excel");
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
@@ -341,7 +341,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Process instance", "Current value" }, story = "Evalute an expression on process intance with current values.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnProcessInstanceWithCurrentValues() throws Exception {
-        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance.getId(), user);
+        waitForUserTaskAndExecuteIt(STEP1_NAME, processInstance, user);
         getProcessAPI().updateProcessDataInstance("stringData", processInstance.getId(), "Excel");
 
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);

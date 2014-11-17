@@ -138,10 +138,10 @@ public class ErrorEventSubProcessTest extends WaitingEventTest {
 
         // throw error
         waitForUserTask("step1", processInstance1.getId());
-        waitForUserTaskAndExecuteIt("step2", processInstance1.getId(), donaBenta.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance1, donaBenta);
 
         waitForUserTask("step1", processInstance2.getId());
-        waitForUserTaskAndExecuteIt("step2", processInstance2.getId(), donaBenta.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance2, donaBenta);
 
         waitForUserTask("subStep", processInstance1.getId());
         waitForUserTask("subStep", processInstance2.getId());
@@ -153,7 +153,7 @@ public class ErrorEventSubProcessTest extends WaitingEventTest {
         processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcessAndData("error1", "error1", "errorStart"));
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(0).getId());
         waitForUserTask("step1", processInstance.getId());
-        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), donaBenta.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance, donaBenta);
 
         final ActivityInstance subStep = waitForUserTask("subStep", processInstance.getId());
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
@@ -200,9 +200,9 @@ public class ErrorEventSubProcessTest extends WaitingEventTest {
         processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcessAndDataOnlyInSubProc("error1", "errorStart", rootUserTaskName,
                 subProcUserTaskName, dataName, dataValue));
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(0).getId());
-        waitForUserTaskAndExecuteIt(rootUserTaskName, processInstance.getId(), donaBenta.getId());
+        waitForUserTaskAndExecuteIt(rootUserTaskName, processInstance, donaBenta);
 
-        final ActivityInstance subStep = waitForUserTask(subProcUserTaskName, processInstance.getId());
+        final ActivityInstance subStep = waitForUserTask(subProcUserTaskName, processInstance);
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
         checkProcessDataInstance(dataName, subProcInst.getId(), dataValue);
 
@@ -248,10 +248,10 @@ public class ErrorEventSubProcessTest extends WaitingEventTest {
         processDefinitions.add(deployAndEnableProcessWithErrorEventSubProcess("e1", "e1", "errorStart"));
         processDefinitions.add(deployAndEnableProcessWithCallActivity(processDefinitions.get(0).getName(), processDefinitions.get(0).getVersion()));
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(1).getId());
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance.getId());
-        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), donaBenta.getId());
+        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
+        waitForUserTaskAndExecuteIt("step2", processInstance, donaBenta);
 
-        final ActivityInstance subStep = waitForUserTask("subStep", processInstance.getId());
+        final ActivityInstance subStep = waitForUserTask("subStep", processInstance);
         final ProcessInstance calledProcInst = getProcessAPI().getProcessInstance(step1.getParentProcessInstanceId());
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
@@ -260,7 +260,7 @@ public class ErrorEventSubProcessTest extends WaitingEventTest {
         waitForProcessToFinish(subProcInst);
         waitForProcessToBeInState(calledProcInst, ProcessInstanceState.ABORTED);
 
-        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), donaBenta.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance, donaBenta);
         waitForProcessToFinish(processInstance);
     }
 
