@@ -2,6 +2,7 @@ package org.bonitasoft.engine.execution.event;
 
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -22,11 +23,10 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SMultiInstanceActi
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -53,9 +53,13 @@ public class ErrorEventHandlerStrategyTest {
     @Mock
     private TechnicalLoggerService logger;
 
-    @InjectMocks
-    @Spy
-    private ErrorEventHandlerStrategy strategy;
+    private ErrorEventHandlerStrategy spyStrategy;
+
+    @Before
+    public void setUp() {
+        spyStrategy = spy(new ErrorEventHandlerStrategy(eventInstanceService, processInstanceService, flowNodeInstanceService,
+                containerRegistry, processDefinitionService, eventsHandler, logger));
+    }
 
     @Test
     public void getWaitingErrorEventFromBoundary_should_find_matching_event_in_multiple_instance_activity() throws Exception {
@@ -76,9 +80,9 @@ public class ErrorEventHandlerStrategyTest {
         when(processDefinitionService.getProcessDefinition(processDefinitionId)).thenReturn(definition);
         when(flowNodeInstanceService.getFlowNodeInstance(parentActivityInstanceId)).thenReturn(multiInstanceInstance);
 
-        strategy.getWaitingErrorEventFromBoundary(eventInstance, errorCode, instance);
+        spyStrategy.getWaitingErrorEventFromBoundary(eventInstance, errorCode, instance);
 
-        verify(strategy).getWaitingErrorEventFromBoundary(eq(errorCode), eq(multiInstanceInstance), anyList());
+        verify(spyStrategy).getWaitingErrorEventFromBoundary(eq(errorCode), eq(multiInstanceInstance), anyList());
     }
 
     private SMultiInstanceActivityInstanceImpl buildMultiInstanceActivity(final long processDefinitionId, final long flowNodeDefinitionId,
