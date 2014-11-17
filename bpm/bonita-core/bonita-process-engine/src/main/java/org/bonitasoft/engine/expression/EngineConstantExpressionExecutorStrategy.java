@@ -46,11 +46,11 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
@@ -64,17 +64,16 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
 
     private final ProcessInstanceService processInstanceService;
 
-    protected final ReadSessionAccessor sessionAccessor;
+    private final SessionAccessor sessionAccessor;
 
-    protected final SessionService sessionService;
+    private final SessionService sessionService;
 
     public EngineConstantExpressionExecutorStrategy(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
-            final SessionService sessionService, final ReadSessionAccessor sessionAccessor) {
+            final SessionService sessionService, final SessionAccessor sessionAccessor) {
         this.activityInstanceService = activityInstanceService;
         this.processInstanceService = processInstanceService;
         this.sessionService = sessionService;
         this.sessionAccessor = sessionAccessor;
-
     }
 
     @Override
@@ -131,13 +130,13 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         } catch (final SActivityInstanceNotFoundException e) {
             throw new SExpressionEvaluationException("Error retrieving activity instance while building EngineExecutionContext as EngineConstantExpression", e,
                     expressionName);
-        } catch (SBonitaSearchException e) {
+        } catch (final SBonitaReadException e) {
             throw new SExpressionEvaluationException("Error while building EngineExecutionContext as EngineConstantExpression", e, expressionName);
         }
     }
 
-    protected APIAccessorImpl getApiAccessor() {
-        return new APIAccessorImpl();
+    protected APIAccessor getApiAccessor() {
+        return new APIAccessorImpl(sessionAccessor, sessionService);
     }
 
     protected APIAccessor getConnectorApiAccessor() throws STenantIdNotSetException {
@@ -155,7 +154,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
 
     private Serializable getFromContextOrEngineExecutionContext(final ExpressionConstants expressionConstant, final Map<String, Object> context,
             final ContainerState containerState) throws SProcessInstanceNotFoundException, SProcessInstanceReadException,
-            SActivityInstanceNotFoundException, SFlowNodeNotFoundException, SFlowNodeReadException, SBonitaSearchException {
+            SActivityInstanceNotFoundException, SFlowNodeNotFoundException, SFlowNodeReadException, SBonitaReadException {
         final Object object = context.get(expressionConstant.getEngineConstantName());
         if (object == null) {
             // try to get it from an already evaluated context
@@ -172,7 +171,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
 
     private Serializable evaluate(final ExpressionConstants expressionConstant, final Map<String, Object> context,
             final ContainerState containerState) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SActivityInstanceNotFoundException,
-            SFlowNodeNotFoundException, SFlowNodeReadException, SBonitaSearchException {
+            SFlowNodeNotFoundException, SFlowNodeReadException, SBonitaReadException {
         // guess it
         if (ExpressionConstants.ENGINE_EXECUTION_CONTEXT.equals(expressionConstant)) {
             return createContext(context, containerState);
@@ -257,7 +256,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
 
     private Serializable createContext(final Map<String, Object> context, final ContainerState containerState) throws SProcessInstanceNotFoundException,
             SProcessInstanceReadException, SActivityInstanceNotFoundException, SFlowNodeReadException,
-            SBonitaSearchException {
+            SBonitaReadException {
         final EngineExecutionContext ctx = new EngineExecutionContext();
         if (context.containsKey(SExpressionContext.CONTAINER_TYPE_KEY) && context.containsKey(SExpressionContext.CONTAINER_ID_KEY)) {
             final String containerType = (String) context.get(SExpressionContext.CONTAINER_TYPE_KEY);
@@ -283,7 +282,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
     }
 
     private void updateContextFromArchivedProcessInstance(final EngineExecutionContext ctx, final long processInstanceId)
-            throws SBonitaSearchException {
+            throws SBonitaReadException {
         final SAProcessInstance processInstance = processInstanceService.getLastArchivedProcessInstance(processInstanceId);
         if (processInstance != null) {
             ctx.setProcessInstanceId(processInstance.getSourceObjectId());
@@ -291,7 +290,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
         }
     }
 
-    private void updateContextFromArchivedActivityInstance(final EngineExecutionContext ctx, final long activityInstanceId) throws SBonitaSearchException {
+    private void updateContextFromArchivedActivityInstance(final EngineExecutionContext ctx, final long activityInstanceId) throws SBonitaReadException {
         final SAActivityInstance activityInstance = activityInstanceService.getLastArchivedFlowNodeInstance(SAActivityInstance.class, activityInstanceId);
         if (activityInstance != null) {
             ctx.setActivityInstanceId(activityInstance.getSourceObjectId());
@@ -347,6 +346,14 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
     @Override
     public boolean mustPutEvaluatedExpressionInContext() {
         return true;
+    }
+
+    public SessionAccessor getSessionAccessor() {
+        return sessionAccessor;
+    }
+
+    public SessionService getSessionService() {
+        return sessionService;
     }
 
 }

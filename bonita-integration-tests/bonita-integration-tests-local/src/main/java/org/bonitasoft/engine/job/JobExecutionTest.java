@@ -16,7 +16,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-// because of waituntil but its the only classe where we use failed jobs... so i don't want to add a handler and so on only for jobs
+// because of waituntil but its the only class where we use failed jobs... so i don't want to add a handler and so on only for jobs
 @SuppressWarnings("deprecation")
 public class JobExecutionTest extends CommonAPITest {
 

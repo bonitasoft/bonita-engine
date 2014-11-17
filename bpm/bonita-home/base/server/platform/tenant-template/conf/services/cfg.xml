@@ -29,7 +29,6 @@
 		<constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
 		<constructor-arg name="classLoaderService" ref="classLoaderService" />
 		<constructor-arg name="workService" ref="workService" />
-		<constructor-arg name="cacheService" ref="cacheService"/>
 	</bean>
 
 	<bean id="containerRegistry" class="org.bonitasoft.engine.execution.ContainerRegistry">
@@ -108,20 +107,19 @@
 			<map>
 				<entry key="PROCESSINSTANCE_STATE_UPDATED">
                     <bean class="org.bonitasoft.engine.execution.handler.ArchiveProcessInstancesHandler">
-						<constructor-arg name="tenantId" value="${tenantId}" />
-					</bean>
-				</entry>
-			</map>
-		</constructor-arg>
-		<constructor-arg name="processDocumentService" ref="processDocumentService" />
-		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="containerRegistry" ref="containerRegistry" />
-		<constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator" />
-		<constructor-arg name="tokenService" ref="tokenService"/>
-		<constructor-arg name="eventsHandler" ref="eventsHandler" />
-		<constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager" />
-		<constructor-arg name="cacheService" ref="cacheService"/>
-	</bean>
+                        <constructor-arg name="tenantId" value="${tenantId}"/>
+                    </bean>
+                </entry>
+            </map>
+        </constructor-arg>
+        <constructor-arg name="documentService" ref="documentService"/>
+        <constructor-arg name="sessionAccessor" ref="sessionAccessor"/>
+        <constructor-arg name="containerRegistry" ref="containerRegistry"/>
+        <constructor-arg name="bpmInstancesCreator" ref="bpmInstancesCreator"/>
+        <constructor-arg name="tokenService" ref="tokenService"/>
+        <constructor-arg name="eventsHandler" ref="eventsHandler"/>
+        <constructor-arg name="flowNodeStateManager" ref="flowNodeStateManager"/>
+    </bean>
 
 	<bean id="transactionalProcessInstanceInterruptor" class="org.bonitasoft.engine.execution.TransactionalProcessInstanceInterruptor">
 		<constructor-arg name="processInstanceService" ref="processInstanceService" />

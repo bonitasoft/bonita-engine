@@ -15,10 +15,10 @@ package org.bonitasoft.engine.search.document;
 
 import java.util.List;
 
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
-import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
+import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractArchivedDocumentSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchArchivedDocumentDescriptor;
@@ -31,23 +31,23 @@ public class SearchArchivedDocumentsSupervisedBy extends AbstractArchivedDocumen
 
     private final long userId;
 
-    private final ProcessDocumentService processDocumentService;
+    private final DocumentService documentService;
 
-    public SearchArchivedDocumentsSupervisedBy(final long userId, final ProcessDocumentService processDocumentService,
+    public SearchArchivedDocumentsSupervisedBy(final long userId, final DocumentService documentService,
             final SearchArchivedDocumentDescriptor searchDescriptor, final SearchOptions options) {
-        super(searchDescriptor, options);
+        super(searchDescriptor, options, documentService);
         this.userId = userId;
-        this.processDocumentService = processDocumentService;
+        this.documentService = documentService;
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processDocumentService.getNumberOfArchivedDocumentsSupervisedBy(userId, searchOptions);
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
+        return documentService.getNumberOfArchivedDocumentsSupervisedBy(userId, searchOptions);
     }
 
     @Override
-    public List<SAProcessDocument> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
-        return processDocumentService.searchArchivedDocumentsSupervisedBy(userId, searchOptions);
+    public List<SAMappedDocument> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
+        return documentService.searchArchivedDocumentsSupervisedBy(userId, searchOptions);
     }
 
 }

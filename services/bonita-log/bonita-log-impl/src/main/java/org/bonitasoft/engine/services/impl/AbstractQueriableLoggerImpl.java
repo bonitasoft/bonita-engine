@@ -18,19 +18,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
-import org.bonitasoft.engine.queriablelogger.model.builder.SQueriableLogBuilderFactory;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.QueriableLogSessionProvider;
 import org.bonitasoft.engine.services.QueriableLoggerService;
@@ -50,17 +48,18 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
 
     private final QueriableLoggerStrategy loggerStrategy;
 
-    private final QueriableLogSessionProvider sessionProvider;
+    protected final TechnicalLoggerService logger;
 
-    private final PlatformService platformService;
+    private final QueriableLogUpdater logUpdater;
 
     public AbstractQueriableLoggerImpl(final PersistenceService persistenceService,
-            final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider, final PlatformService platformService) {
+            final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider, final PlatformService platformService,
+            final TechnicalLoggerService logger) {
+        this.logger = logger;
         NullCheckingUtil.checkArgsNotNull(persistenceService, loggerStrategy, sessionProvider);
         this.persistenceService = persistenceService;
         this.loggerStrategy = loggerStrategy;
-        this.sessionProvider = sessionProvider;
-        this.platformService = platformService;
+        logUpdater = new QueriableLogUpdater(sessionProvider, platformService, logger);
     }
 
     @Override
@@ -88,21 +87,13 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
     }
 
     @Override
-    public long getNumberOfLogs(final QueryOptions searchOptions) throws SBonitaSearchException {
-        try {
-            return persistenceService.getNumberOfEntities(SQueriableLog.class, searchOptions, null);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+    public long getNumberOfLogs(final QueryOptions searchOptions) throws SBonitaReadException {
+        return persistenceService.getNumberOfEntities(SQueriableLog.class, searchOptions, null);
     }
 
     @Override
-    public List<SQueriableLog> searchLogs(final QueryOptions searchOptions) throws SBonitaSearchException {
-        try {
-            return persistenceService.searchEntity(SQueriableLog.class, searchOptions, null);
-        } catch (final SBonitaReadException bre) {
-            throw new SBonitaSearchException(bre);
-        }
+    public List<SQueriableLog> searchLogs(final QueryOptions searchOptions) throws SBonitaReadException {
+        return persistenceService.searchEntity(SQueriableLog.class, searchOptions, null);
     }
 
     @Override
@@ -111,12 +102,7 @@ public abstract class AbstractQueriableLoggerImpl implements QueriableLoggerServ
         final List<SQueriableLog> loggableLogs = new ArrayList<SQueriableLog>();
         for (SQueriableLog log : queriableLogs) {
             if (isLoggable(log.getActionType(), log.getSeverity())) {
-                final SQueriableLogBuilderFactory fact = BuilderFactory.get(SQueriableLogBuilderFactory.class);
-                log = fact.fromInstance(log).callerClassName(callerClassName).callerMethodName(callerMethodName)
-                        .userId(sessionProvider.getUserId()).clusterNode(sessionProvider.getClusterNode())
-                        .productVersion(platformService.getSPlatformProperties().getPlatformVersion())
-                        .done();
-
+                log = logUpdater.buildFinalLog(callerClassName, callerMethodName, log);
                 loggableLogs.add(log);
             }
         }

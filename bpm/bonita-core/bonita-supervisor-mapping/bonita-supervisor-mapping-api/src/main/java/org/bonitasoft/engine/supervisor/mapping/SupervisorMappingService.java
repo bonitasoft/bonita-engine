@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.supervisor.mapping.model.SProcessSupervisor;
 
 /**
@@ -33,9 +32,9 @@ public interface SupervisorMappingService {
 
     /**
      * Create supervisor in DB according to the given supervisor
-     * 
+     *
      * @param supervisor
-     *            a SSupervisor object
+     *        a SSupervisor object
      * @return the new created supervisor
      * @throws SSupervisorCreationException
      */
@@ -43,9 +42,9 @@ public interface SupervisorMappingService {
 
     /**
      * get supervisor without display name by its id
-     * 
+     *
      * @param supervisorId
-     *            identifier of supervisor
+     *        identifier of supervisor
      * @return the supervisor with id equals the parameter
      * @throws SSupervisorNotFoundException
      */
@@ -53,9 +52,9 @@ public interface SupervisorMappingService {
 
     /**
      * Delete the id specified supervisor
-     * 
+     *
      * @param supervisorId
-     *            identifier of supervisor
+     *        identifier of supervisor
      * @throws SSupervisorNotFoundException
      * @throws SSupervisorDeletionException
      */
@@ -63,16 +62,16 @@ public interface SupervisorMappingService {
 
     /**
      * Delete the specific supervisor
-     * 
+     *
      * @param supervisor
-     *            the supervisor will be deleted
+     *        the supervisor will be deleted
      * @throws SSupervisorDeletionException
      */
     void deleteProcessSupervisor(SProcessSupervisor supervisor) throws SSupervisorDeletionException;
 
     /**
      * Delete all supervisors for the connected tenant
-     * 
+     *
      * @throws SSupervisorDeletionException
      * @since 6.1
      */
@@ -80,11 +79,11 @@ public interface SupervisorMappingService {
 
     /**
      * Verify if the id specified user is the supervisor of id specified process definition
-     * 
+     *
      * @param processDefinitionId
-     *            identifier of process definition
+     *        identifier of process definition
      * @param userId
-     *            identifier of user
+     *        identifier of user
      * @return true if user is supervisor of the process, false otherwise
      * @throws SBonitaReadException
      */
@@ -92,22 +91,22 @@ public interface SupervisorMappingService {
 
     /**
      * Search all supervisors suit to the specific criteria
-     * 
+     *
      * @param queryOptions
-     *            The QueryOptions object containing some query conditions
+     *        The QueryOptions object containing some query conditions
      * @return a list of SSupervisor objects
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<SProcessSupervisor> searchProcessSupervisors(QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SProcessSupervisor> searchProcessSupervisors(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * Get total number of supervisors suit to the specific criteria
-     * 
+     *
      * @param searchOptions
-     *            The QueryOptions object containing some query conditions
+     *        The QueryOptions object containing some query conditions
      * @return a list of SSupervisor objects
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfProcessSupervisors(QueryOptions searchOptions) throws SBonitaSearchException;
+    long getNumberOfProcessSupervisors(QueryOptions searchOptions) throws SBonitaReadException;
 
 }

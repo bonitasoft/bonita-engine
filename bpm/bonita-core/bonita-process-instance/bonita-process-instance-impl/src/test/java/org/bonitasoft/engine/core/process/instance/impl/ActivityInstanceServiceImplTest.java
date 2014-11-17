@@ -116,9 +116,9 @@ public class ActivityInstanceServiceImplTest {
     @Test
     public void updateDisplayName_should_truncate_when_display_name_is_bigger_than_75_characters() throws Exception {
         // given
-        final String displayName75 = "123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345";
-        final String displayName = displayName75 + displayName75;
-        final SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
+        String displayName75 = "123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345";
+        String displayName = displayName75 + displayName75;
+        SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
 
         // when
         activityInstanceServiceImpl.updateDisplayName(flowNode, displayName);
@@ -128,18 +128,18 @@ public class ActivityInstanceServiceImplTest {
         checkFlowNodeUpdate(keyProvider.getDisplayNameKey(), displayName75);
     }
 
-    private void checkFlowNodeUpdate(final String attributeKey, final String expectedValue) throws SRecorderException {
-        final ArgumentCaptor<UpdateRecord> recordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
+    private void checkFlowNodeUpdate(String attributeKey, String expectedValue) throws SRecorderException {
+        ArgumentCaptor<UpdateRecord> recordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
         verify(recorder, times(1)).recordUpdate(recordCaptor.capture(), any(SUpdateEvent.class));
-        final Object actualValue = recordCaptor.getValue().getFields().get(attributeKey);
+        Object actualValue = recordCaptor.getValue().getFields().get(attributeKey);
         assertThat(actualValue).isEqualTo(expectedValue);
     }
 
     @Test
     public void updateDisplayName_should_not_change_value_when_display_name_is_lower_than_75_characters() throws Exception {
         // given
-        final String displayName = "simple task";
-        final SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
+        String displayName = "simple task";
+        SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
 
         // when
         activityInstanceServiceImpl.updateDisplayName(flowNode, displayName);
@@ -206,7 +206,7 @@ public class ActivityInstanceServiceImplTest {
         assertNotNull(result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchAssignedAndPendingHumanTasksForThrowException() throws Exception {
         // Given
         final long rootProcessDefinitionId = 10;
@@ -245,7 +245,7 @@ public class ActivityInstanceServiceImplTest {
         assertEquals(1L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfAssignedAndPendingHumanTasksForThrowException() throws Exception {
         // Given
         final long rootProcessDefinitionId = 10;
@@ -282,7 +282,7 @@ public class ActivityInstanceServiceImplTest {
         assertNotNull(result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchAssignedAndPendingHumanTasksThrowException() throws Exception {
         // Given
         final long rootProcessDefinitionId = 10;
@@ -315,7 +315,7 @@ public class ActivityInstanceServiceImplTest {
         assertEquals(1L, result);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfAssignedAndPendingHumanTasksThrowException() throws Exception {
         // Given
         final long rootProcessDefinitionId = 10;
@@ -327,40 +327,4 @@ public class ActivityInstanceServiceImplTest {
         // When
         activityInstanceServiceImpl.getNumberOfAssignedAndPendingHumanTasks(rootProcessDefinitionId, options);
     }
-
-    @Test
-    public void getUserTaskInstanceReturnsTheInstanceOfTheUserTask() throws Exception {
-        //Given
-        final long userTaskInstanceId = 45L;
-        final SUserTaskInstance instance = mock(SUserTaskInstance.class);
-        final SelectByIdDescriptor<SUserTaskInstance> descriptor = SelectDescriptorBuilder.getElementById(SUserTaskInstance.class, "SUserTaskInstance",
-                userTaskInstanceId);
-        when(persistenceService.selectById(descriptor)).thenReturn(instance);
-
-        final SUserTaskInstance userTaskInstance = activityInstanceServiceImpl.getUserTaskInstance(userTaskInstanceId);
-        assertThat(userTaskInstance).isEqualTo(instance);
-    }
-
-    @Test(expected = SActivityInstanceNotFoundException.class)
-    public void getUserTaskInstanceThrowsAnExceptionWhenTheUserTaskIsNotFound() throws Exception {
-        //Given
-        final long userTaskInstanceId = 45L;
-        final SelectByIdDescriptor<SUserTaskInstance> descriptor = SelectDescriptorBuilder.getElementById(SUserTaskInstance.class, "SUserTaskInstance",
-                userTaskInstanceId);
-        when(persistenceService.selectById(descriptor)).thenReturn(null);
-
-        activityInstanceServiceImpl.getUserTaskInstance(userTaskInstanceId);
-    }
-
-    @Test(expected = SActivityReadException.class)
-    public void getUserTaskInstanceThrowsAnExceptionWhenTheReadingTheUserTask() throws Exception {
-        //Given
-        final long userTaskInstanceId = 45L;
-        final SelectByIdDescriptor<SUserTaskInstance> descriptor = SelectDescriptorBuilder.getElementById(SUserTaskInstance.class, "SUserTaskInstance",
-                userTaskInstanceId);
-        when(persistenceService.selectById(descriptor)).thenThrow(new SBonitaReadException("SOS"));
-
-        activityInstanceServiceImpl.getUserTaskInstance(userTaskInstanceId);
-    }
-
 }

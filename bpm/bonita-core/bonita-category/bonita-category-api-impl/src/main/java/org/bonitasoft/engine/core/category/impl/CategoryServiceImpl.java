@@ -43,7 +43,6 @@ import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -138,7 +137,7 @@ public class CategoryServiceImpl implements CategoryService {
         SSession session;
         try {
             session = sessionService.getSession(sessionAccessor.getSessionId());
-        } catch (SessionIdNotSetException e) {
+        } catch (final SessionIdNotSetException e) {
             // no session, it is system
             return -1;
         }
@@ -333,12 +332,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<SProcessCategoryMapping> searchProcessCategoryMappings(final QueryOptions queryOptions) throws SBonitaSearchException {
-        try {
-            return persistenceService.searchEntity(SProcessCategoryMapping.class, queryOptions, null);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+    public List<SProcessCategoryMapping> searchProcessCategoryMappings(final QueryOptions queryOptions) throws SBonitaReadException {
+        return persistenceService.searchEntity(SProcessCategoryMapping.class, queryOptions, null);
     }
 
     @Override
@@ -403,16 +398,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public long getNumberOfProcessDeploymentInfosOfCategory(final long categoryId) throws SBonitaSearchException {
+    public long getNumberOfProcessDeploymentInfosOfCategory(final long categoryId) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("categoryId", (Object) categoryId);
         final SelectOneDescriptor<Long> descriptor = new SelectOneDescriptor<Long>("getNumberOfProcessDefinitionsOfCategory", parameters,
                 SProcessCategoryMapping.class, Long.class);
 
-        try {
-            return persistenceService.selectOne(descriptor);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaSearchException(e);
-        }
+        return persistenceService.selectOne(descriptor);
     }
 
     private void initiateLogBuilder(final long objectId, final int sQueriableLogStatus, final SPersistenceLogBuilder logBuilder, final String callerMethodName) {

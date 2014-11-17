@@ -47,8 +47,7 @@ import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.platform.login.PlatformLoginService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
-import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
@@ -90,6 +89,7 @@ import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.scheduler.JobService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import org.bonitasoft.engine.service.PermissionService;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.impl.SessionAccessorAccessor;
@@ -136,6 +136,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public TimeTracker getTimeTracker() {
         return getInstanceOf(TimeTracker.class);
+    }
+
+    @Override
+    public PermissionService getPermissionService() {
+        return getInstanceOf(PermissionService.class);
     }
 
     @Override
@@ -337,14 +342,10 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
         return getInstanceOf(CommandService.class);
     }
 
-    @Override
-    public DocumentMappingService getDocumentMappingService() {
-        return getInstanceOf(DocumentMappingService.class);
-    }
 
     @Override
-    public ProcessDocumentService getProcessDocumentService() {
-        return getInstanceOf(ProcessDocumentService.class);
+    public DocumentService getDocumentService() {
+        return getInstanceOf(DocumentService.class);
     }
 
     @Override
@@ -480,7 +481,7 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     }
 
     @Override
-    public NodeConfiguration getPlaformConfiguration() {
+    public NodeConfiguration getPlatformConfiguration() {
         return getInstanceOf(NodeConfiguration.class);
     }
 

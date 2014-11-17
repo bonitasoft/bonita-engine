@@ -33,7 +33,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -731,26 +730,19 @@ public class PlatformServiceImpl implements PlatformService {
     }
 
     @Override
-    public List<STenant> searchTenants(final QueryOptions options) throws SBonitaSearchException {
+    public List<STenant> searchTenants(final QueryOptions options) throws SBonitaReadException {
         if (isTraced) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "searchSTenants"));
         }
-        try {
-            final List<STenant> listsSTenants = platformPersistenceService.searchEntity(STenant.class, options, null);
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "searchSTenants"));
-            }
-            return listsSTenants;
-        } catch (final SBonitaReadException bre) {
-            if (isTraced) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "searchSTenants", bre));
-            }
-            throw new SBonitaSearchException(bre);
+        final List<STenant> listsSTenants = platformPersistenceService.searchEntity(STenant.class, options, null);
+        if (isTraced) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "searchSTenants"));
         }
+        return listsSTenants;
     }
 
     @Override
-    public long getNumberOfTenants(final QueryOptions options) throws SBonitaSearchException {
+    public long getNumberOfTenants(final QueryOptions options) throws SBonitaReadException {
         if (isTraced) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "getNumberOfSTenant"));
         }
@@ -764,7 +756,7 @@ public class PlatformServiceImpl implements PlatformService {
             if (isTraced) {
                 logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "getNumberOfSTenant", bre));
             }
-            throw new SBonitaSearchException(bre);
+            throw new SBonitaReadException(bre);
         }
     }
 

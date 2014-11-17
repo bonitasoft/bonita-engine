@@ -22,7 +22,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.STransitionDel
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Zhao Na
@@ -47,16 +47,16 @@ public interface TransitionService {
     /**
      * @param queryOptions
      * @return
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<SATransitionInstance> searchArchivedTransitionInstances(QueryOptions queryOptions) throws SBonitaSearchException;
+    List<SATransitionInstance> searchArchivedTransitionInstances(QueryOptions queryOptions) throws SBonitaReadException;
 
     /**
      * @param countOptions
      * @return
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfArchivedTransitionInstances(QueryOptions countOptions) throws SBonitaSearchException;
+    long getNumberOfArchivedTransitionInstances(QueryOptions countOptions) throws SBonitaReadException;
 
     /**
      * @param saTransitionInstance
@@ -68,9 +68,9 @@ public interface TransitionService {
      * 
      * @param processInstanceId
      * @throws STransitionDeletionException
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @since 6.1
      */
-    void deleteArchivedTransitionsOfProcessInstance(long processInstanceId) throws STransitionDeletionException, SBonitaSearchException;
+    void deleteArchivedTransitionsOfProcessInstance(long processInstanceId) throws STransitionDeletionException, SBonitaReadException;
 
 }

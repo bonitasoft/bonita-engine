@@ -105,13 +105,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- Document -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.document</groupId>
-			<artifactId>bonita-document-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 
 		<!-- Event -->
 		<dependency>
@@ -380,6 +373,27 @@
 
 	<build>
 		<plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>complete test conf setup</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target name="copy-service-test-conf">
+                                <copy todir="${project.build.directory}/conf" overwrite="true">
+                                    <fileset dir="${project.build.directory}/server/conf/service" />
+                                    <fileset dir="${basedir}/src/test/resources/conf" />
+                                </copy>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -399,7 +413,7 @@
 									<type>zip</type>
 								</artifactItem>
 							</artifactItems>
-							<outputDirectory>${project.build.directory}/test-classes/</outputDirectory>
+							<outputDirectory>${project.build.directory}/server</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
@@ -425,7 +439,7 @@
 					</properties>
 					<systemPropertyVariables>
 						<bonita.home>${project.build.directory}</bonita.home>
-						<bonita.services.folder>${project.build.directory}/test-classes/conf</bonita.services.folder>
+						<bonita.services.folder>${project.build.directory}/conf</bonita.services.folder>
 					</systemPropertyVariables>
 					<includes>
 						<include>org/bonitasoft/engine/AllTestsWithJNDI.java</include>
@@ -464,17 +478,24 @@
 					<configuration>
 						<lifecycleMappingMetadata>
 							<pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-antrun-plugin</artifactId>
+                                        <versionRange>[1.6,)</versionRange>
+                                        <goals>
+                                            <goal>run</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>
-											org.apache.maven.plugins
-										</groupId>
-										<artifactId>
-											maven-dependency-plugin
-										</artifactId>
-										<versionRange>
-											[2.7,)
-										</versionRange>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-dependency-plugin</artifactId>
+										<versionRange>[2.7,)</versionRange>
 										<goals>
 											<goal>unpack</goal>
 										</goals>

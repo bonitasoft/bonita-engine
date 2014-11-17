@@ -21,8 +21,8 @@ import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
+import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -32,9 +32,9 @@ import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public class GetDocumentByNameAtProcessInstantiation implements TransactionContentWithResult<SProcessDocument> {
+public class GetDocumentByNameAtProcessInstantiation implements TransactionContentWithResult<SMappedDocument> {
 
-    private final ProcessDocumentService processDocumentService;
+    private final DocumentService documentService;
 
     private final ProcessInstanceService processInstanceService;
 
@@ -42,14 +42,14 @@ public class GetDocumentByNameAtProcessInstantiation implements TransactionConte
 
     private final long processInstanceId;
 
-    private SProcessDocument result;
+    private SMappedDocument result;
 
     private final String documentName;
 
-    public GetDocumentByNameAtProcessInstantiation(final ProcessDocumentService processDocumentService, final ProcessInstanceService processInstanceService,
+    public GetDocumentByNameAtProcessInstantiation(final DocumentService documentService, final ProcessInstanceService processInstanceService,
             final SearchEntitiesDescriptor searchEntitiesDescriptor, final long processInstanceId,
             final String documentName) {
-        this.processDocumentService = processDocumentService;
+        this.documentService = documentService;
         this.processInstanceId = processInstanceId;
         this.documentName = documentName;
         this.processInstanceService = processInstanceService;
@@ -64,11 +64,11 @@ public class GetDocumentByNameAtProcessInstantiation implements TransactionConte
         final ArchivedProcessInstance saProcessInstance = getArchivedProcessInstanceList.getResult().get(0);
         final Date startDate = saProcessInstance.getStartDate();
         final long startTime = startDate != null ? startDate.getTime() : 0;
-        result = processDocumentService.getDocument(processInstanceId, documentName, startTime);
+        result = documentService.getMappedDocument(processInstanceId, documentName, startTime);
     }
 
     @Override
-    public SProcessDocument getResult() {
+    public SMappedDocument getResult() {
         return result;
     }
 

@@ -38,7 +38,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -92,7 +91,7 @@ public class IdentityServiceImplForCustomUserInfoTest {
     private static String DEFAULT_NAME = "skill";
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         when(userInfoDef.getId()).thenReturn(CUSTOM_USER_INFO_DEFINITION_ID);
         when(userInfoDef.getName()).thenReturn(DEFAULT_NAME);
     }
@@ -101,7 +100,7 @@ public class IdentityServiceImplForCustomUserInfoTest {
     public void createCustomUserInfoDefinition_should_call_recorder_insert() throws Exception {
         // given
         given(eventService.hasHandlers(IdentityService.CUSTOM_USER_INFO_DEFINITION, EventActionType.CREATED)).willReturn(true);
-        ArgumentCaptor<SInsertEvent> eventCaptor = ArgumentCaptor.forClass(SInsertEvent.class);
+        final ArgumentCaptor<SInsertEvent> eventCaptor = ArgumentCaptor.forClass(SInsertEvent.class);
 
         // when
         identityServiceImpl.createCustomUserInfoDefinition(userInfoDef);
@@ -115,14 +114,14 @@ public class IdentityServiceImplForCustomUserInfoTest {
     public void createCustomUserInfoDefinition_should_throw_SCustomUserInfoDefinitionCreationException_when_recorder_throws_SRecorderException()
             throws Exception {
         // given
-        SRecorderException recorderException = new SRecorderException("");
+        final SRecorderException recorderException = new SRecorderException("");
         doThrow(recorderException).when(recorder).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
 
         try {
             // when
             identityServiceImpl.createCustomUserInfoDefinition(userInfoDef);
             fail("Creation exception expected");
-        } catch (SCustomUserInfoDefinitionCreationException e) {
+        } catch (final SCustomUserInfoDefinitionCreationException e) {
             // then
             assertThat(e.getDefinitionName()).isEqualTo(DEFAULT_NAME);
             assertThat(e.getCause()).isEqualTo(recorderException);
@@ -134,20 +133,20 @@ public class IdentityServiceImplForCustomUserInfoTest {
     public void createCustomUserInfoDefinition_should_throw_SCustomUserInfoDefinitionAlreadyExistsException_when_persistence_service_returns_result_for_check()
             throws Exception {
         // given
-        SCustomUserInfoDefinition duplicateDef = mock(SCustomUserInfoDefinition.class);
+        final SCustomUserInfoDefinition duplicateDef = mock(SCustomUserInfoDefinition.class);
         given(duplicateDef.getName()).willReturn(DEFAULT_NAME);
         given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME))).willReturn(userInfoDef);
-        
+
         try {
             // when
             identityServiceImpl.createCustomUserInfoDefinition(duplicateDef);
             fail("Already exists exception found");
-        } catch (SCustomUserInfoDefinitionAlreadyExistsException e) {
+        } catch (final SCustomUserInfoDefinitionAlreadyExistsException e) {
             // then
             assertThat(e.getDefinitionName()).isEqualTo(DEFAULT_NAME);
             verify(recorder, never()).recordInsert(any(InsertRecord.class), any(SInsertEvent.class));
         }
-        
+
     }
 
     @Test
@@ -156,7 +155,7 @@ public class IdentityServiceImplForCustomUserInfoTest {
         given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME))).willReturn(userInfoDef);
 
         // when
-        SCustomUserInfoDefinition retrievedDef = identityServiceImpl.getCustomUserInfoDefinitionByName(DEFAULT_NAME);
+        final SCustomUserInfoDefinition retrievedDef = identityServiceImpl.getCustomUserInfoDefinitionByName(DEFAULT_NAME);
 
         // then
         assertThat(retrievedDef).isEqualTo(userInfoDef);
@@ -172,7 +171,7 @@ public class IdentityServiceImplForCustomUserInfoTest {
             // when
             identityServiceImpl.getCustomUserInfoDefinitionByName(DEFAULT_NAME);
             fail("Not found exception expected");
-        } catch (SCustomUserInfoDefinitionNotFoundException e) {
+        } catch (final SCustomUserInfoDefinitionNotFoundException e) {
             // then
             assertThat(e.getDefinitionName()).isEqualTo(DEFAULT_NAME);
         }
@@ -182,14 +181,14 @@ public class IdentityServiceImplForCustomUserInfoTest {
     public void getCustomUserInfoDefinitionByName_should_throw_SCustomUserInfoDefinitionReadException_when_persistence_service_throws_SBonitaReadException()
             throws Exception {
         // given
-        SBonitaReadException persistenceException = new SBonitaReadException("");
+        final SBonitaReadException persistenceException = new SBonitaReadException("");
         given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME))).willThrow(persistenceException);
-        
+
         try {
             // when
             identityServiceImpl.getCustomUserInfoDefinitionByName(DEFAULT_NAME);
             fail("Read exception expected");
-        } catch (SCustomUserInfoDefinitionReadException e) {
+        } catch (final SCustomUserInfoDefinitionReadException e) {
             // then
             assertThat(e.getDefinitionName()).isEqualTo(DEFAULT_NAME);
             assertThat(e.getCause()).isEqualTo(persistenceException);
@@ -200,53 +199,53 @@ public class IdentityServiceImplForCustomUserInfoTest {
     public void hasCustomUserInfoDefinition_should_return_true_if_persistence_service_finds_an_element() throws Exception {
         // given
         given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME))).willReturn(userInfoDef);
-        
+
         // when
-        boolean hasDef = identityServiceImpl.hasCustomUserInfoDefinition(DEFAULT_NAME);
-        
+        final boolean hasDef = identityServiceImpl.hasCustomUserInfoDefinition(DEFAULT_NAME);
+
         // then
         assertThat(hasDef).isTrue();
     }
-    
+
     @Test
     public void hasCustomUserInfoDefinition_should_throw_SCustomUserInfoDefinitionReadException_when_persistence_service_throws_SBonitaReadException()
             throws Exception {
         // given
-        SBonitaReadException persistenceException = new SBonitaReadException("");
+        final SBonitaReadException persistenceException = new SBonitaReadException("");
         given(persistenceService.selectOne(SelectDescriptorBuilder.getCustomUserInfoDefinitionByName(DEFAULT_NAME))).willThrow(persistenceException);
-        
+
         try {
             // when
             identityServiceImpl.hasCustomUserInfoDefinition(DEFAULT_NAME);
             fail("Read exception expected");
-        } catch (SCustomUserInfoDefinitionReadException e) {
+        } catch (final SCustomUserInfoDefinitionReadException e) {
             // then
             assertThat(e.getDefinitionName()).isEqualTo(DEFAULT_NAME);
             assertThat(e.getCause()).isEqualTo(persistenceException);
         }
     }
-    
+
     @Test
     public void searchCustomUserInfoValues_should_return_values_from_persistence_service() throws Exception {
         // given
-        QueryOptions queryOptions = new QueryOptions(0, 10);
-        List<SCustomUserInfoValue> persistenceResult = Arrays.asList(userInfoValue);
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
+        final List<SCustomUserInfoValue> persistenceResult = Arrays.asList(userInfoValue);
         given(persistenceService.searchEntity(SCustomUserInfoValue.class, queryOptions, null)).willReturn(persistenceResult);
 
         // when
-        List<SCustomUserInfoValue> userInfoValues = identityServiceImpl.searchCustomUserInfoValue(queryOptions);
+        final List<SCustomUserInfoValue> userInfoValues = identityServiceImpl.searchCustomUserInfoValue(queryOptions);
 
         // then
         assertThat(userInfoValues).isEqualTo(persistenceResult);
     }
 
     @Test(
-    // then
-    expected = SBonitaSearchException.class)
-    public void searchCustomUserInfoValues_should_throw_exception_SBonitaSearchException_when_persistence_service_throws_SBonitaReadException()
+            // then
+            expected = SBonitaReadException.class)
+    public void searchCustomUserInfoValues_should_throw_exception_SBonitaReadException_when_persistence_service_throws_SBonitaReadException()
             throws Exception {
         // given
-        QueryOptions queryOptions = new QueryOptions(0, 10);
+        final QueryOptions queryOptions = new QueryOptions(0, 10);
         given(persistenceService.searchEntity(SCustomUserInfoValue.class, queryOptions, null)).willThrow(new SBonitaReadException(""));
 
         // when
@@ -257,8 +256,8 @@ public class IdentityServiceImplForCustomUserInfoTest {
     public void createCustomUserInfoValue_should_call_recorder_insert() throws Exception {
         // given
         given(eventService.hasHandlers(IdentityService.CUSTOM_USER_INFO_VALUE, EventActionType.CREATED)).willReturn(true);
-        ArgumentCaptor<InsertRecord> recordCaptor = ArgumentCaptor.forClass(InsertRecord.class);
-        ArgumentCaptor<SInsertEvent> eventCaptor = ArgumentCaptor.forClass(SInsertEvent.class);
+        final ArgumentCaptor<InsertRecord> recordCaptor = ArgumentCaptor.forClass(InsertRecord.class);
+        final ArgumentCaptor<SInsertEvent> eventCaptor = ArgumentCaptor.forClass(SInsertEvent.class);
 
         // when
         identityServiceImpl.createCustomUserInfoValue(userInfoValue);
@@ -282,8 +281,8 @@ public class IdentityServiceImplForCustomUserInfoTest {
     public void deleteCustomUserInfoValue_should_call_recorder_delete() throws Exception {
         // given
         given(eventService.hasHandlers(IdentityService.CUSTOM_USER_INFO_VALUE, EventActionType.DELETED)).willReturn(true);
-        ArgumentCaptor<DeleteRecord> recordCaptor = ArgumentCaptor.forClass(DeleteRecord.class);
-        ArgumentCaptor<SDeleteEvent> eventCaptor = ArgumentCaptor.forClass(SDeleteEvent.class);
+        final ArgumentCaptor<DeleteRecord> recordCaptor = ArgumentCaptor.forClass(DeleteRecord.class);
+        final ArgumentCaptor<SDeleteEvent> eventCaptor = ArgumentCaptor.forClass(SDeleteEvent.class);
 
         // when
         identityServiceImpl.deleteCustomUserInfoValue(userInfoValue);
@@ -305,13 +304,14 @@ public class IdentityServiceImplForCustomUserInfoTest {
 
     @Test
     public void getCustomUserInfoValue_shoul_return_value_returned_by_persistence_service() throws Exception {
-        long id = 10;
+        final long id = 10;
         // given
-        SelectByIdDescriptor<SCustomUserInfoValue> selector = SelectDescriptorBuilder.getElementById(SCustomUserInfoValue.class, "SCustomUserInfoValue", id);
+        final SelectByIdDescriptor<SCustomUserInfoValue> selector = SelectDescriptorBuilder.getElementById(SCustomUserInfoValue.class, "SCustomUserInfoValue",
+                id);
         given(persistenceService.selectById(selector)).willReturn(userInfoValue);
 
         // when
-        SCustomUserInfoValue retriveidUserInfo = identityServiceImpl.getCustomUserInfoValue(id);
+        final SCustomUserInfoValue retriveidUserInfo = identityServiceImpl.getCustomUserInfoValue(id);
 
         // then
         assertThat(retriveidUserInfo).isEqualTo(userInfoValue);
@@ -319,9 +319,10 @@ public class IdentityServiceImplForCustomUserInfoTest {
 
     @Test(expected = SCustomUserInfoValueNotFoundException.class)
     public void getCustomUserInfoValue_shoul_throw_SCustomUserInfoValueNotFoundException_when_persistence_service_returns_null() throws Exception {
-        long id = 10;
+        final long id = 10;
         // given
-        SelectByIdDescriptor<SCustomUserInfoValue> selector = SelectDescriptorBuilder.getElementById(SCustomUserInfoValue.class, "SCustomUserInfoValue", id);
+        final SelectByIdDescriptor<SCustomUserInfoValue> selector = SelectDescriptorBuilder.getElementById(SCustomUserInfoValue.class, "SCustomUserInfoValue",
+                id);
         given(persistenceService.selectById(selector)).willReturn(null);
 
         // when
@@ -330,9 +331,10 @@ public class IdentityServiceImplForCustomUserInfoTest {
 
     @Test(expected = SCustomUserInfoValueReadException.class)
     public void getCustomUserInfoValue_shoul_throw_SCustomUserInfoValueReadException_when_persistence_service_throws_SBonitaReadException() throws Exception {
-        long id = 10;
+        final long id = 10;
         // given
-        SelectByIdDescriptor<SCustomUserInfoValue> selector = SelectDescriptorBuilder.getElementById(SCustomUserInfoValue.class, "SCustomUserInfoValue", id);
+        final SelectByIdDescriptor<SCustomUserInfoValue> selector = SelectDescriptorBuilder.getElementById(SCustomUserInfoValue.class, "SCustomUserInfoValue",
+                id);
         given(persistenceService.selectById(selector)).willThrow(new SBonitaReadException(""));
 
         // when
@@ -343,9 +345,9 @@ public class IdentityServiceImplForCustomUserInfoTest {
     public void updateCustomUserInfoValue_should_call_recorder_update() throws Exception {
         // given
         given(eventService.hasHandlers(IdentityService.CUSTOM_USER_INFO_VALUE, EventActionType.UPDATED)).willReturn(true);
-        EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        ArgumentCaptor<UpdateRecord> recordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
-        ArgumentCaptor<SUpdateEvent> eventCaptor = ArgumentCaptor.forClass(SUpdateEvent.class);
+        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
+        final ArgumentCaptor<UpdateRecord> recordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
+        final ArgumentCaptor<SUpdateEvent> eventCaptor = ArgumentCaptor.forClass(SUpdateEvent.class);
 
         // when
         identityServiceImpl.updateCustomUserInfoValue(userInfoValue, descriptor);
@@ -355,7 +357,7 @@ public class IdentityServiceImplForCustomUserInfoTest {
         assertThat(recordCaptor.getValue().getEntity()).isEqualTo(userInfoValue);
         assertThat(eventCaptor.getValue().getObject()).isEqualTo(userInfoValue);
     }
-    
+
     @Test
     public void getUserIdsWithCustomUserInfo_should_use_query_getUserIdsWithCustomUserInfo_when_no_partial_match() throws Exception {
         //given
@@ -365,36 +367,38 @@ public class IdentityServiceImplForCustomUserInfoTest {
         final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>("getUserIdsWithCustomUserInfo", parameters, SUser.class, Long.class,
                 new QueryOptions(0, 10));
         given(persistenceService.selectList(descriptor)).willReturn(Arrays.asList(10L, 20L));
-        
+
         //when
-        List<Long> userIds= identityServiceImpl.getUserIdsWithCustomUserInfo(DEFAULT_NAME, "Java", false, 0, 10);
+        final List<Long> userIds = identityServiceImpl.getUserIdsWithCustomUserInfo(DEFAULT_NAME, "Java", false, 0, 10);
 
         //then
         assertThat(userIds).containsExactly(10L, 20L);
     }
-    
+
     @Test
     public void getUserIdsWithCustomUserInfo_should_use_query_getUserIdsWithCustomUserInfoContains_when_partial_match() throws Exception {
         //given
         final Map<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("userInfoName", DEFAULT_NAME);
         parameters.put("userInfoValue", "Java");
-        final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>("getUserIdsWithCustomUserInfoContains", parameters, SUser.class, Long.class,
+        final SelectListDescriptor<Long> descriptor = new SelectListDescriptor<Long>("getUserIdsWithCustomUserInfoContains", parameters, SUser.class,
+                Long.class,
                 new QueryOptions(0, 10));
         given(persistenceService.selectList(descriptor)).willReturn(Arrays.asList(10L, 20L));
-        
+
         //when
-        List<Long> userIds= identityServiceImpl.getUserIdsWithCustomUserInfo(DEFAULT_NAME, "Java", true, 0, 10);
-        
+        final List<Long> userIds = identityServiceImpl.getUserIdsWithCustomUserInfo(DEFAULT_NAME, "Java", true, 0, 10);
+
         //then
         assertThat(userIds).containsExactly(10L, 20L);
     }
-    
-    @Test(expected = SIdentityException.class) //then
+
+    @Test(expected = SIdentityException.class)
+    //then
     public void getUserIdsWithCustomUserInfo_should_throw_SIdentityException_when_persistence_service_throws_exception() throws Exception {
         //given
-        given(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>>any())).willThrow(new SBonitaReadException(""));
-        
+        given(persistenceService.selectList(Matchers.<SelectListDescriptor<Long>> any())).willThrow(new SBonitaReadException(""));
+
         //when
         identityServiceImpl.getUserIdsWithCustomUserInfo(DEFAULT_NAME, "Java", false, 0, 10);
     }

@@ -14,7 +14,11 @@
 package org.bonitasoft.engine.identity;
 
 /**
+ * lists the available {@link User} sort orders
+ *
  * @author Matthieu Chaffotte
+ * @see User
+ * @since 6.0.0
  */
 public enum UserCriterion {
     /**

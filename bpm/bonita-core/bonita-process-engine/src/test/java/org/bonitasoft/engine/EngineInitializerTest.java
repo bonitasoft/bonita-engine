@@ -1,5 +1,6 @@
 package org.bonitasoft.engine;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -43,17 +44,17 @@ public class EngineInitializerTest {
 
         serviceAccessorFactory = mock(ServiceAccessorFactory.class);
         when(ServiceAccessorFactory.getInstance()).thenReturn(serviceAccessorFactory);
-        PlatformServiceAccessor platformServiceAccessor = mock(PlatformServiceAccessor.class);
+        final PlatformServiceAccessor platformServiceAccessor = mock(PlatformServiceAccessor.class);
         when(serviceAccessorFactory.createPlatformServiceAccessor()).thenReturn(platformServiceAccessor);
 
         // services
-        SessionAccessor sessionAccessor = mock(SessionAccessor.class);
+        final SessionAccessor sessionAccessor = mock(SessionAccessor.class);
         when(serviceAccessorFactory.createSessionAccessor()).thenReturn(sessionAccessor);
-        PlatformSessionService platformSessionService = mock(PlatformSessionService.class);
+        final PlatformSessionService platformSessionService = mock(PlatformSessionService.class);
         when(platformServiceAccessor.getPlatformSessionService()).thenReturn(platformSessionService);
 
         // sessions
-        SPlatformSession platformSession = mock(SPlatformSession.class);
+        final SPlatformSession platformSession = mock(SPlatformSession.class);
         when(platformSessionService.createSession(anyString())).thenReturn(platformSession);
 
         platformManager = mock(PlatformTenantManager.class);
@@ -110,6 +111,20 @@ public class EngineInitializerTest {
         when(platformProperties.shouldStopPlatform()).thenReturn(false);
         engineInitializer.unloadEngine();
         verify(platformManager, times(0)).stopPlatform(any(PlatformAPI.class));
+    }
+
+    @Test
+    public void getPlatformAPI_should_reuse_the_previous_instance_in_the_second_call() {
+        //given
+        final EngineInitializer initializer = new EngineInitializer(platformManager, platformProperties);
+        final PlatformAPI firstCall = initializer.getPlatformAPI();
+        assertThat(firstCall).isNotNull();
+
+        //when
+        final PlatformAPI secondCall = initializer.getPlatformAPI();
+
+        //then
+        assertThat(secondCall).isSameAs(firstCall);
     }
 
 }

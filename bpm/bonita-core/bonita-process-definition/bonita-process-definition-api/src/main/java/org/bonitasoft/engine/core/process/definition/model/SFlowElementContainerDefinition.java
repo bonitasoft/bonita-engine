@@ -67,8 +67,10 @@ public interface SFlowElementContainerDefinition extends SBaseElement {
     List<SDocumentDefinition> getDocumentDefinitions();
 
     /**
-     * @param connectorDefinitionId
+     * @param name
+     *        the name of the connector definition
      * @return
+     *         the connector definition having that name
      * @since 6.1
      */
     SConnectorDefinition getConnectorDefinition(String name);
@@ -81,4 +83,15 @@ public interface SFlowElementContainerDefinition extends SBaseElement {
 
     boolean containsInclusiveGateway();
 
+    /**
+     * @return
+     * @since 6.4.0
+     */
+    Set<SSubProcessDefinition> getSubProcessDefinitions();
+
+    /**
+     * @return the document list definitions
+     * @since 6.4.0
+     */
+    List<SDocumentListDefinition> getDocumentListDefinitions();
 }

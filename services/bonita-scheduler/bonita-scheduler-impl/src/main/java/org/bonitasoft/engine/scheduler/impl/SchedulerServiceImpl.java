@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -39,6 +40,8 @@ import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
 import org.bonitasoft.engine.queriablelogger.model.builder.ActionType;
 import org.bonitasoft.engine.queriablelogger.model.builder.HasCRUDEAction;
 import org.bonitasoft.engine.queriablelogger.model.builder.SLogBuilder;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
+import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.InjectedService;
 import org.bonitasoft.engine.scheduler.JobIdentifier;
 import org.bonitasoft.engine.scheduler.JobParameter;
@@ -112,8 +115,8 @@ public class SchedulerServiceImpl implements SchedulerService {
         this.eventService = eventService;
         this.transactionService = transactionService;
         this.sessionAccessor = sessionAccessor;
-        schedulerExecutor.setBOSSchedulerService(this);
         this.batchSize = batchSize;
+        schedulerExecutor.setBOSSchedulerService(this);
     }
 
     private void logBeforeMethod(final TechnicalLogSeverity technicalLogSeverity, final String methodName) {
@@ -230,7 +233,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
         return tenantId;
     }
-    
+
     private String getTenantIdAsString() throws SSchedulerException {
         return String.valueOf(getTenantId());
     }
@@ -260,7 +263,7 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Override
     public void start() throws SSchedulerException, SFireEventException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "start");
-        logger.log(getClass(),TechnicalLogSeverity.INFO,"Start scheduler");
+        logger.log(getClass(), TechnicalLogSeverity.INFO, "Start scheduler");
         schedulerExecutor.start();
         eventService.fireEvent(schedulStarted);
         logAfterMethod(TechnicalLogSeverity.TRACE, "start");
@@ -319,7 +322,7 @@ public class SchedulerServiceImpl implements SchedulerService {
 
     /**
      * get the persisted job from the database It opens a transaction!
-     * 
+     *
      * @param jobIdentifier
      * @return the job
      * @throws SSchedulerException
@@ -365,7 +368,7 @@ public class SchedulerServiceImpl implements SchedulerService {
             for (final SJobParameter sJobParameterImpl : parameters) {
                 parameterMap.put(sJobParameterImpl.getKey(), sJobParameterImpl.getValue());
             }
-            parameterMap.put(StatelessJob.JOB_DESCRIPTOR_ID,jobIdentifier.getId());
+            parameterMap.put(StatelessJob.JOB_DESCRIPTOR_ID, jobIdentifier.getId());
             parameterMap.put(JobParameter.BATCH_SIZE.name(), batchSize);
             statelessJob.setAttributes(parameterMap);
             if (servicesResolver != null) {
@@ -408,4 +411,28 @@ public class SchedulerServiceImpl implements SchedulerService {
         schedulerExecutor.rescheduleErroneousTriggers();
     }
 
+    @Override
+    public Date rescheduleJob(final String triggerName, final String groupName, final Date triggerStartTime) throws SSchedulerException {
+        return schedulerExecutor.rescheduleJob(triggerName, groupName, triggerStartTime);
+    }
+
+    @Override
+    public void addJobListener(final List<AbstractBonitaTenantJobListener> jobListeners, final String groupName) throws SSchedulerException {
+        schedulerExecutor.addJobListener(jobListeners, groupName);
+    }
+
+    @Override
+    public void addJobListener(final List<AbstractBonitaPlatformJobListener> jobListeners) throws SSchedulerException {
+        schedulerExecutor.addJobListener(jobListeners);
+    }
+
+    @Override
+    public void initializeScheduler() throws SSchedulerException {
+        schedulerExecutor.initializeScheduler();
+    }
+
+    @Override
+    public boolean isExistingJob(final String jobName) throws SSchedulerException {
+        return schedulerExecutor.isExistingJob(jobName, String.valueOf(getTenantId()));
+    }
 }

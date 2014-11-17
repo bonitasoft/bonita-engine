@@ -16,16 +16,29 @@
  */
 package org.bonitasoft.engine.core.process.instance.model;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.bonitasoft.engine.test.persistence.builder.ActorBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.ActorMemberBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.CallActivityInstanceBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.GatewayInstanceBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMappingBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.*;
-import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.test.persistence.builder.ActorBuilder.anActor;
+import static org.bonitasoft.engine.test.persistence.builder.ActorMemberBuilder.anActorMember;
+import static org.bonitasoft.engine.test.persistence.builder.CallActivityInstanceBuilder.aCallActivityInstanceBuilder;
+import static org.bonitasoft.engine.test.persistence.builder.GatewayInstanceBuilder.aGatewayInstanceBuilder;
+import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMappingBuilder.aPendingActivityMapping;
+import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.aProcessInstance;
+import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
+import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.bonitasoft.engine.test.persistence.builder.ActorBuilder.anActor;
+import static org.bonitasoft.engine.test.persistence.builder.ActorMemberBuilder.anActorMember;
+import static org.bonitasoft.engine.test.persistence.builder.CallActivityInstanceBuilder.aCallActivityInstanceBuilder;
+import static org.bonitasoft.engine.test.persistence.builder.GatewayInstanceBuilder.aGatewayInstanceBuilder;
+import static org.bonitasoft.engine.test.persistence.builder.PendingActivityMappingBuilder.aPendingActivityMapping;
+import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuilder.aProcessInstance;
+import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
+import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -33,8 +46,11 @@ import javax.inject.Inject;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SCallActivityInstanceImpl;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.test.persistence.builder.PersistentObjectBuilder;
 import org.bonitasoft.engine.test.persistence.repository.ProcessInstanceRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -459,4 +475,51 @@ public class ProcessInstanceQueriesTest {
         List<Long> piIds = repository.getChildrenInstanceIdsOfProcessInstance(parentPI.getId());
         assertThat(piIds).isNotEmpty().containsExactly(childPI.getId());
     }
+
+    @Test
+    public void getNumberOfProcessInstances_should_return_the_number_of_running_instances_of_a_process_definition() {
+        repository.add(aProcessInstance().withProcessDefinitionId(45l).build());
+        repository.add(aProcessInstance().withProcessDefinitionId(45l).build());
+        repository.add(aProcessInstance().withProcessDefinitionId(45l).build());
+        repository.add(aProcessInstance().withProcessDefinitionId(12l).build());
+
+        assertThat(repository.getNumberOfProcessInstances(45l)).isEqualTo(3);
+    }
+
+
+    @Test
+    public void getArchivedProcessInstancesInAllStates_should_return_archived_process_instances_when_exist() {
+        // Given
+        final SAProcessInstance saProcessInstance1 = repository.add(buildSAProcessInstance(1L));
+        final SAProcessInstance saProcessInstance2 = repository.add(buildSAProcessInstance(2L));
+
+        // When
+        final List<SAProcessInstance> archivedProcessInstances = repository.getArchivedProcessInstancesInAllStates(Arrays.asList(1L, 2L));
+
+        // Then
+        assertFalse("The list of archived process instance must not be empty !!", archivedProcessInstances.isEmpty());
+        assertEquals("The first element of the list must to have as id 1", saProcessInstance1, archivedProcessInstances.get(0));
+        assertEquals("The second element of the list must to have as id 2", saProcessInstance2, archivedProcessInstances.get(1));
+    }
+
+    @Test
+    public void getArchivedProcessInstancesInAllStates_should_return_empty_list_when_no_archived_process_instances_with_ids() {
+        // Given
+
+        // When
+        final List<SAProcessInstance> archivedProcessInstances = repository.getArchivedProcessInstancesInAllStates(Arrays.asList(1L, 2L));
+
+        // Then
+        assertTrue("The list of archived process instance must be empty !!", archivedProcessInstances.isEmpty());
+    }
+
+    private SAProcessInstanceImpl buildSAProcessInstance(final long id) {
+        final SAProcessInstanceImpl saProcessInstanceImpl = new SAProcessInstanceImpl();
+        saProcessInstanceImpl.setId(id);
+        saProcessInstanceImpl.setSourceObjectId(id);
+        saProcessInstanceImpl.setTenantId(PersistentObjectBuilder.DEFAULT_TENANT_ID);
+        saProcessInstanceImpl.setName("process" + id);
+        return saProcessInstanceImpl;
+    }
+
 }

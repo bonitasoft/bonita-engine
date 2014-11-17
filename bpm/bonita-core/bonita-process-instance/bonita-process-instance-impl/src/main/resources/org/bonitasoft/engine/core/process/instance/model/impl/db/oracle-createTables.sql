@@ -112,15 +112,16 @@ CREATE INDEX idx_ci_container_activation ON connector_instance (tenantid, contai
 CREATE TABLE event_trigger_instance (
 	tenantid NUMBER(19, 0) NOT NULL,
   	id NUMBER(19, 0) NOT NULL,
-  	eventInstanceId NUMBER(19, 0) NOT NULL,
   	kind VARCHAR2(15) NOT NULL,
-  	timerType VARCHAR2(10),
-  	timerValue NUMBER(19, 0),
+  	eventInstanceId NUMBER(19, 0) NOT NULL,
+  	eventInstanceName VARCHAR2(50),
   	messageName VARCHAR2(255),
   	targetProcess VARCHAR2(255),
   	targetFlowNode VARCHAR2(255),
   	signalName VARCHAR2(255),
   	errorCode VARCHAR2(255),
+  	executionDate NUMBER(19, 0), 
+  	jobTriggerName VARCHAR2(255),
   	PRIMARY KEY (tenantid, id)
 );
 

@@ -32,6 +32,7 @@ import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SConstraintDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SContractDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SDocumentDefinition;
+import org.bonitasoft.engine.core.process.definition.model.SDocumentListDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SGatewayDefinition;
@@ -100,6 +101,10 @@ public class XMLSProcessDefinition {
     public static final String DOCUMENT_DEFINITIONS_NODE = "documentDefinitions";
 
     public static final String DOCUMENT_DEFINITION_NODE = "documentDefinition";
+
+    public static final String DOCUMENT_LIST_DEFINITIONS_NODE = "documentListDefinitions";
+
+    public static final String DOCUMENT_LIST_DEFINITION_NODE = "documentListDefinition";
 
     public static final String DOCUMENT_DEFINITION_URL = "url";
 
@@ -487,6 +492,13 @@ public class XMLSProcessDefinition {
             final XMLNode documentDefinitionNode = new XMLNode(DOCUMENT_DEFINITION_NODE);
             fillDocumentDefinitionNode(documentDefinitionNode, document);
             documentDefinitionsNode.addChild(documentDefinitionNode);
+        }
+        final XMLNode documentListDefinitionsNode = new XMLNode(DOCUMENT_LIST_DEFINITIONS_NODE);
+        flowElements.addChild(documentListDefinitionsNode);
+        for (final SDocumentListDefinition documentList : container.getDocumentListDefinitions()) {
+            final XMLNode documentListDefinitionNode = new XMLNode(DOCUMENT_LIST_DEFINITION_NODE);
+            fillDocumentListDefinitionNode(documentListDefinitionNode, documentList);
+            documentListDefinitionsNode.addChild(documentListDefinitionNode);
         }
 
         createAndFillFlowNodes(container, flowElements);
@@ -1025,6 +1037,18 @@ public class XMLSProcessDefinition {
         }
         if (documentDefinition.getFile() != null) {
             documentDefinitionNode.addChild(DOCUMENT_DEFINITION_FILE, documentDefinition.getFile());
+        }
+    }
+
+    private void fillDocumentListDefinitionNode(final XMLNode documentListDefinitionNode, final SDocumentListDefinition documentListDefinition) {
+        documentListDefinitionNode.addAttribute(NAME, documentListDefinition.getName());
+        if (documentListDefinition.getDescription() != null) {
+            documentListDefinitionNode.addChild(DESCRIPTION, documentListDefinition.getDescription());
+        }
+        if (documentListDefinition.getExpression() != null) {
+            final XMLNode value = new XMLNode(EXPRESSION_NODE);
+            fillExpressionNode(value, documentListDefinition.getExpression());
+            documentListDefinitionNode.addChild(value);
         }
     }
 

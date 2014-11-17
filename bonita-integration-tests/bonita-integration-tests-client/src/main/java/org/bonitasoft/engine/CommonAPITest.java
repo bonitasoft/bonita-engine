@@ -78,7 +78,7 @@ public abstract class CommonAPITest extends APITestUtil {
 
     /**
      * FIXME: clean actors!
-     * 
+     *
      * @return
      * @throws BonitaException
      */
@@ -99,6 +99,7 @@ public abstract class CommonAPITest extends APITestUtil {
         messages.addAll(checkNoCategories());
         messages.addAll(checkNoComments());
         messages.addAll(checkNoArchivedComments());
+        messages.addAll(checkNoWaitingEvent());
 
         logoutOnTenant();
         return messages;
@@ -146,6 +147,21 @@ public abstract class CommonAPITest extends APITestUtil {
         data = IOUtil.generateJar(GroupUserFilter.class);
         resources.add(new BarResource("TestGroupUserFilter.jar", data));
         return resources;
+    }
+
+
+    protected String getContentOfResource(String name) {
+        final InputStream stream = this.getClass().getResourceAsStream(name);
+        assertNotNull(stream);
+        try {
+            try {
+                return IOUtils.toString(stream);
+            } finally {
+                stream.close();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

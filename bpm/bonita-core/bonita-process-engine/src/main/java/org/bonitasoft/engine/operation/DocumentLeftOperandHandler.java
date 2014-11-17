@@ -14,23 +14,15 @@
 package org.bonitasoft.engine.operation;
 
 import org.bonitasoft.engine.bpm.document.DocumentValue;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
-import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilder;
-import org.bonitasoft.engine.core.process.document.model.builder.SProcessDocumentBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.document.SDocumentNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
  * Updates of creates a document of the process.
@@ -42,101 +34,41 @@ import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  */
-public class DocumentLeftOperandHandler implements LeftOperandHandler {
+public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandler {
 
-    ProcessDocumentService processDocumentService;
+    private final DocumentHelper documentHelper;
+    final DocumentService documentService;
 
-    private final ActivityInstanceService activityInstanceService;
-
-    private final SessionAccessor sessionAccessor;
-
-    private final SessionService sessionService;
-
-    public DocumentLeftOperandHandler(final ProcessDocumentService processDocumentService, final ActivityInstanceService activityInstanceService,
+    public DocumentLeftOperandHandler(final DocumentService documentService, final ActivityInstanceService activityInstanceService,
             final SessionAccessor sessionAccessor, final SessionService sessionService) {
-        this.processDocumentService = processDocumentService;
-        this.activityInstanceService = activityInstanceService;
-        this.sessionAccessor = sessionAccessor;
-        this.sessionService = sessionService;
+        super(activityInstanceService, sessionAccessor, sessionService);
+        this.documentService = documentService;
+        documentHelper = new DocumentHelper(documentService, null, null);
     }
 
     @Override
     public Object update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
-        final boolean isDocumentWithContent = newValue instanceof DocumentValue;
-        if (!isDocumentWithContent && newValue != null) {
-            throw new SOperationExecutionException("Document operation only accepts an expression returning a DocumentValue and not "
-                    + newValue.getClass().getName());
-        }
-
+        final DocumentValue documentValue = toCheckedDocumentValue(newValue);
         final String documentName = sLeftOperand.getName();
         long processInstanceId;
         try {
-            if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(containerType)) {
-                processInstanceId = containerId;
-            } else {
-                final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(containerId);
-                processInstanceId = flowNodeInstance.getParentProcessInstanceId();
-            }
+            processInstanceId = getProcessInstanceId(containerId, containerType);
             if (newValue == null) {
                 // we just delete the current version
-                try {
-                    processDocumentService.removeCurrentVersion(processInstanceId, documentName);
-                } catch (final SDocumentNotFoundException e) {
-                    // nothing to do
-                }
+                documentHelper.deleteDocument(documentName, processInstanceId);
             } else {
-                long authorId;
-                try {
-                    final long sessionId = sessionAccessor.getSessionId();
-                    authorId = sessionService.getSession(sessionId).getUserId();
-                } catch (final SessionIdNotSetException e) {
-                    authorId = -1;
+                if (documentValue.getDocumentId() != null && !documentValue.hasChanged()) {
+                    //do not update if the document value say it did not changed
+                    return newValue;
                 }
-
-                final DocumentValue documentValue = (DocumentValue) newValue;
-                final boolean hasContent = documentValue.hasContent();
-                try {
-                    // Let's check if the document already exists:
-                    processDocumentService.getDocument(processInstanceId, documentName);
-
-                    // a document exist, update it with the new values
-                    final SProcessDocument document = createDocument(documentName, processInstanceId, authorId, documentValue, hasContent,
-                            documentValue.getUrl());
-                    if (hasContent) {
-                        processDocumentService.updateDocumentOfProcessInstance(document, documentValue.getContent());
-                    } else {
-                        processDocumentService.updateDocumentOfProcessInstance(document);
-                    }
-                } catch (final SDocumentNotFoundException e) {
-                    final SProcessDocument document = createDocument(documentName, processInstanceId, authorId, documentValue, hasContent,
-                            documentValue.getUrl());
-                    if (hasContent) {
-                        processDocumentService.attachDocumentToProcessInstance(document, documentValue.getContent());
-                    } else {
-                        processDocumentService.attachDocumentToProcessInstance(document);
-                    }
-                }
+                documentHelper.createOrUpdateDocument(documentValue, documentName, processInstanceId, getAuthorId());
             }
             return newValue;
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
         }
 
-    }
-
-    private SProcessDocument createDocument(final String documentName, final long processInstanceId, final long authorId, final DocumentValue documentValue,
-            final boolean hasContent, final String documentUrl) {
-        final SProcessDocumentBuilder processDocumentBuilder = BuilderFactory.get(SProcessDocumentBuilderFactory.class).createNewInstance();
-        processDocumentBuilder.setName(documentName);
-        processDocumentBuilder.setFileName(documentValue.getFileName());
-        processDocumentBuilder.setContentMimeType(documentValue.getMimeType());
-        processDocumentBuilder.setProcessInstanceId(processInstanceId);
-        processDocumentBuilder.setAuthor(authorId);
-        processDocumentBuilder.setCreationDate(System.currentTimeMillis());
-        processDocumentBuilder.setHasContent(hasContent);
-        processDocumentBuilder.setURL(documentUrl);
-        return processDocumentBuilder.done();
     }
 
     @Override

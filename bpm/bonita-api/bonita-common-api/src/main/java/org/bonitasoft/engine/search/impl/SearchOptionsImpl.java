@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -125,19 +125,19 @@ public class SearchOptionsImpl implements SearchOptions {
             // Cannot happen as we force a correct value
         }
     }
-    
+
     public final void addLeftParenthesis() {
         try {
             filters.add(new SearchFilter(SearchFilterOperation.L_PARENTHESIS));
-        } catch (IncorrectParameterException e) {
-         // Cannot happen as we force a correct value
+        } catch (final IncorrectParameterException e) {
+            // Cannot happen as we force a correct value
         }
     }
 
     public final void addRightParenthesis() {
         try {
             filters.add(new SearchFilter(SearchFilterOperation.R_PARENTHESIS));
-        } catch (IncorrectParameterException e) {
+        } catch (final IncorrectParameterException e) {
             // Cannot happen as we force a correct value
         }
     }
@@ -148,6 +148,60 @@ public class SearchOptionsImpl implements SearchOptions {
 
     public void setSorts(final List<Sort> sorts) {
         this.sorts = sorts;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (filters == null ? 0 : filters.hashCode());
+        result = prime * result + numberOfResults;
+        result = prime * result + (searchTerm == null ? 0 : searchTerm.hashCode());
+        result = prime * result + (sorts == null ? 0 : sorts.hashCode());
+        result = prime * result + startIndex;
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SearchOptionsImpl other = (SearchOptionsImpl) obj;
+        if (filters == null) {
+            if (other.filters != null) {
+                return false;
+            }
+        } else if (!filters.equals(other.filters)) {
+            return false;
+        }
+        if (numberOfResults != other.numberOfResults) {
+            return false;
+        }
+        if (searchTerm == null) {
+            if (other.searchTerm != null) {
+                return false;
+            }
+        } else if (!searchTerm.equals(other.searchTerm)) {
+            return false;
+        }
+        if (sorts == null) {
+            if (other.sorts != null) {
+                return false;
+            }
+        } else if (!sorts.equals(other.sorts)) {
+            return false;
+        }
+        if (startIndex != other.startIndex) {
+            return false;
+        }
+        return true;
     }
 
 }

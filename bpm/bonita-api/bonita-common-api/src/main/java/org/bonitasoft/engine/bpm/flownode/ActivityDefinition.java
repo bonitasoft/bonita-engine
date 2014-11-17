@@ -17,13 +17,12 @@ import java.util.List;
 
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
-import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
  * An Activity is work that is performed within a Business Process. An Activity can be atomic or non-atomic
- * (compound). The types of Activities that are a part of a Process are: {@link TaskDefinition}, {@link SubProcessDefinition}, and
- * {@link CallActivityDefinition}, which allows the inclusion of re-usable Tasks and Processes.
+ * (compound). The types of Activities that are a part of a Process are: {@link TaskDefinition}, {@link org.bonitasoft.engine.bpm.process.SubProcessDefinition},
+ * and {@link CallActivityDefinition}, which allows the inclusion of re-usable Tasks and Processes.
  *
  * @author Baptiste Mesta
  * @author Feng Hui

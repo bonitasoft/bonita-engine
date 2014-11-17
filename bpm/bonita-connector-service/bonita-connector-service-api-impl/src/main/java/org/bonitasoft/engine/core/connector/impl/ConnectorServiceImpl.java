@@ -91,7 +91,7 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     private static final String CONNECTOR_FOLDER = "connector";
 
-    private static final String CONNECTOR_CACHE_NAME = "CONNECTOR";
+    protected static final String CONNECTOR_CACHE_NAME = "CONNECTOR";
 
     private static final String CLASSPATH_FOLDER = "classpath";
 
@@ -267,7 +267,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         cacheService.store(CONNECTOR_CACHE_NAME, key, connectorImplementation);
     }
 
-    private String buildConnectorImplementationKey(final long rootDefinitionId, final String connectorId, final String version) {
+    protected String buildConnectorImplementationKey(final long rootDefinitionId, final String connectorId, final String version) {
         return new StringBuilder()
         .append(rootDefinitionId)
         .append(":")
@@ -373,10 +373,10 @@ public class ConnectorServiceImpl implements ConnectorService {
         return loadConnectors(sDefinition.getId(), tenantId);
     }
 
-    private boolean loadConnectors(final long processDefinitionId, final long tenantId) throws SConnectorException {
+    protected boolean loadConnectors(final long processDefinitionId, final long tenantId) throws SConnectorException {
         boolean resolved = true;
         try {
-            final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
+            final String processesFolder = getProcessFolder(tenantId);
             final File connectorsFolder = new File(new File(processesFolder, String.valueOf(processDefinitionId)), CONNECTOR_FOLDER);
             final File[] listFiles = connectorsFolder.listFiles();
             if (listFiles != null && listFiles.length > 0) {
@@ -409,6 +409,11 @@ public class ConnectorServiceImpl implements ConnectorService {
             throw new BonitaRuntimeException("Bonita home is not set !!");
         }
         return resolved;
+    }
+
+    private String getProcessFolder(final long tenantId) throws BonitaHomeNotSetException {
+        final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
+        return processesFolder;
     }
 
     @Override
@@ -498,7 +503,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             final String connectorId, final String connectorVersion) throws SConnectorException {
         ZipInputStream zipInputstream = null;
         try {
-            final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
+            final String processesFolder = getProcessFolder(tenantId);
             final File connectorsFolder = new File(new File(processesFolder, String.valueOf(sDefinition.getId())), CONNECTOR_FOLDER);
             if (!connectorsFolder.exists()) {
                 throw new SConnectorException("Connector folder '" + connectorsFolder.getName() + "' not found!");
@@ -678,32 +683,40 @@ public class ConnectorServiceImpl implements ConnectorService {
         // get all connector implementations for processDefinitionId
         List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = null;
         try {
-            int size = cacheService.getCacheSize(CONNECTOR_CACHE_NAME);
+            final int size = cacheService.getCacheSize(CONNECTOR_CACHE_NAME);
             // reload connectors if connector cache size is 0;
             if (size == 0) {
                 this.loadConnectors(processDefinitionId, tenantId);
-                size = cacheService.getCacheSize(CONNECTOR_CACHE_NAME);
-                if (size == 0) {
-                    return Collections.emptyList();
-                }
             }
-            final List<?> cacheKeys = cacheService.getKeys(CONNECTOR_CACHE_NAME);
-            if (cacheKeys.size() > 0) {
-                sConnectorImplementationDescriptors = new ArrayList<SConnectorImplementationDescriptor>();
-                for (final Object cacheKey : cacheKeys) {
-                    if (String.valueOf(cacheKey).startsWith(String.valueOf(processDefinitionId))) { // Is it needed?
-                        SConnectorImplementationDescriptor connectorImplementationDescriptor = (SConnectorImplementationDescriptor) cacheService.get(
-                                CONNECTOR_CACHE_NAME, cacheKey);
-                        if (!isGoodImplementation(connectorImplementationDescriptor)) {
-                            this.loadConnectors(processDefinitionId, tenantId);
-                            connectorImplementationDescriptor = (SConnectorImplementationDescriptor) cacheService.get(CONNECTOR_CACHE_NAME, cacheKey);
-                        }
-                        sConnectorImplementationDescriptors.add(connectorImplementationDescriptor);
-                    }
-                }
+            sConnectorImplementationDescriptors = getConnectorImplementationsFromCacheService(processDefinitionId, tenantId);
+            if (sConnectorImplementationDescriptors.isEmpty()) {
+                // reload connectors if cache is not filed, e.g. server restart
+                this.loadConnectors(processDefinitionId, tenantId);
+                sConnectorImplementationDescriptors = getConnectorImplementationsFromCacheService(processDefinitionId, tenantId);
             }
         } catch (final SCacheException e) {
             // If cache name not found, ignore it.
+        }
+        return sConnectorImplementationDescriptors;
+    }
+
+    private List<SConnectorImplementationDescriptor> getConnectorImplementationsFromCacheService(final long processDefinitionId, final long tenantId)
+            throws SCacheException, SConnectorException {
+        List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors;
+        sConnectorImplementationDescriptors = new ArrayList<SConnectorImplementationDescriptor>();
+        final List<?> cacheKeys = cacheService.getKeys(CONNECTOR_CACHE_NAME);
+        if (cacheKeys.size() > 0) {
+            for (final Object cacheKey : cacheKeys) {
+                if (String.valueOf(cacheKey).startsWith(String.valueOf(processDefinitionId))) { // Is it needed?
+                    SConnectorImplementationDescriptor connectorImplementationDescriptor = (SConnectorImplementationDescriptor) cacheService.get(
+                            CONNECTOR_CACHE_NAME, cacheKey);
+                    if (!isGoodImplementation(connectorImplementationDescriptor)) {
+                        this.loadConnectors(processDefinitionId, tenantId);
+                        connectorImplementationDescriptor = (SConnectorImplementationDescriptor) cacheService.get(CONNECTOR_CACHE_NAME, cacheKey);
+                    }
+                    sConnectorImplementationDescriptors.add(connectorImplementationDescriptor);
+                }
+            }
         }
         return sConnectorImplementationDescriptors;
     }

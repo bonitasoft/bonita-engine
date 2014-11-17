@@ -29,9 +29,9 @@ public class OrganizationAPIImplTest {
 
     private static final int PAGE_SIZE = 1;
 
-    private static long CUSTOM_USER_INFO_DEF_ID1 = 11;
+    private static final long CUSTOM_USER_INFO_DEF_ID1 = 11;
 
-    private static long CUSTOM_USER_INFO_DEF_ID2 = 12;
+    private static final long CUSTOM_USER_INFO_DEF_ID2 = 12;
 
     @Mock
     private TenantServiceAccessor serviceAccessor;

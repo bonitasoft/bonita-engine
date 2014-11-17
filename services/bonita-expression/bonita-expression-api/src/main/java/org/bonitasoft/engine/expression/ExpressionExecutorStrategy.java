@@ -63,6 +63,8 @@ public interface ExpressionExecutorStrategy {
 
     String TYPE_DOCUMENT = "TYPE_DOCUMENT";
 
+    String TYPE_DOCUMENT_LIST = "TYPE_DOCUMENT_LIST";
+
     String TYPE_ENGINE_CONSTANT = "TYPE_ENGINE_CONSTANT";
 
     String TYPE_LIST = "TYPE_LIST";
@@ -94,6 +96,8 @@ public interface ExpressionExecutorStrategy {
     ExpressionKind KIND_PARAMETER = new ExpressionKind(TYPE_PARAMETER);
 
     ExpressionKind KIND_DOCUMENT = new ExpressionKind(TYPE_DOCUMENT);
+
+    ExpressionKind KIND_DOCUMENT_LIST = new ExpressionKind(TYPE_DOCUMENT_LIST);
 
     ExpressionKind KIND_ENGINE_CONSTANT = new ExpressionKind(TYPE_ENGINE_CONSTANT);
 

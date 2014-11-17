@@ -30,6 +30,17 @@ public class DocumentNotFoundException extends NotFoundException {
 
     private static final long serialVersionUID = -1501286386852952410L;
 
+
+    /**
+     * Constructs a new exception with the specified detail message.
+     *
+     * @param message
+     *            The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
+     */
+    public DocumentNotFoundException(String message){
+        super(message);
+    }
+
     /**
      * Constructs a new exception with the specified detail cause.
      * 

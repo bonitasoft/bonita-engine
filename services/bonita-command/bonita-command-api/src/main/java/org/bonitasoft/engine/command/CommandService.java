@@ -18,7 +18,7 @@ import java.util.List;
 import org.bonitasoft.engine.command.model.SCommand;
 import org.bonitasoft.engine.command.model.SCommandCriterion;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
@@ -148,10 +148,10 @@ public interface CommandService {
      * @param options
      *            search criteria
      * @return total number of commands corresponding to the specific criteria
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @author Yanyan Liu
      */
-    long getNumberOfCommands(QueryOptions options) throws SBonitaSearchException;
+    long getNumberOfCommands(QueryOptions options) throws SBonitaReadException;
 
     /**
      * Get a list of commands according to the specific criteria
@@ -159,9 +159,9 @@ public interface CommandService {
      * @param options
      *            search criteria
      * @return a list of command objects
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @author Yanyan Liu
      */
-    List<SCommand> searchCommands(QueryOptions options) throws SBonitaSearchException;
+    List<SCommand> searchCommands(QueryOptions options) throws SBonitaReadException;
 
 }

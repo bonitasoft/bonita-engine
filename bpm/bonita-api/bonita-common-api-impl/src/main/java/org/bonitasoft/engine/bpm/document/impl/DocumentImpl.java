@@ -44,6 +44,11 @@ public class DocumentImpl implements Document {
 
     private String url;
 
+    private String description;
+
+    private String version;
+    private int index;
+
     public DocumentImpl() {
         super();
     }
@@ -143,117 +148,96 @@ public class DocumentImpl implements Document {
 
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (author ^ author >>> 32);
-        result = prime * result + (contentMimeType == null ? 0 : contentMimeType.hashCode());
-        result = prime * result + (contentStorageId == null ? 0 : contentStorageId.hashCode());
-        result = prime * result + (creationDate == null ? 0 : creationDate.hashCode());
-        result = prime * result + (fileName == null ? 0 : fileName.hashCode());
-        result = prime * result + (hasContent ? 1231 : 1237);
-        result = prime * result + (int) (id ^ id >>> 32);
-        result = prime * result + (name == null ? 0 : name.hashCode());
-        result = prime * result + (int) (processInstanceId ^ processInstanceId >>> 32);
-        result = prime * result + (url == null ? 0 : url.hashCode());
-        return result;
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
+    public int getIndex() {
+        return index;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DocumentImpl document = (DocumentImpl) o;
+
+        if (author != document.author) return false;
+        if (hasContent != document.hasContent) return false;
+        if (id != document.id) return false;
+        if (index != document.index) return false;
+        if (processInstanceId != document.processInstanceId) return false;
+        if (contentMimeType != null ? !contentMimeType.equals(document.contentMimeType) : document.contentMimeType != null)
             return false;
-        }
-        if (getClass() != obj.getClass()) {
+        if (contentStorageId != null ? !contentStorageId.equals(document.contentStorageId) : document.contentStorageId != null)
             return false;
-        }
-        final DocumentImpl other = (DocumentImpl) obj;
-        if (author != other.author) {
-                return false;
-        }
-        if (contentMimeType == null) {
-            if (other.contentMimeType != null) {
-                return false;
-            }
-        } else if (!contentMimeType.equals(other.contentMimeType)) {
+        if (creationDate != null ? !creationDate.equals(document.creationDate) : document.creationDate != null)
             return false;
-        }
-        if (contentStorageId == null) {
-            if (other.contentStorageId != null) {
-                return false;
-            }
-        } else if (!contentStorageId.equals(other.contentStorageId)) {
+        if (description != null ? !description.equals(document.description) : document.description != null)
             return false;
-        }
-        if (creationDate == null) {
-            if (other.creationDate != null) {
-                return false;
-            }
-        } else if (!creationDate.equals(other.creationDate)) {
-            return false;
-        }
-        if (fileName == null) {
-            if (other.fileName != null) {
-                return false;
-            }
-        } else if (!fileName.equals(other.fileName)) {
-            return false;
-        }
-        if (hasContent != other.hasContent) {
-            return false;
-        }
-        if (id != other.id) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (processInstanceId != other.processInstanceId) {
-            return false;
-        }
-        if (url == null) {
-            if (other.url != null) {
-                return false;
-            }
-        } else if (!url.equals(other.url)) {
-            return false;
-        }
+        if (fileName != null ? !fileName.equals(document.fileName) : document.fileName != null) return false;
+        if (name != null ? !name.equals(document.name) : document.name != null) return false;
+        if (url != null ? !url.equals(document.url) : document.url != null) return false;
+        if (version != null ? !version.equals(document.version) : document.version != null) return false;
+
         return true;
     }
 
     @Override
-    public String toString() {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("DocumentImpl [id=");
-        builder.append(id);
-        builder.append(", processInstanceId=");
-        builder.append(processInstanceId);
-        builder.append(", name=");
-        builder.append(name);
-        builder.append(", author=");
-        builder.append(author);
-        builder.append(", creationDate=");
-        builder.append(creationDate);
-        builder.append(", hasContent=");
-        builder.append(hasContent);
-        builder.append(", fileName=");
-        builder.append(fileName);
-        builder.append(", contentMimeType=");
-        builder.append(contentMimeType);
-        builder.append(", contentStorageId=");
-        builder.append(contentStorageId);
-        builder.append(", url=");
-        builder.append(url);
-        builder.append("]");
-        return builder.toString();
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (int) (processInstanceId ^ (processInstanceId >>> 32));
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (int) (author ^ (author >>> 32));
+        result = 31 * result + (creationDate != null ? creationDate.hashCode() : 0);
+        result = 31 * result + (hasContent ? 1 : 0);
+        result = 31 * result + (fileName != null ? fileName.hashCode() : 0);
+        result = 31 * result + (contentMimeType != null ? contentMimeType.hashCode() : 0);
+        result = 31 * result + (contentStorageId != null ? contentStorageId.hashCode() : 0);
+        result = 31 * result + (url != null ? url.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + index;
+        return result;
     }
 
+    @Override
+    public String toString() {
+        return "DocumentImpl{" +
+                "id=" + id +
+                ", processInstanceId=" + processInstanceId +
+                ", name='" + name + '\'' +
+                ", author=" + author +
+                ", creationDate=" + creationDate +
+                ", hasContent=" + hasContent +
+                ", fileName='" + fileName + '\'' +
+                ", contentMimeType='" + contentMimeType + '\'' +
+                ", contentStorageId='" + contentStorageId + '\'' +
+                ", url='" + url + '\'' +
+                ", description='" + description + '\'' +
+                ", version='" + version + '\'' +
+                ", index=" + index +
+                '}';
+    }
 }

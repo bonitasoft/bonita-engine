@@ -18,32 +18,67 @@ import java.util.Date;
 import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
- * @author Lu Kai
- * @author Bole Zhang
- * @author Matthieu Chaffotte
+ * represents a Group inside the organization.
+ *
+ * @author Lu Kai, Bole Zhang, Matthieu Chaffotte
+ * @see GroupAPI
+ * @since 6.0.0
  */
 public interface Group extends BonitaObject {
 
+    /**
+     * @return the group's id
+     */
     long getId();
 
+    /**
+     * @return the group's name
+     */
     String getName();
 
+    /**
+     * @return the group's name to display
+     */
     String getDisplayName();
 
+    /**
+     * @return the group's description
+     */
     String getDescription();
 
+    /**
+     * @return the group's icon name
+     */
     String getIconName();
 
+    /**
+     * @return the group's icon file path
+     */
     String getIconPath();
 
+    /**
+     * @return the id of the user that created the group
+     */
     long getCreatedBy();
 
+    /**
+     * @return the group's creation's date
+     */
     Date getCreationDate();
 
+    /**
+     * @return the group's last update date
+     */
     Date getLastUpdate();
 
+    /**
+     * @return the group's path
+     */
     String getParentPath();
 
+    /**
+     * @return the group's full path (i.e. with its parent path)
+     */
     String getPath();
 
 }

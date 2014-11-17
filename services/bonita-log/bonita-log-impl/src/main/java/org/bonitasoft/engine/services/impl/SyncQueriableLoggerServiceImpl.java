@@ -31,13 +31,10 @@ import org.bonitasoft.engine.services.SPersistenceException;
  */
 public class SyncQueriableLoggerServiceImpl extends AbstractQueriableLoggerImpl {
 
-    private final TechnicalLoggerService logger;
-
     public SyncQueriableLoggerServiceImpl(final PersistenceService persistenceService,
             final QueriableLoggerStrategy loggerStrategy, final QueriableLogSessionProvider sessionProvider, final TechnicalLoggerService logger,
             final PlatformService platformService) {
-        super(persistenceService, loggerStrategy, sessionProvider, platformService);
-        this.logger = logger;
+        super(persistenceService, loggerStrategy, sessionProvider, platformService, logger);
     }
 
     // the method log is considered to already be in a transaction.

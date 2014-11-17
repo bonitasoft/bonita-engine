@@ -23,7 +23,7 @@ import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Test;
 
-public class LocalInterruptingTimerBoundaryEventTest extends AbstractTimerBoundaryEventTest {
+public class LocalInterruptingTimerBoundaryEventTest extends AbstractEventTest {
 
     private static final String TIMER_EVENT_PREFIX = "Timer_Ev_";
 
@@ -67,19 +67,19 @@ public class LocalInterruptingTimerBoundaryEventTest extends AbstractTimerBounda
     @Test
     // when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events; only interrupting will be tested
     public void timerBoundaryEventNotTriggered() throws Exception {
-        //given
+        // given
         final long timerDuration = 20000;
-        final ProcessDefinition processDefinition = deployProcessWithTimerBoundaryEvent(timerDuration, true, "step1", "exceptionStep", "step2");
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEvent(timerDuration, true, "step1", "exceptionStep", "step2");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final Long boundaryId = waitForFlowNodeInState(processInstance, "timer", TestStates.WAITING, false);
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
-        //when
+        // when
         waitForUserTaskAndExecuteIt("step1", processInstance, getUser());
 
-        //then
+        // then
         waitForFlowNodeInState(processInstance, "timer", TestStates.ABORTED, false);
         assertThat(containsTimerJob(getJobName(boundaryId))).isFalse();
 
@@ -94,37 +94,34 @@ public class LocalInterruptingTimerBoundaryEventTest extends AbstractTimerBounda
     @Cover(classes = { EventInstance.class, CallActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
             "Call Activity" }, story = "Interrupting timer boundary event not triggered on call activity.", jira = "ENGINE-547")
     @Test
-    //when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events; only interrupting will be tested
+    // when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events; only interrupting will be tested
     public void timerBoundaryEventNotTriggeredOnCallActivity() throws Exception {
-        //given
+        // given
         final long timerDuration = 20000;
         final String simpleProcessName = "targetProcess";
         final String simpleTaskName = "stepCA";
-        final String parentUserTaskName = "step2";
-        final String exceptionFlowTaskName = "exceptionStep";
 
         // deploy a simple process p1
         final ProcessDefinition targetProcessDefinition = deployAndEnableSimpleProcess(simpleProcessName, simpleTaskName);
 
         // deploy a process, p2, with a call activity calling p1. The call activity has an interrupting timer boundary event
-        final ProcessDefinition processDefinition = deployAndEnbleProcessWithTimerBoundaryEventOnCallActivity(timerDuration, true, simpleProcessName,
-                parentUserTaskName, exceptionFlowTaskName);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEventOnCallActivity(timerDuration, true, simpleProcessName);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         final Long boundaryId = waitForFlowNodeInState(processInstance, "timer", TestStates.WAITING, false);
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
-        //when
+        // when
         waitForUserTaskAndExecuteIt("stepCA", processInstance, getUser());
 
-        //then
+        // then
         waitForFlowNodeInState(processInstance, "timer", TestStates.ABORTED, false);
         assertThat(containsTimerJob(getJobName(boundaryId))).isFalse();
 
-        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), getUser().getId());
+        waitForUserTaskAndExecuteIt(PARENT_PROCESS_USER_TASK_NAME, processInstance.getId(), getUser().getId());
         waitForProcessToFinish(processInstance);
-        checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
+        checkFlowNodeWasntExecuted(processInstance.getId(), EXCEPTION_STEP);
 
         disableAndDeleteProcess(processDefinition);
         disableAndDeleteProcess(targetProcessDefinition);
@@ -133,13 +130,13 @@ public class LocalInterruptingTimerBoundaryEventTest extends AbstractTimerBounda
     @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary",
             "interrupting", "Timer", "MultiInstance", "Sequential" }, story = "Execute interrupting timer boundary event not triggered on sequential multi-instance", jira = "ENGINE-547")
     @Test
-    //when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events; only interrupting will be tested
+    // when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events; only interrupting will be tested
     public void timerBoundaryEventNotTriggeredOnSequentialMultiInstance() throws Exception {
-        //given
+        // given
         final long timerDuration = 20000;
         final int loopCardinality = 1;
         final boolean isSequential = true;
-        final ProcessDefinition processDefinition = deployProcessMultiInstanceWithBoundaryEvent(timerDuration, true, "step1", loopCardinality,
+        final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration, true, "step1", loopCardinality,
                 isSequential, "step2", "exceptionStep");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -147,10 +144,10 @@ public class LocalInterruptingTimerBoundaryEventTest extends AbstractTimerBounda
         final Long boundaryId = waitForFlowNodeInState(processInstance, "timer", TestStates.WAITING, false);
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
-        //when
+        // when
         executeRemainingSequencialMultiInstancesOrLoop("step1", processInstance, loopCardinality);
 
-        //then
+        // then
         waitForFlowNodeInState(processInstance, "timer", TestStates.ABORTED, false);
         assertThat(containsTimerJob(getJobName(boundaryId))).isFalse();
 
@@ -165,13 +162,13 @@ public class LocalInterruptingTimerBoundaryEventTest extends AbstractTimerBounda
     @Cover(classes = { EventInstance.class, MultiInstanceLoopCharacteristics.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Timer",
             "Interrupting", "MultiInstance", "Parallel" }, story = "Non-interrupting timer boundary event not triggered on parallel multi-instance (normal flow)", jira = "ENGINE-547")
     @Test
-    //when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events; only interrupting will be tested
+    // when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events; only interrupting will be tested
     public void timerBoundaryEventNotTriggeredOnParallelMultiInstance() throws Exception {
-        //given
+        // given
         final long timerDuration = 20000;
         final int loopCardinality = 1;
         final boolean isSequential = false;
-        final ProcessDefinition processDefinition = deployProcessMultiInstanceWithBoundaryEvent(timerDuration, true, "step1", loopCardinality,
+        final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration, true, "step1", loopCardinality,
                 isSequential, "step2", "exceptionStep");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -179,10 +176,10 @@ public class LocalInterruptingTimerBoundaryEventTest extends AbstractTimerBounda
         final Long boundaryId = waitForFlowNodeInState(processInstance, "timer", TestStates.WAITING, false);
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
-        //when
+        // when
         executeRemainingSequencialMultiInstancesOrLoop("step1", processInstance, loopCardinality);
 
-        //then
+        // then
         waitForFlowNodeInState(processInstance, "timer", TestStates.ABORTED, false);
         assertThat(containsTimerJob(getJobName(boundaryId))).isFalse();
 
@@ -196,22 +193,22 @@ public class LocalInterruptingTimerBoundaryEventTest extends AbstractTimerBounda
     @Cover(classes = { EventInstance.class, LoopActivityInstance.class }, concept = BPMNConcept.EVENTS, keywords = { "Event", "Boundary", "Interruping",
             "Timer", "Loop activity" }, story = "Execute timer boundary event not triggered on loop activity", jira = "ENGINE-547")
     @Test
-    //when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events; only interrupting will be tested
+    // when the boundary event is not triggered we will have the same behavior for interrupting and non-interrupting events; only interrupting will be tested
     public void timerBoundaryEventNotTriggeredOnLoopActivity() throws Exception {
-        //given
+        // given
         final long timerDuration = 20000;
         final int loopMax = 1;
-        final ProcessDefinition processDefinition = deployProcessWithBoundaryEventOnLoopActivity(timerDuration, true, loopMax, "step1", "step2",
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEventOnLoopActivity(timerDuration, true, loopMax, "step1", "step2",
                 "exceptionStep");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final Long boundaryId = waitForFlowNodeInState(processInstance, "timer", TestStates.WAITING, false);
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
-        //when
+        // when
         executeRemainingSequencialMultiInstancesOrLoop("step1", processInstance, loopMax);
 
-        //then
+        // then
         waitForFlowNodeInState(processInstance, "timer", TestStates.ABORTED, false);
         assertThat(containsTimerJob(getJobName(boundaryId))).isFalse();
 

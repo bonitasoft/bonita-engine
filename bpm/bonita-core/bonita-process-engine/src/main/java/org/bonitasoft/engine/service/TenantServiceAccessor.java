@@ -34,8 +34,7 @@ import org.bonitasoft.engine.core.login.LoginService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
-import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -144,9 +143,7 @@ public interface TenantServiceAccessor extends ServiceAccessor {
 
     ConnectorInstanceService getConnectorInstanceService();
 
-    DocumentMappingService getDocumentMappingService();
-
-    ProcessDocumentService getProcessDocumentService();
+    DocumentService getDocumentService();
 
     ProfileService getProfileService();
 
@@ -217,5 +214,7 @@ public interface TenantServiceAccessor extends ServiceAccessor {
     void destroy();
 
     TimeTracker getTimeTracker();
+
+    PermissionService getPermissionService();
 
 }

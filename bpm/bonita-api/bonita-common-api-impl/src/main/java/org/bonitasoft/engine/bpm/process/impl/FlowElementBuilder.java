@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General License as published by the Free Software Foundation
@@ -19,6 +19,9 @@ import org.bonitasoft.engine.expression.Expression;
 
 /**
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
+ * @version 6.3.5
+ * @since 6.0.0
  */
 public interface FlowElementBuilder {
 
@@ -26,9 +29,9 @@ public interface FlowElementBuilder {
      * Adds a integer data on this element
      * 
      * @param name
-     *        data name
+     *        The data name
      * @param defaultValue
-     *        expression representing the default value
+     *        The expression representing the default value
      * @return
      */
     DataDefinitionBuilder addIntegerData(String name, Expression defaultValue);
@@ -37,9 +40,9 @@ public interface FlowElementBuilder {
      * Adds a long data on this element
      * 
      * @param name
-     *        data name
+     *        The data name
      * @param defaultValue
-     *        expression representing the default value
+     *        The expression representing the default value
      * @return
      */
     DataDefinitionBuilder addLongData(String name, Expression defaultValue);
@@ -48,9 +51,9 @@ public interface FlowElementBuilder {
      * Adds a short text data (up to 255 characters) on this element
      * 
      * @param name
-     *        data name
+     *        The data name
      * @param defaultValue
-     *        expression representing the default value
+     *        The expression representing the default value
      * @return
      */
     DataDefinitionBuilder addShortTextData(String name, Expression defaultValue);
@@ -59,9 +62,9 @@ public interface FlowElementBuilder {
      * Adds a long text data (more than 255 characters) on this element
      * 
      * @param name
-     *        data name
+     *        The data name
      * @param defaultValue
-     *        expression representing the default value
+     *        The expression representing the default value
      * @return
      */
     TextDataDefinitionBuilder addLongTextData(String name, Expression defaultValue);
@@ -70,9 +73,9 @@ public interface FlowElementBuilder {
      * Adds a double data on this element
      * 
      * @param name
-     *        data name
+     *        The data name
      * @param defaultValue
-     *        expression representing the default value
+     *        The expression representing the default value
      * @return
      */
     DataDefinitionBuilder addDoubleData(String name, Expression defaultValue);
@@ -81,9 +84,9 @@ public interface FlowElementBuilder {
      * Adds a float data on this element
      * 
      * @param name
-     *        data name
+     *        The data name
      * @param defaultValue
-     *        expression representing the default value
+     *        The expression representing the default value
      * @return
      */
     DataDefinitionBuilder addFloatData(String name, Expression defaultValue);
@@ -92,9 +95,9 @@ public interface FlowElementBuilder {
      * Adds a date data on this element
      * 
      * @param name
-     *        data name
+     *        The data name
      * @param defaultValue
-     *        expression representing the default value
+     *        The expression representing the default value
      * @return
      */
     DataDefinitionBuilder addDateData(String name, Expression defaultValue);
@@ -103,9 +106,9 @@ public interface FlowElementBuilder {
      * Adds a XML data on this element
      * 
      * @param name
-     *        data name
+     *        The data name
      * @param defaultValue
-     *        expression representing the default value
+     *        The expression representing the default value
      * @return
      */
     XMLDataDefinitionBuilder addXMLData(String name, Expression defaultValue);
@@ -114,9 +117,9 @@ public interface FlowElementBuilder {
      * Adds a blob data on this element
      * 
      * @param name
-     *        data name
+     *        The data name
      * @param defaultValue
-     *        expression representing the default value
+     *        The expression representing the default value
      * @return
      */
     DataDefinitionBuilder addBlobData(String name, Expression defaultValue);
@@ -125,9 +128,9 @@ public interface FlowElementBuilder {
      * Adds a boolean data on this element
      * 
      * @param name
-     *        data name
+     *        The data name
      * @param defaultValue
-     *        expression representing the default value
+     *        The expression representing the default value
      * @return
      */
     DataDefinitionBuilder addBooleanData(String name, Expression defaultValue);
@@ -136,11 +139,11 @@ public interface FlowElementBuilder {
      * Adds a data on this element
      * 
      * @param name
-     *        data name
+     *        The data name
      * @param className
-     *        data type class name (i.e. java.lang.String)
+     *        The data type class name (i.e. java.lang.String)
      * @param defaultValue
-     *        expression representing the default value
+     *        The expression representing the default value
      * @return
      */
     DataDefinitionBuilder addData(String name, String className, Expression defaultValue);
@@ -154,11 +157,12 @@ public interface FlowElementBuilder {
      * @see BusinessArchiveBuilder#addClasspathResource(org.bonitasoft.engine.bpm.bar.BarResource)
      * @see BusinessArchiveBuilder#addConnectorImplementation(org.bonitasoft.engine.bpm.bar.BarResource)
      * @param name
-     *        name the connector instance will use
+     *        The name the connector instance will use
      * @param connectorId
-     *        id of the Connector definition (connector implementation added in {@link BusinessArchive} must match this id in definitionId
+     *        The id of the Connector definition (connector implementation added in {@link org.bonitasoft.engine.bpm.bar.BusinessArchive} must match this id in
+     *        definitionId
      * @param version
-     *        version of the Connector definition
+     *        The version of the Connector definition
      * @param activationEvent
      *        {@link ConnectorEvent} on which the connector will be triggered
      * @return
@@ -166,56 +170,56 @@ public interface FlowElementBuilder {
     ConnectorDefinitionBuilder addConnector(String name, String connectorId, String version, ConnectorEvent activationEvent);
 
     /**
-     * Adds an {@link UserTaskDefinition} on this element
+     * Adds an {@link org.bonitasoft.engine.bpm.flownode.UserTaskDefinition} on this element
      * 
      * @param taskName
-     *        task name
+     *        The task name
      * @param actorName
-     *        name of the actor that will perform this task
+     *        The name of the actor that will perform this task
      * @return
      */
     UserTaskDefinitionBuilder addUserTask(String taskName, String actorName);
 
     /**
-     * Adds {@link AutomaticTaskDefinition}
+     * Adds {@link org.bonitasoft.engine.bpm.flownode.AutomaticTaskDefinition}
      * 
      * @param taskName
-     *        task name
+     *        The task name
      * @return
      */
     AutomaticTaskDefinitionBuilder addAutomaticTask(String taskName);
 
     /**
-     * Adds a {@link ReceiveTaskDefinition} on this element
+     * Adds a {@link org.bonitasoft.engine.bpm.flownode.ReceiveTaskDefinition} on this element
      * 
      * @param taskName
-     *        task name
+     *        The task name
      * @param messageName
-     *        name of message to be received
+     *        The name of message to be received
      * @return
      */
     ReceiveTaskDefinitionBuilder addReceiveTask(String taskName, String messageName);
 
     /**
-     * Adds a {@link SendTaskDefinition} on this element
+     * Adds a {@link org.bonitasoft.engine.bpm.flownode.SendTaskDefinition} on this element
      * 
      * @param taskName
-     *        task name
+     *        The task name
      * @param messageName
-     *        name of message to be sent
+     *        The name of message to be sent
      * @param targetProcess
-     *        expression representing the target process name
+     *        The expression representing the target process name
      * @return
      */
     SendTaskDefinitionBuilder addSendTask(String taskName, String messageName, Expression targetProcess);
 
     /**
-     * Adds a {@link ManualTaskDefinition} on this element
+     * Adds a {@link org.bonitasoft.engine.bpm.flownode.ManualTaskDefinition} on this element
      * 
      * @param name
-     *        task name
+     *        The task name
      * @param actorName
-     *        name of the actor that will perform this task
+     *        The name of the actor that will perform this task
      * @return
      */
     ManualTaskDefinitionBuilder addManualTask(String name, String actorName);
@@ -224,9 +228,9 @@ public interface FlowElementBuilder {
      * Adds a transition on this element. Source and target elements must be previously added
      * 
      * @param source
-     *        source element name
+     *        The source element name
      * @param target
-     *        target element name
+     *        The target element name
      * @return
      */
     TransitionDefinitionBuilder addTransition(String source, String target);
@@ -235,80 +239,80 @@ public interface FlowElementBuilder {
      * Adds a conditional transition on this element. Source and target elements must be previously added
      * 
      * @param source
-     *        source element name
+     *        The source element name
      * @param target
-     *        target element name
+     *        The target element name
      * @param condition
-     *        transition condition. The transition is taken if and only if the expression is evaluated to {@link Boolean#TRUE}.
+     *        The transition condition. The transition is taken if and only if the expression is evaluated to {@link Boolean#TRUE}.
      * @return
      */
     TransitionDefinitionBuilder addTransition(String source, String target, Expression condition);
 
     /**
-     * Adds a {@link GatewayDefinition} on this element
+     * Adds a {@link org.bonitasoft.engine.bpm.flownode.GatewayDefinition} on this element
      * 
      * @param name
-     *        gateway name
+     *        The gateway name
      * @param gatewayType
-     *        gateway type
+     *        The gateway type
      * @return
      */
     GatewayDefinitionBuilder addGateway(String name, GatewayType gatewayType);
 
     /**
-     * Adds a {@link StartEventDefinition} on this element
+     * Adds a {@link org.bonitasoft.engine.bpm.flownode.StartEventDefinition} on this element
      * 
      * @param name
-     *        start event name
+     *        The start event name
      * @return
      */
     StartEventDefinitionBuilder addStartEvent(String name);
 
     /**
-     * Adds an {@link EndEventDefinition} on this element
+     * Adds an {@link org.bonitasoft.engine.bpm.flownode.EndEventDefinition} on this element
      * 
      * @param name
-     *        end event name
+     *        The end event name
      * @return
      */
     EndEventDefinitionBuilder addEndEvent(String name);
 
     /**
-     * Adds an {@link IntermediateCatchEventDefinition} on this element
+     * Adds an {@link org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventDefinition} on this element
      * 
      * @param name
-     *        intermediate catch event name
+     *        The intermediate catch event name
      * @return
      */
     IntermediateCatchEventDefinitionBuilder addIntermediateCatchEvent(String name);
 
     /**
-     * Adds an {@link IntermediateThrowEventDefinition} on this element
+     * Adds an {@link org.bonitasoft.engine.bpm.flownode.IntermediateThrowEventDefinition} on this element
      * 
      * @param name
-     *        the intermediate throw event name
+     *        The intermediate throw event name
      * @return
      */
     IntermediateThrowEventDefinitionBuilder addIntermediateThrowEvent(String name);
 
     /**
-     * Adds a {@link CallActivityDefinition} on this element
+     * Adds a {@link org.bonitasoft.engine.bpm.flownode.CallActivityDefinition} on this element
      * 
      * @param name
-     *        the call activity name
+     *        The call activity name
      * @param callableElement
-     *        expression representing the name of process to be called
+     *        The expression representing the name of process to be called
      * @param callableElementVersion
-     *        expression representing the version of process to be called
+     *        The expression representing the version of process to be called
      * @return
      */
     CallActivityBuilder addCallActivity(String name, Expression callableElement, Expression callableElementVersion);
 
     /**
-     * Adds a {@link SubProcessDefinition} on this element
+     * Adds a {@link org.bonitasoft.engine.bpm.process.SubProcessDefinition} on this element
      * 
      * @param name
-     *        the sub process name
+     *        The sub process name
      * @param triggeredByEvent
      *        true if it's an event sub-process; false if it's a subprocess
      * @return
@@ -319,9 +323,9 @@ public interface FlowElementBuilder {
      * Adds a default transition on this element
      * 
      * @param source
-     *        source element name
+     *        The source element name
      * @param target
-     *        target element name
+     *        The target element name
      * @return
      */
     TransitionDefinitionBuilder addDefaultTransition(String source, String target);

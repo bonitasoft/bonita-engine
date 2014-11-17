@@ -16,16 +16,30 @@ package org.bonitasoft.engine.identity;
 import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
+ * thrown when a {@link User} is not found in the organization
+ *
  * @author Matthieu Chaffotte
+ * @see User
+ * @since 6.0.0
  */
 public class UserNotFoundException extends NotFoundException {
 
     private static final long serialVersionUID = 8392620780257647179L;
 
+    /**
+     * creates a new exception instance with the given message
+     *
+     * @param message the exception message
+     */
     public UserNotFoundException(final String message) {
         super(message);
     }
 
+    /**
+     * creates a new exception instance with the given exception as cause
+     *
+     * @param cause the exception cause
+     */
     public UserNotFoundException(final Throwable cause) {
         super(cause);
     }

@@ -18,19 +18,21 @@ import java.util.List;
 import org.bonitasoft.engine.commons.PlatformLifecycleService;
 import org.bonitasoft.engine.commons.RestartHandler;
 import org.bonitasoft.engine.execution.work.TenantRestartHandler;
+import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 
 /**
  * This class allow to provide a configuration for the current node
  * We should be able to have one different per node
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public interface NodeConfiguration {
 
     /**
      * specify if the scheduler should start on this node
-     * 
+     *
      * @return
      *         true if the scheduler
      */
@@ -38,7 +40,7 @@ public interface NodeConfiguration {
 
     /**
      * specify if we should resume unfinished elements when the node is started
-     * 
+     *
      * @return
      */
     boolean shouldResumeElements();
@@ -68,5 +70,7 @@ public interface NodeConfiguration {
      *         true if the sessions should be cleaned when the node is stopped
      */
     boolean shouldClearSessions();
+
+    List<AbstractBonitaPlatformJobListener> getJobListeners();
 
 }
