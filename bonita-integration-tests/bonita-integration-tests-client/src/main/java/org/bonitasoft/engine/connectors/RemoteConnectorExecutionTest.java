@@ -413,7 +413,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
 
     @Test
     public void getNumberofConnectorImplementationsWhenProcessDoesNotExists() {
-        assertEquals(0, getProcessAPI().getNumberOfConnectorImplementations(123l));
+        assertEquals(0, getProcessAPI().getNumberOfConnectorImplementations(123L));
     }
 
     @Test
@@ -1372,7 +1372,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("step2", processInstance);
         final DataInstance numberOfUser = getProcessAPI().getProcessDataInstance("numberOfUser", processInstance.getId());
-        assertEquals(2l, numberOfUser.getValue());
+        assertEquals(2L, numberOfUser.getValue());
         final SearchResult<Document> documents = getProcessAPI().searchDocuments(
                 new SearchOptionsBuilder(0, 10).filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId()).done());
         assertEquals(1, documents.getCount());

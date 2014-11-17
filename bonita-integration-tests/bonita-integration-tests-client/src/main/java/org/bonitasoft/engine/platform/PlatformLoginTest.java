@@ -83,7 +83,7 @@ public class PlatformLoginTest extends CommonAPITest {
     @Test(expected = SessionNotFoundException.class)
     public void logoutWithWrongSession() throws BonitaException {
         try {
-            platformLoginAPI.logout(new PlatformSessionImpl(123l, null, -1l, null, -1l));
+            platformLoginAPI.logout(new PlatformSessionImpl(123L, null, -1L, null, -1L));
         } finally {
             platformLoginAPI.logout(session);
             logAsPlatformAdmin();

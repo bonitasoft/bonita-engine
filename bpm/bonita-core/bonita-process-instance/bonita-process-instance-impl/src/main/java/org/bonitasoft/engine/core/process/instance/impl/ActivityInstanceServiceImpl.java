@@ -964,7 +964,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
         Long selectOne;
         selectOne = getPersistenceService().selectOne(new SelectOneDescriptor<Long>("isTaskHidden", parameters, SHiddenTaskInstance.class, Long.class));
-        return selectOne == 1l;
+        return selectOne == 1L;
     }
 
     @Override

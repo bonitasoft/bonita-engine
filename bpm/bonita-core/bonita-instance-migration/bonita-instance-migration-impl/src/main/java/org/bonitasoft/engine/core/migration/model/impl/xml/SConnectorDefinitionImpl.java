@@ -89,7 +89,7 @@ public class SConnectorDefinitionImpl implements SConnectorDefinition {
 
     @Override
     public Long getId() {
-        return 0l;
+        return 0L;
     }
 
     @Override

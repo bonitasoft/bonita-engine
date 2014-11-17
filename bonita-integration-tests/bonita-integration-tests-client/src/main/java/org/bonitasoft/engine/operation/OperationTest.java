@@ -114,9 +114,9 @@ public class OperationTest extends CommonAPITest {
                 Collections.singletonList(Long.class.getName()),
                 Collections.singletonList(new LeftOperandBuilder().createNewInstance().setName("myData12").done()),
                 Collections.singletonList(OperatorType.ASSIGNMENT), Collections.singletonList("="),
-                Collections.singletonList(new ExpressionBuilder().createConstantLongExpression(1234567891234567891l)),
-                Collections.singletonList(new ExpressionBuilder().createConstantLongExpression(1234567891234567892l)),
-                Collections.singletonList((Object) 1234567891234567891l), Collections.singletonList((Object) 1234567891234567892l));
+                Collections.singletonList(new ExpressionBuilder().createConstantLongExpression(1234567891234567891L)),
+                Collections.singletonList(new ExpressionBuilder().createConstantLongExpression(1234567891234567892L)),
+                Collections.singletonList((Object) 1234567891234567891L), Collections.singletonList((Object) 1234567891234567892L));
     }
 
     @Test
@@ -126,10 +126,10 @@ public class OperationTest extends CommonAPITest {
                 new LeftOperandBuilder().createNewInstance().setName("myData1").done(), new LeftOperandBuilder().createNewInstance().setName("myData2").done(),
                 new LeftOperandBuilder().createNewInstance().setName("myData3").done()), Arrays.asList(OperatorType.ASSIGNMENT, OperatorType.ASSIGNMENT,
                 OperatorType.ASSIGNMENT), Arrays.asList("=", "=", "="), Arrays.asList(new ExpressionBuilder().createConstantStringExpression("test1"),
-                new ExpressionBuilder().createConstantBooleanExpression(false), new ExpressionBuilder().createConstantLongExpression(1234567891234567891l)),
+                new ExpressionBuilder().createConstantBooleanExpression(false), new ExpressionBuilder().createConstantLongExpression(1234567891234567891L)),
                 Arrays.asList(new ExpressionBuilder().createConstantStringExpression("test2"), new ExpressionBuilder().createConstantBooleanExpression(true),
-                        new ExpressionBuilder().createConstantLongExpression(1234567891234567892l)), Arrays.asList((Object) "test1", (Object) false,
-                        (Object) 1234567891234567891l), Arrays.asList((Object) "test2", (Object) true, (Object) 1234567891234567892l));
+                        new ExpressionBuilder().createConstantLongExpression(1234567891234567892L)), Arrays.asList((Object) "test1", (Object) false,
+                        (Object) 1234567891234567891L), Arrays.asList((Object) "test2", (Object) true, (Object) 1234567891234567892L));
     }
 
     @Test
@@ -141,12 +141,12 @@ public class OperationTest extends CommonAPITest {
                                 .setName("myData1").done()), Arrays.asList(OperatorType.ASSIGNMENT, OperatorType.ASSIGNMENT, OperatorType.ASSIGNMENT,
                         OperatorType.ASSIGNMENT), Arrays.asList("=", "=", "=", "="), Arrays.asList(
                         new ExpressionBuilder().createConstantStringExpression("test1"), new ExpressionBuilder().createConstantBooleanExpression(false),
-                        new ExpressionBuilder().createConstantLongExpression(1234567891234567891l),
+                        new ExpressionBuilder().createConstantLongExpression(1234567891234567891L),
                         new ExpressionBuilder().createConstantStringExpression("test1")), Arrays.asList(
                         new ExpressionBuilder().createConstantStringExpression("test2"), new ExpressionBuilder().createConstantBooleanExpression(true),
-                        new ExpressionBuilder().createConstantLongExpression(1234567891234567892l),
+                        new ExpressionBuilder().createConstantLongExpression(1234567891234567892L),
                         new ExpressionBuilder().createConstantStringExpression("test3")), Arrays.asList((Object) "test1", (Object) false,
-                        (Object) 1234567891234567891l, (Object) "test1"), Arrays.asList((Object) "test3", (Object) true, (Object) 1234567891234567892l,
+                        (Object) 1234567891234567891L, (Object) "test1"), Arrays.asList((Object) "test3", (Object) true, (Object) 1234567891234567892L,
                         (Object) "test3"));
     }
 
@@ -376,7 +376,7 @@ public class OperationTest extends CommonAPITest {
         final Expression loggedUser = expressionBuilder.createEngineConstant(ExpressionConstants.LOGGED_USER_ID);
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("APIAccessorInGroovyScript", "1.0");
-        designProcessDefinition.addLongData("userId", new ExpressionBuilder().createConstantLongExpression(123l));
+        designProcessDefinition.addLongData("userId", new ExpressionBuilder().createConstantLongExpression(123L));
         designProcessDefinition.addActor("Workers").addUserTask("step1", "Workers").addOperation(leftOperand, OperatorType.ASSIGNMENT, "=", null, loggedUser);
         designProcessDefinition.addAutomaticTask("start").addUserTask("step2", "Workers").addTransition("start", "step1").addTransition("step1", "step2");
 

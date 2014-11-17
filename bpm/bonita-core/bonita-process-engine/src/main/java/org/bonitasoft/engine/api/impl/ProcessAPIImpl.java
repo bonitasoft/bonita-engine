@@ -174,7 +174,6 @@ import org.bonitasoft.engine.bpm.flownode.SendEventException;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstanceNotFoundException;
-import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
@@ -456,8 +455,8 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     public ProcessAPIImpl(final ProcessManagementAPIImplDelegate processManagementAPIDelegate, final DocumentAPI documentAPI) {
-        this.processManagementAPIImplDelegate = processManagementAPIDelegate;
-        this.documentAPIImpl = documentAPI;
+        processManagementAPIImplDelegate = processManagementAPIDelegate;
+        documentAPIImpl = documentAPI;
     }
 
     protected ProcessManagementAPIImplDelegate instantiateProcessManagementAPIDelegate() {
@@ -2247,7 +2246,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     final FilterResult result = executeFilter(processDefinitionId, humanTaskInstanceId, humanTaskDefinition.getActorName(),
                             sUserFilterDefinition);
                     final List<Long> userIds = result.getResult();
-                    if (userIds == null || userIds.isEmpty() || userIds.contains(0l) || userIds.contains(-1l)) {
+                    if (userIds == null || userIds.isEmpty() || userIds.contains(0L) || userIds.contains(-1L)) {
                         throw new UpdateException("no user id returned by the user filter " + sUserFilterDefinition + " on activity "
                                 + humanTaskDefinition.getName());
                     }
@@ -5876,22 +5875,22 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Document removeDocument(long documentId) throws DocumentNotFoundException, DeletionException {
+    public Document removeDocument(final long documentId) throws DocumentNotFoundException, DeletionException {
         return documentAPIImpl.removeDocument(documentId);
     }
 
     @Override
-    public List<Document> getDocumentList(long processInstanceId, String name, int from, int numberOfResult) throws DocumentNotFoundException {
+    public List<Document> getDocumentList(final long processInstanceId, final String name, final int from, final int numberOfResult) throws DocumentNotFoundException {
         return documentAPIImpl.getDocumentList(processInstanceId, name, from, numberOfResult);
     }
 
     @Override
-    public void setDocumentList(long processInstanceId, String name, List<DocumentValue> documentsValues) throws DocumentException, DocumentNotFoundException {
+    public void setDocumentList(final long processInstanceId, final String name, final List<DocumentValue> documentsValues) throws DocumentException, DocumentNotFoundException {
         documentAPIImpl.setDocumentList(processInstanceId, name, documentsValues);
     }
 
     @Override
-    public void deleteContentOfArchivedDocument(long documentId) throws DocumentException, DocumentNotFoundException {
+    public void deleteContentOfArchivedDocument(final long documentId) throws DocumentException, DocumentNotFoundException {
         documentAPIImpl.deleteContentOfArchivedDocument(documentId);
     }
 
@@ -5904,13 +5903,13 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Document addDocument(long processInstanceId, String documentName, String description, DocumentValue documentValue)
+    public Document addDocument(final long processInstanceId, final String documentName, final String description, final DocumentValue documentValue)
             throws ProcessInstanceNotFoundException, DocumentAttachmentException, AlreadyExistsException {
         return documentAPIImpl.addDocument(processInstanceId, documentName, description, documentValue);
     }
 
     @Override
-    public Document updateDocument(long documentId, DocumentValue documentValue) throws ProcessInstanceNotFoundException, DocumentAttachmentException,
+    public Document updateDocument(final long documentId, final DocumentValue documentValue) throws ProcessInstanceNotFoundException, DocumentAttachmentException,
             AlreadyExistsException {
         return documentAPIImpl.updateDocument(documentId, documentValue);
     }

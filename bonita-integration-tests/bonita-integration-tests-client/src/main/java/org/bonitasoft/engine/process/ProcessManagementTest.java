@@ -376,7 +376,7 @@ public class ProcessManagementTest extends CommonAPITest {
 
     @Test
     public void getArchivedActivityInstancesOfAnUnknownProcess() {
-        final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(456213846564l, 0, 100,
+        final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(456213846564L, 0, 100,
                 ActivityInstanceCriterion.REACHED_STATE_DATE_ASC);
         assertEquals(0, archivedActivityInstances.size());
     }
@@ -1458,7 +1458,7 @@ public class ProcessManagementTest extends CommonAPITest {
 
     @Test(expected = NotFoundException.class)
     public void getArchiveCommentNotFound() throws Exception {
-        getProcessAPI().getArchivedComment(123456789l);
+        getProcessAPI().getArchivedComment(123456789L);
     }
 
     @Test

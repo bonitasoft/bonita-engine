@@ -315,7 +315,7 @@ public class StateBehaviors {
         final FilterResult result = userFilterService.executeFilter(processDefinitionId, sUserFilterDefinition, sUserFilterDefinition.getInputs(),
                 processClassloader, expressionContext, actorName);
         final List<Long> userIds = result.getResult();
-        if (userIds == null || userIds.isEmpty() || userIds.contains(0l) || userIds.contains(-1l)) {
+        if (userIds == null || userIds.isEmpty() || userIds.contains(0L) || userIds.contains(-1L)) {
             throw new SActivityStateExecutionException("no user id returned by the user filter " + sUserFilterDefinition + " on activity "
                     + humanTaskDefinition.getName());
         }

@@ -148,7 +148,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
         final TransitionService transitionService = tenantAccessor.getTransitionInstanceService();
-        Callable<Long> getNumberOfArchivedTransitionInstances = new Callable<Long>() {
+        final Callable<Long> getNumberOfArchivedTransitionInstances = new Callable<Long>() {
 
             @Override
             public Long call() throws Exception {
@@ -308,7 +308,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
     @Test(expected = ArchivedFlowNodeInstanceNotFoundException.class)
     public void getArchivedFlowNodeInstanceNotFound() throws ArchivedFlowNodeInstanceNotFoundException {
-        getProcessAPI().getArchivedFlowNodeInstance(123456789l);
+        getProcessAPI().getArchivedFlowNodeInstance(123456789L);
     }
 
 }
