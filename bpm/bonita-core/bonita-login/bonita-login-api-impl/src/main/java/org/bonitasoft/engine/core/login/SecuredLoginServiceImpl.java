@@ -73,7 +73,7 @@ public class SecuredLoginServiceImpl implements LoginService {
     @Override
     @Deprecated
     public SSession login(final long tenantId, final String userName, final String password) throws SLoginException {
-        Map<String, Serializable> credentials = new HashMap<String, Serializable>();
+        final Map<String, Serializable> credentials = new HashMap<String, Serializable>();
         credentials.put(AuthenticationConstants.BASIC_TENANT_ID, String.valueOf(tenantId));
         credentials.put(AuthenticationConstants.BASIC_PASSWORD, password);
         credentials.put(AuthenticationConstants.BASIC_USERNAME, userName);
@@ -82,11 +82,11 @@ public class SecuredLoginServiceImpl implements LoginService {
     }
 
     @Override
-    public SSession login(Map<String, Serializable> credentials) throws SLoginException {
+    public SSession login(final Map<String, Serializable> credentials) throws SLoginException {
         if (credentials == null) {
             throw new SLoginException("invalid credentials, map is null");
         }
-        Long tenantId = NumberUtils.toLong(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)), -1);
+        final Long tenantId = NumberUtils.toLong(String.valueOf(credentials.get(AuthenticationConstants.BASIC_TENANT_ID)), -1);
         sessionAccessor.setSessionInfo(-1, tenantId); // necessary to check user credentials
         long userId = 0;
         boolean isTechnicalUser = false;
@@ -198,7 +198,7 @@ public class SecuredLoginServiceImpl implements LoginService {
         String userName;
         if (credentials == null || !credentials.containsKey(AuthenticationConstants.BASIC_USERNAME)
                 || credentials.get(AuthenticationConstants.BASIC_USERNAME) == null
-                || StringUtils.isBlank((userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME))))) {
+                || StringUtils.isBlank(userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME)))) {
             throw new SLoginException("invalid credentials, username is blank");
         }
         return userName;

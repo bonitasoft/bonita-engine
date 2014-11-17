@@ -30,7 +30,7 @@ public class ProcessInstanceHandler extends AbstractUpdateHandler {
 
     public ProcessInstanceHandler(final long tenantId) {
         super(tenantId);
-        this.identifier = UUID.randomUUID().toString();
+        identifier = UUID.randomUUID().toString();
     }
 
     @Override
@@ -42,7 +42,7 @@ public class ProcessInstanceHandler extends AbstractUpdateHandler {
     @Override
     public boolean isInterested(final SEvent event) {
         final Object object = event.getObject();
-        return (object instanceof SProcessInstance);
+        return object instanceof SProcessInstance;
     }
 
     @Override
