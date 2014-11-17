@@ -29,6 +29,7 @@ import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.InvalidPageTokenException;
 import org.bonitasoft.engine.exception.InvalidPageZipContentException;
+import org.bonitasoft.engine.exception.InvalidPageZipMissingIndexException;
 import org.bonitasoft.engine.exception.UpdatingWithInvalidPageTokenException;
 import org.bonitasoft.engine.exception.UpdatingWithInvalidPageZipContentException;
 import org.bonitasoft.engine.identity.User;
@@ -42,14 +43,19 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.profile.ProfileEntryCreator;
 import com.bonitasoft.engine.profile.ProfileEntryType;
+import org.junit.rules.ExpectedException;
 
 @SuppressWarnings("javadoc")
 public class PageAPIIT extends CommonAPISPTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     private static final String DISPLAY_NAME = "My Päge";
 
@@ -313,17 +319,27 @@ public class PageAPIIT extends CommonAPISPTest {
         // then: expected exception
     }
 
-    @Test(expected = InvalidPageZipContentException.class)
+    @Test
     public void should_createPage_with_invalid_content_InvalidPageZipContentException() throws BonitaException, IOException {
         // , "content.zip"given
         final String pageName = generateUniquePageName();
         final byte[] pageContent = IOUtil.zip(Collections.singletonMap("README.md", "empty file".getBytes()));
+        expectedException.expect(InvalidPageZipMissingIndexException.class);
         getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
                 pageContent);
 
         // when
-        getPageAPI().createPage(new PageCreator(pageName, CONTENT_NAME).setDescription(PAGE_DESCRIPTION).setDisplayName(DISPLAY_NAME),
-                pageContent);
+
+        // then: expected exception
+    }
+    @Test
+    public void should_getPageProperties_throw_alreadyExists() throws BonitaException, IOException {
+        // , "content.zip"given
+        final byte[] pageContent = IOUtil.zip(Collections.singletonMap("README.md", "empty file".getBytes()));
+
+        expectedException.expect(InvalidPageZipMissingIndexException.class);
+        // when
+        getPageAPI().getPageProperties(pageContent, true);
 
         // then: expected exception
     }

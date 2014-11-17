@@ -13,13 +13,13 @@ import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.filter.UserFilterService;
 import org.bonitasoft.engine.core.operation.OperationService;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.document.mapping.DocumentMappingService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.TokenService;
@@ -54,20 +54,18 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
     public FlowNodeStateManagerExt(final ProcessDefinitionService processDefinitionService, final ProcessInstanceService processInstanceService,
             final ActivityInstanceService activityInstanceService, final ConnectorInstanceService connectorInstanceService,
             final ClassLoaderService classLoaderService, final ExpressionResolverService expressionResolverService, final SchedulerService schedulerService,
-            final DataInstanceService dataInstanceService, final EventInstanceService eventInstanceService,
-            final OperationService operationService, final BPMInstancesCreator bpmInstancesCreator,
-            final ContainerRegistry containerRegistry, final ArchiveService archiveService, final TechnicalLoggerService logger,
-            final DocumentMappingService documentMappingService, final SCommentService commentService,
-            final BreakpointService breakpointService, final EventsHandler eventsHandler, final UserFilterService userFilterService,
-            final ActorMappingService actorMappingService, final WorkService workService, final TokenService tokenService,
-            final IdentityService identityService, final RefBusinessDataService refBusinessDataService) {
-        super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, classLoaderService,
-                expressionResolverService, schedulerService, dataInstanceService, eventInstanceService,
-                operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentMappingService, commentService,
-                eventsHandler, userFilterService, actorMappingService, workService, tokenService, identityService, new StateBehaviorsExt(bpmInstancesCreator,
-                        eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService, connectorInstanceService,
-                        expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService, containerRegistry,
-                        eventInstanceService, schedulerService, commentService, identityService, logger, tokenService, refBusinessDataService));
+            final DataInstanceService dataInstanceService, final EventInstanceService eventInstanceService, final OperationService operationService,
+            final BPMInstancesCreator bpmInstancesCreator, final ContainerRegistry containerRegistry, final ArchiveService archiveService,
+            final TechnicalLoggerService logger, final DocumentService documentService, final SCommentService commentService,
+            final EventsHandler eventsHandler, final UserFilterService userFilterService, final ActorMappingService actorMappingService,
+            final WorkService workService, final TokenService tokenService, final IdentityService identityService, final BreakpointService breakpointService,
+            final RefBusinessDataService refBusinessDataService) {
+        super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, expressionResolverService,
+                dataInstanceService, operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentService, commentService,
+                new StateBehaviorsExt(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService,
+                        connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService,
+                        containerRegistry, eventInstanceService, schedulerService, commentService, identityService, logger, tokenService,
+                        refBusinessDataService));
         this.breakpointService = breakpointService;
     }
 

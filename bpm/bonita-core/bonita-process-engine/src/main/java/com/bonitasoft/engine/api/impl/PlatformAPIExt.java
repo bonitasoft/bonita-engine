@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -22,7 +22,6 @@ import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.impl.AvailableOnStoppedNode;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
-import org.bonitasoft.engine.api.impl.PlatformAPIImplDelegate;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.api.impl.transaction.StopServiceStrategy;
@@ -116,12 +115,15 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     private static final String PROFILES_FILE_SP = "profiles-sp.xml";
 
+    private final LicenseChecker checker;
+
     public PlatformAPIExt() {
-        super();
+        this(LicenseChecker.getInstance());
     }
 
-    public PlatformAPIExt(final PlatformAPIImplDelegate delegate) {
-        super(delegate);
+    public PlatformAPIExt(final LicenseChecker checker) {
+        super();
+        this.checker = checker;
     }
 
     @Override
@@ -139,7 +141,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     @Override
     @CustomTransactions
     public final long createTenant(final TenantCreator creator) throws CreationException, AlreadyExistsException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_TENANT);
+        checker.checkLicenseAndFeature(Features.CREATE_TENANT);
         PlatformServiceAccessor platformAccessor = null;
         // useless? done in create(Tenantcreator)
         try {
@@ -167,6 +169,16 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
         creator.setDefaultTenant(false);
         return create(creator);
+    }
+
+    @Override
+    @CustomTransactions
+    @AvailableOnStoppedNode
+    public void createPlatform() throws CreationException {
+        if (!checker.checkLicense()) {
+            throw new CreationException("The licence is not valid: " + checker.getErrorMessage());
+        }
+        super.createPlatform();
     }
 
     @Override
@@ -326,7 +338,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     @Override
     protected void importProfiles(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> profilesFromXML,
             final org.bonitasoft.engine.service.TenantServiceAccessor tenantServiceAccessor) throws ExecutionException {
-        PageService pageService = ((TenantServiceAccessor) tenantServiceAccessor).getPageService();
+        final PageService pageService = ((TenantServiceAccessor) tenantServiceAccessor).getPageService();
         new ProfilesImporterExt(profileService, identityService, pageService, profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES).importProfiles(-1);
     }
 
@@ -336,11 +348,9 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final SBonitaException e) {
             throw new CreationException(e);
         }
-
     }
 
     public void deployTenantReports(final long tenantId, final TenantServiceAccessor tenantAccessor) throws Exception {
-
         final DefaultReportList reports = new DefaultReportList(tenantAccessor.getTechnicalLoggerService(), BonitaHomeServer.getInstance()
                 .getTenantReportFolder(tenantId));
 
@@ -430,7 +440,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
 
-            final NodeConfiguration nodeConfiguration = platformAccessor.getPlaformConfiguration();
+            final NodeConfiguration nodeConfiguration = platformAccessor.getPlatformConfiguration();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
 
@@ -723,7 +733,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     @CustomTransactions
     @AvailableOnStoppedNode
     public void startNode() throws StartNodeException {
-        LicenseChecker.getInstance().checkLicence();
+        checker.checkLicense();
         super.startNode();
     }
 
@@ -734,12 +744,11 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         super.stopNode();
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
-            BroadcastService broadcastService = platformAccessor.getBroadcastService();
+            final BroadcastService broadcastService = platformAccessor.getBroadcastService();
             broadcastService.submit(new NotifyNodeStoppedTask());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new StopNodeException(e);
         }
-
     }
 
     public void stopNode(final String message) throws StopNodeException {
@@ -806,4 +815,5 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             }
         });
     }
+
 }

@@ -9,8 +9,11 @@
 package com.bonitasoft.engine.platform;
 
 /**
+ * Criterion to sort tenants when retrieved using {@link com.bonitasoft.engine.api.PlatformAPI#getTenants(int, int, TenantCriterion)}
+ *
  * @author Lu Kai
  * @author Feng Hui
+ * @since 6.0.0
  */
 public enum TenantCriterion {
 

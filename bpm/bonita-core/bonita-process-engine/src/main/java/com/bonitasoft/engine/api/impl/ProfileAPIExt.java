@@ -202,7 +202,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
     @Override
     public Profile updateProfile(final long id, final ProfileUpdater updateDescriptor) throws UpdateException, AlreadyExistsException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.CUSTOM_PROFILES);
 
         if (updateDescriptor == null || updateDescriptor.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
@@ -235,7 +235,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
     @Override
     public ProfileEntry createProfileEntry(final ProfileEntryCreator creator) throws CreationException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.CUSTOM_PROFILES);
 
         final Map<ProfileEntryField, Serializable> fields = creator.getFields();
         final String type = (String) fields.get(ProfileEntryField.TYPE);
@@ -288,7 +288,7 @@ public class ProfileAPIExt extends ProfileAPIImpl implements ProfileAPI {
 
     @Override
     public ProfileEntry updateProfileEntry(final long id, final ProfileEntryUpdater updateDescriptor) throws UpdateException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CUSTOM_PROFILES);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.CUSTOM_PROFILES);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProfileService profileService = tenantAccessor.getProfileService();
