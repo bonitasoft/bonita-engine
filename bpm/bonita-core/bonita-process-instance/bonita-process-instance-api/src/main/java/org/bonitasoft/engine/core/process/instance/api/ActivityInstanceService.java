@@ -32,6 +32,7 @@ import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -107,16 +108,19 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     SActivityInstance getActivityInstance(long activityInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException;
 
     /**
-     * Get humanTaskInstance by its id
+     * Returns the instance of the human task.
      *
-     * @param activityInstanceId
-     *        identifier of humanTaskInstance
-     * @return an SHumanTaskInstance object with id corresponding to the parameter
+     * @param humanTaskInstanceId
+     *        the identifier of human task
+     * @return the instance of the human task
      * @throws SActivityInstanceNotFoundException
+     *         if the identifier does not refer to an existing human task
      * @throws SActivityReadException
+     *         if an exception occurs when retrieving the instance
      */
     SHumanTaskInstance getHumanTaskInstance(long activityInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException;
 
+    
     /**
      * Get activities with specific states in the root container in specific order, this is used for pagination
      *
@@ -938,5 +942,20 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @since 6.3.3
      */
     List<SHumanTaskInstance> searchAssignedAndPendingHumanTasks(long rootProcessDefinitionId, QueryOptions queryOptions) throws SBonitaReadException;
+
+    
+    
+   
+    /**
+     * Returns the instance of the user task.
+     *
+     * @param userTaskInstanceId the identifier of the instance of the user task
+     * @return the instance of the user task
+     * @throws SActivityInstanceNotFoundException
+     *         if the identifier does not refer to an existing user task
+     * @throws SActivityReadException
+     *         if an exception occurs when retrieving the instance
+     */
+    SUserTaskInstance getUserTaskInstance(long userTaskInstanceId) throws SActivityInstanceNotFoundException, SActivityReadException;
 
 }

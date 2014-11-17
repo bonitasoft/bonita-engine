@@ -262,8 +262,7 @@ public class StateBehaviors {
                             final Serializable value = loopData.getValue();
                             final int index = flowNodeInstance.getLoopCounter();
                             if (value instanceof List<?>) {
-                                final List<Serializable> list = (List<Serializable>) value;
-                                list.set(index, outputData.getValue());
+                ((List<Serializable>) value).set(index, outputData.getValue());
                             } else {
                                 throw new SActivityExecutionException("unable to map the ouput of the multi instanciated activity "
                                         + flowNodeInstance.getName() + " the output loop data named " + loopData.getName() + " is not a list but "
@@ -309,8 +308,7 @@ public class StateBehaviors {
 
     private void mapUsingUserFilters(final SFlowNodeInstance flowNodeInstance, final SHumanTaskDefinition humanTaskDefinition, final String actorName,
             final long processDefinitionId, final SUserFilterDefinition sUserFilterDefinition) throws SClassLoaderException, SUserFilterExecutionException,
-            SActivityStateExecutionException, SActivityCreationException, SFlowNodeNotFoundException, SFlowNodeReadException, SActivityModificationException,
-            SCommentAddException, SUserNotFoundException {
+            SActivityStateExecutionException, SActivityCreationException, SFlowNodeNotFoundException, SFlowNodeReadException, SActivityModificationException {
         final ClassLoader processClassloader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
         final SExpressionContext expressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
                 flowNodeInstance.getLogicalGroup(0));
@@ -377,7 +375,7 @@ public class StateBehaviors {
 
     /**
      * Return the phases and connectors to execute, as a couple of (phase, couple of (connector instance, connector definition))
-     * 
+     *
      * @param processDefinition
      *        the process where the connectors are defined.
      * @param flowNodeInstance
@@ -604,15 +602,7 @@ public class StateBehaviors {
                 activityInstanceService.updateDisplayName(flowNodeInstance, displayName);
                 activityInstanceService.updateDisplayDescription(flowNodeInstance, displayDescription);
             }
-        } catch (final SFlowNodeModificationException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
-        } catch (final SExpressionTypeUnknownException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
-        } catch (final SExpressionEvaluationException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
-        } catch (final SExpressionDependencyMissingException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
-        } catch (final SInvalidExpressionException e) {
+        } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException("error while updating display name and description", e);
         }
     }
@@ -633,15 +623,7 @@ public class StateBehaviors {
                     activityInstanceService.updateDisplayDescription(flowNodeInstance, displayDescriptionAfterCompletion);
                 }
             }
-        } catch (final SFlowNodeModificationException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
-        } catch (final SExpressionTypeUnknownException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
-        } catch (final SExpressionEvaluationException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
-        } catch (final SExpressionDependencyMissingException e) {
-            throw new SActivityStateExecutionException("error while updating display name and description", e);
-        } catch (final SInvalidExpressionException e) {
+        } catch (final SBonitaException e) {
             throw new SActivityStateExecutionException("error while updating display name and description", e);
         }
     }
@@ -840,14 +822,17 @@ public class StateBehaviors {
     }
 
     private void interruptWaitingEvents(final long instanceId, final SCatchEventDefinition catchEventDef)
-            throws SBonitaSearchException, SWaitingEventModificationException {
+            throws SBonitaReadException, SWaitingEventModificationException {
         if (!catchEventDef.getEventTriggers().isEmpty()) {
             interruptWaitingEvents(instanceId, SWaitingEvent.class);
         }
     }
 
-    public void interrupWaitinEvents(final SReceiveTaskInstance receiveTaskInstance) throws SBonitaException {
+    public void interrupWaitinEvents(final SFlowNodeInstance receiveTaskInstance) throws SBonitaException {
+        if (receiveTaskInstance instanceof SReceiveTaskInstance || receiveTaskInstance instanceof SIntermediateCatchEventInstance
+                || receiveTaskInstance instanceof SBoundaryEventInstance) {
         interruptWaitingEvents(receiveTaskInstance.getId(), SWaitingEvent.class);
+    }
     }
 
     private QueryOptions getWaitingEventsCountOptions(final long instanceId, final Class<? extends SWaitingEvent> waitingEventClass) {
@@ -871,7 +856,7 @@ public class StateBehaviors {
     }
 
     private <T extends SWaitingEvent> void interruptWaitingEvents(final long instanceId, final Class<T> waitingEventClass)
-            throws SBonitaSearchException, SWaitingEventModificationException {
+            throws SBonitaReadException, SWaitingEventModificationException {
         final QueryOptions queryOptions = getWaitingEventsQueryOptions(instanceId, waitingEventClass);
         final QueryOptions countOptions = getWaitingEventsCountOptions(instanceId, waitingEventClass);
         long count = 0;
@@ -905,13 +890,13 @@ public class StateBehaviors {
         }
     }
 
-    public void addAssignmentSystemCommentIfTaskWasAutoAssign(SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
+    public void addAssignmentSystemCommentIfTaskWasAutoAssign(final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
         if (SFlowNodeType.USER_TASK.equals(flowNodeInstance.getType()) || SFlowNodeType.MANUAL_TASK.equals(flowNodeInstance.getType())) {
-            long userId = ((SHumanTaskInstance) flowNodeInstance).getAssigneeId();
+            final long userId = ((SHumanTaskInstance) flowNodeInstance).getAssigneeId();
             if (userId > 0) {
                 try {
                     addAssignmentSystemComment(flowNodeInstance, userId);
-                } catch (SBonitaException e) {
+                } catch (final SBonitaException e) {
                     throw new SActivityStateExecutionException("error while updating display name and description", e);
                 }
             }
@@ -919,7 +904,7 @@ public class StateBehaviors {
 
     }
 
-    public void addAssignmentSystemComment(SFlowNodeInstance flowNodeInstance, long userId) throws SUserNotFoundException, SCommentAddException {
+    public void addAssignmentSystemComment(final SFlowNodeInstance flowNodeInstance, final long userId) throws SUserNotFoundException, SCommentAddException {
         final SUser user = identityService.getUser(userId);
         if (commentService.isCommentEnabled(SystemCommentType.STATE_CHANGE)) {
             commentService.addSystemComment(flowNodeInstance.getRootContainerId(), "The task \"" + flowNodeInstance.getDisplayName() + "\" is now assigned to "
@@ -956,10 +941,9 @@ public class StateBehaviors {
             if (value instanceof List) {
                 final List<?> loopDataInputCollection = (List<?>) value;
                 return loopDataInputCollection.size();
-            } else {
+            }
                 throw new SActivityStateExecutionException("The multi instance on activity " + flowNodeInstance.getName() + " of process "
                         + processDefinition.getName() + " " + processDefinition.getVersion() + " have a loop data input which is not a java.util.List");
-            }
         }
         return numberOfInstanceMax;
     }

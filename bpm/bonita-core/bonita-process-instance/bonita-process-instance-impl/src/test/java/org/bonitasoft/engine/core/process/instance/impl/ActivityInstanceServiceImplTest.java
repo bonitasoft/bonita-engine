@@ -17,21 +17,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
-import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.impl.SUserTaskInstanceBuilderFactoryImpl;
-import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
-import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -116,9 +111,9 @@ public class ActivityInstanceServiceImplTest {
     @Test
     public void updateDisplayName_should_truncate_when_display_name_is_bigger_than_75_characters() throws Exception {
         // given
-        String displayName75 = "123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345";
-        String displayName = displayName75 + displayName75;
-        SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
+        final String displayName75 = "123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345";
+        final String displayName = displayName75 + displayName75;
+        final SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
 
         // when
         activityInstanceServiceImpl.updateDisplayName(flowNode, displayName);
@@ -128,18 +123,18 @@ public class ActivityInstanceServiceImplTest {
         checkFlowNodeUpdate(keyProvider.getDisplayNameKey(), displayName75);
     }
 
-    private void checkFlowNodeUpdate(String attributeKey, String expectedValue) throws SRecorderException {
-        ArgumentCaptor<UpdateRecord> recordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
+    private void checkFlowNodeUpdate(final String attributeKey, final String expectedValue) throws SRecorderException {
+        final ArgumentCaptor<UpdateRecord> recordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
         verify(recorder, times(1)).recordUpdate(recordCaptor.capture(), any(SUpdateEvent.class));
-        Object actualValue = recordCaptor.getValue().getFields().get(attributeKey);
+        final Object actualValue = recordCaptor.getValue().getFields().get(attributeKey);
         assertThat(actualValue).isEqualTo(expectedValue);
     }
 
     @Test
     public void updateDisplayName_should_not_change_value_when_display_name_is_lower_than_75_characters() throws Exception {
         // given
-        String displayName = "simple task";
-        SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
+        final String displayName = "simple task";
+        final SFlowNodeInstance flowNode = mock(SFlowNodeInstance.class);
 
         // when
         activityInstanceServiceImpl.updateDisplayName(flowNode, displayName);
