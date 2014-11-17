@@ -33,7 +33,7 @@ import org.bonitasoft.engine.session.model.builder.SSessionBuilderFactory;
  */
 public class SessionServiceImpl implements SessionService {
 
-    private final long DEFAULT_SESSION_DURATION = 3600000;
+    private static final long DEFAULT_SESSION_DURATION = 3600000;
 
     private long sessionDuration = DEFAULT_SESSION_DURATION;
 
@@ -85,7 +85,7 @@ public class SessionServiceImpl implements SessionService {
         SSession session = null;
         try {
             session = sessionProvider.getSession(sessionId);
-        } catch (SSessionNotFoundException e) {
+        } catch (final SSessionNotFoundException e) {
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "Session with id = <" + sessionId + "> is invalid, because it does not exist.");
             }

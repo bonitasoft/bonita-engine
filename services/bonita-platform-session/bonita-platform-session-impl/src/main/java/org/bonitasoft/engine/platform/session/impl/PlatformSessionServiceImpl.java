@@ -34,7 +34,7 @@ import org.bonitasoft.engine.platform.session.model.builder.SPlatformSessionBuil
  */
 public class PlatformSessionServiceImpl implements PlatformSessionService {
 
-    private final long DEFAULT_SESSION_DURATION = 3600000;
+    private static final long DEFAULT_SESSION_DURATION = 3600000;
 
     private final PlatformSessionProvider platformSessionProvider;
 
