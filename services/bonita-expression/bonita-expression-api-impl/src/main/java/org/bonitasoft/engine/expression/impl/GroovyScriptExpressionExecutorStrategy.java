@@ -19,14 +19,10 @@ import groovy.lang.GroovyShell;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.expression.ContainerState;
-import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
-import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 
 /**
@@ -35,7 +31,7 @@ import org.bonitasoft.engine.expression.model.SExpression;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class GroovyScriptExpressionExecutorStrategy extends NonEmptyContentExpressionExecutorStrategy {
+public class GroovyScriptExpressionExecutorStrategy extends AbstractGroovyScriptExpressionExecutorStrategy {
 
     @Override
     public Object evaluate(final SExpression expression, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
@@ -61,26 +57,6 @@ public class GroovyScriptExpressionExecutorStrategy extends NonEmptyContentExpre
         } catch (final Exception e) {
             throw new SExpressionEvaluationException("Script throws an exception" + expression, e, expressionName);
         }
-    }
-
-    @Override
-    public ExpressionKind getExpressionKind() {
-        return KIND_READ_ONLY_SCRIPT_GROOVY;
-    }
-
-    @Override
-    public List<Object> evaluate(final List<SExpression> expressions, final Map<String, Object> context, final Map<Integer, Object> resolvedExpressions,
-            final ContainerState containerState) throws SExpressionEvaluationException {
-        final List<Object> list = new ArrayList<Object>(expressions.size());
-        for (final SExpression expression : expressions) {
-            list.add(evaluate(expression, context, resolvedExpressions, containerState));
-        }
-        return list;
-    }
-
-    @Override
-    public boolean mustPutEvaluatedExpressionInContext() {
-        return false;
     }
 
 }

@@ -22,10 +22,10 @@ import static org.mockito.Mockito.mock;
 import java.util.Collections;
 
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.junit.Before;
@@ -61,8 +61,6 @@ public class RestartFlowNodesHandlerTest {
         doReturn(activityInstanceService).when(tenantServiceAccessor).getActivityInstanceService();
     }
 
-
-
     @Test
     public final void do_nothing_if_no_flownode() throws Exception {
         //given
@@ -76,11 +74,10 @@ public class RestartFlowNodesHandlerTest {
         assertThat(restartFlowNodesHandler.flownodesToRestartByTenant.get(123l)).isEmpty();
     }
 
-
     @Test(expected = RestartException.class)
     public final void throw_exception_if_error_when_get_flownode() throws Exception {
         //given
-        doThrow(new SFlowNodeReadException("plop")).when(activityInstanceService).getFlowNodeInstanceIdsToRestart(any(QueryOptions.class));
+        doThrow(new SBonitaReadException("plop")).when(activityInstanceService).getFlowNodeInstanceIdsToRestart(any(QueryOptions.class));
 
         //when
         restartFlowNodesHandler.beforeServicesStart(platformServiceAccessor, tenantServiceAccessor);

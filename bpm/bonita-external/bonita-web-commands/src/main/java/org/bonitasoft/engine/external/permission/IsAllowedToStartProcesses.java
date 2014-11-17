@@ -23,7 +23,7 @@ import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
-import org.bonitasoft.engine.command.TenantCommand;
+import org.bonitasoft.engine.command.system.CommandWithParameters;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -33,10 +33,10 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 /**
  * Specific Command to access the actor Id list for a specific Process Definition and a specific actor ids.
  * The mandatory keys to set as parameters are "PROCESS_DEFINITION_ID_KEY" and "ACTOR_IDS_KEY".
- * 
+ *
  * @author Zhao Na
  */
-public class IsAllowedToStartProcesses extends TenantCommand {
+public class IsAllowedToStartProcesses extends CommandWithParameters {
 
     private TenantServiceAccessor serviceAccessor;
 
@@ -51,24 +51,19 @@ public class IsAllowedToStartProcesses extends TenantCommand {
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         this.serviceAccessor = serviceAccessor;
-        ActorMappingService actorMappingService = this.serviceAccessor.getActorMappingService();
-        Map<Long, Boolean> resMap = new HashMap<Long, Boolean>();
+        final ActorMappingService actorMappingService = this.serviceAccessor.getActorMappingService();
+        final Map<Long, Boolean> resMap = new HashMap<Long, Boolean>();
 
-        List<Long> processDefinitionIds = (List<Long>) parameters.get(PROCESSDEFINITION_IDS_KEY);
-        if (processDefinitionIds == null) {
-            throw new SCommandParameterizationException("Mandatory parameter " + PROCESSDEFINITION_IDS_KEY + " is missing or not convertible to List<Long>.");
-        }
-        long userId = (Long) parameters.get(USER_ID_KEY);
-        if (userId == 0) {
-            throw new SCommandParameterizationException("Mandatory parameter " + USER_ID_KEY + " is missing or not convertible to Long.");
-        }
+        final List<Long> processDefinitionIds = getMandatoryParameter(parameters, PROCESSDEFINITION_IDS_KEY, "Mandatory parameter " + PROCESSDEFINITION_IDS_KEY
+                + " is missing or not convertible to List<Long>.");
+        final long userId = getLongMandadoryParameter(parameters, USER_ID_KEY);
 
         checkIfUserExists(userId);
 
         if (!processDefinitionIds.isEmpty()) {
-            for (Long processDefinitionId : processDefinitionIds) {
+            for (final Long processDefinitionId : processDefinitionIds) {
                 try {
-                    List<SActor> ckRes = actorMappingService.getActorsOfUserCanStartProcessDefinition(userId, processDefinitionId, 0,
+                    final List<SActor> ckRes = actorMappingService.getActorsOfUserCanStartProcessDefinition(userId, processDefinitionId, 0,
                             QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
                     if (ckRes != null && ckRes.size() == 1) {
                         resMap.put(processDefinitionId, true);
@@ -84,9 +79,9 @@ public class IsAllowedToStartProcesses extends TenantCommand {
         return (Serializable) resMap;
     }
 
-    private void checkIfUserExists(long userId) throws SCommandParameterizationException {
+    private void checkIfUserExists(final long userId) throws SCommandParameterizationException {
         try {
-            final IdentityService identityService = this.serviceAccessor.getIdentityService();
+            final IdentityService identityService = serviceAccessor.getIdentityService();
             identityService.getUser(userId);
         } catch (final SUserNotFoundException e) {
             throw new SCommandParameterizationException("No such user refer to this userId :" + userId, e);

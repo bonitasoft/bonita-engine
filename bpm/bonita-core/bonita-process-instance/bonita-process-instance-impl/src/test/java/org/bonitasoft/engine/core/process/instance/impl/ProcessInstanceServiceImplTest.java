@@ -80,6 +80,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -154,10 +155,9 @@ public class ProcessInstanceServiceImplTest {
     @Before
     public void setUp() throws SBonitaException {
         doCallRealMethod().when(processInstanceService).deleteParentProcessInstanceAndElements(anyListOf(SProcessInstance.class));
-        doCallRealMethod().when(processInstanceService).deleteParentProcessInstanceAndElements(any(SProcessInstance.class));
 
-        doCallRealMethod().when(processInstanceService).deleteParentArchivedProcessInstancesAndElements(anyListOf(SAProcessInstance.class));
-        doCallRealMethod().when(processInstanceService).deleteParentArchivedProcessInstanceAndElements(any(SAProcessInstance.class));
+        doCallRealMethod().when(processInstanceService).deleteArchivedParentProcessInstancesAndElements(anyListOf(SAProcessInstance.class));
+        doCallRealMethod().when(processInstanceService).deleteArchivedParentProcessInstanceAndElements(any(SAProcessInstance.class));
 
         when(processInstance.getId()).thenReturn(processInstanceId);
         when(aProcessInstance.getId()).thenReturn(archivedProcessInstanceId);
@@ -169,7 +169,7 @@ public class ProcessInstanceServiceImplTest {
     }
 
     @Test
-    public void deleteParentPIAndElementsOnAbsentProcessShouldBeIgnored() throws Exception {
+    public void deleteParentProcessInstanceAndElementsOnAbsentProcessShouldBeIgnored() throws Exception {
         // given:
         doThrow(SProcessInstanceModificationException.class).when(processInstanceService).deleteProcessInstance(processInstance);
         doThrow(SProcessInstanceNotFoundException.class).when(processInstanceService).getProcessInstance(processInstanceId);
@@ -183,7 +183,7 @@ public class ProcessInstanceServiceImplTest {
     }
 
     @Test(expected = SBonitaException.class)
-    public void exceptionInDeleteParentPIAndElementsOnStillExistingProcessShouldRaiseException() throws Exception {
+    public void deleteParentProcessInstanceAndElements_should_throw_exception_when_deleteProcessInstance_failed() throws Exception {
         // given:
         doThrow(SProcessInstanceModificationException.class).when(processInstanceService).deleteProcessInstance(processInstance);
         // getProcessInstance normally returns:
@@ -206,10 +206,26 @@ public class ProcessInstanceServiceImplTest {
         doNothing().when(processInstanceService).logArchivedProcessInstanceNotFound(any(SProcessInstanceModificationException.class));
 
         // when:
-        processInstanceService.deleteParentArchivedProcessInstanceAndElements(aProcessInstance);
+        processInstanceService.deleteArchivedParentProcessInstanceAndElements(aProcessInstance);
 
         // then:
         verify(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
+    }
+
+    @Test(expected = SBonitaException.class)
+    public void exceptionInDeleteParentArchivedPIAndElementsOnStillExistingProcessShouldRaiseException() throws Exception {
+        // given:
+        doThrow(SProcessInstanceModificationException.class).when(processInstanceService).deleteArchivedProcessInstanceElements(anyLong(), anyLong());
+        // getProcessInstance normally returns:
+        doReturn(mock(SAProcessInstance.class)).when(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
+
+        try {
+            // when:
+            processInstanceService.deleteArchivedParentProcessInstanceAndElements(aProcessInstance);
+        } finally {
+            // then:
+            verify(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
+        }
     }
 
     @Test(expected = SProcessInstanceModificationException.class)
@@ -221,7 +237,7 @@ public class ProcessInstanceServiceImplTest {
 
         try {
             // when:
-            processInstanceService.deleteParentArchivedProcessInstanceAndElements(aProcessInstance);
+            processInstanceService.deleteArchivedParentProcessInstanceAndElements(aProcessInstance);
         } finally {
             // then:
             verify(processInstanceService).getArchivedProcessInstance(archivedProcessInstanceId);
@@ -247,20 +263,20 @@ public class ProcessInstanceServiceImplTest {
 
     @Test
     public void deleteParentArchivedProcessInstancesAndElements_returns_0_when_no_elements_are_deleted() throws Exception {
-        assertEquals(0, processInstanceService.deleteParentArchivedProcessInstancesAndElements(Collections.<SAProcessInstance> emptyList()));
+        assertEquals(0, processInstanceService.deleteArchivedParentProcessInstancesAndElements(Collections.<SAProcessInstance> emptyList()));
     }
 
     @Test
     public void deleteParentArchivedProcessInstancesAndElements_returns_1_when_1_elements_are_deleted() throws Exception {
         final List<SAProcessInstance> processInstances = Arrays.asList(mock(SAProcessInstance.class));
-        assertEquals(1, processInstanceService.deleteParentArchivedProcessInstancesAndElements(processInstances));
+        assertEquals(1, processInstanceService.deleteArchivedParentProcessInstancesAndElements(processInstances));
     }
 
     @Test
     public void deleteParentArchivedProcessInstancesAndElements_returns_n_when_n_elements_are_deleted() throws Exception {
         final List<SAProcessInstance> processInstances = Arrays.asList(mock(SAProcessInstance.class), mock(SAProcessInstance.class),
                 mock(SAProcessInstance.class));
-        assertEquals(3, processInstanceService.deleteParentArchivedProcessInstancesAndElements(processInstances));
+        assertEquals(3, processInstanceService.deleteArchivedParentProcessInstancesAndElements(processInstances));
     }
 
     @Test
@@ -272,7 +288,7 @@ public class ProcessInstanceServiceImplTest {
         processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstance);
         verify(processInstanceService, times(1)).deleteProcessInstanceElements(sProcessInstance);
         verify(processInstanceService, times(1)).deleteArchivedProcessInstanceElements(sProcessInstance.getId(), sProcessInstance.getProcessDefinitionId());
-        verify(processInstanceService, times(1)).deleteArchivedFlowNodeInstances(sProcessInstance.getId());
+        verify(activityInstanceService, times(1)).deleteArchivedFlowNodeInstances(sProcessInstance.getId());
     }
 
     @Test
@@ -761,7 +777,7 @@ public class ProcessInstanceServiceImplTest {
         inputParameters.put("processDefinitionId", 45L);
         final SelectOneDescriptor<Long> countDescriptor = new SelectOneDescriptor<Long>("countProcessInstancesOfProcessDefinition", inputParameters,
                 SProcessInstance.class);
-        when(readPersistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(4L);
+        when(readPersistenceService.selectOne(countDescriptor)).thenReturn(4L);
 
         processInstanceService.getNumberOfProcessInstances(45L);
 
@@ -770,7 +786,8 @@ public class ProcessInstanceServiceImplTest {
 
     @Test(expected = SBonitaReadException.class)
     public void getNumberOfProcessInstances_should_throw_a_read_exception_if_getNumberOfEntities_does_it() throws Exception {
-        when(readPersistenceService.selectOne(any(SelectOneDescriptor.class))).thenThrow(new SBonitaReadException("error"));
+        when(readPersistenceService.selectOne(Matchers.<SelectOneDescriptor<Long>> any())).thenThrow(
+                new SBonitaReadException("error"));
 
         processInstanceService.getNumberOfProcessInstances(45L);
     }

@@ -48,7 +48,7 @@ public class PermissionAPIImplTest {
     private APICallContext apiCallContext;
 
     @Before
-    public void before() throws Exception {
+    public void before() {
         permissionAPI = spy(new PermissionAPIImpl());
         doReturn(tenantServiceAccessor).when(permissionAPI).getTenantServiceAccessor();
         doReturn(permissionService).when(tenantServiceAccessor).getPermissionService();
@@ -61,7 +61,7 @@ public class PermissionAPIImplTest {
         doReturn(true).when(permissionService).checkAPICallWithScript("myScript", apiCallContext, false);
 
         //when
-        boolean isAllowed = permissionAPI.checkAPICallWithScript("myScript", apiCallContext, false);
+        final boolean isAllowed = permissionAPI.checkAPICallWithScript("myScript", apiCallContext, false);
 
         //then
         assertThat(isAllowed).isTrue();

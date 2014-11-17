@@ -37,7 +37,6 @@ import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.api.impl.DocumentHelper;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
-import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilder;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -151,30 +150,12 @@ public class DocumentAPIImpl implements DocumentAPI {
         return APIUtils.getUserId();
     }
 
-    private SDocument buildExternalProcessDocumentReference(final String fileName,
-            final String mimeType, final long authorId, final String url) {
-        final SDocumentBuilder documentBuilder = initDocumentBuilder(fileName, mimeType, authorId);
-        documentBuilder.setURL(url);
-        documentBuilder.setHasContent(false);
-        return documentBuilder.done();
+    private SDocument buildExternalProcessDocumentReference(final String fileName, final String mimeType, final long authorId, final String url) {
+        return BuilderFactory.get(SDocumentBuilderFactory.class).createNewExternalProcessDocumentReference(fileName, mimeType, authorId, url).done();
     }
 
-    private SDocument buildProcessDocument(final String fileName, final String mimetype,
-            final long authorId, final byte[] content) {
-        final SDocumentBuilder documentBuilder = initDocumentBuilder(fileName, mimetype, authorId);
-        documentBuilder.setHasContent(true);
-        documentBuilder.setContent(content);
-        return documentBuilder.done();
-    }
-
-    private SDocumentBuilder initDocumentBuilder(final String fileName, final String mimetype,
-            final long authorId) {
-        final SDocumentBuilder documentBuilder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance();
-        documentBuilder.setFileName(fileName);
-        documentBuilder.setMimeType(mimetype);
-        documentBuilder.setAuthor(authorId);
-        documentBuilder.setCreationDate(System.currentTimeMillis());
-        return documentBuilder;
+    private SDocument buildProcessDocument(final String fileName, final String mimeType, final long authorId, final byte[] content) {
+        return BuilderFactory.get(SDocumentBuilderFactory.class).createNewProcessDocument(fileName, mimeType, authorId, content).done();
     }
 
     @Override

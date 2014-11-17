@@ -19,7 +19,7 @@ package org.bonitasoft.engine.test;
  */
 public enum TestStates {
 
-    INITIAL("initializing"),
+    INITIALIZING("initializing"),
 
     NORMAL_FINAL("completed"),
 

@@ -29,8 +29,7 @@ public class MessageBoundaryEventTest extends AbstractEventTest {
 
         getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("pMessageBoundary"),
                 new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
-        final ActivityInstance executionStep = waitForUserTask("exceptionStep", processInstance.getId());
-        assignAndExecuteStep(executionStep, donaBenta.getId());
+        waitForUserTaskAndExecuteIt(EXCEPTION_STEP, processInstance, donaBenta);
 
         waitForProcessToFinish(processInstance);
 
@@ -128,8 +127,7 @@ public class MessageBoundaryEventTest extends AbstractEventTest {
 
         getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("processWithBoundaryMessageEventAndMultiInstance"),
                 new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
-        final ActivityInstance executionStep = waitForUserTask("exceptionStep", processInstance.getId());
-        assignAndExecuteStep(executionStep, donaBenta.getId());
+        waitForUserTaskAndExecuteIt(EXCEPTION_STEP, processInstance, donaBenta);
 
         waitForProcessToFinish(processInstance);
 
@@ -180,8 +178,7 @@ public class MessageBoundaryEventTest extends AbstractEventTest {
 
         getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("processWithBoundaryMessageEventAndMultiInstance"),
                 new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
-        final ActivityInstance executionStep = waitForUserTask("exceptionStep", processInstance.getId());
-        assignAndExecuteStep(executionStep, donaBenta.getId());
+        waitForUserTaskAndExecuteIt(EXCEPTION_STEP, processInstance, donaBenta);
 
         waitForProcessToFinish(processInstance);
 
@@ -233,8 +230,7 @@ public class MessageBoundaryEventTest extends AbstractEventTest {
 
         getProcessAPI().sendMessage("MyMessage", new ExpressionBuilder().createConstantStringExpression("processWithLoopActivityAndBoundaryEvent"),
                 new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
-        final ActivityInstance executionStep = waitForUserTask("exceptionStep", processInstance.getId());
-        assignAndExecuteStep(executionStep, donaBenta.getId());
+        waitForUserTaskAndExecuteIt(EXCEPTION_STEP, processInstance, donaBenta);
 
         waitForProcessToFinish(processInstance);
 
@@ -254,7 +250,7 @@ public class MessageBoundaryEventTest extends AbstractEventTest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         for (int i = 0; i < loopMax; i++) {
-            waitForUserTaskAndExecuteIt("step1", processInstance.getId(), donaBenta.getId());
+            waitForUserTaskAndExecuteIt("step1", processInstance, donaBenta);
         }
         final ActivityInstance waitForUserTask = waitForUserTask("step2", processInstance.getId());
 

@@ -14,7 +14,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
         ProcessResolutionTest.class,
         ProcessExecutionTest.class,
-        ProcessManagementTest.class,
+        ProcessManagementIT.class,
         ProcessDeploymentTest.class,
         ProcessDescriptionTest.class,
         GetProcessDefinitionTest.class,

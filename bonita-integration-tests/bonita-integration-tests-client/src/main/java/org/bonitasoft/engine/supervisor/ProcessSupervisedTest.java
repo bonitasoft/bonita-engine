@@ -182,7 +182,7 @@ public class ProcessSupervisedTest extends CommonAPITest {
     @Test
     public void superviseMyArchivedTask() throws Exception {
         final List<HumanTaskInstance> instanceList = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
-        HumanTaskInstance humanTaskInstance = instanceList.get(0);
+        final HumanTaskInstance humanTaskInstance = instanceList.get(0);
         // one archive tasks
         final long activityInstanceId = humanTaskInstance.getId();
 
@@ -351,9 +351,6 @@ public class ProcessSupervisedTest extends CommonAPITest {
 
     @Test
     public void searchPendingTasksSupervisedBy() throws Exception {
-        final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstances.get(2).getId(), 0, 10);
-        final long activityInstanceId = activities.get(0).getId();
-
         final SearchOptionsBuilder searchOptions = BuildTestUtil.buildSearchOptions(0, 10, HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
         final SearchResult<HumanTaskInstance> result = getProcessAPI().searchPendingTasksSupervisedBy(matti.getId(), searchOptions.done());
         assertNotNull(result);

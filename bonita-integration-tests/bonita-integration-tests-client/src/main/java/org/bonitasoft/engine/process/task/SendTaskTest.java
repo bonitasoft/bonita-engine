@@ -69,7 +69,7 @@ public class SendTaskTest extends CommonAPITest {
 
     @Before
     public void setUp() throws Exception {
-         loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
         user = getIdentityAPI().createUser("john", "bpm");
     }
 
@@ -177,7 +177,7 @@ public class SendTaskTest extends CommonAPITest {
                 10, ActivityInstanceCriterion.LAST_UPDATE_DESC);
         assertTrue(archivedActivityInstances.get(0) instanceof ArchivedSendTaskInstance);
         forceMatchingOfEvents();
-        waitForStep("step1", receiveMessageProcessInstance);
+        waitForUserTask("step1", receiveMessageProcessInstance);
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
         assertEquals("Doe", dataInstance.getValue());
@@ -218,8 +218,7 @@ public class SendTaskTest extends CommonAPITest {
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
         forceMatchingOfEvents();
-
-        waitForStep("step1", receiveMessageProcessInstance);
+        waitForUserTask("step1", receiveMessageProcessInstance);
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
         assertEquals("Doe", dataInstance.getValue());

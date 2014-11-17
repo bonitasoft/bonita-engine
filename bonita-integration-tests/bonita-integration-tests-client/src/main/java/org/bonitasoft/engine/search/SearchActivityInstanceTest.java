@@ -12,7 +12,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import org.bonitasoft.engine.CommonAPITest;
 import org.bonitasoft.engine.api.ProcessAPI;
@@ -44,11 +43,9 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.BuildTestUtil;
-import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.test.check.CheckNbOfActivities;
-import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -96,9 +93,8 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(user.getId(), processDefinition.getId());
 
         // Wait for 2 activities in READY state:
-        final CheckNbOfActivities checkNbReadyActivities = new CheckNbOfActivities(getProcessAPI(), 200, 3000, true, processInstance, 2,
-                TestStates.READY);
-        assertTrue("Expected 2 open activities for process instance " + processInstance.getId(), checkNbReadyActivities.waitUntil());
+        waitForUserTask("userTask", processInstance);
+        waitForUserTask("secondTask", processInstance);
 
         // Check that no tasks are archived yet:
         SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, 12);
@@ -107,7 +103,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         assertEquals(0, archActivitResult.getCount());
 
         // Skip the 2 tasks one by one:
-        final Set<ActivityInstance> activities = checkNbReadyActivities.getResult();
+        final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 2);
         int nbTasksArchived = 0;
         for (final ActivityInstance activityInstance : activities) {
             skipTask(activityInstance.getId());
@@ -504,13 +500,11 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         final ProcessInstance pi2 = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("userTask1", pi1);
         waitForUserTaskAndAssigneIt("userTask2", pi1, user);
-        final WaitForStep waitForStep4 = waitForStep("manualTask", pi1);
-        assertTrue(waitForStep4.waitUntil());
+        waitForUserTask("manualTask", pi1);
 
         waitForUserTask("userTask1", pi2);
         waitForUserTask("userTask2", pi2);
-        final WaitForStep waitForStep44 = waitForStep("manualTask", pi2);
-        assertTrue(waitForStep44.waitUntil());
+        waitForUserTask("manualTask", pi2);
 
         // finish the tasks
         final List<ActivityInstance> openedActivityInstances1 = getProcessAPI().getOpenActivityInstances(pi1.getId(), 0, 20, ActivityInstanceCriterion.DEFAULT);
@@ -1168,18 +1162,19 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME);
         processBuilder.addSendTask("sendTask", "myMessage", new ExpressionBuilder().createConstantStringExpression("p1"))
-                .addConnector("wait900ms", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_ENTER)
-                .addInput("timeout", new ExpressionBuilder().createConstantLongExpression(900));
+                .addConnector("wait2000ms", "testConnectorLongToExecute", "1.0.0", ConnectorEvent.ON_FINISH)
+                .addInput("timeout", new ExpressionBuilder().createConstantLongExpression(2000));
         processBuilder.addAutomaticTask("autoTask");
         processBuilder.addUserTask("userTask", ACTOR_NAME);
         processBuilder.addTransition("autoTask", "sendTask");
         processBuilder.addTransition("sendTask", "userTask");
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorLongToExecute(processBuilder, ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        //        waitForFlowNodeInState(processInstance, "sendTask", TestStates.INITIALIZING, true);
+        waitForFlowNodeInExecutingState(processInstance, "sendTask", true);
+
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ArchivedActivityInstanceSearchDescriptor.NAME, Order.ASC);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForActivity("sendTask", processInstance);
-
         final SearchResult<ActivityInstance> searchActivities = getProcessAPI().searchActivities(builder.done());
         assertEquals(1, searchActivities.getCount());
         final List<ActivityInstance> activities = searchActivities.getResult();
