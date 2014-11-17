@@ -253,13 +253,13 @@ public class ProfilesImporter {
     protected SProfileEntry createProfileEntry(final ExportedParentProfileEntry parentEntry, final long profileId, final long parentId) {
         return BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(parentEntry.getName(), profileId)
                 .setDescription(parentEntry.getDescription()).setIndex(parentEntry.getIndex()).setPage(parentEntry.getPage())
-                .setParentId(parentId).setType(parentEntry.getType()).setCustom(new Boolean(parentEntry.isCustom())).done();
+                .setParentId(parentId).setType(parentEntry.getType()).setCustom(Boolean.valueOf(parentEntry.isCustom())).done();
     }
 
     protected SProfileEntry createProfileEntry(final ExportedProfileEntry childEntry, final long profileId, final long parentId) {
         return BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(childEntry.getName(), profileId)
                 .setDescription(childEntry.getDescription()).setIndex(childEntry.getIndex()).setPage(childEntry.getPage())
-                .setParentId(parentId).setType(childEntry.getType()).setCustom(new Boolean(childEntry.isCustom())).done();
+                .setParentId(parentId).setType(childEntry.getType()).setCustom(Boolean.valueOf(childEntry.isCustom())).done();
     }
 
     public static List<String> toWarnings(final List<ImportStatus> importProfiles) {
