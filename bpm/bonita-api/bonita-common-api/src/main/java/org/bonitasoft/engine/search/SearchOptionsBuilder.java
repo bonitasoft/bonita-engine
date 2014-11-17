@@ -63,9 +63,19 @@ public class SearchOptionsBuilder {
      * @param field
      *            The name of the field to filter on. Depending on the search perimeter, specify the field by accessing the relevant xxxSearchDescriptor classes. 
      *            For example, HumanTaskInstanceSearchDescriptor.NAME and HumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID.
+     *            To search on Custom User Information (Custom information define and attach on user), use the constant CustomUserInfoValueSearchDescriptor.DEFINITION_ID and CustomUserInfoValueSearchDescriptor.VALUE
+     *            without any operand between. To retrieve the Definition ID, use {@link IdentityAPI.getCustomUserInfo}. 
+     *            Then for example :
+     *            final SearchOptionsBuilder optionsBuilder = new SearchOptionsBuilder(0, 10);
+     *            optionsBuilder.filter(CustomUserInfoValueSearchDescriptor.DEFINITION_ID, customUserInfoDefinitionId);
+     *            optionsBuilder.filter(CustomUserInfoValueSearchDescriptor.VALUE, 101);
+     *            
      * @param value
      *            the single value to filter on that field name
      * @return this builder itself
+     * @see CustomUserInfoValueSearchDescriptor
+     * @see IdentityAPI.getCustomUserInfo() to retrieve ID of customer info
+     * @see IdentityAPI.getUserIdsWithCustomUserInfo() for a direct access
      * @since 6.0
      */
     public SearchOptionsBuilder filter(final String field, final Serializable value) {
