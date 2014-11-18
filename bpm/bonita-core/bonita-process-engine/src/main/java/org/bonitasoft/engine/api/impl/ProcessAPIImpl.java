@@ -347,7 +347,6 @@ import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
-import org.bonitasoft.engine.log.LogMessageBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
@@ -891,11 +890,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     @CustomTransactions
     @Override
     public void executeFlowNode(final long flownodeInstanceId) throws FlowNodeExecutionException {
-        try {
-            executeFlowNode(0, flownodeInstanceId, true);
-        } catch (final SBonitaException e) {
-            throw new FlowNodeExecutionException(e);
-        }
+        executeFlowNode(0, flownodeInstanceId, true);
     }
 
     @CustomTransactions
@@ -910,22 +905,13 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction) throws SBonitaException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final LockService lockService = tenantAccessor.getLockService();
-        final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
-        final TransactionContent transactionContent = new ExecuteFlowNode(userId, activityInstanceService, flownodeInstanceId, processExecutor, logger);
-
-        final GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(activityInstanceService, flownodeInstanceId);
-        executeTransactionContent(tenantAccessor, getFlowNodeInstance, wrapInTransaction);
-        final BonitaLock lock = lockService.lock(getFlowNodeInstance.getResult().getParentProcessInstanceId(), SFlowElementsContainerType.PROCESS.name(),
-                tenantAccessor.getTenantId());
+    protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction) throws FlowNodeExecutionException {
         try {
-            executeTransactionContent(tenantAccessor, transactionContent, wrapInTransaction);
-        } finally {
-            lockService.unlock(lock, tenantAccessor.getTenantId());
+            executeFlowNode(userId, flownodeInstanceId, true, new HashMap<String, Object>());
+        } catch (final SBonitaException e) {
+            throw new FlowNodeExecutionException(e);
+        } catch (final ContractViolationException e) {
+            throw new FlowNodeExecutionException(e);
         }
 
     }
@@ -5925,19 +5911,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     protected void executeFlowNode(final long userId, final long flownodeInstanceId, final boolean wrapInTransaction, final Map<String, Object> inputs)
             throws ContractViolationException, SBonitaException, SFlowNodeNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final GetFlowNodeInstance getFlowNodeInstance = new GetFlowNodeInstance(tenantAccessor.getActivityInstanceService(), flownodeInstanceId);
         executeTransactionContent(tenantAccessor, getFlowNodeInstance, wrapInTransaction);
         final SFlowNodeInstance flowNodeInstance = getFlowNodeInstance.getResult();
         if (flowNodeInstance instanceof SUserTaskInstance) {
-            final GetContractOfUserTaskInstance contractOfUserTaskInstance = new GetContractOfUserTaskInstance(tenantAccessor.getProcessDefinitionService(),
-                    (SUserTaskInstance) flowNodeInstance);
-            executeTransactionContent(tenantAccessor, contractOfUserTaskInstance, wrapInTransaction);
-            final SContractDefinition contractDefinition = contractOfUserTaskInstance.getResult();
-            final ContractValidator validator = new ContractValidatorFactory().createContractValidator(tenantAccessor.getTechnicalLoggerService());
-            if (!validator.isValid(contractDefinition, inputs)) {
-                throw new ContractViolationException("Contract is not valid: ", validator.getComments());
-            }
+            throwContractViolationExceptionIfContractIsInvalid(wrapInTransaction, inputs, tenantAccessor, flowNodeInstance);
         }
 
         final LockService lockService = tenantAccessor.getLockService();
@@ -5953,18 +5931,33 @@ public class ProcessAPIImpl implements ProcessAPI {
         }
     }
 
+    private void throwContractViolationExceptionIfContractIsInvalid(final boolean wrapInTransaction, final Map<String, Object> inputs,
+            final TenantServiceAccessor tenantAccessor,
+            final SFlowNodeInstance flowNodeInstance) throws SBonitaException, ContractViolationException {
+        final GetContractOfUserTaskInstance contractOfUserTaskInstance = new GetContractOfUserTaskInstance(tenantAccessor.getProcessDefinitionService(),
+                (SUserTaskInstance) flowNodeInstance);
+        executeTransactionContent(tenantAccessor, contractOfUserTaskInstance, wrapInTransaction);
+        final SContractDefinition contractDefinition = contractOfUserTaskInstance.getResult();
+        final ContractValidator validator = new ContractValidatorFactory().createContractValidator(tenantAccessor.getTechnicalLoggerService());
+        if (!validator.isValid(contractDefinition, inputs)) {
+            throw new ContractViolationException("Contract is not valid: ", validator.getComments());
+        }
+    }
+
     @Override
     public Document removeDocument(final long documentId) throws DocumentNotFoundException, DeletionException {
         return documentAPIImpl.removeDocument(documentId);
     }
 
     @Override
-    public List<Document> getDocumentList(final long processInstanceId, final String name, final int from, final int numberOfResult) throws DocumentNotFoundException {
+    public List<Document> getDocumentList(final long processInstanceId, final String name, final int from, final int numberOfResult)
+            throws DocumentNotFoundException {
         return documentAPIImpl.getDocumentList(processInstanceId, name, from, numberOfResult);
     }
 
     @Override
-    public void setDocumentList(final long processInstanceId, final String name, final List<DocumentValue> documentsValues) throws DocumentException, DocumentNotFoundException {
+    public void setDocumentList(final long processInstanceId, final String name, final List<DocumentValue> documentsValues) throws DocumentException,
+            DocumentNotFoundException {
         documentAPIImpl.setDocumentList(processInstanceId, name, documentsValues);
     }
 
@@ -5988,55 +5981,10 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Document updateDocument(final long documentId, final DocumentValue documentValue) throws ProcessInstanceNotFoundException, DocumentAttachmentException,
+    public Document updateDocument(final long documentId, final DocumentValue documentValue) throws ProcessInstanceNotFoundException,
+            DocumentAttachmentException,
             AlreadyExistsException {
         return documentAPIImpl.updateDocument(documentId, documentValue);
-    }
-
-    private class ExecuteFlowNode implements TransactionContent {
-
-        private final long userId;
-        private final ActivityInstanceService activityInstanceService;
-        private final long flownodeInstanceId;
-        private final ProcessExecutor processExecutor;
-        private final TechnicalLoggerService logger;
-
-        public ExecuteFlowNode(final long userId, final ActivityInstanceService activityInstanceService, final long flownodeInstanceId,
-                final ProcessExecutor processExecutor, final TechnicalLoggerService logger) {
-            this.userId = userId;
-            this.activityInstanceService = activityInstanceService;
-            this.flownodeInstanceId = flownodeInstanceId;
-            this.processExecutor = processExecutor;
-            this.logger = logger;
-        }
-
-        @Override
-        public void execute() throws SBonitaException {
-            final SSession session = SessionInfos.getSession();
-            if (session != null) {
-                final long executerSubstituteUserId = session.getUserId();
-                final long executerUserId;
-                if (userId == 0) {
-                    executerUserId = executerSubstituteUserId;
-                } else {
-                    executerUserId = userId;
-                }
-
-                final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flownodeInstanceId);
-                final boolean isFirstState = flowNodeInstance.getStateId() == 0;
-                // no need to handle failed state, all is in the same tx, if the node fail we just have an exception on client side + rollback
-                processExecutor
-                        .executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), executerUserId,
-                                executerSubstituteUserId);
-                if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
-                    final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance, session.getUserName(), executerUserId,
-                            executerSubstituteUserId);
-                    logger.log(getClass(), TechnicalLogSeverity.INFO, message);
-                }
-
-                addSystemCommentOnProcessInstanceWhenExecutingTaskFor(flowNodeInstance, executerUserId, executerSubstituteUserId);
-            }
-        }
     }
 
     @Override
