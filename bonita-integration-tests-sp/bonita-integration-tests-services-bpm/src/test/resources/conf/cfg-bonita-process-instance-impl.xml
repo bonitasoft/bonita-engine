@@ -5,6 +5,8 @@
 		<constructor-arg name="recorder" ref="tenantRecorderSync" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="archiveService" ref="archiveService" />
+        <constructor-arg name="dataInstanceService" ref="dataInstanceService" />
+        <constructor-arg name="connectorInstanceService" ref="connectorInstanceService" />
 		<constructor-arg name="eventService" ref="eventService" />
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 	</bean>

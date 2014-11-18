@@ -20,12 +20,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.bonitasoft.engine.api.ApplicationAPI;
 import org.bonitasoft.engine.api.LoginAPI;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -95,6 +94,8 @@ public class APITestSPUtil extends APITestUtil {
     private TenantManagementAPI tenantManagementAPI;
 
     private PageAPI pageAPI;
+
+    private ApplicationAPI applicationAPI;
 
     @Override
     public PlatformLoginAPI getPlatformLoginAPI() throws BonitaException {
@@ -167,6 +168,10 @@ public class APITestSPUtil extends APITestUtil {
         return tenantManagementAPI;
     }
 
+    public ApplicationAPI getApplicationAPI() {
+        return applicationAPI;
+    }
+
     public void setTenantManagementAPI(final TenantManagementAPI tenantManagementAPI) {
         this.tenantManagementAPI = tenantManagementAPI;
     }
@@ -206,6 +211,7 @@ public class APITestSPUtil extends APITestUtil {
         setPlatformMonitoringAPI(TenantAPIAccessor.getPlatformMonitoringAPI(getSession()));
         setTenantManagementAPI(TenantAPIAccessor.getTenantManagementAPI(getSession()));
         logAPI = TenantAPIAccessor.getLogAPI(getSession());
+        applicationAPI = TenantAPIAccessor.getApplicationAPI(getSession());
     }
 
     protected void setPageAPI(final PageAPI pageAPI) {
@@ -258,11 +264,11 @@ public class APITestSPUtil extends APITestUtil {
     }
 
     public long createAndActivateTenant(final String uniqueName) throws BonitaException {
-        StringBuilder stringBuilder = new StringBuilder();
+        final StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(uniqueName);
         stringBuilder.append("_");
         stringBuilder.append(System.currentTimeMillis());
-        String tenantUniqueName = stringBuilder.toString();
+        final String tenantUniqueName = stringBuilder.toString();
 
         return BPMTestSPUtil.createAndActivateTenantWithDefaultTechnicalLogger(tenantUniqueName);
     }
@@ -365,17 +371,6 @@ public class APITestSPUtil extends APITestUtil {
             return Collections.emptyList();
         }
         return Arrays.asList("There is some data mapping present: " + count);
-    }
-
-    public void assignAndExecuteStep(final ActivityInstance activityInstance, final User user) throws BonitaException {
-        assignAndExecuteStep(activityInstance.getId(), user.getId());
-    }
-
-    @Override
-    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final long processInstanceId, final User user) throws Exception {
-        final ActivityInstance waitForUserTask = waitForUserTask(taskName, processInstanceId);
-        assignAndExecuteStep(waitForUserTask, user);
-        return (HumanTaskInstance) waitForUserTask;
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndTestConnector3(final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName,

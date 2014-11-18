@@ -1,9 +1,0 @@
-# please provide below the list of report names to load automatically.
-# The format must respect "name=description".
-# a file with name "<name>-content*" is expected in the same folder as the report content. If several files match, the first encountered one is taken.
-# a file with name "<name>-screenshot*" is expected in the same folder as the report screenshot to display. Any image format supported at client side is valid. If several files match, the first encountered one is taken.
-
-case_avg_time=This report, display the average time to close a case. 2 data are available, 1 for the mean and one for the median for a given period and/or apps. \nYou can access the portal, by clicking on the link in the below table.
-case_list=This report, display the list of cases available in the different status (open or closed) for a given period and/or apps. \nYou can access the portail, by clicking on the link in the below table.
-task_list=This report, display the list of human tasks available in the different status (open or closed) for a given period and/or apps. \nYou can access the portal, by clicking on the link in the below table.
-case_history=This report, display all human information regarding the case associated to an apps.
