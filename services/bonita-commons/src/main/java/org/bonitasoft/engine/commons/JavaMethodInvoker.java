@@ -18,10 +18,13 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.beanutils.MethodUtils;
+
 /**
  * Invokes a method on a Java Object.
- * 
+ *
  * @author Emmanuel Duchastenier
+ * @author Matthieu Chaffotte
  */
 public class JavaMethodInvoker {
 
@@ -50,20 +53,6 @@ public class JavaMethodInvoker {
         autoboxableTypes.put(Boolean.class.getName(), boolean.class);
     }
 
-    private Method getMethod(final Class<?> dataType, final String operator, final String className) throws NoSuchMethodException, ClassNotFoundException {
-        if (className != null) {
-            try {
-                return dataType.getDeclaredMethod(operator, getClassOrPrimitiveClass(className));
-            } catch (final NoSuchMethodException e) {
-                if (autoboxableTypes.containsKey(className)) {
-                    return dataType.getDeclaredMethod(operator, autoboxableTypes.get(className));
-                }
-                throw e;
-            }
-        }
-        return dataType.getDeclaredMethod(operator);
-    }
-
     protected Class<?> getClassOrPrimitiveClass(final String type) throws ClassNotFoundException {
         if (primitiveTypes.containsKey(type)) {
             return primitiveTypes.get(type);
@@ -74,9 +63,9 @@ public class JavaMethodInvoker {
     public Object invokeJavaMethod(final String typeOfValueToSet, final Object valueToSetObjectWith, final Object objectToInvokeJavaMethodOn,
             final String operator, final String operatorParameterClassName) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
-        Class<?> expressionResultType = getClassOrPrimitiveClass(typeOfValueToSet);
+        final Class<?> expressionResultType = getClassOrPrimitiveClass(typeOfValueToSet);
         final Class<?> dataType = Thread.currentThread().getContextClassLoader().loadClass(objectToInvokeJavaMethodOn.getClass().getName());
-        final Method method = getMethod(dataType, operator, operatorParameterClassName);
+        final Method method = MethodUtils.getMatchingAccessibleMethod(dataType, operator, new Class[] { getClassOrPrimitiveClass(operatorParameterClassName) });
         final Object o = dataType.cast(objectToInvokeJavaMethodOn);
         method.invoke(o, expressionResultType.cast(valueToSetObjectWith));
         return o;
