@@ -544,7 +544,7 @@ public class ModelConvertor {
     public static List<ProcessInstance> toProcessInstances(final List<SProcessInstance> sProcessInstances,
             final ProcessDefinitionService processDefinitionService) {
         final List<ProcessInstance> clientProcessInstances = new ArrayList<ProcessInstance>();
-        final HashMap<Long, SProcessDefinition> processDefinitions = new HashMap<Long, SProcessDefinition>();
+        final Map<Long, SProcessDefinition> processDefinitions = new HashMap<Long, SProcessDefinition>();
         if (sProcessInstances != null) {
             for (final SProcessInstance sProcessInstance : sProcessInstances) {
                 SProcessDefinition sProcessDefinition = processDefinitions.get(sProcessInstance.getProcessDefinitionId());
@@ -1729,7 +1729,7 @@ public class ModelConvertor {
                 .setRightOperand(ModelConvertor.constructSExpression(operation.getRightOperand()))
                 .setLeftOperand(
                         BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(operation.getLeftOperand().getName())
-                                .setType(operation.getLeftOperand().getType()).done()).done();
+                        .setType(operation.getLeftOperand().getType()).done()).done();
     }
 
     public static List<SOperation> convertOperations(final List<Operation> operations) {

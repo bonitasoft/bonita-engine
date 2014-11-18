@@ -49,7 +49,6 @@ import org.bonitasoft.engine.core.connector.exception.SConnectorInstanceReadExce
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SDocument;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
-import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilder;
 import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -76,7 +75,6 @@ import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SGatewayNotFoundException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
@@ -90,7 +88,6 @@ import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.SToken;
-import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
@@ -122,6 +119,7 @@ import org.bonitasoft.engine.home.BonitaHomeServer;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.Operation;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.ModelConvertor;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
@@ -210,7 +208,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
         this.cacheService = cacheService;
-        transitionEvaluator = new TransitionEvaluator(expressionResolverService);
+        this.transitionEvaluator = new TransitionEvaluator(expressionResolverService);
         // dependency injection because of circular references...
         flowNodeStateManager.setProcessExecutor(this);
         eventsHandler.setProcessExecutor(this);
@@ -318,7 +316,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         return createProcessInstance(processDefinition, starterId, starterSubstituteId, callerId, null, -1);
     }
 
-    private SActivityInstance getCaller(final long callerId) throws SActivityReadException, SActivityInstanceNotFoundException {
+    private SActivityInstance getCaller(final long callerId) throws SBonitaReadException, SActivityInstanceNotFoundException {
         if (callerId > 0) {
             return activityInstanceService.getActivityInstance(callerId);
         }
@@ -387,7 +385,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         if (gatewayInstance != null
                 && gatewayInstance.getHitBys() != null
                 && (gatewayInstance.getHitBys().contains(GatewayInstanceService.FINISH) || Arrays.asList(gatewayInstance.getHitBys().split(",")).contains(
-                        flowNodeDefinition.getTransitionIndex(transitionDefinition.getName())))) {
+                        String.valueOf(flowNodeDefinition.getTransitionIndex(transitionDefinition.getName()))))) {
             gatewayInstance = null;// already hit we create a new one
         }
         if (gatewayInstance != null && !tokenRefId.equals(gatewayInstance.getTokenRefId())) {
@@ -528,41 +526,17 @@ public class ProcessExecutorImpl implements ProcessExecutor {
 
     protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
             final String url, final long authorId, final String description, final int index) throws SObjectCreationException, SObjectAlreadyExistsException {
-        final SDocument attachment = buildExternalProcessDocumentReference(fileName, mimeType, authorId, url);
+        final SDocument attachment = BuilderFactory.get(SDocumentBuilderFactory.class)
+                .createNewExternalProcessDocumentReference(fileName, mimeType, authorId, url).done();
         return documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, description, index);
     }
 
     protected SMappedDocument attachDocument(final long processInstanceId, final String documentName, final String fileName, final String mimeType,
             final byte[] documentContent, final long authorId, final String description, final int index) throws SObjectCreationException,
             SObjectAlreadyExistsException {
-        final SDocument attachment = buildProcessDocument(fileName, mimeType, authorId, documentContent);
+        final SDocument attachment = BuilderFactory.get(SDocumentBuilderFactory.class).createNewProcessDocument(fileName, mimeType, authorId, documentContent)
+                .done();
         return documentService.attachDocumentToProcessInstance(attachment, processInstanceId, documentName, description, index);
-    }
-
-    private SDocument buildExternalProcessDocumentReference(final String fileName,
-            final String mimeType, final long authorId, final String url) {
-        final SDocumentBuilder documentBuilder = initDocumentBuilder(fileName, mimeType, authorId);
-        documentBuilder.setURL(url);
-        documentBuilder.setHasContent(false);
-        return documentBuilder.done();
-    }
-
-    private SDocument buildProcessDocument(final String fileName, final String mimetype,
-            final long authorId, final byte[] content) {
-        final SDocumentBuilder documentBuilder = initDocumentBuilder(fileName, mimetype, authorId);
-        documentBuilder.setHasContent(true);
-        documentBuilder.setContent(content);
-        return documentBuilder.done();
-    }
-
-    private SDocumentBuilder initDocumentBuilder(final String fileName, final String mimetype,
-            final long authorId) {
-        final SDocumentBuilder documentBuilder = BuilderFactory.get(SDocumentBuilderFactory.class).createNewInstance();
-        documentBuilder.setFileName(fileName);
-        documentBuilder.setMimeType(mimetype);
-        documentBuilder.setAuthor(authorId);
-        documentBuilder.setCreationDate(System.currentTimeMillis());
-        return documentBuilder;
     }
 
     @Override

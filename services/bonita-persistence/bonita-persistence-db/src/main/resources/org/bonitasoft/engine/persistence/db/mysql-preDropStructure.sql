@@ -47,6 +47,7 @@ ALTER TABLE profileentry DROP FOREIGN KEY fk_profileentry_profileId;
 
 -- business application
 ALTER TABLE business_app_menu DROP FOREIGN KEY fk_app_menu_tenantId;
+ALTER TABLE business_app_menu DROP FOREIGN KEY fk_app_menu_appId;
 ALTER TABLE business_app_menu DROP FOREIGN KEY fk_app_menu_pageId;
 ALTER TABLE business_app_menu DROP FOREIGN KEY fk_app_menu_parentId;
 ALTER TABLE business_app_page DROP FOREIGN KEY fk_app_page_tenantId;

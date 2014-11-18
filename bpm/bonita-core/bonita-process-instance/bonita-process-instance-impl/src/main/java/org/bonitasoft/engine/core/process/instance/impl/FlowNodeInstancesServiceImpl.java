@@ -49,7 +49,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
-import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -382,7 +381,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public long getNumberOfFlowNodeInstances(final Class<? extends PersistentObject> entityClass, final QueryOptions countOptions)
+    public long getNumberOfFlowNodeInstances(final Class<? extends SFlowNodeInstance> entityClass, final QueryOptions countOptions)
             throws SBonitaReadException {
         return getPersistenceService().getNumberOfEntities(entityClass, countOptions, null);
     }
@@ -394,21 +393,17 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public long getNumberOfFlowNodeInstancesSupervisedBy(final Long supervisorId, final Class<? extends PersistentObject> entityClass,
+    public long getNumberOfFlowNodeInstancesSupervisedBy(final Long supervisorId, final Class<? extends SFlowNodeInstance> entityClass,
             final QueryOptions queryOptions) throws SBonitaReadException {
-        try {
-            final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
-            return getPersistenceService().getNumberOfEntities(entityClass, SUPERVISED_BY, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaReadException(e);
-        }
+        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+        return getPersistenceService().getNumberOfEntities(entityClass, SUPERVISED_BY, queryOptions, parameters);
     }
 
     @Override
-    public List<SFlowNodeInstance> searchFlowNodeInstancesSupervisedBy(final Long supervisorId, final Class<? extends PersistentObject> entityClass,
+    public <T extends SFlowNodeInstance> List<T> searchFlowNodeInstancesSupervisedBy(final Long supervisorId, final Class<T> entityClass,
             final QueryOptions queryOptions) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
-        return (List<SFlowNodeInstance>) getPersistenceService().searchEntity(entityClass, SUPERVISED_BY, queryOptions, parameters);
+        return getPersistenceService().searchEntity(entityClass, SUPERVISED_BY, queryOptions, parameters);
     }
 
     @Override
@@ -426,19 +421,15 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     @Override
     public long getNumberOfArchivedFlowNodeInstancesSupervisedBy(final long supervisorId, final Class<? extends SAFlowNodeInstance> entityClass,
             final QueryOptions queryOptions) throws SBonitaReadException {
-        try {
-            final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
-            return getPersistenceService().getNumberOfEntities(entityClass, SUPERVISED_BY, queryOptions, parameters);
-        } catch (final SBonitaReadException e) {
-            throw new SBonitaReadException(e);
-        }
+        final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
+        return getPersistenceService().getNumberOfEntities(entityClass, SUPERVISED_BY, queryOptions, parameters);
     }
 
     @Override
-    public List<SAFlowNodeInstance> searchArchivedFlowNodeInstancesSupervisedBy(final long supervisorId, final Class<? extends SAFlowNodeInstance> entityClass,
+    public <T extends SAFlowNodeInstance> List<T> searchArchivedFlowNodeInstancesSupervisedBy(final long supervisorId, final Class<T> entityClass,
             final QueryOptions queryOptions) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
-        return (List<SAFlowNodeInstance>) getPersistenceService().searchEntity(entityClass, SUPERVISED_BY, queryOptions, parameters);
+        return getPersistenceService().searchEntity(entityClass, SUPERVISED_BY, queryOptions, parameters);
     }
 
     protected EventService getEventService() {
@@ -488,14 +479,9 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public List<Long> getFlowNodeInstanceIdsToRestart(final QueryOptions queryOptions) throws SFlowNodeReadException {
-        List<Long> selectList;
-        try {
-            selectList = getPersistenceService().selectList(
-                    new SelectListDescriptor<Long>("getFlowNodeInstanceIdsToRestart", null, SFlowNodeInstance.class, queryOptions));
-        } catch (final SBonitaReadException e) {
-            throw new SFlowNodeReadException(e);
-        }
+    public List<Long> getFlowNodeInstanceIdsToRestart(final QueryOptions queryOptions) throws SBonitaReadException {
+        final List<Long> selectList = getPersistenceService().selectList(
+                new SelectListDescriptor<Long>("getFlowNodeInstanceIdsToRestart", null, SFlowNodeInstance.class, queryOptions));
         return getUnmodifiableList(selectList);
     }
 

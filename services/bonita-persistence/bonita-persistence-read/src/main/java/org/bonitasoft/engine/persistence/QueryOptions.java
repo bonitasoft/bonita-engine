@@ -169,4 +169,31 @@ public class QueryOptions implements Serializable {
         return filters != null && !filters.isEmpty() || multipleFilter != null;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof QueryOptions)) return false;
+
+        QueryOptions that = (QueryOptions) o;
+
+        if (fromIndex != that.fromIndex) return false;
+        if (numberOfResults != that.numberOfResults) return false;
+        if (filters != null ? !filters.equals(that.filters) : that.filters != null) return false;
+        if (multipleFilter != null ? !multipleFilter.equals(that.multipleFilter) : that.multipleFilter != null)
+            return false;
+        if (orderByOptions != null ? !orderByOptions.equals(that.orderByOptions) : that.orderByOptions != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = fromIndex;
+        result = 31 * result + numberOfResults;
+        result = 31 * result + (filters != null ? filters.hashCode() : 0);
+        result = 31 * result + (multipleFilter != null ? multipleFilter.hashCode() : 0);
+        result = 31 * result + (orderByOptions != null ? orderByOptions.hashCode() : 0);
+        return result;
+    }
 }

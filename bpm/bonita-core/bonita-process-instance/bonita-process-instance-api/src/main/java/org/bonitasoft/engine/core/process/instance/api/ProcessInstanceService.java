@@ -188,7 +188,7 @@ public interface ProcessInstanceService {
      * @throws SFlowNodeReadException
      * @since 6.1
      */
-    long deleteParentArchivedProcessInstancesAndElements(List<SAProcessInstance> saProcessInstances) throws SFlowNodeReadException,
+    long deleteArchivedParentProcessInstancesAndElements(List<SAProcessInstance> saProcessInstances) throws SFlowNodeReadException,
             SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
@@ -201,7 +201,7 @@ public interface ProcessInstanceService {
      * @throws SFlowNodeReadException
      * @since 6.4.0
      */
-    void deleteParentArchivedProcessInstanceAndElements(SAProcessInstance saProcessInstance) throws SFlowNodeReadException,
+    void deleteArchivedParentProcessInstanceAndElements(SAProcessInstance saProcessInstance) throws SFlowNodeReadException,
             SProcessInstanceHierarchicalDeletionException, SProcessInstanceModificationException;
 
     /**
@@ -547,6 +547,32 @@ public interface ProcessInstanceService {
      */
     SAProcessInstance getLastArchivedProcessInstance(long sourceObjectProcessInstanceId) throws SBonitaReadException;
 
+    /**
+     * Get the number of the {@link SProcessInstance} with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR}
+     * state.
+     *
+     * @param queryOptions
+     *        the search criteria containing a map of specific parameters of a query
+     * @return The number of the {@link SProcessInstance} with at least one failed task or the
+     *         {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR} state.
+     * @throws SBonitaException
+     * @since 6.4.0
+     */
+    long getNumberOfFailedProcessInstances(QueryOptions queryOptions) throws SBonitaReadException;
+
+    /**
+     * List all {@link SProcessInstance} with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR} state.
+     *
+     * @param queryOptions
+     *        the search criteria containing a map of specific parameters of a query
+     * @return The list of {@link SProcessInstance} with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR}
+     *         state.
+     * @throws SBonitaException
+     * @since 6.4.0
+     */
+    List<SProcessInstance> searchFailedProcessInstances(QueryOptions queryOptions) throws SBonitaReadException;
+
     long getNumberOfProcessInstances(long processDefinitionId) throws SBonitaReadException;
+
 
 }

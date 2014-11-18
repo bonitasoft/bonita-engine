@@ -16,8 +16,6 @@
 package org.bonitasoft.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,18 +68,20 @@ public class PermissionAPIIT extends CommonAPILocalTest {
     public void execute_security_script_with_dependencies() throws Exception {
 
         //given
-        writeScriptToBonitaHome(getContentOfResource("/MyRule"), "org","test","MyRule");
-        User john = createUser("john", "bpm");
-        User jack = createUser("jack", "bpm");
-
+        writeScriptToBonitaHome(getContentOfResource("/MyRule"), "org", "test", "MyRule");
+        final User john = createUser("john", "bpm");
+        final User jack = createUser("jack", "bpm");
 
         //when
-        loginOnDefaultTenantWith("jack","bpm");
-        boolean jackResult = getPermissionAPI().checkAPICallWithScript("org.test.MyRule", new APICallContext("GET", "identity", "user", String.valueOf(jack.getId()), "query", "body"), false);
+        loginOnDefaultTenantWith("jack", "bpm");
+        final boolean jackResult = getPermissionAPI().checkAPICallWithScript("org.test.MyRule",
+                new APICallContext("GET", "identity", "user", String.valueOf(jack.getId()), "query", "body"), false);
         logoutOnTenant();
-        loginOnDefaultTenantWith("john","bpm");
-        boolean johnResult = getPermissionAPI().checkAPICallWithScript("org.test.MyRule", new APICallContext("GET", "identity", "user", String.valueOf(john.getId()), "query", "body"), false);
-        boolean johnResultOnOtherAPI = getPermissionAPI().checkAPICallWithScript("org.test.MyRule", new APICallContext("GET", "identity", "user", String.valueOf(jack.getId()), "query", "body"), false);
+        loginOnDefaultTenantWith("john", "bpm");
+        final boolean johnResult = getPermissionAPI().checkAPICallWithScript("org.test.MyRule",
+                new APICallContext("GET", "identity", "user", String.valueOf(john.getId()), "query", "body"), false);
+        final boolean johnResultOnOtherAPI = getPermissionAPI().checkAPICallWithScript("org.test.MyRule",
+                new APICallContext("GET", "identity", "user", String.valueOf(jack.getId()), "query", "body"), false);
 
         //then: ExecutionException
         assertThat(jackResult).isFalse();
@@ -91,7 +91,6 @@ public class PermissionAPIIT extends CommonAPILocalTest {
         deleteUser(john);
         deleteUser(jack);
     }
-
 
     @Test
     public void execute_security_script_with_not_found_script() throws Exception {
@@ -104,16 +103,16 @@ public class PermissionAPIIT extends CommonAPILocalTest {
         //then: ExecutionException
     }
 
-    private void writeScriptToBonitaHome(String script, String...path) throws IOException, SBonitaException {
+    private void writeScriptToBonitaHome(final String script, final String... path) throws IOException, SBonitaException {
         File file = securityScriptsFolder;
         for (int i = 0; i < path.length; i++) {
-            file = new File(file, i == path.length -1 ? path[i]+".groovy": path[i]);
+            file = new File(file, i == path.length - 1 ? path[i] + ".groovy" : path[i]);
         }
         file.getParentFile().mkdirs();
         file.createNewFile();
         IOUtil.writeFile(file, script);
         System.out.println("write to file " + file.getPath());
-        PermissionService permissionService = TenantServiceSingleton.getInstance().getPermissionService();
+        final PermissionService permissionService = TenantServiceSingleton.getInstance().getPermissionService();
         //restart the service to reload scripts
         permissionService.stop();
         permissionService.start();

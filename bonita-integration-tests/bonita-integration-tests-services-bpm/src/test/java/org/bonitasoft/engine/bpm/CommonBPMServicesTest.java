@@ -101,6 +101,14 @@ public class CommonBPMServicesTest {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CommonBPMServicesTest.class);
 
+    private static final String BONITA_SERVICES_FOLDER_DEFAULT_PATH = "target/conf";
+
+    private static final String BONITA_SERVICES_FOLDER_PROPERTY = "bonita.services.folder";
+
+    private static final String BONITA_HOME_DEFAULT_PATH = "target/home";
+
+    private static final String BONITA_HOME_PROPERTY = "bonita.home";
+
     private static BPMServicesBuilder bpmServicesBuilder;
 
     protected static TransactionService transactionService;
@@ -171,6 +179,10 @@ public class CommonBPMServicesTest {
     }
 
     static {
+        System.setProperty(BONITA_HOME_PROPERTY, System.getProperty(BONITA_HOME_PROPERTY, BONITA_HOME_DEFAULT_PATH));
+        System.setProperty(BONITA_SERVICES_FOLDER_PROPERTY, System.getProperty(BONITA_SERVICES_FOLDER_PROPERTY, BONITA_SERVICES_FOLDER_DEFAULT_PATH));
+        System.setProperty("sysprop.bonita.db.vendor", System.getProperty("sysprop.bonita.db.vendor", "h2"));
+
         bpmServicesBuilder = new BPMServicesBuilder();
         transactionService = bpmServicesBuilder.getTransactionService();
         bpmServicesBuilder.getPlatformService();

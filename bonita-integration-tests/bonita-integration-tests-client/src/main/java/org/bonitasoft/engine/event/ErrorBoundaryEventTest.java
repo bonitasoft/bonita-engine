@@ -124,11 +124,11 @@ public class ErrorBoundaryEventTest extends AbstractEventTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcDef.getId());
         waitForFlowNodeInExecutingState(processInstance, "callStep", false);
         final ActivityInstance calledStep2 = waitForUserTask("calledStep2", processInstance.getId());
-        waitForUserTaskAndExecuteIt("calledStep1", processInstance.getId(), donaBenta.getId());
+        waitForUserTaskAndExecuteIt("calledStep1", processInstance, donaBenta);
 
         waitForArchivedActivity(calledStep2.getId(), TestStates.ABORTED);
         // if there are no catch error able to handle the thrown error, the throw error event has the same behavior as a terminate event.
-        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), donaBenta.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance, donaBenta);
 
         waitForProcessToFinish(processInstance);
 
@@ -150,8 +150,8 @@ public class ErrorBoundaryEventTest extends AbstractEventTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(procDefLevel2.getId());
         final FlowNodeInstance callActivityL2 = waitForFlowNodeInExecutingState(processInstance, "callStepL2", false);
         final FlowNodeInstance callActivityL1 = waitForFlowNodeInExecutingState(processInstance, "callStepL1", true);
-        final HumanTaskInstance calledStep2 = waitForUserTask("calledStep2", processInstance.getId());
-        final ActivityInstance calledStep1 = waitForUserTaskAndExecuteIt("calledStep1", processInstance.getId(), donaBenta.getId());
+        final HumanTaskInstance calledStep2 = waitForUserTask("calledStep2", processInstance);
+        final ActivityInstance calledStep1 = waitForUserTaskAndExecuteIt("calledStep1", processInstance, donaBenta);
 
         final ProcessInstance calledProcessInstanceL0 = getProcessAPI().getProcessInstance(calledStep1.getParentProcessInstanceId());
         final ProcessInstance calledProcessInstanceL1 = getProcessAPI().getProcessInstance(callActivityL1.getParentProcessInstanceId());
@@ -183,8 +183,8 @@ public class ErrorBoundaryEventTest extends AbstractEventTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(procDefLevel2.getId());
         final FlowNodeInstance callActivityL2 = waitForFlowNodeInExecutingState(processInstance, "callStepL2", false);
         final FlowNodeInstance callActivityL1 = waitForFlowNodeInExecutingState(processInstance, "callStepL1", true);
-        final ActivityInstance calledStep1 = waitForUserTask("calledStep1", processInstance.getId());
-        final ActivityInstance calledStep2 = waitForUserTask("calledStep2", processInstance.getId());
+        final ActivityInstance calledStep1 = waitForUserTask("calledStep1", processInstance);
+        final ActivityInstance calledStep2 = waitForUserTask("calledStep2", processInstance);
         final ProcessInstance calledProcessInstanceL0 = getProcessAPI().getProcessInstance(calledStep1.getParentProcessInstanceId());
         final ProcessInstance calledProcessInstanceL1 = getProcessAPI().getProcessInstance(callActivityL1.getParentProcessInstanceId());
         assignAndExecuteStep(calledStep1, donaBenta.getId());
@@ -196,7 +196,7 @@ public class ErrorBoundaryEventTest extends AbstractEventTest {
         assignAndExecuteStep(executionStep.getId(), donaBenta.getId());
         waitForProcessToFinish(calledProcessInstanceL1);
 
-        waitForUserTaskAndExecuteIt("step2", processInstance.getId(), donaBenta.getId());
+        waitForUserTaskAndExecuteIt("step2", processInstance, donaBenta);
         waitForProcessToFinish(processInstance);
 
         waitForArchivedActivity(callActivityL1.getId(), TestStates.ABORTED);

@@ -13,14 +13,10 @@
  **/
 package org.bonitasoft.engine.service;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
-import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 /**
  * @author Matthieu Chaffotte
@@ -45,7 +41,7 @@ public final class TenantServiceSingleton {
         long tenantId;
         try {
             tenantId = ServiceAccessorFactory.getInstance().createSessionAccessor().getTenantId();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
         return getInstance(tenantId);

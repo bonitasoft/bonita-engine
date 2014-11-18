@@ -44,7 +44,6 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.wait.WaitForStep;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +55,7 @@ public class GetUpdatedVariableValuesForActivityInstanceTest extends CommonAPITe
 
     @Before
     public void before() throws Exception {
-         loginOnDefaultTenantWithDefaultTechnicalUser();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
     }
 
     @After
@@ -83,9 +82,8 @@ public class GetUpdatedVariableValuesForActivityInstanceTest extends CommonAPITe
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, actorName, user);
 
         final long processDefinitionId = processDefinition.getId();
-        final ProcessInstance pi = getProcessAPI().startProcess(processDefinitionId);
-        final WaitForStep waitForStep = waitForStep("step1", pi);
-        final long activityInstanceId = waitForStep.getStepId();
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitionId);
+        final long activityInstanceId = waitForUserTask("step1", processInstance).getId();
 
         // Let's update the value of data1 to 22. It should not be taken into account at process def level:
         getProcessAPI().updateActivityDataInstance(dataName1, activityInstanceId, 22);

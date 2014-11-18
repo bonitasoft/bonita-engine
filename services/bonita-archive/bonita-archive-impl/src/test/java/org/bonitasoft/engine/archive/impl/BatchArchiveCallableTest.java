@@ -15,93 +15,94 @@ import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.services.PersistenceService;
+import org.bonitasoft.engine.services.SPersistenceException;
 import org.junit.Test;
 
 public class BatchArchiveCallableTest {
 
     @Test
-    public void testCreateArchivedObjectsList() throws Exception {
-        ArchiveInsertRecord record1 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
-        ArchiveInsertRecord record2 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
-        ArchiveInsertRecord record3 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
-        ArchiveInsertRecord[] records = new ArchiveInsertRecord[] {record1, record2, record3};
-        BatchArchiveCallable callable = new BatchArchiveCallable(null, records);
+    public void testCreateArchivedObjectsList() {
+        final ArchiveInsertRecord record1 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
+        final ArchiveInsertRecord record2 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
+        final ArchiveInsertRecord record3 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
+        final ArchiveInsertRecord[] records = new ArchiveInsertRecord[] { record1, record2, record3 };
+        final BatchArchiveCallable callable = new BatchArchiveCallable(null, records);
 
-        List<ArchivedPersistentObject> createArchivedObjectsList = callable.createArchivedObjectsList(records);
+        final List<ArchivedPersistentObject> createArchivedObjectsList = callable.createArchivedObjectsList(records);
 
         assertThat(createArchivedObjectsList.size(), is(records.length));
         for (int i = 0; i < records.length; i++) {
-            ArchivedPersistentObject archivedPersistentObject = createArchivedObjectsList.get(i);
+            final ArchivedPersistentObject archivedPersistentObject = createArchivedObjectsList.get(i);
             assertThat(archivedPersistentObject, is(records[i].getEntity()));
         }
 
     }
 
     @Test
-    public void testCreateArchivedObjectsListWithNoRecords() throws Exception {
-        ArchiveInsertRecord[] records = new ArchiveInsertRecord[] {};
-        BatchArchiveCallable callable = new BatchArchiveCallable(null, records);
+    public void testCreateArchivedObjectsListWithNoRecords() {
+        final ArchiveInsertRecord[] records = new ArchiveInsertRecord[] {};
+        final BatchArchiveCallable callable = new BatchArchiveCallable(null, records);
 
-        List<ArchivedPersistentObject> createArchivedObjectsList = callable.createArchivedObjectsList(records);
+        final List<ArchivedPersistentObject> createArchivedObjectsList = callable.createArchivedObjectsList(records);
 
         assertTrue(createArchivedObjectsList.isEmpty());
     }
 
     @Test
-    public void testCreateArchivedObjectsListWithNullRecords() throws Exception {
-        ArchiveInsertRecord record1 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
-        ArchiveInsertRecord record2 = null;
-        ArchiveInsertRecord record3 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
-        ArchiveInsertRecord[] records = new ArchiveInsertRecord[] {record1, record2, record3};
-        BatchArchiveCallable callable = new BatchArchiveCallable(null, records);
+    public void testCreateArchivedObjectsListWithNullRecords() {
+        final ArchiveInsertRecord record1 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
+        final ArchiveInsertRecord record2 = null;
+        final ArchiveInsertRecord record3 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
+        final ArchiveInsertRecord[] records = new ArchiveInsertRecord[] { record1, record2, record3 };
+        final BatchArchiveCallable callable = new BatchArchiveCallable(null, records);
 
-        List<ArchivedPersistentObject> createArchivedObjectsList = callable.createArchivedObjectsList(records);
+        final List<ArchivedPersistentObject> createArchivedObjectsList = callable.createArchivedObjectsList(records);
 
         // The second one that is null was skipped.
         assertThat(createArchivedObjectsList.size(), is(2));
 
         ArchivedPersistentObject archivedPersistentObject;
         // Check the first one
-        archivedPersistentObject= createArchivedObjectsList.get(0);
+        archivedPersistentObject = createArchivedObjectsList.get(0);
         assertThat(archivedPersistentObject, is(records[0].getEntity()));
 
         // Check the second that is the third one.
-        archivedPersistentObject= createArchivedObjectsList.get(1);
+        archivedPersistentObject = createArchivedObjectsList.get(1);
         assertThat(archivedPersistentObject, is(records[2].getEntity()));
     }
 
     @Test
-    public void testHasObjectsReturnsTrueWhenNotEmpty() throws Exception {
-        ArchiveInsertRecord record1 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
-        ArchiveInsertRecord record2 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
-        ArchiveInsertRecord record3 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
-        ArchiveInsertRecord[] records = new ArchiveInsertRecord[] {record1, record2, record3};
-        BatchArchiveCallable callable = new BatchArchiveCallable(null, records);
+    public void testHasObjectsReturnsTrueWhenNotEmpty() {
+        final ArchiveInsertRecord record1 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
+        final ArchiveInsertRecord record2 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
+        final ArchiveInsertRecord record3 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
+        final ArchiveInsertRecord[] records = new ArchiveInsertRecord[] { record1, record2, record3 };
+        final BatchArchiveCallable callable = new BatchArchiveCallable(null, records);
 
         assertTrue(callable.hasObjects());
     }
 
     @Test
-    public void testHasObjectsReturnsFalseWhenEmpty() throws Exception {
-        BatchArchiveCallable callable = new BatchArchiveCallable(null, new ArchiveInsertRecord[] {});
+    public void testHasObjectsReturnsFalseWhenEmpty() {
+        final BatchArchiveCallable callable = new BatchArchiveCallable(null, new ArchiveInsertRecord[] {});
 
         assertFalse(callable.hasObjects());
     }
 
     @Test
-    public void testHasObjectsReturnsFalseWhenNull() throws Exception {
-        BatchArchiveCallable callable = new BatchArchiveCallable(null, (ArchiveInsertRecord) null);
+    public void testHasObjectsReturnsFalseWhenNull() {
+        final BatchArchiveCallable callable = new BatchArchiveCallable(null, (ArchiveInsertRecord) null);
 
         assertFalse(callable.hasObjects());
     }
 
     @Test
-    public void testCallWithOneRecord() throws Exception {
+    public void testCallWithOneRecord() throws SPersistenceException {
         final ArchivedPersistentObject entity = mock(ArchivedPersistentObject.class);
-        ArchiveInsertRecord record1 = new ArchiveInsertRecord(entity);
-        ArchiveInsertRecord[] records = new ArchiveInsertRecord[] {record1};
-        PersistenceService persistenceService = mock(PersistenceService.class);
-        BatchArchiveCallable callable = new BatchArchiveCallable(persistenceService, records);
+        final ArchiveInsertRecord record1 = new ArchiveInsertRecord(entity);
+        final ArchiveInsertRecord[] records = new ArchiveInsertRecord[] { record1 };
+        final PersistenceService persistenceService = mock(PersistenceService.class);
+        final BatchArchiveCallable callable = new BatchArchiveCallable(persistenceService, records);
 
         callable.call();
 
@@ -109,13 +110,13 @@ public class BatchArchiveCallableTest {
     }
 
     @Test
-    public void testCallWithMoreThanOneRecord() throws Exception {
-        ArchiveInsertRecord record1 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
-        ArchiveInsertRecord record2 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
-        ArchiveInsertRecord record3 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
-        ArchiveInsertRecord[] records = new ArchiveInsertRecord[] {record1, record2, record3};
-        PersistenceService persistenceService = mock(PersistenceService.class);
-        BatchArchiveCallable callable = new BatchArchiveCallable(persistenceService, records);
+    public void testCallWithMoreThanOneRecord() throws SPersistenceException {
+        final ArchiveInsertRecord record1 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
+        final ArchiveInsertRecord record2 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
+        final ArchiveInsertRecord record3 = new ArchiveInsertRecord(mock(ArchivedPersistentObject.class));
+        final ArchiveInsertRecord[] records = new ArchiveInsertRecord[] { record1, record2, record3 };
+        final PersistenceService persistenceService = mock(PersistenceService.class);
+        final BatchArchiveCallable callable = new BatchArchiveCallable(persistenceService, records);
 
         callable.call();
 

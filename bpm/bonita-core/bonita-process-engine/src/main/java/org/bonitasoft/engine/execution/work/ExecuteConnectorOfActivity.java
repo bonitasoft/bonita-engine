@@ -152,8 +152,8 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
         // create an instance using this definition
         final SThrowEventInstance throwEventInstance = createThrowErrorEventInstance(context, eventDefinition);
         final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
-        final boolean hasActionToExecute = eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, eventDefinition,
-                throwEventInstance, errorEventTriggerDefinition, sFlowNodeInstance);
+        eventsHandler.getHandler(SEventTriggerType.ERROR).handlePostThrowEvent(sProcessDefinition, eventDefinition, throwEventInstance,
+                errorEventTriggerDefinition, sFlowNodeInstance);
         setConnectorAndContainerToFailed(context, exception);
     }
 

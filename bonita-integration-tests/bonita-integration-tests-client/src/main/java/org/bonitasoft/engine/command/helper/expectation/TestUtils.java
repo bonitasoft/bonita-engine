@@ -12,31 +12,31 @@ import org.bonitasoft.engine.identity.User;
  */
 public class TestUtils {
 
-    private CommonAPITest testCase;
+    private final CommonAPITest testCase;
 
-    public TestUtils(CommonAPITest testCase) {
+    public TestUtils(final CommonAPITest testCase) {
         this.testCase = testCase;
     }
 
-    public Process wrap(ProcessInstance process) {
+    public Process wrap(final ProcessInstance process) {
         return new Process(process);
     }
 
     public class Process {
 
-        private ProcessInstance process;
+        private final ProcessInstance process;
 
-        Process(ProcessInstance process) {
+        Process(final ProcessInstance process) {
             this.process = process;
         }
 
-        public void execute(User behalf, String... steps) throws Exception {
-            for (String step : steps) {
-                testCase.waitForUserTaskAndExecuteIt(step, process.getId(), behalf.getId());
+        public void execute(final User behalf, final String... steps) throws Exception {
+            for (final String step : steps) {
+                testCase.waitForUserTaskAndExecuteIt(step, process, behalf);
             }
         }
 
-        public StepExpectation expect(String... steps) {
+        public StepExpectation expect(final String... steps) {
             return new StepExpectation(testCase, process, steps);
         }
 
@@ -44,15 +44,15 @@ public class TestUtils {
             return new ProcessExpectation(testCase, process);
         }
 
-        public VariableExpectation expectVariable(String name) {
+        public VariableExpectation expectVariable(final String name) {
             return new VariableExpectation(testCase, process, name);
         }
 
-        public DocumentExpectation expectDocument(String name) {
+        public DocumentExpectation expectDocument(final String name) {
             return new DocumentExpectation(testCase, process, name);
         }
 
-        public void sendSignal(String name) throws SendEventException {
+        public void sendSignal(final String name) throws SendEventException {
             testCase.getProcessAPI().sendSignal(name);
         }
     }

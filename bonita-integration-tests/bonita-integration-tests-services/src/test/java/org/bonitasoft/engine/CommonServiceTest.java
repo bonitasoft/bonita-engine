@@ -61,7 +61,7 @@ public class CommonServiceTest {
         setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
 
         /** set bonita.services.folder to target/test-classes/conf as it is done in pom.xml -> no need to edit test configuration */
-        setSystemPropertyIfNotSet("bonita.services.folder", "target/test-classes/conf");
+        setSystemPropertyIfNotSet("bonita.services.folder", "target/conf");
         setSystemPropertyIfNotSet("bonita.home", "target");
 
         // Force these system properties

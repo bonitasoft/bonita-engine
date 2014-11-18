@@ -11,7 +11,7 @@ import org.bonitasoft.engine.login.LoginAPITest;
 import org.bonitasoft.engine.login.PlatformLoginAPITest;
 import org.bonitasoft.engine.operation.OperationTest;
 import org.bonitasoft.engine.platform.command.PlatformCommandTest;
-import org.bonitasoft.engine.process.ProcessManagementTest;
+import org.bonitasoft.engine.process.ProcessManagementIT;
 import org.bonitasoft.engine.process.task.PendingTasksTest;
 import org.bonitasoft.engine.profile.ProfileITest;
 import org.bonitasoft.engine.search.SearchProcessInstanceTest;
@@ -24,7 +24,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
         RemoteEngineTests.class,// this class is only in remote (we test that server stack trace are reported in client side)
         PlatformCommandTest.class,
-        ProcessManagementTest.class,
+        ProcessManagementIT.class,
         ProfileITest.class,
         SearchProcessInstanceTest.class,
         PendingTasksTest.class,

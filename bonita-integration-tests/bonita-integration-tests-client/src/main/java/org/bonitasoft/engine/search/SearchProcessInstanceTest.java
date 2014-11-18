@@ -23,6 +23,7 @@ import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
+import org.bonitasoft.engine.connectors.TestConnectorThatThrowException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.expression.Expression;
@@ -120,6 +121,67 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         assertEquals(0, result.getCount());
 
         disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(classes = { ProcessInstance.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, jira = "BS-11031", keywords = { "Failed task",
+            "Failed process" })
+    @Test
+    public void searchFailedProcessInstances() throws Exception {
+        // Build a process with a failed connector on enter
+        final ProcessDefinition processDefinitionWithFailedConnector = deployAndEnableProcessWithConnector(BuildTestUtil
+                .buildProcessDefinitionWithFailedConnector("Process with failed connector in enter"), "TestConnectorThatThrowException.impl",
+                TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
+
+        // Build a process with a failed task
+        final ProcessDefinition processDefinitionWithFailedTask = deployAndEnableProcessWithConnector(BuildTestUtil
+                .buildProcessDefinitionWithAutomaticTaskAndFailedConnector("Process with failed task"), "TestConnectorThatThrowException.impl",
+                TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
+
+        final ProcessInstance instance1 = getProcessAPI().startProcess(processDefinitionWithFailedConnector.getId());
+        waitForProcessToBeInState(instance1, ProcessInstanceState.ERROR);
+
+        final ProcessInstance instance2 = getProcessAPI().startProcess(processDefinitionWithFailedTask.getId());
+        waitForFlowNodeInFailedState(instance2);
+
+        final ProcessInstance instance3 = getProcessAPI().startProcess(processDefinitionWithFailedConnector.getId());
+        waitForProcessToBeInState(instance3, ProcessInstanceState.ERROR);
+
+        // search and check result ASC
+        final SearchOptionsBuilder searchOptions1 = BuildTestUtil.buildSearchOptions(0, 2, ProcessInstanceSearchDescriptor.START_DATE, Order.ASC);
+        SearchResult<ProcessInstance> result = getProcessAPI().searchFailedProcessInstances(searchOptions1.done());
+        assertNotNull(result);
+        assertEquals(3, result.getCount());
+        final List<ProcessInstance> processInstanceList1 = result.getResult();
+        assertNotNull(processInstanceList1);
+        assertEquals(2, processInstanceList1.size());
+        assertEquals(instance1.getId(), processInstanceList1.get(0).getId());
+        assertEquals(instance2.getId(), processInstanceList1.get(1).getId());
+
+        // search and check result DESC
+        final SearchOptionsBuilder searchOptions2 = BuildTestUtil.buildSearchOptions(0, 3, ProcessInstanceSearchDescriptor.START_DATE, Order.DESC);
+        result = getProcessAPI().searchFailedProcessInstances(searchOptions2.done());
+        assertNotNull(result);
+        assertEquals(3, result.getCount());
+        final List<ProcessInstance> processInstanceList2 = result.getResult();
+        assertEquals(3, processInstanceList2.size());
+        assertEquals(instance3.getId(), processInstanceList2.get(0).getId());
+        assertEquals(instance2.getId(), processInstanceList2.get(1).getId());
+        assertEquals(instance1.getId(), processInstanceList2.get(2).getId());
+
+        // Search only process instance with state ERROR
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 3);
+        builder.filter(ProcessInstanceSearchDescriptor.STATE_NAME, ProcessInstanceState.ERROR);
+        builder.sort(ProcessInstanceSearchDescriptor.START_DATE, Order.ASC);
+        result = getProcessAPI().searchFailedProcessInstances(builder.done());
+        assertNotNull(result);
+        assertEquals(2, result.getCount());
+        final List<ProcessInstance> processInstances = result.getResult();
+        assertNotNull(processInstances);
+        assertEquals(2, processInstances.size());
+        assertEquals(instance1.getId(), processInstances.get(0).getId());
+        assertEquals(instance3.getId(), processInstances.get(1).getId());
+
+        disableAndDeleteProcess(processDefinitionWithFailedConnector, processDefinitionWithFailedTask);
     }
 
     /*
@@ -1147,12 +1209,11 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         final ProcessInstance procInst = getProcessAPI().startProcess(simpleProcess.getId());
 
         // execute it until the end
-        final long processInstanceId = procInst.getId();
-        waitForUserTaskAndExecuteIt("step1", processInstanceId, user.getId());
-        waitForProcessToFinish(processInstanceId);
+        waitForUserTaskAndExecuteIt("step1", procInst, user);
+        waitForProcessToFinish(procInst);
 
         // search archived process instances: all states must be retrieved
-        final SearchResult<ArchivedProcessInstance> searchResult = searchAchivedProcessInstancesInAllStates(processInstanceId);
+        final SearchResult<ArchivedProcessInstance> searchResult = searchAchivedProcessInstancesInAllStates(procInst.getId());
 
         assertEquals(3, searchResult.getCount());
         final List<ArchivedProcessInstance> archivedProcesses = searchResult.getResult();
