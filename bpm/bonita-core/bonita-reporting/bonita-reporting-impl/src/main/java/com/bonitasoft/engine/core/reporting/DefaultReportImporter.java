@@ -68,7 +68,7 @@ public class DefaultReportImporter {
             entityUpdateDescriptor.addField(SReportFields.NAME,reportName);
             entityUpdateDescriptor.addField(SReportFields.DESCRIPTION,description);
             entityUpdateDescriptor.addField(SReportFields.SCREENSHOT,screenShot);
-            entityUpdateDescriptor.addField(SReportFields.CONTENT,screenShot);
+            entityUpdateDescriptor.addField(SReportFields.CONTENT,reportContent);
             reportingService.update(existingReport, entityUpdateDescriptor);
         }else{
             logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Report "+reportName+" exists and is up to date, do nothing");

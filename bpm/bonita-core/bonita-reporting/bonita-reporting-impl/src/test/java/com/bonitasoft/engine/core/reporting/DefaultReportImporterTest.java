@@ -11,6 +11,7 @@
 
 package com.bonitasoft.engine.core.reporting;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.MapEntry.entry;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
@@ -35,6 +36,7 @@ import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -103,8 +105,12 @@ public class DefaultReportImporterTest {
         //when
         defaultReportImporter.invoke("the_report");
         //then
+        ArgumentCaptor<EntityUpdateDescriptor> captor = ArgumentCaptor.forClass(EntityUpdateDescriptor.class);
         verify(reportingService, never()).addReport(any(SReport.class), any(byte[].class));
-        verify(reportingService).update(any(SReport.class), any(EntityUpdateDescriptor.class));
+        verify(reportingService).update(any(SReport.class), captor.capture());
+        EntityUpdateDescriptor value = captor.getValue();
+        assertThat((byte[])value.getFields().get("content")).containsExactly(zipContent);
+        assertThat((byte[])value.getFields().get("screenshot")).containsExactly(screenshot);
     }
 
     private InputStream stream(byte[] zip) throws IOException {
