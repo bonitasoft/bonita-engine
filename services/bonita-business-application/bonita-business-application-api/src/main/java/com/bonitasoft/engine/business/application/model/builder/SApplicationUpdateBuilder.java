@@ -12,21 +12,16 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public interface SApplicationUpdateBuilder {
 
     EntityUpdateDescriptor done();
 
-    SApplicationUpdateBuilder updateHomePageId(long applicationPageId);
-
-    public SApplicationUpdateBuilder updateName(final String name);
+    public SApplicationUpdateBuilder updateToken(final String name);
 
     public SApplicationUpdateBuilder updateDisplayName(final String displayName);
 
     public SApplicationUpdateBuilder updateVersion(final String version);
-
-    public SApplicationUpdateBuilder updatePath(final String path);
 
     public SApplicationUpdateBuilder updateDescription(final String description);
 
@@ -36,6 +31,6 @@ public interface SApplicationUpdateBuilder {
 
     public SApplicationUpdateBuilder updateProfileId(final Long profileId);
 
-    public SApplicationUpdateBuilder updateUpdatedBy(final Long updaterUserId);
+    public SApplicationUpdateBuilder updateHomePageId(final Long homePageId);
 
 }

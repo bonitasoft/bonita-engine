@@ -20,9 +20,7 @@ import org.bonitasoft.engine.search.descriptor.SearchEntityDescriptor;
 
 import com.bonitasoft.engine.business.application.ApplicationMenuSearchDescriptor;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
-import com.bonitasoft.engine.business.application.model.SApplicationPage;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuBuilderFactory;
-import com.bonitasoft.engine.business.application.model.builder.SApplicationPageBuilderFactory;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -36,13 +34,13 @@ public class SearchApplicationMenuDescriptor extends SearchEntityDescriptor {
 
     SearchApplicationMenuDescriptor() {
         final SApplicationMenuBuilderFactory appMenuKeyProvider = BuilderFactory.get(SApplicationMenuBuilderFactory.class);
-        final SApplicationPageBuilderFactory appPageKeyProvider = BuilderFactory.get(SApplicationPageBuilderFactory.class);
-        keys = new HashMap<String, FieldDescriptor>(4);
+        keys = new HashMap<String, FieldDescriptor>(6);
         keys.put(ApplicationMenuSearchDescriptor.ID, new FieldDescriptor(SApplicationMenu.class, appMenuKeyProvider.getIdKey()));
         keys.put(ApplicationMenuSearchDescriptor.APPLICATION_PAGE_ID, new FieldDescriptor(SApplicationMenu.class, appMenuKeyProvider.getApplicationPageIdKey()));
         keys.put(ApplicationMenuSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SApplicationMenu.class, appMenuKeyProvider.getDisplayNameKey()));
         keys.put(ApplicationMenuSearchDescriptor.INDEX, new FieldDescriptor(SApplicationMenu.class, appMenuKeyProvider.getIndexKey()));
-        keys.put(ApplicationMenuSearchDescriptor.APPLICATION_ID, new FieldDescriptor(SApplicationPage.class, appPageKeyProvider.getApplicationIdKey()));
+        keys.put(ApplicationMenuSearchDescriptor.APPLICATION_ID, new FieldDescriptor(SApplicationMenu.class, appMenuKeyProvider.getApplicationIdKey()));
+        keys.put(ApplicationMenuSearchDescriptor.PARENT_ID, new FieldDescriptor(SApplicationMenu.class, appMenuKeyProvider.getParentIdKey()));
 
         allFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
 

@@ -34,26 +34,25 @@ public class SearchApplicationDescriptor extends SearchEntityDescriptor {
 
     SearchApplicationDescriptor() {
         final SApplicationBuilderFactory keyProvider = BuilderFactory.get(SApplicationBuilderFactory.class);
-        keys = new HashMap<String, FieldDescriptor>(10);
+        keys = new HashMap<String, FieldDescriptor>(11);
         keys.put(ApplicationSearchDescriptor.ID, new FieldDescriptor(SApplication.class, keyProvider.getIdKey()));
-        keys.put(ApplicationSearchDescriptor.NAME, new FieldDescriptor(SApplication.class, keyProvider.getNameKey()));
+        keys.put(ApplicationSearchDescriptor.TOKEN, new FieldDescriptor(SApplication.class, keyProvider.getTokenKey()));
         keys.put(ApplicationSearchDescriptor.DISPLAY_NAME, new FieldDescriptor(SApplication.class, keyProvider.getDisplayNameKey()));
         keys.put(ApplicationSearchDescriptor.VERSION, new FieldDescriptor(SApplication.class, keyProvider.getVersionKey()));
-        keys.put(ApplicationSearchDescriptor.PATH, new FieldDescriptor(SApplication.class, keyProvider.getPathKey()));
         keys.put(ApplicationSearchDescriptor.ICON_PATH, new FieldDescriptor(SApplication.class, keyProvider.getIconPathKey()));
         keys.put(ApplicationSearchDescriptor.CREATION_DATE, new FieldDescriptor(SApplication.class, keyProvider.getCreationDateKey()));
         keys.put(ApplicationSearchDescriptor.CREATED_BY, new FieldDescriptor(SApplication.class, keyProvider.getCreatedByKey()));
         keys.put(ApplicationSearchDescriptor.LAST_UPDATE_DATE, new FieldDescriptor(SApplication.class, keyProvider.getLastUpdatedDateKey()));
         keys.put(ApplicationSearchDescriptor.UPDATED_BY, new FieldDescriptor(SApplication.class, keyProvider.getUpdatedByKey()));
         keys.put(ApplicationSearchDescriptor.STATE, new FieldDescriptor(SApplication.class, keyProvider.getStateKey()));
+        keys.put(ApplicationSearchDescriptor.PROFILE_ID, new FieldDescriptor(SApplication.class, keyProvider.getProfileIdKey()));
 
         allFields = new HashMap<Class<? extends PersistentObject>, Set<String>>(1);
 
         final Set<String> pageFields = new HashSet<String>(5);
-        pageFields.add(keyProvider.getNameKey());
+        pageFields.add(keyProvider.getTokenKey());
         pageFields.add(keyProvider.getDisplayNameKey());
         pageFields.add(keyProvider.getVersionKey());
-        pageFields.add(keyProvider.getPathKey());
         pageFields.add(keyProvider.getIconPathKey());
         pageFields.add(keyProvider.getStateKey());
         allFields.put(SApplication.class, pageFields);

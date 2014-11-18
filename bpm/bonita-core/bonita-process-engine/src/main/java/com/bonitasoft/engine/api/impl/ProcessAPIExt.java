@@ -46,6 +46,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorStateReset;
 import org.bonitasoft.engine.bpm.connector.InvalidConnectorImplementationException;
 import org.bonitasoft.engine.bpm.contract.ContractViolationException;
 import org.bonitasoft.engine.bpm.contract.Input;
+import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
@@ -150,11 +151,18 @@ import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
 import com.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
 import com.bonitasoft.engine.bpm.process.Index;
 import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
+import com.bonitasoft.engine.businessdata.BusinessDataReference;
+import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
+import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
+import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
+import com.bonitasoft.engine.core.process.instance.model.SSimpleRefBusinessDataInstance;
 import com.bonitasoft.engine.parameter.OrderBy;
 import com.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.parameter.SParameter;
 import com.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -167,7 +175,8 @@ import com.bonitasoft.manager.Features;
  */
 public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
-    protected static TenantServiceAccessor getTenantAccessor() {
+    @Override
+    protected TenantServiceAccessor getTenantAccessor() {
         try {
             final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long tenantId = sessionAccessor.getTenantId();
@@ -1211,6 +1220,45 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         return new EvaluateExpressionsInstanceLevelAndArchivedExt(expressions, containerId, containerType, processDefinitionId, time, expressionService,
                 getTenantAccessor()
                 .getBusinessDataRepository());
+    }
+
+    @Override
+    public BusinessDataReference getProcessBusinessDataReference(final String businessDataName, final long processInstanceId) throws DataNotFoundException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        try {
+            final RefBusinessDataService refBusinessDataService = tenantAccessor.getRefBusinessDataService();
+            final SRefBusinessDataInstance sReference = refBusinessDataService.getRefBusinessDataInstance(businessDataName,
+                    processInstanceId);
+            if (sReference instanceof SSimpleRefBusinessDataInstance) {
+                return SPModelConvertor.toSimpleBusinessDataReference((SSimpleRefBusinessDataInstance) sReference);
+            } else {
+                return SPModelConvertor.toMultipleBusinessDataReference((SMultiRefBusinessDataInstance) sReference);
+            }
+        } catch (final SRefBusinessDataInstanceNotFoundException srbdnfe) {
+            throw new DataNotFoundException(srbdnfe);
+        } catch (final SBonitaReadException sbre) {
+            throw new RetrieveException(sbre);
+        }
+    }
+
+    @Override
+    public List<BusinessDataReference> getProcessBusinessDataReferences(final long processInstanceId, final int startIndex, final int maxResults) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        try {
+            final RefBusinessDataService refBusinessDataService = tenantAccessor.getRefBusinessDataService();
+            final List<SRefBusinessDataInstance> sReferences = refBusinessDataService.getRefBusinessDataInstances(processInstanceId, startIndex, maxResults);
+            final List<BusinessDataReference> references = new ArrayList<BusinessDataReference>();
+            for (final SRefBusinessDataInstance sReference : sReferences) {
+                if (sReference instanceof SSimpleRefBusinessDataInstance) {
+                    references.add(SPModelConvertor.toSimpleBusinessDataReference((SSimpleRefBusinessDataInstance) sReference));
+                } else {
+                    references.add(SPModelConvertor.toMultipleBusinessDataReference((SMultiRefBusinessDataInstance) sReference));
+                }
+            }
+            return references;
+        } catch (final SBonitaReadException sbre) {
+            throw new RetrieveException(sbre);
+        }
     }
 
 }

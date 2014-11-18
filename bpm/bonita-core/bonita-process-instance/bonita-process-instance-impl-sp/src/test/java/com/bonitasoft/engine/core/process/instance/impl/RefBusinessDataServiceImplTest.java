@@ -17,11 +17,11 @@ import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceCreationException;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceModificationException;
@@ -31,6 +31,7 @@ import com.bonitasoft.engine.core.process.instance.model.impl.SProcessSimpleRefB
 import com.bonitasoft.engine.core.process.instance.model.impl.SSimpleRefBusinessDataInstanceImpl;
 import com.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilderExt;
 
+@RunWith(MockitoJUnitRunner.class)
 public class RefBusinessDataServiceImplTest {
 
     @Mock
@@ -47,11 +48,6 @@ public class RefBusinessDataServiceImplTest {
 
     @InjectMocks
     private RefBusinessDataServiceImpl service;
-
-    @Before
-    public void initMocks() {
-        MockitoAnnotations.initMocks(this);
-    }
 
     private SSimpleRefBusinessDataInstanceImpl buildSRefBusinessDataInstance() {
         final SSimpleRefBusinessDataInstanceImpl instance = new SProcessSimpleRefBusinessDataInstanceImpl();
@@ -136,6 +132,18 @@ public class RefBusinessDataServiceImplTest {
         doThrow(new SRecorderException("ouch!")).when(recorder).recordInsert(new InsertRecord(refBusinessDataInstance), null);
 
         service.addRefBusinessDataInstance(refBusinessDataInstance);
+    }
+
+    @Test
+    public void getRefBusinessDataInstancesShouldCallThePersistenceService() throws Exception {
+        final long processIntanceId = 789798798L;
+        final int startIndex = 0;
+        final int maxResults = 100;
+
+        service.getRefBusinessDataInstances(processIntanceId, startIndex, maxResults);
+
+        verify(persistence).selectList(SelectDescriptorBuilderExt.getSRefBusinessDataInstances(processIntanceId,
+                startIndex, maxResults));
     }
 
 }

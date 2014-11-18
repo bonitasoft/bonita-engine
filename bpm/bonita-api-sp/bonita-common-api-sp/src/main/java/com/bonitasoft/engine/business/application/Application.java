@@ -22,11 +22,11 @@ import org.bonitasoft.engine.profile.Profile;
 public interface Application extends BaseElement {
 
     /**
-     * Retrieves the <code>Application</code> name
+     * Retrieves the <code>Application</code> token
      *
-     * @return the <code>Application</code> name
+     * @return the <code>Application</code> token
      */
-    String getName();
+    String getToken();
 
     /**
      * Retrieves the <code>Application</code> display name
@@ -41,13 +41,6 @@ public interface Application extends BaseElement {
      * @return the <code>Application</code> version
      */
     String getVersion();
-
-    /**
-     * Retrieves the <code>Application</code> path
-     *
-     * @return the <code>Application</code> path
-     */
-    String getPath();
 
     /**
      * Retrieves the <code>Application</code> description
@@ -92,9 +85,11 @@ public interface Application extends BaseElement {
     long getUpdatedBy();
 
     /**
-     * Retrieves the <code>Application</code> status
+     * Retrieves the <code>Application</code> state. The possible values are {@link ApplicationState#ACTIVATED#name()} and {@link ApplicationState#DEACTIVATED
+     * #name()}
      *
-     * @return the <code>Application</code> status
+     * @return the <code>Application</code> state
+     * @see ApplicationState
      */
     String getState();
 
@@ -102,13 +97,15 @@ public interface Application extends BaseElement {
      * Retrieves the identifier of the {@link ApplicationPage} defined as home page for this application
      *
      * @return the identifier of the {@link ApplicationPage} defined as home page for this application
+     * @see ApplicationPage
      */
-    long getHomePageId();
+    Long getHomePageId();
 
     /**
      * Retrieves the identifier of the associated {@link Profile} or null if there is no profile is associated to this application.
      *
      * @return the identifier of the associated {@link Profile} or null if there is no profile is associated to this application.
+     * @see Profile
      */
     Long getProfileId();
 

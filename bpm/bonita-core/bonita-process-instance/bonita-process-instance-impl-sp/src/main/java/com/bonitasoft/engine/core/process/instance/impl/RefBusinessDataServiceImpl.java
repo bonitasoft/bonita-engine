@@ -21,6 +21,7 @@ import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLog;
 import org.bonitasoft.engine.queriablelogger.model.SQueriableLogSeverity;
@@ -170,6 +171,14 @@ public class RefBusinessDataServiceImpl implements RefBusinessDataService {
         final SelectOneDescriptor<Integer> descriptor = SelectDescriptorBuilderExt.getNumberOfDataOfMultiRefBusinessData(name,
                 processInstanceId);
         return persistenceRead.selectOne(descriptor);
+    }
+
+    @Override
+    public List<SRefBusinessDataInstance> getRefBusinessDataInstances(final long processInstanceId, final int startIndex, final int maxResults)
+            throws SBonitaReadException {
+        final SelectListDescriptor<SRefBusinessDataInstance> descriptor = SelectDescriptorBuilderExt.getSRefBusinessDataInstances(processInstanceId,
+                startIndex, maxResults);
+        return persistenceRead.selectList(descriptor);
     }
 
 }

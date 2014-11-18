@@ -11,6 +11,10 @@
 	<artifactId>bonita-reporting-impl</artifactId>
 
 	<dependencies>
+        <dependency>
+            <groupId>com.bonitasoft.manager</groupId>
+            <artifactId>manager</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine.core.reporting</groupId>
 			<artifactId>bonita-reporting-api</artifactId>

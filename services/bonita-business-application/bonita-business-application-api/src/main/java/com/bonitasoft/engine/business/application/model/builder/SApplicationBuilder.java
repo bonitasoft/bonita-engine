@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.business.application.model.builder;
 
 import com.bonitasoft.engine.business.application.model.SApplication;
+import com.bonitasoft.engine.business.application.model.SApplicationState;
 
 
 /**
@@ -24,5 +25,7 @@ public interface SApplicationBuilder {
     SApplicationBuilder setIconPath(String iconPath);
 
     SApplicationBuilder setProfileId(Long profileId);
+
+    SApplicationBuilder setState(String state);
 
 }

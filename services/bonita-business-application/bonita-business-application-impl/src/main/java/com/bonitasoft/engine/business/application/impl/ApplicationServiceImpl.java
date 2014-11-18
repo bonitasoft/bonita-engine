@@ -27,7 +27,6 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -46,8 +45,11 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
 
 import com.bonitasoft.engine.business.application.ApplicationService;
-import com.bonitasoft.engine.business.application.SInvalidDisplayNameException;
-import com.bonitasoft.engine.business.application.SInvalidNameException;
+import com.bonitasoft.engine.business.application.impl.cleaner.ApplicationDestructor;
+import com.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuCleaner;
+import com.bonitasoft.engine.business.application.impl.cleaner.ApplicationMenuDestructor;
+import com.bonitasoft.engine.business.application.impl.cleaner.ApplicationPageDestructor;
+import com.bonitasoft.engine.business.application.impl.converter.MenuIndexConverter;
 import com.bonitasoft.engine.business.application.model.SApplication;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
 import com.bonitasoft.engine.business.application.model.SApplicationPage;
@@ -55,19 +57,21 @@ import com.bonitasoft.engine.business.application.model.builder.SApplicationBuil
 import com.bonitasoft.engine.business.application.model.builder.SApplicationLogBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationMenuLogBuilder;
 import com.bonitasoft.engine.business.application.model.builder.SApplicationPageLogBuilder;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationFields;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationLogBuilderImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuBuilderFactoryImpl;
+import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuFields;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationMenuLogBuilderImpl;
 import com.bonitasoft.engine.business.application.model.builder.impl.SApplicationPageLogBuilderImpl;
 import com.bonitasoft.manager.Features;
 import com.bonitasoft.manager.Manager;
 
-
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class ApplicationServiceImpl implements ApplicationService {
 
+    public static final int MAX_RESULTS = 1000;
     private final Recorder recorder;
 
     private final ReadPersistenceService persistenceService;
@@ -78,12 +82,31 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     private final boolean active;
 
+    private IndexManager indexManager;
+    private MenuIndexConverter menuIndexConverter;
+    private ApplicationDestructor applicationDestructor;
+    private ApplicationPageDestructor applicationPageDestructor;
+    private ApplicationMenuDestructor applicationMenuDestructor;
+
     public ApplicationServiceImpl(final Recorder recorder, final ReadPersistenceService persistenceService, final QueriableLoggerService queriableLoggerService) {
-        this(Manager.getInstance(), recorder, persistenceService, queriableLoggerService);
+        this(Manager.getInstance(), recorder, persistenceService, queriableLoggerService, null, null, null, null, null);
+        indexManager = new IndexManager(new IndexUpdater(this, MAX_RESULTS), new MenuIndexValidator());
+        menuIndexConverter = new MenuIndexConverter(this);
+        final ApplicationMenuCleaner applicationMenuCleaner = new ApplicationMenuCleaner(this);
+        applicationDestructor = new ApplicationDestructor(applicationMenuCleaner);
+        applicationPageDestructor = new ApplicationPageDestructor(applicationMenuCleaner, new HomePageChecker(this));
+        applicationMenuDestructor = new ApplicationMenuDestructor(applicationMenuCleaner);
     }
 
     ApplicationServiceImpl(final Manager manager, final Recorder recorder, final ReadPersistenceService persistenceService,
-            final QueriableLoggerService queriableLoggerService) {
+            final QueriableLoggerService queriableLoggerService, final IndexManager indexManager, final MenuIndexConverter menuIndexConverter,
+            final ApplicationDestructor applicationDestructor, final ApplicationPageDestructor applicationPageDestructor,
+            final ApplicationMenuDestructor applicationMenuDestructor) {
+        this.indexManager = indexManager;
+        this.menuIndexConverter = menuIndexConverter;
+        this.applicationDestructor = applicationDestructor;
+        this.applicationPageDestructor = applicationPageDestructor;
+        this.applicationMenuDestructor = applicationMenuDestructor;
         active = manager.isFeatureActive(Features.BUSINESS_APPLICATIONS);
         this.recorder = recorder;
         this.persistenceService = persistenceService;
@@ -92,26 +115,18 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public SApplication createApplication(final SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException,
-    SInvalidNameException, SInvalidDisplayNameException {
+    public SApplication createApplication(final SApplication application) throws SObjectCreationException, SObjectAlreadyExistsException {
         checkLicense();
         final String methodName = "createApplication";
-        final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.CREATED, "Creating application named " + application.getName());
+        final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.CREATED, "Creating application named " + application.getToken());
         try {
             validateApplication(application);
             final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(ApplicationService.APPLICATION)
                     .setObject(application).done();
             recorder.recordInsert(new InsertRecord(application), insertEvent);
             log(application.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
-        } catch (final SInvalidNameException e) {
-            log(application.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
-        } catch (final SInvalidDisplayNameException e) {
-            log(application.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
         } catch (final SObjectAlreadyExistsException e) {
-            log(application.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
+            return logAndRetrowException(application.getId(), methodName, logBuilder, e);
         } catch (final SBonitaException e) {
             handleCreationException(application, logBuilder, e, methodName);
         }
@@ -124,33 +139,21 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
     }
 
-    private void validateApplication(final SApplication application) throws SInvalidNameException, SBonitaReadException, SObjectAlreadyExistsException,
-    SObjectCreationException, SInvalidDisplayNameException {
-        final String applicationName = application.getName();
-        validateApplicationName(applicationName);
-        validateApplicationDisplayName(application.getDisplayName());
+    private void validateApplication(final SApplication application) throws SBonitaReadException, SObjectAlreadyExistsException,
+            SObjectCreationException {
+        final String applicationName = application.getToken();
+        validateApplicationToken(applicationName);
 
     }
 
-    private void validateApplicationName(final String applicationName) throws SInvalidNameException, SBonitaReadException, SObjectAlreadyExistsException {
-        if (!URLValidator.isValid(applicationName)) {
-            throw new SInvalidNameException(
-                    "Invalid application name '"
-                            + applicationName
-                            + "': the name can not be null or empty and should contains only alpha numeric characters and the following special characters '-', '.', '_' or '~'");
-        }
-        if (hasApplicationWithName(applicationName)) {
-            throw new SObjectAlreadyExistsException("An application already exists with name '" + applicationName + "'.");
+    private void validateApplicationToken(final String applicationToken) throws SBonitaReadException, SObjectAlreadyExistsException {
+        if (hasApplicationWithToken(applicationToken)) {
+            throw new SObjectAlreadyExistsException("An application already exists with token '" + applicationToken + "'.");
         }
     }
 
-    private void validateApplicationDisplayName(final String applicationDisplayName) throws SInvalidDisplayNameException {
-        if (applicationDisplayName == null || applicationDisplayName.trim().isEmpty()) {
-            throw new SInvalidDisplayNameException("The application display name can not be null or empty");
-        }
-    }
-
-    private void handleCreationException(final PersistentObject persitentObject, final SPersistenceLogBuilder logBuilder, final Exception e, final String methodName)
+    private void handleCreationException(final PersistentObject persitentObject, final SPersistenceLogBuilder logBuilder, final Exception e,
+            final String methodName)
             throws SObjectCreationException {
         log(persitentObject.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
         throw new SObjectCreationException(e);
@@ -162,11 +165,16 @@ public class ApplicationServiceImpl implements ApplicationService {
         throw new SObjectModificationException(e);
     }
 
-    public boolean hasApplicationWithName(final String name) throws SBonitaReadException {
-        final SApplication application = persistenceService.selectOne(new SelectOneDescriptor<SApplication>("getApplicationByName", Collections
-                .<String, Object> singletonMap("name",
-                        name), SApplication.class));
+    public boolean hasApplicationWithToken(final String name) throws SBonitaReadException {
+        final SApplication application = getApplicationByToken(name);
         return application != null;
+    }
+
+    @Override
+    public SApplication getApplicationByToken(final String token) throws SBonitaReadException {
+        return persistenceService.selectOne(new SelectOneDescriptor<SApplication>("getApplicationByToken", Collections
+                .<String, Object> singletonMap("token",
+                        token), SApplication.class));
     }
 
     private <T extends SLogBuilder & HasCRUDEAction> void initializeLogBuilder(final T logBuilder, final String message, final ActionType actionType) {
@@ -222,11 +230,11 @@ public class ApplicationServiceImpl implements ApplicationService {
             final SApplication application = getApplication(applicationId);
             final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION)
                     .setObject(application).done();
+            applicationDestructor.onDeleteApplication(application);
             recorder.recordDelete(new DeleteRecord(application), event);
             log(application.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SObjectNotFoundException e) {
-            log(applicationId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
+            logAndRetrowException(applicationId, methodName, logBuilder, e);
         } catch (final SBonitaException e) {
             throwModificationException(applicationId, logBuilder, methodName, e);
         }
@@ -235,38 +243,76 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public SApplication updateApplication(final long applicationId, final EntityUpdateDescriptor updateDescriptor)
-            throws SObjectModificationException,
-    SInvalidNameException, SInvalidDisplayNameException, SBonitaReadException, SObjectAlreadyExistsException, SObjectNotFoundException {
+            throws SObjectModificationException, SObjectAlreadyExistsException, SObjectNotFoundException {
+        checkLicense();
+        final String methodName = "updateApplication";
+        final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.UPDATED, "Updating application with id " + applicationId);
+
+        try {
+            handleHomePageUpdate(updateDescriptor);
+            final SApplication application = getApplication(applicationId);
+            return updateApplication(application, updateDescriptor);
+        } catch (final SObjectNotFoundException e) {
+            throw e;
+        } catch (final SObjectAlreadyExistsException e) {
+            throw e;
+        } catch (final SObjectModificationException e) {
+            throw e;
+        } catch (final SBonitaException e) {
+            log(applicationId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            throw new SObjectModificationException(e);
+        }
+    }
+
+    private void handleHomePageUpdate(final EntityUpdateDescriptor updateDescriptor) throws SBonitaReadException, SObjectModificationException {
+        final Long homePageId = (Long) updateDescriptor.getFields().get(SApplicationFields.HOME_PAGE_ID);
+        if (homePageId != null) {
+            final SApplicationPage applicationPage = executeGetApplicationPageById(homePageId);
+            if (applicationPage == null) {
+                throw new SObjectModificationException("Invalid home page id: No application page found with id '" + homePageId + "'");
+            }
+        }
+    }
+
+    @Override
+    public SApplication updateApplication(final SApplication application, final EntityUpdateDescriptor updateDescriptor)
+            throws SObjectModificationException, SObjectAlreadyExistsException {
         checkLicense();
         final String methodName = "updateApplication";
         final long now = System.currentTimeMillis();
-        final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.UPDATED, "Updating application with id " + applicationId);
-
-        final SApplication application = getApplication(applicationId);
-
-        if (updateDescriptor.getFields().containsKey(SApplicationFields.NAME)
-                && !application.getName().equals(updateDescriptor.getFields().get(SApplicationFields.NAME))) {
-            validateApplicationName((String) updateDescriptor.getFields().get(SApplicationFields.NAME));
-        }
-        if (updateDescriptor.getFields().containsKey(SApplicationFields.DISPLAY_NAME)
-                && !application.getDisplayName().equals(updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME))) {
-            validateApplicationDisplayName((String) updateDescriptor.getFields().get(SApplicationFields.DISPLAY_NAME));
-        }
-
-        updateDescriptor.addField(applicationKeyProvider.getLastUpdatedDateKey(), now);
+        final SApplicationLogBuilder logBuilder = getApplicationLogBuilder(ActionType.UPDATED, "Updating application with id " + application.getId());
 
         try {
+            validateUpdatedFields(updateDescriptor, application);
+            updateDescriptor.addField(applicationKeyProvider.getLastUpdatedDateKey(), now);
+
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(application,
                     updateDescriptor);
             final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ApplicationService.APPLICATION)
                     .setObject(application).done();
             recorder.recordUpdate(updateRecord, updateEvent);
-            log(applicationId, SQueriableLog.STATUS_OK, logBuilder, methodName);
+            log(application.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             return application;
 
+        } catch (final SObjectAlreadyExistsException e) {
+            return logAndRetrowException(application.getId(), methodName, logBuilder, e);
         } catch (final SBonitaException e) {
-            log(applicationId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            log(application.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
             throw new SObjectModificationException(e);
+        }
+    }
+
+    private <T, E extends SBonitaException> T logAndRetrowException(final long objectId, final String methodName, final SPersistenceLogBuilder logBuilder,
+            final E e) throws E {
+        log(objectId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+        throw e;
+    }
+
+    private void validateUpdatedFields(final EntityUpdateDescriptor updateDescriptor, final SApplication application) throws SBonitaReadException,
+            SObjectAlreadyExistsException {
+        if (updateDescriptor.getFields().containsKey(SApplicationFields.TOKEN)
+                && !application.getToken().equals(updateDescriptor.getFields().get(SApplicationFields.TOKEN))) {
+            validateApplicationToken((String) updateDescriptor.getFields().get(SApplicationFields.TOKEN));
         }
     }
 
@@ -283,12 +329,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public SApplicationPage createApplicationPage(final SApplicationPage applicationPage) throws SObjectCreationException, SObjectAlreadyExistsException,
-    SInvalidNameException {
+    public SApplicationPage createApplicationPage(final SApplicationPage applicationPage) throws SObjectCreationException, SObjectAlreadyExistsException {
         checkLicense();
         final String methodName = "createApplicationPage";
         final SApplicationPageLogBuilder logBuilder = getApplicationPageLogBuilder(ActionType.CREATED,
-                "Creating application page named " + applicationPage.getName());
+                "Creating application page with token " + applicationPage.getToken());
         try {
             validateApplicationPage(applicationPage);
             final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class)
@@ -296,31 +341,20 @@ public class ApplicationServiceImpl implements ApplicationService {
                     .setObject(applicationPage).done();
             recorder.recordInsert(new InsertRecord(applicationPage), insertEvent);
             log(applicationPage.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
-        } catch (final SInvalidNameException e) {
-            log(applicationPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
         } catch (final SObjectAlreadyExistsException e) {
-            log(applicationPage.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
+            return logAndRetrowException(applicationPage.getId(), methodName, logBuilder, e);
         } catch (final SBonitaException e) {
             handleCreationException(applicationPage, logBuilder, e, methodName);
         }
         return applicationPage;
     }
 
-    private void validateApplicationPage(final SApplicationPage applicationPage) throws SInvalidNameException, SBonitaReadException,
-    SObjectAlreadyExistsException {
-        final String applicationPageName = applicationPage.getName();
-        if (!URLValidator.isValid(applicationPageName)) {
-            throw new SInvalidNameException(
-                    "Invalid application page name'"
-                            + applicationPageName
-                            + "': the name can not be null or empty and should contains only alpha numeric characters and the following special characters '-', '.', '_' or '~'");
-        }
-        if (hasApplicationPage(applicationPage.getApplicationId(), applicationPageName)) {
+    private void validateApplicationPage(final SApplicationPage applicationPage) throws SBonitaReadException, SObjectAlreadyExistsException {
+        final String applicationPageToken = applicationPage.getToken();
+        if (hasApplicationPage(applicationPage.getApplicationId(), applicationPageToken)) {
             final StringBuilder stb = new StringBuilder();
-            stb.append("An application page named '");
-            stb.append(applicationPageName);
+            stb.append("An application page with token '");
+            stb.append(applicationPageToken);
             stb.append("' already exists for the application with id '");
             stb.append(applicationPage.getApplicationId());
             stb.append("'");
@@ -333,30 +367,30 @@ public class ApplicationServiceImpl implements ApplicationService {
         return applicationPage != null;
     }
 
-    public SApplicationPage getApplicationPage(final long applicationId, final String applicationPageName) throws SBonitaReadException {
+    public SApplicationPage getApplicationPage(final long applicationId, final String applicationPageToken) throws SBonitaReadException {
         final Map<String, Object> inputParameters = new HashMap<String, Object>(2);
         inputParameters.put("applicationId", applicationId);
-        inputParameters.put("applicationPageName", applicationPageName);
+        inputParameters.put("applicationPageToken", applicationPageToken);
         final SApplicationPage applicationPage = persistenceService
-                .selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationPageByNameAndApplicationId", inputParameters, SApplicationPage.class));
+                .selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationPageByTokenAndApplicationId", inputParameters, SApplicationPage.class));
         return applicationPage;
     }
 
     @Override
-    public SApplicationPage getApplicationPage(final String applicationName, final String applicationPageName) throws SBonitaReadException,
-    SObjectNotFoundException {
+    public SApplicationPage getApplicationPage(final String applicationToken, final String applicationPageToken) throws SBonitaReadException,
+            SObjectNotFoundException {
         checkLicense();
         final Map<String, Object> inputParameters = new HashMap<String, Object>(2);
-        inputParameters.put("applicationName", applicationName);
-        inputParameters.put("applicationPageName", applicationPageName);
+        inputParameters.put("applicationToken", applicationToken);
+        inputParameters.put("applicationPageToken", applicationPageToken);
         final SApplicationPage applicationPage = persistenceService
-                .selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationPageByNameAndApplicationName", inputParameters, SApplicationPage.class));
+                .selectOne(new SelectOneDescriptor<SApplicationPage>("getApplicationPageByTokenAndApplicationToken", inputParameters, SApplicationPage.class));
         if (applicationPage == null) {
             final StringBuilder stb = new StringBuilder();
             stb.append("No application page found with name '");
-            stb.append(applicationPageName);
-            stb.append("' and application name '");
-            stb.append(applicationName);
+            stb.append(applicationPageToken);
+            stb.append("' and application token '");
+            stb.append(applicationToken);
             stb.append("'.");
             throw new SObjectNotFoundException(stb.toString());
         }
@@ -365,31 +399,55 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public SApplicationPage getApplicationPage(final long applicationPageId) throws SBonitaReadException, SObjectNotFoundException {
-        final SApplicationPage applicationPage = persistenceService
-                .selectById(new SelectByIdDescriptor<SApplicationPage>("getApplicationPageById", SApplicationPage.class, applicationPageId));
+        final SApplicationPage applicationPage = executeGetApplicationPageById(applicationPageId);
         if (applicationPage == null) {
             throw new SObjectNotFoundException("No application page found with id '" + applicationPageId + "'.");
         }
         return applicationPage;
     }
 
+    private SApplicationPage executeGetApplicationPageById(final long applicationPageId) throws SBonitaReadException {
+        return persistenceService
+                .selectById(new SelectByIdDescriptor<SApplicationPage>("getApplicationPageById", SApplicationPage.class, applicationPageId));
+    }
+
     @Override
-    public void deleteApplicationPage(final long applicationpPageId) throws SObjectModificationException, SObjectNotFoundException {
+    public SApplicationPage deleteApplicationPage(final long applicationPageId) throws SObjectModificationException, SObjectNotFoundException {
         checkLicense();
         final String methodName = "deleteApplicationPage";
         final SApplicationPageLogBuilder logBuilder = getApplicationPageLogBuilder(ActionType.DELETED, "Deleting application page with id "
-                + applicationpPageId);
+                + applicationPageId);
+        SApplicationPage applicationPage = null;
         try {
-            final SApplicationPage applicationPage = getApplicationPage(applicationpPageId);
-            final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_PAGE)
-                    .setObject(applicationPage).done();
-            recorder.recordDelete(new DeleteRecord(applicationPage), event);
-            log(applicationPage.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            applicationPage = getApplicationPage(applicationPageId);
+            deleteApplicationPage(applicationPage);
         } catch (final SObjectNotFoundException e) {
-            log(applicationpPageId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            logAndRetrowException(applicationPageId, methodName, logBuilder, e);
+        } catch (final SObjectModificationException e) {
             throw e;
         } catch (final SBonitaException e) {
-            throwModificationException(applicationpPageId, logBuilder, methodName, e);
+            throwModificationException(applicationPageId, logBuilder, methodName, e);
+        }
+        return applicationPage;
+
+    }
+
+    @Override
+    public void deleteApplicationPage(final SApplicationPage applicationPage) throws SObjectModificationException {
+        checkLicense();
+        final String methodName = "deleteApplicationPage";
+        final SApplicationPageLogBuilder logBuilder = getApplicationPageLogBuilder(ActionType.DELETED, "Deleting application page with id "
+                + applicationPage.getId());
+        try {
+            final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_PAGE)
+                    .setObject(applicationPage).done();
+            applicationPageDestructor.onDeleteApplicationPage(applicationPage);
+            recorder.recordDelete(new DeleteRecord(applicationPage), event);
+            log(applicationPage.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+        } catch (final SObjectModificationException e) {
+            logAndRetrowException(applicationPage.getId(), methodName, logBuilder, e);
+        } catch (final SBonitaException e) {
+            throwModificationException(applicationPage.getId(), logBuilder, methodName, e);
         }
 
     }
@@ -428,7 +486,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         checkLicense();
         final String methodName = "createApplicationMenu";
         final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.CREATED,
-                "Creating application menu with diplay name " + applicationMenu.getDisplayName());
+                "Creating application menu with display name " + applicationMenu.getDisplayName());
         try {
             final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class)
                     .createInsertEvent(ApplicationService.APPLICATION_MENU)
@@ -439,6 +497,66 @@ public class ApplicationServiceImpl implements ApplicationService {
             handleCreationException(applicationMenu, logBuilder, e, methodName);
         }
         return applicationMenu;
+    }
+
+    @Override
+    public SApplicationMenu updateApplicationMenu(final long applicationMenuId, final EntityUpdateDescriptor updateDescriptor)
+            throws SObjectModificationException,
+            SObjectNotFoundException {
+        checkLicense();
+        final String methodName = "updateApplicationMenu";
+        final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.UPDATED, "Updating application menu with id " + applicationMenuId);
+
+        try {
+            final SApplicationMenu applicationMenu = getApplicationMenu(applicationMenuId);
+
+            updateApplicationMenu(applicationMenu, updateDescriptor, true);
+            return applicationMenu;
+        } catch (final SObjectNotFoundException e) {
+            return logAndRetrowException(applicationMenuId, methodName, logBuilder, e);
+        } catch (final SBonitaReadException e) {
+            log(applicationMenuId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            throw new SObjectModificationException(e);
+        }
+    }
+
+    @Override
+    public SApplicationMenu updateApplicationMenu(final SApplicationMenu applicationMenu, final EntityUpdateDescriptor updateDescriptor,
+            final boolean organizeIndexes)
+            throws SObjectModificationException {
+        final String methodName = "updateApplicationMenu";
+        final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.UPDATED,
+                "Updating application menu with id " + applicationMenu.getId());
+
+        try {
+            organizeIndexesOnUpdate(applicationMenu, updateDescriptor, organizeIndexes);
+            final SUpdateEvent updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class)
+                    .createUpdateEvent(ApplicationService.APPLICATION_MENU)
+                    .setObject(applicationMenu).done();
+            final UpdateRecord updateRecord = UpdateRecord.buildSetFields(applicationMenu,
+                    updateDescriptor);
+            recorder.recordUpdate(updateRecord, updateEvent);
+            log(applicationMenu.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
+            return applicationMenu;
+        } catch (final SBonitaException e) {
+            log(applicationMenu.getId(), SQueriableLog.STATUS_FAIL, logBuilder, methodName);
+            throw new SObjectModificationException(e);
+        }
+    }
+
+    private void organizeIndexesOnUpdate(final SApplicationMenu applicationMenu, final EntityUpdateDescriptor updateDescriptor, final boolean organizeIndexes)
+            throws SObjectModificationException, SBonitaReadException {
+        final Map<String, Object> fields = updateDescriptor.getFields();
+        if (fields.containsKey(SApplicationMenuFields.PARENT_ID) && !fields.containsKey(SApplicationMenuFields.INDEX)) {
+            //we need to force the update of index, as it has change of parent
+            fields.put(SApplicationMenuFields.INDEX, getNextAvailableIndex((Long) fields.get(SApplicationMenuFields.PARENT_ID)));
+        }
+        final Integer newIndexValue = (Integer) fields.get(SApplicationMenuFields.INDEX);
+        if (newIndexValue != null && organizeIndexes) {
+            final MenuIndex oldIndex = menuIndexConverter.toMenuIndex(applicationMenu);
+            final MenuIndex newIndex = menuIndexConverter.toMenuIndex(applicationMenu, updateDescriptor);
+            indexManager.organizeIndexesOnUpdate(oldIndex, newIndex);
+        }
     }
 
     @Override
@@ -453,21 +571,37 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public void deleteApplicationMenu(final long applicationMenuId) throws SObjectModificationException, SObjectNotFoundException {
+    public SApplicationMenu deleteApplicationMenu(final long applicationMenuId) throws SObjectModificationException, SObjectNotFoundException {
         checkLicense();
         final String methodName = "deleteApplicationMenu";
         final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.DELETED, "Deleting application menu with id " + applicationMenuId);
+        SApplicationMenu applicationMenu = null;
         try {
-            final SApplicationMenu applicationMenu = getApplicationMenu(applicationMenuId);
-            final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_MENU)
-                    .setObject(applicationMenu).done();
-            recorder.recordDelete(new DeleteRecord(applicationMenu), event);
+            applicationMenu = getApplicationMenu(applicationMenuId);
+            deleteApplicationMenu(applicationMenu);
             log(applicationMenu.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
         } catch (final SObjectNotFoundException e) {
-            log(applicationMenuId, SQueriableLog.STATUS_FAIL, logBuilder, methodName);
-            throw e;
-        } catch (final SBonitaException e) {
+            logAndRetrowException(applicationMenuId, methodName, logBuilder, e);
+        } catch (final SBonitaReadException e) {
             throwModificationException(applicationMenuId, logBuilder, methodName, e);
+        }
+        return applicationMenu;
+    }
+
+    @Override
+    public void deleteApplicationMenu(final SApplicationMenu applicationMenu) throws SObjectModificationException {
+        final String methodName = "deleteApplicationMenu";
+        final SApplicationMenuLogBuilder logBuilder = getApplicationMenuLogBuilder(ActionType.DELETED,
+                "Deleting application menu with id " + applicationMenu.getId());
+        try {
+            final SDeleteEvent event = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(ApplicationService.APPLICATION_MENU)
+                    .setObject(applicationMenu).done();
+            applicationMenuDestructor.onDeleteApplicationMenu(applicationMenu);
+            final int lastUsedIndex = getLastUsedIndex(applicationMenu.getParentId());
+            indexManager.organizeIndexesOnDelete(new MenuIndex(applicationMenu.getParentId(), applicationMenu.getIndex(), lastUsedIndex));
+            recorder.recordDelete(new DeleteRecord(applicationMenu), event);
+        } catch (final SBonitaException e) {
+            throwModificationException(applicationMenu.getId(), logBuilder, methodName, e);
         }
     }
 
@@ -484,8 +618,37 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    public int getNextAvailableIndex(final Long parentMenuId) throws SBonitaReadException {
+        final int lastIndex = getLastUsedIndex(parentMenuId);
+        return lastIndex + 1;
+    }
+
+    @Override
     public List<String> getAllPagesForProfile(long profileId) throws SBonitaReadException {
-        SelectListDescriptor<String> selectList = new SelectListDescriptor<String>("getAllPagesForProfile",Collections.<String, Object>singletonMap("profileId",profileId),SApplicationPage.class, new QueryOptions(0,QueryOptions.UNLIMITED_NUMBER_OF_RESULTS));
+        SelectListDescriptor<String> selectList = new SelectListDescriptor<String>("getAllPagesForProfile", Collections.<String, Object> singletonMap(
+                "profileId", profileId), SApplicationPage.class, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS));
         return persistenceService.selectList(selectList);
     }
+
+    protected Integer executeGetLastUsedIndexQuery(final Long parentMenuId) throws SBonitaReadException {
+        SelectOneDescriptor<Integer> selectDescriptor;
+        if (parentMenuId == null) {
+            selectDescriptor = new SelectOneDescriptor<Integer>("getLastIndexForRootMenu", Collections.<String, Object> emptyMap(),
+                    SApplicationMenu.class);
+        } else {
+            final SApplicationMenuBuilderFactoryImpl factory = new SApplicationMenuBuilderFactoryImpl();
+            selectDescriptor = new SelectOneDescriptor<Integer>("getLastIndexForChildOf", Collections.<String, Object> singletonMap(
+                    factory.getParentIdKey(), parentMenuId),
+                    SApplicationMenu.class);
+        }
+        final Integer lastUsedIndex = persistenceService.selectOne(selectDescriptor);
+        return lastUsedIndex;
+    }
+
+    @Override
+    public int getLastUsedIndex(final Long parentMenuId) throws SBonitaReadException {
+        final Integer lastUsedIndex = executeGetLastUsedIndexQuery(parentMenuId);
+        return lastUsedIndex == null ? 0 : lastUsedIndex;
+    }
+
 }

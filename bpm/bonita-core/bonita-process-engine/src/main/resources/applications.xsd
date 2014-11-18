@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0" targetNamespace="http://documentation.bonitasoft.com/application-xml-schema/1.0" xmlns="http://documentation.bonitasoft.com/application-xml-schema/1.0" xmlns:tns="http://documentation.bonitasoft.com/application-xml-schema/1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="applications" type="applicationNodeContainer"/>
+
+    <xs:complexType name="applicationNode">
+        <xs:sequence>
+            <xs:element name="displayName" type="xs:string"/>
+            <xs:element name="description" type="xs:string" minOccurs="0"/>
+            <xs:element name="iconPath" type="xs:string" minOccurs="0"/>
+            <xs:element name="applicationPages" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="applicationPage" type="applicationPageNode" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="applicationMenus" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="applicationMenu" type="applicationMenuNode" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="token" type="xs:string" use="required"/>
+        <xs:attribute name="version" type="xs:string" use="required"/>
+        <xs:attribute name="profile" type="xs:string"/>
+        <xs:attribute name="homePage" type="xs:string"/>
+        <xs:attribute name="state" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="applicationPageNode">
+        <xs:sequence/>
+        <xs:attribute name="customPage" type="xs:string" use="required"/>
+        <xs:attribute name="token" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="applicationMenuNode">
+        <xs:sequence>
+            <xs:element name="displayName" type="xs:string"/>
+            <xs:element name="applicationMenus" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="applicationMenu" type="applicationMenuNode" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="applicationPage" type="xs:string"/>
+    </xs:complexType>
+
+    <xs:complexType name="applicationNodeContainer">
+        <xs:sequence>
+            <xs:element name="application" type="applicationNode" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
+

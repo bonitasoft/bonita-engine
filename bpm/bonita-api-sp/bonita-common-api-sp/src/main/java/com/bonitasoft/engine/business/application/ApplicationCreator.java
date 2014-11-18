@@ -12,10 +12,14 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bonitasoft.engine.profile.Profile;
 
 /**
- * @author Elias Ricken de Medeiros
+ * Describes the information about an {@link Application} to be created
  *
+ * @author Elias Ricken de Medeiros
+ * @since 6.4
+ * @see Application
  */
 public class ApplicationCreator implements Serializable {
 
@@ -23,33 +27,75 @@ public class ApplicationCreator implements Serializable {
 
     private final Map<ApplicationField, Serializable> fields;
 
-    public ApplicationCreator(final String name, final String displayName, final String version, final String path) {
+    /**
+     * Creates an instance of <code>ApplicationCreator</code> containing mandatory information
+     *
+     * @param token the {@link Application} token. The token will be part of application URL. It cannot be null or empty and should contain only alpha numeric
+     *        characters and the following special characters '-', '.', '_' or '~'.
+     * @param displayName the <code>Application</code> display name. It cannot be null or empty
+     * @param version the <code>Application</code> version
+     * @see Application
+     */
+    public ApplicationCreator(final String token, final String displayName, final String version) {
         fields = new HashMap<ApplicationField, Serializable>(2);
-        fields.put(ApplicationField.NAME, name);
+        fields.put(ApplicationField.TOKEN, token);
         fields.put(ApplicationField.VERSION, version);
-        fields.put(ApplicationField.PATH, path);
         fields.put(ApplicationField.DISPLAY_NAME, displayName);
     }
 
-    public String getName() {
-        return fields.get(ApplicationField.NAME).toString();
+    /**
+     * Retrieves the {@link Application} token
+     *
+     * @return the <code>Application</code> token
+     * @see Application
+     */
+    public String getToken() {
+        return (String) fields.get(ApplicationField.TOKEN);
     }
 
+    /**
+     * Defines the {@link Application} description and returns the current <code>ApplicationCreator</code>
+     *
+     * @param description the <code>Application</code> description
+     * @return the current <code>ApplicationCreator</code>
+     * @see Application
+     */
     public ApplicationCreator setDescription(final String description) {
         fields.put(ApplicationField.DESCRIPTION, description);
         return this;
     }
 
+    /**
+     * Defines the {@link Application} icon path and returns the current <code>ApplicationCreator</code>
+     *
+     * @param iconPath the <code>Application</code> icon path
+     * @return the current <code>ApplicationCreator</code>
+     * @see Application
+     */
     public ApplicationCreator setIconPath(final String iconPath) {
         fields.put(ApplicationField.ICON_PATH, iconPath);
         return this;
     }
 
+    /**
+     * Defines the identifier of the {@link Profile} related to this {@link Application} and returns the current <code>ApplicationCreator</code>
+     *
+     * @param profileId the <code>Profile</code> identifier
+     * @return the current <code>ApplicationCreator</code>
+     * @see Application
+     * @see Profile
+     */
     public ApplicationCreator setProfileId(final Long profileId) {
         fields.put(ApplicationField.PROFILE_ID, profileId);
         return this;
     }
 
+    /**
+     * Retrieves all fields defined in this <code>ApplicationCreator</code>
+     *
+     * @return a {@link Map}<{@link ApplicationField}, {@link Serializable}> containing all fields defined in this <code>ApplicationCreator</code>
+     * @see ApplicationField
+     */
     public Map<ApplicationField, Serializable> getFields() {
         return fields;
     }

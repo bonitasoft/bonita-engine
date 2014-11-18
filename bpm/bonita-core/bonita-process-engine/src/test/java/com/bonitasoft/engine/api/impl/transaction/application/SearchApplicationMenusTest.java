@@ -18,14 +18,13 @@ import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.bonitasoft.engine.api.impl.convertor.ApplicationConvertor;
+import com.bonitasoft.engine.api.impl.convertor.ApplicationMenuConvertor;
 import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationService;
 import com.bonitasoft.engine.business.application.model.SApplicationMenu;
@@ -41,7 +40,7 @@ public class SearchApplicationMenusTest {
     private ApplicationService applicationService;
 
     @Mock
-    private ApplicationConvertor convertor;
+    private ApplicationMenuConvertor convertor;
 
     @InjectMocks
     private SearchApplicationMenus search;

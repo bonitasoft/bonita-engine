@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
+import org.bonitasoft.engine.persistence.QueryOptions;
+import org.bonitasoft.engine.persistence.SelectListDescriptor;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
 
 import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
@@ -35,6 +37,15 @@ public class SelectDescriptorBuilderExt extends SelectDescriptorBuilder {
         parameters.put("name", name);
         parameters.put("processInstanceId", processInstanceId);
         return new SelectOneDescriptor<SRefBusinessDataInstance>("getSRefBusinessDataInstance", parameters, SRefBusinessDataInstance.class);
+    }
+
+    public static SelectListDescriptor<SRefBusinessDataInstance> getSRefBusinessDataInstances(final long processInstanceId, final int startIndex,
+            final int maxResults) {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("processInstanceId", processInstanceId);
+        final QueryOptions options = new QueryOptions(startIndex, maxResults);
+        return new SelectListDescriptor<SRefBusinessDataInstance>("getSRefBusinessDataInstancesOfProcess", parameters, SRefBusinessDataInstance.class,
+                options);
     }
 
     public static SelectOneDescriptor<SRefBusinessDataInstance> getSFlowNodeRefBusinessDataInstance(final String name, final long flowNodeInstanceId) {
