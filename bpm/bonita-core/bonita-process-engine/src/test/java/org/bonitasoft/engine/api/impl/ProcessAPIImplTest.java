@@ -17,6 +17,7 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
@@ -616,28 +617,6 @@ public class ProcessAPIImplTest {
         assertEquals(numberOfFailedProcessInstances, searchFailedProcessInstances.getCount());
         assertEquals(failedProcessInstances, searchFailedProcessInstances.getResult());
     }
-    
-    @Test
-    public void getPendingHumanTaskInstances_should_return_user_tasks_of_enabled_and_disabled_processes() throws Exception {
-        final Set<Long> actorIds = new HashSet<Long>();
-        actorIds.add(454545L);
-        final long userId = 1983L;
-        final List<Long> processDefinitionIds = new ArrayList<Long>();
-        processDefinitionIds.add(7897987L);
-        when(processDefinitionService.getProcessDefinitionIds(0, Integer.MAX_VALUE)).thenReturn(processDefinitionIds);
-        final List<SActor> actors = new ArrayList<SActor>();
-        final SActor actor = mock(SActor.class);
-        actors.add(actor);
-        when(actor.getId()).thenReturn(454545L);
-        when(actorMappingService.getActors(new HashSet<Long>(processDefinitionIds), userId)).thenReturn(actors);
-        final OrderAndField orderAndField = OrderAndFields.getOrderAndFieldForActivityInstance(ActivityInstanceCriterion.NAME_DESC);
-
-        processAPI.getPendingHumanTaskInstances(userId, 0, 100, ActivityInstanceCriterion.NAME_DESC);
-
-        verify(processDefinitionService).getProcessDefinitionIds(0, Integer.MAX_VALUE);
-        verify(actorMappingService).getActors(anySet(), eq(userId));
-        verify(activityInstanceService).getPendingTasks(eq(userId), anySet(), eq(0), eq(100), eq(orderAndField.getField()), eq(orderAndField.getOrder()));
-    }
 
     @Test(expected = RetrieveException.class)
     public void getConnectorsImplementations_should_throw__exception() throws Exception {
@@ -738,14 +717,14 @@ public class ProcessAPIImplTest {
         verify(activityInstance, never()).getParentActivityInstanceId();
         verify(activityInstance, never()).getRootContainerId();
     }
-    
+
     @Test
     public void purgeClassLoader_should_call_delegate() throws Exception {
         processAPI.purgeClassLoader(45L);
 
         verify(managementAPIImplDelegate).purgeClassLoader(45L);
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void deleteArchivedProcessInstances_by_ids_should_throw_exception_when_null_argument() throws Exception {
         processAPI.deleteArchivedProcessInstancesInAllStates(null);
@@ -969,37 +948,4 @@ public class ProcessAPIImplTest {
                 eq(orderAndField.getOrder()));
     }
 
-    @Test
-    public void getConnectorsImplementations_should_return_list() throws Exception {
-        //given
-        final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = createConnectorList();
-
-        doReturn(sConnectorImplementationDescriptors).when(connectorService).getConnectorImplementations(anyLong(), anyLong(),
-                anyInt(), anyInt(), anyString(),
-                any(OrderByType.class));
-
-        //when
-        final List<ConnectorImplementationDescriptor> connectorImplementations = processAPI.getConnectorImplementations(PROCESS_DEFINITION_ID, START_INDEX,
-                MAX_RESULT, CONNECTOR_CRITERION_DEFINITION_ID_ASC);
-
-        //then
-        assertThat(connectorImplementations).as("should return connectore implementation").hasSameSizeAs(sConnectorImplementationDescriptors);
-    }
-
-    @Test
-    public void getNumberOfConnectorImplementations_should_return_count() throws Exception {
-        //given
-        final List<SConnectorImplementationDescriptor> sConnectorImplementationDescriptors = createConnectorList();
-
-        doReturn((long) sConnectorImplementationDescriptors.size()).when(connectorService)
-                .getNumberOfConnectorImplementations(PROCESS_DEFINITION_ID, TENANT_ID);
-
-        //when
-        final long numberOfConnectorImplementations = processAPI.getNumberOfConnectorImplementations(PROCESS_DEFINITION_ID);
-
-        //then
-        assertThat(numberOfConnectorImplementations).as("should return count").isEqualTo(sConnectorImplementationDescriptors.size());
-    }
-
-   
 }
