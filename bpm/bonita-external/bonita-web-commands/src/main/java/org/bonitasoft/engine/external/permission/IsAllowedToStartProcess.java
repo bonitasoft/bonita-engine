@@ -22,7 +22,7 @@ import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
-import org.bonitasoft.engine.command.TenantCommand;
+import org.bonitasoft.engine.command.system.CommandWithParameters;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
@@ -31,11 +31,11 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 /**
  * Specific Command to access the actor Id list for a specific Process Definition and a specific actor ids.
  * The mandatory keys to set as parameters are "PROCESS_DEFINITION_ID_KEY" and "ACTOR_IDS_KEY".
- * 
+ *
  * @author Zhao Na
  * @author Celine Souchet
  */
-public class IsAllowedToStartProcess extends TenantCommand {
+public class IsAllowedToStartProcess extends CommandWithParameters {
 
     private TenantServiceAccessor serviceAccessor;
 
@@ -50,22 +50,18 @@ public class IsAllowedToStartProcess extends TenantCommand {
     public Serializable execute(final Map<String, Serializable> parameters, final TenantServiceAccessor serviceAccessor)
             throws SCommandParameterizationException, SCommandExecutionException {
         this.serviceAccessor = serviceAccessor;
-        ActorMappingService actorMappingService = this.serviceAccessor.getActorMappingService();
+        final ActorMappingService actorMappingService = this.serviceAccessor.getActorMappingService();
         final ProcessDefinitionService processDefinitionService = this.serviceAccessor.getProcessDefinitionService();
 
-        Set<Long> actorIds = (Set<Long>) parameters.get(ACTOR_IDS_KEY);
-        if (actorIds == null) {
-            throw new SCommandParameterizationException("Mandatory parameter " + ACTOR_IDS_KEY + " is missing or not convertible to Set<Long>.");
-        }
-        long processDefinitionId = (Long) parameters.get(PROCESS_DEFINITION_ID_KEY);
-        if (processDefinitionId == 0) {
-            throw new SCommandParameterizationException("Mandatory parameter " + PROCESS_DEFINITION_ID_KEY + " is missing or not convertible to Long.");
-        }
+        final Set<Long> actorIds = getMandatoryParameter(parameters, ACTOR_IDS_KEY, "Mandatory parameter " + ACTOR_IDS_KEY
+                + " is missing or not convertible to Set<Long>.");
+        final long processDefinitionId = getLongMandadoryParameter(parameters, PROCESS_DEFINITION_ID_KEY);
+
         try {
             final SProcessDefinition definition = processDefinitionService.getProcessDefinition(processDefinitionId);
             final SActor sActor = actorMappingService.getActor(definition.getActorInitiator().getName(), processDefinitionId);
             if (sActor != null) {
-                for (long actorId : actorIds) {
+                for (final long actorId : actorIds) {
                     if (sActor.getId() == actorId) {
                         return true;
                     }

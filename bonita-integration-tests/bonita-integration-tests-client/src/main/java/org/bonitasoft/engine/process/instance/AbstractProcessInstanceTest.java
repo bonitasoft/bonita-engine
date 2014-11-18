@@ -27,13 +27,13 @@ public abstract class AbstractProcessInstanceTest extends CommonAPITest {
         logoutOnTenant();
     }
 
-    protected ProcessDefinition deployProcessWith2UserTasksAnd1AutoTask(final String actorName, final String taskName1, final String taskName2,
-            final String autoTaskName) throws BonitaException {
+    protected ProcessDefinition deployProcessWith2UserTasksAnd1AutoTask(final String taskName1, final String taskName2, final String autoTaskName)
+            throws BonitaException {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0");
         processDefinitionBuilder.addStartEvent("start");
-        processDefinitionBuilder.addActor(actorName);
-        processDefinitionBuilder.addUserTask(taskName1, actorName);
-        processDefinitionBuilder.addUserTask(taskName2, actorName);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addUserTask(taskName1, ACTOR_NAME);
+        processDefinitionBuilder.addUserTask(taskName2, ACTOR_NAME);
         processDefinitionBuilder.addAutomaticTask(autoTaskName);
         processDefinitionBuilder.addEndEvent("end1");
         processDefinitionBuilder.addEndEvent("end2");
@@ -43,7 +43,7 @@ public abstract class AbstractProcessInstanceTest extends CommonAPITest {
         processDefinitionBuilder.addTransition("start", taskName2);
         processDefinitionBuilder.addTransition(taskName2, "end2");
 
-        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), actorName, pedro);
+        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, pedro);
     }
 
     protected ProcessDefinition deployProcessWith2AutomaticTasks(final String taskName1, final String taskName2) throws BonitaException {

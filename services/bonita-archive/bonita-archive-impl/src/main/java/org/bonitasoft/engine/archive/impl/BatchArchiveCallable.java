@@ -20,7 +20,6 @@ import java.util.concurrent.Callable;
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
-import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.services.PersistenceService;
 import org.bonitasoft.engine.services.SPersistenceException;
 
@@ -33,9 +32,9 @@ public class BatchArchiveCallable implements Callable<Void> {
     public BatchArchiveCallable(final PersistenceService persistenceService, final ArchiveInsertRecord... records) {
         this.persistenceService = persistenceService;
         if (records == null) {
-            this.archivedObjects = new ArrayList<ArchivedPersistentObject>();
+            archivedObjects = new ArrayList<ArchivedPersistentObject>();
         } else {
-            this.archivedObjects = createArchivedObjectsList(records);
+            archivedObjects = createArchivedObjectsList(records);
         }
     }
 
@@ -59,22 +58,22 @@ public class BatchArchiveCallable implements Callable<Void> {
     public Void call() throws SPersistenceException {
         if (hasObjects()) {
             try {
-                if (this.archivedObjects.size() == 1) {
-                    this.persistenceService.insert(archivedObjects.get(0));
+                if (archivedObjects.size() == 1) {
+                    persistenceService.insert(archivedObjects.get(0));
                 } else {
-                    this.persistenceService.insertInBatch(new ArrayList<PersistentObject>(this.archivedObjects));
+                    persistenceService.insertInBatch(new ArrayList<PersistentObject>(archivedObjects));
                 }
             } finally {
                 // Do we still need to clear the list even if there was some Exceptions ?
                 // What happens with the retry ?
-                this.archivedObjects.clear();
+                archivedObjects.clear();
             }
         }
         return null;
     }
 
     public boolean hasObjects() {
-        return this.archivedObjects != null && !this.archivedObjects.isEmpty();
+        return archivedObjects != null && !archivedObjects.isEmpty();
     }
 
 }

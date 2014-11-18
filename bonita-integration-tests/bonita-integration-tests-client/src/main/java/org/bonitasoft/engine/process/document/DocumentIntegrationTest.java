@@ -1563,10 +1563,10 @@ public class DocumentIntegrationTest extends CommonAPITest {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void add_and_update_a_list_of_document() throws Exception {
         final ProcessInstance processInstance = deployProcessWithList();
-
 
         //add doc1_1 to list1
         getProcessAPI().addDocument(processInstance.getId(), "list1", "doc list", new DocumentValue("doc1_1"));
@@ -1581,7 +1581,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         getProcessAPI().addDocument(processInstance.getId(), "list1", "doc list", new DocumentValue("doc1_2").setIndex(0));
 
         final HumanTaskInstance step1 = waitForUserTask("step1");
-        assignAndExecuteStep(step1,user.getId());
+        assignAndExecuteStep(step1, user.getId());
         final HumanTaskInstance step2 = waitForUserTask("step2");
         //add doc1_3 to list1 at the end
         getProcessAPI().addDocument(processInstance.getId(), "list1", "doc list", new DocumentValue("doc1_3"));
@@ -1606,7 +1606,6 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertThat(updated.getIndex()).isEqualTo(document.getIndex());
         assertThat(updated.getUrl()).isEqualTo("The new value");
 
-
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
         expressions.put(new ExpressionBuilder().createDocumentListExpression("list1"), Collections.<String, Serializable>emptyMap());
         final List<Document> initialList1 = (List<Document>) getProcessAPI().evaluateExpressionsAtProcessInstanciation(processInstance.getId(), expressions).get("list1");
@@ -1616,7 +1615,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertThat(new String(getProcessAPI().getDocumentContent(initialList1.get(2).getContentStorageId()))).isEqualTo("hello2");
         assertThat(new String(getProcessAPI().getDocumentContent(initialList1.get(3).getContentStorageId()))).isEqualTo("hello3");
 
-        assignAndExecuteStep(step2,user.getId());
+        assignAndExecuteStep(step2, user.getId());
         waitForProcessToFinish(processInstance.getId());
 
         final List<Document> finalList1 = (List<Document>) getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions).get("list1");

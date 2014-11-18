@@ -280,7 +280,7 @@ public class ProcessExecutionTest extends CommonAPITest {
 
         final List<ArchivedProcessInstance> archs = getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 100);
         assertEquals(1, archs.size());
-        assertEquals(TestStates.INITIAL.getStateName(), archs.get(0).getState());
+        assertEquals(TestStates.INITIALIZING.getStateName(), archs.get(0).getState());
 
         assignAndExecuteStep(step1, user.getId());
         waitForProcessToFinish(processInstance);

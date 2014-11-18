@@ -42,7 +42,6 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.bonitasoft.engine.test.check.CheckNbOfHumanTasks;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,11 +89,13 @@ public class PendingTasksTest extends CommonAPITest {
         getProcessAPI().addGroupToActor(actors.get(1).getId(), group.getId());
         // addUserToFirstActorOfProcess(user.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
-        getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // Wait for tasks in READY state:
-        final CheckNbOfHumanTasks checkNbOfHumanTasks = checkNbOfHumanTasks(4);
-        final SearchResult<HumanTaskInstance> tasks = checkNbOfHumanTasks.getHumanTaskInstances();
+        waitForUserTask("step1", processInstance);
+        final HumanTaskInstance step2 = waitForUserTask("step2", processInstance);
+        final HumanTaskInstance step3 = waitForUserTask("step3", processInstance);
+        waitForUserTask("step4", processInstance);
 
         // 2 tasks should already be pending for me:
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
@@ -103,14 +104,14 @@ public class PendingTasksTest extends CommonAPITest {
         assertEquals(2, humanTasksSearch.getCount());
 
         // Force assigning 'task3' (DESC name sort) to me (event though I am not an actor for it):
-        getProcessAPI().assignUserTask(tasks.getResult().get(1).getId(), user.getId());
+        getProcessAPI().assignUserTask(step3.getId(), user.getId());
 
         // 3 tasks should now be available for me:
         humanTasksSearch = getProcessAPI().searchMyAvailableHumanTasks(user.getId(), searchOptions);
         assertEquals(3, humanTasksSearch.getCount());
 
         // Force assigning 'task2' (DESC name sort) to someone else than me (event though he is not an actor for it):
-        getProcessAPI().assignUserTask(tasks.getResult().get(2).getId(), user2.getId());
+        getProcessAPI().assignUserTask(step2.getId(), user2.getId());
 
         // 2 tasks should now be available for me:
         humanTasksSearch = getProcessAPI().searchMyAvailableHumanTasks(user.getId(), searchOptions);
@@ -157,10 +158,11 @@ public class PendingTasksTest extends CommonAPITest {
         getProcessAPI().enableProcess(processDefinition1.getId());
         getProcessAPI().enableProcess(processDefinition2.getId());
         // 5. start both processes
-        getProcessAPI().startProcess(processDefinition1.getId());
-        getProcessAPI().startProcess(processDefinition2.getId());
+        final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
+        waitForUserTask("Request", processInstance1);
+        final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
+        waitForUserTask("Request", processInstance2);
         // 6.check Pending tasks list. The below exception appears.
-        waitForPendingTasks(userId, 2);
         final List<HumanTaskInstance> userTaskInstances = getProcessAPI().getPendingHumanTaskInstances(userId, 0, 10, ActivityInstanceCriterion.NAME_ASC);
         assertNotNull(userTaskInstances);
         assertEquals(2, userTaskInstances.size());
@@ -184,8 +186,8 @@ public class PendingTasksTest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, john);
         final Date before = new Date();
         Thread.sleep(20);
-        final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-        waitForStep("deliver", startProcess);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("deliver", processInstance);
         final List<HumanTaskInstance> activityInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT);
         Thread.sleep(20);
         final Date after = new Date();
@@ -239,8 +241,8 @@ public class PendingTasksTest extends CommonAPITest {
         processBuilder.addActor("myActor");
         processBuilder.addUserTask(taskName, "myActor");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), "myActor", user);
-        getProcessAPI().startProcess(processDefinition.getId());
-        waitForPendingTasks(user.getId(), 1);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask(taskName, processInstance);
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.searchTerm(taskName);

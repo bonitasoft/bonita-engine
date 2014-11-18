@@ -17,7 +17,7 @@ public class SAXMLDataInstanceImplTest {
     private SDataInstance dataInstance;
 
     @Test
-    public void SAXMLDataInstanceImpl_should_return_given_value() throws Exception {
+    public void SAXMLDataInstanceImpl_should_return_given_value() {
         //given
         final Serializable givenValue = new String("serializable value");
         final SAXMLDataInstanceImpl sxmlObjectDataInstanceImpl = new SAXMLDataInstanceImpl(dataInstance);
@@ -31,7 +31,7 @@ public class SAXMLDataInstanceImplTest {
     }
 
     @Test
-    public void SAXMLDataInstanceImpl_should_return_null_when_no_given_value() throws Exception {
+    public void SAXMLDataInstanceImpl_should_return_null_when_no_given_value() {
         //given
         final SAXMLDataInstanceImpl sxmlObjectDataInstanceImpl = new SAXMLDataInstanceImpl(dataInstance);
 
@@ -43,7 +43,7 @@ public class SAXMLDataInstanceImplTest {
     }
 
     @Test
-    public void discriminator_should_not_be_null() throws Exception {
+    public void discriminator_should_not_be_null() {
         //given
         final SAXMLDataInstanceImpl sxmlObjectDataInstanceImpl = new SAXMLDataInstanceImpl();
 
@@ -55,7 +55,7 @@ public class SAXMLDataInstanceImplTest {
     }
 
     @Test
-    public void nameSpaceTest() throws Exception {
+    public void nameSpaceTest() {
         //given
         final String expected = "namspace";
         final SAXMLDataInstanceImpl sxmlObjectDataInstanceImpl = new SAXMLDataInstanceImpl();
@@ -69,7 +69,7 @@ public class SAXMLDataInstanceImplTest {
     }
 
     @Test
-    public void elementTest() throws Exception {
+    public void elementTest() {
         //given
         final String expected = "namspace";
         final SAXMLDataInstanceImpl sxmlObjectDataInstanceImpl = new SAXMLDataInstanceImpl();

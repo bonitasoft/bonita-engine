@@ -138,8 +138,8 @@ public class ProcessActorTest extends CommonAPITest {
         final ActorInstance actor = actors.get(0);
         assertEquals(ACTOR_NAME, actor.getName());
 
-        getProcessAPI().startProcess(processDefinition.getId());
-        waitForPendingTasks(user.getId(), 1);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("deliver", processInstance);
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
@@ -748,7 +748,6 @@ public class ProcessActorTest extends CommonAPITest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
         waitForUserTask("deliver", processInstance);
-        waitForPendingTasks(user.getId(), 1);
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
@@ -769,8 +768,8 @@ public class ProcessActorTest extends CommonAPITest {
 
         getProcessAPI().addRoleAndGroupToActor(actor.getId(), role.getId(), group.getId());
 
-        getProcessAPI().startProcess(definition.getId());
-        waitForPendingTasks(user.getId(), 1);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
+        waitForUserTask("deliver", processInstance);
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
@@ -844,10 +843,12 @@ public class ProcessActorTest extends CommonAPITest {
         }
 
         getProcessAPI().enableProcess(processDefinition.getId());
-        final ProcessInstance procInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         nbOfActors = getProcessAPI().getNumberOfActors(processDefinition.getId());
         assertEquals(3, nbOfActors);
-        checkNbOfOpenActivities(procInstance, 3);
+        waitForUserTask("step2", processInstance);
+        waitForUserTask("step3", processInstance);
+        waitForUserTask("step4", processInstance);
 
         nbOfActors = getProcessAPI().getNumberOfActors(processDefinition.getId());
         assertEquals(3, nbOfActors);

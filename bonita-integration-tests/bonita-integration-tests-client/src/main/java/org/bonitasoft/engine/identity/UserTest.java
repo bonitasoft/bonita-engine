@@ -395,119 +395,126 @@ public class UserTest extends CommonAPITest {
     public void updateUser() throws BonitaException {
         final String james = "james";
         final User user = getIdentityAPI().createUser(james, "mbp");
-        final UserUpdater updateDescriptor = new UserUpdater();
-        final String firstName = "Changed first name";
-        updateDescriptor.setFirstName(firstName);
-        final String iconName = "new icon name";
-        updateDescriptor.setIconName(iconName);
-        final String iconPath = "new_icon_path";
-        updateDescriptor.setIconPath(iconPath);
-        final String jobTitle = "New job title";
-        updateDescriptor.setJobTitle(jobTitle);
-        final String lastName = "Modified Last name";
-        updateDescriptor.setLastName(lastName);
-        final long managerId = 12354L;
-        updateDescriptor.setManagerId(managerId);
-        final String password = "Ch4n63D_P455W0RD";
-        updateDescriptor.setPassword(password);
-        final String username = "new_user_name";
-        updateDescriptor.setUserName(username);
 
-        final ContactDataUpdater persoDataUpDescr = new ContactDataUpdater();
-        final String address = "3 rue des lilas";
-        persoDataUpDescr.setAddress(address);
-        final String building = "SkyScrapper";
-        persoDataUpDescr.setBuilding(building);
-        final String city = "Lyon";
-        persoDataUpDescr.setCity(city);
-        final String country = "Lichtenstein";
-        persoDataUpDescr.setCountry(country);
-        final String email = "noreply@yahoo.es";
-        persoDataUpDescr.setEmail(email);
-        final String faxNumber = "01-020013021452";
-        persoDataUpDescr.setFaxNumber(faxNumber);
-        final String mobileNumber = "06-02-000000";
-        persoDataUpDescr.setMobileNumber(mobileNumber);
-        final String phoneNumber = "04-76-000000";
-        persoDataUpDescr.setPhoneNumber(phoneNumber);
-        final String room = "Home";
-        persoDataUpDescr.setRoom(room);
-        final String state = "Rhône";
-        persoDataUpDescr.setState(state);
-        final String website = "http://perso.bonitasoft.com";
-        persoDataUpDescr.setWebsite(website);
-        final String zipCode = "69000";
-        persoDataUpDescr.setZipCode(zipCode);
-
-        final ContactDataUpdater proDataUpDescr = new ContactDataUpdater();
-        final String address2 = "34 Gustave Eiffel";
-        proDataUpDescr.setAddress(address2);
-        final String building2 = "BigBlock";
-        proDataUpDescr.setBuilding(building2);
-        final String city2 = "L.A.";
-        proDataUpDescr.setCity(city2);
-        final String country2 = "Spain";
-        proDataUpDescr.setCountry(country2);
-        final String email2 = "noreply@bonitasoft.com";
-        proDataUpDescr.setEmail(email2);
-        final String faxNumber2 = "01-356743254";
-        proDataUpDescr.setFaxNumber(faxNumber2);
-        final String mobileNumber2 = "06-02-1111111";
-        proDataUpDescr.setMobileNumber(mobileNumber2);
-        final String phoneNumber2 = "04-76-111111";
-        proDataUpDescr.setPhoneNumber(phoneNumber2);
-        final String room2 = "A304";
-        proDataUpDescr.setRoom(room2);
-        final String state2 = "Isere";
-        proDataUpDescr.setState(state2);
-        final String website2 = "http://www.bonitasoft.com";
-        proDataUpDescr.setWebsite(website2);
-        final String zipCode2 = "38000";
-        proDataUpDescr.setZipCode(zipCode2);
-        final String title = "titre";
-        updateDescriptor.setTitle(title);
-        updateDescriptor.setPersonalContactData(persoDataUpDescr);
-        updateDescriptor.setProfessionalContactData(proDataUpDescr);
+        final UserUpdater updateDescriptor = buildUserUpdaterWithProAndPersoContact();
         final User updatedUser = getIdentityAPI().updateUser(user.getId(), updateDescriptor);
-        assertNotNull(updatedUser);
-        assertEquals(username, updatedUser.getUserName());
-        assertEquals(firstName, updatedUser.getFirstName());
-        assertEquals(iconName, updatedUser.getIconName());
-        assertEquals(iconPath, updatedUser.getIconPath());
-        assertEquals(jobTitle, updatedUser.getJobTitle());
-        assertEquals(lastName, updatedUser.getLastName());
-        assertEquals(managerId, updatedUser.getManagerUserId());
-        assertNotSame(password, updatedUser.getPassword());
+
+        checkUser(updatedUser);
 
         final ContactData persoData = getIdentityAPI().getUserContactData(updatedUser.getId(), true);
-        assertEquals(address, persoData.getAddress());
-        assertEquals(building, persoData.getBuilding());
-        assertEquals(city, persoData.getCity());
-        assertEquals(country, persoData.getCountry());
-        assertEquals(email, persoData.getEmail());
-        assertEquals(faxNumber, persoData.getFaxNumber());
-        assertEquals(mobileNumber, persoData.getMobileNumber());
-        assertEquals(phoneNumber, persoData.getPhoneNumber());
-        assertEquals(room, persoData.getRoom());
-        assertEquals(state, persoData.getState());
-        assertEquals(website, persoData.getWebsite());
-        assertEquals(zipCode, persoData.getZipCode());
+        checkPersoUserContactData(persoData);
+
         final ContactData proData = getIdentityAPI().getUserContactData(updatedUser.getId(), false);
-        assertEquals(address2, proData.getAddress());
-        assertEquals(building2, proData.getBuilding());
-        assertEquals(city2, proData.getCity());
-        assertEquals(country2, proData.getCountry());
-        assertEquals(email2, proData.getEmail());
-        assertEquals(faxNumber2, proData.getFaxNumber());
-        assertEquals(mobileNumber2, proData.getMobileNumber());
-        assertEquals(phoneNumber2, proData.getPhoneNumber());
-        assertEquals(room2, proData.getRoom());
-        assertEquals(state2, proData.getState());
-        assertEquals(website2, proData.getWebsite());
-        assertEquals(zipCode2, proData.getZipCode());
-        assertEquals(title, updatedUser.getTitle());
+        checkProUserContactData(proData);
 
         getIdentityAPI().deleteUser(updatedUser.getId());
+    }
+
+    private UserUpdater buildUserUpdater() {
+        final UserUpdater updateDescriptor = new UserUpdater();
+        updateDescriptor.setFirstName("Changed first name");
+        updateDescriptor.setIconName("new icon name");
+        updateDescriptor.setIconPath("new_icon_path");
+        updateDescriptor.setJobTitle("New job title");
+        updateDescriptor.setLastName("Modified Last name");
+        updateDescriptor.setManagerId(12354L);
+        updateDescriptor.setPassword("Ch4n63D_P455W0RD");
+        updateDescriptor.setUserName("new_user_name");
+        updateDescriptor.setTitle("titre");
+        return updateDescriptor;
+    }
+
+    private void checkUser(final User updatedUser) {
+        assertNotNull(updatedUser);
+        assertEquals("new_user_name", updatedUser.getUserName());
+        assertEquals("Changed first name", updatedUser.getFirstName());
+        assertEquals("new icon name", updatedUser.getIconName());
+        assertEquals("new_icon_path", updatedUser.getIconPath());
+        assertEquals("New job title", updatedUser.getJobTitle());
+        assertEquals("Modified Last name", updatedUser.getLastName());
+        assertEquals(12354L, updatedUser.getManagerUserId());
+        assertNotSame("Ch4n63D_P455W0RD", updatedUser.getPassword());
+        assertEquals("titre", updatedUser.getTitle());
+    }
+
+    private UserUpdater buildUserUpdaterWithProContact() {
+        final ContactDataUpdater proDataUpDescr = buildProContactDataUpdater();
+        final UserUpdater updateDescriptor = buildUserUpdater();
+        updateDescriptor.setProfessionalContactData(proDataUpDescr);
+        return updateDescriptor;
+    }
+
+    private UserUpdater buildUserUpdaterWithProAndPersoContact() {
+        final ContactDataUpdater proDataUpDescr = buildProContactDataUpdater();
+        final ContactDataUpdater persoDataUpDescr = buildPersoContactDataUpdater();
+        final UserUpdater updateDescriptor = buildUserUpdater();
+        updateDescriptor.setProfessionalContactData(proDataUpDescr);
+        updateDescriptor.setPersonalContactData(persoDataUpDescr);
+        return updateDescriptor;
+    }
+
+    private ContactDataUpdater buildProContactDataUpdater() {
+        final ContactDataUpdater proDataUpDescr = new ContactDataUpdater();
+        proDataUpDescr.setAddress("34 Gustave Eiffel");
+        proDataUpDescr.setBuilding("BigBlock");
+        proDataUpDescr.setCity("L.A.");
+        proDataUpDescr.setCountry("Spain");
+        proDataUpDescr.setEmail("noreply@bonitasoft.com");
+        proDataUpDescr.setFaxNumber("01-356743254");
+        proDataUpDescr.setMobileNumber("06-02-1111111");
+        proDataUpDescr.setPhoneNumber("04-76-111111");
+        proDataUpDescr.setRoom("A304");
+        proDataUpDescr.setState("Isere");
+        proDataUpDescr.setWebsite("http://www.bonitasoft.com");
+        proDataUpDescr.setZipCode("38000");
+        return proDataUpDescr;
+    }
+
+    private void checkProUserContactData(final ContactData proData) {
+        assertEquals("34 Gustave Eiffel", proData.getAddress());
+        assertEquals("BigBlock", proData.getBuilding());
+        assertEquals("L.A.", proData.getCity());
+        assertEquals("Spain", proData.getCountry());
+        assertEquals("noreply@bonitasoft.com", proData.getEmail());
+        assertEquals("01-356743254", proData.getFaxNumber());
+        assertEquals("06-02-1111111", proData.getMobileNumber());
+        assertEquals("04-76-111111", proData.getPhoneNumber());
+        assertEquals("A304", proData.getRoom());
+        assertEquals("Isere", proData.getState());
+        assertEquals("http://www.bonitasoft.com", proData.getWebsite());
+        assertEquals("38000", proData.getZipCode());
+    }
+
+    private ContactDataUpdater buildPersoContactDataUpdater() {
+        final ContactDataUpdater persoDataUpDescr = new ContactDataUpdater();
+        persoDataUpDescr.setAddress("3 rue des lilas");
+        persoDataUpDescr.setBuilding("SkyScrapper");
+        persoDataUpDescr.setCity("Lyon");
+        persoDataUpDescr.setCountry("Lichtenstein");
+        persoDataUpDescr.setEmail("noreply@yahoo.es");
+        persoDataUpDescr.setFaxNumber("01-020013021452");
+        persoDataUpDescr.setMobileNumber("06-02-000000");
+        persoDataUpDescr.setPhoneNumber("04-76-000000");
+        persoDataUpDescr.setRoom("Home");
+        persoDataUpDescr.setState("Rhône");
+        persoDataUpDescr.setWebsite("http://perso.bonitasoft.com");
+        persoDataUpDescr.setZipCode("69000");
+        return persoDataUpDescr;
+    }
+
+    private void checkPersoUserContactData(final ContactData persoData) {
+        assertEquals("3 rue des lilas", persoData.getAddress());
+        assertEquals("SkyScrapper", persoData.getBuilding());
+        assertEquals("Lyon", persoData.getCity());
+        assertEquals("Lichtenstein", persoData.getCountry());
+        assertEquals("noreply@yahoo.es", persoData.getEmail());
+        assertEquals("01-020013021452", persoData.getFaxNumber());
+        assertEquals("06-02-000000", persoData.getMobileNumber());
+        assertEquals("04-76-000000", persoData.getPhoneNumber());
+        assertEquals("Home", persoData.getRoom());
+        assertEquals("Rhône", persoData.getState());
+        assertEquals("http://perso.bonitasoft.com", persoData.getWebsite());
+        assertEquals("69000", persoData.getZipCode());
     }
 
     @Cover(classes = { IdentityAPI.class, User.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Organization", "Enabled", "User", "Update" }, jira = "ENGINE-577")
@@ -586,57 +593,8 @@ public class UserTest extends CommonAPITest {
     public void updateUserWithOnlyDataChanging() throws BonitaException {
         final User user = getIdentityAPI().createUser("james", "mbp");
 
-        final ContactDataUpdater persoDataUpDescr = new ContactDataUpdater();
-        final String address = "3 rue des lilas";
-        persoDataUpDescr.setAddress(address);
-        final String building = "SkyScrapper";
-        persoDataUpDescr.setBuilding(building);
-        final String city = "Lyon";
-        persoDataUpDescr.setCity(city);
-        final String country = "Lichtenstein";
-        persoDataUpDescr.setCountry(country);
-        final String email = "noreply@yahoo.es";
-        persoDataUpDescr.setEmail(email);
-        final String faxNumber = "01-020013021452";
-        persoDataUpDescr.setFaxNumber(faxNumber);
-        final String mobileNumber = "06-02-000000";
-        persoDataUpDescr.setMobileNumber(mobileNumber);
-        final String phoneNumber = "04-76-000000";
-        persoDataUpDescr.setPhoneNumber(phoneNumber);
-        final String room = "Home";
-        persoDataUpDescr.setRoom(room);
-        final String state = "Rhône";
-        persoDataUpDescr.setState(state);
-        final String website = "http://perso.bonitasoft.com";
-        persoDataUpDescr.setWebsite(website);
-        final String zipCode = "69000";
-        persoDataUpDescr.setZipCode(zipCode);
-
-        final ContactDataUpdater proDataUpDescr = new ContactDataUpdater();
-        final String address2 = "34 Gustave Eiffel";
-        proDataUpDescr.setAddress(address2);
-        final String building2 = "BigBlock";
-        proDataUpDescr.setBuilding(building2);
-        final String city2 = "L.A.";
-        proDataUpDescr.setCity(city2);
-        final String country2 = "Spain";
-        proDataUpDescr.setCountry(country2);
-        final String email2 = "noreply@bonitasoft.com";
-        proDataUpDescr.setEmail(email2);
-        final String faxNumber2 = "01-356743254";
-        proDataUpDescr.setFaxNumber(faxNumber2);
-        final String mobileNumber2 = "06-02-1111111";
-        proDataUpDescr.setMobileNumber(mobileNumber2);
-        final String phoneNumber2 = "04-76-111111";
-        proDataUpDescr.setPhoneNumber(phoneNumber2);
-        final String room2 = "A304";
-        proDataUpDescr.setRoom(room2);
-        final String state2 = "Isere";
-        proDataUpDescr.setState(state2);
-        final String website2 = "http://www.bonitasoft.com";
-        proDataUpDescr.setWebsite(website2);
-        final String zipCode2 = "38000";
-        proDataUpDescr.setZipCode(zipCode2);
+        final ContactDataUpdater persoDataUpDescr = buildPersoContactDataUpdater();
+        final ContactDataUpdater proDataUpDescr = buildProContactDataUpdater();
 
         final UserUpdater updater = new UserUpdater();
         updater.setPersonalContactData(persoDataUpDescr);
@@ -645,31 +603,10 @@ public class UserTest extends CommonAPITest {
         assertNotNull(updatedUser);
 
         final ContactData persoData = getIdentityAPI().getUserContactData(updatedUser.getId(), true);
-        assertEquals(address, persoData.getAddress());
-        assertEquals(building, persoData.getBuilding());
-        assertEquals(city, persoData.getCity());
-        assertEquals(country, persoData.getCountry());
-        assertEquals(email, persoData.getEmail());
-        assertEquals(faxNumber, persoData.getFaxNumber());
-        assertEquals(mobileNumber, persoData.getMobileNumber());
-        assertEquals(phoneNumber, persoData.getPhoneNumber());
-        assertEquals(room, persoData.getRoom());
-        assertEquals(state, persoData.getState());
-        assertEquals(website, persoData.getWebsite());
-        assertEquals(zipCode, persoData.getZipCode());
+        checkPersoUserContactData(persoData);
+
         final ContactData proData = getIdentityAPI().getUserContactData(updatedUser.getId(), false);
-        assertEquals(address2, proData.getAddress());
-        assertEquals(building2, proData.getBuilding());
-        assertEquals(city2, proData.getCity());
-        assertEquals(country2, proData.getCountry());
-        assertEquals(email2, proData.getEmail());
-        assertEquals(faxNumber2, proData.getFaxNumber());
-        assertEquals(mobileNumber2, proData.getMobileNumber());
-        assertEquals(phoneNumber2, proData.getPhoneNumber());
-        assertEquals(room2, proData.getRoom());
-        assertEquals(state2, proData.getState());
-        assertEquals(website2, proData.getWebsite());
-        assertEquals(zipCode2, proData.getZipCode());
+        checkProUserContactData(proData);
 
         getIdentityAPI().deleteUser(updatedUser.getId());
     }
@@ -747,7 +684,7 @@ public class UserTest extends CommonAPITest {
     }
 
     @Cover(classes = { IdentityAPI.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Search", "Users", "Filter", "Order", "Pagination",
-    "Column not unique" }, jira = "ENGINE-1557")
+            "Column not unique" }, jira = "ENGINE-1557")
     @Test
     public void searchUser() throws BonitaException {
         final List<User> users = new ArrayList<User>();
@@ -989,7 +926,7 @@ public class UserTest extends CommonAPITest {
     }
 
     @Cover(classes = { IdentityAPI.class, SearchOptionsBuilder.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "Search", "User", "Manager",
-    "Not in team" }, jira = "ENGINE-569")
+            "Not in team" }, jira = "ENGINE-569")
     @Test
     public void searchUsersNotInTeam() throws BonitaException {
         // Manager
@@ -1078,52 +1015,7 @@ public class UserTest extends CommonAPITest {
     public void getUserWithProContactData() throws BonitaException {
         final String james = "james";
         final User user = getIdentityAPI().createUser(james, "mbp");
-        final UserUpdater updateDescriptor = new UserUpdater();
-        final String firstName = "Changed first name";
-        updateDescriptor.setFirstName(firstName);
-        final String iconName = "new icon name";
-        updateDescriptor.setIconName(iconName);
-        final String iconPath = "new_icon_path";
-        updateDescriptor.setIconPath(iconPath);
-        final String jobTitle = "New job title";
-        updateDescriptor.setJobTitle(jobTitle);
-        final String lastName = "Modified Last name";
-        updateDescriptor.setLastName(lastName);
-        final long managerId = 12354L;
-        updateDescriptor.setManagerId(managerId);
-        final String password = "Ch4n63D_P455W0RD";
-        updateDescriptor.setPassword(password);
-        final String username = "new_user_name";
-        updateDescriptor.setUserName(username);
-
-        final ContactDataUpdater proDataUpDescr = new ContactDataUpdater();
-        final String address2 = "34 Gustave Eiffel";
-        proDataUpDescr.setAddress(address2);
-        final String building2 = "BigBlock";
-        proDataUpDescr.setBuilding(building2);
-        final String city2 = "L.A.";
-        proDataUpDescr.setCity(city2);
-        final String country2 = "Spain";
-        proDataUpDescr.setCountry(country2);
-        final String email2 = "noreply@bonitasoft.com";
-        proDataUpDescr.setEmail(email2);
-        final String faxNumber2 = "01-356743254";
-        proDataUpDescr.setFaxNumber(faxNumber2);
-        final String mobileNumber2 = "06-02-1111111";
-        proDataUpDescr.setMobileNumber(mobileNumber2);
-        final String phoneNumber2 = "04-76-111111";
-        proDataUpDescr.setPhoneNumber(phoneNumber2);
-        final String room2 = "A304";
-        proDataUpDescr.setRoom(room2);
-        final String state2 = "Isere";
-        proDataUpDescr.setState(state2);
-        final String website2 = "http://www.bonitasoft.com";
-        proDataUpDescr.setWebsite(website2);
-        final String zipCode2 = "38000";
-        proDataUpDescr.setZipCode(zipCode2);
-        final String title = "titre";
-        updateDescriptor.setTitle(title);
-        updateDescriptor.setProfessionalContactData(proDataUpDescr);
+        final UserUpdater updateDescriptor = buildUserUpdaterWithProContact();
         final User updatedUser = getIdentityAPI().updateUser(user.getId(), updateDescriptor);
         final ContactData userContactData = getIdentityAPI().getUserContactData(updatedUser.getId(), false);
 
@@ -1139,23 +1031,7 @@ public class UserTest extends CommonAPITest {
     public void getUserWithoutProContactData() throws BonitaException {
         final String james = "james";
         final User user = getIdentityAPI().createUser(james, "mbp");
-        final UserUpdater updateDescriptor = new UserUpdater();
-        final String firstName = "Changed first name";
-        updateDescriptor.setFirstName(firstName);
-        final String iconName = "new icon name";
-        updateDescriptor.setIconName(iconName);
-        final String iconPath = "new_icon_path";
-        updateDescriptor.setIconPath(iconPath);
-        final String jobTitle = "New job title";
-        updateDescriptor.setJobTitle(jobTitle);
-        final String lastName = "Modified Last name";
-        updateDescriptor.setLastName(lastName);
-        final long managerId = 12354L;
-        updateDescriptor.setManagerId(managerId);
-        final String password = "Ch4n63D_P455W0RD";
-        updateDescriptor.setPassword(password);
-        final String username = "new_user_name";
-        updateDescriptor.setUserName(username);
+        final UserUpdater updateDescriptor = buildUserUpdater();
         final User updatedUser = getIdentityAPI().updateUser(user.getId(), updateDescriptor);
 
         final UserWithContactData proUser = getIdentityAPI().getUserWithProfessionalDetails(updatedUser.getId());

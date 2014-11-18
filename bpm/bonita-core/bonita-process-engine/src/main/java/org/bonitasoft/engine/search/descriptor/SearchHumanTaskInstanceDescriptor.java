@@ -90,7 +90,7 @@ public class SearchHumanTaskInstanceDescriptor extends SearchEntityDescriptor {
     }
 
     @Override
-    protected Serializable convertFilterValue(final Serializable filterValue) {
+    protected Serializable convertFilterValue(final String filterField, final Serializable filterValue) {
         if (filterValue instanceof TaskPriority) {
             return STaskPriority.valueOf(((TaskPriority) filterValue).name());
         }

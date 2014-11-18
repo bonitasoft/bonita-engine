@@ -12,9 +12,13 @@
 
 		<delete dir="${target.dir}/conf" />
 		<copy todir="${target.dir}/conf" overwrite="true">
-			<fileset dir="../bonita-test-utils/bonita-server-test-utils/src/test/resources/conf/service" />
-			<fileset dir="../bonita-test-utils/bonita-server-test-utils/src/test/resources/conf/bpm" />
-			<fileset dir="${basedir}/src/test/resources/conf" />
+			<fileset dir="${basedir}/../bonita-test-utils/bonita-server-test-utils/src/test/resources/conf/service" />
+		</copy>
+		<copy todir="${target.dir}/conf" overwrite="true">
+			<fileset dir="${basedir}/../bonita-test-utils/bonita-server-test-utils/src/test/resources/conf/bpm" />
+		</copy>
+		<copy todir="${target.dir}/conf" overwrite="true">
+			<fileset dir="${basedir}/home/server/platform/conf" />
 		</copy>
 
 		<loadfile srcFile="${basedir}/pom.xml" property="project.version">

@@ -127,17 +127,6 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
                 return null;
             }
 
-            private String toString(final SADataInstance saDataInstance) {
-                final StringBuilder stb = new StringBuilder("[");
-                stb.append("name=");
-                stb.append(saDataInstance.getName());
-                stb.append("value=");
-                stb.append(saDataInstance.getValue());
-                stb.append(" ");
-                stb.append("]");
-                return stb.toString();
-            }
-
         });
         // TODO check data instance visibility mapping when archived
     }
