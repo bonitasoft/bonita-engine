@@ -1144,4 +1144,33 @@ public class BDRepositoryIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition.getId());
     }
 
+    @Test
+    public void deployABDRAndCreateInOperationAMultipleBusinessData() throws Exception {
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployees", "import " + EMPLOYEE_QUALIF_CLASSNAME
+                + "; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';"
+                + " Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; return [jane, john];", List.class.getName());
+
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
+        processDefinitionBuilder.addBusinessData("myEmployees", EMPLOYEE_QUALIF_CLASSNAME, null).setMultiple(true);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(new OperationBuilder().
+                createBusinessDataSetAttributeOperation("myEmployees", "addAll", "java.util.Collection", employeeExpression));
+        processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
+        processDefinitionBuilder.addTransition("step1", "step2");
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
+
+        final HumanTaskInstance userTask = waitForUserTask("step1", instance.getId());
+        String employeeToString = getEmployeesToString("myEmployees", instance.getId());
+        assertThat(employeeToString).isEqualTo("Employee [firstName=[], lastName=[]]");
+
+        assignAndExecuteStep(userTask, matti.getId());
+        waitForUserTask("step2", instance.getId());
+        employeeToString = getEmployeesToString("myEmployees", instance.getId());
+        assertThat(employeeToString).isEqualTo("Employee [firstName=[Jane, John], lastName=[Doe, Doe]]");
+
+        disableAndDeleteProcess(definition.getId());
+    }
+
 }

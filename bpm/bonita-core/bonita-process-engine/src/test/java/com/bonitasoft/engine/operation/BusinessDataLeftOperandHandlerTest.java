@@ -448,12 +448,7 @@ public class BusinessDataLeftOperandHandlerTest {
         when(refInstance.getDataClassName()).thenReturn(Employee.class.getName());
 
         final List<Employee> employees = (List<Employee>) leftOperandHandler.getBusinessData(bizDataName, processInstanceId, "PROCESS_INSTANCE");
-        assertThat(employees).hasSize(1);
-        final Employee employee = employees.get(0);
-        assertThat(employee).isNotNull();
-        assertThat(employee.getPersistenceId()).isNull();
-        assertThat(employee.getFirstName()).isNull();
-        assertThat(employee.getLastName()).isNull();
+        assertThat(employees).isEmpty();
     }
 
 }
