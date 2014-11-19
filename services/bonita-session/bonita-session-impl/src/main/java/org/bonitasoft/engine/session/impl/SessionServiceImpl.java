@@ -26,6 +26,8 @@ import org.bonitasoft.engine.session.SessionProvider;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.session.model.builder.SSessionBuilderFactory;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -109,6 +111,18 @@ public class SessionServiceImpl implements SessionService {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getSession"));
         }
         return BuilderFactory.get(SSessionBuilderFactory.class).copy(session);
+    }
+
+    @Override
+    public long getLoggedUserFromSession(ReadSessionAccessor sessionAccessor) {
+        try {
+            long sessionId = sessionAccessor.getSessionId();
+            return sessionProvider.getSession(sessionId).getUserId();
+        } catch (SessionIdNotSetException e) {
+            return -1;
+        } catch (SSessionNotFoundException e) {
+            return -1;
+        }
     }
 
     @Override

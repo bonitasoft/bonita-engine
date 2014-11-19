@@ -168,14 +168,14 @@ public class ExecuteActionsAndTerminateTask extends ExecuteActionsBaseEntry {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         final SCommentService commentService = tenantAccessor.getCommentService();
-        final SSession session = SessionInfos.getSession();
+        final SessionInfos session = SessionInfos.getSessionInfos();
 
         if (executerUserId != executerSubstituteUserId) {
             final IdentityService identityService = tenantAccessor.getIdentityService();
             try {
                 final SUser executerUser = identityService.getUser(executerUserId);
                 final StringBuilder stb = new StringBuilder();
-                stb.append("The user " + session.getUserName() + " ");
+                stb.append("The user " + session.getUsername() + " ");
                 stb.append("acting as delegate of the user " + executerUser.getUserName() + " ");
                 stb.append("has done the task \"" + flowNodeInstance.getDisplayName() + "\".");
                 commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb.toString());

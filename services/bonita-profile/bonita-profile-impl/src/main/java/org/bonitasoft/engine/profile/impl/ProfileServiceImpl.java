@@ -735,7 +735,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     private long getSessionUserId() throws SSessionNotFoundException, SessionIdNotSetException {
-        return sessionService.getSession(sessionAccessor.getSessionId()).getUserId();
+        return sessionService.getLoggedUserFromSession(sessionAccessor);
     }
 
 }

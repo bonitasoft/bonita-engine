@@ -927,14 +927,14 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         final SCommentService commentService = tenantAccessor.getCommentService();
 
-        final SSession session = SessionInfos.getSession();
+        final SessionInfos session = SessionInfos.getSessionInfos();
 
         if (executerUserId != executerSubstituteUserId) {
             final IdentityService identityService = tenantAccessor.getIdentityService();
             try {
                 final SUser executerUser = identityService.getUser(executerUserId);
                 final StringBuilder stb = new StringBuilder();
-                stb.append("The user " + session.getUserName() + " ");
+                stb.append("The user " + session.getUsername() + " ");
                 stb.append("acting as delegate of the user " + executerUser.getUserName() + " ");
                 stb.append("has done the task \"" + flowNodeInstance.getDisplayName() + "\".");
                 commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb.toString());
@@ -5949,7 +5949,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         @Override
         public void execute() throws SBonitaException {
-            final SSession session = SessionInfos.getSession();
+            final SessionInfos session = SessionInfos.getSessionInfos();
             if (session != null) {
                 final long executerSubstituteUserId = session.getUserId();
                 final long executerUserId;
@@ -5966,7 +5966,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                         .executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), executerUserId,
                                 executerSubstituteUserId);
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
-                    final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance, session.getUserName(), executerUserId,
+                    final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance, session.getUsername(), executerUserId,
                             executerSubstituteUserId);
                     logger.log(getClass(), TechnicalLogSeverity.INFO, message);
                 }

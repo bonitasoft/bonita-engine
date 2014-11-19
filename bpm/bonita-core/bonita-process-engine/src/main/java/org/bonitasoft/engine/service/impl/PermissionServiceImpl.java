@@ -87,7 +87,7 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     protected APIAccessorImpl createAPIAccessorImpl() {
-        return new APIAccessorImpl(sessionAccessor, sessionService);
+        return new APIAccessorImpl();
     }
 
     private void checkStarted() throws SExecutionException {

@@ -378,7 +378,6 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         NullCheckingUtil.checkArgsNotNull(definition);
         final SProcessDefinitionLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new Process definition");
         try {
-            final SSession session = getSession();
             final long tenantId = sessionAccessor.getTenantId();
             final long processId = setIdOnProcessDefinition(definition);
             // storeProcessDefinition(processId, tenantId, definition);// FIXME remove that to check the read of processes
@@ -404,7 +403,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             }
             final SProcessDefinitionDeployInfo definitionDeployInfo = BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class)
                     .createNewInstance(definition.getName(), definition.getVersion()).setProcessId(processId).setDescription(definition.getDescription())
-                    .setDeployedBy(session.getUserId()).setDeploymentDate(System.currentTimeMillis()).setActivationState(ActivationState.DISABLED.name())
+                    .setDeployedBy(getUserId()).setDeploymentDate(System.currentTimeMillis()).setActivationState(ActivationState.DISABLED.name())
                     .setConfigurationState(ConfigurationState.UNRESOLVED.name()).setDisplayName(displayName).setDisplayDescription(displayDescription).done();
 
             final InsertRecord record = new InsertRecord(definitionDeployInfo);
@@ -425,15 +424,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         return definition;
     }
 
-    private SSession getSession() throws SSessionNotFoundException {
-        long sessionId;
-        try {
-            sessionId = sessionAccessor.getSessionId();
-        } catch (final SessionIdNotSetException e) {
-            // system
-            return null;
-        }
-        return sessionService.getSession(sessionId);
+    private long getUserId() {
+        return sessionService.getLoggedUserFromSession(sessionAccessor);
     }
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
