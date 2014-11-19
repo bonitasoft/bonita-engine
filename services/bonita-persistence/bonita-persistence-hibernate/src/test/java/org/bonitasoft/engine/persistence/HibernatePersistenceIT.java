@@ -31,7 +31,7 @@ public class HibernatePersistenceIT {
         allFields.put(Book.class, fields);
         final QueryOptions queryOptions = new QueryOptions(0,
                 10,
-                Collections.<OrderByOption>emptyList(),
+                Collections.<OrderByOption> emptyList(),
                 new ArrayList<FilterOption>(0),
                 new SearchFields(Arrays.asList(searchTerms), allFields));
         return queryOptions;
@@ -53,7 +53,8 @@ public class HibernatePersistenceIT {
         executeSearch(enableWordSearch, expectedResults);
     }
 
-    protected void executeSearch(final boolean enableWordSearch, final int expectedResults) throws ClassNotFoundException, SPersistenceException, SBonitaReadException {
+    protected void executeSearch(final boolean enableWordSearch, final int expectedResults) throws ClassNotFoundException, SPersistenceException,
+            SBonitaReadException {
         // Setup Hibernate and extract SessionFactory
         final Configuration configuration = new Configuration().configure();
         final ServiceRegistry serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
@@ -61,9 +62,10 @@ public class HibernatePersistenceIT {
         sessionFactory = configuration.buildSessionFactory(serviceRegistry);
 
         //
-        final List<Class<? extends PersistentObject>> classMapping = Arrays.<Class<? extends PersistentObject>>asList(Book.class);
+        final List<Class<? extends PersistentObject>> classMapping = Arrays.<Class<? extends PersistentObject>> asList(Book.class);
         final Map<String, String> classAliasMappings = Collections.singletonMap(Book.class.getName(), "book");
-        final PlatformHibernatePersistenceService persistenceService = new PlatformHibernatePersistenceService(sessionFactory, classMapping, classAliasMappings, enableWordSearch, Collections.<String>emptySet(), mock(TechnicalLoggerService.class));
+        final PlatformHibernatePersistenceService persistenceService = new PlatformHibernatePersistenceService(sessionFactory, OrderByCheckingMode.STRICT,
+                classMapping, classAliasMappings, enableWordSearch, Collections.<String> emptySet(), mock(TechnicalLoggerService.class));
 
         Session session;
         session = persistenceService.getSession(true);
