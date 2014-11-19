@@ -22,7 +22,7 @@ public class BOMBuilder {
         lastName.setName("lastName");
         lastName.setType(FieldType.STRING);
         final BusinessObject employee = new BusinessObject();
-        employee.setQualifiedName("com.bonitasoft.Employee");
+        employee.setQualifiedName("com.company.Employee");
         employee.addField(firstName);
         employee.addField(lastName);
         final BusinessObjectModel bom = new BusinessObjectModel();
@@ -32,7 +32,7 @@ public class BOMBuilder {
 
     public BusinessObjectModel buildModelWithAllSupportedTypes() {
         final BusinessObject invoice = new BusinessObject();
-        invoice.setQualifiedName("com.bonitasoft.pojo.ComplexInvoice");
+        invoice.setQualifiedName("com.company.pojo.ComplexInvoice");
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(invoice);
         return bom;
@@ -40,7 +40,7 @@ public class BOMBuilder {
 
     public BusinessObjectModel buildModelWithConstrainedFields() {
         final BusinessObject constrained = new BusinessObject();
-        constrained.setQualifiedName("com.bonitasoft.pojo.ConstrainedItem");
+        constrained.setQualifiedName("com.company.pojo.ConstrainedItem");
         final BusinessObjectModel bom = new BusinessObjectModel();
         bom.addBusinessObject(constrained);
         return bom;
@@ -54,7 +54,7 @@ public class BOMBuilder {
         lastName.setName("lastName");
         lastName.setType(FieldType.STRING);
         final BusinessObject employee = new BusinessObject();
-        employee.setQualifiedName("com.bonitasoft.Employee");
+        employee.setQualifiedName("com.company.Employee");
         employee.addField(firstName);
         employee.addField(lastName);
 
@@ -72,7 +72,7 @@ public class BOMBuilder {
         nickNames.setCollection(Boolean.TRUE);
 
         final BusinessObject employee = new BusinessObject();
-        employee.setQualifiedName("com.bonitasoft.Person");
+        employee.setQualifiedName("com.company.Person");
         employee.addField(nickNames);
 
         final BusinessObjectModel bom = new BusinessObjectModel();
