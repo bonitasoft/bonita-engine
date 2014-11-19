@@ -41,61 +41,12 @@ import com.bonitasoft.engine.api.ReportingAPI;
 @RunWith(MockitoJUnitRunner.class)
 public class APIAccessorExtTest {
 
-    private static final long TENANT_ID = 45L;
 
-    @Mock
-    private SSession session;
-
-    @Mock
-    private SessionAccessor sessionAccessor;
-
-    @Mock
-    private SessionService sessionService;
 
     private APIAccessorExt apiAccessor;
 
     private void initAPIAccessor() throws SBonitaException {
-        when(sessionAccessor.getTenantId()).thenReturn(TENANT_ID);
-        when(sessionService.createSession(TENANT_ID, APIAccessorExt.class.getSimpleName())).thenReturn(session);
-        when(session.getId()).thenReturn(78L);
-
-        apiAccessor = new APIAccessorExt(sessionAccessor, sessionService);
-    }
-
-    @Test
-    public void constructorAPIAccessorExt_should_create_a_new_session() throws Exception {
-        initAPIAccessor();
-
-        verify(sessionService).createSession(TENANT_ID, APIAccessorExt.class.getSimpleName());
-        verify(sessionAccessor).setSessionInfo(78L, TENANT_ID);
-    }
-
-    @Test(expected = SBonitaRuntimeException.class)
-    public void constructorAPIAccessorExt_should_throw_an_exception_if_one_occurs_during_session_creation() throws Exception {
-        when(sessionAccessor.getTenantId()).thenReturn(TENANT_ID);
-        when(sessionService.createSession(TENANT_ID, APIAccessorExt.class.getSimpleName())).thenThrow(new SSessionException("error"));
-
-        new APIAccessorExt(sessionAccessor, sessionService);
-    }
-
-    @Test(expected = SBonitaRuntimeException.class)
-    public void constructorAPIAccessorExt_should_throw_an_exception_if_a_runtime_one_occurs_during_session_creation() throws Exception {
-        when(sessionAccessor.getTenantId()).thenReturn(TENANT_ID);
-        when(sessionService.createSession(TENANT_ID, APIAccessorExt.class.getSimpleName())).thenThrow(new SBonitaRuntimeException("error"));
-
-        try {
-            new APIAccessorExt(sessionAccessor, sessionService);
-        } catch (final SBonitaRuntimeException bre) {
-            assertThat(bre.getCause()).isNull();
-            throw bre;
-        }
-    }
-
-    @Test(expected = SBonitaRuntimeException.class)
-    public void constructorAPIAccessorExt_should_throw_an_exception_if_one_occurs_during_tenant_retrieving() throws Exception {
-        when(sessionAccessor.getTenantId()).thenThrow(new STenantIdNotSetException("error"));
-
-        new APIAccessorExt(sessionAccessor, sessionService);
+        apiAccessor = new APIAccessorExt();
     }
 
     @Test

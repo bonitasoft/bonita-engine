@@ -31,7 +31,7 @@ public class EngineConstantExpressionExecutorStrategy extends org.bonitasoft.eng
 
     @Override
     protected APIAccessorImpl getApiAccessor() {
-        return new APIAccessorExt(getSessionAccessor(), getSessionService());
+        return new APIAccessorExt();
     }
 
     @Override
