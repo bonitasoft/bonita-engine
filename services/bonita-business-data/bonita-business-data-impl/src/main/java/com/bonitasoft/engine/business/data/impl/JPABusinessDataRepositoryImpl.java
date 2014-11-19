@@ -140,7 +140,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         for (final Long primaryKey : primaryKeys) {
             final T entity = em.find(entityClass, primaryKey);
             if (entity != null) {
-                em.detach(entity);
                 entities.add(entity);
             }
         }
