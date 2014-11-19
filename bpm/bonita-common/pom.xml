@@ -23,11 +23,6 @@
 			<artifactId>bonita-common-api-impl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-common-api-ejb2</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -46,7 +41,6 @@
 								<includes>
 									<include>org.bonitasoft.engine.api:bonita-common-api</include>
 									<include>org.bonitasoft.engine.api:bonita-common-api-impl</include>
-									<include>org.bonitasoft.engine.api:bonita-common-api-ejb2</include>
 								</includes>
 							</artifactSet>
 							<outputDirectory>${project.build.directory}</outputDirectory>

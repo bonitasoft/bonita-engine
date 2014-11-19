@@ -21,11 +21,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-client-api-ejb2</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
 			<artifactId>bonita-client-api-ejb3</artifactId>
 			<version>${project.version}</version>
 		</dependency>
