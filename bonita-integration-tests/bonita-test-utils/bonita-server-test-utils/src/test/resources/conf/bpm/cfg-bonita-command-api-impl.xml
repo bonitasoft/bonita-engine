@@ -9,7 +9,6 @@
         <constructor-arg name="queriableLoggerService" ref="syncQueriableLoggerService" />
 	</bean>
 
-
 	<bean id="db-bos-command-model" class="org.bonitasoft.engine.persistence.DBConfiguration">
 		<constructor-arg name="createTablesFile" value="/org/bonitasoft/engine/command/db/${db.vendor}-createTables.sql" />
 		<constructor-arg name="initTablesFile" value="/org/bonitasoft/engine/command/db/${db.vendor}-initTables.sql" />

@@ -827,7 +827,8 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
             final ActivateTenant activateTenant = new ActivateTenant(tenantId, platformService, schedulerService, platformAccessor.getTechnicalLoggerService(),
-                    tenantServiceAccessor.getWorkService(), plaformConfiguration, tenantServiceAccessor.getTenantConfiguration());
+                    tenantServiceAccessor.getWorkService(), tenantServiceAccessor.getConnectorExecutor(), plaformConfiguration,
+                    tenantServiceAccessor.getTenantConfiguration());
             activateTenant.execute();
             sessionService.deleteSession(sessionId);
         } catch (final STenantActivationException stae) {
