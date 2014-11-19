@@ -36,6 +36,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
+import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -363,9 +364,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
 
             final WorkService workService = tenantServiceAccessor.getWorkService();
+            final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
 
             final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService,
-                    platformAccessor.getTechnicalLoggerService(), workService, nodeConfiguration, tenantServiceAccessor.getTenantConfiguration());
+                    platformAccessor.getTechnicalLoggerService(), workService, connectorExecutor, nodeConfiguration, tenantServiceAccessor.getTenantConfiguration());
             transactionContent.execute();
             //TODO remove me when bug that does not start services on tenant creation is fixed
             tenantServiceAccessor.getReportingService().start();
