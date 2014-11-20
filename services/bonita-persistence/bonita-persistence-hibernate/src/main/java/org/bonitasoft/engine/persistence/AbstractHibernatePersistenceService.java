@@ -92,8 +92,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     /**
      * @param sessionFactory
-     * @param orderByCheckingMode
-     *        If is null, the queries (who return a list) must to have an "Order by" clause.
      * @param classMapping
      * @param classAliasMappings
      * @param enableWordSearch
@@ -101,17 +99,16 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
      * @param logger
      * @throws ClassNotFoundException
      */
-    protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory, final OrderByCheckingMode orderByCheckingMode,
-            final List<Class<? extends PersistentObject>> classMapping, final Map<String, String> classAliasMappings, final boolean enableWordSearch,
+    protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping,
+            final Map<String, String> classAliasMappings, final boolean enableWordSearch,
             final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
         super("TEST", ";", "#", enableWordSearch, wordSearchExclusionMappings, logger);
         this.sessionFactory = sessionFactory;
-        this.orderByCheckingMode = orderByCheckingMode;
-        statistics = sessionFactory.getStatistics();
-
         this.classAliasMappings = classAliasMappings;
-        cacheQueries = Collections.emptyMap();
         this.classMapping = classMapping;
+        orderByCheckingMode = getOrderByCheckingMode();
+        statistics = sessionFactory.getStatistics();
+        cacheQueries = Collections.emptyMap();
         interfaceToClassMapping = Collections.emptyMap();
         mappingExclusions = Collections.emptyList();
     }
@@ -122,8 +119,6 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     /**
      * @param name
-     * @param orderByCheckingMode
-     *        If is null, the queries (who return a list) must to have an "Order by" clause.
      * @param hbmConfigurationProvider
      * @param tenantConfigurationsProvider
      * @param statementDelimiter
@@ -136,14 +131,13 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
      * @throws SPersistenceException
      * @throws ClassNotFoundException
      */
-    public AbstractHibernatePersistenceService(final String name, final OrderByCheckingMode orderByCheckingMode,
-            final HibernateConfigurationProvider hbmConfigurationProvider, final DBConfigurationsProvider tenantConfigurationsProvider,
-            final String statementDelimiter, final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager,
-            final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException,
-            ClassNotFoundException {
+    public AbstractHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
+            final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
+            final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource, final boolean enableWordSearch,
+            final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
         super(name, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
                 wordSearchExclusionMappings, logger);
-        this.orderByCheckingMode = orderByCheckingMode;
+        orderByCheckingMode = getOrderByCheckingMode();
         Configuration configuration;
         try {
             configuration = hbmConfigurationProvider.getConfiguration();
@@ -189,6 +183,11 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         mappingExclusions = hbmConfigurationProvider.getMappingExclusions();
 
         cacheQueries = hbmConfigurationProvider.getCacheQueries();
+    }
+
+    private OrderByCheckingMode getOrderByCheckingMode() {
+        final String property = System.getProperty("sysprop.bonita.orderby.checking.mode");
+        return property != null ? OrderByCheckingMode.valueOf(property) : null;
     }
 
     /**
@@ -795,7 +794,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     private void checkOrderByClause(final Query query) {
         if (query != null && !query.getQueryString().toLowerCase().contains("order by")) {
             if (orderByCheckingMode == null) {
-                checkOrderByClauseWithStrictMode(query);
+                return;
             }
 
             switch (orderByCheckingMode) {
@@ -811,14 +810,10 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                     break;
                 case STRICT:
                 default:
-                    checkOrderByClauseWithStrictMode(query);
+                    throw new IllegalArgumentException("Query " + query.getQueryString()
+                            + " does not contain 'ORDER BY' clause hence is not allowed. Please specify ordering before re-sending the query");
             }
         }
-    }
-
-    private void checkOrderByClauseWithStrictMode(final Query query) {
-        throw new IllegalArgumentException("Query " + query.getQueryString()
-                + " does not contain 'ORDER BY' clause hence is not allowed. Please specify ordering before re-sending the query");
     }
 
     protected void setParameters(final Query query, final Map<String, Object> inputParameters) {

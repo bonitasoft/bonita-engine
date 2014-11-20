@@ -182,6 +182,7 @@
                                 <bonita.version>${project.version}</bonita.version>
                                 <sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
                                 <bonita.home>${bonita.home}</bonita.home>
+                                <sysprop.bonita.orderby.checking.mode>NONE</sysprop.bonita.orderby.checking.mode>
                             </systemPropertyVariables>
                             <includes>
                                 <include>org/bonitasoft/engine/SlowExecutionLocalIntegrationTests.java</include>
