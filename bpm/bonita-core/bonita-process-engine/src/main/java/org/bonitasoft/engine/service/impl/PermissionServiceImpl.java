@@ -80,14 +80,14 @@ public class PermissionServiceImpl implements PermissionService {
             session = sessionService.getSession(sessionAccessor.getSessionId());
             final APISession apiSession = ModelConvertor.toAPISession(session, null);
             final PermissionRule permissionRule = (PermissionRule) aClass.newInstance();
-            return permissionRule.check(apiSession, context, createAPIAccessorImpl(), new ServerLoggerWrapper(permissionRule.getClass(), logger));
+            return permissionRule.isAllowed(apiSession, context, createAPIAccessorImpl(), new ServerLoggerWrapper(permissionRule.getClass(), logger));
         } catch (final Throwable e) {
             throw new SExecutionException("The permission rule thrown an exception", e);
         }
     }
 
     protected APIAccessorImpl createAPIAccessorImpl() {
-        return new APIAccessorImpl(sessionAccessor, sessionService);
+        return new APIAccessorImpl();
     }
 
     private void checkStarted() throws SExecutionException {

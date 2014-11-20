@@ -28,10 +28,12 @@ import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.process.impl.BoundaryEventDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ConnectorDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.DocumentBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -184,6 +186,25 @@ public class BuildTestUtil {
         builder.addEndEvent("end");
         builder.addTransition("start", "StepBeforeFailedConnector").addTransition("StepBeforeFailedConnector", "AutomaticStep")
                 .addTransition("AutomaticStep", "end");
+        return builder;
+    }
+
+    public static ProcessDefinitionBuilder buildProcessDefinitionWithMultiInstanceUserTaskAndFailedConnector(final String processName, final String userTaskName)
+            throws InvalidExpressionException {
+        final String errorCode = "mistake";
+
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(processName, PROCESS_VERSION);
+        builder.addActor(ACTOR_NAME);
+        final UserTaskDefinitionBuilder userTaskBuilder = builder.addUserTask(userTaskName, ACTOR_NAME);
+        userTaskBuilder.addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(3));
+        final ConnectorDefinitionBuilder connectorDefinitionBuilder = userTaskBuilder.addConnector("testConnectorThatThrowException",
+                "testConnectorThatThrowException", "1.0", ConnectorEvent.ON_FINISH).throwErrorEventWhenFailed(errorCode);
+        connectorDefinitionBuilder.addInput("kind", new ExpressionBuilder().createConstantStringExpression("plop"));
+        final BoundaryEventDefinitionBuilder boundaryEvent = userTaskBuilder.addBoundaryEvent("error", true);
+        boundaryEvent.addErrorEventTrigger(errorCode);
+        builder.addUserTask("normalFlow", ACTOR_NAME);
+        builder.addUserTask("errorFlow", ACTOR_NAME);
+        builder.addTransition(userTaskName, "normalFlow").addTransition("error", "errorFlow");
         return builder;
     }
 

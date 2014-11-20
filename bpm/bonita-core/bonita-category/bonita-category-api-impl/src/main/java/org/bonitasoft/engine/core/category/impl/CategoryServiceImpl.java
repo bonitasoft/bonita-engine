@@ -112,11 +112,7 @@ public class CategoryServiceImpl implements CategoryService {
     private SCategory addCategory(final String name, final String description) throws SCategoryCreationException {
         final SCategoryLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new category with name " + name);
         final long creator;
-        try {
-            creator = getCreator();
-        } catch (final SSessionNotFoundException e) {
-            throw new SCategoryCreationException(e);
-        }
+        creator = getCreator();
         final SCategory sCategory = BuilderFactory.get(SCategoryBuilderFactory.class).createNewInstance(name, creator).setDescription(description).done();
         final InsertRecord insertRecord = new InsertRecord(sCategory);
         SInsertEvent insertEvent = null;
@@ -133,15 +129,8 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
-    private long getCreator() throws SSessionNotFoundException {
-        SSession session;
-        try {
-            session = sessionService.getSession(sessionAccessor.getSessionId());
-        } catch (final SessionIdNotSetException e) {
-            // no session, it is system
-            return -1;
-        }
-        return session.getUserId();
+    private long getCreator() {
+        return sessionService.getLoggedUserFromSession(sessionAccessor);
     }
 
     @Override

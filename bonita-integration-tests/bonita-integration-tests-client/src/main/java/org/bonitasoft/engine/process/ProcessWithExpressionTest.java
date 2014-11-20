@@ -216,8 +216,8 @@ public class ProcessWithExpressionTest extends CommonAPITest {
         expression = new ExpressionBuilder().createConstantStringExpression("test");
         assertEquals("test", getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues, processDefinition.getId()));
 
-        expression = new ExpressionBuilder().createConstantLongExpression(123456l);
-        assertEquals(123456l, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues, processDefinition.getId()));
+        expression = new ExpressionBuilder().createConstantLongExpression(123456L);
+        assertEquals(123456L, getProcessAPI().evaluateExpressionOnProcessDefinition(expression, inputValues, processDefinition.getId()));
         disableAndDeleteProcess(processDefinition);
     }
 

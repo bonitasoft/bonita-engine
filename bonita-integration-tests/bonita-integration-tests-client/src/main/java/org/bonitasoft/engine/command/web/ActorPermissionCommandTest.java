@@ -40,11 +40,11 @@ import org.junit.Test;
  */
 public class ActorPermissionCommandTest extends CommonAPITest {
 
-    private final String IS_ALLOWED_TO_START_PROCESS_CMD = "isAllowedToStartProcess";
+    private static final String IS_ALLOWED_TO_START_PROCESS_CMD = "isAllowedToStartProcess";
 
-    private final String IS_ALLOWED_TO_START_PROCESSES_CMD = "isAllowedToStartProcesses";
+    private static final String IS_ALLOWED_TO_START_PROCESSES_CMD = "isAllowedToStartProcesses";
 
-    private final String IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD = "isAllowedToSeeOverviewForm";
+    private static final String IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD = "isAllowedToSeeOverviewForm";
 
     @Before
     public void before() throws Exception {

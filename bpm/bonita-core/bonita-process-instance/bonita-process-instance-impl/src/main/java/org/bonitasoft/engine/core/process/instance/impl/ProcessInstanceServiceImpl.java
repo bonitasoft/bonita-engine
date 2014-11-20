@@ -470,7 +470,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             for (final SFlowNodeInstance activityInstance : activityInstances) {
                 deleteFlowNodeInstance(activityInstance, processDefinition);
             }
-        } while (!activityInstances.isEmpty());
+        } while (activityInstances.size() == BATCH_SIZE);
     }
 
     @Override

@@ -16,6 +16,7 @@ package org.bonitasoft.engine.api.impl;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -54,25 +55,35 @@ public class SessionInfos {
     public static SSession getSession() {
         SSession session;
         try {
-            final SessionAccessor sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
-            final long sessionId = sessionAccessor.getSessionId();
-            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
-            session = platformServiceAccessor.getSessionService().getSession(sessionId);
+            final long sessionId = getSessionAccessor().getSessionId();
+            session = getSessionService().getSession(sessionId);
         } catch (final SessionIdNotSetException e) {
             return null;
-        } catch (final Exception e) {
-            throw new BonitaRuntimeException(e);
+        } catch (SSessionNotFoundException e) {
+            return null;
         }
         return session;
     }
 
-    public static long getUserIdFromSession() {
-        SSession session = getSession();
-        if (session == null) {
-            // system
-            return -1;
+    private static SessionService getSessionService() {
+        try {
+            final PlatformServiceAccessor platformServiceAccessor = ServiceAccessorFactory.getInstance().createPlatformServiceAccessor();
+            return platformServiceAccessor.getSessionService();
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e);
         }
-        return session.getUserId();
+    }
+
+    private static SessionAccessor getSessionAccessor() {
+        try {
+            return ServiceAccessorFactory.getInstance().createSessionAccessor();
+        } catch (final Exception e) {
+            throw new BonitaRuntimeException(e);
+        }
+    }
+
+    public static long getUserIdFromSession() {
+        return getSessionService().getLoggedUserFromSession(getSessionAccessor());
     }
 
     public static String getUserNameFromSession() {

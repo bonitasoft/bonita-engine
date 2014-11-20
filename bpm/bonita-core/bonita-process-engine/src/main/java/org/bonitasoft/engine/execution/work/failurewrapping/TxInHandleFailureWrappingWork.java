@@ -52,7 +52,7 @@ public abstract class TxInHandleFailureWrappingWork extends WrappingBonitaWork {
 
                 @Override
                 public Void call() throws Exception {
-                    setExceptionContext(((SBonitaException) e), context);
+                    setExceptionContext((SBonitaException) e, context);
 
                     return null;
                 }

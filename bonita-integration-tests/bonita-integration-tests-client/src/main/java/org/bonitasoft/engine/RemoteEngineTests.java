@@ -24,11 +24,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
+ *
  * Test all things related to remote connection
- * 
+ *
  * @author Baptiste Mesta
- * 
+ *
  */
 public class RemoteEngineTests extends CommonAPITest {
 
@@ -48,9 +48,9 @@ public class RemoteEngineTests extends CommonAPITest {
     @Test
     public void check_remote_exception_is_given_to_client() {
         try {
-            getProcessAPI().getFlowNodeInstance(123456789l);
+            getProcessAPI().getFlowNodeInstance(123456789L);
             fail("should fail");
-        } catch (FlowNodeInstanceNotFoundException e) {
+        } catch (final FlowNodeInstanceNotFoundException e) {
             e.printStackTrace();
             assertTrue(containsStack(e.getStackTrace(), "SFlowNodeNotFoundException"));
             assertNull(e.getCause());
@@ -59,7 +59,7 @@ public class RemoteEngineTests extends CommonAPITest {
     }
 
     private boolean containsStack(final StackTraceElement[] stackTrace, final String string) {
-        for (StackTraceElement stackTraceElement : stackTrace) {
+        for (final StackTraceElement stackTraceElement : stackTrace) {
             if (stackTraceElement.getClassName().contains(string)) {
                 return true;
             }

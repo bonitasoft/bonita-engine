@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2014 Bonitasoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,18 +11,30 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.api;
-
-import java.rmi.RemoteException;
-
-import javax.ejb.CreateException;
-import javax.ejb.EJBHome;
+package org.bonitasoft.engine.persistence;
 
 /**
- * @author Matthieu Chaffotte
+ * It's used when we check if the queries who return a list have an "Order by" clause.
+ *
+ * @author Celine Souchet
+ * @version 6.4.0
+ * @since 6.4.0
  */
-public interface ServerAPIHome extends EJBHome {
+public enum OrderByCheckingMode {
 
-    RemoteServerAPI create() throws CreateException, RemoteException;
+    /**
+     * Do nothing
+     */
+    NONE,
+
+    /**
+     * Log a warning message
+     */
+    WARNING,
+
+    /**
+     * Throw an IllegalArgumentException
+     */
+    STRICT
 
 }

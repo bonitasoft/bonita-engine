@@ -85,7 +85,7 @@ public class ExpressionServiceImpl implements ExpressionService {
         try {
             expressionResult = expressionExecutorStrategy.evaluate(expression, dependencyValues, resolvedExpressions, containerState);
         } finally {
-            if (this.timeTracker.isTrackable(TimeTrackerRecords.EVALUATE_EXPRESSION)) {
+            if (timeTracker.isTrackable(TimeTrackerRecords.EVALUATE_EXPRESSION)) {
                 final long endTime = System.currentTimeMillis();
                 final StringBuilder desc = new StringBuilder();
                 desc.append("Expression: ");
@@ -96,7 +96,7 @@ public class ExpressionServiceImpl implements ExpressionService {
                 desc.append(" - ");
                 desc.append("strategy: ");
                 desc.append(expressionExecutorStrategy);
-                this.timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSION, desc.toString(), (endTime - startTime));
+                timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSION, desc.toString(), endTime - startTime);
             }
         }
         if (mustCheckExpressionReturnType()) {
@@ -149,7 +149,7 @@ public class ExpressionServiceImpl implements ExpressionService {
         try {
             list = expressionExecutorStrategy.evaluate(expressions, dependencyValues, resolvedExpressions, containerState);
         } finally {
-            if (this.timeTracker.isTrackable(TimeTrackerRecords.EVALUATE_EXPRESSIONS)) {
+            if (timeTracker.isTrackable(TimeTrackerRecords.EVALUATE_EXPRESSIONS)) {
                 final long endTime = System.currentTimeMillis();
                 final StringBuilder desc = new StringBuilder();
                 desc.append("Expressions: ");
@@ -160,7 +160,7 @@ public class ExpressionServiceImpl implements ExpressionService {
                 desc.append(" - ");
                 desc.append("strategy: ");
                 desc.append(expressionExecutorStrategy);
-                this.timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSIONS, desc.toString(), (endTime - startTime));
+                timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSIONS, desc.toString(), endTime - startTime);
             }
         }
         if (list == null || list.size() != expressions.size()) {

@@ -371,12 +371,12 @@ public class ProcessActorTest extends CommonAPITest {
     @Test(expected = UpdateException.class)
     public void updateActorWithEmptyDescriptor() throws Exception {
         final ActorUpdater descriptor = new ActorUpdater();
-        getProcessAPI().updateActor(1l, descriptor);
+        getProcessAPI().updateActor(1L, descriptor);
     }
 
     @Test(expected = UpdateException.class)
     public void updateActorWithNoDescriptor() throws Exception {
-        getProcessAPI().updateActor(1l, null);
+        getProcessAPI().updateActor(1L, null);
     }
 
     @Test
@@ -394,7 +394,7 @@ public class ProcessActorTest extends CommonAPITest {
         final ActorInstance actor = actors.get(0);
         assertEquals(ACTOR_NAME, actor.getName());
 
-        assertEquals(1l, getProcessAPI().getNumberOfActorMembers(actor.getId()));
+        assertEquals(1L, getProcessAPI().getNumberOfActorMembers(actor.getId()));
 
         final List<ActorMember> actorMembers = getProcessAPI().getActorMembers(actor.getId(), 0, 10);
         assertEquals(1, actorMembers.size());

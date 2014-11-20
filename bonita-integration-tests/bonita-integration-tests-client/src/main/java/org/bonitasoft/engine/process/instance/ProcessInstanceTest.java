@@ -157,7 +157,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
 
     @Test(expected = DeletionException.class)
     public void deleteUnknownProcessInstance() throws Exception {
-        getProcessAPI().deleteProcessInstance(123456789123l);
+        getProcessAPI().deleteProcessInstance(123456789123L);
     }
 
     @Test

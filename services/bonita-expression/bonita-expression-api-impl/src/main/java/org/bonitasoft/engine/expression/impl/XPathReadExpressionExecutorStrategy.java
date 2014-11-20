@@ -107,7 +107,7 @@ public class XPathReadExpressionExecutorStrategy implements ExpressionExecutorSt
     private Object transType(final Object result, final String returnType) {
         try {
             if (Boolean.class.getName().equals(returnType)) {
-                return result != null && ("true".equalsIgnoreCase(((String) result)) || "1".equals(result));
+                return result != null && ("true".equalsIgnoreCase((String) result) || "1".equals(result));
             }
             if (Long.class.getName().equals(returnType)) {
                 return Long.parseLong((String) result);

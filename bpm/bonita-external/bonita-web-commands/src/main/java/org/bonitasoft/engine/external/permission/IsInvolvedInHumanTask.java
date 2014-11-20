@@ -32,7 +32,9 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInsta
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * Specific Command to know if a user is involved in a specific human task.
@@ -70,6 +72,8 @@ public class IsInvolvedInHumanTask extends CommandWithParameters {
             throws SActivityInstanceNotFoundException, SActorNotFoundException, SBonitaReadException {
         final ActorMappingService actorMappingService = serviceAccessor.getActorMappingService();
         final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
+        SessionService sessionService = serviceAccessor.getSessionService();
+        SessionAccessor sessionAccessor = serviceAccessor.getSessionAccessor();
 
         long actorId = -1;
         long assigneeId = -1;
@@ -91,11 +95,12 @@ public class IsInvolvedInHumanTask extends CommandWithParameters {
             }
         }
 
-        final SSession session = getCurrentSession();
+        final long loggedUserId = sessionService.getLoggedUserFromSession(sessionAccessor);
+        //FIXME the command return true when: we give a user id != -1 and when the task is not assigned...
         if (userId != -1) {
             //in case we are performing a Do For (task assigned or not, we don't care
             return true;
-        } else if (session.getUserId() == assigneeId) {
+        } else if (loggedUserId == assigneeId) {
             //if user has the current task assigned
             return true;
         } else if (assigneeId == 0L) {
@@ -104,15 +109,6 @@ public class IsInvolvedInHumanTask extends CommandWithParameters {
             return actor.getScopeId() == processDefinitionId;
         }
         return false;
-    }
-
-    /**
-     * method created for stubbing purpose
-     *
-     * @return current session
-     */
-    protected SSession getCurrentSession() {
-        return SessionInfos.getSession();
     }
 
 }

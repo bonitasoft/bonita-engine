@@ -24,14 +24,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.concurrent.Callable;
 import java.util.zip.ZipOutputStream;
 
@@ -924,14 +927,14 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TechnicalLoggerService logger = tenantAccessor.getTechnicalLoggerService();
         final SCommentService commentService = tenantAccessor.getCommentService();
 
-        final SSession session = SessionInfos.getSession();
+        final SessionInfos session = SessionInfos.getSessionInfos();
 
         if (executerUserId != executerSubstituteUserId) {
             final IdentityService identityService = tenantAccessor.getIdentityService();
             try {
                 final SUser executerUser = identityService.getUser(executerUserId);
                 final StringBuilder stb = new StringBuilder();
-                stb.append("The user " + session.getUserName() + " ");
+                stb.append("The user " + session.getUsername() + " ");
                 stb.append("acting as delegate of the user " + executerUser.getUserName() + " ");
                 stb.append("has done the task \"" + flowNodeInstance.getDisplayName() + "\".");
                 commentService.addSystemComment(flowNodeInstance.getParentProcessInstanceId(), stb.toString());
@@ -2243,7 +2246,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                     final FilterResult result = executeFilter(processDefinitionId, humanTaskInstanceId, humanTaskDefinition.getActorName(),
                             sUserFilterDefinition);
                     final List<Long> userIds = result.getResult();
-                    if (userIds == null || userIds.isEmpty() || userIds.contains(0l) || userIds.contains(-1l)) {
+                    if (userIds == null || userIds.isEmpty() || userIds.contains(0L) || userIds.contains(-1L)) {
                         throw new UpdateException("no user id returned by the user filter " + sUserFilterDefinition + " on activity "
                                 + humanTaskDefinition.getName());
                     }
@@ -3571,15 +3574,29 @@ public class ProcessAPIImpl implements ProcessAPI {
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final UserTransactionService userTxService = tenantAccessor.getUserTransactionService();
         try {
-            final List<SProcessInstance> sProcessInstances = userTxService.executeInTransaction(new Callable<List<SProcessInstance>>() {
+            final Map<SProcessInstance, List<Long>> processInstancesWithChildrenIds = userTxService.executeInTransaction(new Callable<Map<SProcessInstance, List<Long>>>() {
 
                 @Override
-                public List<SProcessInstance> call() throws SBonitaReadException {
-                    return searchProcessInstancesFromProcessDefinition(processInstanceService, processDefinitionId, startIndex, maxResults);
+                public Map<SProcessInstance, List<Long>> call() throws SBonitaReadException {
+                    List<SProcessInstance> sProcessInstances1 = searchProcessInstancesFromProcessDefinition(processInstanceService, processDefinitionId, startIndex, maxResults);
+                    Map<SProcessInstance, List<Long>> sProcessInstanceListHashMap = new LinkedHashMap<SProcessInstance, List<Long>>(sProcessInstances1.size());
+                    for (SProcessInstance rootProcessInstance : sProcessInstances1) {
+                        List<Long> tmpList;
+                        List<Long> childrenProcessInstanceIds = new ArrayList<Long>();
+                        int fromIndex = 0;
+                        do {
+                            // from index always will be zero because elements will be deleted
+                            tmpList = processInstanceService.getArchivedChildrenSourceObjectIdsFromRootProcessInstance(rootProcessInstance.getId(), fromIndex, BATCH_SIZE, OrderByType.ASC);
+                            childrenProcessInstanceIds.addAll(tmpList);
+                            fromIndex += BATCH_SIZE;
+                        } while (tmpList.size() == BATCH_SIZE);
+                        sProcessInstanceListHashMap.put(rootProcessInstance,childrenProcessInstanceIds);
+                    }
+                    return sProcessInstanceListHashMap;
                 }
             });
 
-            if (sProcessInstances.isEmpty()) {
+            if (processInstancesWithChildrenIds.isEmpty()) {
                 return 0;
             }
 
@@ -3587,11 +3604,12 @@ public class ProcessAPIImpl implements ProcessAPI {
             final String objectType = SFlowElementsContainerType.PROCESS.name();
             List<BonitaLock> locks = null;
             try {
-                locks = createLockProcessInstances(lockService, objectType, sProcessInstances, tenantAccessor.getTenantId());
+                locks = createLockProcessInstances(lockService, objectType, processInstancesWithChildrenIds, tenantAccessor.getTenantId());
                 return userTxService.executeInTransaction(new Callable<Long>() {
 
                     @Override
                     public Long call() throws Exception {
+                        List<SProcessInstance> sProcessInstances = new ArrayList<SProcessInstance>(processInstancesWithChildrenIds.keySet());
                         deleteJobsOnProcessInstance(processDefinitionId, sProcessInstances);
                         return processInstanceService.deleteParentProcessInstanceAndElements(sProcessInstances);
                     }
@@ -3786,12 +3804,19 @@ public class ProcessAPIImpl implements ProcessAPI {
         return processInstanceService.searchArchivedProcessInstances(queryOptions);
     }
 
-    private List<BonitaLock> createLockProcessInstances(final LockService lockService, final String objectType, final List<SProcessInstance> sProcessInstances,
+    private List<BonitaLock> createLockProcessInstances(final LockService lockService, final String objectType, final Map<SProcessInstance, List<Long>> sProcessInstances,
             final long tenantId) throws SLockException {
         final List<BonitaLock> locks = new ArrayList<BonitaLock>();
-        for (final SProcessInstance sProcessInstance : sProcessInstances) {
-            final BonitaLock bonitaLock = lockService.lock(sProcessInstance.getId(), objectType, tenantId);
-            locks.add(bonitaLock);
+        HashSet<Long> uniqIds = new HashSet<Long>();
+        for (Entry<SProcessInstance, List<Long>> sProcessInstancewithChildrenIds : sProcessInstances.entrySet()) {
+            uniqIds.add(sProcessInstancewithChildrenIds.getKey().getId());
+            for (Long childId : sProcessInstancewithChildrenIds.getValue()) {
+                uniqIds.add(childId);
+            }
+        }
+        for (Long id : uniqIds) {
+            final BonitaLock childLock = lockService.lock(id, objectType, tenantId);
+            locks.add(childLock);
         }
         return locks;
     }
@@ -5871,14 +5896,12 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public List<Document> getDocumentList(final long processInstanceId, final String name, final int from, final int numberOfResult)
-            throws DocumentNotFoundException {
+    public List<Document> getDocumentList(final long processInstanceId, final String name, final int from, final int numberOfResult) throws DocumentNotFoundException {
         return documentAPIImpl.getDocumentList(processInstanceId, name, from, numberOfResult);
     }
 
     @Override
-    public void setDocumentList(final long processInstanceId, final String name, final List<DocumentValue> documentsValues) throws DocumentException,
-            DocumentNotFoundException {
+    public void setDocumentList(final long processInstanceId, final String name, final List<DocumentValue> documentsValues) throws DocumentException, DocumentNotFoundException {
         documentAPIImpl.setDocumentList(processInstanceId, name, documentsValues);
     }
 
@@ -5902,8 +5925,7 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Document updateDocument(final long documentId, final DocumentValue documentValue) throws ProcessInstanceNotFoundException,
-            DocumentAttachmentException,
+    public Document updateDocument(final long documentId, final DocumentValue documentValue) throws ProcessInstanceNotFoundException, DocumentAttachmentException,
             AlreadyExistsException {
         return documentAPIImpl.updateDocument(documentId, documentValue);
     }
@@ -5927,7 +5949,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         @Override
         public void execute() throws SBonitaException {
-            final SSession session = SessionInfos.getSession();
+            final SessionInfos session = SessionInfos.getSessionInfos();
             if (session != null) {
                 final long executerSubstituteUserId = session.getUserId();
                 final long executerUserId;
@@ -5944,7 +5966,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                         .executeFlowNode(flownodeInstanceId, null, null, flowNodeInstance.getParentProcessInstanceId(), executerUserId,
                                 executerSubstituteUserId);
                 if (logger.isLoggable(getClass(), TechnicalLogSeverity.INFO) && !isFirstState /* don't log when create subtask */) {
-                    final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance, session.getUserName(), executerUserId,
+                    final String message = LogMessageBuilder.buildExecuteTaskContextMessage(flowNodeInstance, session.getUsername(), executerUserId,
                             executerSubstituteUserId);
                     logger.log(getClass(), TechnicalLogSeverity.INFO, message);
                 }

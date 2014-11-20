@@ -147,8 +147,6 @@ public class SCommentServiceImpl implements SCommentService {
             return sComment;
         } catch (final SRecorderException e) {
             throw new SCommentAddException(processInstanceId, "human", e);
-        } catch (final SSessionNotFoundException e) {
-            throw new SCommentAddException("Session is not found.", e);
         }
     }
 
@@ -198,16 +196,8 @@ public class SCommentServiceImpl implements SCommentService {
         } while (sComments != null && sComments.size() > 0);
     }
 
-    private long getUserId() throws SSessionNotFoundException {
-        long sessionId;
-        try {
-            sessionId = sessionAccessor.getSessionId();
-        } catch (final SessionIdNotSetException e) {
-            // system
-            return -1;
-        }
-        final SSession session = sessionService.getSession(sessionId);
-        return session.getUserId();
+    private long getUserId() {
+        return sessionService.getLoggedUserFromSession(sessionAccessor);
     }
 
     @Override

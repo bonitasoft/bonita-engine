@@ -93,7 +93,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
             throw new SGatewayCreationException(e);
         }
         if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            StringBuilder stb = new StringBuilder();
+            final StringBuilder stb = new StringBuilder();
             stb.append("Created gateway instance [name = <" + gatewayInstance.getName());
             stb.append(">, id = <" + gatewayInstance.getId());
             stb.append(">, parent process instance id = <" + gatewayInstance.getParentProcessInstanceId());
@@ -183,7 +183,7 @@ public class GatewayInstanceServiceImpl implements GatewayInstanceService {
         if (hitBys == null || hitBys.isEmpty()) {
             columnValue = String.valueOf(transitionIndex);
         } else {
-            columnValue = hitBys + "," + String.valueOf(transitionIndex);
+            columnValue = hitBys + "," + transitionIndex;
         }
         updateOneColum(gatewayInstance, sGatewayInstanceBuilderFactory.getHitBysKey(), columnValue, GATEWAYINSTANCE_HITBYS);
     }
