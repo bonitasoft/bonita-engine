@@ -82,7 +82,7 @@
 		<jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
 		<!-- Tells Sonar where the Jacoco coverage result file is located for Integration Tests -->
 		<sonar.jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</sonar.jacoco.itReportPath>
-        <sonar.exclusions>**/*BuilderImpl.java,**/*FactoryImpl.java</sonar.exclusions>
+        <sonar.exclusions>**/*Test.java,**/*Tests.java,**/*IT.java</sonar.exclusions>
 	</properties>
 
 	<dependencyManagement>
@@ -558,10 +558,6 @@
 							<includes>
 								<include>org.bonitasoft.engine.*</include>
 							</includes>
-                            <excludes>
-                                <excludes>**/*BuilderImpl.java</excludes>
-                                <excludes>**/*FactoryImpl.java</excludes>
-                            </excludes>
 						</configuration>
 						<executions>
 							<!-- Prepares a variable, jacoco.agent.ut.arg, that contains the info to be passed to the JVM hosting the code being tested. -->
