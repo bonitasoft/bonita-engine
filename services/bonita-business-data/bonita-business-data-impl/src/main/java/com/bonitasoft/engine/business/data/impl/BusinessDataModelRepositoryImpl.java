@@ -36,6 +36,8 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyBuilderFactory;
 import org.bonitasoft.engine.dependency.model.builder.SDependencyMappingBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.xml.sax.SAXException;
 
@@ -112,7 +114,8 @@ public class BusinessDataModelRepositoryImpl implements BusinessDataModelReposit
 
     private List<SDependency> searchBDMDependencies() throws SBusinessDataRepositoryException {
         try {
-            final QueryOptions queryOptions = new QueryOptions(asList(new FilterOption(SDependency.class, "name", BDR_DEPENDENCY_NAME)), null);
+            final QueryOptions queryOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, asList(new OrderByOption(SDependency.class, "name",
+                    OrderByType.ASC)), asList(new FilterOption(SDependency.class, "name", BDR_DEPENDENCY_NAME)), null);
             return dependencyService.getDependencies(queryOptions);
         } catch (final SDependencyException e) {
             throw new SBusinessDataRepositoryException(e);

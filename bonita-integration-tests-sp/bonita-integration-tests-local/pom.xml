@@ -246,6 +246,7 @@
                             <systemPropertyVariables>
                                 <bonita.version>${project.version}</bonita.version>
                                 <bonita.home>${bonita.home}</bonita.home>
+                                <sysprop.bonita.orderby.checking.mode>NONE</sysprop.bonita.orderby.checking.mode>
                             </systemPropertyVariables>
                             <includes>
                                 <include>com/bonitasoft/engine/SlowExecutionLocalIntegrationTestsSP.java</include>
