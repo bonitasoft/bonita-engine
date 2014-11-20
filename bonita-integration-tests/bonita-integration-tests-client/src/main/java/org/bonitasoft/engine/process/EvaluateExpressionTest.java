@@ -183,8 +183,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
         return processBuilder;
     }
 
-    private void cleanup(final long userId, final long processDefinitionId) throws BonitaException {
-        deleteUser(userId);
+    private void cleanup(final long processDefinitionId) throws BonitaException {
         disableAndDeleteProcess(processDefinitionId);
     }
 
@@ -390,9 +389,6 @@ public class EvaluateExpressionTest extends CommonAPITest {
     @Ignore("not yet supported")
     @Test
     public void evaluateComplexExpression() throws Exception {
-        final String userName = "Manu";
-        final User manu = createUser(userName, "bpm");
-        loginOnDefaultTenantWith(userName, "bpm");
         final String a = "a";
         final String b = "b";
         final String c = "c";
@@ -415,7 +411,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
                 Arrays.asList(true)).addIntegerData(a, defaultA).addIntegerData(b, defaultB).addIntegerData(c, defaultC)
                 .addDescription("Delivery all day and night long").getProcess();
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, "Actor1", manu);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, "Actor1", user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -424,16 +420,13 @@ public class EvaluateExpressionTest extends CommonAPITest {
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessDefinition(processDefinition.getId(), expressions);
         assertEquals(Integer.valueOf(12), result.get("theScript"));
 
-        cleanup(manu.getId(), processDefinition.getId());
+        cleanup(processDefinition.getId());
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Complex expression", "Process instance" }, story = "Evaluate a complex expression on process instance.", jira = "")
     @Ignore("not yet supported")
     @Test
     public void evaluateComplexExpressionOnProcessInstance() throws Exception {
-        final String userName = "Manu";
-        final User manu = createUser(userName, "bpm");
-        loginOnDefaultTenantWith(userName, "bpm");
         final String a = "a";
         final int a_value = 1;
         final Expression aExpr = new ExpressionBuilder().createDataExpression(a, Integer.class.getName());
@@ -450,7 +443,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
         final DesignProcessDefinition processDef = createProcessDefinitionBuilderWithHumanAndAutomaticSteps("My_Process", "1.0", Arrays.asList("step1"),
                 Arrays.asList(true)).addIntegerData(a, defaultA).addDescription("Delivery all day and night long").getProcess();
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, "Actor1", manu);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, "Actor1", user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
@@ -460,18 +453,15 @@ public class EvaluateExpressionTest extends CommonAPITest {
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
         assertEquals(Integer.valueOf(17), result.get("theScript"));
 
-        cleanup(manu.getId(), processDefinition.getId());
+        cleanup(processDefinition.getId());
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Pattern expression" }, story = "Evaluate a pattern expression.", jira = "")
     @Test
     public void evaluatePatternExpression() throws Exception {
-        final String userName = "Manu";
-        final User manu = createUser(userName, "poele");
-        loginOnDefaultTenantWith(userName, "poele");
         final String dataName = "birthYear";
         // get processInstance
-        final ProcessDefinition processDefinition = createAndDeployProcessDefinitionAndInstance(dataName, 1977, true, manu);
+        final ProcessDefinition processDefinition = createAndDeployProcessDefinitionAndInstance(dataName, 1977, true, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
@@ -488,7 +478,7 @@ public class EvaluateExpressionTest extends CommonAPITest {
         final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
         assertEquals("My birth year is 1977", result.get(messagePattern));
 
-        cleanup(manu.getId(), processDefinition.getId());
+        cleanup(processDefinition.getId());
     }
 
 }

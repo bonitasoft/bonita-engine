@@ -70,7 +70,7 @@ public class SearchCommentTest extends CommonAPITest {
 
         // clean all data for test
         disableAndDeleteProcess(processDefinition);
-        deleteUser(user.getId());
+        deleteUser(user);
     }
 
     @Test
@@ -149,7 +149,7 @@ public class SearchCommentTest extends CommonAPITest {
 
         // clean all data for test
         disableAndDeleteProcess(processDefinition);
-        deleteUser(user.getId());
+        deleteUser(user);
     }
 
     @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchComments" }, jira = "ENGINE-366")
@@ -157,8 +157,7 @@ public class SearchCommentTest extends CommonAPITest {
     public void searchComments() throws Exception {
         final User user = createUser(USERNAME, PASSWORD);
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
-        DesignProcessDefinition designProcessDefinition;
-        designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"),
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("step1", "step2"),
                 Arrays.asList(true, true));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
@@ -278,7 +277,7 @@ public class SearchCommentTest extends CommonAPITest {
 
         // clean all data for test
         disableAndDeleteProcess(processDefinition);
-        deleteUser(user.getId());
+        deleteUser(user);
     }
 
     @Test
@@ -337,8 +336,7 @@ public class SearchCommentTest extends CommonAPITest {
         assertEquals(commentContent4, commentList2.get(0).getContent());
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(jack.getId());
-        deleteUser(john.getId());
+        deleteUsers(jack, john);
     }
 
     @Test
@@ -411,10 +409,7 @@ public class SearchCommentTest extends CommonAPITest {
         assertTrue(commentList2.get(0).getContent().contains("Content5"));
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(john);
-        deleteUser(jack);
-        deleteUser(jim);
-        deleteUser(steven);
+        deleteUsers(john, jack, jim, steven);
     }
 
 }

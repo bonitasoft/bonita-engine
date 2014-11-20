@@ -31,7 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SuppressWarnings("javadoc")
-public class HiddenTaskTest extends CommonAPITest {
+public class HiddenTaskIT extends CommonAPITest {
 
     private ProcessDefinition processDefinition;
 
@@ -64,8 +64,7 @@ public class HiddenTaskTest extends CommonAPITest {
     @After
     public void afterTest() throws BonitaException {
         disableAndDeleteProcess(processDefinition);
-        deleteUser(user.getId());
-        deleteUser(user2.getId());
+        deleteUsers(user, user2);
         logoutOnTenant();
     }
 

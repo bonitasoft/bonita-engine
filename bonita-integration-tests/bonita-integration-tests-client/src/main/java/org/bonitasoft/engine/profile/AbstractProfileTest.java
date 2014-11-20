@@ -111,12 +111,7 @@ public abstract class AbstractProfileTest extends CommonAPITest {
 
     @After
     public void after() throws BonitaException, IOException {
-        deleteUser(user1.getId());
-        deleteUser(user2.getId());
-        deleteUser(user3.getId());
-        deleteUser(user4.getId());
-        deleteUser(user5.getId());
-
+        deleteUsers(user1, user2, user3, user4, user5);
         deleteGroups(group1, group2, group3);
         deleteRoles(role1, role2, role3);
 

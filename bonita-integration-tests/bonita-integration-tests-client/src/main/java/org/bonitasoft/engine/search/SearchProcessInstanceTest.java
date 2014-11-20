@@ -726,15 +726,14 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         assertEquals(0, result.getCount());
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(user.getId());
+        deleteUser(user);
     }
 
     @Test
     public void searchArchivedProcessInstancesInvolvingUser() throws Exception {
         final User user = createUser("john", "bpm");
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
-                Arrays.asList("step1"),
-                Arrays.asList(false));
+                Arrays.asList("step1"), Arrays.asList(false));
         final ProcessDefinition processDefinition = deployAndEnableProcess(designProcessDefinition);
 
         logoutOnTenant();
@@ -765,7 +764,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         assertEquals(instance5.getId(), processInstances.get(4).getSourceObjectId());
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(user.getId());
+        deleteUser(user);
     }
 
     @Cover(classes = { ProcessAPI.class, ArchivedProcessInstancesSearchDescriptor.class }, concept = BPMNConcept.PROCESS, keywords = { "Search", "Archived",
