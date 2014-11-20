@@ -15,7 +15,6 @@ import javax.sql.DataSource;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.DBConfigurationsProvider;
 import org.bonitasoft.engine.persistence.HibernateConfigurationProvider;
-import org.bonitasoft.engine.persistence.OrderByCheckingMode;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObjectWithFlag;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
@@ -29,14 +28,13 @@ public class TenantHibernatePersistenceService extends org.bonitasoft.engine.per
 
     private static final String DELETED_KEY = "deleted";
 
-    public TenantHibernatePersistenceService(final String name, final ReadSessionAccessor sessionAccessor, final OrderByCheckingMode orderByCheckingMode,
+    public TenantHibernatePersistenceService(final String name, final ReadSessionAccessor sessionAccessor,
             final HibernateConfigurationProvider hbmConfigurationProvider, final DBConfigurationsProvider tenantConfigurationsProvider,
             final String statementDelimiter, final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager,
             final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException,
             ClassNotFoundException {
         super(name, sessionAccessor, hbmConfigurationProvider, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger,
-                orderByCheckingMode, sequenceManager,
-                datasource, enableWordSearch, wordSearchExclusionMappings);
+                sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings);
     }
 
     @Override

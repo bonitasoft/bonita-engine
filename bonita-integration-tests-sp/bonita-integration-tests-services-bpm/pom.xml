@@ -791,6 +791,7 @@
 					<systemPropertyVariables>
 						<bonita.home>${bonita.home}</bonita.home>
 						<bonita.services.folder>${project.build.directory}/conf</bonita.services.folder>
+                        <sysprop.bonita.orderby.checking.mode>NONE</sysprop.bonita.orderby.checking.mode>
 					</systemPropertyVariables>
 					<includes>
 						<include>com/bonitasoft/engine/bpm/test/AllBPMSPTestsWithJNDI.java</include>
