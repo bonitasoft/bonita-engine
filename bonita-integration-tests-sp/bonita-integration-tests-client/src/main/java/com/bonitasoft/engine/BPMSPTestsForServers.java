@@ -11,7 +11,7 @@ package com.bonitasoft.engine;
 import org.bonitasoft.engine.BonitaSuiteRunner;
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.process.task.PendingTasksTest;
+import org.bonitasoft.engine.process.task.PendingTasksIT;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
@@ -27,7 +27,6 @@ import com.bonitasoft.engine.page.PageAPIIT;
 import com.bonitasoft.engine.platform.NodeAPITest;
 import com.bonitasoft.engine.process.ProcessManagementTest;
 import com.bonitasoft.engine.profile.ProfileSPITest;
-import com.bonitasoft.engine.reporting.ReportingAPIIT;
 import com.bonitasoft.engine.reporting.ReportingSQLValidityIT;
 import com.bonitasoft.engine.search.SearchProcessInstanceTest;
 import com.bonitasoft.engine.supervisor.ProcessSupervisedTest;
@@ -35,24 +34,24 @@ import com.bonitasoft.engine.tenant.TenantIT;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-    PageAPIIT.class,
-    ApplicationAPIITs.class,
-    TenantIT.class,
-    NodeAPITest.class,
-    LogTest.class,
-    ExternalCommandsTestSP.class,
-    TaskOnDemandTest.class,
-    ProcessManagementTest.class,
-    PendingTasksTest.class,
-    ProcessSupervisedTest.class,
-    ProfileSPITest.class,
-    MonitoringAPITest.class,
-    SearchProcessInstanceTest.class,
-    ReportingSQLValidityIT.class,
-    PlatformMonitoringAPITest.class,
-    TenantIT.class,
-    BDRepositoryIT.class,
-    ExecuteBDMQueryCommandIT.class
+        PageAPIIT.class,
+        ApplicationAPIITs.class,
+        TenantIT.class,
+        NodeAPITest.class,
+        LogTest.class,
+        ExternalCommandsTestSP.class,
+        TaskOnDemandTest.class,
+        ProcessManagementTest.class,
+        PendingTasksIT.class,
+        ProcessSupervisedTest.class,
+        ProfileSPITest.class,
+        MonitoringAPITest.class,
+        SearchProcessInstanceTest.class,
+        ReportingSQLValidityIT.class,
+        PlatformMonitoringAPITest.class,
+        TenantIT.class,
+        BDRepositoryIT.class,
+        ExecuteBDMQueryCommandIT.class
 })
 @Initializer(BPMSPTestsForServers.class)
 public class BPMSPTestsForServers {

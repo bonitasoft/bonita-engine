@@ -78,7 +78,7 @@ public class ClusterTests extends CommonAPISPTest {
 
     @After
     public void afterTest() throws Exception {
-        deleteUser(user.getId());
+        deleteUser(user);
         changeToNode1();
         logoutOnTenant();
     }
@@ -132,10 +132,10 @@ public class ClusterTests extends CommonAPISPTest {
         final UserTaskDefinitionBuilder addUserTask = designProcessDefinition.addUserTask("step0", ACTOR_NAME);
         addUserTask.addShortTextData("text", new ExpressionBuilder().createConstantStringExpression("default"));
         addUserTask
-        .addConnector("aConnector", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER)
-        .addInput("input1", new ExpressionBuilder().createConstantStringExpression("inputValue"))
-        .addOutput(
-                new OperationBuilder().createSetDataOperation("text", new ExpressionBuilder().createInputExpression("output1", String.class.getName())));
+                .addConnector("aConnector", "org.bonitasoft.connector.testConnectorWithOutput", "1.0", ConnectorEvent.ON_ENTER)
+                .addInput("input1", new ExpressionBuilder().createConstantStringExpression("inputValue"))
+                .addOutput(
+                        new OperationBuilder().createSetDataOperation("text", new ExpressionBuilder().createInputExpression("output1", String.class.getName())));
 
         final BusinessArchiveBuilder businessArchiveBuilder = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(
                 designProcessDefinition.done());

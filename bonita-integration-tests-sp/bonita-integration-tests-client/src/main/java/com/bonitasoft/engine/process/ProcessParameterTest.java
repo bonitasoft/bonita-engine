@@ -207,8 +207,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         assertEquals(paramValue, dataInstance.getValue());
 
         disableAndDeleteProcess(processDefinition);
-
-        deleteUser(user.getId());
+        deleteUser(user);
     }
 
     @Test
@@ -699,7 +698,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         assertEquals(ConfigurationState.RESOLVED, getProcessAPI().getProcessDeploymentInfo(processDefinitionId).getConfigurationState());
 
         disableAndDeleteProcess(processDef);
-        deleteUser(user.getId());
+        deleteUser(user);
     }
 
     private ProcessDefinitionBuilderExt buildProcessWithOutputConnectorAndParameter(final String delivery, final String inputName, final String connectorId,
@@ -752,7 +751,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         assertThat((Boolean) getProcessAPI().evaluateExpressionOnProcessDefinition(isDoubleValueDouble, inputValues, processDefinition.getId()), is(true));
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(jack.getId());
+        deleteUser(jack);
     }
 
     // TODO move these methods to an util class
