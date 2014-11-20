@@ -44,7 +44,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import bitronix.tm.TransactionManagerServices;
 
-import com.bonitasoft.pojo.Employee;
+import com.company.pojo.Employee;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })

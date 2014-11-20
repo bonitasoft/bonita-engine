@@ -11,7 +11,6 @@
 package com.bonitasoft.engine.operation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -121,7 +120,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
             if (!dataIds.isEmpty()) {
                 return businessDataRepository.findByIds(dataClass, dataIds);
             }
-            return Arrays.asList(dataClass.newInstance());
+            return new ArrayList<Entity>();
         } catch (final Exception e) {
             throw new SBonitaReadException(e);
         }

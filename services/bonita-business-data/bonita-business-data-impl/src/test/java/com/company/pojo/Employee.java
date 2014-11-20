@@ -1,4 +1,4 @@
-package com.bonitasoft.pojo;
+package com.company.pojo;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

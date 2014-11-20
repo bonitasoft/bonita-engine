@@ -247,7 +247,7 @@ public class SPPlatformTest {
     }
 
     @Test(expected = AlreadyExistsException.class)
-    public void createExistedTenant() throws BonitaException {
+    public void createAnAlreadyExistingTenantShouldThrowException() throws BonitaException {
         platformAPI.createTenant(new TenantCreator(tenantName1, "", "testIconName", "testIconPath", "", ""));
     }
 

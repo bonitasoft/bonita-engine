@@ -1,6 +1,6 @@
 package com.bonitasoft.engine.business.data.impl;
 
-import static com.bonitasoft.pojo.EmployeeBuilder.anEmployee;
+import static com.company.pojo.EmployeeBuilder.anEmployee;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Matchers.any;
@@ -42,8 +42,8 @@ import bitronix.tm.TransactionManagerServices;
 
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
-import com.bonitasoft.pojo.Employee;
-import com.bonitasoft.pojo.Person;
+import com.company.pojo.Employee;
+import com.company.pojo.Person;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })

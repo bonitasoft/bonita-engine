@@ -8,6 +8,7 @@
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 		<constructor-arg name="likeEscapeCharacter" value="#" />
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="orderByCheckingMode" type="org.bonitasoft.engine.persistence.OrderByCheckingMode" value="${orderByCheckingMode}"/>
 		<constructor-arg name="sequenceManager" ref="sequenceManager" />
 		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />
         <constructor-arg name="enableWordSearch" value="false" />
@@ -21,6 +22,7 @@
 	<bean id="persistenceService" class="com.bonitasoft.engine.persistence.TenantHibernatePersistenceService" depends-on="dbProperties" destroy-method="destroy">
 		<constructor-arg name="name" value="journal" />
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
+        <constructor-arg name="orderByCheckingMode" type="org.bonitasoft.engine.persistence.OrderByCheckingMode" value="${orderByCheckingMode}"/>
 		<constructor-arg name="hbmConfigurationProvider" ref="journalConfigurationProvider" />
 		<constructor-arg name="tenantConfigurationsProvider" ref="dbConfigurationsProvider" />
 		<constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
