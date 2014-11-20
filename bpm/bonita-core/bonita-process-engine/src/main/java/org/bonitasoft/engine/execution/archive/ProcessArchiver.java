@@ -26,8 +26,6 @@ import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
-import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
-import org.bonitasoft.engine.core.process.comment.model.archive.builder.SACommentBuilderFactory;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SActivityDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
@@ -67,8 +65,8 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.SRecorderException;
 
 /**
@@ -103,7 +101,7 @@ public class ProcessArchiver {
             archiveDataInstances(processDefinition, processInstance, dataInstanceService, archiveDate);
         }
         // Archive SComment
-        archiveComments(processDefinition, processInstance, archiveService, logger, commentService, archiveDate);
+        archiveComments(processDefinition, processInstance, commentService, archiveDate);
 
         // archive document mappings
         archiveDocumentMappings(processDefinition, processInstance, documentService, archiveDate);
@@ -129,7 +127,7 @@ public class ProcessArchiver {
             List<SConnectorInstance> connectorInstances;
             int i = 0;
             do {
-                connectorInstances = connectorInstanceService.getConnectorInstances(containerId, containerType, i, i + BATCH_SIZE, null, null);
+                connectorInstances = connectorInstanceService.getConnectorInstances(containerId, containerType, i, i + BATCH_SIZE, "id", OrderByType.ASC);
                 i += BATCH_SIZE;
                 for (final SConnectorInstance sConnectorInstance : connectorInstances) {
                     connectorInstanceService.archiveConnectorInstance(sConnectorInstance, archiveDate);
@@ -169,11 +167,13 @@ public class ProcessArchiver {
             final DocumentService documentService, final long archiveDate) throws SArchivingException {
         try {
             List<SMappedDocument> mappedDocuments;
+            int startIndex = 0;
             do {
-                mappedDocuments = documentService.getDocumentsOfProcessInstance(processInstance.getId(), 0, BATCH_SIZE, null, null);
+                mappedDocuments = documentService.getDocumentsOfProcessInstance(processInstance.getId(), startIndex, BATCH_SIZE, null, null);
                 for (final SMappedDocument mappedDocument : mappedDocuments) {
                     documentService.archive(mappedDocument, archiveDate);
                 }
+                startIndex += BATCH_SIZE;
             } while (mappedDocuments.size() == BATCH_SIZE);
         } catch (final SBonitaException e) {
             setExceptionContext(processDefinition, processInstance, e);
@@ -182,39 +182,21 @@ public class ProcessArchiver {
     }
 
     private static void archiveComments(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
-            final ArchiveService archiveService, final TechnicalLoggerService logger, final SCommentService commentService, final long archiveDate)
-            throws SArchivingException {
-        List<SComment> sComments = null;
-        int startIndex = 0;
-        do {
-            try {
-                sComments = commentService.getComments(processInstance.getId(), new QueryOptions(startIndex, BATCH_SIZE));
-            } catch (final SBonitaReadException e) {
-                setExceptionContext(processDefinition, processInstance, e);
-                if (logger.isLoggable(ProcessArchiver.class, TechnicalLogSeverity.ERROR)) {
-                    logger.log(ProcessArchiver.class, TechnicalLogSeverity.ERROR, "No process comment found for the process instance.", e);
-                }
-            }
-            if (sComments != null) {
+            final SCommentService commentService, final long archiveDate) throws SArchivingException {
+        try {
+            List<SComment> sComments = null;
+            int startIndex = 0;
+            do {
+                sComments = commentService
+                        .getComments(processInstance.getId(), new QueryOptions(startIndex, BATCH_SIZE, SComment.class, "id", OrderByType.ASC));
                 for (final SComment sComment : sComments) {
-                    archiveComment(processDefinition, processInstance, archiveService, archiveDate, sComment);
+                    commentService.archive(archiveDate, sComment);
                 }
-            }
-            startIndex += BATCH_SIZE;
-        } while (sComments != null && sComments.size() > 0);
-    }
-
-    private static void archiveComment(final SProcessDefinition processDefinition, final SProcessInstance processInstance, final ArchiveService archiveService,
-            final long archiveDate, final SComment sComment) throws SArchivingException {
-        final SAComment saComment = BuilderFactory.get(SACommentBuilderFactory.class).createNewInstance(sComment).done();
-        if (saComment != null) {
-            final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saComment);
-            try {
-                archiveService.recordInsert(archiveDate, insertRecord);
-            } catch (final SRecorderException e) {
-                setExceptionContext(processDefinition, processInstance, e);
-                throw new SArchivingException("Unable to archive the process instance comments.", e);
-            }
+                startIndex += BATCH_SIZE;
+            } while (!sComments.isEmpty());
+        } catch (final SBonitaException e) {
+            setExceptionContext(processDefinition, processInstance, e);
+            throw new SArchivingException("Unable to archive the process instance comments.", e);
         }
     }
 

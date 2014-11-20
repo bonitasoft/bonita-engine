@@ -206,7 +206,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         try {
             List<SPendingActivityMapping> mappings = null;
             final boolean createEvents = getEventService().hasHandlers(PENDINGACTIVITYMAPPING, EventActionType.DELETED);
-            while ((mappings = getPendingMappings(humanTaskInstanceId, new QueryOptions(0, BATCH_SIZE))).size() > 0) {
+            final QueryOptions queryOptions = new QueryOptions(0, BATCH_SIZE, SPendingActivityMapping.class, "id", OrderByType.ASC);
+            while (!(mappings = getPendingMappings(humanTaskInstanceId, queryOptions)).isEmpty()) {
                 deletePendingMappings(mappings, createEvents);
             }
         } catch (final SBonitaException e) {
