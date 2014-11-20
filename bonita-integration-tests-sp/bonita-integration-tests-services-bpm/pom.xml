@@ -522,8 +522,8 @@
 		</dependency>
 		<!-- Misc -->
 		<dependency>
-			<groupId>org.bonitasoft.engine.test</groupId>
-			<artifactId>bonita-server-test-utils</artifactId>
+			<groupId>com.bonitasoft.engine.test</groupId>
+			<artifactId>bonita-server-test-utils-sp</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -767,8 +767,8 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.bonitasoft.engine.test</groupId>
-                                    <artifactId>bonita-server-test-utils</artifactId>
+                                    <groupId>com.bonitasoft.engine.test</groupId>
+                                    <artifactId>bonita-server-test-utils-sp</artifactId>
                                     <version>${project.version}</version>
                                     <type>zip</type>
                                 </artifactItem>
