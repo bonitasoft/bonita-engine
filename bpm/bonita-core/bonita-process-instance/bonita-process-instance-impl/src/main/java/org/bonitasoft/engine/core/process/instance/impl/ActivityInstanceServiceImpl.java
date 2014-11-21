@@ -574,8 +574,9 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
             throws SBonitaReadException {
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("parentActivityInstanceId", parentActivityInstanceId);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfResults, SFlowNodeInstance.class, "id", OrderByType.ASC);
         final SelectListDescriptor<SActivityInstance> descriptor = new SelectListDescriptor<SActivityInstance>("getChildrenOfAnActivity", parameters,
-                SActivityInstance.class, new QueryOptions(fromIndex, numberOfResults));
+                SActivityInstance.class, queryOptions);
         return getPersistenceService().selectList(descriptor);
     }
 

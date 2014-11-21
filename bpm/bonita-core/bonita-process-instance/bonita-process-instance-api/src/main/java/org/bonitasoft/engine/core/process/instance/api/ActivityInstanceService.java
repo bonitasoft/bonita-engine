@@ -243,7 +243,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
     List<SActivityInstance> getActivityInstances(long rootContainerId, int fromIndex, int numberOfResults) throws SBonitaReadException;
 
     /**
-     * Get all child instances for the specific parent activity instance.
+     * Get all child instances for the specific parent activity instance, order by id ascending.
      *
      * @param parentActivityInstanceId
      *        identifier of parent activity instance
