@@ -187,7 +187,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     private OrderByCheckingMode getOrderByCheckingMode() {
         final String property = System.getProperty("sysprop.bonita.orderby.checking.mode");
-        return property != null ? OrderByCheckingMode.valueOf(property) : null;
+        return property != null && !property.isEmpty() ? OrderByCheckingMode.valueOf(property) : OrderByCheckingMode.NONE;
     }
 
     /**
@@ -792,11 +792,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
     }
 
     private void checkOrderByClause(final Query query) {
-        if (query != null && !query.getQueryString().toLowerCase().contains("order by")) {
-            if (orderByCheckingMode == null) {
-                return;
-            }
-
+        if (!query.getQueryString().toLowerCase().contains("order by")) {
             switch (orderByCheckingMode) {
                 case NONE:
                     break;

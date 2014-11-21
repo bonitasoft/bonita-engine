@@ -98,17 +98,20 @@ public class PlatformHibernatePersistenceServiceTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.persistence.PlatformHibernatePersistenceService#PlatformHibernatePersistenceService(String, HibernateConfigurationProvider, DBConfigurationsProvider, String, String, TechnicalLoggerService, SequenceManager, DataSource, boolean, Set)}
-     * .
+     * {@link org.bonitasoft.engine.persistence.AbstractHibernatePersistenceService#selectList(org.bonitasoft.engine.persistence.SelectListDescriptor)}.
      */
-    @Test(expected = IllegalArgumentException.class)
-    public final void constructor_should_throw_exception_when_no_ORDER_BY_clause_in_query_and_checking_mode_is_empty() throws Exception {
+    @Test
+    public final void selectList_should_do_nothing_when_no_ORDER_BY_clause_in_query_and_checking_mode_is_empty() throws Exception {
         // Given
+        buildQueryWithoutOrderByClause();
         System.setProperty("sysprop.bonita.orderby.checking.mode", "");
 
+        platformHibernatePersistenceService = spy(new PlatformHibernatePersistenceService(name, hbmConfigurationProvider, dbConfigurationsProvider,
+                statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings));
+        final SelectListDescriptor<Object> selectDescriptor = mock(SelectListDescriptor.class);
+
         // When
-        new PlatformHibernatePersistenceService(name, hbmConfigurationProvider, dbConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger,
-                sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings);
+        platformHibernatePersistenceService.selectList(selectDescriptor);
     }
 
     /**
@@ -186,6 +189,26 @@ public class PlatformHibernatePersistenceServiceTest {
         verify(logger).log(AbstractHibernatePersistenceService.class,
                 TechnicalLogSeverity.WARNING,
                 "Query '' does not contain 'ORDER BY' clause. It's better to modify your query to order the result, especially if you use the pagination.");
+    }
+
+    /**
+     * Test method for
+     * {@link org.bonitasoft.engine.persistence.AbstractHibernatePersistenceService#selectList(org.bonitasoft.engine.persistence.SelectListDescriptor)}.
+     */
+    @Test
+    public final void selectList_should_do_nothing_when_ORDER_BY_clause_in_query_and_checking_mode_is_STRICT() throws Exception {
+        // Given
+        final Query query = mock(Query.class);
+        doReturn("Order by").when(query).getQueryString();
+        doReturn(query).when(session).getNamedQuery(anyString());
+        System.setProperty("sysprop.bonita.orderby.checking.mode", OrderByCheckingMode.STRICT.name());
+
+        platformHibernatePersistenceService = spy(new PlatformHibernatePersistenceService(name, hbmConfigurationProvider, dbConfigurationsProvider,
+                statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings));
+        final SelectListDescriptor<Object> selectDescriptor = mock(SelectListDescriptor.class);
+
+        // When
+        platformHibernatePersistenceService.selectList(selectDescriptor);
     }
 
     private void buildQueryWithoutOrderByClause() {
