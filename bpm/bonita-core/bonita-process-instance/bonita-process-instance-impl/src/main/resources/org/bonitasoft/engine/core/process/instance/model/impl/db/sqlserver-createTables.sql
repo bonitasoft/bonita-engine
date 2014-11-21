@@ -97,6 +97,8 @@ CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId)
 GO
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4)
 GO
+CREATE INDEX idx_fn_lg2_state_tenant_del ON flownode_instance (logicalGroup2, stateName, tenantid, deleted)
+GO
 
 CREATE TABLE connector_instance (
   tenantid NUMERIC(19, 0) NOT NULL,
