@@ -34,7 +34,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class HumanTasksTest extends CommonAPITest {
+public class HumanTasksIT extends CommonAPITest {
 
     protected User user;
 

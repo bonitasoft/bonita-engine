@@ -47,7 +47,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.CollectionUtils;
 
-public class PendingTasksTest extends CommonAPITest {
+public class PendingTasksIT extends CommonAPITest {
 
     private static final String JACK = "jack";
 

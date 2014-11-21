@@ -28,6 +28,7 @@ import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.command.CommandParameterizationException;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -46,20 +47,19 @@ public class ActorPermissionCommandTest extends CommonAPITest {
 
     private static final String IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD = "isAllowedToSeeOverviewForm";
 
+    private User user;
+
     @Before
     public void before() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
+        user = createUser(USERNAME, "bpm");
+        loginOnDefaultTenantWith(USERNAME, "bpm");
     }
 
     @After
     public void after() throws BonitaException {
+        deleteUser(user);
         logoutOnTenant();
-    }
-
-    private void cleanup(final long userId, final List<Long> processDefinitionIds) throws BonitaException {
-        // clean up:
-        deleteUser(userId);
-        disableAndDeleteProcessById(processDefinitionIds);
     }
 
     private Map<String, Serializable> prepareParametersWithUserId(final long userId, final List<Long> processDefinitionIds) {
@@ -103,15 +103,12 @@ public class ActorPermissionCommandTest extends CommonAPITest {
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Command", "Actor permission", "Start process" }, story = "Test if an actor is allowed to start a process.", jira = "")
     @Test
-    public void testIsAllowedToStartProcesses() throws Exception {
-        final String userName = "Manu";
-        final User manu = createUser(userName, "bpm");
-        loginOnDefaultTenantWith(userName, "bpm");
+    public void isAllowedToStartProcesses() throws Exception {
         final String ACTOR_NAME1 = "ActorMenu";
         final String ACTOR_NAME2 = "ActorElias";
         final String ACTOR_NAME3 = "ActorBap";
 
-        final List<Long> pIds = new ArrayList<Long>();
+        final List<Long> processDefinitionIds = new ArrayList<Long>();
         final int num = 5;
         for (int i = 0; i < num; i++) {
             ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("My_Process", String.valueOf(i));
@@ -127,53 +124,49 @@ public class ActorPermissionCommandTest extends CommonAPITest {
             final DesignProcessDefinition processDef = processDefinitionBuilder.done();
             final ProcessDefinition processDefinition = getProcessAPI().deploy(
                     new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDef).done());
-            getProcessAPI().addUserToActor(ACTOR_NAME1, processDefinition, manu.getId());
-            getProcessAPI().addUserToActor(ACTOR_NAME2, processDefinition, manu.getId());
-            getProcessAPI().addUserToActor(ACTOR_NAME3, processDefinition, manu.getId());
+            getProcessAPI().addUserToActor(ACTOR_NAME1, processDefinition, user.getId());
+            getProcessAPI().addUserToActor(ACTOR_NAME2, processDefinition, user.getId());
+            getProcessAPI().addUserToActor(ACTOR_NAME3, processDefinition, user.getId());
             final long processDefinitionId = processDefinition.getId();
             getProcessAPI().enableProcess(processDefinitionId);
             final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
             assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
             getProcessAPI().startProcess(processDefinition.getId());
-            pIds.add(processDefinitionId);
+            processDefinitionIds.add(processDefinitionId);
         }
 
-        final Map<String, Serializable> paras = prepareParametersWithUserId(manu.getId(), pIds);
+        final Map<String, Serializable> paras = prepareParametersWithUserId(user.getId(), processDefinitionIds);
         final Map<Long, Boolean> res = (Map<Long, Boolean>) getCommandAPI().execute(IS_ALLOWED_TO_START_PROCESSES_CMD, paras);
 
-        assertEquals(pIds.size(), res.size());
-        assertTrue(res.get(pIds.get(0)));
-        assertFalse(res.get(pIds.get(1)));
-        assertTrue(res.get(pIds.get(2)));
-        assertFalse(res.get(pIds.get(3)));
-        assertTrue(res.get(pIds.get(4)));
+        assertEquals(processDefinitionIds.size(), res.size());
+        assertTrue(res.get(processDefinitionIds.get(0)));
+        assertFalse(res.get(processDefinitionIds.get(1)));
+        assertTrue(res.get(processDefinitionIds.get(2)));
+        assertFalse(res.get(processDefinitionIds.get(3)));
+        assertTrue(res.get(processDefinitionIds.get(4)));
 
-        cleanup(manu.getId(), pIds);
+        disableAndDeleteProcessById(processDefinitionIds);
     }
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Command", "Actor permission", "Start process" }, story = "Test if an actor is allowed to start a process.", jira = "")
     @Test
-    public void testIsAllowedToStartProcess() throws Exception {
-        final String userName = "Manu";
-        final User manu = createUser(userName, "bpm");
-        loginOnDefaultTenantWith(userName, "bpm");
+    public void isAllowedToStartProcess() throws Exception {
         final String ACTOR_NAME1 = "ActorMenu";
         final String ACTOR_NAME2 = "ActorElias";
         final String ACTOR_NAME3 = "ActorBap";
 
-        DesignProcessDefinition processDef = null;
         ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0");
         processDefinitionBuilder = setterActors(processDefinitionBuilder, Arrays.asList(ACTOR_NAME1, ACTOR_NAME1, ACTOR_NAME2, ACTOR_NAME3),
                 Arrays.asList(true, false, false, false));
         // one process has only one actorInitiator.
-        processDef = processDefinitionBuilder.done();
+        final DesignProcessDefinition processDef = processDefinitionBuilder.done();
 
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
                 new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDef).done());
-        getProcessAPI().addUserToActor(ACTOR_NAME1, processDefinition, manu.getId());
-        getProcessAPI().addUserToActor(ACTOR_NAME2, processDefinition, manu.getId());
-        getProcessAPI().addUserToActor(ACTOR_NAME3, processDefinition, manu.getId());
+        getProcessAPI().addUserToActor(ACTOR_NAME1, processDefinition, user.getId());
+        getProcessAPI().addUserToActor(ACTOR_NAME2, processDefinition, user.getId());
+        getProcessAPI().addUserToActor(ACTOR_NAME3, processDefinition, user.getId());
         final long processDefinitionId = processDefinition.getId();
         getProcessAPI().enableProcess(processDefinitionId);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
@@ -194,16 +187,12 @@ public class ActorPermissionCommandTest extends CommonAPITest {
         final boolean res = (Boolean) getCommandAPI().execute(IS_ALLOWED_TO_START_PROCESS_CMD, paras);
         assertTrue(res);
 
-        cleanup(manu.getId(), Arrays.asList(processDefinition.getId()));
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Command", "Actor permission", "Initiator actor", "Overview form" }, story = "Test if initiator actor is allowed to see overview form.", jira = "")
     @Test
-    public void testIsAllowedToSeeOverviewFormForInitiatorActor() throws Exception {
-        final String userName = "Manu";
-        final User manu = createUser(userName, "bpm");
-        loginOnDefaultTenantWith(userName, "bpm");
-
+    public void isAllowedToSeeOverviewFormForInitiatorActor() throws Exception {
         final List<Long> processDefinitionIds = new ArrayList<Long>(2);
         final List<Long> processInstanceIds = new ArrayList<Long>(2);
         for (int i = 0; i < 2; i++) {
@@ -217,7 +206,7 @@ public class ActorPermissionCommandTest extends CommonAPITest {
             designProcessDefinition.addUserTask("step2", ACTOR_NAME);
             designProcessDefinition.addTransition("step1", "step2");
             // assign pending task to jack
-            final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, manu);
+            final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
             final long processDefinitionId = processDefinition.getId();
             final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinitionId);
             assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
@@ -229,21 +218,20 @@ public class ActorPermissionCommandTest extends CommonAPITest {
             waitForUserTask("step2", processInstance.getId());
         }
 
-        final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(manu.getId(), processInstanceIds.get(0));
+        final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(user.getId(), processInstanceIds.get(0));
         assertTrue((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
 
-        final Map<String, Serializable> paras2 = prepareParametersWithArchivedDescriptor(manu.getId(), processInstanceIds.get(1));
+        final Map<String, Serializable> paras2 = prepareParametersWithArchivedDescriptor(user.getId(), processInstanceIds.get(1));
         assertTrue((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras2));
 
-        cleanup(manu.getId(), processDefinitionIds);
+        disableAndDeleteProcessById(processDefinitionIds);
     }
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Command", "Actor permission", "Archived process instance", "Overview form",
             "User" }, story = "Test if user is allowed to see overview form for archived process instances.", jira = "")
     @Ignore("test was bad (does not test archived things)")
     @Test
-    public void testIsAllowedToSeeOverviewFormForArchivedProcessInstancesInvolvingUser() throws Exception {
-        final User user = createUser("jack", "bpm");
+    public void isAllowedToSeeOverviewFormForArchivedProcessInstancesInvolvingUser() throws Exception {
         // create process
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("SearchOpenProcessInstancesInvolvingUser",
                 "14.3");
@@ -265,47 +253,41 @@ public class ActorPermissionCommandTest extends CommonAPITest {
         assertTrue((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
 
         skipTask(pendingTask.getId());
-        cleanup(user.getId(), Arrays.asList(processDefinition.getId()));
+        disableAndDeleteProcess(processDefinition);
     }
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.ACTOR, keywords = { "Command", "Actor permission", "Archived process instance", "Overview form",
             "User" }, story = "Test if user is allowed to see overview form for archived process instances.", jira = "")
     @Test
-    public void testIsAllowedToSeeOverviewFormForProcessInstancesInvolvingUser() throws Exception {
-        final User user = createUser("jack", "bpm");
+    public void isAllowedToSeeOverviewFormForProcessInstancesInvolvingUser() throws Exception {
+        final User jack = createUser("jack", "bpm");
         // create process
-        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("SearchOpenProcessInstancesInvolvingUser",
-                "14.3");
-        designProcessDefinition.addActor(ACTOR_NAME);
-        designProcessDefinition.addAutomaticTask("step1");
-        designProcessDefinition.addUserTask("step2", ACTOR_NAME);
-        designProcessDefinition.addUserTask("step3", ACTOR_NAME);
-        designProcessDefinition.addTransition("step1", "step2");
-        designProcessDefinition.addTransition("step2", "step3");
+        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
+                Arrays.asList("step1", "step2", "step3"), Arrays.asList(false, true, true));
         // assign pending task to jack
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, jack);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         logoutOnTenant();
         loginOnDefaultTenantWith("jack", "bpm");
 
         final HumanTaskInstance pendingTask = waitForUserTask("step2", processInstance);
-        final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(user.getId(), processInstance.getId());
+        final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(jack.getId(), processInstance.getId());
         // before execute
         assertFalse((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
-        assignAndExecuteStep(pendingTask, user.getId());
+        assignAndExecuteStep(pendingTask, jack.getId());
         waitForUserTask("step3", processInstance);
 
         // after execute
         assertTrue((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
 
-        cleanup(user.getId(), Arrays.asList(processDefinition.getId()));
+        disableAndDeleteProcess(processDefinition);
+        deleteUser(jack);
     }
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Command", "Actor permission", "Wrong parameter" }, story = "Execute actor permission command with wrong parameter", jira = "ENGINE-586")
     @Test(expected = CommandParameterizationException.class)
-    public void testIsAllowedToStartProcessCommandWithWrongParameter() throws Exception {
-
+    public void isAllowedToStartProcessCommandWithWrongParameter() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("BAD_KEY", "bad_value");
 
@@ -314,8 +296,7 @@ public class ActorPermissionCommandTest extends CommonAPITest {
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Command", "Actor permission", "Wrong parameter" }, story = "Execute actor permission command with wrong parameter", jira = "ENGINE-586")
     @Test(expected = CommandParameterizationException.class)
-    public void testIsAllowedToStartProcessesCommandWithWrongParameter() throws Exception {
-
+    public void isAllowedToStartProcessesCommandWithWrongParameter() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("BAD_KEY", "bad_value");
 
@@ -324,8 +305,7 @@ public class ActorPermissionCommandTest extends CommonAPITest {
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.PROFILE, keywords = { "Command", "Actor permission", "Wrong parameter" }, story = "Execute actor permission command with wrong parameter", jira = "ENGINE-586")
     @Test(expected = CommandParameterizationException.class)
-    public void testIsAllowedToSeeOverviewFormCommandWithWrongParameter() throws Exception {
-
+    public void isAllowedToSeeOverviewFormCommandWithWrongParameter() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("BAD_KEY", "bad_value");
 

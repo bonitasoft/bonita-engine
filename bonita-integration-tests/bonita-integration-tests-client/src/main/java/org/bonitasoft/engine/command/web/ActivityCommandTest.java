@@ -86,7 +86,7 @@ public class ActivityCommandTest extends CommonAPITest {
 
     @After
     public void after() throws BonitaException, BonitaHomeNotSetException {
-        deleteUser(businessUser.getId());
+        deleteUser(businessUser);
         logoutOnTenant();
     }
 

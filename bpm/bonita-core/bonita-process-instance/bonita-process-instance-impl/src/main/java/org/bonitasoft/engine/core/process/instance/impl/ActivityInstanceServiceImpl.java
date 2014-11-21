@@ -206,7 +206,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         try {
             List<SPendingActivityMapping> mappings = null;
             final boolean createEvents = getEventService().hasHandlers(PENDINGACTIVITYMAPPING, EventActionType.DELETED);
-            while ((mappings = getPendingMappings(humanTaskInstanceId, new QueryOptions(0, BATCH_SIZE))).size() > 0) {
+            final QueryOptions queryOptions = new QueryOptions(0, BATCH_SIZE, SPendingActivityMapping.class, "id", OrderByType.ASC);
+            while (!(mappings = getPendingMappings(humanTaskInstanceId, queryOptions)).isEmpty()) {
                 deletePendingMappings(mappings, createEvents);
             }
         } catch (final SBonitaException e) {
@@ -573,8 +574,9 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
             throws SBonitaReadException {
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("parentActivityInstanceId", parentActivityInstanceId);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfResults, SFlowNodeInstance.class, "id", OrderByType.ASC);
         final SelectListDescriptor<SActivityInstance> descriptor = new SelectListDescriptor<SActivityInstance>("getChildrenOfAnActivity", parameters,
-                SActivityInstance.class, new QueryOptions(fromIndex, numberOfResults));
+                SActivityInstance.class, queryOptions);
         return getPersistenceService().selectList(descriptor);
     }
 

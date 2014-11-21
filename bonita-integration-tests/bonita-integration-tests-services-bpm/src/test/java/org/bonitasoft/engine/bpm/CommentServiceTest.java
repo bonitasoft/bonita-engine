@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.bonitasoft.engine.core.process.comment.api.SCommentService;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Test;
@@ -37,7 +38,7 @@ public class CommentServiceTest extends CommonBPMServicesTest {
     }
 
     private void createAndRetrieveComment(final String commentContent) throws Exception {
-        long processInstanceId = 123456L;
+        final long processInstanceId = 123456L;
 
         transactionService.begin();
         final SComment comment = commentService.addComment(processInstanceId, commentContent);
@@ -45,7 +46,7 @@ public class CommentServiceTest extends CommonBPMServicesTest {
         assertNotNull(comment);
 
         transactionService.begin();
-        final List<SComment> comments = commentService.getComments(processInstanceId, new QueryOptions(0, 50));
+        final List<SComment> comments = commentService.getComments(processInstanceId, new QueryOptions(0, 50, SComment.class, "id", OrderByType.ASC));
         transactionService.complete();
         assertNotNull(comments);
         assertEquals(1, comments.size());

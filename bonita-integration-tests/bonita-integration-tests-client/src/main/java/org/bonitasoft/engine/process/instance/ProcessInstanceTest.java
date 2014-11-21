@@ -709,8 +709,7 @@ public class ProcessInstanceTest extends AbstractProcessInstanceTest {
         } finally {
             // Clean up
             disableAndDeleteProcess(processDefinition);
-            deleteUser(jack.getId());
-            deleteUser(otherUser.getId());
+            deleteUsers(jack, otherUser);
         }
     }
 

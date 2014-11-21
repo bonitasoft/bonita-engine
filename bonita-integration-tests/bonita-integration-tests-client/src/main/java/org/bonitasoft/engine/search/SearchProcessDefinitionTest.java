@@ -56,7 +56,7 @@ public class SearchProcessDefinitionTest extends CommonAPITest {
     public void afterTest() throws BonitaException {
         disableAndDeleteProcess(enabledProcessDefinitions);
         deleteProcess(disabledProcessDefinitions);
-        deleteUser(user.getId());
+        deleteUser(user);
 
         logoutOnTenant();
     }

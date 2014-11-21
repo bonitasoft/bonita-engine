@@ -147,7 +147,8 @@ public class SupervisorTest extends CommonAPITest {
     @Test
     public void isUserProcessSupervisor() throws Exception {
         final long processDefinitionId = processDefinitions.get(0).getId();
-        final long userId = createUser("user546", "bpm", "FirstName564", "LastName2").getId();
+        final User user = createUser("user546", "bpm", "FirstName564", "LastName2");
+        final long userId = user.getId();
         ProcessSupervisor createdSupervisor = null;
 
         try {
@@ -162,7 +163,7 @@ public class SupervisorTest extends CommonAPITest {
             if (createdSupervisor != null) {
                 deleteSupervisor(createdSupervisor.getSupervisorId());
             }
-            deleteUser(userId);
+            deleteUser(user);
         }
     }
 
@@ -173,7 +174,7 @@ public class SupervisorTest extends CommonAPITest {
 
         // Count to assert
         final SearchOptionsBuilder builder = buildSearchOptions(null, 7, 3, ProcessSupervisorSearchDescriptor.USER_ID, Order.ASC);
-        SearchResult<ProcessSupervisor> result = getProcessAPI().searchProcessSupervisors(builder.done());
+        final SearchResult<ProcessSupervisor> result = getProcessAPI().searchProcessSupervisors(builder.done());
         assertEquals(12, result.getCount());
 
         final ProcessSupervisor getSupervisorResult = result.getResult().get(0);

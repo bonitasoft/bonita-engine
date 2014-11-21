@@ -174,7 +174,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(user.getId());
+        deleteUser(user);
     }
 
     @Test
@@ -196,7 +196,7 @@ public class ProcessExecutionTest extends CommonAPITest {
                 containsState(getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 10), TestStates.NORMAL_FINAL));// FIXME
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(user.getId());
+        deleteUser(user);
     }
 
     @Test

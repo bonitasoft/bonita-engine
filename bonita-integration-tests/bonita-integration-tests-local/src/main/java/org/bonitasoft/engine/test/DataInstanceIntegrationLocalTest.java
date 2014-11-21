@@ -43,8 +43,7 @@ public class DataInstanceIntegrationLocalTest extends CommonAPILocalTest {
 
     @After
     public void afterTest() throws BonitaException {
-        deleteUser(cebolinha.getId());
-        deleteUser(cascao.getId());
+        deleteUsers(cebolinha, cascao);
         logoutOnTenant();
     }
 

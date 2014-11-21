@@ -46,26 +46,26 @@
 	</query>
 
 	<query name="getSADataInstanceIdFromMapping">
-		SELECT data_mapping.dataInstanceId
-		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl AS data_mapping
-		WHERE data_mapping.dataName = :dataName
-		AND data_mapping.containerId = :containerId
-		AND data_mapping.containerType = :containerType
+		SELECT saDataInstanceVisibilityMapping.dataInstanceId
+		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl AS saDataInstanceVisibilityMapping
+		WHERE saDataInstanceVisibilityMapping.dataName = :dataName
+		AND saDataInstanceVisibilityMapping.containerId = :containerId
+		AND saDataInstanceVisibilityMapping.containerType = :containerType
 	</query>
 
 	<query name="getSADataInstanceIdsFromMapping">
-		SELECT data_mapping.dataInstanceId
-		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl AS data_mapping
-		WHERE data_mapping.dataName IN (:dataNames)
-		AND data_mapping.containerId = :containerId
-		AND data_mapping.containerType = :containerType
+		SELECT saDataInstanceVisibilityMapping.dataInstanceId
+		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl AS saDataInstanceVisibilityMapping
+		WHERE saDataInstanceVisibilityMapping.dataName IN (:dataNames)
+		AND saDataInstanceVisibilityMapping.containerId = :containerId
+		AND saDataInstanceVisibilityMapping.containerType = :containerType
 	</query>
 
 	<query name="getSADataInstanceVisibilityMappings">
-		SELECT data_mapping
-		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl AS data_mapping
-		WHERE data_mapping.containerId = :containerId
-		AND data_mapping.containerType = :containerType
+		SELECT saDataInstanceVisibilityMapping
+		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl AS saDataInstanceVisibilityMapping
+		WHERE saDataInstanceVisibilityMapping.containerId = :containerId
+		AND saDataInstanceVisibilityMapping.containerType = :containerType
 	</query>
 
 	<query name="getLocalSADataInstances">

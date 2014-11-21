@@ -44,7 +44,7 @@ import org.junit.Test;
  * @author Baptiste Mesta
  * @author Yanyan Liu
  */
-public class UserFilterTest extends CommonAPITest {
+public class UserFilterIT extends CommonAPITest {
 
     private static final String JOHN = "john";
 

@@ -1298,7 +1298,7 @@ public class RemoteConnectorExecutionTest extends ConnectorExecutionTest {
         assertEquals(Long.valueOf(johnUserId), processDataInstance.getValue());
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(jack.getId());
+        deleteUser(jack);
     }
 
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "Engine Execution Context", }, story = "Access the connector execution context from a connector.", jira = "")

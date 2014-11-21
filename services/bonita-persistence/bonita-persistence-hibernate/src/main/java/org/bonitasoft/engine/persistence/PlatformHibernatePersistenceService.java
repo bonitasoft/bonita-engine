@@ -32,18 +32,17 @@ import org.hibernate.SessionFactory;
  */
 public class PlatformHibernatePersistenceService extends AbstractHibernatePersistenceService {
 
-    protected PlatformHibernatePersistenceService(final SessionFactory sessionFactory, final OrderByCheckingMode orderByCheckingMode,
-            final List<Class<? extends PersistentObject>> classMapping, final Map<String, String> classAliasMappings, final boolean enableWordSearch,
-            final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
-        super(sessionFactory, orderByCheckingMode, classMapping, classAliasMappings, enableWordSearch, wordSearchExclusionMappings, logger);
+    protected PlatformHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping,
+            final Map<String, String> classAliasMappings, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings,
+            final TechnicalLoggerService logger) throws ClassNotFoundException {
+        super(sessionFactory, classMapping, classAliasMappings, enableWordSearch, wordSearchExclusionMappings, logger);
     }
 
     public PlatformHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
             final DBConfigurationsProvider dbConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
-            final TechnicalLoggerService logger, final OrderByCheckingMode orderByCheckingMode, final SequenceManager sequenceManager,
-            final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException,
-            ClassNotFoundException {
-        super(name, orderByCheckingMode, hbmConfigurationProvider, dbConfigurationsProvider, statementDelimiter,
+            final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource, final boolean enableWordSearch,
+            final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
+        super(name, hbmConfigurationProvider, dbConfigurationsProvider, statementDelimiter,
                 likeEscapeCharacter, logger, sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings);
     }
 

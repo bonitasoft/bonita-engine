@@ -12,6 +12,7 @@ import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorService;
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.junit.After;
 import org.junit.Before;
@@ -26,7 +27,7 @@ public class ConnectorInstanceServiceIntegrationTests extends CommonBPMServicesT
 
     @Before
     public void setUp() {
-        this.connectorInstanceService = getServicesBuilder().getConnectorInstanceService();
+        connectorInstanceService = getServicesBuilder().getConnectorInstanceService();
     }
 
     @After
@@ -36,11 +37,12 @@ public class ConnectorInstanceServiceIntegrationTests extends CommonBPMServicesT
 
     private void cleanConnectorInstances() throws Exception {
         getTransactionService().begin();
+        final QueryOptions queryOptions = new QueryOptions(0, 100, SConnectorInstance.class, "id", OrderByType.ASC);
         List<SConnectorInstance> connetorInstances = null;
         do {
-            connetorInstances = this.connectorInstanceService.searchConnectorInstances(new QueryOptions(0, 100));
+            connetorInstances = connectorInstanceService.searchConnectorInstances(queryOptions);
             for (final SConnectorInstance connectorInstance : connetorInstances) {
-                this.connectorInstanceService.deleteConnectorInstance(connectorInstance);
+                connectorInstanceService.deleteConnectorInstance(connectorInstance);
             }
         } while (!connetorInstances.isEmpty());
         getTransactionService().complete();
@@ -51,7 +53,7 @@ public class ConnectorInstanceServiceIntegrationTests extends CommonBPMServicesT
         final SConnectorInstance connectorInstance = BuilderFactory.get(SConnectorInstanceBuilderFactory.class)
                 .createNewInstance(name, containerId, containerType, connectorId, version, activationEvent, executionOrder).done();
         getTransactionService().begin();
-        this.connectorInstanceService.createConnectorInstance(connectorInstance);
+        connectorInstanceService.createConnectorInstance(connectorInstance);
         getTransactionService().complete();
         return connectorInstance;
     }
@@ -59,7 +61,7 @@ public class ConnectorInstanceServiceIntegrationTests extends CommonBPMServicesT
     private SConnectorInstance getNextInTransaction(final long containerId, final String containerType, final ConnectorEvent activationEvent)
             throws SBonitaException {
         getTransactionService().begin();
-        final SConnectorInstance connectorInstance = this.connectorInstanceService.getNextExecutableConnectorInstance(containerId, containerType,
+        final SConnectorInstance connectorInstance = connectorInstanceService.getNextExecutableConnectorInstance(containerId, containerType,
                 activationEvent);
         getTransactionService().complete();
         return connectorInstance;
@@ -67,8 +69,8 @@ public class ConnectorInstanceServiceIntegrationTests extends CommonBPMServicesT
 
     private void setStateIntransaction(final long connectorId, final String state) throws SBonitaException {
         getTransactionService().begin();
-        final SConnectorInstance connectorInstance = this.connectorInstanceService.getConnectorInstance(connectorId);
-        this.connectorInstanceService.setState(connectorInstance, state);
+        final SConnectorInstance connectorInstance = connectorInstanceService.getConnectorInstance(connectorId);
+        connectorInstanceService.setState(connectorInstance, state);
         getTransactionService().complete();
     }
 

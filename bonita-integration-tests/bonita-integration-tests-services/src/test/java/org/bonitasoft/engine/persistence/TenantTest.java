@@ -669,7 +669,7 @@ public class TenantTest extends CommonServiceTest {
         checkParent(parent, persistenceService.selectOne(new SelectOneDescriptor<Human>("getChildParent", inputParameters, Human.class)));
 
         final List<Child> readChildren = persistenceService.selectList(new SelectListDescriptor<Child>("getParentChildren", PersistenceTestUtil.getMap("id",
-                parent.getId()), Child.class, new QueryOptions(0, 20)));
+                parent.getId()), Child.class, new QueryOptions(0, 20, Child.class, "id", OrderByType.ASC)));
         assertNotNull(readChildren);
         assertEquals(2, readChildren.size()); // postgres do not retrieve children with the query in the good order
         boolean child1Ok = false;
@@ -690,7 +690,7 @@ public class TenantTest extends CommonServiceTest {
         }
         assertTrue("does not retrieved good children", child1Ok && child2Ok);
         final List<Human> humansByFirstName = persistenceService.selectList(new SelectListDescriptor<Human>("getHumanByFirstName", PersistenceTestUtil.getMap(
-                "firstName", child1.getFirstName()), Human.class, new QueryOptions(0, 20)));
+                "firstName", child1.getFirstName()), Human.class, new QueryOptions(0, 20, Human.class, "id", OrderByType.ASC)));
         assertNotNull(humansByFirstName);
         assertEquals(1, humansByFirstName.size());
         PersistenceTestUtil.checkHuman(child1, humansByFirstName.iterator().next());
@@ -722,7 +722,7 @@ public class TenantTest extends CommonServiceTest {
 
         // final List<?> list2 = persistenceService.readList(new SelectDescriptor<Human>("getHumanByIds", TenantUtil.getMap("ids", list), Human.class));
         final List<Human> list2 = persistenceService.selectList(new SelectListDescriptor<Human>("getHumansById", PersistenceTestUtil.getMap("ids", list),
-                Human.class, new QueryOptions(0, 20)));
+                Human.class, new QueryOptions(0, 20, Human.class, "id", OrderByType.ASC)));
         assertEquals(3, list2.size());
 
         final Child readChild1 = persistenceService.selectById(new SelectByIdDescriptor<Child>("getChildById", Child.class, child1.getId()));
@@ -871,7 +871,7 @@ public class TenantTest extends CommonServiceTest {
         final Child child = buildChild("child1FN", "child11LN", 5, parent);
         persistenceService.insert(child);
 
-        QueryOptions queryOptions = buildQueryOptionsOrderByFirstnameASC("hum");
+        final QueryOptions queryOptions = buildQueryOptionsOrderByFirstnameASC("hum");
 
         final List<Human> allHumans = persistenceService.selectList(new SelectListDescriptor<Human>("getAllHumans", null, Human.class, queryOptions));
 
@@ -885,12 +885,12 @@ public class TenantTest extends CommonServiceTest {
     }
 
     protected QueryOptions buildQueryOptionsOrderByFirstnameASC(final String searchTerm) {
-        Map<Class<? extends PersistentObject>, Set<String>> allFields = new HashMap<Class<? extends PersistentObject>, Set<String>>();
+        final Map<Class<? extends PersistentObject>, Set<String>> allFields = new HashMap<Class<? extends PersistentObject>, Set<String>>();
         final Set<String> fields = new HashSet<String>(2);
         fields.add("firstName");
         fields.add("lastName");
         allFields.put(Human.class, fields);
-        QueryOptions queryOptions = new QueryOptions(0, 10, Arrays.asList(new OrderByOption(Human.class, "firstName", OrderByType.ASC)),
+        final QueryOptions queryOptions = new QueryOptions(0, 10, Arrays.asList(new OrderByOption(Human.class, "firstName", OrderByType.ASC)),
                 new ArrayList<FilterOption>(0), new SearchFields(Arrays.asList(searchTerm), allFields));
         return queryOptions;
     }

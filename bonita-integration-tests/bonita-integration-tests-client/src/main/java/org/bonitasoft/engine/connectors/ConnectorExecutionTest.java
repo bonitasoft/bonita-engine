@@ -50,7 +50,7 @@ public class ConnectorExecutionTest extends CommonAPITest {
     @After
     public void afterTest() throws BonitaException {
         VariableStorage.clearAll();
-        deleteUser(johnUserId);
+        deleteUser(johnUser);
         logoutOnTenant();
     }
 
@@ -72,7 +72,7 @@ public class ConnectorExecutionTest extends CommonAPITest {
     }
 
     public ProcessDefinition deployProcessWithActorAndTestConnectorEngineExecutionContextAndFilterWithAutoAssign(
-            ProcessDefinitionBuilder processDefinitionBuilder, String actorName, User user) throws IOException, BonitaException {
+            final ProcessDefinitionBuilder processDefinitionBuilder, final String actorName, final User user) throws IOException, BonitaException {
         final List<BarResource> connectorImplementations = Arrays.asList(BuildTestUtil.getContentAndBuildBarResource(
                 "TestConnectorEngineExecutionContext.impl",
                 TestConnectorEngineExecutionContext.class));

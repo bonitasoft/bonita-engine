@@ -64,8 +64,8 @@ public class HibernatePersistenceIT {
         //
         final List<Class<? extends PersistentObject>> classMapping = Arrays.<Class<? extends PersistentObject>> asList(Book.class);
         final Map<String, String> classAliasMappings = Collections.singletonMap(Book.class.getName(), "book");
-        final PlatformHibernatePersistenceService persistenceService = new PlatformHibernatePersistenceService(sessionFactory, OrderByCheckingMode.STRICT,
-                classMapping, classAliasMappings, enableWordSearch, Collections.<String> emptySet(), mock(TechnicalLoggerService.class));
+        final PlatformHibernatePersistenceService persistenceService = new PlatformHibernatePersistenceService(sessionFactory, classMapping,
+                classAliasMappings, enableWordSearch, Collections.<String> emptySet(), mock(TechnicalLoggerService.class));
 
         Session session;
         session = persistenceService.getSession(true);

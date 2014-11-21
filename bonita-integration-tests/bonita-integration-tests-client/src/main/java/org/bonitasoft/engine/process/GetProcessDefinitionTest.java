@@ -349,7 +349,7 @@ public class GetProcessDefinitionTest extends CommonAPITest {
 
         deleteRoles(roleToKeep);
         deleteRoles(roleToDelete);
-        deleteUser(manu.getId());
+        deleteUser(manu);
         disableAndDeleteProcess(processDefinition1);
         disableAndDeleteProcess(processDefinition2);
     }
@@ -414,15 +414,9 @@ public class GetProcessDefinitionTest extends CommonAPITest {
         assertEquals(processDefinition21.getId(), pDepInfo1.getProcessId());
         assertEquals(processDefinition21.getName(), pDepInfo1.getName());
 
-        deleteRoles(roleToKeep1);
-        deleteRoles(roleToDelete1);
-        deleteRoles(roleToKeep2);
-        deleteRoles(roleToDelete2);
-        deleteUser(manu.getId());
-        disableAndDeleteProcess(processDefinition11);
-        disableAndDeleteProcess(processDefinition12);
-        disableAndDeleteProcess(processDefinition21);
-        disableAndDeleteProcess(processDefinition22);
+        deleteRoles(roleToKeep1, roleToDelete1, roleToKeep2, roleToDelete2);
+        deleteUser(manu);
+        disableAndDeleteProcess(processDefinition11, processDefinition12, processDefinition21, processDefinition22);
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Actor", "Group", "Process" }, jira = "ENGINE-565", story = "Tests the method returning the list of processes that a removal of the group passed in parameters would cause to pass in unresolved.")
@@ -478,7 +472,7 @@ public class GetProcessDefinitionTest extends CommonAPITest {
 
         deleteGroups(groupToKeep);
         deleteGroups(groupToDelete);
-        deleteUser(manu.getId());
+        deleteUser(manu);
         disableAndDeleteProcess(processDefinition1);
         disableAndDeleteProcess(processDefinition2);
         disableAndDeleteProcess(processDefinition3);
@@ -533,12 +527,9 @@ public class GetProcessDefinitionTest extends CommonAPITest {
 
         assertEquals(3, procDepInfos.size());
 
-        deleteGroups(groupToKeep);
-        deleteGroups(groupToDelete);
-        deleteUser(manu.getId());
-        disableAndDeleteProcess(processDefinition1);
-        disableAndDeleteProcess(processDefinition2);
-        disableAndDeleteProcess(processDefinition3);
+        deleteGroups(groupToKeep, groupToDelete);
+        deleteUser(manu);
+        disableAndDeleteProcess(processDefinition1, processDefinition2, processDefinition3);
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.ACTOR, keywords = { "Actor", "Group", "Process" }, story = "Tests the cases were the 2roles-2users-2groups removed separately would'nt cause the process to pass in unresolved but would altoger. The list of prrocesses returned must reflect that.", jira = "")
@@ -722,7 +713,7 @@ public class GetProcessDefinitionTest extends CommonAPITest {
         assertEquals(designProcessDefinition, resultDesignProcessDefinition);
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(user.getId());
+        deleteUser(user);
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Get", "DesignProcessDefinition", "Not Existing" }, jira = "ENGINE-1817")

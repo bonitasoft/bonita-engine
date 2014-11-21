@@ -355,7 +355,8 @@ public class JobServiceImpl implements JobService {
     public void deleteJobDescriptorByJobName(final String jobName) throws SJobDescriptorDeletionException {
         final List<FilterOption> filters = new ArrayList<FilterOption>();
         filters.add(new FilterOption(SJobDescriptor.class, "jobName", jobName));
-        final QueryOptions queryOptions = new QueryOptions(0, 1, null, filters, null);
+        final List<OrderByOption> orders = Arrays.asList(new OrderByOption(SJobDescriptor.class, "id", OrderByType.ASC));
+        final QueryOptions queryOptions = new QueryOptions(0, 1, orders, filters, null);
         try {
             final List<SJobDescriptor> jobDescriptors = searchJobDescriptors(queryOptions);
             if (!jobDescriptors.isEmpty()) {
