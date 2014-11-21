@@ -53,9 +53,8 @@ public class TaskOnDemandTest extends CommonAPISPTest {
 
     @After
     public void tearDown() throws Exception {
-        deleteUser(john.getId());
-        deleteUser(jack.getId());
-       logoutOnTenant();
+        deleteUsers(john, jack);
+        logoutOnTenant();
     }
 
     @Test
@@ -64,7 +63,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         processBuilder.addActor(ACTOR_NAME).addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", ACTOR_NAME);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
 
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith(john.getUserName(), PASSWORD);
 
         getProcessAPI().startProcess(processDefinition.getId());
@@ -101,7 +100,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         processBuilder.addActor(ACTOR_NAME).addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", ACTOR_NAME);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
 
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith(john.getUserName(), PASSWORD);
 
         final ProcessInstance pInstance = getProcessAPI().startProcess(processDefinition.getId());
@@ -144,7 +143,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
     public void createUserTaskOnParent() throws Exception {
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess();
 
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith(john.getUserName(), PASSWORD);
 
         getProcessAPI().startProcess(processDefinition.getId());
@@ -196,7 +195,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
     public void deleteManualTask() throws Exception {
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess();
 
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith(john.getUserName(), PASSWORD);
 
         getProcessAPI().startProcess(processDefinition.getId());
@@ -224,7 +223,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
     @Test(expected = DeletionException.class)
     public void deleteNotManualTask() throws Exception {
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess();
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith(john.getUserName(), PASSWORD);
         getProcessAPI().startProcess(processDefinition.getId());
         final List<HumanTaskInstance> pendingTasks = waitForPendingTasks(john.getId(), 1);
@@ -258,7 +257,7 @@ public class TaskOnDemandTest extends CommonAPISPTest {
         processBuilder.addActor(ACTOR_NAME).addAutomaticTask("toHaveIdGreaterThan1").addUserTask("userTask1", ACTOR_NAME);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
 
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith(john.getUserName(), PASSWORD);
 
         getProcessAPI().startProcess(processDefinition.getId());

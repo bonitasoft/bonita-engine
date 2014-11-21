@@ -122,7 +122,7 @@ public class ActivityCommandExtTest extends CommonAPISPTest {
     @After
     public void afterTest() throws BonitaException {
         disableAndDeleteProcess(processDefinition);
-        deleteUser(businessUser.getId());
+        deleteUser(businessUser);
         logoutOnTenant();
     }
 

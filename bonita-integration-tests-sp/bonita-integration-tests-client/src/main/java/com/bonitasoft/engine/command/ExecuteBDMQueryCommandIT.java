@@ -162,7 +162,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
             getTenantManagementAPI().cleanAndUninstallBusinessDataModel();
             getTenantManagementAPI().resume();
         }
-        deleteUser(businessUser.getId());
+        deleteUser(businessUser);
         logoutOnTenant();
     }
 

@@ -53,7 +53,7 @@ public class SPTimerBoundaryEventTest extends CommonAPISPTest {
     public void afterTest() throws BonitaException {
         logoutOnTenant();
         loginOnDefaultTenantWithDefaultTechnicalUser();
-        deleteUser(donaBenta.getId());
+        deleteUser(donaBenta);
         logoutOnTenant();
     }
 
