@@ -12,7 +12,6 @@ import java.lang.reflect.Proxy;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.ApiAccessType;
-import org.bonitasoft.engine.api.EJB2ServerAPI;
 import org.bonitasoft.engine.api.EJB3ServerAPI;
 import org.bonitasoft.engine.api.HTTPServerAPI;
 import org.bonitasoft.engine.api.PlatformCommandAPI;
@@ -36,7 +35,7 @@ import org.bonitasoft.engine.util.APITypeManager;
  * <li>{@link PlatformMonitoringAPI}</li>
  * <li>{@link PlatformLoginAPI}</li>
  * </ul>
- * 
+ *
  * @author Matthieu Chaffotte
  */
 public class PlatformAPIAccessor {
@@ -50,9 +49,6 @@ public class PlatformAPIAccessor {
             case EJB3:
                 parameters = APITypeManager.getAPITypeParameters();
                 return new EJB3ServerAPI(parameters);
-            case EJB2:
-                parameters = APITypeManager.getAPITypeParameters();
-                return new EJB2ServerAPI(parameters);
             case HTTP:
                 parameters = APITypeManager.getAPITypeParameters();
                 return new HTTPServerAPI(parameters);

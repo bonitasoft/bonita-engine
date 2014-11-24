@@ -13,7 +13,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.CommandAPI;
-import org.bonitasoft.engine.api.EJB2ServerAPI;
 import org.bonitasoft.engine.api.EJB3ServerAPI;
 import org.bonitasoft.engine.api.HTTPServerAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
@@ -57,9 +56,6 @@ public final class TenantAPIAccessor {
             case EJB3:
                 parameters = APITypeManager.getAPITypeParameters();
                 return new EJB3ServerAPI(parameters);
-            case EJB2:
-                parameters = APITypeManager.getAPITypeParameters();
-                return new EJB2ServerAPI(parameters);
             case HTTP:
                 parameters = APITypeManager.getAPITypeParameters();
                 return new HTTPServerAPI(parameters);
@@ -103,7 +99,7 @@ public final class TenantAPIAccessor {
     }
 
     public static PlatformMonitoringAPI getPlatformMonitoringAPI(final APISession session) throws BonitaHomeNotSetException, UnknownAPITypeException,
-    ServerAPIException {
+            ServerAPIException {
         return getAPI(PlatformMonitoringAPI.class, session);
     }
 
@@ -128,7 +124,7 @@ public final class TenantAPIAccessor {
     }
 
     public static TenantManagementAPI getTenantManagementAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException,
-    UnknownAPITypeException {
+            UnknownAPITypeException {
         return getAPI(TenantManagementAPI.class, session);
     }
 

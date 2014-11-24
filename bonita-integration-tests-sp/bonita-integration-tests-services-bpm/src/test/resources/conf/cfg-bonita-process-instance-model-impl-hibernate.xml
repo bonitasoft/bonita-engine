@@ -34,8 +34,8 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SConnectorInstanceWithFailureInfo" value="cfi" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SStartEventInstance" value="e" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance" value="e" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstanceImpl" value="e" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstanceImpl" value="e" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateCatchEventInstance" value="e" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SIntermediateThrowEventInstance" value="e" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SEndEventInstance" value="e" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SEventInstance" value="e" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.SCatchEventInstance" value="e" />
@@ -49,9 +49,10 @@
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent" value="s" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingErrorEvent" value="s" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance" value="m" />
-				<entry key="org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl" value="mapping" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping" value="mapping" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SActivityInstance" value="a" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance" value="a" />
+				<entry key="org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance" value="a" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance" value="a" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance" value="a" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance" value="a" />

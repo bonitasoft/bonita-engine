@@ -43,7 +43,12 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject>
         if (qualifiedName == null) {
             status.addError("A Business Object must have a qualified name");
             return status;
+        } 
+        
+        if (qualifiedName.startsWith("com.bonitasoft")) {
+            status.addError("Package com.bonitasoft is reserved. Please choose another package name");
         }
+        
         String simpleName = bo.getSimpleName();
         if (!SourceVersion.isName(qualifiedName) || !sqlNameValidator.isValid(simpleName)) {
             status.addError(qualifiedName + " is not a valid Java qualified name");

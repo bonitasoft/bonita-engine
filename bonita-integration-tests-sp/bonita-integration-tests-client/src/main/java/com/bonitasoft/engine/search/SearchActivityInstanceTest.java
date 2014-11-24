@@ -47,7 +47,7 @@ public class SearchActivityInstanceTest extends CommonAPISPTest {
 
     @After
     public void afterTest() throws BonitaException {
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     @Before
@@ -188,7 +188,7 @@ public class SearchActivityInstanceTest extends CommonAPISPTest {
             assertTrue("keyword search sould return only tasks with name containing 'userTask'", activity.getName().contains("userTask"));
         }
 
-        deleteUser(user.getId());
+        deleteUser(user);
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
         disableAndDeleteProcess(processDef1, processDef2);
     }

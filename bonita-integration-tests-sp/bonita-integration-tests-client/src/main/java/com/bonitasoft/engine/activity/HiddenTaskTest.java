@@ -67,9 +67,8 @@ public class HiddenTaskTest extends CommonAPISPTest {
     @After
     public void afterTest() throws BonitaException {
         disableAndDeleteProcess(processDefinition);
-        deleteUser(user.getId());
-        deleteUser(user2.getId());
-       logoutOnTenant();
+        deleteUsers(user, user2);
+        logoutOnTenant();
     }
 
     @Test
@@ -92,7 +91,7 @@ public class HiddenTaskTest extends CommonAPISPTest {
     }
 
     private void logoutLogin(final User user) throws BonitaException {
-       logoutOnTenant();
+        logoutOnTenant();
         if (user != null) {
             loginOnDefaultTenantWith(user.getUserName(), "abc");
             checkNbOPendingTasks = new CheckNbPendingTasksForUserUsingSearch(getProcessAPI(), 50, 3000, true, 2, user.getId(),

@@ -4,8 +4,8 @@
 
 	<persistence-unit name="BDR" transaction-type="JTA">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<class>com.bonitasoft.pojo.Employee</class>
-		<class>com.bonitasoft.pojo.Person</class>
+		<class>com.company.pojo.Employee</class>
+		<class>com.company.pojo.Person</class>
 		<properties>
 			<property name="hibernate.show_sql" value="false" />
 			<property name="hibernate.format_sql" value="true" />

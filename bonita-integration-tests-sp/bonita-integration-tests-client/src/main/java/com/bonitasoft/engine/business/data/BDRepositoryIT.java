@@ -191,11 +191,30 @@ public class BDRepositoryIT extends CommonAPISPTest {
         person.setDescription("Describe a simple person");
         person.addUniqueConstraint("uk_fl", "firstName", "lastName");
 
+        final BusinessObject productBO = new BusinessObject();
+        productBO.setQualifiedName("org.bonita.pojo.Product");
+        productBO.addField(name);
+
+        final RelationField products = new RelationField();
+        products.setType(Type.AGGREGATION);
+        products.setFetchType(FetchType.LAZY);
+        products.setName("products");
+        products.setCollection(Boolean.TRUE);
+        products.setNullable(Boolean.TRUE);
+        products.setReference(productBO);
+
+        final BusinessObject catalogBO = new BusinessObject();
+        catalogBO.setQualifiedName("org.bonita.pojo.ProductCatalog");
+        catalogBO.addField(name);
+        catalogBO.addField(products);
+
         final BusinessObjectModel model = new BusinessObjectModel();
         model.addBusinessObject(employee);
         model.addBusinessObject(person);
         model.addBusinessObject(addressBO);
         model.addBusinessObject(countryBO);
+        model.addBusinessObject(productBO);
+        model.addBusinessObject(catalogBO);
         return model;
     }
 
@@ -1140,6 +1159,73 @@ public class BDRepositoryIT extends CommonAPISPTest {
         assertThat(result).as("Address should have the right street and city").contains("\"street\" : \"32, rue Gustave Eiffel\"")
                 .contains("\"city\" : \"Grenoble\"")
                 .contains("\"rel\" : \"country\"");
+
+        disableAndDeleteProcess(definition.getId());
+    }
+
+    @Test
+    public void deployABDRAndCreateInOperationAMultipleBusinessData() throws Exception {
+        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployees", "import " + EMPLOYEE_QUALIF_CLASSNAME
+                + "; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';"
+                + " Employee jane = new Employee(); jane.firstName = 'Jane'; jane.lastName = 'Doe'; return [jane, john];", List.class.getName());
+
+        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance("test", "1.2-alpha");
+        processDefinitionBuilder.addBusinessData("myEmployees", EMPLOYEE_QUALIF_CLASSNAME, null).setMultiple(true);
+        processDefinitionBuilder.addActor(ACTOR_NAME);
+        processDefinitionBuilder.addUserTask("step1", ACTOR_NAME).addOperation(new OperationBuilder().
+                createBusinessDataSetAttributeOperation("myEmployees", "addAll", "java.util.Collection", employeeExpression));
+        processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
+        processDefinitionBuilder.addTransition("step1", "step2");
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
+        final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
+
+        final HumanTaskInstance userTask = waitForUserTask("step1", instance.getId());
+        String employeeToString = getEmployeesToString("myEmployees", instance.getId());
+        assertThat(employeeToString).isEqualTo("Employee [firstName=[], lastName=[]]");
+
+        assignAndExecuteStep(userTask, matti.getId());
+        waitForUserTask("step2", instance.getId());
+        employeeToString = getEmployeesToString("myEmployees", instance.getId());
+        assertThat(employeeToString).isEqualTo("Employee [firstName=[Jane, John], lastName=[Doe, Doe]]");
+
+        disableAndDeleteProcess(definition.getId());
+    }
+
+    @Test
+    public void should_get_the_lazy_list_in_a_multiple_business_data() throws Exception {
+        final Expression initProducts = new ExpressionBuilder().createGroovyScriptExpression("initProducts", "import org.bonita.pojo.Product;"
+                + " Product p1 = new Product(); p1.name = 'Rock'; "
+                + " Product p2 = new Product(); p2.name = 'Paper'; "
+                + " return [p1, p2];", List.class.getName());
+
+        final Expression productdependency = new ExpressionBuilder().createBusinessDataExpression("products", List.class.getName());
+
+        final Expression initCatalogs = new ExpressionBuilder().createGroovyScriptExpression("initCatalogs", "import org.bonita.pojo.ProductCatalog;"
+                + " ProductCatalog pc = new ProductCatalog(); pc.name = 'MyFirstCatalog'; pc.setProducts(products);"
+                + " return [pc];", List.class.getName(), productdependency);
+
+        final Expression catalogdependency = new ExpressionBuilder().createBusinessDataExpression("productCatalogs", List.class.getName());
+
+        final Expression nbOfProducts = new ExpressionBuilder().createGroovyScriptExpression("nbOfProducts", "import org.bonita.pojo.ProductCatalog;"
+                + " productCatalogs.get(0).getProducts().size()", Integer.class.getName(), catalogdependency);
+
+        final ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("def", "6.3-beta");
+        builder.addActor(ACTOR_NAME);
+        builder.addBusinessData("products", "org.bonita.pojo.Product", initProducts).setMultiple(true);
+        builder.addBusinessData("productCatalogs", "org.bonita.pojo.ProductCatalog", null).setMultiple(true);
+        builder.addIntegerData("count", null);
+        builder.addAutomaticTask("initCatalogs")
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("productCatalogs"), OperatorType.ASSIGNMENT, null, null, initCatalogs);
+        builder.addUserTask("next", ACTOR_NAME)
+                .addOperation(new OperationBuilder().createSetDataOperation("count", nbOfProducts));
+        builder.addTransition("initCatalogs", "next");
+
+        final ProcessDefinition definition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
+        final long processInstanceId = getProcessAPI().startProcess(definition.getId()).getId();
+
+        final HumanTaskInstance userTask = waitForUserTask("next", processInstanceId);
+        assignAndExecuteStep(userTask.getId(), matti.getId());
 
         disableAndDeleteProcess(definition.getId());
     }
