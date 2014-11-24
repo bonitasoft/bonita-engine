@@ -396,11 +396,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public void deleteUser(final User user) throws BonitaException {
-        deleteUser(user.getId());
-    }
-
-    public void deleteUser(final long userId) throws BonitaException {
-        getIdentityAPI().deleteUser(userId);
+        getIdentityAPI().deleteUser(user.getId());
     }
 
     public void deleteCategories(final List<Category> categories) throws BonitaException {
@@ -970,11 +966,11 @@ public class APITestUtil extends PlatformTestUtil {
         return humanTaskInstance;
     }
 
-    public ActivityInstance waitForUserTaskAndAssigneIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception,
+    public HumanTaskInstance waitForUserTaskAndAssigneIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception,
             UpdateException {
-        final ActivityInstance activityInstance = waitForUserTask(taskName, processInstance.getId());
-        getProcessAPI().assignUserTask(activityInstance.getId(), user.getId());
-        return activityInstance;
+        final HumanTaskInstance humanTaskInstance = waitForUserTask(taskName, processInstance.getId());
+        getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
+        return humanTaskInstance;
     }
 
     public GatewayInstance waitForGateway(final ProcessInstance processInstance, final String name) throws Exception {

@@ -82,7 +82,7 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
         try {
             return evaluateExpressionsFlatten(Collections.singletonList(expression), evaluationContext).get(0);
         } finally {
-            if (this.timeTracker.isTrackable(TimeTrackerRecords.EVALUATE_EXPRESSION_INCLUDING_CONTEXT)) {
+            if (timeTracker.isTrackable(TimeTrackerRecords.EVALUATE_EXPRESSION_INCLUDING_CONTEXT)) {
                 final long endTime = System.currentTimeMillis();
                 final StringBuilder desc = new StringBuilder();
                 desc.append("Expression: ");
@@ -90,7 +90,7 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
                 desc.append(" - ");
                 desc.append("evaluationContext: ");
                 desc.append(evaluationContext);
-                this.timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSION_INCLUDING_CONTEXT, desc.toString(), (endTime - startTime));
+                timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSION_INCLUDING_CONTEXT, desc.toString(), endTime - startTime);
             }
         }
     }

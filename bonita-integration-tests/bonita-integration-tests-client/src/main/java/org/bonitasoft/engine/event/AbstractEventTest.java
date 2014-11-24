@@ -122,7 +122,7 @@ public abstract class AbstractEventTest extends CommonAPITest {
     public void afterTest() throws BonitaException {
         logoutOnTenant();
         loginOnDefaultTenantWithDefaultTechnicalUser();
-        deleteUser(donaBenta.getId());
+        deleteUser(donaBenta);
         logoutOnTenant();
     }
 

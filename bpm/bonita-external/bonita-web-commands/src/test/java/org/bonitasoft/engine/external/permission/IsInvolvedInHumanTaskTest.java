@@ -27,8 +27,11 @@ import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
+import org.bonitasoft.engine.service.ServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,18 +57,22 @@ public class IsInvolvedInHumanTaskTest {
     @Mock
     ActorMappingService actorMappingService;
 
-    @Spy
-    IsInvolvedInHumanTask isInvolvedInHumanTask = new IsInvolvedInHumanTask();
+    @Mock
+    SessionAccessor sessionAccessor;
 
     @Mock
-    SSession session;
+    SessionService sessionService;
+
+    IsInvolvedInHumanTask isInvolvedInHumanTask = new IsInvolvedInHumanTask();
+
 
     @Before
     public void setup() throws Exception {
         when(serviceAccessor.getActivityInstanceService()).thenReturn(activityInstanceService);
         when(activityInstanceService.getHumanTaskInstance(anyLong())).thenReturn(humanTaskInstance);
         when(serviceAccessor.getActorMappingService()).thenReturn(actorMappingService);
-        doReturn(session).when(isInvolvedInHumanTask).getCurrentSession();
+        when(serviceAccessor.getSessionAccessor()).thenReturn(sessionAccessor);
+        when(serviceAccessor.getSessionService()).thenReturn(sessionService);
     }
 
     /**
@@ -99,7 +106,7 @@ public class IsInvolvedInHumanTaskTest {
         parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, -1l);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
-        when(session.getUserId()).thenReturn(4l);
+        when(sessionService.getLoggedUserFromSession(sessionAccessor)).thenReturn(4l);
         when(humanTaskInstance.getAssigneeId()).thenReturn(4l);
 
         // When
@@ -115,7 +122,7 @@ public class IsInvolvedInHumanTaskTest {
         parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, -1l);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
-        when(session.getUserId()).thenReturn(5l);
+        when(sessionService.getLoggedUserFromSession(sessionAccessor)).thenReturn(5l);
         when(humanTaskInstance.getAssigneeId()).thenReturn(4l);
 
         // When
@@ -130,7 +137,7 @@ public class IsInvolvedInHumanTaskTest {
         parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 4l);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
-        when(session.getUserId()).thenReturn(4l);
+        when(sessionService.getLoggedUserFromSession(sessionAccessor)).thenReturn(4l);
         when(humanTaskInstance.getAssigneeId()).thenReturn(4l);
 
         // When
@@ -146,7 +153,7 @@ public class IsInvolvedInHumanTaskTest {
         parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 5l);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
-        when(session.getUserId()).thenReturn(4l);
+        when(sessionService.getLoggedUserFromSession(sessionAccessor)).thenReturn(4l);
 
         // When
         assertThat(isInvolvedInHumanTask.execute(parameters, serviceAccessor)).isSameAs(true);
@@ -160,7 +167,7 @@ public class IsInvolvedInHumanTaskTest {
         parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, -1l);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
-        when(session.getUserId()).thenReturn(5l);
+        when(sessionService.getLoggedUserFromSession(sessionAccessor)).thenReturn(5l);
         final long actorId = 888L;
         final long scopeId = 99L;
         when(humanTaskInstance.getActorId()).thenReturn(actorId);
@@ -183,7 +190,7 @@ public class IsInvolvedInHumanTaskTest {
         parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, -1l);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
-        when(session.getUserId()).thenReturn(5l);
+        when(sessionService.getLoggedUserFromSession(sessionAccessor)).thenReturn(5l);
         final long actorId = 888L;
         final long scopeId = 99L;
         final long otherScopeId = 100L;
@@ -207,7 +214,7 @@ public class IsInvolvedInHumanTaskTest {
         parameters.put(IsInvolvedInHumanTask.USER_ID_KEY, 22l);
         parameters.put(IsInvolvedInHumanTask.HUMAN_TASK_INSTANCE_ID_KEY, 100l);
 
-        when(session.getUserId()).thenReturn(22l);
+        when(sessionService.getLoggedUserFromSession(sessionAccessor)).thenReturn(22l);
         when(humanTaskInstance.getAssigneeId()).thenReturn(9l);
 
         // When

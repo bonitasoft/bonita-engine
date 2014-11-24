@@ -18,10 +18,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentAddException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentDeletionException;
 import org.bonitasoft.engine.core.process.comment.api.SCommentNotFoundException;
@@ -49,11 +51,8 @@ import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
 import org.bonitasoft.engine.recorder.model.DeleteRecord;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 
 /**
  * @author Hongwen Zang
@@ -147,8 +146,6 @@ public class SCommentServiceImpl implements SCommentService {
             return sComment;
         } catch (final SRecorderException e) {
             throw new SCommentAddException(processInstanceId, "human", e);
-        } catch (final SSessionNotFoundException e) {
-            throw new SCommentAddException("Session is not found.", e);
         }
     }
 
@@ -187,9 +184,11 @@ public class SCommentServiceImpl implements SCommentService {
 
     @Override
     public void deleteComments(final long processInstanceId) throws SBonitaException {
+        final QueryOptions queryOptions = new QueryOptions(0, 100, SComment.class, "id", OrderByType.ASC);
+
         List<SComment> sComments = null;
         do {
-            sComments = getComments(processInstanceId, new QueryOptions(0, 100));
+            sComments = getComments(processInstanceId, queryOptions);
             if (sComments != null) {
                 for (final SComment sComment : sComments) {
                     delete(sComment);
@@ -198,16 +197,8 @@ public class SCommentServiceImpl implements SCommentService {
         } while (sComments != null && sComments.size() > 0);
     }
 
-    private long getUserId() throws SSessionNotFoundException {
-        long sessionId;
-        try {
-            sessionId = sessionAccessor.getSessionId();
-        } catch (final SessionIdNotSetException e) {
-            // system
-            return -1;
-        }
-        final SSession session = sessionService.getSession(sessionId);
-        return session.getUserId();
+    private long getUserId() {
+        return sessionService.getLoggedUserFromSession(sessionAccessor);
     }
 
     @Override
@@ -296,5 +287,18 @@ public class SCommentServiceImpl implements SCommentService {
                 archiveService.recordDelete(new DeleteRecord(saComment));
             }
         } while (!searchArchivedComments.isEmpty());
+    }
+
+    @Override
+    public void archive(final long archiveDate, final SComment sComment) throws SObjectModificationException {
+        final SAComment saComment = BuilderFactory.get(SACommentBuilderFactory.class).createNewInstance(sComment).done();
+        if (saComment != null) {
+            final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saComment);
+            try {
+                archiveService.recordInsert(archiveDate, insertRecord);
+            } catch (final SRecorderException e) {
+                throw new SObjectModificationException("Unable to archive the comment with id = <" + sComment.getId() + ">", e);
+            }
+        }
     }
 }

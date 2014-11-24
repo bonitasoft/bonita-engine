@@ -20,6 +20,8 @@ import org.bonitasoft.engine.events.model.SInsertEvent;
 import org.bonitasoft.engine.events.model.SUpdateEvent;
 import org.bonitasoft.engine.events.model.builders.SEventBuilderFactory;
 import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.SelectOneDescriptor;
@@ -110,7 +112,8 @@ public class RecorderTest extends CommonServiceTest {
         final List<FilterOption> filters = new ArrayList<FilterOption>(2);
         filters.add(getActionTypeFilterOption(actionType));
         filters.add(new FilterOption(SQueriableLog.class, getLogModelBuilderFactory().getObjectIdKey(), indexValue));
-        final QueryOptions opts = new QueryOptions(0, 10, null, filters, null);
+        final List<OrderByOption> orders = Arrays.asList(new OrderByOption(SQueriableLog.class, "id", OrderByType.ASC));
+        final QueryOptions opts = new QueryOptions(0, 10, orders, filters, null);
         return loggerService.searchLogs(opts);
     }
 
@@ -120,7 +123,8 @@ public class RecorderTest extends CommonServiceTest {
 
     private List<SQueriableLog> getLogs(final String actionType) throws SBonitaReadException {
         final List<FilterOption> filters = Arrays.asList(getActionTypeFilterOption(actionType));
-        return loggerService.searchLogs(new QueryOptions(0, 10, null, filters, null));
+        final List<OrderByOption> orders = Arrays.asList(new OrderByOption(SQueriableLog.class, "id", OrderByType.ASC));
+        return loggerService.searchLogs(new QueryOptions(0, 10, orders, filters, null));
     }
 
     private void checkHuman(final Human expectedHuman, final Human retrievedHuman) {

@@ -337,7 +337,7 @@ public class OrganizationTest extends CommonAPITest {
         UserMembership userMembership = userMemberships.get(0);
         assertEquals(bonitaRD.getId(), userMembership.getGroupId());
         assertEquals(jack.getId(), userMembership.getAssignedBy());
-        assertEquals(new Date(1331142448365l), userMembership.getAssignedDate());
+        assertEquals(new Date(1331142448365L), userMembership.getAssignedDate());
         userMemberships = getIdentityAPI().getUserMemberships(jack.getId(), 0, 10, UserMembershipCriterion.GROUP_NAME_ASC);
         assertEquals(1, userMemberships.size());
         userMembership = userMemberships.get(0);

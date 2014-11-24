@@ -47,7 +47,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.CollectionUtils;
 
-public class PendingTasksTest extends CommonAPITest {
+public class PendingTasksIT extends CommonAPITest {
 
     private static final String JACK = "jack";
 
@@ -695,7 +695,7 @@ public class PendingTasksTest extends CommonAPITest {
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
 
-        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(-156l, builder.done());
+        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(-156L, builder.done());
         assertEquals(0, searchResult.getCount());
         final List<User> possibleUsers = searchResult.getResult();
         assertTrue(CollectionUtils.isEmpty(possibleUsers));

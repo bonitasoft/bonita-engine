@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.session;
 
 import org.bonitasoft.engine.session.model.SSession;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -80,6 +81,15 @@ public interface SessionService {
      * @since 6.0
      */
     SSession getSession(long sessionId) throws SSessionNotFoundException;
+
+    /**
+     *
+     * @param sessionAccessor
+     *          the sessionAccessor that contains the current session
+     * @return the logged user or -1 if there is no session
+     * @since 6.4
+     */
+    long getLoggedUserFromSession(ReadSessionAccessor sessionAccessor);
 
     /**
      * Define how long, in milliseconds, the created sessions will be valid. This does not affect already created session

@@ -37,7 +37,7 @@ import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
 
 /**
  * Common implementation to persistence services relying on a database
- * 
+ *
  * @author Elias Ricken de Medeiros
  * @author Baptiste Mesta
  * @author Celine Souchet
@@ -80,8 +80,8 @@ public abstract class AbstractDBPersistenceService implements TenantPersistenceS
     public AbstractDBPersistenceService(final String name, final String statementDelimiter, final String likeEscapeCharacter,
             final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
         this.name = name;
-        this.sequenceManager = null;
-        this.datasource = null;
+        sequenceManager = null;
+        datasource = null;
         this.statementDelimiter = statementDelimiter;
         this.likeEscapeCharacter = likeEscapeCharacter;
         this.enableWordSearch = enableWordSearch;

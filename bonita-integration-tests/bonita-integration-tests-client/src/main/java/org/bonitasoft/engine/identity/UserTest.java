@@ -250,7 +250,7 @@ public class UserTest extends CommonAPITest {
 
     @Test
     public void cannotGetTechUserInList() {
-        final Map<Long, User> users = getIdentityAPI().getUsers(Arrays.asList(-1l));
+        final Map<Long, User> users = getIdentityAPI().getUsers(Arrays.asList(-1L));
         assertNull(users.get(-1));
     }
 
@@ -1044,13 +1044,13 @@ public class UserTest extends CommonAPITest {
     @Cover(jira = "ENGINE-1825", classes = { UserWithContactData.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "user", "contact data" })
     @Test(expected = UserNotFoundException.class)
     public void throwExceptionWhenGettingUnknownUserWithProContactData() throws BonitaException {
-        getIdentityAPI().getUserWithProfessionalDetails(-45l);
+        getIdentityAPI().getUserWithProfessionalDetails(-45L);
     }
 
     @Cover(jira = "ENGINE-1825", classes = { UserWithContactData.class }, concept = BPMNConcept.ORGANIZATION, keywords = { "user", "contact data" })
     @Test(expected = UserNotFoundException.class)
     public void throwExceptionWhenGettingTechnicalUserWithProContactData() throws BonitaException {
-        getIdentityAPI().getUserWithProfessionalDetails(-1l);
+        getIdentityAPI().getUserWithProfessionalDetails(-1L);
     }
 
     @Cover(classes = { User.class, ContactData.class }, concept = BPMNConcept.ORGANIZATION, jira = "BS-8991", keywords = { "user", "255 characters" })

@@ -40,5 +40,5 @@ public interface PermissionRule {
      * @return
      *         true if the user is allowed to access the api or false otherwise
      */
-    boolean check(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger);
+    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger);
 }

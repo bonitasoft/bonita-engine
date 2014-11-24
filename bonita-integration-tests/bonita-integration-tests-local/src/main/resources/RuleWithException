@@ -33,7 +33,7 @@ import org.bonitasoft.engine.session.APISession
 class RuleWithException implements PermissionRule {
 
     @Override
-    boolean check(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
+    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {
         throw new RuntimeException();
     }
 }

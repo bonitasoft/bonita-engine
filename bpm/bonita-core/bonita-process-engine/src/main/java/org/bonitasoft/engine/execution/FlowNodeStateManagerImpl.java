@@ -518,6 +518,7 @@ public class FlowNodeStateManagerImpl implements FlowNodeStateManager {
                 final NormalStateTransitionsManager normalStateTransitionsManager = new NormalStateTransitionsManager(normalTransitions.get(flowNodeInstance
                         .getType()), flowNodeInstance);
                 nextStateToHandle = normalStateTransitionsManager.getNextState(flowNodeStateToExecute);
+                break;
         }
         if (nextStateToHandle == null) {
             throw new SActivityExecutionException("no state found after " + states.get(flowNodeStateToExecute.getId()).getClass() + " for "

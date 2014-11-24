@@ -17,6 +17,7 @@ package org.bonitasoft.engine.core.process.comment.api;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.core.process.comment.model.SComment;
 import org.bonitasoft.engine.core.process.comment.model.archive.SAComment;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -238,5 +239,13 @@ public interface SCommentService {
      * @since 6.1
      */
     void deleteComments(long processInstanceId) throws SBonitaException;
+
+    /**
+     * @param archiveDate
+     * @param sComment
+     * @throws SObjectModificationException
+     * @since 6.4.0
+     */
+    void archive(long archiveDate, SComment sComment) throws SObjectModificationException;
 
 }

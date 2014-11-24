@@ -95,8 +95,7 @@ public class CallActivityTest extends CommonAPITest {
 
     @After
     public void afterTest() throws BonitaException {
-        deleteUser(cebolinha.getId());
-        deleteUser(cascao.getId());
+        deleteUsers(cebolinha, cascao);
         logoutOnTenant();
     }
 
@@ -156,9 +155,7 @@ public class CallActivityTest extends CommonAPITest {
         processDefBuilder.addTransition("callActivity", "step1");
         processDefBuilder.addTransition("step1", "end");
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
-
-        return processDefinition;
+        return deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
     }
 
     private void addDataOutputOperationIfNeed(final boolean addOutputOperations, final CallActivityBuilder callActivityBuilder)
@@ -760,7 +757,6 @@ public class CallActivityTest extends CommonAPITest {
             disableAndDeleteProcess(callingProcessDef);
             deleteProcess(targetProcessDef1);
         }
-
     }
 
     @Cover(classes = CallActivityDefinition.class, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Dependencies" }, jira = "")

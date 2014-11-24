@@ -201,7 +201,7 @@ public class ConnectorInstanceServiceImpl implements ConnectorInstanceService {
         inputParameters.put("activationEvent", activationEvent);
         inputParameters.put("state", state);
         final SelectListDescriptor<SConnectorInstance> selectListDescriptor = new SelectListDescriptor<SConnectorInstance>("getConnectorInstancesWithState",
-                inputParameters, SConnectorInstance.class, new QueryOptions(from, numberOfResult));
+                inputParameters, SConnectorInstance.class, new QueryOptions(from, numberOfResult, SConnectorInstance.class, "id", OrderByType.ASC));
         try {
             return persistenceService.selectList(selectListDescriptor);
         } catch (final SBonitaReadException e) {

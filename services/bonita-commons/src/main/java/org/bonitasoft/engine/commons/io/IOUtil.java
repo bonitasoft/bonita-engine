@@ -602,7 +602,7 @@ public class IOUtil {
     }
 
     public static File createTempDirectoryInDefaultTempDirectory(final String directoryName) {
-        final File tmpDir = new File(TMP_DIRECTORY, directoryName + "_" + String.valueOf(System.currentTimeMillis()));
+        final File tmpDir = new File(TMP_DIRECTORY, directoryName + "_" + System.currentTimeMillis());
         createTempDirectory(tmpDir);
         return tmpDir;
     }
@@ -728,7 +728,7 @@ public class IOUtil {
         }
     }
 
-    public static byte[] getPropertyAsString(final Properties prop, String comment) throws IOException {
+    public static byte[] getPropertyAsString(final Properties prop, final String comment) throws IOException {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         prop.store(out, comment);
         return out.toByteArray();

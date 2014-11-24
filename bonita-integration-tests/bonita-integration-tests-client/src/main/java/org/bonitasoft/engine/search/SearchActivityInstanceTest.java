@@ -983,9 +983,7 @@ public class SearchActivityInstanceTest extends CommonAPITest {
         assertEquals("task4", humanTaskInstance.getName());
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(john.getId());
-        deleteUser(jack.getId());
-        deleteUser(jules.getId());
+        deleteUsers(john, jack, jules);
     }
 
     @Cover(classes = { SearchOptionsBuilder.class, ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "SearchPendingTasks", "Apostrophe" }, jira = "ENGINE-366")

@@ -111,7 +111,7 @@ public class EntityMemberCommandsTest extends CommonAPITest {
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Create", "Delete" }, story = "Create new entity member and delete it.", jira = "")
     @Test
-    public void testCreateNewEntityMemberAndDeleteIt() throws Exception {
+    public void createNewEntityMemberAndDeleteIt() throws Exception {
         final User newUser = createUser("test1", "password");
         // execute command:
         final HashMap<String, Serializable> createCommandParameters = new HashMap<String, Serializable>(4);
@@ -139,7 +139,7 @@ public class EntityMemberCommandsTest extends CommonAPITest {
             // We must pass here:
         }
 
-        deleteUser(newUser.getId());
+        deleteUser(newUser);
     }
 
     @Cover(classes = CommandAPI.class, concept = BPMNConcept.MEMBER, keywords = { "Command", "Member", "Entity", "Delete" }, story = "Delete all entity members for external id.", jira = "")
@@ -150,7 +150,8 @@ public class EntityMemberCommandsTest extends CommonAPITest {
         final HashMap<String, Serializable> createCommandParameters = new HashMap<String, Serializable>(4);
         createCommandParameters.put(DISCRIMINATOR_ID_KEY, USER_REPORT_DISCRIMINATOR);
         createCommandParameters.put(EXTERNAL_ID_KEY, externalId1);
-        final long userId = createUser("Ducobu", "WhatIsAPassword?").getId();
+        final User user = createUser("Ducobu", "WhatIsAPassword?");
+        final long userId = user.getId();
         createCommandParameters.put(USER_ID_KEY, userId);
         // createCommandParameters.put(ROLE_ID_KEY, -1L);
         // createCommandParameters.put(GROUP_ID_KEY, -1L);
@@ -201,7 +202,7 @@ public class EntityMemberCommandsTest extends CommonAPITest {
         entityMembers2 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_FOR_USER_COMMAND, searchParameters2);
         assertEquals(0, entityMembers2.getCount());
 
-        deleteUser(userId);
+        deleteUser(user);
         deleteRoles(role);
     }
 
@@ -515,7 +516,7 @@ public class EntityMemberCommandsTest extends CommonAPITest {
         final SearchResult<EntityMember> memberResult2 = (SearchResult<EntityMember>) getCommandAPI().execute(SEARCH_COMMAND, searchParameters2);
         assertEquals(0, memberResult2.getCount());
 
-        deleteUser(user1.getId());
+        deleteUser(user1);
         deleteEntityMembers(member1);
     }
 
@@ -572,7 +573,7 @@ public class EntityMemberCommandsTest extends CommonAPITest {
 
         deleteRoles(role1);
         deleteGroups(group1);
-        deleteUser(user1.getId());
+        deleteUser(user1);
         deleteEntityMembers(member1, member2);
     }
 

@@ -174,7 +174,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(user.getId());
+        deleteUser(user);
     }
 
     @Test
@@ -196,7 +196,7 @@ public class ProcessExecutionTest extends CommonAPITest {
                 containsState(getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 10), TestStates.NORMAL_FINAL));// FIXME
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(user.getId());
+        deleteUser(user);
     }
 
     @Test
@@ -316,7 +316,7 @@ public class ProcessExecutionTest extends CommonAPITest {
     @Test(expected = ArchivedProcessInstanceNotFoundException.class)
     @Cover(classes = Connector.class, concept = BPMNConcept.PROCESS, keywords = { "archive", "process" }, jira = "ENGINE-507", story = "get a archived process instance by an unknown id throw a not found exception")
     public void getArchivedProcessInstanceByIdNotFound() throws Exception {
-        getProcessAPI().getArchivedProcessInstance(123456789l);
+        getProcessAPI().getArchivedProcessInstance(123456789L);
     }
 
     @Test
@@ -405,7 +405,7 @@ public class ProcessExecutionTest extends CommonAPITest {
         final User user = createUserAndloginOnDefaultTenantWith(johnName);
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("processToUpdateDueDate", "1.0");
         builder.addActor("johnny");
-        builder.addUserTask("step1", "johnny").addExpectedDuration(10000000l);
+        builder.addUserTask("step1", "johnny").addExpectedDuration(10000000L);
         final DesignProcessDefinition done = builder.done();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(done, "johnny", user);
 
@@ -424,12 +424,12 @@ public class ProcessExecutionTest extends CommonAPITest {
 
     @Test(expected = UpdateException.class)
     public void updateDueDateOfUnknownTask() throws Exception {
-        getProcessAPI().updateDueDateOfTask(123456789l, new Date());
+        getProcessAPI().updateDueDateOfTask(123456789L, new Date());
     }
 
     @Test(expected = UpdateException.class)
     public void updateDueDateOfTaskWithNullDate() throws Exception {
-        getProcessAPI().updateDueDateOfTask(123456789l, null);
+        getProcessAPI().updateDueDateOfTask(123456789L, null);
     }
 
     @Test

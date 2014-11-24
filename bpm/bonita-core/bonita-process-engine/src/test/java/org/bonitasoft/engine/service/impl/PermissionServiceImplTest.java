@@ -169,7 +169,7 @@ public class PermissionServiceImplTest {
                 "\n" +
                 "class MyCustomRule implements PermissionRule {\n" +
                 "    @Override\n" +
-                "    boolean check(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
+                "    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
                 "        logger.warning(\"Executing my custom rule\")\n" +
                 "        return true\n" +
                 "    }\n" +
@@ -185,6 +185,40 @@ public class PermissionServiceImplTest {
         verify(logger).log(argThat(new HasName("MyCustomRule")), eq(TechnicalLogSeverity.WARNING), eq("Executing my custom rule"));
     }
 
+
+
+    @Test
+    public void should_checkAPICallWithScript_run_the_class_with_package_in_script_root_folder() throws SBonitaException, ClassNotFoundException, IOException {
+        //given
+        File test = new File(scriptFolder, "test");
+        test.mkdir();
+        FileUtils.writeStringToFile(new File(test, "MyCustomRule.groovy"), "" +
+                "package test;" +
+                "" +
+                "import org.bonitasoft.engine.api.APIAccessor\n" +
+                "import org.bonitasoft.engine.api.Logger\n" +
+                "import org.bonitasoft.engine.api.permission.APICallContext\n" +
+                "import org.bonitasoft.engine.api.permission.PermissionRule\n" +
+                "import org.bonitasoft.engine.session.APISession\n" +
+                "\n" +
+                "class MyCustomRule implements PermissionRule {\n" +
+                "    @Override\n" +
+                "    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
+                "        logger.warning(\"Executing my custom rule\")\n" +
+                "        return true\n" +
+                "    }\n" +
+                "}" +
+                "");
+
+        permissionService.start();
+
+        //when
+        final boolean myCustomRule = permissionService.checkAPICallWithScript("test.MyCustomRule", new APICallContext(), false);
+
+        assertThat(myCustomRule).isTrue();
+        verify(logger).log(argThat(new HasName("test.MyCustomRule")), eq(TechnicalLogSeverity.WARNING), eq("Executing my custom rule"));
+    }
+
     /*
      * @Test
      * public void perf() throws SBonitaException, ClassNotFoundException, IOException {
@@ -198,7 +232,7 @@ public class PermissionServiceImplTest {
      * "\n" +
      * "class MyCustomRule implements PermissionRule {\n" +
      * "    @Override\n" +
-     * "    boolean check(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
+     * "    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
      * "        logger.warning(\"Executing my custom rule\")\n" +
      * "        return true\n" +
      * "    }\n" +
@@ -228,7 +262,7 @@ public class PermissionServiceImplTest {
                 "\n" +
                 "class MyCustomRule implements PermissionRule {\n" +
                 "    @Override\n" +
-                "    boolean check(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
+                "    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
                 "        return true\n" +
                 "    }\n" +
                 "}" +
@@ -247,7 +281,7 @@ public class PermissionServiceImplTest {
                 "\n" +
                 "class MyCustomRule implements PermissionRule {\n" +
                 "    @Override\n" +
-                "    boolean check(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
+                "    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
                 "        return false\n" +
                 "    }\n" +
                 "}" +
@@ -269,7 +303,7 @@ public class PermissionServiceImplTest {
                 "\n" +
                 "class MyCustomRule implements PermissionRule {\n" +
                 "    @Override\n" +
-                "    boolean check(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
+                "    boolean isAllowed(APISession apiSession, APICallContext apiCallContext, APIAccessor apiAccessor, Logger logger) {\n" +
                 "        throw new RuntimeException()\n" +
                 "    }\n" +
                 "}" +
@@ -307,7 +341,6 @@ public class PermissionServiceImplTest {
 
         @Override
         public boolean matches(final Object item) {
-            myCustomRule = "MyCustomRule";
             return item instanceof Class<?> && ((Class) item).getName().equals(myCustomRule);
         }
     }

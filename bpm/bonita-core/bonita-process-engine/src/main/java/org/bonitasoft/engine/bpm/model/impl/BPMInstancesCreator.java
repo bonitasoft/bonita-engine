@@ -162,7 +162,7 @@ public class BPMInstancesCreator {
             final EventInstanceService eventInstanceService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService,
             final DataInstanceService dataInstanceService, final TechnicalLoggerService logger, final TransientDataService transientDataService,
-            ArchiveService archiveService) {
+            final ArchiveService archiveService) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.actorMappingService = actorMappingService;
@@ -213,7 +213,7 @@ public class BPMInstancesCreator {
             parentContainerType = DataInstanceContainer.PROCESS_INSTANCE.toString();
         }
         try {
-            boolean shouldArchiveMapping = ProcessArchiver.willBeArchived(flowNodeInstance, archiveService);
+            final boolean shouldArchiveMapping = ProcessArchiver.willBeArchived(flowNodeInstance, archiveService);
             dataInstanceService.addChildContainer(flowNodeInstance.getParentContainerId(), parentContainerType, flowNodeInstance.getId(),
                     DataInstanceContainer.ACTIVITY_INSTANCE.toString(), shouldArchiveMapping);
         } catch (final SDataInstanceException e) {
@@ -397,8 +397,7 @@ public class BPMInstancesCreator {
         } catch (final SBonitaException sbe) {
             throw new SActorNotFoundException(sbe);
         }
-        final SActor actor = getSActor.getResult();
-        return actor;
+        return getSActor.getResult();
     }
 
     private SIntermediateThrowEventInstanceBuilder createIntermediateThrowEventInstance(final long processDefinitionId, final long rootContainerId,

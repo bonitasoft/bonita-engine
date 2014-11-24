@@ -63,21 +63,13 @@ public class UpdateGroup implements TransactionContent {
         final String nameKey = sGroupFactiry.getNameKey();
         final Map<String, Object> fields = changeDescriptor.getFields();
         if (fields.containsKey(parentPathKey) || fields.containsKey(nameKey)) {
-            final String parentPath = ((fields.containsKey(parentPathKey) ? (String) fields.get(parentPathKey) : group.getParentPath()));
-            final String groupName = (fields.containsKey(nameKey) ? (String) fields.get(nameKey) : group.getName());
+            final String parentPath = fields.containsKey(parentPathKey) ? (String) fields.get(parentPathKey) : group.getParentPath();
+            final String groupName = fields.containsKey(nameKey) ? (String) fields.get(nameKey) : group.getName();
             updateChildren(group, parentPath, sGroupFactiry.getIdKey(), parentPathKey, groupName);
         }
         identityService.updateGroup(group, changeDescriptor);
     }
 
-    /**
-     * @param group
-     * @param parentPath
-     * @param idKey
-     * @param parentPathKey
-     * @param groupName
-     * @throws SIdentityException
-     */
     private void updateChildren(final SGroup group, final String parentPath, final String idKey, final String parentPathKey, final String groupName)
             throws SIdentityException {
         List<SGroup> groupChildren = null;

@@ -297,7 +297,7 @@ public class ProcessArchiveTest extends CommonAPILocalTest {
 
     @Test(expected = ArchivedFlowNodeInstanceNotFoundException.class)
     public void getArchivedFlowNodeInstanceNotFound() throws ArchivedFlowNodeInstanceNotFoundException {
-        getProcessAPI().getArchivedFlowNodeInstance(123456789l);
+        getProcessAPI().getArchivedFlowNodeInstance(123456789L);
     }
 
 }

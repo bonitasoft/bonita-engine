@@ -95,7 +95,7 @@ public class ProcessCategoryTest extends CommonAPITest {
         assertEquals(name, category.getName());
         assertEquals(user.getId(), category.getCreator());
 
-        deleteUser(user.getId());
+        deleteUser(user);
     }
 
     @Cover(classes = { ProcessAPI.class, Category.class, AlreadyExistsException.class }, concept = BPMNConcept.PROCESS, keywords = { "Create", "Category",

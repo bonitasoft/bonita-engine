@@ -440,6 +440,7 @@
 					<systemPropertyVariables>
 						<bonita.home>${project.build.directory}</bonita.home>
 						<bonita.services.folder>${project.build.directory}/conf</bonita.services.folder>
+						<sysprop.bonita.orderby.checking.mode>NONE</sysprop.bonita.orderby.checking.mode>
 					</systemPropertyVariables>
 					<includes>
 						<include>org/bonitasoft/engine/AllTestsWithJNDI.java</include>

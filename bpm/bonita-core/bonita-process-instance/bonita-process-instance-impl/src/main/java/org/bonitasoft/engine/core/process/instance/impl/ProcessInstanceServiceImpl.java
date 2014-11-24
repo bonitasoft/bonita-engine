@@ -470,7 +470,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             for (final SFlowNodeInstance activityInstance : activityInstances) {
                 deleteFlowNodeInstance(activityInstance, processDefinition);
             }
-        } while (!activityInstances.isEmpty());
+        } while (activityInstances.size() == BATCH_SIZE);
     }
 
     @Override
@@ -548,9 +548,11 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     private void setExceptionContext(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
             final SBonitaException e) {
-        e.setProcessDefinitionIdOnContext(processDefinition.getId());
-        e.setProcessDefinitionNameOnContext(processDefinition.getName());
-        e.setProcessDefinitionVersionOnContext(processDefinition.getVersion());
+        if (processDefinition != null) {
+            e.setProcessDefinitionIdOnContext(processDefinition.getId());
+            e.setProcessDefinitionNameOnContext(processDefinition.getName());
+            e.setProcessDefinitionVersionOnContext(processDefinition.getVersion());
+        }
         setExceptionContext(flowNodeInstance, e);
     }
 

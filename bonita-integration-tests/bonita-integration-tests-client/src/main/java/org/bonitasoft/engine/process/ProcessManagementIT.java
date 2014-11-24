@@ -366,7 +366,7 @@ public class ProcessManagementIT extends CommonAPITest {
 
     @Test
     public void getArchivedActivityInstancesOfAnUnknownProcess() {
-        final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(456213846564l, 0, 100,
+        final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(456213846564L, 0, 100,
                 ActivityInstanceCriterion.REACHED_STATE_DATE_ASC);
         assertEquals(0, archivedActivityInstances.size());
     }
@@ -1413,7 +1413,7 @@ public class ProcessManagementIT extends CommonAPITest {
 
         // delete data for test
         disableAndDeleteProcess(processDefinition1, processDefinition2, processDefinition3, processDefinition4);
-        deleteUser(john.getId());
+        deleteUser(john);
     }
 
     @Test
@@ -1436,12 +1436,12 @@ public class ProcessManagementIT extends CommonAPITest {
 
         waitForProcessToFinish(pi0);
         disableAndDeleteProcess(processDefinition);
-        deleteUser(user.getId());
+        deleteUser(user);
     }
 
     @Test(expected = NotFoundException.class)
     public void getArchiveCommentNotFound() throws Exception {
-        getProcessAPI().getArchivedComment(123456789l);
+        getProcessAPI().getArchivedComment(123456789L);
     }
 
     @Test
@@ -1499,7 +1499,7 @@ public class ProcessManagementIT extends CommonAPITest {
             fail("Process should finish");
         }
         disableAndDeleteProcess(processDefinition);
-        deleteUser(jack.getId());
+        deleteUser(jack);
     }
 
     @Test
@@ -1524,7 +1524,7 @@ public class ProcessManagementIT extends CommonAPITest {
         }
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(jack.getId());
+        deleteUser(jack);
     }
 
     @Test
@@ -1549,7 +1549,7 @@ public class ProcessManagementIT extends CommonAPITest {
         }
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(jack.getId());
+        deleteUser(jack);
     }
 
     @Test
@@ -1576,7 +1576,7 @@ public class ProcessManagementIT extends CommonAPITest {
         }
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(jack.getId());
+        deleteUser(jack);
     }
 
     private List<Long> createProcessDefinitionWithTwoHumanStepsAndDeployBusinessArchive(final int nbProcess) throws InvalidProcessDefinitionException,
@@ -1623,7 +1623,7 @@ public class ProcessManagementIT extends CommonAPITest {
         assertEquals(Double.valueOf(3.14), dataInstance.getValue());
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(jack.getId());
+        deleteUser(jack);
     }
 
     @Cover(jira = "BS-10584", classes = { ClassLoader.class, ProcessDefinition.class, ProcessInstance.class }, concept = BPMNConcept.PROCESS, keywords = {
@@ -1640,8 +1640,8 @@ public class ProcessManagementIT extends CommonAPITest {
 
         getProcessAPI().purgeClassLoader(processDefinition.getId());
 
-        deleteProcess(processDefinition.getId());
-        deleteUser(jack.getId());
+        deleteProcess(processDefinition);
+        deleteUser(jack);
     }
 
 }

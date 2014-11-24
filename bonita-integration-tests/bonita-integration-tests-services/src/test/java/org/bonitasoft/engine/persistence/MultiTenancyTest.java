@@ -45,7 +45,7 @@ public class MultiTenancyTest extends CommonServiceTest {
                 0,
                 persistenceService.selectList(
                         new SelectListDescriptor<Human>("getHumanByFirstName", PersistenceTestUtil.getMap("firstName", firstName), Human.class,
-                                new QueryOptions(0, 20))).size());
+                                new QueryOptions(0, 20, Human.class, "id", OrderByType.ASC))).size());
 
         persistenceService.insert(human1);
         PersistenceTestUtil.checkHuman(human1, persistenceService.selectById(new SelectByIdDescriptor<Human>("getHumanById", Human.class, human1.getId())));
@@ -54,7 +54,7 @@ public class MultiTenancyTest extends CommonServiceTest {
                 1,
                 persistenceService.selectList(
                         new SelectListDescriptor<Human>("getHumanByFirstName", PersistenceTestUtil.getMap("firstName", firstName), Human.class,
-                                new QueryOptions(0, 20))).size());
+                                new QueryOptions(0, 20, Human.class, "id", OrderByType.ASC))).size());
 
         persistenceService.delete(human1);
 

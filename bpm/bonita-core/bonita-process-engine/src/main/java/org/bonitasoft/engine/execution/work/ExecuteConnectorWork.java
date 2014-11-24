@@ -138,7 +138,7 @@ public abstract class ExecuteConnectorWork extends TenantAwareBonitaWork {
                 desc.append(" - ");
                 desc.append("connectorInstanceId: ");
                 desc.append(connectorInstanceId);
-                timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_WORK, desc.toString(), (endTime - startTime));
+                timeTracker.track(TimeTrackerRecords.EXECUTE_CONNECTOR_WORK, desc.toString(), endTime - startTime);
             }
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }

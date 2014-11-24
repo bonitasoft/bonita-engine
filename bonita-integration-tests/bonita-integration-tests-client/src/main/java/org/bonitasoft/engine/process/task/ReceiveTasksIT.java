@@ -71,7 +71,7 @@ import org.junit.Test;
 /**
  * @author Julien Molinaro
  */
-public class ReceiveTasksTest extends CommonAPITest {
+public class ReceiveTasksIT extends CommonAPITest {
 
     private static final String SEARCH_WAITING_EVENTS_COMMAND = "searchWaitingEventsCommand";
 

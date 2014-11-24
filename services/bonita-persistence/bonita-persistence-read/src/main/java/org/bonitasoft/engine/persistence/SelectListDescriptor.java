@@ -19,7 +19,7 @@ import java.util.Map;
  * @author Charles Souillard
  * @author Matthieu Chaffotte
  */
-public final class SelectListDescriptor<T> extends AbstractSelectWithParametersDescriptor<T> {
+public class SelectListDescriptor<T> extends AbstractSelectWithParametersDescriptor<T> {
 
     private final QueryOptions queryOptions;
 

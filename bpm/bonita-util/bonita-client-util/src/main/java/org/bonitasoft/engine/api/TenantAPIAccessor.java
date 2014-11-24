@@ -33,7 +33,7 @@ import org.bonitasoft.engine.util.APITypeManager;
  * <li>{@link IdentityAPI},</li>
  * <li>{@link LoginAPI}</li>
  * </ul>
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Elias Ricken de Medeiros
  */
@@ -48,9 +48,6 @@ public final class TenantAPIAccessor {
             case EJB3:
                 parameters = APITypeManager.getAPITypeParameters();
                 return new EJB3ServerAPI(parameters);
-            case EJB2:
-                parameters = APITypeManager.getAPITypeParameters();
-                return new EJB2ServerAPI(parameters);
             case HTTP:
                 parameters = APITypeManager.getAPITypeParameters();
                 return new HTTPServerAPI(parameters);
@@ -64,7 +61,7 @@ public final class TenantAPIAccessor {
 
     /**
      * Refreshes the way the engine client communicates to the engine server.
-     * 
+     *
      * @see APITypeManager
      * @see ApiAccessType
      */

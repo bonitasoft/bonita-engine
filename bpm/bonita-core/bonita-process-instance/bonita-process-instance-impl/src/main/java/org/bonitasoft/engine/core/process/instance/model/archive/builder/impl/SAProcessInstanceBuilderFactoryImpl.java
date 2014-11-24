@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -40,15 +40,15 @@ public class SAProcessInstanceBuilderFactoryImpl implements SAProcessInstanceBui
 
     private static final String CALLER_ID = "callerId";
 
-    private final String END_DATE_KEY = "endDate";
+    private static final String END_DATE_KEY = "endDate";
 
-    private final String STARTED_BY_KEY = "startedBy";
+    private static final String STARTED_BY_KEY = "startedBy";
 
-    private final String STARTED_BY_SUBSTITUTE_KEY = "startedBySubstitute";
+    private static final String STARTED_BY_SUBSTITUTE_KEY = "startedBySubstitute";
 
-    private final String START_DATE_KEY = "startDate";
+    private static final String START_DATE_KEY = "startDate";
 
-    private final String LAST_UPDATE_KEY = "lastUpdate";
+    private static final String LAST_UPDATE_KEY = "lastUpdate";
 
     @Override
     public SAProcessInstanceBuilder createNewInstance(final SProcessInstance processInstance) {

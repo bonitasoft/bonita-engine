@@ -22,6 +22,7 @@ import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.ServerAPIException;
 import org.bonitasoft.engine.exception.UnknownAPITypeException;
+import org.bonitasoft.engine.session.InvalidSessionException;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.util.APITypeManager;
 
@@ -34,7 +35,7 @@ import org.bonitasoft.engine.util.APITypeManager;
  * <li>{@link PlatformCommandAPI}</li>
  * <li>{@link PlatformLoginAPI}</li>
  * </ul>
- * 
+ *
  * @author Matthieu Chaffotte
  */
 public class PlatformAPIAccessor {
@@ -48,9 +49,6 @@ public class PlatformAPIAccessor {
             case EJB3:
                 parameters = APITypeManager.getAPITypeParameters();
                 return new EJB3ServerAPI(parameters);
-            case EJB2:
-                parameters = APITypeManager.getAPITypeParameters();
-                return new EJB2ServerAPI(parameters);
             case HTTP:
                 parameters = APITypeManager.getAPITypeParameters();
                 return new HTTPServerAPI(parameters);
@@ -96,7 +94,7 @@ public class PlatformAPIAccessor {
 
     /**
      * @param session
-     *            a {@link PlatformSession} created using the {@link PlatformLoginAPI}
+     *        a {@link PlatformSession} created using the {@link PlatformLoginAPI}
      * @return
      *         the {@link PlatformAPI}
      * @throws InvalidSessionException
@@ -110,7 +108,7 @@ public class PlatformAPIAccessor {
 
     /**
      * @param session
-     *            a {@link PlatformSession} created using the {@link PlatformLoginAPI}
+     *        a {@link PlatformSession} created using the {@link PlatformLoginAPI}
      * @return
      *         the {@link PlatformCommandAPI}
      * @throws BonitaHomeNotSetException

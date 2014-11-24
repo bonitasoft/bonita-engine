@@ -725,7 +725,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
 
     @Test(expected = ArchivedDocumentNotFoundException.class)
     public void getArchivedDocumentNotFound() throws BonitaException {
-        getProcessAPI().getArchivedProcessDocument(123456789l);
+        getProcessAPI().getArchivedProcessDocument(123456789L);
     }
 
     @Test
@@ -1590,9 +1590,8 @@ public class DocumentIntegrationTest extends CommonAPITest {
         //check added
         final List<Document> list1 = getProcessAPI().getDocumentList(processInstance.getId(), "list1", 0, 100);
         final List<Document> list2 = getProcessAPI().getDocumentList(processInstance.getId(), "list2", 0, 100);
-        final SearchResult<Document> list1_search = getProcessAPI().searchDocuments(
-                new SearchOptionsBuilder(0, 100).filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId())
-                        .filter(DocumentsSearchDescriptor.DOCUMENT_NAME, "list1").sort(DocumentsSearchDescriptor.LIST_INDEX, Order.DESC).done());
+        final SearchResult<Document> list1_search = getProcessAPI().searchDocuments(new SearchOptionsBuilder(0, 100).filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId())
+                .filter(DocumentsSearchDescriptor.DOCUMENT_NAME, "list1").sort(DocumentsSearchDescriptor.LIST_INDEX, Order.DESC).done());
         final ArrayList<Document> reversedList1 = new ArrayList<Document>(list1);
         Collections.reverse(reversedList1);
         assertThat(list1_search.getResult()).isEqualTo(reversedList1);
@@ -1608,9 +1607,8 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assertThat(updated.getUrl()).isEqualTo("The new value");
 
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
-        expressions.put(new ExpressionBuilder().createDocumentListExpression("list1"), Collections.<String, Serializable> emptyMap());
-        final List<Document> initialList1 = (List<Document>) getProcessAPI().evaluateExpressionsAtProcessInstanciation(processInstance.getId(), expressions)
-                .get("list1");
+        expressions.put(new ExpressionBuilder().createDocumentListExpression("list1"), Collections.<String, Serializable>emptyMap());
+        final List<Document> initialList1 = (List<Document>) getProcessAPI().evaluateExpressionsAtProcessInstanciation(processInstance.getId(), expressions).get("list1");
         assertThat(initialList1).hasSize(4);
         assertThat(initialList1.get(0).getUrl()).isEqualTo("http://www.myrul.com/mydoc.txt");
         assertThat(new String(getProcessAPI().getDocumentContent(initialList1.get(1).getContentStorageId()))).isEqualTo("hello1");
@@ -1620,8 +1618,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
         assignAndExecuteStep(step2, user.getId());
         waitForProcessToFinish(processInstance.getId());
 
-        final List<Document> finalList1 = (List<Document>) getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions)
-                .get("list1");
+        final List<Document> finalList1 = (List<Document>) getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions).get("list1");
         assertThat(finalList1).hasSize(7);
 
         disableAndDeleteProcess(processInstance.getProcessDefinitionId());
@@ -1658,7 +1655,7 @@ public class DocumentIntegrationTest extends CommonAPITest {
                 List.class.getName()));
         //process with list2 without initial value
         builder.addDocumentListDefinition("list2");
-        builder.addActor("actor").addUserTask("step1", "actor").addUserTask("step2", "actor");
+        builder.addActor("actor").addUserTask("step1", "actor").addUserTask("step2","actor");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "actor", user);
         return getProcessAPI().startProcess(processDefinition.getId());
     }

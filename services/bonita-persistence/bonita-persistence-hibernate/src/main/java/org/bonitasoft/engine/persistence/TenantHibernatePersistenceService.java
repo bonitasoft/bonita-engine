@@ -53,8 +53,8 @@ public class TenantHibernatePersistenceService extends AbstractHibernatePersiste
             final String statementDelimiter, final String likeEscapeCharacter, final TechnicalLoggerService logger, final SequenceManager sequenceManager,
             final DataSource datasource, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings) throws SPersistenceException,
             ClassNotFoundException {
-        super(name, hbmConfigurationProvider, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger, sequenceManager, datasource,
-                enableWordSearch, wordSearchExclusionMappings);
+        super(name, hbmConfigurationProvider, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, logger,
+                sequenceManager, datasource, enableWordSearch, wordSearchExclusionMappings);
         this.sessionAccessor = sessionAccessor;
     }
 

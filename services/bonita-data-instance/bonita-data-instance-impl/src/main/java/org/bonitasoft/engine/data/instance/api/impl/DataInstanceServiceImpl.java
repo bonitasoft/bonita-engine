@@ -67,7 +67,7 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 /**
  * General mechanism for lookup is to look in specific flow node to search a data instance. When refering to "local" data instance, it means the lookup is
  * performed only on the specific element, and not on inherited data for parent containers.
- * 
+ *
  * @author Zhao Na
  * @author Elias Ricken de Medeiros
  * @author Feng Hui
@@ -265,7 +265,8 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public void addChildContainer(final long parentContainerId, final String parentContainerType, final long containerId, final String containerType, boolean shouldArchiveMapping)
+    public void addChildContainer(final long parentContainerId, final String parentContainerType, final long containerId, final String containerType,
+            final boolean shouldArchiveMapping)
             throws SDataInstanceException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "addChildContainer");
         try {
@@ -282,7 +283,8 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             while (parentVisibleDataInstances.size() > 0) {
                 for (final SDataInstance parentData : parentVisibleDataInstances) {
                     if (!localData.contains(parentData.getName())) {
-                        insertDataInstanceVisibilityMapping(containerId, containerType, parentData.getName(), parentData.getId(), archivedDate, shouldArchiveMapping);
+                        insertDataInstanceVisibilityMapping(containerId, containerType, parentData.getName(), parentData.getId(), archivedDate,
+                                shouldArchiveMapping);
                     }
                 }
                 currentIndex += batchSize;
@@ -326,10 +328,12 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public List<SDataInstanceVisibilityMapping> createDataContainer(final long containerId, final String containerType, boolean shouldArchiveMapping) throws SDataInstanceException {
+    public List<SDataInstanceVisibilityMapping> createDataContainer(final long containerId, final String containerType, final boolean shouldArchiveMapping)
+            throws SDataInstanceException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "createDataContainer");
         try {
-            final List<SDataInstanceVisibilityMapping> listSDataInstanceVisibilityMapping = insertMappingForLocalElement(containerId, containerType, shouldArchiveMapping);
+            final List<SDataInstanceVisibilityMapping> listSDataInstanceVisibilityMapping = insertMappingForLocalElement(containerId, containerType,
+                    shouldArchiveMapping);
             logAfterMethod(TechnicalLogSeverity.TRACE, "createDataContainer");
             return listSDataInstanceVisibilityMapping;
         } catch (final SRecorderException e) {
@@ -338,7 +342,8 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         }
     }
 
-    protected List<SDataInstanceVisibilityMapping> insertMappingForLocalElement(final long containerId, final String containerType, boolean shouldArchiveMapping) throws SRecorderException,
+    protected List<SDataInstanceVisibilityMapping> insertMappingForLocalElement(final long containerId, final String containerType,
+            final boolean shouldArchiveMapping) throws SRecorderException,
             SDataInstanceException {
         final int batchSize = 50;
         int currentIndex = 0;
@@ -347,7 +352,8 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         final List<SDataInstanceVisibilityMapping> mappings = new ArrayList<SDataInstanceVisibilityMapping>(localDataInstances.size());
         while (localDataInstances != null && localDataInstances.size() > 0) {
             for (final SDataInstance sDataInstance : localDataInstances) {
-                mappings.add(insertDataInstanceVisibilityMapping(containerId, containerType, sDataInstance.getName(), sDataInstance.getId(), archiveDate, shouldArchiveMapping));
+                mappings.add(insertDataInstanceVisibilityMapping(containerId, containerType, sDataInstance.getName(), sDataInstance.getId(), archiveDate,
+                        shouldArchiveMapping));
             }
             currentIndex += batchSize;
             localDataInstances = getLocalDataInstances(containerId, containerType, currentIndex, batchSize);
@@ -358,14 +364,14 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     /**
      * Insert mapping to be able to tell which is the data that is visible from the container:
      * i.e. with the given name on the given container the visible data have the id given by the visibility mapping
-     * 
+     *
      * @param containerId
      * @param containerType
      * @param dataName
      * @param dataInstanceId
      * @param archiveDate
      * @param shouldArchive
-     *          true if we create an archived version of the mapping
+     *        true if we create an archived version of the mapping
      * @throws SRecorderException
      * @throws SDefinitiveArchiveNotFound
      */
@@ -378,7 +384,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         // add archived mapping also because when the data change the archive mapping will be used to retrieve old value
         final SADataInstanceVisibilityMapping archivedMapping = BuilderFactory.get(SADataInstanceVisibilityMappingBuilderFactory.class)
                 .createNewInstance(containerId, containerType, dataName, dataInstanceId, mapping.getId()).done();
-        if(shouldArchive){
+        if (shouldArchive) {
             archiveService.recordInsert(archiveDate, new ArchiveInsertRecord(archivedMapping));
         }
         return mapping;
@@ -625,8 +631,9 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         final HashMap<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("containerId", containerId);
         parameters.put("containerType", containerType);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfResults, SADataInstanceVisibilityMapping.class, "id", OrderByType.ASC);
         final SelectListDescriptor<SADataInstanceVisibilityMapping> selectDescriptor = new SelectListDescriptor<SADataInstanceVisibilityMapping>(
-                "getSADataInstanceVisibilityMappings", parameters, SADataInstanceVisibilityMapping.class, new QueryOptions(fromIndex, numberOfResults));
+                "getSADataInstanceVisibilityMappings", parameters, SADataInstanceVisibilityMapping.class, queryOptions);
         return persistenceService.selectList(selectDescriptor);
     }
 

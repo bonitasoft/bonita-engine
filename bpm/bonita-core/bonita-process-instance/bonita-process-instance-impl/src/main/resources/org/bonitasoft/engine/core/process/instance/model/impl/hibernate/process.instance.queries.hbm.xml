@@ -91,11 +91,11 @@
 	</query>
 
 	<query name="getChildrenOfAnActivity">
-		SELECT flowNode
-		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS flowNode
-		WHERE flowNode.logicalGroup3 = :parentActivityInstanceId
-		AND flowNode.deleted = FALSE
-		AND flowNode.terminal = FALSE
+		SELECT f
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
+		WHERE f.logicalGroup3 = :parentActivityInstanceId
+		AND f.deleted = FALSE
+		AND f.terminal = FALSE
 	</query>
 
 	<query name="getAssignedUserTasks">
