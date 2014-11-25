@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-transaction</artifactId>
 		<groupId>org.bonitasoft.engine.transaction</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.4.0.RC3</version>
 	</parent>
 
 	<artifactId>bonita-transaction-api</artifactId>
