@@ -269,6 +269,8 @@ public class FailureHandlingBonitaWorkTest {
         final Map<String, Object> context = new HashMap<String, Object>();
         final SExpressionEvaluationException seee = new SExpressionEvaluationException("message", "expressionName");
         doThrow(seee).when(wrappedWork).work(context);
+        // Yes for all log level, in order to simulate a TRACE configuration
+        when(loggerService.isLoggable(any(Class.class), eq(TechnicalLogSeverity.DEBUG))).thenReturn(true);
         when(loggerService.isLoggable(any(Class.class), eq(TechnicalLogSeverity.ERROR))).thenReturn(true);
 
         txBonitawork.handleFailure(seee, context);

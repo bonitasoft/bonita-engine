@@ -100,9 +100,8 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
     }
 
     private void logException(final TechnicalLoggerService loggerService, final Throwable e) {
-        if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Exception : ", e);
-        } else if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
+        // Always check from the most serious reason to the least serious
+        if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
             final StringBuilder logBuilder = new StringBuilder(e.getClass().getName());
             logBuilder.append(" : \"");
             final String message = e.getMessage();
@@ -113,6 +112,8 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
             }
             logBuilder.append("\"");
             loggerService.log(getClass(), TechnicalLogSeverity.ERROR, logBuilder.toString());
+        } else if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
+            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Exception : ", e);
         }
     }
 
