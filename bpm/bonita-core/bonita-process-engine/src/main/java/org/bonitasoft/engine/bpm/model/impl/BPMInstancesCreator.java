@@ -704,7 +704,10 @@ public class BPMInstancesCreator {
                         DataInstanceContainer.ACTIVITY_INSTANCE.name());// in a multi instance
                 if (dataInstance != null) {
                     try {
-                        dataValue = (Serializable) ((List<?>) dataInstance.getValue()).get(index);
+                        final List<Serializable> list = (List<Serializable>) dataInstance.getValue();
+                        if (!list.isEmpty()) {
+                            dataValue = list.get(index);
+                        }
                     } catch (final ClassCastException e) {
                         throw new SDataInstanceReadException("LoopDataInput ref named " + loopDataInputRef + " in " + containerId + " " + containerType
                                 + " is not a list or the value is not serializable.");
