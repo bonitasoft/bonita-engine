@@ -62,7 +62,6 @@ import org.junit.Test;
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-@SuppressWarnings("javadoc")
 public class MultiInstanceTest extends CommonAPITest {
 
     private static final String JACK = "jack";
@@ -384,7 +383,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test of completion condition (Sequential multi-instance - Number of completed instances).
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -430,7 +429,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test with completion condition equal to true (sequential multi-instance).
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -454,7 +453,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test with completion condition equal to true (parallel multi-instance).
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -484,7 +483,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test of completion condition (Sequential multi-instance - Number of completed instances).
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -499,7 +498,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test of completion condition (Sequential multi-instance - Number of instances).
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -514,7 +513,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test of completion condition (Sequential multi-instance - Number of terminated instances).
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -529,7 +528,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test of completion condition (Sequential multi-instance - Number of actives instances).
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -544,7 +543,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test of completion condition (Parallel multi-instance - Number of completed instances).
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -560,7 +559,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test of completion condition (Parallel multi-instance - Number of instances).
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -576,7 +575,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test of completion condition (Parallel multi-instance - Number of terminated instances).
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -592,7 +591,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test of completion condition (Parallel multi-instance - Number of actives instances).
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -608,7 +607,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test of task execution after a sequential multi-instance with user tasks.
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -632,7 +631,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test of task execution after a sequential multi-instance with automatics tasks.
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -659,7 +658,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test of task execution after a parallel multi-instance with user tasks.
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -683,7 +682,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test of task execution after a parallel multi-instance with automatics tasks.
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -710,7 +709,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test of parallel multi-instance with several users.
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -759,7 +758,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test of sequential multi-instance with several users.
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -808,7 +807,7 @@ public class MultiInstanceTest extends CommonAPITest {
 
     /**
      * Test of sequential multi-instance with sub-process.
-     * 
+     *
      * @throws Exception
      * @since 6.0
      */
@@ -976,6 +975,41 @@ public class MultiInstanceTest extends CommonAPITest {
         inputStream.close();
         resources.add(new BarResource(filterName + ".impl", data));
         return resources;
+    }
+
+    @Test
+    public void multiInstanceWithAnEmptyList_should_instantiate_once_the_task() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("multiInstanceWithAnEmptyList", PROCESS_VERSION);
+        builder.addActor(ACTOR_NAME);
+        builder.addData("list", List.class.getName(), new ExpressionBuilder().createGroovyScriptExpression("emptyList", "[]", List.class.getName()));
+        final UserTaskDefinitionBuilder taskDefinitionBuilder = builder.addUserTask("step1", ACTOR_NAME);
+        taskDefinitionBuilder.addData("listValue", String.class.getName(), null);
+        taskDefinitionBuilder.addMultiInstance(true, "list").addDataInputItemRef("listValue");
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForUserTask("step1", processInstance);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    public void multiInstanceWithANullList_should_put_the_task_in_failed_state() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("multiInstanceWithAnEmptyList", PROCESS_VERSION);
+        builder.addActor(ACTOR_NAME);
+        builder.addData("list", List.class.getName(), null);
+        final UserTaskDefinitionBuilder taskDefinitionBuilder = builder.addUserTask("step1", ACTOR_NAME);
+        taskDefinitionBuilder.addData("listValue", String.class.getName(), null);
+        taskDefinitionBuilder.addMultiInstance(true, "list").addDataInputItemRef("listValue");
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        waitForFlowNodeInFailedState(processInstance);
+
+        disableAndDeleteProcess(processDefinition);
     }
 
 }
