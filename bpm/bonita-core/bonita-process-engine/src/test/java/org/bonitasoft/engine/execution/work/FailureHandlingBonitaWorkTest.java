@@ -276,6 +276,7 @@ public class FailureHandlingBonitaWorkTest {
         txBonitawork.handleFailure(seee, context);
 
         verify(loggerService, times(2)).log(any(Class.class), eq(TechnicalLogSeverity.ERROR), anyString());
+        verify(loggerService, times(1)).log(any(Class.class), eq(TechnicalLogSeverity.DEBUG), anyString(), any(Throwable.class));
     }
 
 }
