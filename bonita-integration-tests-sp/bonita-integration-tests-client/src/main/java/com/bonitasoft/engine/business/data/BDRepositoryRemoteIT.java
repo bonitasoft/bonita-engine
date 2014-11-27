@@ -394,9 +394,9 @@ public class BDRepositoryRemoteIT extends CommonAPISPTest {
                 .get(createBusinessDataExpressionToFindAddresses(citySF)
                         .getName())).get(0);
 
-        whenAddAdressToEmployee(humanTaskInstance, bizDataEmployeeFound, bizDataSfAddressesFound, "myEmployee2", "address2");
+        addAdressToEmployee(humanTaskInstance, bizDataEmployeeFound, bizDataSfAddressesFound, "myEmployee2", "address2");
 
-        thenVerifyNumberOfAddresses(3);
+        verifyNumberOfAddresses(3);
         //then get employee
         //        final Map<Expression, Map<String, Serializable>> countAddressesExpressionMap = new HashMap<Expression, Map<String, Serializable>>();
         //        final Expression findEmployeeExpression = createBusinessDataExpressionToFindTheEmployee();
@@ -421,12 +421,12 @@ public class BDRepositoryRemoteIT extends CommonAPISPTest {
 
     }
 
-    private void thenVerifyNumberOfAddresses(final int expectedCount) {
+    private void verifyNumberOfAddresses(final int expectedCount) {
         // TODO Auto-generated method stub
 
     }
 
-    private void whenAddAdressToEmployee(final HumanTaskInstance humanTaskInstance, final Serializable bizDataEmployeeFound,
+    private void addAdressToEmployee(final HumanTaskInstance humanTaskInstance, final Serializable bizDataEmployeeFound,
             final Serializable bizDataSfAddressesFound,
             final String employeeInputName, final String addressinputName) throws InvalidExpressionException, ExpressionEvaluationException {
         final Expression addAdressExpression = createGrovyExpressionToAddAddressToEmployee(employeeInputName, addressinputName);
