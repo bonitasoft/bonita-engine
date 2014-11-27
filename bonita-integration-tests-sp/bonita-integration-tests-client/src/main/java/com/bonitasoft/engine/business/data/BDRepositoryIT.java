@@ -36,10 +36,12 @@ import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
+import org.bonitasoft.engine.bpm.process.ProcessEnablementException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.CallActivityBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
@@ -58,6 +60,7 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.CommonAPISPTest;
@@ -74,6 +77,7 @@ import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.businessdata.BusinessDataReference;
+import com.bonitasoft.engine.businessdata.BusinessDataRepositoryException;
 import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
 
 public class BDRepositoryIT extends CommonAPISPTest {
@@ -247,7 +251,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         logoutOnTenant();
     }
 
-    //@Test
+    @Test
     public void deploying_bdm_after_process_should_put_process_in_resolved_state() throws Exception {
         final String aQualifiedName = "org.bonitasoft.test.Bo";
         final byte[] bom = buildSimpleBom(aQualifiedName);
@@ -298,7 +302,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
     }
 
     @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData", "business data java setter operation" }, jira = "BS-7217", story = "update a business data using a java setter operation")
-    //@Test
+    @Test
     public void shouldBeAbleToUpdateBusinessDataUsingBizDataJavaSetterOperation() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee e = new Employee(); e.firstName = 'Jules'; e.lastName = 'UnNamed'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
@@ -344,7 +348,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition.getId());
     }
 
-    //@Test
+    @Test
     public void deployABDRAndCreateADefaultBusinessDataAndReuseReference() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee e = new Employee(); e.firstName = 'Jane'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
@@ -376,7 +380,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition.getId());
     }
 
-    //@Test
+    @Test
     public void deployABDRAndCreateABOAndUdpateThroughAGroovyScript() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
@@ -401,7 +405,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition.getId());
     }
 
-    //@Test(expected = ProcessEnablementException.class)
+    @Test(expected = ProcessEnablementException.class)
     public void deployProcessWithWrongBusinessDataTypeShouldNotBeDeployable() throws Exception {
         final User user = createUser("login1", "password");
         ProcessDefinition processDefinition = null;
@@ -420,7 +424,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         }
     }
 
-    //@Test
+    @Test
     public void deployABDRAndExecuteAGroovyScriptWhichContainsAPOJOFromTheBDR() throws BonitaException {
         final Expression stringExpression = new ExpressionBuilder()
                 .createGroovyScriptExpression(
@@ -446,7 +450,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         disableAndDeleteProcess(processDefinition.getId());
     }
 
-    //@Test(expected = BonitaRuntimeException.class)
+    @Test(expected = BonitaRuntimeException.class)
     public void createAnEmployeeWithARequiredFieldAtNullThrowsAnException() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
                 "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
@@ -464,7 +468,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         }
     }
 
-    //@Test(expected = BonitaRuntimeException.class)
+    @Test(expected = BonitaRuntimeException.class)
     public void createAnEmployeeWithATooSmallFieldAtNullThrowsAnException() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee",
                 "import org.bonita.pojo.Employee; Employee e = new Employee(); e.firstName = 'John124578/'; e.lastName = 'Doe'; return e;",
@@ -483,7 +487,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         }
     }
 
-    //@Test
+    @Test
     public void updateBusinessDataShouldWorkOutsideATransaction() throws Exception {
         final String taskName = "step";
 
@@ -498,7 +502,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition);
     }
 
-    //@Test
+    @Test
     public void should_deploy_generate_client_bdm_jar_in_bonita_home() throws Exception {
         final String bonitaHomePath = System.getProperty(BonitaHome.BONITA_HOME);
         final String clientBdmJarPath = bonitaHomePath + File.separator + "server" + File.separator + "tenants" + File.separator + "1" + File.separator
@@ -508,7 +512,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         assertThat(getTenantManagementAPI().getClientBDMZip()).isNotEmpty();
     }
 
-    //@Test(expected = BusinessDataRepositoryException.class)
+    @Test(expected = BusinessDataRepositoryException.class)
     public void should_undeploy_delete_generate_client_bdm_jar_in_bonita_home() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         getTenantManagementAPI().pause();
@@ -523,7 +527,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         getTenantManagementAPI().getClientBDMZip();
     }
 
-    //@Test
+    @Test
     public void shouldBeAbleToRunDAOCallThroughGroovy() throws Exception {
         final String firstName = "FlofFlof";
         final String lastName = "Boudin";
@@ -568,7 +572,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition.getId());
     }
 
-    //@Test
+    @Test
     public void should_use_factory_to_instantiate_dao_on_client_side() throws Exception {
         final AddressRef ref1 = new AddressRef("newYorkAddr", "33, corner street", "NY");
         final AddressRef ref2 = new AddressRef("romeAddr", "2, plaza del popolo", "Roma");
@@ -755,7 +759,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
     @Cover(classes = { Operation.class }, concept = BPMNConcept.OPERATION, keywords = { "BusinessData", "java setter operation", "mandatory field",
             "intermixed" }, jira = "BS-8591", story = "Create business datas using intermixed java setter operations.")
-    //@Test
+    @Test
     public void shouldBeAbleToCreate2BusinessDataUsingIntermixedBizDataJavaSetterOperations() throws Exception {
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
                 "shouldBeAbleToUpdateBusinessDataUsingJavaSetterOperation", PROCESS_VERSION);
@@ -788,7 +792,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition.getId());
     }
 
-    //@Test
+    @Test
     public void shouldBeAbleToDeleteABusinessDataUsingOperation() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee e = new Employee(); e.firstName = 'John'; e.lastName = 'Doe'; return e;", EMPLOYEE_QUALIF_CLASSNAME);
@@ -860,7 +864,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
     }
 
-    //@Test
+    @Test
     public void deployABDRAndCreateAndUdpateAMultipleBusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployees", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';"
@@ -908,7 +912,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         }
     }
 
-    //@Test
+    @Test
     public void useMultipleBusinessDataInAUserTaskWithMultiInstance() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployees", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';"
@@ -939,7 +943,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         disableAndDeleteProcess(processDefinition);
     }
 
-    //@Test
+    @Test
     public void useMultipleBusinessDataInACallActivityWithSequentialMultiInstance() throws Exception {
         ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("UpdateEmployee", "1.2-beta");
         builder.addActor(ACTOR_NAME);
@@ -982,7 +986,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         disableAndDeleteProcess(subProcessDefinition);
     }
 
-    //@Test
+    @Test
     public void useMultipleBusinessDataInACallActivityWithInDataMultiInstance() throws Exception {
         ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("UpdateEmployee", "1.2-beta");
         builder.addActor(ACTOR_NAME);
@@ -1029,7 +1033,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         disableAndDeleteProcess(subProcessDefinition);
     }
 
-    //@Test deactivated until it is stable
+    @Test deactivated until it is stable
     public void useMultipleBusinessDataInACallActivityWithOutDataMultiInstance() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee john = new Employee(); john.firstName = 'John' + activityInstanceId; john.lastName = 'Doe'; john;",
@@ -1069,7 +1073,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         disableAndDeleteProcess(subProcessDefinition);
     }
 
-    //@Test
+    @Test
     public void should_return_the_list_of_entities_from_the_multiple_instance() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployees", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';"
@@ -1116,7 +1120,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition);
     }
 
-    //@Test
+    @Test
     public void commandGetBusinessData_should_return_a_simple_lazy_child() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; import org.bonita.pojo.Address; Employee e = new Employee(); e.firstName = 'Alphonse';"
@@ -1162,7 +1166,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         disableAndDeleteProcess(definition.getId());
     }
 
-    //@Test
+    @Test
     public void deployABDRAndCreateInOperationAMultipleBusinessData() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployees", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; Employee john = new Employee(); john.firstName = 'John'; john.lastName = 'Doe';"
