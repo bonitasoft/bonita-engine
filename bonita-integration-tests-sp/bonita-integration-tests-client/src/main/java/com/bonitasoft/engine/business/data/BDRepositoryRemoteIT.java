@@ -224,6 +224,7 @@ public class BDRepositoryRemoteIT extends CommonAPISPTest {
             getTenantManagementAPI().cleanAndUninstallBusinessDataModel();
             getTenantManagementAPI().resume();
         }
+        resumeClassloader();
 
         deleteUser(matti);
         logoutOnTenant();
@@ -332,6 +333,7 @@ public class BDRepositoryRemoteIT extends CommonAPISPTest {
     public void get_lazy_object_outside_a_transaction_should_throw_exception() throws Exception {
         final String bizDataGrenobleAdressName = "bizGrenobleAddress";
         final String bizDataSFAddressName = "bizSfAddress";
+        final String bizDataParisAddressName = "bizParisAddress";
         final String bizDataEmployeeName = "bizEmployee";
 
         final String automaticTaskToInitBizData = "step1";
@@ -339,10 +341,13 @@ public class BDRepositoryRemoteIT extends CommonAPISPTest {
         final String humanTask = "step3";
 
         final String citySF = "S.F.";
+        final String cityGrenoble = "Grenoble";
+        final String cityParis = "Paris";
 
         //given
-        final Expression grenobleAddressExpression = createGrovyExpressionThatCreateAddressWithCityName("Grenoble");
+        final Expression grenobleAddressExpression = createGrovyExpressionThatCreateAddressWithCityName(cityGrenoble);
         final Expression sfAddressExpression = createGrovyExpressionThatCreateAddressWithCityName(citySF);
+        final Expression parisAddressExpression = createGrovyExpressionThatCreateAddressWithCityName(cityParis);
         final Expression employeeExpression = createGrovyExpressionThatCreateEmployeWithOneAddress(bizDataGrenobleAdressName);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
@@ -351,6 +356,7 @@ public class BDRepositoryRemoteIT extends CommonAPISPTest {
         processDefinitionBuilder.addBusinessData(bizDataEmployeeName, EMPLOYEE_QUALIF_CLASSNAME, null);
         processDefinitionBuilder.addBusinessData(bizDataGrenobleAdressName, ADDRESS_QUALIF_CLASSNAME, grenobleAddressExpression);
         processDefinitionBuilder.addBusinessData(bizDataSFAddressName, ADDRESS_QUALIF_CLASSNAME, sfAddressExpression);
+        processDefinitionBuilder.addBusinessData(bizDataParisAddressName, ADDRESS_QUALIF_CLASSNAME, parisAddressExpression);
 
         processDefinitionBuilder.addActor(ACTOR_NAME);
 
@@ -361,19 +367,11 @@ public class BDRepositoryRemoteIT extends CommonAPISPTest {
                 .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataSFAddressName), OperatorType.ASSIGNMENT, null, null,
                         sfAddressExpression);
 
-        //                .addOperation(new OperationBuilder().createJavaMethodOperation("myEmployee", "addToAdresses",
-        //                        ADDRESS_QUALIF_CLASSNAME,
-        //                        new ExpressionBuilder().createInputExpression("address2", ADDRESS_QUALIF_CLASSNAME)));
-
-        //call java operation
-        processDefinitionBuilder.addAutomaticTask(automaticTaskToCallJavaMethodOperation)/*
-                                                                                          * .addOperation(
-                                                                                          * new OperationBuilder().createJavaMethodOperation("myEmployee",
-                                                                                          * "addToAdresses",
-                                                                                          * ADDRESS_QUALIF_CLASSNAME,
-                                                                                          * new ExpressionBuilder().createInputExpression("address2",
-                                                                                          * ADDRESS_QUALIF_CLASSNAME)))
-                                                                                          */;
+        //call java operation to add address
+        processDefinitionBuilder.addAutomaticTask(automaticTaskToCallJavaMethodOperation)
+                .addOperation(
+                        new OperationBuilder().createBusinessDataSetAttributeOperation(bizDataEmployeeName, "addToAddresses", ADDRESS_QUALIF_CLASSNAME,
+                                new ExpressionBuilder().createBusinessDataExpression(bizDataParisAddressName, ADDRESS_QUALIF_CLASSNAME)));
 
         //waiting task
         processDefinitionBuilder.addUserTask(humanTask, ACTOR_NAME);
@@ -396,9 +394,41 @@ public class BDRepositoryRemoteIT extends CommonAPISPTest {
                 .get(createBusinessDataExpressionToFindAddresses(citySF)
                         .getName())).get(0);
 
-        // when adding address to employee
-        final String employeeInputName = "myEmployee2";
-        final String addressinputName = "address2";
+        whenAddAdressToEmployee(humanTaskInstance, bizDataEmployeeFound, bizDataSfAddressesFound, "myEmployee2", "address2");
+
+        thenVerifyNumberOfAddresses(3);
+        //then get employee
+        //        final Map<Expression, Map<String, Serializable>> countAddressesExpressionMap = new HashMap<Expression, Map<String, Serializable>>();
+        //        final Expression findEmployeeExpression = createBusinessDataExpressionToFindTheEmployee();
+        //        final Expression countExpression = createGrovyExpressionToCountAdresses();
+        //        final Serializable employee = evaluateExpressionsOnActivityInstance.get(findEmployeeExpression.getName());
+        //
+        //        countAddressesExpressionMap.put(findEmployeeExpression, Collections.singletonMap("myEmployee", employee));
+        //        countAddressesExpressionMap.put(countExpression, Collections.singletonMap("myEmployee", employee));
+        //
+        //        final Map<String, Serializable> findEmployeeMap = getProcessAPI().evaluateExpressionsOnActivityInstance(
+        //                humanTaskInstance.getId(), countAddressesExpressionMap);
+        //
+        //
+        //        //then count addresses
+        //
+        //
+        //
+        //        assertThat(serializable).as("should get 3 address count").isEqualTo(3);
+
+        //cleanup
+        disableAndDeleteProcess(definition.getId());
+
+    }
+
+    private void thenVerifyNumberOfAddresses(final int expectedCount) {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void whenAddAdressToEmployee(final HumanTaskInstance humanTaskInstance, final Serializable bizDataEmployeeFound,
+            final Serializable bizDataSfAddressesFound,
+            final String employeeInputName, final String addressinputName) throws InvalidExpressionException, ExpressionEvaluationException {
         final Expression addAdressExpression = createGrovyExpressionToAddAddressToEmployee(employeeInputName, addressinputName);
 
         final Map<Expression, Map<String, Serializable>> addAdressExpressionMap = new HashMap<Expression, Map<String, Serializable>>();
@@ -408,25 +438,11 @@ public class BDRepositoryRemoteIT extends CommonAPISPTest {
         mapForAddAdress.put(employeeInputName, bizDataEmployeeFound);
         mapForAddAdress.put(addressinputName, bizDataSfAddressesFound);
 
-        final Map<Expression, Map<String, Serializable>> expressions2 = new HashMap<Expression, Map<String, Serializable>>();
-        expressions2.put(addAdressExpression, mapForAddAdress);
+        final Map<Expression, Map<String, Serializable>> mapToAddAddressToEmployee = new HashMap<Expression, Map<String, Serializable>>();
+        mapToAddAddressToEmployee.put(addAdressExpression, mapForAddAdress);
 
-        final Map<String, Serializable> evaluateExpressionsOnActivityInstance = getProcessAPI().evaluateExpressionsOnActivityInstance(
-                humanTaskInstance.getId(), expressions2);
-
-        final Serializable employee = evaluateExpressionsOnActivityInstance.get(addAdressExpression.getName());
-
-        //            then
-        final Expression countExpression = createGrovyExpressionToCountAdresses();
-        final Map<Expression, Map<String, Serializable>> expression3 = new HashMap<Expression, Map<String, Serializable>>();
-        expression3.put(countExpression, Collections.singletonMap("myEmployee", employee));
-
-        final Map<String, Serializable> evaluateExpressionsOnActivityInstance3 = getProcessAPI().evaluateExpressionsOnActivityInstance(
-                humanTaskInstance.getId(), expressions2);
-
-        final Serializable serializable = evaluateExpressionsOnActivityInstance3.get("countExpression");
-        assertThat(serializable).as("should get 2 address count").isEqualTo(2);
-
+        getProcessAPI().evaluateExpressionsOnActivityInstance(
+                humanTaskInstance.getId(), mapToAddAddressToEmployee);
     }
 
     private Expression createGrovyExpressionToAddAddressToEmployee(final String employeeInputName, final String addressinputName)
@@ -475,7 +491,7 @@ public class BDRepositoryRemoteIT extends CommonAPISPTest {
     }
 
     private Expression createBusinessDataExpressionToFindTheEmployee() throws InvalidExpressionException {
-        return new ExpressionBuilder().createQueryBusinessDataExpression("createQueryBusinessDataExpression",
+        return new ExpressionBuilder().createQueryBusinessDataExpression("createBusinessDataExpressionToFindTheEmployee",
                 "Employee.findByFirstNameAndLastNameNewOrder", EMPLOYEE_QUALIF_CLASSNAME,
                 new ExpressionBuilder().createConstantStringExpression("firstName", "Alphonse"),
                 new ExpressionBuilder().createConstantStringExpression("lastName", "Dupond"));
