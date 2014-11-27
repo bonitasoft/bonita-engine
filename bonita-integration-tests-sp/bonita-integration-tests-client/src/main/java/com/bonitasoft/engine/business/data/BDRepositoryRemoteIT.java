@@ -428,7 +428,7 @@ public class BDRepositoryRemoteIT extends CommonAPISPTest {
 
     private void addAdressToEmployee(final HumanTaskInstance humanTaskInstance, final Serializable bizDataEmployeeFound,
             final Serializable bizDataSfAddressesFound,
-            final String employeeInputName, final String addressinputName) throws InvalidExpressionException, ExpressionEvaluationException {
+            final String employeeInputName, final String addressinputName) throws Exception {
         final Expression addAdressExpression = createGrovyExpressionToAddAddressToEmployee(employeeInputName, addressinputName);
 
         final Map<Expression, Map<String, Serializable>> addAdressExpressionMap = new HashMap<Expression, Map<String, Serializable>>();
