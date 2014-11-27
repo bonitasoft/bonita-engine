@@ -22,7 +22,6 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
@@ -72,7 +71,7 @@ public class BDRepositoryRemoteIT extends CommonAPISPTest {
     private static final String ADDRESS_QUALIF_CLASSNAME = "org.bonita.pojo.Address";
     private static final String EMPLOYEE_QUALIF_CLASSNAME = "org.bonita.pojo.Employee";
 
-    private static final String GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME = "findByPhoneNumber";
+    //    private static final String GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME = "findByPhoneNumber";
 
     private User matti;
 
@@ -162,20 +161,8 @@ public class BDRepositoryRemoteIT extends CommonAPISPTest {
         final long processInstanceId = getProcessAPI().startProcess(definition.getId()).getId();
         final HumanTaskInstance humanTaskInstance = waitForUserTask(TASK_HUMAN_TASK, processInstanceId);
 
-        final Map<String, Serializable> evaluateExpressionsAtProcessInstanciation = getProcessAPI().evaluateExpressionsOnActivityInstance(
-                humanTaskInstance.getId(), createExpressionsToEvaluate(createBusinessDataExpressionToFindTheEmployee(),
-                        createBusinessDataExpressionToFindAddresses(CITY_SF)));
-
-        final Serializable bizDataEmployeeFound = evaluateExpressionsAtProcessInstanciation.get(createBusinessDataExpressionToFindTheEmployee().getName());
-        @SuppressWarnings("rawtypes")
-        final Serializable bizDataSfAddressesFound = (Serializable) ((List) evaluateExpressionsAtProcessInstanciation
-                .get(createBusinessDataExpressionToFindAddresses(CITY_SF)
-                        .getName())).get(0);
-
-        addAdressToEmployee(humanTaskInstance, bizDataEmployeeFound, bizDataSfAddressesFound);
-
         //then
-        verifyLazyAddressesCount(humanTaskInstance, 3);
+        verifyLazyAddressesCount(humanTaskInstance, 2);
         verifyEagerCountryFieldInAddresses(humanTaskInstance, COUNTRY_FRANCE);
         //cleanup
         disableAndDeleteProcess(definition.getId());
@@ -255,45 +242,6 @@ public class BDRepositoryRemoteIT extends CommonAPISPTest {
 
     }
 
-    private void addAdressToEmployee(final HumanTaskInstance humanTaskInstance, final Serializable bizDataEmployeeFound,
-            final Serializable bizDataSfAddressesFound
-            ) throws Exception {
-        final String employeeInputName = "employeeInput";
-        final String addressinputName = "adressInput";
-
-        final Expression addAdressExpression = createGrovyExpressionToAddAddressToEmployee(employeeInputName, addressinputName);
-
-        final Map<Expression, Map<String, Serializable>> addAdressExpressionMap = new HashMap<Expression, Map<String, Serializable>>();
-        addAdressExpressionMap.put(addAdressExpression, Collections.singletonMap("address", bizDataSfAddressesFound));
-
-        final Map<String, Serializable> mapForAddAdress = new HashMap<String, Serializable>();
-        mapForAddAdress.put(employeeInputName, bizDataEmployeeFound);
-        mapForAddAdress.put(addressinputName, bizDataSfAddressesFound);
-
-        final Map<Expression, Map<String, Serializable>> mapToAddAddressToEmployee = new HashMap<Expression, Map<String, Serializable>>();
-        mapToAddAddressToEmployee.put(addAdressExpression, mapForAddAdress);
-
-        getProcessAPI().evaluateExpressionsOnActivityInstance(
-                humanTaskInstance.getId(), mapToAddAddressToEmployee);
-    }
-
-    private Expression createGrovyExpressionToAddAddressToEmployee(final String employeeInputName, final String addressinputName)
-            throws InvalidExpressionException {
-        final Expression addAdressExpression;
-        final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(employeeInputName)
-                .append(".addToAddresses(")
-                .append(addressinputName)
-                .append("); ")
-                .append("return ")
-                .append(employeeInputName)
-                .append(";");
-        addAdressExpression = new ExpressionBuilder().createGroovyScriptExpression("addAdressExpression",
-                stringBuilder.toString()
-                , EMPLOYEE_QUALIF_CLASSNAME, new ExpressionBuilder().createInputExpression(employeeInputName, EMPLOYEE_QUALIF_CLASSNAME),
-                new ExpressionBuilder().createInputExpression(addressinputName, ADDRESS_QUALIF_CLASSNAME));
-        return addAdressExpression;
-    }
 
     private Expression createGrovyExpressionThatCreateEmployeWithOneAddress(final String businessDataAdressName) throws InvalidExpressionException {
         final StringBuilder script = new StringBuilder();
@@ -310,31 +258,31 @@ public class BDRepositoryRemoteIT extends CommonAPISPTest {
                 createBusinessDataExpressionWithName(businessDataAdressName));
     }
 
-    private Map<Expression, Map<String, Serializable>> createExpressionsToEvaluate(final Expression... expresssions) {
-        final Map<Expression, Map<String, Serializable>> expressions;
-        expressions = new HashMap<Expression, Map<String, Serializable>>();
-        final Map<String, Serializable> mapContext = new HashMap<String, Serializable>();
-        for (final Expression expression : expresssions) {
-            expressions.put(expression, mapContext);
-        }
-        return expressions;
-    }
-
-    private Expression createBusinessDataExpressionToFindAddresses(final String city) throws InvalidExpressionException {
-        return new ExpressionBuilder().createQueryBusinessDataExpression(
-                "createQueryBusinessDataExpressionFindAddress",
-                "Address.findByCity", List.class.getName(),
-                new ExpressionBuilder().createConstantStringExpression("city", city),
-                new ExpressionBuilder().createExpression("startIndex", "0", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
-                new ExpressionBuilder().createExpression("maxResults", "10", Integer.class.getName(), ExpressionType.TYPE_CONSTANT));
-    }
-
-    private Expression createBusinessDataExpressionToFindTheEmployee() throws InvalidExpressionException {
-        return new ExpressionBuilder().createQueryBusinessDataExpression("createBusinessDataExpressionToFindTheEmployee",
-                "Employee." + FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER, EMPLOYEE_QUALIF_CLASSNAME,
-                new ExpressionBuilder().createConstantStringExpression("firstName", "Alphonse"),
-                new ExpressionBuilder().createConstantStringExpression("lastName", "Dupond"));
-    }
+    //    private Map<Expression, Map<String, Serializable>> createExpressionsToEvaluate(final Expression... expresssions) {
+    //        final Map<Expression, Map<String, Serializable>> expressions;
+    //        expressions = new HashMap<Expression, Map<String, Serializable>>();
+    //        final Map<String, Serializable> mapContext = new HashMap<String, Serializable>();
+    //        for (final Expression expression : expresssions) {
+    //            expressions.put(expression, mapContext);
+    //        }
+    //        return expressions;
+    //    }
+    //
+    //    private Expression createBusinessDataExpressionToFindAddresses(final String city) throws InvalidExpressionException {
+    //        return new ExpressionBuilder().createQueryBusinessDataExpression(
+    //                "createQueryBusinessDataExpressionFindAddress",
+    //                "Address.findByCity", List.class.getName(),
+    //                new ExpressionBuilder().createConstantStringExpression("city", city),
+    //                new ExpressionBuilder().createExpression("startIndex", "0", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
+    //                new ExpressionBuilder().createExpression("maxResults", "10", Integer.class.getName(), ExpressionType.TYPE_CONSTANT));
+    //    }
+    //
+    //    private Expression createBusinessDataExpressionToFindTheEmployee() throws InvalidExpressionException {
+    //        return new ExpressionBuilder().createQueryBusinessDataExpression("createBusinessDataExpressionToFindTheEmployee",
+    //                "Employee." + FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER, EMPLOYEE_QUALIF_CLASSNAME,
+    //                new ExpressionBuilder().createConstantStringExpression("firstName", "Alphonse"),
+    //                new ExpressionBuilder().createConstantStringExpression("lastName", "Dupond"));
+    //    }
 
     private Expression createBusinessDataExpressionWithName(final String businessDataName) throws InvalidExpressionException {
         Expression createBusinessDataExpression;
