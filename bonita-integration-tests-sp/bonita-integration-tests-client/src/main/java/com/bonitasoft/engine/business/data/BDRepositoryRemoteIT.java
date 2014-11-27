@@ -121,7 +121,7 @@ public class BDRepositoryRemoteIT extends CommonAPISPTest {
     }
 
     @Test
-    public void get_lazy_object_outside_a_transaction_should_throw_exception() throws Exception {
+    public void get_lazy_object_outside_a_transaction_should_not_throw_exception() throws Exception {
         //given
         final Expression grenobleAddressExpression = createGrovyExpressionThatCreateAddressWithCityName(CITY_GRENOBLE, COUNTRY_FRANCE);
         final Expression sfAddressExpression = createGrovyExpressionThatCreateAddressWithCityName(CITY_SF, COUNTRY_USA);
