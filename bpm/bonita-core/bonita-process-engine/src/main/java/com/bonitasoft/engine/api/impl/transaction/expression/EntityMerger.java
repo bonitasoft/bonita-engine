@@ -19,6 +19,8 @@ package com.bonitasoft.engine.api.impl.transaction.expression;
 import java.io.Serializable;
 import java.util.Collection;
 
+import com.bonitasoft.engine.api.impl.transaction.expression.fix.LazyLoader;
+import com.bonitasoft.engine.api.impl.transaction.expression.fix.Proxyfier;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 
@@ -41,8 +43,10 @@ public class EntityMerger {
             try {
                 @SuppressWarnings("unchecked")
                 final Collection<Entity> newCollection = collection.getClass().newInstance();
+                
+                Proxyfier proxyfier = new Proxyfier(new LazyLoader(bdrService));
                 for (final Object item : collection) {
-                    newCollection.add(bdrService.merge((Entity) item));
+                    newCollection.add(proxyfier.proxifyIfNeeded((Entity) item));
                 }
                 return (Serializable) newCollection;
             } catch (final InstantiationException e) {
@@ -51,7 +55,8 @@ public class EntityMerger {
                 throw new IllegalStateException(e);
             }
         } else if (isAnEntity(value)) {
-            return bdrService.merge((Entity) value);
+            Proxyfier proxyfier = new Proxyfier(new LazyLoader(bdrService));
+            return proxyfier.proxifyIfNeeded((Entity) value);
         } else {
             return value;
         }

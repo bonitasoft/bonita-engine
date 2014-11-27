@@ -20,6 +20,8 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 
+import com.bonitasoft.engine.api.impl.transaction.expression.fix.LazyLoader;
+import com.bonitasoft.engine.api.impl.transaction.expression.fix.Proxyfier;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
@@ -55,11 +57,23 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
                 }
                 return businessDataRepository.findByNamedQuery(queryName, numberClass, parameters);
             } else if (List.class.getName().equals(returnType)) {
-                return businessDataRepository.findListByNamedQuery(queryName, Entity.class, parameters,
-                        getStartIndexParameter(expression.getDependencies(), resolvedExpressions, expression.getName(), parameters),
-                        getMaxResultParameter(expression.getDependencies(), resolvedExpressions, expression.getName(), parameters));
+                List<Entity> entities =
+                        businessDataRepository.findListByNamedQuery(queryName, Entity.class, parameters,
+                                getStartIndexParameter(expression.getDependencies(), resolvedExpressions, expression.getName(), parameters),
+                                getMaxResultParameter(expression.getDependencies(), resolvedExpressions, expression.getName(), parameters));
+                
+                List<Entity> e = new ArrayList<Entity>();
+                for (Entity entity : entities) {
+                    Proxyfier proxyfier = new Proxyfier(new LazyLoader(businessDataRepository));
+                    Entity proxify = proxyfier.proxify(entity);
+                    e.add(proxify);
+                }
+                
+                return e;
             } else {
-                return businessDataRepository.findByNamedQuery(queryName, Entity.class, parameters);
+                Entity findByNamedQuery = businessDataRepository.findByNamedQuery(queryName, Entity.class, parameters);
+                Proxyfier proxyfier = new Proxyfier(new LazyLoader(businessDataRepository));
+                return proxyfier.proxify(findByNamedQuery);
             }
         } catch (final NonUniqueResultException nure) {
             throw new SExpressionEvaluationException(nure, expression.getName());

@@ -35,25 +35,7 @@ import com.bonitasoft.engine.tenant.TenantIT;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-        PageAPIIT.class,
-        ApplicationAPIITs.class,
-        TenantIT.class,
-        NodeAPITest.class,
-        LogTest.class,
-        ExternalCommandsTestSP.class,
-        TaskOnDemandTest.class,
-        ProcessManagementTest.class,
-        PendingTasksIT.class,
-        ProcessSupervisedTest.class,
-        ProfileSPITest.class,
-        MonitoringAPITest.class,
-        SearchProcessInstanceTest.class,
-        ReportingSQLValidityIT.class,
-        PlatformMonitoringAPITest.class,
-        TenantIT.class,
-        BDRepositoryIT.class,
         BDRepositoryRemoteIT.class,
-        ExecuteBDMQueryCommandIT.class
 })
 @Initializer(BPMSPTestsForServers.class)
 public class BPMSPTestsForServers {

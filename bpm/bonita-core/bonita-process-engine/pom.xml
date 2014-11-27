@@ -21,6 +21,14 @@
 			<artifactId>manager</artifactId>
 		</dependency>
 
+    <dependency>
+        <artifactId>bonita-operation-api-impl</artifactId>
+        <groupId>org.bonitasoft.engine.core.operation</groupId>
+        <version>6.4.0-SNAPSHOT</version>
+    </dependency>
+
+    
+
 		<dependency>
 			<groupId>com.bonitasoft.engine</groupId>
 			<artifactId>bonita-common-sp</artifactId>
@@ -56,6 +64,11 @@
 			<artifactId>bonita-page-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.18.1-GA</version>
+        </dependency>
 		<dependency>
 			<groupId>com.bonitasoft.engine.data</groupId>
 			<artifactId>bonita-business-data-api</artifactId>

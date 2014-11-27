@@ -83,17 +83,14 @@ import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
 public class BDRepositoryIT extends CommonAPISPTest {
 
     private static final String ADDRESS_QUALIF_NAME = "org.bonita.pojo.Address";
+    private static final String EMPLOYEE_QUALIF_CLASSNAME = "org.bonita.pojo.Employee";
 
     private static final String GET_EMPLOYEE_BY_LAST_NAME_QUERY_NAME = "findByLastName";
-
     private static final String GET_EMPLOYEE_BY_PHONE_NUMBER_QUERY_NAME = "findByPhoneNumber";
 
     private static final String CLIENT_BDM_ZIP_FILENAME = "client-bdm.zip";
 
-    private static final String EMPLOYEE_QUALIF_CLASSNAME = "org.bonita.pojo.Employee";
-
     private User matti;
-
     private File clientFolder;
 
     private BusinessObjectModel buildBOM() {

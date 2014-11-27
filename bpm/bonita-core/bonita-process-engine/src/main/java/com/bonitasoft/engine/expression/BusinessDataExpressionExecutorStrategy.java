@@ -22,6 +22,8 @@ import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
+import com.bonitasoft.engine.api.impl.transaction.expression.fix.LazyLoader;
+import com.bonitasoft.engine.api.impl.transaction.expression.fix.Proxyfier;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
@@ -74,10 +76,20 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
             final Class<Entity> bizClass = (Class<Entity>) Thread.currentThread().getContextClassLoader().loadClass(refBusinessDataInstance.getDataClassName());
             if (refBusinessDataInstance instanceof SSimpleRefBusinessDataInstance) {
                 final SSimpleRefBusinessDataInstance reference = (SSimpleRefBusinessDataInstance) refBusinessDataInstance;
-                return businessDataRepository.findById(bizClass, reference.getDataId());
+                Entity findByNamedQuery = businessDataRepository.findById(bizClass, reference.getDataId());
+                Proxyfier proxyfier = new Proxyfier(new LazyLoader(businessDataRepository));
+                return proxyfier.proxify(findByNamedQuery);
             }
             final SMultiRefBusinessDataInstance reference = (SMultiRefBusinessDataInstance) refBusinessDataInstance;
-            return businessDataRepository.findByIds(bizClass, reference.getDataIds());
+            List<Entity> entities =  businessDataRepository.findByIds(bizClass, reference.getDataIds());
+            
+            List<Entity> e = new ArrayList<Entity>();
+            for (Entity entity : entities) {
+                Proxyfier proxyfier = new Proxyfier(new LazyLoader(businessDataRepository));
+                e.add(proxyfier.proxify(entity));
+            }
+            return e;
+            
         } catch (final SBonitaReadException e) {
             throw new SExpressionEvaluationException("Unable to retrieve business data instance with name " + businessDataName, expression.getName());
         } catch (final SBonitaException e) {
