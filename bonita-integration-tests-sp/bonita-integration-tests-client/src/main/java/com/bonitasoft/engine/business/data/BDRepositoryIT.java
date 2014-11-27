@@ -58,7 +58,6 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.CommonAPISPTest;
@@ -1115,78 +1114,6 @@ public class BDRepositoryIT extends CommonAPISPTest {
         assertThat(((SimpleBusinessDataReference) references.get(0)).getStorageId()).isNotNull();
 
         disableAndDeleteProcess(definition);
-    }
-
-    @Test
-    public void get_lazy_object_outside_a_transaction_should_throw_exception() throws Exception {
-        final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
-                + "; import org.bonita.pojo.Address; Employee e = new Employee(); e.firstName = 'Alphonse';"
-                + " e.lastName = 'Dupond'; e.addToAddresses(myAddress); return e;", EMPLOYEE_QUALIF_CLASSNAME,
-                new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIF_NAME));
-
-        final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
-                "import org.bonita.pojo.Address; import org.bonita.pojo.Country; "
-                        + "Country c = new Country(); c.name='France'; "
-                        + "Address a = new Address(); a.street='32, rue Gustave Eiffel'; a.city='Grenoble'; a.country = c; a;",
-                ADDRESS_QUALIF_NAME);
-
-        final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
-                "rest", "1.0");
-        final String bizDataName = "myEmployee";
-        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIF_CLASSNAME, null);
-        processDefinitionBuilder.addBusinessData("myAddress", ADDRESS_QUALIF_NAME, addressExpression);
-        processDefinitionBuilder.addActor(ACTOR_NAME);
-        processDefinitionBuilder.addAutomaticTask("step1")
-                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName), OperatorType.ASSIGNMENT, null, null, employeeExpression);
-        processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
-        processDefinitionBuilder.addTransition("step1", "step2");
-
-        final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
-        final long processInstanceId = getProcessAPI().startProcess(definition.getId()).getId();
-
-        final HumanTaskInstance humanTaskInstance = waitForUserTask("step2", processInstanceId);
-
-        final Expression createQueryBusinessDataExpression = new ExpressionBuilder().createQueryBusinessDataExpression("expression Name",
-                "Employee.findByFirstNameAndLastNameNewOrder", EMPLOYEE_QUALIF_CLASSNAME,
-                new ExpressionBuilder().createConstantStringExpression("firstName", "Alphonse"),
-                new ExpressionBuilder().createConstantStringExpression("lastName", "Dupond"));
-
-        final Map<String, Serializable> map = new HashMap<String, Serializable>();
-
-        final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
-        expressions.put(createQueryBusinessDataExpression, map);
-
-        final Map<String, Serializable> evaluateExpressionsAtProcessInstanciation = getProcessAPI().evaluateExpressionsOnActivityInstance(
-                humanTaskInstance.getId(), expressions);
-
-        assertThat(evaluateExpressionsAtProcessInstanciation).as("should retrieve employee").hasSize(1);
-        final Serializable businessData = evaluateExpressionsAtProcessInstanciation.get(createQueryBusinessDataExpression.getName());
-
-        final Expression countExpression = new ExpressionBuilder().createGroovyScriptExpression("countExpression", "myEmployee.getAddresses().size()"
-                , Integer.class.getName(),
-                new ExpressionBuilder().createInputExpression("myEmployee", EMPLOYEE_QUALIF_CLASSNAME));
-
-        final Map<Expression, Map<String, Serializable>> expressions2 = new HashMap<Expression, Map<String, Serializable>>();
-        expressions2.put(countExpression, Collections.singletonMap("myEmployee", businessData));
-
-        //        final Method method = businessData.getClass().getMethod("getAddresses");
-        //        final Object invoke = method.invoke(businessData);
-        //        final Method getSizeMethod = invoke.getClass().getMethod("size");
-        //        getSizeMethod.invoke(invoke);
-
-
-        try {
-            final Map<String, Serializable> evaluateExpressionsOnActivityInstance = getProcessAPI().evaluateExpressionsOnActivityInstance(
-                    humanTaskInstance.getId(), expressions2);
-
-            final Serializable serializable = evaluateExpressionsOnActivityInstance.get("countExpression");
-            assertThat(serializable).as("should get 1 address count").isEqualTo(1);
-
-        } finally {
-            disableAndDeleteProcess(definition.getId());
-
-        }
-
     }
 
     //@Test
