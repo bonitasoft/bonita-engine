@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.bonitasoft.engine</groupId>
     <artifactId>services</artifactId>
-    <version>6.4.0</version>
+    <version>6.4.0-SNAPSHOT</version>
   </parent>
   <groupId>com.bonitasoft.engine.application</groupId>
   <artifactId>bonita-business-application</artifactId>
