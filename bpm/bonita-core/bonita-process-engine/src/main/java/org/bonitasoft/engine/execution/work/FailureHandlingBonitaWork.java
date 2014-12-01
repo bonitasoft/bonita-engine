@@ -110,10 +110,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
                 logBuilder.append(message);
             }
             logBuilder.append("\"");
-            loggerService.log(getClass(), TechnicalLogSeverity.ERROR, logBuilder.toString());
-        }
-        if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Exception : ", e);
+            loggerService.log(getClass(), TechnicalLogSeverity.ERROR, logBuilder.toString(), e);
         }
     }
 
