@@ -18,11 +18,11 @@ import java.util.Date;
 import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
- * represents a Role inside the organization.
+ * Represents a role inside the organization.
  *
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
- * @see RoleAPI
+ * @see org.bonitasoft.engine.api.RoleAPI
  * @since 6.0.0
  */
 public interface Role extends BonitaObject {

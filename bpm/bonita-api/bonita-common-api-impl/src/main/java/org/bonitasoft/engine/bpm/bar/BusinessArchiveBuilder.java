@@ -101,9 +101,9 @@ public class BusinessArchiveBuilder {
      * This resource must be a connector implementation descriptor file (.impl) and must be compliant to the connector-implementation-descriptor.xsd
      * <p>
      * A connector definition should also be added in the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition} using
-     * {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder#addConnector(String, String, String, org.bonitasoft.engine.bpm.model.ConnectorEvent)}
+     * {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder#addConnector(String, String, String, org.bonitasoft.engine.bpm.connector.ConnectorEvent)}
      * or
-     * {@link org.bonitasoft.engine.bpm.process.impl.ActivityDefinitionBuilder#addConnector(String, String, String, org.bonitasoft.engine.bpm.model.ConnectorEvent)}
+     * {@link org.bonitasoft.engine.bpm.process.impl.ActivityDefinitionBuilder#addConnector(String, String, String, org.bonitasoft.engine.bpm.connector.ConnectorEvent)}
      * <p>
      * <p>
      * e.g. if you add a connector in your process add here dependencies the process need to execute it
