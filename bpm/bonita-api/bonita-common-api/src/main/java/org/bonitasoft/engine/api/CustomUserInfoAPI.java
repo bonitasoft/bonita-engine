@@ -51,13 +51,14 @@ public interface CustomUserInfoAPI {
      * </pre>
      * <p></p>
      *
-     * @param creator a {@link org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator} describing all information about the
-     *        {@code CustomUserInfoDefinition} to be created
-     * @return the created {@code CustomUserInfoDefinition}
+     * @param creator
+     *        A {@link org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator} describing all information about the {@code CustomUserInfoDefinition} to
+     *        be created
+     * @return The created {@code CustomUserInfoDefinition}
      * @throws AlreadyExistsException
-     *         if a {@code CustomUserInfoDefinition} already exists with the same name.
+     *         If a {@code CustomUserInfoDefinition} already exists with the same name.
      * @throws CreationException
-     *         if an error occurs during the creation
+     *         If an error occurs during the creation
      * @see org.bonitasoft.engine.identity.CustomUserInfoDefinition
      * @see org.bonitasoft.engine.identity.User
      * @see org.bonitasoft.engine.identity.CustomUserInfoDefinitionCreator
@@ -69,10 +70,10 @@ public interface CustomUserInfoAPI {
      * Retrieves the list of {@link CustomUserInfoDefinition} according to the given pagination criteria, ordered by name.
      *
      * @param startIndex
-     *        the index for the first element to be retrieved (starts from zero)
+     *        The index for the first element to be retrieved (starts from zero)
      * @param maxResult
-     *        the maximum number of elements to be retrieved.
-     * @return the list of {@code CustomUserInfoDefinition} according to the given pagination criteria, ordered by name.
+     *        The maximum number of elements to be retrieved.
+     * @return The list of {@code CustomUserInfoDefinition} according to the given pagination criteria, ordered by name.
      * @since 6.3
      * @see org.bonitasoft.engine.identity.CustomUserInfoDefinition
      */
@@ -82,7 +83,7 @@ public interface CustomUserInfoAPI {
     /**
      * Retrieves the number of existing {@link org.bonitasoft.engine.identity.CustomUserInfoDefinition}s.
      *
-     * @return the number of existing {@code CustomUserInfoDefinition}s.
+     * @return The number of existing {@code CustomUserInfoDefinition}s.
      * @since 6.3
      * @see org.bonitasoft.engine.identity.CustomUserInfoDefinition
      */
@@ -93,9 +94,9 @@ public interface CustomUserInfoAPI {
      * will be deleted as well.
      *
      * @param id
-     *        the identifier of the {@code CustomUserInfoDefinition}
+     *        The identifier of the {@code CustomUserInfoDefinition}
      * @throws DeletionException
-     *         if an error occurs during deletion
+     *         If an error occurs during deletion
      * @since 6.3
      * @see org.bonitasoft.engine.identity.CustomUserInfoDefinition
      * @see org.bonitasoft.engine.identity.CustomUserInfoValue
@@ -107,11 +108,11 @@ public interface CustomUserInfoAPI {
      * {@code CustomUserInfo}s which have {@code CustomUserInfoDefinition} without a related {@link CustomUserInfoValue}, the field value will be null.
      *
      * @param userId
-     *        the {@link org.bonitasoft.engine.identity.User} identifier
+     *        The identifier of the {@link org.bonitasoft.engine.identity.User}
      * @param startIndex
-     *        the index of the first result to be retrieved (it starts from zero)
+     *        The index of the first element to be retrieved (it starts from zero)
      * @param maxResult
-     *        the maximum elements to be retrieved.
+     *        The maximum elements to be retrieved.
      * @return The list of {@link CustomUserInfo} for the given {@code User}, ordered by {@code CustomUserInfoDefinition} name.
      * @see CustomUserInfoDefinition
      * @see CustomUserInfoValue
@@ -127,8 +128,7 @@ public interface CustomUserInfoAPI {
      * {@link org.bonitasoft.engine.identity.CustomUserInfoValueSearchDescriptor}.
      * <p></p>
      * Example: searches the first 10 {@code CustomUserInfoValue}s having the given {@code CustomUserInfoDefinition} (referenced by its identifier) with the
-     * given
-     * value. The result is ordered by the related {@code User} identifier:
+     * given value. The result is ordered by the related {@code User} identifier:
      * <pre>
      * SearchOptionsBuilder optionsBuilder = new SearchOptionsBuilder(0, 10);
      * optionsBuilder.filter(CustomUserInfoValueSearchDescriptor.DEFINITION_ID, userInfoDefinition.getId());
@@ -138,8 +138,8 @@ public interface CustomUserInfoAPI {
      * </pre>
      *
      * @param options
-     *        the {@link org.bonitasoft.engine.search.SearchOptions} containing the search criteria
-     * @return the {@link org.bonitasoft.engine.search.SearchResult} containing the number and the list of {@code CustomUserInfoValue}s matching the criteria
+     *        The {@link org.bonitasoft.engine.search.SearchOptions} containing the search criteria
+     * @return The {@link org.bonitasoft.engine.search.SearchResult} containing the number and the list of {@code CustomUserInfoValue}s matching the criteria
      * @since 6.3
      * @see org.bonitasoft.engine.search.SearchOptions
      * @see org.bonitasoft.engine.identity.CustomUserInfoValue
@@ -152,17 +152,18 @@ public interface CustomUserInfoAPI {
      * Defines the value of a {@link org.bonitasoft.engine.identity.CustomUserInfoDefinition} for a given {@link org.bonitasoft.engine.identity.User}.
      *
      * @param definitionId
-     *        the {@code CustomUserInfoDefinition} identifier
+     *        The identifier of the {@code CustomUserInfoDefinition}
      * @param userId
-     *        the {@code User} identifier
+     *        The identifier of the {@code User}
      * @param value
-     *        the {@code Custom User Information} value
+     *        The {@code Custom User Information} value
      * @return a {@link org.bonitasoft.engine.identity.CustomUserInfoValue} representing the value of the given {@code CustomUserInfoDefinition} for the given
      *         {@code User}
-     * @throws org.bonitasoft.engine.exception.UpdateException when an error occurs during the update.
+     * @throws org.bonitasoft.engine.exception.UpdateException
+     *         When an error occurs during the update.
      * @since 6.3
-     * @see org.bonitasoft.engine.identity.CustomUserInfoDefinition
-     * @see org.bonitasoft.engine.identity.User
+     * @see org.bonitasoft.engine.identity.CustomUserInfoDefinition#getId()
+     * @see org.bonitasoft.engine.identity.User#getId()
      * @see org.bonitasoft.engine.identity.CustomUserInfoValue
      */
     CustomUserInfoValue setCustomUserInfoValue(long definitionId, long userId, String value) throws UpdateException;
