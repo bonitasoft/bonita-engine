@@ -19,9 +19,11 @@ import java.util.Map;
 
 /**
  * The descriptor which contains the fields to update an actor.
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
+ * @since 6.0.0
+ * @version 6.4.1
  */
 public class ActorUpdater implements Serializable {
 
@@ -32,11 +34,11 @@ public class ActorUpdater implements Serializable {
      */
     public enum ActorField {
         /**
-         * The name of the field corresponding to the display name of the actor
+         * Corresponding to the display name of the actor
          */
         DISPLAY_NAME,
         /**
-         * The name of the field corresponding to the description of the actor
+         * Corresponding to the description of the actor
          */
         DESCRIPTION;
     }
@@ -51,28 +53,28 @@ public class ActorUpdater implements Serializable {
     }
 
     /**
-     * Set the new display name
-     * 
+     * Set the new display name.
+     *
      * @param name
-     *            The new display name
+     *        The new display name
      */
     public void setDisplayName(final String name) {
         fields.put(ActorField.DISPLAY_NAME, name);
     }
 
     /**
-     * Set the new description
-     * 
+     * Set the new description.
+     *
      * @param description
-     *            The new description
+     *        The new description
      */
     public void setDescription(final String description) {
         fields.put(ActorField.DESCRIPTION, description);
     }
 
     /**
-     * Get the fields to update, and the new value
-     * 
+     * Get the fields to update, and the new value.
+     *
      * @return The map containing the pairs (field, new value) to update.
      */
     public Map<ActorField, Serializable> getFields() {
