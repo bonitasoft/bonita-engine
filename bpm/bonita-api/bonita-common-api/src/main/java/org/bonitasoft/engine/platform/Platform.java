@@ -21,10 +21,10 @@ import java.io.Serializable;
  * The <code>platform</code> is the base on which runs the <code>Bonita BPM Engine</code>. There is only one platform for a running <code>Bonita BPM
  * Engine</code>.
  * <p>
- * In order to perform actions on the platform, please, refer to the {@link PlatformAPI}
+ * In order to perform actions on the platform, please, refer to the {@link org.bonitasoft.engine.api.PlatformAPI}
  *
  * @author Matthieu Chaffotte
- * @see PlatformAPI
+ * @see org.bonitasoft.engine.api.PlatformAPI
  * @since 6.0.0
  */
 public interface Platform extends Serializable {

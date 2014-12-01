@@ -97,7 +97,7 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user for whom to list the hidden tasks.
      * @param searchOptions
-     *        The search criterion. See {@link HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        The search criterion. See {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return The list of hidden tasks for the specified user.
      * @throws SearchException
      *         If an exception occurs when getting the list of tasks.
@@ -109,7 +109,7 @@ public interface ProcessRuntimeAPI {
      * List all open root process instances.
      *
      * @param searchOptions
-     *        The search criterion. See {@link ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return A {@link ProcessInstance} object.
      * @throws SearchException
      *         If an exception occurs when getting the list of tasks.
@@ -121,7 +121,7 @@ public interface ProcessRuntimeAPI {
      * List all process instances.
      *
      * @param searchOptions
-     *        The search criterion. See {@link ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return A {@link ProcessInstance} object.
      * @throws SearchException
      *         If an exception occurs when getting the list of {@link ProcessInstance}.
@@ -133,7 +133,7 @@ public interface ProcessRuntimeAPI {
      * List all process instances with at least one failed task or the {@link org.bonitasoft.engine.bpm.process.ProcessInstanceState#ERROR} state.
      *
      * @param searchOptions
-     *        The search criterion. See {@link ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return A {@link ProcessInstance} object.
      * @throws SearchException
      *         If an exception occurs when getting the list of {@link ProcessInstance}.
@@ -148,7 +148,7 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search criterion. See {@link ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return The list of process instances supervised by the specified user.
      * @throws SearchException
      *         If an exception occurs when getting the list of process instances.
@@ -248,10 +248,8 @@ public interface ProcessRuntimeAPI {
      * @param processInstanceId
      *        The identifier of the process instance.
      * @return The number of open activity instances.
-     *         #throws ProcessInstanceNotFoundException
-     *         if the specified process instacne id does not refer to a process instance.
      * @throws ProcessInstanceNotFoundException
-     *         If no matching process definition is found for parameter processInstanceId
+     *         If no matching process instance is found for parameter processInstanceId
      * @since 6.0
      */
     int getNumberOfOpenedActivityInstances(long processInstanceId) throws ProcessInstanceNotFoundException;
@@ -633,8 +631,8 @@ public interface ProcessRuntimeAPI {
     /**
      * Get the list of pending human task instances available to the specified user.
      * A human task is pending for a given user if it is not yet assigned and if the
-     * user is a candidate either through an {@link ActorMember} or through a {@link UserFilter}. Hidden tasks for this user are not retrieved (see
-     * {@link #hideTasks(long, Long...)}).
+     * user is a candidate either through an {@link org.bonitasoft.engine.bpm.actor.ActorMember} or through a {@link org.bonitasoft.engine.filter.UserFilter}.
+     * Hidden tasks for this user are not retrieved (see {@link #hideTasks(long, Long...)}).
      *
      * @param userId
      *        The identifier of the user.
@@ -1224,9 +1222,8 @@ public interface ProcessRuntimeAPI {
      * Search the archived human tasks for tasks that match the search options.
      *
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results. See {@link ArchivedHumanTaskInstanceSearchDescriptor} for valid
-     *        fields
-     *        for searching and sorting.
+     *        The search conditions and the options for sorting and paging the results. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return The archived human tasks that match the search conditions.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -1242,8 +1239,8 @@ public interface ProcessRuntimeAPI {
      * @param managerUserId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results. See {@link HumanTaskInstanceSearchDescriptor} for valid fields for
-     *        searching and sorting.
+     *        The search conditions and the options for sorting and paging the results. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return The assigned human tasks that match the search conditions and are supervised by the user.
      * @throws SearchException
      *         If there is an error in the search conditions.
@@ -1257,8 +1254,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results. See {@link HumanTaskInstanceSearchDescriptor} for valid fields for
-     *        searching and sorting.
+     *        The search conditions and the options for sorting and paging the results. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return The pending human tasks that match the search conditions and are supervised by the user.
      * @throws SearchException
      *         If there is an error in the search conditions.
@@ -1272,8 +1269,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results. See {@link HumanTaskInstanceSearchDescriptor} for valid fields for
-     *        searching and sorting.
+     *        The search conditions and the options for sorting and paging the results. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return The pending human tasks that match the search conditions and are available to the user.
      * @throws SearchException
      *         If there is an error in the search conditions.
@@ -1287,8 +1284,8 @@ public interface ProcessRuntimeAPI {
      * @param managerUserId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results. See {@link HumanTaskInstanceSearchDescriptor} for valid fields for
-     *        searching and sorting.
+     *        The search conditions and the options for sorting and paging the results. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return The pending human tasks that match the search conditions and are managed by the user.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1306,8 +1303,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results. See {@link HumanTaskInstanceSearchDescriptor} for valid fields for
-     *        searching and sorting.
+     *        The search conditions and the options for sorting and paging the results. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return The assigned and pending human tasks
      * @throws SearchException
      *         If there is an error in the search conditions.
@@ -1322,8 +1319,8 @@ public interface ProcessRuntimeAPI {
      * @param rootProcessDefinitionId
      *        The identifier of the root process definition
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results. See {@link HumanTaskInstanceSearchDescriptor} for valid fields for
-     *        searching and sorting.
+     *        The search conditions and the options for sorting and paging the results. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return The assigned and pending human tasks
      * @throws SearchException
      *         If there is an error in the search conditions.
@@ -1345,7 +1342,7 @@ public interface ProcessRuntimeAPI {
     Map<Long, Long> getNumberOfOverdueOpenTasks(List<Long> userIds);
 
     /**
-     * Cancels the process instance and all of its active flownodes.
+     * Cancels the process instance and all of its active flow nodes.
      *
      * @param processInstanceId
      *        The identifier of the process instance.
@@ -1577,8 +1574,8 @@ public interface ProcessRuntimeAPI {
      * Search for connector instances.
      *
      * @param searchOptions
-     *        The search conditions and the options for sorting and paging the results. See {@link ConnectorInstancesSearchDescriptor} for valid fields for
-     *        searching and sorting.
+     *        The search conditions and the options for sorting and paging the results. See
+     *        {@link org.bonitasoft.engine.bpm.connector.ConnectorInstancesSearchDescriptor} for valid fields for searching and sorting.
      * @return The {@link SearchResult} containing the <code>ConnectorInstance</code>s matching the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1592,7 +1589,8 @@ public interface ProcessRuntimeAPI {
      * Search for archived connector instances.
      *
      * @param searchOptions
-     *        The search options parameters. See {@link ArchiveConnectorInstancesSearchDescriptor} for valid fields for searching and sorting.
+     *        The search options parameters. See {@link org.bonitasoft.engine.bpm.connector.ArchiveConnectorInstancesSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The {@link SearchResult} containing the <code>ArchivedConnectorInstance</code>s matching the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1640,9 +1638,8 @@ public interface ProcessRuntimeAPI {
      * Search for archived activity instances in terminal states. Archived activity instances in intermediate states are not considered.
      *
      * @param searchOptions
-     *        The criterion used to search for archived activity instances. See {@link ArchivedActivityInstanceSearchDescriptor} for valid fields for
-     *        searching
-     *        and sorting.
+     *        The criterion used to search for archived activity instances. See
+     *        {@link org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstanceSearchDescriptor} for valid fields for searching and sorting.
      * @return A {@link SearchResult} containing the search result.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1656,7 +1653,8 @@ public interface ProcessRuntimeAPI {
      * Search for activity instances.
      *
      * @param searchOptions
-     *        The criterion used to search for activity instances. See {@link ActivityInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        The criterion used to search for activity instances. See {@link org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor} for valid
+     *        fields for searching and sorting.
      * @return A {@link SearchResult} containing the search result.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1670,7 +1668,8 @@ public interface ProcessRuntimeAPI {
      * Search for flow node instances (activities, gateways and events).
      *
      * @param searchOptions
-     *        The criterion used to search for flow node instances. See {@link FlowNodeInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        The criterion used to search for flow node instances. See {@link org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor} for valid
+     *        fields for searching and sorting.
      * @return A {@link SearchResult} containing the search result
      * @throws InvalidSessionException
      *         If the ession is invalid, e.g session has expired.
@@ -1684,8 +1683,8 @@ public interface ProcessRuntimeAPI {
      * Search for archived flow node instances (activities, gateways and events)
      *
      * @param searchOptions
-     *        The options used to search for flow node instances. See {@link ArchivedFlowNodeInstanceSearchDescriptor} for valid fields for searching and
-     *        sorting.
+     *        The options used to search for flow node instances. See {@link org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor} for
+     *        valid fields for searching and sorting.
      * @return A {@link SearchResult} containing the search result.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g session has expired.
@@ -1704,7 +1703,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user for whom the tasks are available.
      * @param searchOptions
-     *        The options used to search for tasks. See {@link HumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        The options used to search for tasks. See {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @return The list of tasks matching the search options.
      * @throws InvalidSessionException
      *         If the current session is invalid.
@@ -1718,7 +1718,8 @@ public interface ProcessRuntimeAPI {
      * Search for comments related to the specified process instance.
      *
      * @param searchOptions
-     *        The options used to search for comments. See {@link SearchCommentsDescriptor} for valid fields for searching and sorting.
+     *        The options used to search for comments. See {@link org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptorr} for valid fields for searching
+     *        and sorting.
      * @return The matching comments.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1784,7 +1785,8 @@ public interface ProcessRuntimeAPI {
      * @param managerUserId
      *        The identifier of the user.
      * @param searchOptions
-     *        The options used to search for comments. See {@link SearchCommentsDescriptor} for valid fields for searching and sorting.
+     *        The options used to search for comments. See {@link org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor} for valid fields for searching and
+     *        sorting.
      * @return The comments managed by the user that match the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1800,7 +1802,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The options used to search for comments. See {@link SearchCommentsDescriptor} for valid fields for searching and sorting.
+     *        The options used to search for comments. See {@link org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor} for valid fields for searching and
+     *        sorting.
      * @return The comments on process instances that the user can access.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1900,7 +1903,8 @@ public interface ProcessRuntimeAPI {
      * Search for archived comments.
      *
      * @param searchOptions
-     *        The options used to search for comments. See {@link ArchivedCommentsSearchDescriptor} for valid fields for searching and sorting.
+     *        The options used to search for comments. See {@link org.bonitasoft.engine.bpm.comment.ArchivedCommentsSearchDescriptor} for valid fields for
+     *        searching and sorting.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @return The <code>ArchivedComment</code> items that match the search options.
@@ -1916,7 +1920,8 @@ public interface ProcessRuntimeAPI {
      * @param managerUserId
      *        The identifier of the user manager,
      * @param searchOptions
-     *        The options used to search for tasks. See {@link ArchivedHumanTaskInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        The options used to search for tasks. See {@link org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor} for valid fields
+     *        for searching and sorting.
      * @return The archived humanTask instances managed by the specified user that match the search options.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -1930,7 +1935,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The options used to search for process instance. See {@link ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        The options used to search for process instance. See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid fields
+     *        for searching and sorting.
      * @return The <code>ProcessInstance</code>s that match the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -1946,7 +1952,8 @@ public interface ProcessRuntimeAPI {
      * @param managerUserId
      *        The identifier of the user manager.
      * @param searchOptions
-     *        The search options (pagination, filter, order sort). See {@link ProcessInstanceSearchDescriptor} for valid fields for searching and sorting.
+     *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor} for valid
+     *        fields for searching and sorting.
      * @return The <code>ProcessInstance</code>s that match the search options.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -1961,10 +1968,10 @@ public interface ProcessRuntimeAPI {
      *
      * @param searchOptions
      *        The search options (pagination, filter, order sort).
-     * @return The archived process instances that match the search options. See {@link ArchivedProcessInstancesSearchDescriptor} for valid fields for searching
-     *         and sorting.
+     * @return The archived process instances that match the search options. See
+     *         {@link org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor} for valid fields for searching and sorting.
      * @throws SearchException
-     *         If the search could not be fullfilled correctly
+     *         If the search could not be full filled correctly
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
      * @since 6.0
@@ -1977,8 +1984,8 @@ public interface ProcessRuntimeAPI {
      * retrieved for a single ProcessInstance (one for each reached state).
      *
      * @param searchOptions
-     *        The search options (pagination, filter, order sort). See {@link ArchivedProcessInstancesSearchDescriptor} for valid fields for searching and
-     *        sorting.
+     *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor} for
+     *        valid fields for searching and sorting.
      * @return The archived process instances in all states that match the search options.
      * @throws SearchException
      *         If the search could not be completed correctly.
@@ -1992,8 +1999,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search options (pagination, filter, order sort). See {@link ArchivedProcessInstancesSearchDescriptor} for valid fields for searching and
-     *        sorting.
+     *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor} for
+     *        valid fields for searching and sorting.
      * @return The archived process instances supervised by the user that match the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -2009,8 +2016,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search options (pagination, filter, order sort). See {@link ArchivedProcessInstancesSearchDescriptor} for valid fields for searching and
-     *        sorting.
+     *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor} for
+     *        valid fields for searching and sorting.
      * @return The archived process instances that the user can access that match the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -2024,8 +2031,8 @@ public interface ProcessRuntimeAPI {
      * Search for human task instances.
      *
      * @param searchOptions
-     *        The search options (pagination, filter, order sort). See {@link HumanTaskInstanceSearchDescriptor} for valid fields for searching and
-     *        sorting.
+     *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid
+     *        fields for searching and sorting.
      * @return The human task instances that match the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -2041,8 +2048,8 @@ public interface ProcessRuntimeAPI {
      * @param supervisorId
      *        The identifier of supervising user.
      * @param searchOptions
-     *        The search options (pagination, filter, order sort). See {@link HumanTaskInstanceSearchDescriptor} for valid fields for searching and
-     *        sorting.
+     *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor} for valid
+     *        fields for searching and sorting.
      * @return The human task instances that match the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -2058,8 +2065,8 @@ public interface ProcessRuntimeAPI {
      * @param supervisorId
      *        The identifier of the supervising user.
      * @param searchOptions
-     *        The search options (pagination, filter, order sort). See {@link ArchivedHumanTaskInstanceSearchDescriptor} for valid fields for searching and
-     *        sorting.
+     *        The search options (pagination, filter, order sort). See {@link org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor} for
+     *        valid fields for searching and sorting.
      * @return The archived human task instances that match the search options.
      * @throws InvalidSessionException
      *         If the session is invalid, e.g. the session has expired.
@@ -2314,7 +2321,7 @@ public interface ProcessRuntimeAPI {
      * @param humanTaskInstanceId
      *        The identifier of the human task instance
      * @param searchOptions
-     *        the search options. See {@link UserSearchDescriptor} for valid fields for searching and sorting.
+     *        the search options. See {@link org.bonitasoft.engine.identity.UserSearchDescriptor} for valid fields for searching and sorting.
      * @return The list of users.
      * @throws InvalidSessionException
      *         If the session is invalid (expired, unknown, ...)
@@ -2331,7 +2338,8 @@ public interface ProcessRuntimeAPI {
      * @param userId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search criterion. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
+     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and
+     *        sorting.
      * @return The list of process definitions
      * @throws SearchException
      *         if an exception occurs when getting the process deployment information.
@@ -2347,7 +2355,8 @@ public interface ProcessRuntimeAPI {
      * @param supervisorId
      *        The identifier of the user.
      * @param searchOptions
-     *        The search criterion. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
+     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and
+     *        sorting.
      * @return The list of process definitions
      * @throws SearchException
      *         if an exception occurs when getting the process deployment information.
@@ -2361,7 +2370,8 @@ public interface ProcessRuntimeAPI {
      * The tasks are in stable state, not in terminal/executing state.
      *
      * @param searchOptions
-     *        The search criterion. See {@link ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and sorting.
+     *        The search criterion. See {@link org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor} for valid fields for searching and
+     *        sorting.
      * @return The list of process definitions
      * @throws SearchException
      *         If an exception occurs when getting the process deployment information.
