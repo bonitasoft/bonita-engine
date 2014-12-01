@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.bonitasoft.engine.test</groupId>
 		<artifactId>bonita-integration-tests-sp</artifactId>
-		<version>6.4.1-SNAPSHOT</version>
+		<version>7.0.0-SNAPSHOT</version>
 	</parent>
 	
 	<packaging>pom</packaging>
