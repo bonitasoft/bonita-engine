@@ -8,30 +8,30 @@
  *******************************************************************************/
 package com.bonitasoft.engine.bdm.dao.client.resources.utils;
 
-import static com.bonitasoft.engine.bdm.dao.client.resources.utils.Capitalizer.capitalize;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
+
+import org.apache.commons.lang3.text.WordUtils;
 
 import com.bonitasoft.engine.bdm.model.field.Field;
 
 /**
  * Wrapper over entity getter method
- * 
+ *
  * @author Colin Puy
  */
 public class EntityGetter {
 
     private final Method method;
 
-    public EntityGetter(Method method) {
+    public EntityGetter(final Method method) {
         checkIsGetter(method);
         this.method = method;
     }
 
-    private void checkIsGetter(Method method) {
-        String methodName = method.getName();
+    private void checkIsGetter(final Method method) {
+        final String methodName = method.getName();
         if (!methodName.startsWith("get") || methodName.length() <= 3) {
             throw new IllegalArgumentException(methodName + " is not a valid getter name.");
         }
@@ -53,12 +53,12 @@ public class EntityGetter {
     }
 
     public String getAssociatedNamedQuery() {
-        String targetEntityName = getTargetEntityClass().getSimpleName();
-        return targetEntityName + ".find" + getCapitalizedFieldName() + "By" + getSourceEntityName() + capitalize(Field.PERSISTENCE_ID);
+        final String targetEntityName = getTargetEntityClass().getSimpleName();
+        return targetEntityName + ".find" + getCapitalizedFieldName() + "By" + getSourceEntityName() + WordUtils.capitalize(Field.PERSISTENCE_ID);
     }
 
     public boolean returnsList() {
-        Class<?> returnTypeClass = method.getReturnType();
+        final Class<?> returnTypeClass = method.getReturnType();
         return List.class.isAssignableFrom(returnTypeClass);
     }
 
