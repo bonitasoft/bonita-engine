@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2013, 2014 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -16,9 +16,11 @@ package org.bonitasoft.engine.bpm;
 import java.io.Serializable;
 
 /**
- * Every (client) model object of bonita extends this interface
- * 
+ * Interface <code>BonitaObject</code> is the root interface of the client model hierarchy of Bonita BPM.
+ *
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
+ * @since 6.0.0
  */
 public interface BonitaObject extends Serializable {
 
