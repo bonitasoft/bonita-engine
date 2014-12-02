@@ -12,26 +12,24 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
-import org.apache.commons.lang3.text.WordUtils;
-
 import com.bonitasoft.engine.bdm.model.field.Field;
 
 /**
  * Wrapper over entity getter method
- *
+ * 
  * @author Colin Puy
  */
 public class EntityGetter {
 
     private final Method method;
 
-    public EntityGetter(final Method method) {
+    public EntityGetter(Method method) {
         checkIsGetter(method);
         this.method = method;
     }
 
-    private void checkIsGetter(final Method method) {
-        final String methodName = method.getName();
+    private void checkIsGetter(Method method) {
+        String methodName = method.getName();
         if (!methodName.startsWith("get") || methodName.length() <= 3) {
             throw new IllegalArgumentException(methodName + " is not a valid getter name.");
         }
@@ -53,12 +51,12 @@ public class EntityGetter {
     }
 
     public String getAssociatedNamedQuery() {
-        final String targetEntityName = getTargetEntityClass().getSimpleName();
-        return targetEntityName + ".find" + getCapitalizedFieldName() + "By" + getSourceEntityName() + WordUtils.capitalize(Field.PERSISTENCE_ID);
+        String targetEntityName = getTargetEntityClass().getSimpleName();
+        return targetEntityName + ".find" + getCapitalizedFieldName() + "By" + getSourceEntityName() + Capitalizer.capitalize(Field.PERSISTENCE_ID);
     }
 
     public boolean returnsList() {
-        final Class<?> returnTypeClass = method.getReturnType();
+        Class<?> returnTypeClass = method.getReturnType();
         return List.class.isAssignableFrom(returnTypeClass);
     }
 
