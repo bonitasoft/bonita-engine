@@ -126,7 +126,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         final RelationField addresses = new RelationField();
         addresses.setType(Type.AGGREGATION);
-        addresses.setFetchType(FetchType.LAZY);
+        addresses.setFetchType(FetchType.EAGER);
         addresses.setName("addresses");
         addresses.setCollection(Boolean.TRUE);
         addresses.setNullable(Boolean.TRUE);

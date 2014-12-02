@@ -9,7 +9,7 @@
 package com.bonitasoft.engine.api.impl.transaction.expression;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
@@ -46,19 +46,19 @@ public class EntityMergerTest {
     }
 
     @Test
-    public void merge_an_single_entity_should_call_merge_on_bdrService() {
+    public void merge_an_single_entity_should_not_call_merge_on_bdrService() {
         entityMerger.merge(testEntity);
-        verify(bdrService).merge(testEntity);
+        verify(bdrService, never()).merge(testEntity);
     }
 
     @Test
-    public void merge_a_collection_of_entity_should_call_merge_on_bdrService_for_each_entity() {
+    public void merge_a_collection_of_entity_should_not_call_merge_on_bdrService_for_each_entity() {
         final List<Entity> listOfEntities = new ArrayList<Entity>();
         listOfEntities.add(testEntity);
         listOfEntities.add(testEntity);
         listOfEntities.add(testEntity);
         entityMerger.merge((Serializable) listOfEntities);
-        verify(bdrService, times(3)).merge(testEntity);
+        verify(bdrService, never()).merge(testEntity);
     }
 
     @Test

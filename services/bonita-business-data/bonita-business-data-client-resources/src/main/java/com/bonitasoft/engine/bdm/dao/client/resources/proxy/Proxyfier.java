@@ -11,7 +11,6 @@ package com.bonitasoft.engine.bdm.dao.client.resources.proxy;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javassist.util.proxy.MethodFilter;
@@ -129,15 +128,7 @@ public class Proxyfier {
         }
 
         private boolean shouldBeLoaded(final Method thisMethod, final Object notLazyLoaded) {
-            return (notLazyLoaded == null || isEmptyCollection(notLazyLoaded)) && !alreadyLoaded.contains(toFieldName(thisMethod.getName()))
-                    && thisMethod.getAnnotation(LazyLoaded.class) != null;
-        }
-
-        private boolean isEmptyCollection(final Object notLazyLoaded) {
-            if (notLazyLoaded instanceof Collection<?>) {
-                return ((Collection<?>) notLazyLoaded).isEmpty();
-            }
-            return false;
+            return thisMethod.isAnnotationPresent(LazyLoaded.class) && !alreadyLoaded.contains(toFieldName(thisMethod.getName()));
         }
 
         private boolean isGetterOrSetter(final Method method) {

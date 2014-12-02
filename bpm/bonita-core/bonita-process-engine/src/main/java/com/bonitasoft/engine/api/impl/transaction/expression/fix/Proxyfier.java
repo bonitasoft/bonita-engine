@@ -11,7 +11,6 @@ package com.bonitasoft.engine.api.impl.transaction.expression.fix;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javassist.util.proxy.MethodFilter;
@@ -35,16 +34,16 @@ public class Proxyfier {
 
     @SuppressWarnings("unchecked")
     public <T extends Entity> T proxifyIfNeeded(final T entity) {
-        if (isLazyMethodProxy(entity)) {
+        if (isLazyMethodProxyfied(entity)) {
             return entity;
         }
         return (T) proxifyEntity(entity);
     }
-    
-    private boolean isLazyMethodProxy(Entity e) {
+
+    public static boolean isLazyMethodProxyfied(final Entity e) {
         return ProxyFactory.isProxyClass(e.getClass()) && ProxyFactory.getHandler((Proxy) e) instanceof LazyMethodHandler;
     }
-    
+
     @SuppressWarnings("unchecked")
     public <T extends Entity> T proxify(final T entity) {
         return (T) proxifyEntity(entity);
@@ -87,11 +86,11 @@ public class Proxyfier {
             this.entity = entity;
             this.lazyloader = lazyloader;
         }
-        
+
         public Entity getEntity() {
             return entity;
         }
-        
+
         @Override
         public Object invoke(final Object self, final Method thisMethod, final Method proceed, final Object[] args) throws Throwable {
             Object invocationResult = thisMethod.invoke(entity, args);
@@ -146,15 +145,7 @@ public class Proxyfier {
         }
 
         private boolean shouldBeLoaded(final Method thisMethod, final Object notLazyLoaded) {
-            return (notLazyLoaded == null || isEmptyCollection(notLazyLoaded)) && !alreadyLoaded.contains(toFieldName(thisMethod.getName()))
-                    && thisMethod.getAnnotation(LazyLoaded.class) != null;
-        }
-
-        private boolean isEmptyCollection(final Object notLazyLoaded) {
-            if (notLazyLoaded instanceof Collection<?>) {
-                return ((Collection<?>) notLazyLoaded).isEmpty();
-            }
-            return false;
+            return thisMethod.isAnnotationPresent(LazyLoaded.class) && !alreadyLoaded.contains(toFieldName(thisMethod.getName()));
         }
 
         private boolean isGetterOrSetter(final Method method) {
@@ -183,5 +174,13 @@ public class Proxyfier {
             return true;
         }
 
+    }
+
+    public static Entity unProxyfyIfNeeded(final Entity entity) {
+        if (isLazyMethodProxyfied(entity)) {
+            final LazyMethodHandler handler = (LazyMethodHandler) ProxyFactory.getHandler((Proxy) entity);
+            return handler.getEntity();
+        }
+        return entity;
     }
 }

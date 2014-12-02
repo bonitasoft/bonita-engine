@@ -22,6 +22,7 @@ import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
+import com.bonitasoft.engine.api.impl.transaction.expression.fix.Proxyfier;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
@@ -65,7 +66,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
             if (newValue instanceof Entity) {
                 final Entity newBusinessDataValue = (Entity) newValue;
                 final SSimpleRefBusinessDataInstance simpleRef = (SSimpleRefBusinessDataInstance) reference;
-                final Entity businessData = businessDataRepository.merge(newBusinessDataValue);
+                final Entity businessData = mergeToBusinessDataRepository(newBusinessDataValue);
                 if (!businessData.getPersistenceId().equals(simpleRef.getDataId())) {
                     refBusinessDataService.updateRefBusinessDataInstance(simpleRef, businessData.getPersistenceId());
                 }
@@ -76,7 +77,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
             final List<Long> businessDataIds = new ArrayList<Long>();
             final List<Entity> updated = new ArrayList<Entity>();
             for (final Entity entity : newBusinessDataValue) {
-                final Entity businessData = businessDataRepository.merge(entity);
+                final Entity businessData = mergeToBusinessDataRepository(entity);
                 businessDataIds.add(businessData.getPersistenceId());
                 updated.add(businessData);
             }
@@ -88,6 +89,10 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
         }
+    }
+
+    private Entity mergeToBusinessDataRepository(final Entity newBusinessDataValue) {
+        return businessDataRepository.merge(Proxyfier.unProxyfyIfNeeded(newBusinessDataValue));
     }
 
     private void checkIsValidBusinessData(final SRefBusinessDataInstance reference, final Object newValue) throws SOperationExecutionException {
