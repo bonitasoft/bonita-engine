@@ -22,7 +22,7 @@ import org.bonitasoft.engine.bpm.BonitaObject;
  *
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
- * @see RoleAPI
+ * @see org.bonitasoft.engine.api.RoleAPI
  * @since 6.0.0
  */
 public interface Role extends BonitaObject {

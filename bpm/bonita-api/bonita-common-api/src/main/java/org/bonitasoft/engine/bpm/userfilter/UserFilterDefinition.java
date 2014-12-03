@@ -25,7 +25,7 @@ import org.bonitasoft.engine.expression.Expression;
  * <code>UserFilter</code>s have many similarities to connector in their definition and execution.
  * 
  * @author Baptiste Mesta
- * @see ConnectorDefinition
+ * @see org.bonitasoft.engine.bpm.connector.ConnectorDefinition
  */
 public interface UserFilterDefinition extends NamedElement {
 

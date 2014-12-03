@@ -16,10 +16,10 @@ package org.bonitasoft.engine.platform.command;
 import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
- * Describes a <code>Platform command</code>. Actions related to <code>platform commands</code> are managed by the {@link PlatformCommandAPI}
+ * Describes a <code>Platform command</code>. Actions related to <code>platform commands</code> are managed by the {@link org.bonitasoft.engine.api.PlatformCommandAPI}
  *
  * @author Zhang Bole
- * @see PlatformCommandAPI
+ * @see org.bonitasoft.engine.api.PlatformCommandAPI
  * @since 6.0.0
  */
 public interface PlatformCommandDescriptor extends BonitaObject {

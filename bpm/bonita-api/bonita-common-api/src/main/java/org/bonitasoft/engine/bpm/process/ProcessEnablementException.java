@@ -17,7 +17,7 @@ import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
  * Thrown when a process cannot be enabled. This can happen if the process is already enabled, or if an unexpected error occurs on methods like {link
- * {@link ProcessAPI#enableProcess(long)}.
+ * {@link org.bonitasoft.engine.api.ProcessAPI#enableProcess(long)}.
  *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte

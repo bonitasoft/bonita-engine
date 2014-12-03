@@ -37,27 +37,27 @@ import org.bonitasoft.engine.search.SearchResult;
 /**
  * Manipulate tenant commands. A command can be registered, unregistered, and executed with parameters.
  * <p>
- * Commands are used to extend engine behavior, and are classes that are called from this API and executed on the server side. <br/>
+ * Commands are used to extend engine behavior, and are classes that are called from this API and executed on the server side. <br>
  * in the execute method of this class.
  * </p>
  * <p>
  * A command is composed of a jar containing at least one class that implements org.bonitasoft.engine.command.TenantCommand.
  * org.bonitasoft.engine.command.system.CommandWithParameters can be used to handle parameter more easily. The behavior of the command must be defined in the
- * execute method of this class.<br/>
+ * execute method of this class.<br>
  * TenantCommand is a class available only in bonita-server.jar. In order to create the jar you will need to have a dependency on that jar.
  * <p>
  * The jar containing the command class must be added to the engine using the {@link CommandAPI#addDependency} method with a name to identify the dependency so
- * that it can be removed later.<br/>
+ * that it can be removed later.<br>
  * Then the command must be registered using {@link CommandAPI#register(String, String, String)} with a name to identify it and an implementation that is the
- * fully qualified name of the command class.<br/>
+ * fully qualified name of the command class.<br>
  * After registration, the command can be executed using {@link CommandAPI#execute(long, Map)} with the id returned by the register method or
- * {@link CommandAPI#execute(String, Map)} with the name of the command and with a map of parameters required by the command.<br/>
+ * {@link CommandAPI#execute(String, Map)} with the name of the command and with a map of parameters required by the command.<br>
  * Finally the command can be removed using both {@link CommandAPI#unregister(long)} or {@link CommandAPI#unregister(String)} and
  * {@link CommandAPI#removeDependency(String)}
  * </p>
  * 
  * <pre>
- * Code example:<br/> 
+ * Code example:<br>
  * 
  * In this example we deploy a command named "myCommandName". The class that implements TenantCommand is org.bonitasoft.engine.command.IntegerCommand and 
  * is contained in the jar we deploy using CommandAPI.addDependency.
@@ -103,7 +103,7 @@ public interface CommandAPI {
      *            the dependency name
      * @param jar
      *            the JAR content
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws AlreadyExistsException
      *             if a dependency with the same name already exists
@@ -118,7 +118,7 @@ public interface CommandAPI {
      * 
      * @param name
      *            the dependency name.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DependencyNotFoundException
      *             occurs when the name does not refer to any existing dependency
@@ -138,7 +138,7 @@ public interface CommandAPI {
      * @param implementation
      *            the implementation class which will be uses when executing the command. This class is inside the jar.
      * @return the descriptor of the newly created command
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws AlreadyExistsException
      *             when a command with the same name already exists
@@ -156,7 +156,7 @@ public interface CommandAPI {
      * @param parameters
      *            the parameters
      * @return the result of the command execution.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws CommandNotFoundException
      *             occurs when the name does not refer to any existing command
@@ -178,7 +178,7 @@ public interface CommandAPI {
      * @param parameters
      *            the parameters
      * @return the result of the command execution.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws CommandNotFoundException
      *             occurs when the name does not refer to any existing command
@@ -200,7 +200,7 @@ public interface CommandAPI {
      * @param parameters
      *            the parameters
      * @return the result of the command execution.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws CommandNotFoundException
      *             occurs when the name does not refer to any existing command
@@ -222,7 +222,7 @@ public interface CommandAPI {
      * @param parameters
      *            the parameters
      * @return the result of the command execution.
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws CommandNotFoundException
      *             occurs when the name does not refer to any existing command
@@ -241,7 +241,7 @@ public interface CommandAPI {
      * 
      * @param name
      *            the command name
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws CommandNotFoundException
      *             occurs when the name does not refer to any existing command.
@@ -257,7 +257,7 @@ public interface CommandAPI {
      * @param name
      *            the command name
      * @return the descriptor of the command
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws CommandNotFoundException
      *             occurs when the command name does not refer to any existing command.
@@ -275,7 +275,7 @@ public interface CommandAPI {
      * @param sort
      *            the sorting criterion
      * @return the paginated list of descriptors of the command
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
@@ -288,7 +288,7 @@ public interface CommandAPI {
      *            the command name
      * @param updateDescriptor
      *            the update descriptor
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws CommandNotFoundException
      *             when the name does not refer to any existing command
@@ -301,7 +301,7 @@ public interface CommandAPI {
     /**
      * Delete all commands
      * 
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DeletionException
      *             occurs when an exception is thrown during command (unregistering) deletion
@@ -319,7 +319,7 @@ public interface CommandAPI {
      * @param sort
      *            The sorting criterion
      * @return The list of commands
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
@@ -331,7 +331,7 @@ public interface CommandAPI {
      * @param commandId
      *            identifier of command
      * @return the descriptor of the command
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws CommandNotFoundException
      *             occurs when the command id does not refer to any existing command.
@@ -346,7 +346,7 @@ public interface CommandAPI {
      *            identifier of command to indicate which command will be updated
      * @param updateDescriptor
      *            the update descriptor
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws CommandNotFoundException
      *             occurs when the command id does not refer to any existing command
@@ -361,7 +361,7 @@ public interface CommandAPI {
      * 
      * @param commandId
      *            the identifier of command
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws CommandNotFoundException
      *             occurs when the name does not refer to any existing command.
@@ -377,7 +377,7 @@ public interface CommandAPI {
      * @param searchOptions
      *            The criterion used during the search
      * @return A {@link SearchResult} containing the search result
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws SearchException
      *             when problem occurs during the commands search

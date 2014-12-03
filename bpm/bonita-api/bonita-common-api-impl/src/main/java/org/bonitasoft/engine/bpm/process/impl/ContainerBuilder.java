@@ -23,10 +23,12 @@ public interface ContainerBuilder extends FlowElementBuilder {
      * Add a document definition in this container.
      * <p>
      * Must add also the content if the document is not external. This can be done using
-     * {@link BusinessArchiveBuilder#addDocumentResource(org.bonitasoft.engine.bpm.bar.BarResource)}
+     * {@link org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder#addDocumentResource(org.bonitasoft.engine.bpm.bar.BarResource)}
      *
      * @param name
+     *      name of the document definition
      * @return
+     *      the builder
      */
     DocumentDefinitionBuilder addDocumentDefinition(final String name);
 

@@ -154,8 +154,8 @@ public interface FlowElementBuilder {
      * Must also add connector dependencies and connector implementation descriptor
      * <p>
      * 
-     * @see BusinessArchiveBuilder#addClasspathResource(org.bonitasoft.engine.bpm.bar.BarResource)
-     * @see BusinessArchiveBuilder#addConnectorImplementation(org.bonitasoft.engine.bpm.bar.BarResource)
+     * @see org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder#addClasspathResource(org.bonitasoft.engine.bpm.bar.BarResource)
+     * @see org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder#addConnectorImplementation(org.bonitasoft.engine.bpm.bar.BarResource)
      * @param name
      *        The name the connector instance will use
      * @param connectorId

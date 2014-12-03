@@ -25,7 +25,7 @@ import org.bonitasoft.engine.platform.StopNodeException;
 /**
  * <b>Manage the platform.</b>
  * <p>
- * The platform is the base on which runs the engine.<br/>
+ * The platform is the base on which runs the engine.<br>
  * It mainly handles the creation of tables in database and also allow to start/stop a Node which is the current Virtual machine on which runs the engine. There
  * is only one platform for a running Bonita Engine.
  * </p>
@@ -48,7 +48,7 @@ public interface PlatformAPI {
      * <li>The platform state is persisted</li>
      * </ul>
      * 
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             occurs if the API session is invalid, e.g session has expired.
      * @throws CreationException
      *             occurs when an exception is thrown during platform creation
@@ -57,12 +57,12 @@ public interface PlatformAPI {
 
     /**
      * <b>Initialize the platform.</b>
-     * The running environment of Bonita Engine is initialized and marked as activated.<br/>
+     * The running environment of Bonita Engine is initialized and marked as activated.<br>
      * Business elements linked to the execution are initialized, after this step the technical user will be able to connect to the engine and to import the
      * organization. No user are created by default and the default username/password to connect to the Bonita Engine are stored in the file bonita-server.xml
      * that is in the Bonita home.
      * 
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             occurs if the API session is invalid, e.g session has expired.
      * @throws CreationException
      *             occurs when an exception is thrown during platform creation
@@ -74,7 +74,7 @@ public interface PlatformAPI {
      * 
      * @see #createPlatform()
      * @see #initializePlatform()
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             occurs if the API session is invalid, e.g session has expired.
      * @throws CreationException
      *             occurs when an exception is thrown during platform creation
@@ -88,7 +88,7 @@ public interface PlatformAPI {
      * <p>
      * Starting the node make the Scheduler service to start and restart elements that were not finished by the Work service on the previous shutdown.
      * 
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             occurs if API Session is invalid, e.g session has expired.
      * @throws StartNodeException
      *             occurs when an exception is thrown during the activation of the node
@@ -102,7 +102,7 @@ public interface PlatformAPI {
      * <p>
      * Stopping the node make the Scheduler service to stop.
      * 
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             occurs if API Session is invalid, e.g session has expired.
      * @throws StopNodeException
      *             occurs when an exception is thrown during the stop of the node
@@ -119,7 +119,7 @@ public interface PlatformAPI {
      * This method does the opposite of {@link #initializePlatform()}
      * 
      * @see #initializePlatform()
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DeletionException
      *             occurs when an exception is thrown during platform deletion
@@ -132,7 +132,7 @@ public interface PlatformAPI {
      * This method delete the platform, i.e. all the database tables.
      * 
      * @see #createPlatform()
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DeletionException
      *             occurs when an exception is thrown during platform deletion
@@ -144,7 +144,7 @@ public interface PlatformAPI {
      * 
      * @see #cleanPlatform()
      * @see #deletePlatform()
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DeletionException
      *             occurs when an exception is thrown during platform deletion
@@ -155,7 +155,7 @@ public interface PlatformAPI {
      * Get the platform.
      * 
      * @return the Platform object
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws PlatformNotFoundException
      *             occurs when the identifier does not refer to an existing platform
@@ -166,7 +166,7 @@ public interface PlatformAPI {
      * Check if the platform created or not.
      * 
      * @return true if the platform existed
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws PlatformNotFoundException
      *             occurs when the identifier does not refer to an existing platform
@@ -177,7 +177,7 @@ public interface PlatformAPI {
      * Get the state of the platform of the current node
      * 
      * @return {@link PlatformState#STARTED} or {@link PlatformState#STOPPED} depending on the scheduler state
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *             Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws PlatformNotFoundException
      *             occurs when the identifier does not refer to an existing platform

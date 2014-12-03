@@ -21,7 +21,7 @@ import org.bonitasoft.engine.bpm.BonitaObject;
  * represents a Group inside the organization.
  *
  * @author Lu Kai, Bole Zhang, Matthieu Chaffotte
- * @see GroupAPI
+ * @see org.bonitasoft.engine.api.GroupAPI
  * @since 6.0.0
  */
 public interface Group extends BonitaObject {

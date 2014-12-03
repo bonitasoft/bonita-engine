@@ -23,7 +23,7 @@ import org.bonitasoft.engine.bpm.BonitaObject;
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
  * @author Celine Souchet
- * @see UserAPI
+ * @see org.bonitasoft.engine.api.UserAPI
  * @since 6.0.0
  */
 public interface User extends BonitaObject {

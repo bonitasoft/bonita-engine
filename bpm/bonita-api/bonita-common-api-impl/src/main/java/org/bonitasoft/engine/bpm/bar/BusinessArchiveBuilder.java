@@ -50,7 +50,7 @@ public class BusinessArchiveBuilder {
      * Set the process definition of the {@link BusinessArchive} that is currently build
      * <p> {@link DesignProcessDefinition} can be constructed using {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder}
      * 
-     * @see ProcessDefinitionBuilder
+     * @see org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder
      * @param processDefinition
      * @return
      *         the same {@link BusinessArchiveBuilder} in order to chain calls
@@ -67,8 +67,9 @@ public class BusinessArchiveBuilder {
      * {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder} <p> {@link DesignProcessDefinition} can be
      * constructed using {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder}
      * 
-     * @see ProcessDefinitionBuilder
-     * @param processDefinition
+     * @see org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder
+     * @param parameters
+     *      the parameters value to use
      * @return
      *         the same {@link BusinessArchiveBuilder} in order to chain calls
      */
@@ -101,9 +102,9 @@ public class BusinessArchiveBuilder {
      * This resource must be a connector implementation descriptor file (.impl) and must be compliant to the connector-implementation-descriptor.xsd
      * <p>
      * A connector definition should also be added in the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition} using
-     * {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder#addConnector(String, String, String, org.bonitasoft.engine.bpm.model.ConnectorEvent)}
+     * {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder#addConnector(String, String, String, org.bonitasoft.engine.bpm.connector.ConnectorEvent)}
      * or
-     * {@link org.bonitasoft.engine.bpm.process.impl.ActivityDefinitionBuilder#addConnector(String, String, String, org.bonitasoft.engine.bpm.model.ConnectorEvent)}
+     * {@link org.bonitasoft.engine.bpm.process.impl.ActivityDefinitionBuilder#addConnector(String, String, String, org.bonitasoft.engine.bpm.connector.ConnectorEvent)}
      * <p>
      * <p>
      * e.g. if you add a connector in your process add here dependencies the process need to execute it
@@ -133,7 +134,7 @@ public class BusinessArchiveBuilder {
 
     /**
      * Set the actor mapping for this {@link BusinessArchive} <p>
-     * The file must be compliant with the xsd actorMapping.xsd The actor mapping specify for each {@link ActorDefinition actor} of the process who it is in the
+     * The file must be compliant with the xsd actorMapping.xsd The actor mapping specify for each {@link org.bonitasoft.engine.bpm.actor.ActorDefinition} of the process who it is in the
      * organization.
      * <p>
      * It is not mandatory to set it in the {@link BusinessArchive}, it can be set after the process was deployed using

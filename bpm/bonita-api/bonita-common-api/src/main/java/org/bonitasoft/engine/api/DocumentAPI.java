@@ -49,8 +49,10 @@ import org.bonitasoft.engine.search.SearchResult;
 public interface DocumentAPI {
 
     /**
-     * Attach a document by reference to the specified process instance.<br/>
+     * Attach a document by reference to the specified process instance.
+     * <p>
      * The document itself does not contain content but is a reference to external content specified by its URL.
+     * </p>
      *
      * @param processInstanceId
      *        The identifier of the process instance
@@ -65,7 +67,7 @@ public interface DocumentAPI {
      * @return a document object
      * @throws ProcessInstanceNotFoundException
      *         when the processInstanceId does not refer to an existing process instance
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @throws DocumentAttachmentException
      *         when an error occurs while attaching the document
@@ -88,7 +90,7 @@ public interface DocumentAPI {
      * @return a document object
      * @throws ProcessInstanceNotFoundException
      *         when the processInstanceId does not refer to an existing process instance
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @throws DocumentAttachmentException
      *         when an error occurs while attaching the document
@@ -101,16 +103,15 @@ public interface DocumentAPI {
 
     /**
      * Attach a new document to a process instance.
-     * <p>
+     * <br>
      * Depending on the DocumentValue given the document will be internal (with content) or external (with url).
-     * <ol>
-     * <li>If the target document is a list of document then we append it to the list</li>
-     * <li>If the target document is a list of document and the index is set on the document value then we insert the element in the list at the specified
-     * index</li>
-     * <li>If the target single document or is non existent in the definition we create it</li>
-     * <li>If the target single document and is already existent an exception is thrown</li>
-     * </ol>
-     * </p>
+     *  <ol>
+     *      <li>If the target document is a list of document then we append it to the list</li>
+     *      <li>If the target document is a list of document and the index is set on the document value then we insert the element in the list at the specified
+     *      index</li>
+     *      <li>If the target single document or is non existent in the definition we create it</li>
+     *      <li>If the target single document and is already existent an exception is thrown</li>
+     *  </ol>
      *
      * @param processInstanceId
      *        The identifier of the process instance
@@ -123,7 +124,7 @@ public interface DocumentAPI {
      * @return a document object
      * @throws ProcessInstanceNotFoundException
      *         when the processInstanceId does not refer to an existing process instance
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @throws DocumentAttachmentException
      *         when an error occurs while attaching the document
@@ -136,8 +137,10 @@ public interface DocumentAPI {
             DocumentAttachmentException, AlreadyExistsException;
 
     /**
-     * Attach the given document to the specified process instance.<br />
+     * Attach the given document to the specified process instance.
+     * <p>
      * The content is stored to enable later retrieval.
+     * </p>
      *
      * @param processInstanceId
      *        The identifier of the process instance
@@ -152,7 +155,7 @@ public interface DocumentAPI {
      * @return a document object
      * @throws ProcessInstanceNotFoundException
      **         when the processInstanceId does not refer to an existing process instance
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @throws DocumentAttachmentException
      *         when an error occurs while attaching the document
@@ -176,7 +179,7 @@ public interface DocumentAPI {
      * @param url
      *        The URL of the document content
      * @return a document object
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @throws DocumentAttachmentException
      *         when an error occurs while attaching the new version of the document
@@ -186,8 +189,10 @@ public interface DocumentAPI {
             throws DocumentAttachmentException;
 
     /**
-     * Attach a new document version to the specified process instance. The document is a new version of the named document.<br />
+     * Attach a new document version to the specified process instance. The document is a new version of the named document.
+     * <p>
      * The content is stored to enable later retrieval.
+     * </p>
      *
      * @param processInstanceId
      *        The identifier of the process instance
@@ -200,7 +205,7 @@ public interface DocumentAPI {
      * @param documentContent
      *        The content of the document
      * @return a document object
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @throws DocumentAttachmentException
      *         when an error occurs while attaching the new version of the document
@@ -217,7 +222,7 @@ public interface DocumentAPI {
      * @return a document object
      * @throws DocumentNotFoundException
      *         when the document identifier does not refer to an existing document
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @since 6.0
      */
@@ -235,7 +240,7 @@ public interface DocumentAPI {
      * @return the removed document object
      * @throws DocumentNotFoundException
      *         when the document identifier does not refer to an existing document
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @since 6.4.0
      */
@@ -256,7 +261,7 @@ public interface DocumentAPI {
      *         a paginated list of the latest version of each document attached to the process instance
      * @throws ProcessInstanceNotFoundException
      *         when the specified processInstanceId does not refer to an existing process instance
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @throws DocumentException
      *         when any other error occurs during document handling
@@ -273,7 +278,7 @@ public interface DocumentAPI {
      * @return document content as a byte array
      * @throws DocumentNotFoundException
      *         when the specified documentId does not refer to an existing document
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is note valid
      * @since 6.0
      */
@@ -287,7 +292,7 @@ public interface DocumentAPI {
      * @param documentName
      *        The name of the document
      * @return a document object
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @throws DocumentNotFoundException
      *         when the specified documentName does not refer to an existing document attached to this process instance
@@ -303,7 +308,7 @@ public interface DocumentAPI {
      * @param documentName
      *        The name of the document
      * @return a document object
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @throws DocumentNotFoundException
      *         when the specified documentName does not refer to a document attached to the specified process instance
@@ -321,7 +326,7 @@ public interface DocumentAPI {
      * @return a document object
      * @throws DocumentNotFoundException
      *         when the specified documentName does not refer to an existing document attached to the process instance that contains the activity
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @since 6.0
      */
@@ -333,7 +338,7 @@ public interface DocumentAPI {
      * @param processInstanceId
      *        The process instance identifier
      * @return the number of documents in the specified process instance
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @throws DocumentException
      *         when an error occurs during document handling
@@ -347,7 +352,7 @@ public interface DocumentAPI {
      * @param searchOptions
      *        A {@link SearchOptions} object defining the search options
      * @return the matching document list and its total number
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @throws SearchException
      *         when an error occurs during the search
@@ -363,7 +368,7 @@ public interface DocumentAPI {
      * @param searchOptions
      *        A {@link SearchOptions} object defining the search options
      * @return the list of matching documents and the number of such documents
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @throws UserNotFoundException
      *         when the specified userId does not refer to an existing user
@@ -379,7 +384,7 @@ public interface DocumentAPI {
      * @param searchOptions
      *        A {@link SearchOptions} object defining the search options
      * @return the matching archived document list and its total number
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @throws SearchException
      *         when an error occurs during the search
@@ -396,7 +401,7 @@ public interface DocumentAPI {
      * @param searchOptions
      *        A {@link SearchOptions} object defining the search options
      * @return the matching archived document list and its total number
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @throws UserNotFoundException
      *         when the specified userId does not refer to an existing user
@@ -412,7 +417,7 @@ public interface DocumentAPI {
      * @param sourceObjectId
      *        The identifier of the document
      * @return an archived document
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @throws ArchivedDocumentNotFoundException
      *         when the specified identifier does not refer to an archived document
@@ -426,7 +431,7 @@ public interface DocumentAPI {
      * @param sourceObjectId
      *        The identifier of the document
      * @return an archived document
-     * @throws InvalidSessionException
+     * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is not valid
      * @throws ArchivedDocumentNotFoundException
      *         when the specified identifier does not refer to an archived document

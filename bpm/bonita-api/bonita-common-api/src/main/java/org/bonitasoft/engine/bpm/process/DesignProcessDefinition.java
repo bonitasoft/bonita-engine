@@ -56,7 +56,7 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     /**
      * Retrieves the definition of the FlowElementContainerDefinition of the process container
      *
-     * @return The {@link FlowElementContainerDefinition} of the process container.<br/>
+     * @return The {@link FlowElementContainerDefinition} of the process container.<br>
      *         return type FlowElementContainerDefinition in this package is deprecated. Instead use
      *         {@link org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition}
      */
@@ -74,7 +74,7 @@ public interface DesignProcessDefinition extends ProcessDefinition {
      * Retrieves a Set of ActorDefinition objects from a ProcessDefinition
      *
      * @return A set of {@link ActorDefinition} objects.
-     *         <br/>If no actors have been defined, return an empty Set.
+     *         <br>If no actors have been defined, return an empty Set.
      * @see #getActorsList()
      * @since 6.0
      * @deprecated As of release 6.1, replaced by {@link #getActorsList()} which return the same information as a list
@@ -86,7 +86,7 @@ public interface DesignProcessDefinition extends ProcessDefinition {
      * Gets the list of all actors defined on this process.
      *
      * @return The list of {@link ActorDefinition} objects defined in this process.
-     *         <br/>If no actors have been defined, return an empty List.
+     *         <br>If no actors have been defined, return an empty List.
      * @since 6.1
      */
     List<ActorDefinition> getActorsList();
