@@ -6,7 +6,7 @@
  * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
  * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.business.data;
+package com.bonitasoft.engine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,6 +43,7 @@ import com.bonitasoft.engine.bdm.model.field.RelationField.FetchType;
 import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
+import com.bonitasoft.engine.business.data.ClassloaderRefresher;
 
 public class BDRepositoryLocalIT extends CommonAPISPTest {
 
