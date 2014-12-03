@@ -16,7 +16,6 @@ import org.junit.runners.Suite.SuiteClasses;
 import com.bonitasoft.engine.activity.ActivityTests;
 import com.bonitasoft.engine.business.application.ApplicationAPIITs;
 import com.bonitasoft.engine.business.data.BDRepositoryIT;
-import com.bonitasoft.engine.business.data.BDRepositoryRemoteIT;
 import com.bonitasoft.engine.command.ExecuteBDMQueryCommandIT;
 import com.bonitasoft.engine.connector.RemoteConnectorExecutionTestSP;
 import com.bonitasoft.engine.external.ExternalCommandsTestSP;
@@ -55,7 +54,6 @@ import com.bonitasoft.engine.tenant.TenantIT;
         TenantIT.class,
         OperationTest.class,
         BDRepositoryIT.class,
-        BDRepositoryRemoteIT.class,
         ExecuteBDMQueryCommandIT.class
 })
 @Initializer(TestsInitializerSP.class)

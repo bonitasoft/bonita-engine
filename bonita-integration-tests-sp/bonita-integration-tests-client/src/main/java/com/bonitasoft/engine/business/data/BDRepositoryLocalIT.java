@@ -44,7 +44,7 @@ import com.bonitasoft.engine.bdm.model.field.RelationField.Type;
 import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
-public class BDRepositoryRemoteIT extends CommonAPISPTest {
+public class BDRepositoryLocalIT extends CommonAPISPTest {
 
     private static final String FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER = "findByFirstNameAndLastNameNewOrder";
 
@@ -118,7 +118,7 @@ public class BDRepositoryRemoteIT extends CommonAPISPTest {
     }
 
     @Test
-    public void get_lazy_object_outside_a_transaction_should_not_throw_exception() throws Exception {
+    public void should_get_lazy_object_outside_a_transaction() throws Exception {
         //given
         final Expression addressGrenobleExpression = createGrovyExpressionThatCreateAddressWithCityName(CITY_GRENOBLE, COUNTRY_FRANCE);
         final Expression addressSfExpression = createGrovyExpressionThatCreateAddressWithCityName(CITY_SF, COUNTRY_USA);

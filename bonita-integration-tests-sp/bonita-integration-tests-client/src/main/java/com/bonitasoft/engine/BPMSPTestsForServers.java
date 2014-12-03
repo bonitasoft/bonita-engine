@@ -11,31 +11,14 @@ package com.bonitasoft.engine;
 import org.bonitasoft.engine.BonitaSuiteRunner;
 import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.process.task.PendingTasksIT;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.bonitasoft.engine.activity.TaskOnDemandTest;
-import com.bonitasoft.engine.business.application.ApplicationAPIITs;
-import com.bonitasoft.engine.business.data.BDRepositoryIT;
-import com.bonitasoft.engine.business.data.BDRepositoryRemoteIT;
-import com.bonitasoft.engine.command.ExecuteBDMQueryCommandIT;
-import com.bonitasoft.engine.external.ExternalCommandsTestSP;
-import com.bonitasoft.engine.log.LogTest;
-import com.bonitasoft.engine.monitoring.MonitoringAPITest;
-import com.bonitasoft.engine.monitoring.PlatformMonitoringAPITest;
-import com.bonitasoft.engine.page.PageAPIIT;
-import com.bonitasoft.engine.platform.NodeAPITest;
-import com.bonitasoft.engine.process.ProcessManagementTest;
-import com.bonitasoft.engine.profile.ProfileSPITest;
-import com.bonitasoft.engine.reporting.ReportingSQLValidityIT;
-import com.bonitasoft.engine.search.SearchProcessInstanceTest;
-import com.bonitasoft.engine.supervisor.ProcessSupervisedTest;
-import com.bonitasoft.engine.tenant.TenantIT;
+import com.bonitasoft.engine.business.data.BDRepositoryLocalIT;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-        BDRepositoryRemoteIT.class,
+        BDRepositoryLocalIT.class,
 })
 @Initializer(BPMSPTestsForServers.class)
 public class BPMSPTestsForServers {
