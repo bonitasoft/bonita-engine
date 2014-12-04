@@ -6,7 +6,7 @@
  * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
  * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.bdm.dao.client.resources.proxy;
+package com.bonitasoft.engine.api.impl.transaction.expression.bdm;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -15,6 +15,7 @@ import java.util.List;
 
 import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
+import javassist.util.proxy.Proxy;
 import javassist.util.proxy.ProxyFactory;
 
 import com.bonitasoft.engine.bdm.Entity;
@@ -23,12 +24,24 @@ import com.bonitasoft.engine.bdm.lazy.LazyLoaded;
 /**
  * @author Colin Puy
  */
-public class Proxyfier {
+public class ServerProxyfier {
 
-    private final LazyLoader lazyLoader;
+    private final ServerLazyLoader lazyLoader;
 
-    public Proxyfier(final LazyLoader lazyLoader) {
+    public ServerProxyfier(final ServerLazyLoader lazyLoader) {
         this.lazyLoader = lazyLoader;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Entity> T proxifyIfNeeded(final T entity) {
+        if (isLazyMethodProxyfied(entity)) {
+            return entity;
+        }
+        return (T) proxifyEntity(entity);
+    }
+
+    public static boolean isLazyMethodProxyfied(final Entity e) {
+        return ProxyFactory.isProxyClass(e.getClass()) && ProxyFactory.getHandler((Proxy) e) instanceof LazyMethodHandler;
     }
 
     @SuppressWarnings("unchecked")
@@ -63,15 +76,19 @@ public class Proxyfier {
     /**
      * Handler that lazy load values for lazy loading methods that hasn't been loaded
      */
-    private class LazyMethodHandler implements MethodHandler {
+    public class LazyMethodHandler implements MethodHandler {
 
-        private final LazyLoader lazyloader;
+        private final ServerLazyLoader lazyloader;
         private final List<String> alreadyLoaded = new ArrayList<String>();
         private final Entity entity;
 
-        public LazyMethodHandler(final Entity entity, final LazyLoader lazyloader) {
+        public LazyMethodHandler(final Entity entity, final ServerLazyLoader lazyloader) {
             this.entity = entity;
             this.lazyloader = lazyloader;
+        }
+
+        public Entity getEntity() {
+            return entity;
         }
 
         @Override
@@ -157,5 +174,13 @@ public class Proxyfier {
             return true;
         }
 
+    }
+
+    public static Entity unProxyfyIfNeeded(final Entity entity) {
+        if (isLazyMethodProxyfied(entity)) {
+            final LazyMethodHandler handler = (LazyMethodHandler) ProxyFactory.getHandler((Proxy) entity);
+            return handler.getEntity();
+        }
+        return entity;
     }
 }
