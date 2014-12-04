@@ -22,8 +22,8 @@ import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
-import com.bonitasoft.engine.api.impl.transaction.expression.fix.LazyLoader;
-import com.bonitasoft.engine.api.impl.transaction.expression.fix.Proxyfier;
+import com.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerLazyLoader;
+import com.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerProxyfier;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
@@ -77,7 +77,7 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
             if (refBusinessDataInstance instanceof SSimpleRefBusinessDataInstance) {
                 final SSimpleRefBusinessDataInstance reference = (SSimpleRefBusinessDataInstance) refBusinessDataInstance;
                 Entity findByNamedQuery = businessDataRepository.findById(bizClass, reference.getDataId());
-                Proxyfier proxyfier = new Proxyfier(new LazyLoader(businessDataRepository));
+                ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(businessDataRepository));
                 return proxyfier.proxify(findByNamedQuery);
             }
             final SMultiRefBusinessDataInstance reference = (SMultiRefBusinessDataInstance) refBusinessDataInstance;
@@ -85,7 +85,7 @@ public class BusinessDataExpressionExecutorStrategy extends NonEmptyContentExpre
             
             List<Entity> e = new ArrayList<Entity>();
             for (Entity entity : entities) {
-                Proxyfier proxyfier = new Proxyfier(new LazyLoader(businessDataRepository));
+                ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(businessDataRepository));
                 e.add(proxyfier.proxify(entity));
             }
             return e;

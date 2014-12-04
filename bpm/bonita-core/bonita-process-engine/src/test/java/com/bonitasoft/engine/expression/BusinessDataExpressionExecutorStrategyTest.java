@@ -48,7 +48,7 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.bonitasoft.engine.api.impl.transaction.expression.fix.Proxyfier;
+import com.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerProxyfier;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
@@ -61,7 +61,7 @@ import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstanc
 public class BusinessDataExpressionExecutorStrategyTest {
 
     @Mock
-    Proxyfier proxyfier;
+    ServerProxyfier proxyfier;
 
     @Mock
     private BusinessDataRepository businessDataRepository;
@@ -221,7 +221,7 @@ public class BusinessDataExpressionExecutorStrategyTest {
 
     private SimpleBizData unProxyfyIdNeeded(final Entity fetchedBizData) {
         final SimpleBizData unProxyfyIfNeeded;
-        unProxyfyIfNeeded = (SimpleBizData) Proxyfier.unProxyfyIfNeeded(fetchedBizData);
+        unProxyfyIfNeeded = (SimpleBizData) ServerProxyfier.unProxyfyIfNeeded(fetchedBizData);
         return unProxyfyIfNeeded;
     }
 

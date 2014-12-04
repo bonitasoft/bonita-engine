@@ -6,7 +6,7 @@
  * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
  * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.api.impl.transaction.expression.fix;
+package com.bonitasoft.engine.api.impl.transaction.expression.bdm;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,11 +24,11 @@ import com.bonitasoft.engine.bdm.lazy.LazyLoaded;
 /**
  * @author Colin Puy
  */
-public class Proxyfier {
+public class ServerProxyfier {
 
-    private final LazyLoader lazyLoader;
+    private final ServerLazyLoader lazyLoader;
 
-    public Proxyfier(final LazyLoader lazyLoader) {
+    public ServerProxyfier(final ServerLazyLoader lazyLoader) {
         this.lazyLoader = lazyLoader;
     }
 
@@ -78,11 +78,11 @@ public class Proxyfier {
      */
     public class LazyMethodHandler implements MethodHandler {
 
-        private final LazyLoader lazyloader;
+        private final ServerLazyLoader lazyloader;
         private final List<String> alreadyLoaded = new ArrayList<String>();
         private final Entity entity;
 
-        public LazyMethodHandler(final Entity entity, final LazyLoader lazyloader) {
+        public LazyMethodHandler(final Entity entity, final ServerLazyLoader lazyloader) {
             this.entity = entity;
             this.lazyloader = lazyloader;
         }

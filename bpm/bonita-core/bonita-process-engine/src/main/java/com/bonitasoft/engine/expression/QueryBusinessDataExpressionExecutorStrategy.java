@@ -20,8 +20,8 @@ import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException
 import org.bonitasoft.engine.expression.model.ExpressionKind;
 import org.bonitasoft.engine.expression.model.SExpression;
 
-import com.bonitasoft.engine.api.impl.transaction.expression.fix.LazyLoader;
-import com.bonitasoft.engine.api.impl.transaction.expression.fix.Proxyfier;
+import com.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerLazyLoader;
+import com.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerProxyfier;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
@@ -64,7 +64,7 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
                 
                 List<Entity> e = new ArrayList<Entity>();
                 for (Entity entity : entities) {
-                    Proxyfier proxyfier = new Proxyfier(new LazyLoader(businessDataRepository));
+                    ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(businessDataRepository));
                     Entity proxify = proxyfier.proxify(entity);
                     e.add(proxify);
                 }
@@ -72,7 +72,7 @@ public class QueryBusinessDataExpressionExecutorStrategy extends NonEmptyContent
                 return e;
             } else {
                 Entity findByNamedQuery = businessDataRepository.findByNamedQuery(queryName, Entity.class, parameters);
-                Proxyfier proxyfier = new Proxyfier(new LazyLoader(businessDataRepository));
+                ServerProxyfier proxyfier = new ServerProxyfier(new ServerLazyLoader(businessDataRepository));
                 return proxyfier.proxify(findByNamedQuery);
             }
         } catch (final NonUniqueResultException nure) {

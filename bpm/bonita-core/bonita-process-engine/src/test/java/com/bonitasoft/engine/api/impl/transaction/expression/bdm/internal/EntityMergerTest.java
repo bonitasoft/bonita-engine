@@ -6,7 +6,7 @@
  * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
  * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.api.impl.transaction.expression;
+package com.bonitasoft.engine.api.impl.transaction.expression.bdm.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
@@ -23,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.bonitasoft.engine.api.impl.transaction.expression.EntityMerger;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 

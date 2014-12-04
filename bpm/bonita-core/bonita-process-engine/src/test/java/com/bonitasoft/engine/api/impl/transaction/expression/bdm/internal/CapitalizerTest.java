@@ -1,9 +1,8 @@
-package com.bonitasoft.engine.api.impl.transaction.expression.fix;
+package com.bonitasoft.engine.api.impl.transaction.expression.bdm.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-
 
 public class CapitalizerTest {
 
@@ -21,5 +20,4 @@ public class CapitalizerTest {
     public void capitalizer_empty_value() throws Exception {
         assertThat(Capitalizer.capitalize("")).isEqualTo("");
     }
-
 }

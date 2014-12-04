@@ -6,23 +6,24 @@
  * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
  * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
  *******************************************************************************/
-package com.bonitasoft.engine.api.impl.transaction.expression.fix;
+package com.bonitasoft.engine.api.impl.transaction.expression.bdm;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.bonitasoft.engine.api.impl.transaction.expression.bdm.internal.EntityGetter;
 import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
 
-public class LazyLoader {
+public class ServerLazyLoader {
 
     
     private BusinessDataRepository businessDataRepository;
 
-    public LazyLoader(BusinessDataRepository bdBusinessDataRepository) {
+    public ServerLazyLoader(BusinessDataRepository bdBusinessDataRepository) {
         this.businessDataRepository = bdBusinessDataRepository;
     }
     

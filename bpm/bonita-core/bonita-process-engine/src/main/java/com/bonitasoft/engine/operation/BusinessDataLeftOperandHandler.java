@@ -22,7 +22,7 @@ import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
-import com.bonitasoft.engine.api.impl.transaction.expression.fix.Proxyfier;
+import com.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerProxyfier;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
@@ -92,7 +92,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     private Entity mergeToBusinessDataRepository(final Entity newBusinessDataValue) {
-        return businessDataRepository.merge(Proxyfier.unProxyfyIfNeeded(newBusinessDataValue));
+        return businessDataRepository.merge(ServerProxyfier.unProxyfyIfNeeded(newBusinessDataValue));
     }
 
     private void checkIsValidBusinessData(final SRefBusinessDataInstance reference, final Object newValue) throws SOperationExecutionException {
