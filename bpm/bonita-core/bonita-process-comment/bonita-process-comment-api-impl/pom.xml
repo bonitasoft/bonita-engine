@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-process-comment</artifactId>
 		<groupId>org.bonitasoft.engine.core.process.comment</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.4.0</version>
 	</parent>
 
 	<artifactId>bonita-process-comment-api-impl</artifactId>
