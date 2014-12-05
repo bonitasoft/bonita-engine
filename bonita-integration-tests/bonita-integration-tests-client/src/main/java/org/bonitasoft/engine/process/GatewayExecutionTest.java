@@ -300,9 +300,10 @@ public class GatewayExecutionTest extends CommonAPITest {
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         // test execution
-        getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        // we should have 2 elements ready:
-        waitForPendingTasks(user, 1);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
+        // we should have 1 elements ready:
+        waitForUserTaskAndExecuteIt("step2", processInstance, user);
+
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -604,24 +605,16 @@ public class GatewayExecutionTest extends CommonAPITest {
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
+
         // we should have 2 elements ready:
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 5000, true, 2, user);
-        assertTrue("there was no pending task for john (expected step2 and step3)", checkNbPendingTaskOf.waitUntil());
-        final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        assertEquals(2, pendingTasks.size());
-        final HumanTaskInstance step2 = pendingTasks.get(0);
-        assertEquals("step2", step2.getName());
-        final HumanTaskInstance step3 = pendingTasks.get(1);
-        assertEquals("step3", step3.getName());
-        assignAndExecuteStep(step2, user.getId());
+        final HumanTaskInstance step3 = waitForUserTask("step3", processInstance);
+        waitForUserTaskAndExecuteIt("step2", processInstance, user);
+
         final CheckNbPendingTaskOf checkNbPendingTaskOf2 = new CheckNbPendingTaskOf(getProcessAPI(), 50, 2000, true, 2, user);
         assertFalse("there was no pending task for john (expected step3)", checkNbPendingTaskOf2.waitUntil());
+
         assignAndExecuteStep(step3, user.getId());
-        waitForUserTask("step4", processInstance);
-        final List<HumanTaskInstance> pendingTasks2 = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);
-        final HumanTaskInstance step4 = pendingTasks2.get(0);
-        assertEquals("step4", step4.getName());
-        assignAndExecuteStep(step4, user.getId());
+        waitForUserTaskAndExecuteIt("step4", processInstance, user);
         assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
@@ -737,25 +730,14 @@ public class GatewayExecutionTest extends CommonAPITest {
                 .addDefaultTransition("gateway1", "step4").addTransition("step2", "gateway2").addTransition("step3", "gateway2")
                 .addTransition("step4", "gateway2").addTransition("gateway2", "step5").getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
-        assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         // test execution
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
         // we should have 2 elements ready:
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 10000, true, 2, user);
-        checkNbPendingTaskOf.waitUntil();
-        // assertTrue("# pending tasks does not match expected", expectedNbPendingTask);
-        final List<HumanTaskInstance> pendingHumanTaskInstances = checkNbPendingTaskOf.getPendingHumanTaskInstances();
-        assertEquals(2, pendingHumanTaskInstances.size());
-        assertEquals("step5", pendingHumanTaskInstances.get(0).getName());
-        assertEquals("step5", pendingHumanTaskInstances.get(1).getName());
-        for (final HumanTaskInstance humanTaskInstance : pendingHumanTaskInstances) {
-            getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
-        }
-        for (final HumanTaskInstance humanTaskInstance : pendingHumanTaskInstances) {
-            getProcessAPI().executeFlowNode(humanTaskInstance.getId());
-        }
+        waitForUserTaskAndExecuteIt("step5", processInstance, user);
+        waitForUserTaskAndExecuteIt("step5", processInstance, user);
+
         assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
@@ -780,19 +762,9 @@ public class GatewayExecutionTest extends CommonAPITest {
 
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        // we should have 2 elements ready:
-        final CheckNbPendingTaskOf checkNbPendingTaskOf = new CheckNbPendingTaskOf(getProcessAPI(), 50, 10000, true, 1, user);
-        checkNbPendingTaskOf.waitUntil();
-        // assertTrue("# pending tasks does not match expected", expectedNbPendingTask);
-        final List<HumanTaskInstance> pendingHumanTaskInstances = checkNbPendingTaskOf.getPendingHumanTaskInstances();
-        assertEquals(1, pendingHumanTaskInstances.size());
-        assertEquals("step5", pendingHumanTaskInstances.get(0).getName());
-        for (final HumanTaskInstance humanTaskInstance : pendingHumanTaskInstances) {
-            getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
-        }
-        for (final HumanTaskInstance humanTaskInstance : pendingHumanTaskInstances) {
-            getProcessAPI().executeFlowNode(humanTaskInstance.getId());
-        }
+        // we should have 1 elements ready:
+        waitForUserTaskAndExecuteIt("step5", processInstance, user);
+
         assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
@@ -818,17 +790,10 @@ public class GatewayExecutionTest extends CommonAPITest {
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         // we should have 3 elements ready:
-        final List<HumanTaskInstance> pendingHumanTaskInstances = checkNbPendingTaskOf(3, user).getPendingHumanTaskInstances();
-        assertEquals(3, pendingHumanTaskInstances.size());
-        assertEquals("step5", pendingHumanTaskInstances.get(0).getName());
-        assertEquals("step5", pendingHumanTaskInstances.get(1).getName());
-        assertEquals("step5", pendingHumanTaskInstances.get(2).getName());
-        for (final HumanTaskInstance humanTaskInstance : pendingHumanTaskInstances) {
-            getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
-        }
-        for (final HumanTaskInstance humanTaskInstance : pendingHumanTaskInstances) {
-            getProcessAPI().executeFlowNode(humanTaskInstance.getId());
-        }
+        waitForUserTaskAndExecuteIt("step5", processInstance, user);
+        waitForUserTaskAndExecuteIt("step5", processInstance, user);
+        waitForUserTaskAndExecuteIt("step5", processInstance, user);
+
         assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
         disableAndDeleteProcess(processDefinition);
     }
