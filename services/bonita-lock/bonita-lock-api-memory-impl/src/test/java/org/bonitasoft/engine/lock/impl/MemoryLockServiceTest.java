@@ -1,6 +1,6 @@
 package org.bonitasoft.engine.lock.impl;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -12,6 +12,10 @@ import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.SLockException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
+
 /**
  * Copyright (C) 2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
@@ -25,9 +29,6 @@ import org.junit.Before;
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Baptiste Mesta
@@ -146,7 +147,7 @@ public class MemoryLockServiceTest {
         final LockThread lockThread = new LockThread(4, "a");
         lockThread.start();
         lockThread.join(100);
-        assertTrue("should able to lock", lockThread.isLockObtained());
+        assertTrue("should be able to lock", lockThread.isLockObtained());
     }
 
     @Test
