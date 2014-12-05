@@ -38,7 +38,7 @@ import com.bonitasoft.engine.business.application.ApplicationUpdater;
 import com.bonitasoft.engine.page.Page;
 
 /**
- * This API allows to list and manage Bonita Living Applications ({@link Application}).
+ * This API allows to list and manage Bonita Living Applications ({@link com.bonitasoft.engine.business.application.Application}).
  *
  * @author Elias Ricken de Medeiros
  * @see Application
@@ -287,7 +287,7 @@ public interface ApplicationAPI {
 
     /**
      * Imports {@link com.bonitasoft.engine.business.application.Application}s based on a XML file content.
-     * <p>
+     * <br>
      * Before importing {@code Application}s ensure that all {@link org.bonitasoft.engine.profile.Profile}s referenced by {@code Application}s and all
      * {@link com.bonitasoft.engine.page.Page}s referenced by {@link com.bonitasoft.engine.business.application.ApplicationPage}s are available.
      * <ul>
@@ -298,7 +298,6 @@ public interface ApplicationAPI {
      * pointing to this {@code ApplicationPage} will not be created. An {@code ImportError} will be added to the {@code ImportStatus} related to the
      * {@code Application} containing this {@code ApplicationPage}.</li>
      * </ul>
-     * </p>
      *
      * @param xmlContent a byte array representing the content of XML file containing the applications to be imported.
      * @param policy the {@link com.bonitasoft.engine.business.application.ApplicationImportPolicy} used to execute the import
@@ -311,10 +310,10 @@ public interface ApplicationAPI {
      * @see com.bonitasoft.engine.business.application.ApplicationImportPolicy
      * @see org.bonitasoft.engine.api.ImportStatus
      * @see org.bonitasoft.engine.api.ImportError
-     * @See com.bonitasoft.engine.business.application.ApplicationPage
+     * @see com.bonitasoft.engine.business.application.ApplicationPage
      * @see com.bonitasoft.engine.business.application.ApplicationMenu
      * @see org.bonitasoft.engine.profile.Profile
-     * @See com.bonitasoft.engine.page.Page
+     * @see com.bonitasoft.engine.page.Page
      */
     List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy) throws ImportException, AlreadyExistsException;
 

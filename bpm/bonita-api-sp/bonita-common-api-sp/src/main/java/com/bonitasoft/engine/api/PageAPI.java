@@ -111,8 +111,6 @@ public interface PageAPI {
      *            the Identifier of the page to update
      * @param pageUpdater
      *            the creator object to instantiate the new page.
-     * @param content
-     *            the binary content of the page.
      * @return the newly created page.
      * @throws UpdateException
      *             if an error occurs during the update.
@@ -133,7 +131,7 @@ public interface PageAPI {
      * @throws UpdateException
      *             if an error occurs during the update.
      */
-    void updatePageContent(final long pageId, final byte[] getPageContent) throws UpdateException, UpdatingWithInvalidPageTokenException,
+    void updatePageContent(final long pageId, final byte[] content) throws UpdateException, UpdatingWithInvalidPageTokenException,
             UpdatingWithInvalidPageZipContentException;
 
     /**

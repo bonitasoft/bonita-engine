@@ -19,7 +19,7 @@ import java.util.Map;
  * @author Celine Souchet
  * @version 6.3.5
  * @since 6.0.0
- * @see ProcessInstance
+ * @see org.bonitasoft.engine.bpm.process.ProcessInstance
  */
 public class ProcessInstanceUpdater implements Serializable {
 

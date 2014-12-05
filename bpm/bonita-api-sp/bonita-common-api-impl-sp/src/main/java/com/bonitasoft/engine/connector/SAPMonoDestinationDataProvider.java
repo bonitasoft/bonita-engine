@@ -17,7 +17,7 @@ import com.sap.conn.jco.ext.Environment;
 /**
  * 
  * 
- * Used by SAP connector in order to synchronize SAP {@link DestinationDataProvider} used
+ * Used by SAP connector in order to synchronize SAP {@code com.sap.conn.jco.ext.DestinationDataProvider} used
  * 
  * 
  * Warning: Internal use only!
@@ -46,7 +46,6 @@ public class SAPMonoDestinationDataProvider implements DestinationDataProvider {
      * 
      * @param destinationName
      * @return
-     * @throws ConnectorException
      */
     public static synchronized SAPMonoDestinationDataProvider getInstance(final String destinationName) throws IllegalStateException {
         // TODO: handle several destinationName correctly

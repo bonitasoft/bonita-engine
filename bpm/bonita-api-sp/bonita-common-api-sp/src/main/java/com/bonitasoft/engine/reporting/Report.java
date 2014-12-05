@@ -17,7 +17,7 @@ import org.bonitasoft.engine.bpm.BaseElement;
  * It is used by Bonita BPM Portal to store specific reporting behaviour.
  * 
  * @author Matthieu Chaffotte
- * @see ReportingAPI
+ * @see com.bonitasoft.engine.api.ReportingAPI
  */
 public interface Report extends BaseElement {
 
