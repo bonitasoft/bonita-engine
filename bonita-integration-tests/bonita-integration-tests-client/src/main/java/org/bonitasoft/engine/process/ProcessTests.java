@@ -2,7 +2,10 @@ package org.bonitasoft.engine.process;
 
 import org.bonitasoft.engine.process.actor.ActorTests;
 import org.bonitasoft.engine.process.comment.CommentTest;
-import org.bonitasoft.engine.process.data.DataInstanceIntegrationTest;
+import org.bonitasoft.engine.process.data.ActivityDataDefinitionIT;
+import org.bonitasoft.engine.process.data.ActivityDataInstanceIT;
+import org.bonitasoft.engine.process.data.ProcessDataDefinitionIT;
+import org.bonitasoft.engine.process.data.ProcessDataInstanceIT;
 import org.bonitasoft.engine.process.document.DocumentIntegrationTest;
 import org.bonitasoft.engine.process.instance.ProcessInstanceTests;
 import org.bonitasoft.engine.process.task.TaskTests;
@@ -28,7 +31,10 @@ import org.junit.runners.Suite.SuiteClasses;
         CommentTest.class,
         DocumentIntegrationTest.class,
         ActorTests.class,
-        DataInstanceIntegrationTest.class
+        ActivityDataInstanceIT.class,
+        ActivityDataDefinitionIT.class,
+        ProcessDataInstanceIT.class,
+        ProcessDataDefinitionIT.class
 })
 public class ProcessTests {
 

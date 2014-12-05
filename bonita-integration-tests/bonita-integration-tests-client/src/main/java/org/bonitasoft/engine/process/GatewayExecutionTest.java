@@ -1093,7 +1093,7 @@ public class GatewayExecutionTest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final long flowNodeInstanceId = waitForFlowNodeInState(processInstance, "join", TestStates.EXECUTING, false);
+        FlowNodeInstance joinGateway = waitForFlowNodeInExecutingState(processInstance, "join", false);
 
         logoutOnTenant();
         final PlatformSession loginPlatform = loginOnPlatform();
@@ -1108,7 +1108,7 @@ public class GatewayExecutionTest extends CommonAPITest {
         // To be sure asynchronous restart works have been executed:
         Thread.sleep(200);
 
-        final FlowNodeInstance joinGateway = getProcessAPI().getFlowNodeInstance(flowNodeInstanceId);
+        joinGateway = getProcessAPI().getFlowNodeInstance(joinGateway.getId());
         assertEquals(TestStates.EXECUTING.getStateName(), joinGateway.getState());
 
         disableAndDeleteProcess(processDefinition);

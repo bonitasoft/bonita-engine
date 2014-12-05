@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -46,6 +47,7 @@ import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
 import org.bonitasoft.engine.bpm.comment.ArchivedComment;
 import org.bonitasoft.engine.bpm.comment.Comment;
+import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.DocumentCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
@@ -907,14 +909,24 @@ public class APITestUtil extends PlatformTestUtil {
             throws Exception {
         final Long flowNodeInstanceId = waitForFlowNode(processInstance.getId(), TestStates.READY, flowNodeName, useRootProcessInstance,
                 DEFAULT_TIMEOUT);
-        final FlowNodeInstance flowNodeInstance = getProcessAPI().getFlowNodeInstance(flowNodeInstanceId);
-        assertNotNull(flowNodeInstance);
-        return flowNodeInstance;
+        return getFlowNode(flowNodeInstanceId);
     }
 
     public FlowNodeInstance waitForFlowNodeInExecutingState(final ProcessInstance processInstance, final String flowNodeName,
             final boolean useRootProcessInstance) throws Exception {
-        final Long activityId = waitForFlowNode(processInstance.getId(), TestStates.EXECUTING, flowNodeName, useRootProcessInstance, DEFAULT_TIMEOUT);
+        final Long activityId = waitForFlowNodeInState(processInstance, flowNodeName, TestStates.EXECUTING, useRootProcessInstance);
+        return getFlowNodeInstance(activityId);
+    }
+
+    public FlowNodeInstance waitForFlowNodeInCompletedState(final ProcessInstance processInstance, final String flowNodeName,
+            final boolean useRootProcessInstance) throws Exception {
+        final Long activityId = waitForFlowNodeInState(processInstance, flowNodeName, TestStates.NORMAL_FINAL, useRootProcessInstance);
+        return getFlowNodeInstance(activityId);
+    }
+
+    public FlowNodeInstance waitForFlowNodeInWaitingState(final ProcessInstance processInstance, final String flowNodeName,
+            final boolean useRootProcessInstance) throws Exception {
+        final Long activityId = waitForFlowNodeInState(processInstance, flowNodeName, TestStates.WAITING, useRootProcessInstance);
         return getFlowNodeInstance(activityId);
     }
 
@@ -932,6 +944,10 @@ public class APITestUtil extends PlatformTestUtil {
             final boolean useRootProcessInstance) throws Exception {
         final Long flowNodeInstanceId = waitForFlowNode(processInstance.getId(), TestStates.INTERRUPTED, flowNodeName, useRootProcessInstance,
                 DEFAULT_TIMEOUT);
+        return getFlowNode(flowNodeInstanceId);
+    }
+
+    private FlowNodeInstance getFlowNode(final Long flowNodeInstanceId) throws FlowNodeInstanceNotFoundException {
         final FlowNodeInstance flowNodeInstance = getProcessAPI().getFlowNodeInstance(flowNodeInstanceId);
         assertNotNull(flowNodeInstance);
         return flowNodeInstance;
@@ -956,8 +972,8 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public FlowNodeInstance waitForFlowNodeInFailedState(final ProcessInstance processInstance, final String flowNodeName) throws Exception {
-        final Long flowNodeId = waitForFlowNodeInState(processInstance, flowNodeName, TestStates.FAILED, true);
-        return getFlowNodeInstance(flowNodeId);
+        final Long flowNodeInstanceId = waitForFlowNodeInState(processInstance, flowNodeName, TestStates.FAILED, true);
+        return getFlowNodeInstance(flowNodeInstanceId);
     }
 
     public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception {
@@ -1526,6 +1542,19 @@ public class APITestUtil extends PlatformTestUtil {
      */
     protected void forceMatchingOfEvents() throws CommandNotFoundException, CommandExecutionException, CommandParameterizationException {
         commandAPI.execute(ClientEventUtil.EXECUTE_EVENTS_COMMAND, Collections.<String, Serializable> emptyMap());
+    }
+
+    public ArchivedDataInstance getArchivedDataInstance(final List<ArchivedDataInstance> archivedDataInstances, final String dataName) {
+        ArchivedDataInstance archivedDataInstance = null;
+        final Iterator<ArchivedDataInstance> iterator = archivedDataInstances.iterator();
+        while (archivedDataInstance == null || iterator.hasNext()) {
+            final ArchivedDataInstance next = iterator.next();
+            if (next.getName().equals(dataName)) {
+                archivedDataInstance = next;
+            }
+        }
+        assertNotNull(archivedDataInstance);
+        return archivedDataInstance;
     }
 
 }

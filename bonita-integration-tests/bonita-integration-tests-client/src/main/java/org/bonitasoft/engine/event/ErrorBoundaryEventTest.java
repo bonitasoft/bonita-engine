@@ -96,22 +96,22 @@ public class ErrorBoundaryEventTest extends AbstractEventTest {
         final ProcessDefinition callerProcDef = deployAndEnableProcessWithBoundaryErrorEventOnCallActivity("pErrorBoundary", "calledProcess", "callStep",
                 "error1", "delivery");
 
-        final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcDef.getId());
-        final ActivityInstance calledStep1 = waitForUserTask("calledStep1", processInstance.getId());
-        final ActivityInstance calledStep2 = waitForUserTask("calledStep2", processInstance.getId());
-        final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep1.getParentProcessInstanceId());
-        assignAndExecuteStep(calledStep2, donaBenta.getId());
+        try {
+            final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcDef.getId());
+            final ActivityInstance calledStep1 = waitForUserTask("calledStep1", processInstance.getId());
+            final ActivityInstance calledStep2 = waitForUserTask("calledStep2", processInstance.getId());
+            final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep1.getParentProcessInstanceId());
+            assignAndExecuteStep(calledStep2, donaBenta.getId());
+            waitForFlowNodeInState(processInstance, "calledStep1", TestStates.ABORTED, true);
+            waitForProcessToFinish(calledProcessInstance);
 
-        waitForProcessToFinish(calledProcessInstance);
-        waitForFlowNodeInState(processInstance, "calledStep1", TestStates.ABORTED, true);
-
-        final ActivityInstance executionStep = waitForUserTask("step2", processInstance.getId());
-        assignAndExecuteStep(executionStep, donaBenta.getId());
-
-        waitForProcessToFinish(processInstance);
-        checkWasntExecuted(processInstance, EXCEPTION_STEP);
-
-        disableAndDeleteProcess(calledProcDef, callerProcDef);
+            final ActivityInstance executionStep = waitForUserTask("step2", processInstance.getId());
+            assignAndExecuteStep(executionStep, donaBenta.getId());
+            waitForProcessToFinish(processInstance);
+            checkWasntExecuted(processInstance, EXCEPTION_STEP);
+        } finally {
+            disableAndDeleteProcess(calledProcDef, callerProcDef);
+        }
     }
 
     @Test

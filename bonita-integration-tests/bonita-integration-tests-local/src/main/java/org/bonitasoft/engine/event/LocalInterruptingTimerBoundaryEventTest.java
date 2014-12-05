@@ -7,6 +7,7 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventInstance;
 import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.LoopActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -73,7 +74,8 @@ public class LocalInterruptingTimerBoundaryEventTest extends AbstractEventTest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final Long boundaryId = waitForFlowNodeInState(processInstance, "timer", TestStates.WAITING, false);
+        final FlowNodeInstance timer = waitForFlowNodeInWaitingState(processInstance, "timer", false);;
+        final Long boundaryId = timer.getId();
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
         // when
@@ -109,7 +111,8 @@ public class LocalInterruptingTimerBoundaryEventTest extends AbstractEventTest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final Long boundaryId = waitForFlowNodeInState(processInstance, "timer", TestStates.WAITING, false);
+        final FlowNodeInstance timer = waitForFlowNodeInWaitingState(processInstance, "timer", false);;
+        final Long boundaryId = timer.getId();
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
         // when
@@ -141,7 +144,8 @@ public class LocalInterruptingTimerBoundaryEventTest extends AbstractEventTest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final Long boundaryId = waitForFlowNodeInState(processInstance, "timer", TestStates.WAITING, false);
+        final FlowNodeInstance timer = waitForFlowNodeInWaitingState(processInstance, "timer", false);
+        final Long boundaryId = timer.getId();
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
         // when
@@ -173,7 +177,8 @@ public class LocalInterruptingTimerBoundaryEventTest extends AbstractEventTest {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final Long boundaryId = waitForFlowNodeInState(processInstance, "timer", TestStates.WAITING, false);
+        final FlowNodeInstance timer = waitForFlowNodeInWaitingState(processInstance, "timer", false);;
+        final Long boundaryId = timer.getId();
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
         // when
@@ -202,7 +207,8 @@ public class LocalInterruptingTimerBoundaryEventTest extends AbstractEventTest {
                 "exceptionStep");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final Long boundaryId = waitForFlowNodeInState(processInstance, "timer", TestStates.WAITING, false);
+        final FlowNodeInstance timer = waitForFlowNodeInWaitingState(processInstance, "timer", false);;
+        final Long boundaryId = timer.getId();
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
         // when

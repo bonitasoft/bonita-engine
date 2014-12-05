@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -128,7 +129,8 @@ public class LocalTimerEventTest extends CommonAPILocalTest {
         final ProcessDefinition definition = deployProcessWithTimerIntermediateCatchEvent(TimerType.DURATION, timerExpression, "step");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        final Long floNodeInstanceId = waitForFlowNodeInState(processInstance, "intermediateCatchEvent", TestStates.WAITING, false);
+        final FlowNodeInstance intermediateCatchEvent = waitForFlowNodeInWaitingState(processInstance, "intermediateCatchEvent", false);
+        final Long floNodeInstanceId = intermediateCatchEvent.getId();
         final String jobName = getJobName(floNodeInstanceId);
         assertThat(containsTimerJob(jobName)).isTrue();
 

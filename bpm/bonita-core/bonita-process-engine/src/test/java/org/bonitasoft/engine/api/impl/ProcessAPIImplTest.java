@@ -946,4 +946,9 @@ public class ProcessAPIImplTest {
 
         verify(managementAPIImplDelegate).purgeClassLoader(45L);
     }
+
+    @Test(expected = UpdateException.class)
+    public void updateDueDateOfTask_should_throw_exception_when_date_is_null() throws Exception {
+        processAPI.updateDueDateOfTask(123456789L, null);
+    }
 }
