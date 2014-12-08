@@ -187,7 +187,7 @@ public class BDMQueryUtilTest {
         f2.setReference(bo);
         bo.addField(f2);
 
-        assertThat(BDMQueryUtil.getAllProvidedQueriesNameForBusinessObject(bo)).containsExactly("findByName", "find");
+        assertThat(BDMQueryUtil.getAllProvidedQueriesNameForBusinessObject(bo)).containsOnly("findByName", "find");
     }
 
     @Test
