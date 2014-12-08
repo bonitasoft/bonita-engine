@@ -1,6 +1,5 @@
 package org.bonitasoft.engine;
 
-import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.accessors.TenantAccessorTest;
 import org.bonitasoft.engine.command.AdvancedStartProcessCommandIT;
 import org.bonitasoft.engine.command.CommandTest;
@@ -17,6 +16,8 @@ import org.bonitasoft.engine.profile.ProfileITest;
 import org.bonitasoft.engine.search.SearchProcessInstanceTest;
 import org.bonitasoft.engine.supervisor.ProcessSupervisedTest;
 import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 

@@ -1,4 +1,4 @@
-package org.bonitasoft.engine;
+package org.bonitasoft.engine.test.runner;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -26,7 +26,7 @@ public class BonitaSuiteRunner extends Suite implements BonitaRunner {
     }
 
     static Class<?> getAnnotatedInitializer(final Class<?> klass) throws InitializationError {
-        Initializer annotation = klass.getAnnotation(Initializer.class);
+        final Initializer annotation = klass.getAnnotation(Initializer.class);
         if (annotation == null) {
             throw new InitializationError(String.format("class '%s' must have a Initializer annotation", klass.getName()));
         }
@@ -82,24 +82,24 @@ public class BonitaSuiteRunner extends Suite implements BonitaRunner {
     }
 
     private void initializeClasses() {
-        List<Runner> children = getChildren();
+        final List<Runner> children = getChildren();
         setRootToFalse(children);
     }
 
     private void setRootToFalse(final List<Runner> children) {
-        for (Runner runner : children) {
+        for (final Runner runner : children) {
             if (runner instanceof BonitaRunner) {
-                BonitaRunner bonitaRunner = (BonitaRunner) runner;
+                final BonitaRunner bonitaRunner = (BonitaRunner) runner;
                 bonitaRunner.setRoot(false);
             } else if (runner instanceof Suite) {
-                Suite suite = (Suite) runner;
+                final Suite suite = (Suite) runner;
                 try {
-                    Method method = Suite.class.getDeclaredMethod("getChildren");
+                    final Method method = Suite.class.getDeclaredMethod("getChildren");
                     method.setAccessible(true);
                     @SuppressWarnings("unchecked")
-                    List<Runner> invoke = (List<Runner>) method.invoke(suite);
+                    final List<Runner> invoke = (List<Runner>) method.invoke(suite);
                     setRootToFalse(invoke);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     throw new RuntimeException(e);
                 }
             }

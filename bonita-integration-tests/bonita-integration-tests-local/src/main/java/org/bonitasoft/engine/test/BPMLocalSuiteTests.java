@@ -1,11 +1,11 @@
 package org.bonitasoft.engine.test;
 
-import org.bonitasoft.engine.BonitaSuiteRunner;
-import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.TestsInitializer;
 import org.bonitasoft.engine.event.LocalInterruptingTimerBoundaryEventTest;
 import org.bonitasoft.engine.event.LocalTimerEventTest;
 import org.bonitasoft.engine.job.JobExecutionTest;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.theme.ThemeTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;

@@ -14,38 +14,27 @@
 package org.bonitasoft.engine.api.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.api.ProfileAPI;
 import org.bonitasoft.engine.api.ThemeAPI;
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.commons.exceptions.SBonitaRuntimeException;
-import org.bonitasoft.engine.session.SSessionException;
-import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
-import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
-import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class APIAccessorImplTest {
 
-
     private APIAccessorImpl apiAccessor;
 
-    private void initAPIAccessor() throws SBonitaException {
-
+    private void initAPIAccessor() {
         apiAccessor = new APIAccessorImpl();
     }
+
     @Test
-    public void getIdentityAPI_should_return_the_default_implementation() throws SBonitaException {
+    public void getIdentityAPI_should_return_the_default_implementation() {
         initAPIAccessor();
         final IdentityAPI identityAPI = apiAccessor.getIdentityAPI();
 
@@ -53,7 +42,7 @@ public class APIAccessorImplTest {
     }
 
     @Test
-    public void getProcessAPI_should_return_the_default_implementation() throws SBonitaException {
+    public void getProcessAPI_should_return_the_default_implementation() {
         initAPIAccessor();
         final ProcessAPI processAPI = apiAccessor.getProcessAPI();
 
@@ -61,7 +50,7 @@ public class APIAccessorImplTest {
     }
 
     @Test
-    public void getCommandAPI_should_return_the_default_implementation() throws SBonitaException {
+    public void getCommandAPI_should_return_the_default_implementation() {
         initAPIAccessor();
         final CommandAPI commandAPI = apiAccessor.getCommandAPI();
 
@@ -69,7 +58,7 @@ public class APIAccessorImplTest {
     }
 
     @Test
-    public void getProfileAPI_should_return_the_default_implementation() throws SBonitaException {
+    public void getProfileAPI_should_return_the_default_implementation() {
         initAPIAccessor();
         final ProfileAPI profileAPI = apiAccessor.getProfileAPI();
 
@@ -77,7 +66,7 @@ public class APIAccessorImplTest {
     }
 
     @Test
-    public void getThemeAPI_should_return_the_default_implementation() throws SBonitaException {
+    public void getThemeAPI_should_return_the_default_implementation() {
         initAPIAccessor();
         final ThemeAPI themeAPI = apiAccessor.getThemeAPI();
 

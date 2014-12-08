@@ -1,4 +1,4 @@
-package org.bonitasoft.engine;
+package org.bonitasoft.engine.test.runner;
 
 public interface BonitaRunner {
 

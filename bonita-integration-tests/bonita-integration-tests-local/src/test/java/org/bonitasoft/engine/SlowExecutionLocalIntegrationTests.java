@@ -1,6 +1,5 @@
 package org.bonitasoft.engine;
 
-import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.event.InterruptingTimerBoundaryEventTest;
 import org.bonitasoft.engine.event.MessageBoundaryEventTest;
 import org.bonitasoft.engine.event.MessageEventSubProcessTest;
@@ -13,6 +12,8 @@ import org.bonitasoft.engine.platform.PlatformLoginTest;
 import org.bonitasoft.engine.platform.PlatformTest;
 import org.bonitasoft.engine.test.APIMethodTest;
 import org.bonitasoft.engine.test.BPMLocalSuiteTests;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 

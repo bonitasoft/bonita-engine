@@ -1,4 +1,4 @@
-package org.bonitasoft.engine;
+package org.bonitasoft.engine.test.runner;
 
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
