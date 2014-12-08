@@ -15,8 +15,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
-import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
-import org.bonitasoft.engine.BonitaTestRunner;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -37,6 +35,8 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -190,9 +190,9 @@ public class TenantMaintenanceIT extends CommonAPISPTest {
 
     private void logNumberOfProcess(final long tenantId, final String tenantName) throws Exception {
         loginOnTenantWithTechnicalLogger(tenantId);
-        long numberOfProcessInstances = getProcessAPI()
+        final long numberOfProcessInstances = getProcessAPI()
                 .getNumberOfProcessInstances();
-        long numberOfArchivedProcessInstances = getProcessAPI()
+        final long numberOfArchivedProcessInstances = getProcessAPI()
                 .getNumberOfArchivedProcessInstances();
 
         LOGGER.info(String.format(
@@ -207,7 +207,7 @@ public class TenantMaintenanceIT extends CommonAPISPTest {
 
     private ProcessDefinition createProcessOnTenant(final long tenantId) throws Exception {
         loginOnTenantWith(USERNAME, PASSWORD, tenantId);
-        String processName = new StringBuilder().append(PROCESS_NAME).append(tenantId).toString();
+        final String processName = new StringBuilder().append(PROCESS_NAME).append(tenantId).toString();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance(processName,
                         PROCESS_VERSION)
