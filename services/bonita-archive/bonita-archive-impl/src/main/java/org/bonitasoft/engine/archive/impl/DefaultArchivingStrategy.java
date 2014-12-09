@@ -23,7 +23,7 @@ public class DefaultArchivingStrategy extends AbstractArchivingStrategy {
     public DefaultArchivingStrategy() {
         super();
         archives.put("org.bonitasoft.engine.core.process.comment.model.SComment", true);
-        archives.put("org.bonitasoft.engine.core.process.document.mapping.model.SDocumentMapping", true);
+        archives.put("org.bonitasoft.engine.core.document.model.SDocumentMapping", true);
         archives.put("org.bonitasoft.engine.core.process.instance.model.SProcessInstance", true);
         archives.put("org.bonitasoft.engine.core.process.instance.model.STransitionInstance", true);
         archives.put("org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance", true);
@@ -36,6 +36,8 @@ public class DefaultArchivingStrategy extends AbstractArchivingStrategy {
         archives.put("org.bonitasoft.engine.core.process.instance.model.SGatewayInstance", true);
         archives.put("org.bonitasoft.engine.core.process.instance.model.SSubProcessActivityInstance", true);
         archives.put("org.bonitasoft.engine.core.process.instance.model.SConnectorInstance", true);
+        archives.put("org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance", true);
+        archives.put("org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance", true);
         archives.put("org.bonitasoft.engine.data.instance.model.SDataInstance", true);
         archives.put("org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping", true);
         // is the archived version because there is no not archived version

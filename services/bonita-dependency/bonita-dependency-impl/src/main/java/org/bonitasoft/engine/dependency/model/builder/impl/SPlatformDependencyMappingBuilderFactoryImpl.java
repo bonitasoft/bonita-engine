@@ -16,7 +16,6 @@ package org.bonitasoft.engine.dependency.model.builder.impl;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMappingBuilder;
 import org.bonitasoft.engine.dependency.model.builder.SPlatformDependencyMappingBuilderFactory;
-import org.bonitasoft.engine.dependency.model.impl.SDependencyMappingImpl;
 import org.bonitasoft.engine.dependency.model.impl.SPlatformDependencyMappingImpl;
 
 /**

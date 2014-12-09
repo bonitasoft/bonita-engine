@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -70,7 +70,6 @@ import org.bonitasoft.engine.bpm.flownode.ActivityStates;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedAutomaticTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedCallActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ArchivedFlowElementInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedGatewayInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
@@ -82,12 +81,14 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedSubProcessActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedUserTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.BPMEventType;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
+import org.bonitasoft.engine.bpm.flownode.EventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.StateCategory;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
+import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.ActivityInstanceImpl;
@@ -121,6 +122,7 @@ import org.bonitasoft.engine.bpm.flownode.impl.internal.ReceiveTaskInstanceImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.SendTaskInstanceImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.StartEventInstanceImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.SubProcessActivityInstanceImpl;
+import org.bonitasoft.engine.bpm.flownode.impl.internal.TimerEventTriggerInstanceImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.UserTaskInstanceImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.WaitingErrorEventImpl;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.WaitingMessageEventImpl;
@@ -144,6 +146,9 @@ import org.bonitasoft.engine.command.CommandDescriptorImpl;
 import org.bonitasoft.engine.command.model.SCommand;
 import org.bonitasoft.engine.core.category.model.SCategory;
 import org.bonitasoft.engine.core.connector.parser.SConnectorImplementationDescriptor;
+import org.bonitasoft.engine.core.document.api.DocumentService;
+import org.bonitasoft.engine.core.document.model.SMappedDocument;
+import org.bonitasoft.engine.core.document.model.archive.SAMappedDocument;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.operation.model.SOperation;
 import org.bonitasoft.engine.core.operation.model.SOperatorType;
@@ -157,9 +162,6 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.model.SConnectorDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
-import org.bonitasoft.engine.core.process.document.model.SAProcessDocument;
-import org.bonitasoft.engine.core.process.document.model.SProcessDocument;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SCallActivityInstance;
@@ -180,7 +182,6 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInsta
 import org.bonitasoft.engine.core.process.instance.model.archive.SAAutomaticTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SACallActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInstance;
-import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowElementInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAGatewayInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
@@ -198,6 +199,8 @@ import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaiting
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingSignalEvent;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
+import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEventTriggerInstance;
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
@@ -223,11 +226,15 @@ import org.bonitasoft.engine.identity.UserCreator;
 import org.bonitasoft.engine.identity.UserCreator.UserField;
 import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.identity.impl.ContactDataImpl;
+import org.bonitasoft.engine.identity.impl.CustomUserInfoDefinitionImpl;
+import org.bonitasoft.engine.identity.impl.CustomUserInfoValueImpl;
 import org.bonitasoft.engine.identity.impl.GroupImpl;
 import org.bonitasoft.engine.identity.impl.RoleImpl;
 import org.bonitasoft.engine.identity.impl.UserImpl;
 import org.bonitasoft.engine.identity.impl.UserMembershipImpl;
 import org.bonitasoft.engine.identity.model.SContactInfo;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
+import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -524,7 +531,7 @@ public class ModelConvertor {
     public static List<ProcessInstance> toProcessInstances(final List<SProcessInstance> sProcessInstances,
             final ProcessDefinitionService processDefinitionService) {
         final List<ProcessInstance> clientProcessInstances = new ArrayList<ProcessInstance>();
-        final HashMap<Long, SProcessDefinition> processDefinitions = new HashMap<Long, SProcessDefinition>();
+        final Map<Long, SProcessDefinition> processDefinitions = new HashMap<Long, SProcessDefinition>();
         if (sProcessInstances != null) {
             for (final SProcessInstance sProcessInstance : sProcessInstances) {
                 SProcessDefinition sProcessDefinition = processDefinitions.get(sProcessInstance.getProcessDefinitionId());
@@ -677,9 +684,9 @@ public class ModelConvertor {
         aFlowNode.setParentContainerId(saFlowNode.getParentContainerId());
         aFlowNode.setRootContainerId(saFlowNode.getRootContainerId());
         aFlowNode.setSourceObjectId(saFlowNode.getSourceObjectId());
-        aFlowNode.setProcessDefinitionId(saFlowNode.getLogicalGroup(0));
-        aFlowNode.setProcessInstanceId(saFlowNode.getLogicalGroup(1));
-        aFlowNode.setParentActivityInstanceId(saFlowNode.getLogicalGroup(2));
+        aFlowNode.setProcessDefinitionId(saFlowNode.getProcessDefinitionId());
+        aFlowNode.setProcessInstanceId(saFlowNode.getParentProcessInstanceId());
+        aFlowNode.setParentActivityInstanceId(saFlowNode.getParentActivityInstanceId());
         aFlowNode.setDescription(saFlowNode.getDescription());
         aFlowNode.setDisplayName(saFlowNode.getDisplayName());
         aFlowNode.setDisplayDescription(saFlowNode.getDisplayDescription());
@@ -1084,6 +1091,58 @@ public class ModelConvertor {
         final EventInstanceImpl eventInstance = getEventInstance(sEvent);
         updateFlowNode(eventInstance, sEvent, flowNodeStateManager.getState(sEvent.getStateId()).getName());
         return eventInstance;
+    }
+
+    public static List<EventTriggerInstance> toEventTriggerInstances(final List<SEventTriggerInstance> sEventTriggerInstances) {
+        final List<EventTriggerInstance> eventTriggerInstances = new ArrayList<EventTriggerInstance>();
+        for (final SEventTriggerInstance sEventTriggerInstance : sEventTriggerInstances) {
+            final EventTriggerInstance eventTriggerInstance = toEventTriggerInstance(sEventTriggerInstance);
+            if (eventTriggerInstance != null) {
+                eventTriggerInstances.add(eventTriggerInstance);
+            }
+        }
+        return eventTriggerInstances;
+    }
+
+    public static List<TimerEventTriggerInstance> toTimerEventTriggerInstances(final List<STimerEventTriggerInstance> sEventTriggerInstances) {
+        final List<TimerEventTriggerInstance> eventTriggerInstances = new ArrayList<TimerEventTriggerInstance>();
+        for (final STimerEventTriggerInstance sEventTriggerInstance : sEventTriggerInstances) {
+            final TimerEventTriggerInstance eventTriggerInstance = toTimerEventTriggerInstance(sEventTriggerInstance);
+            if (eventTriggerInstance != null) {
+                eventTriggerInstances.add(eventTriggerInstance);
+            }
+        }
+        return eventTriggerInstances;
+    }
+
+    public static EventTriggerInstance toEventTriggerInstance(final SEventTriggerInstance sEventTriggerInstance) {
+        EventTriggerInstance eventTriggerInstance = null;
+        switch (sEventTriggerInstance.getEventTriggerType()) {
+            case ERROR:
+                // Not support for now
+                break;
+            case TIMER:
+                eventTriggerInstance = toTimerEventTriggerInstance((STimerEventTriggerInstance) sEventTriggerInstance);
+                break;
+            case SIGNAL:
+                // Not support for now
+                break;
+            case MESSAGE:
+                // Not support for now
+                break;
+            case TERMINATE:
+                // Not support for now
+                break;
+            default:
+                throw new UnknownElementType(sEventTriggerInstance.getClass().getName());
+
+        }
+        return eventTriggerInstance;
+    }
+
+    public static TimerEventTriggerInstance toTimerEventTriggerInstance(final STimerEventTriggerInstance sTimerEventTriggerInstance) {
+        return new TimerEventTriggerInstanceImpl(sTimerEventTriggerInstance.getId(), sTimerEventTriggerInstance.getEventInstanceId(),
+                sTimerEventTriggerInstance.getEventInstanceName(), new Date(sTimerEventTriggerInstance.getExecutionDate()));
     }
 
     public static WaitingEvent toWaitingEvent(final SWaitingEvent sWaitingEvent) {
@@ -1495,53 +1554,61 @@ public class ModelConvertor {
         return supervisor;
     }
 
-    public static List<Document> toDocuments(final Collection<SProcessDocument> attachments) {
+    public static List<Document> toDocuments(final Collection<SMappedDocument> mappedDocuments, final DocumentService documentService) {
         final List<Document> documents = new ArrayList<Document>();
-        for (final SProcessDocument sProcessDocument : attachments) {
-            final Document document = toDocument(sProcessDocument);
+        for (final SMappedDocument mappedDocument : mappedDocuments) {
+            final Document document = toDocument(mappedDocument, documentService);
             documents.add(document);
         }
         return documents;
     }
 
-    public static Document toDocument(final SProcessDocument attachment) {
-        final DocumentImpl documentImpl = new DocumentImpl();
-        documentImpl.setId(attachment.getId());
-        documentImpl.setProcessInstanceId(attachment.getProcessInstanceId());
-        documentImpl.setName(attachment.getName());
-        documentImpl.setAuthor(attachment.getAuthor());
-        documentImpl.setCreationDate(new Date(attachment.getCreationDate()));
-        documentImpl.setHasContent(attachment.hasContent());
-        documentImpl.setContentMimeType(attachment.getContentMimeType());
-        documentImpl.setFileName(attachment.getContentFileName());
-        documentImpl.setContentStorageId(attachment.getContentStorageId());
-        documentImpl.setUrl(attachment.getURL());
+    public static Document toDocument(final SMappedDocument mappedDocument, final DocumentService documentService) {
 
+        final DocumentImpl documentImpl = new DocumentImpl();
+        if (mappedDocument instanceof SAMappedDocument) {
+            documentImpl.setId(((SAMappedDocument) mappedDocument).getSourceObjectId());
+        } else {
+            documentImpl.setId(mappedDocument.getId());
+        }
+        setDocumentFields(mappedDocument, documentService, documentImpl);
         return documentImpl;
     }
 
-    public static List<ArchivedDocument> toArchivedDocuments(final Collection<SAProcessDocument> attachments) {
+    private static void setDocumentFields(final SMappedDocument mappedDocument, final DocumentService documentService, final DocumentImpl documentImpl) {
+        documentImpl.setProcessInstanceId(mappedDocument.getProcessInstanceId());
+        documentImpl.setName(mappedDocument.getName());
+        documentImpl.setDescription(mappedDocument.getDescription());
+        documentImpl.setVersion(mappedDocument.getVersion());
+        documentImpl.setAuthor(mappedDocument.getAuthor());
+        documentImpl.setCreationDate(new Date(mappedDocument.getCreationDate()));
+        documentImpl.setHasContent(mappedDocument.hasContent());
+        documentImpl.setContentMimeType(mappedDocument.getMimeType());
+        documentImpl.setFileName(mappedDocument.getFileName());
+        documentImpl.setContentStorageId(String.valueOf(mappedDocument.getDocumentId()));
+        documentImpl.setIndex(mappedDocument.getIndex());
+        if (mappedDocument.hasContent()) {
+            documentImpl.setUrl(documentService.generateDocumentURL(mappedDocument.getFileName(), String.valueOf(mappedDocument.getDocumentId())));
+        } else {
+            documentImpl.setUrl(mappedDocument.getUrl());
+        }
+    }
+
+    public static List<ArchivedDocument> toArchivedDocuments(final Collection<SAMappedDocument> mappedDocuments, final DocumentService documentService) {
         final List<ArchivedDocument> documents = new ArrayList<ArchivedDocument>();
-        for (final SAProcessDocument sAProcessDocument : attachments) {
-            final ArchivedDocument document = toArchivedDocument(sAProcessDocument);
+        for (final SAMappedDocument mappedDocument : mappedDocuments) {
+            final ArchivedDocument document = toArchivedDocument(mappedDocument, documentService);
             documents.add(document);
         }
         return documents;
     }
 
-    public static ArchivedDocument toArchivedDocument(final SAProcessDocument attachment) {
-        final ArchivedDocumentImpl documentImpl = new ArchivedDocumentImpl(attachment.getName());
-        documentImpl.setId(attachment.getId());
-        documentImpl.setProcessInstanceId(attachment.getProcessInstanceId());
-        documentImpl.setArchiveDate(new Date(attachment.getArchiveDate()));
-        documentImpl.setContentStorageId(attachment.getContentStorageId());
-        documentImpl.setDocumentAuthor(attachment.getAuthor());
-        documentImpl.setDocumentContentFileName(attachment.getContentFileName());
-        documentImpl.setDocumentContentMimeType(attachment.getContentMimeType());
-        documentImpl.setDocumentCreationDate(new Date(attachment.getCreationDate()));
-        documentImpl.setDocumentHasContent(attachment.hasContent());
-        documentImpl.setDocumentURL(attachment.getURL());
-        documentImpl.setSourceObjectId(attachment.getSourceObjectId());
+    public static ArchivedDocument toArchivedDocument(final SAMappedDocument mappedDocument, final DocumentService documentService) {
+        final ArchivedDocumentImpl documentImpl = new ArchivedDocumentImpl(mappedDocument.getName());
+        documentImpl.setId(mappedDocument.getId());
+        setDocumentFields(mappedDocument, documentService, documentImpl);
+        documentImpl.setArchiveDate(new Date(mappedDocument.getArchiveDate()));
+        documentImpl.setSourceObjectId(mappedDocument.getSourceObjectId());
         return documentImpl;
     }
 
@@ -1646,10 +1713,10 @@ public class ModelConvertor {
                 .createNewInstance()
                 .setOperator(operation.getOperator())
                 .setType(SOperatorType.valueOf(operation.getType().name()))
-                .setRightOperand(ServerModelConvertor.convertExpression(operation.getRightOperand()))
+                .setRightOperand(ModelConvertor.constructSExpression(operation.getRightOperand()))
                 .setLeftOperand(
                         BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(operation.getLeftOperand().getName())
-                                .setType(operation.getLeftOperand().getType()).done()).done();
+                        .setType(operation.getLeftOperand().getType()).done()).done();
     }
 
     public static List<SOperation> convertOperations(final List<Operation> operations) {
@@ -1750,11 +1817,6 @@ public class ModelConvertor {
             actors.add(actor);
         }
         return actors;
-    }
-
-    public static List<ArchivedFlowElementInstance> toArchivedFlowElementInstances(final List<SAFlowElementInstance> serverObjects) {
-        // TODO Implement me!
-        return null;
     }
 
     public static List<ArchivedFlowNodeInstance> toArchivedFlowNodeInstances(final List<SAFlowNodeInstance> saFlowNodes,
@@ -1971,6 +2033,25 @@ public class ModelConvertor {
         final ThemeType type = ThemeType.valueOf(sTheme.getType().name());
         final Date lastUpdateDate = new Date(sTheme.getLastUpdateDate());
         return new ThemeImpl(sTheme.getContent(), sTheme.getCssContent(), sTheme.isDefault(), type, lastUpdateDate);
+    }
+
+    public static CustomUserInfoDefinitionImpl convert(final SCustomUserInfoDefinition sDefinition) {
+        final CustomUserInfoDefinitionImpl definition = new CustomUserInfoDefinitionImpl();
+        definition.setId(sDefinition.getId());
+        definition.setName(sDefinition.getName());
+        definition.setDescription(sDefinition.getDescription());
+        return definition;
+    }
+
+    public static CustomUserInfoValueImpl convert(final SCustomUserInfoValue sValue) {
+        if (sValue == null) {
+            return null;
+        }
+        final CustomUserInfoValueImpl value = new CustomUserInfoValueImpl();
+        value.setDefinitionId(sValue.getDefinitionId());
+        value.setUserId(sValue.getUserId());
+        value.setValue(sValue.getValue());
+        return value;
     }
 
 }

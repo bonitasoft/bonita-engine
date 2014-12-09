@@ -210,24 +210,16 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         if (!messageTrigger.getDataDefinitions().isEmpty()) {
             bpmInstancesCreator.createDataInstances(messageTrigger.getDataDefinitions(), messageInstance.getId(), DataInstanceContainer.MESSAGE_INSTANCE,
                     expressionContext);
-            dataInstanceService.createDataContainer(messageInstance.getId(), DataInstanceContainer.MESSAGE_INSTANCE.name());
-            TechnicalLoggerService logger = bpmInstancesCreator.getLogger();
+            dataInstanceService.createDataContainer(messageInstance.getId(), DataInstanceContainer.MESSAGE_INSTANCE.name(), false);
+            final TechnicalLoggerService logger = bpmInstancesCreator.getLogger();
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                StringBuilder stb = new StringBuilder();
-                stb.append("Initialized variables for message instance [name: <");
-                stb.append(messageInstance.getMessageName());
-                stb.append(">, id: <");
-                stb.append(messageInstance.getId());
-                stb.append(">, flow node: <");
-                stb.append(messageInstance.getFlowNodeName());
-                stb.append(">, target flow node: <");
-                stb.append(messageInstance.getTargetFlowNode());
-                stb.append(">, target process: <");
-                stb.append(messageInstance.getTargetProcess());
-                stb.append(">, process definition: <");
-                stb.append(messageInstance.getProcessDefinitionId());
-                stb.append(">]");
-                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, stb.toString());
+                logger.log(
+                        this.getClass(),
+                        TechnicalLogSeverity.DEBUG,
+                        "Initialized variables for message instance [name: <" + messageInstance.getMessageName() + ">, id: <" + messageInstance.getId()
+                                + ">, flow node: <" + messageInstance.getFlowNodeName() + ">, target flow node: <" + messageInstance.getTargetFlowNode()
+                                + ">, target process: <" + messageInstance.getTargetProcess() + ">, process definition: <"
+                                + messageInstance.getProcessDefinitionId() + ">]");
             }
         }
     }
@@ -301,9 +293,8 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         final SWaitingMessageEventBuilderFactory builderFact = BuilderFactory.get(SWaitingMessageEventBuilderFactory.class);
         final SMessageEventTriggerDefinition messageEventTriggerDefinition = (SMessageEventTriggerDefinition) sEventTriggerDefinition;
         final SWaitingMessageEventBuilder builder = builderFact.createNewWaitingMessageEventSubProcInstance(processDefinition.getId(),
-                parentProcessInstance.getId(),
-                parentProcessInstance.getRootProcessInstanceId(), messageEventTriggerDefinition.getMessageName(), processDefinition.getName(),
-                eventDefinition.getId(), eventDefinition.getName(), subProcessId);
+                parentProcessInstance.getId(), parentProcessInstance.getRootProcessInstanceId(), messageEventTriggerDefinition.getMessageName(),
+                processDefinition.getName(), eventDefinition.getId(), eventDefinition.getName(), subProcessId);
         final SExpressionContext expressionContext = new SExpressionContext(parentProcessInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
                 processDefinition.getId());
         fillCorrelation(builder, messageEventTriggerDefinition.getCorrelations(), expressionContext);

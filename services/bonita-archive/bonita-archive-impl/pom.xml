@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-archive</artifactId>
 		<groupId>org.bonitasoft.engine.archive</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.5.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-archive-impl</artifactId>
@@ -30,8 +30,36 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.persistence</groupId>
-			<artifactId>bonita-delete-api</artifactId>
+			<artifactId>bonita-persistence-read</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.transaction</groupId>
+			<artifactId>bonita-transaction-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine.recorder</groupId>
+			<artifactId>bonita-recorder-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-commons</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 </project>

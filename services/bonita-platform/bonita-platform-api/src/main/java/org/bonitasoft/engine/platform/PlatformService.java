@@ -17,7 +17,21 @@ import java.util.Collection;
 import java.util.List;
 
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
+import org.bonitasoft.engine.platform.exception.SPlatformAlreadyExistException;
+import org.bonitasoft.engine.platform.exception.SPlatformCreationException;
+import org.bonitasoft.engine.platform.exception.SPlatformDeletionException;
+import org.bonitasoft.engine.platform.exception.SPlatformNotFoundException;
+import org.bonitasoft.engine.platform.exception.SPlatformUpdateException;
+import org.bonitasoft.engine.platform.exception.STenantActivationException;
+import org.bonitasoft.engine.platform.exception.STenantAlreadyExistException;
+import org.bonitasoft.engine.platform.exception.STenantCreationException;
+import org.bonitasoft.engine.platform.exception.STenantDeactivationException;
+import org.bonitasoft.engine.platform.exception.STenantDeletionException;
+import org.bonitasoft.engine.platform.exception.STenantException;
+import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
+import org.bonitasoft.engine.platform.exception.STenantUpdateException;
 import org.bonitasoft.engine.platform.model.SPlatform;
 import org.bonitasoft.engine.platform.model.SPlatformProperties;
 import org.bonitasoft.engine.platform.model.STenant;
@@ -37,6 +51,8 @@ public interface PlatformService {
     // This service MUST BE re implemented in case multi tenancy is managed in a different way. To illustrate this, let's take 2 examples:
     // 1 - multi tenancy based on a discriminator column (same DB, same schema, same tables)
     // 2 - multi tenancy done using different schemas
+
+    String TENANT = "TENANT";
 
     /**
      * Retrieve the platform from the cache
@@ -237,22 +253,13 @@ public interface PlatformService {
     boolean isPlatformCreated();
 
     /**
-     * Return true if the tenant is activated else return false.
-     * 
-     * @param sTenant
-     * @return true if the tenant is activated
-     * @since 6.0
-     */
-    boolean isTenantActivated(STenant sTenant);
-
-    /**
      * Return a list of tenants by the given conditions, as one part of SearchResult that is search method's return value in platformApi
      * 
      * @param options
      * @return a list of tenants by the given conditions
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    List<STenant> searchTenants(QueryOptions options) throws SBonitaSearchException;
+    List<STenant> searchTenants(QueryOptions options) throws SBonitaReadException;
 
     /**
      * Get all tenants
@@ -270,9 +277,9 @@ public interface PlatformService {
      * 
      * @param options
      * @return a number of tenants by the given conditions
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberOfTenants(QueryOptions options) throws SBonitaSearchException;
+    long getNumberOfTenants(QueryOptions options) throws SBonitaReadException;
 
     void deleteTenantTables() throws STenantDeletionException;
 

@@ -48,9 +48,9 @@ public class ConnectorInstanceServiceImplTest {
 
     private static final String EXCEPTION_MESSAGE = "exceptionMessage";
 
-    private String message = "An exception occured during execution.";
+    private final String message = "An exception occured during execution.";
 
-    private String causedByMessage = "This is the caused by message.";
+    private final String causedByMessage = "This is the caused by message.";
 
     @Mock
     private ReadPersistenceService readPersitenceService;
@@ -69,26 +69,29 @@ public class ConnectorInstanceServiceImplTest {
 
     @InjectMocks
     private ConnectorInstanceServiceImpl connectorInstanceServiceImpl;
-    
+
     @Before
     public void setUp() {
-        SConnectorInstanceWithFailureInfoBuilderFactory fact = mock(SConnectorInstanceWithFailureInfoBuilderFactory.class);
+        final String bonitaHome = System.getProperty("bonita.home");
+        System.err.println("using bonita_home:" + bonitaHome);
+
+        final SConnectorInstanceWithFailureInfoBuilderFactory fact = mock(SConnectorInstanceWithFailureInfoBuilderFactory.class);
         when(fact.getExceptionMessageKey()).thenReturn(EXCEPTION_MESSAGE);
         when(fact.getStackTraceKey()).thenReturn(STACK_TRACE);
     }
 
     @Test
     public void setConnectorInstanceFailureException() throws Exception {
-        Exception exception = new Exception(message);
-        
+        final Exception exception = new Exception(message);
+
         //call method
         connectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailureMock, exception);
-        
+
         //verify
-        ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
+        final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
         verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
-        UpdateRecord updateRecord = updateRecordCaptor.getValue();
-        String stackTrace = (String)updateRecord.getFields().get(STACK_TRACE);
+        final UpdateRecord updateRecord = updateRecordCaptor.getValue();
+        final String stackTrace = (String)updateRecord.getFields().get(STACK_TRACE);
 
         assertEquals(message, updateRecord.getFields().get(EXCEPTION_MESSAGE));
         assertTrue(stackTrace.startsWith(Exception.class.getName() + ": " + message));
@@ -97,17 +100,17 @@ public class ConnectorInstanceServiceImplTest {
 
     @Test
     public void setConnectorInstanceFailureExceptionWithNullMessage() throws Exception {
-        Exception exception = new Exception();
-        
+        final Exception exception = new Exception();
+
         //call method
         connectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailureMock, exception);
-        
+
         //verify
-        ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
+        final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
         verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
-        UpdateRecord updateRecord = updateRecordCaptor.getValue();
-        String stackTrace = (String)updateRecord.getFields().get(STACK_TRACE);
-        
+        final UpdateRecord updateRecord = updateRecordCaptor.getValue();
+        final String stackTrace = (String)updateRecord.getFields().get(STACK_TRACE);
+
         assertNull(updateRecord.getFields().get(EXCEPTION_MESSAGE));
         assertTrue(stackTrace.startsWith(Exception.class.getName()));
         assertTrue(stackTrace.contains(getClass().getName() + ".setConnectorInstanceFailureExceptionWithNullMessage"));
@@ -115,18 +118,18 @@ public class ConnectorInstanceServiceImplTest {
 
     @Test
     public void setConnectorInstanceFailureExceptionWithCausedBy() throws Exception {
-        Exception causedByException = new Exception(causedByMessage);
-        Exception exception = new Exception(message, causedByException);
-        
+        final Exception causedByException = new Exception(causedByMessage);
+        final Exception exception = new Exception(message, causedByException);
+
         //call method
         connectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailureMock, exception);
-        
+
         //verify
-        ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
+        final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
         verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
-        UpdateRecord updateRecord = updateRecordCaptor.getValue();
-        String stackTrace = (String)updateRecord.getFields().get(STACK_TRACE);
-        
+        final UpdateRecord updateRecord = updateRecordCaptor.getValue();
+        final String stackTrace = (String)updateRecord.getFields().get(STACK_TRACE);
+
         assertEquals(causedByMessage, updateRecord.getFields().get(EXCEPTION_MESSAGE));
         assertTrue(stackTrace.startsWith(Exception.class.getName() + ": " + message));
         assertTrue(stackTrace.contains(getClass().getName() + ".setConnectorInstanceFailureExceptionWithCausedBy"));
@@ -137,40 +140,40 @@ public class ConnectorInstanceServiceImplTest {
     public void cleanConnectorInstanceFailureException() throws Exception {
         //call method
         connectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailureMock, null);
-        
+
         //verify
-        ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
+        final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
         verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
-        UpdateRecord updateRecord = updateRecordCaptor.getValue();
-        String stackTrace = (String)updateRecord.getFields().get(STACK_TRACE);
-        
+        final UpdateRecord updateRecord = updateRecordCaptor.getValue();
+        final String stackTrace = (String)updateRecord.getFields().get(STACK_TRACE);
+
         assertNull(updateRecord.getFields().get(EXCEPTION_MESSAGE));
         assertNull(stackTrace);
     }
-    
+
     @Test
     public void setConnectorInstanceFailureExceptionMessageGreaterThen255() throws Exception {
-        String messageToRepeat = "This is a message repeated many times. ";
-        StringBuilder stb = new StringBuilder();
+        final String messageToRepeat = "This is a message repeated many times. ";
+        final StringBuilder stb = new StringBuilder();
         int currentLength = 0;
         while (currentLength < 256) {
             stb.append(messageToRepeat);
             currentLength += messageToRepeat.length();
         }
-        String longMessage = stb.toString();
-        
-        Exception exception = new Exception(longMessage);
-        
+        final String longMessage = stb.toString();
+
+        final Exception exception = new Exception(longMessage);
+
         //call method
         connectorInstanceServiceImpl.setConnectorInstanceFailureException(connectorInstanceWithFailureMock, exception);
-        
-        //verify
-        ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
-        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
-        UpdateRecord updateRecord = updateRecordCaptor.getValue();
-        String stackTrace = (String)updateRecord.getFields().get(STACK_TRACE);
 
-        String retrievedMessage = (String) updateRecord.getFields().get(EXCEPTION_MESSAGE);
+        //verify
+        final ArgumentCaptor<UpdateRecord> updateRecordCaptor = ArgumentCaptor.forClass(UpdateRecord.class);
+        verify(recorder, times(1)).recordUpdate(updateRecordCaptor.capture(), any(SUpdateEvent.class));
+        final UpdateRecord updateRecord = updateRecordCaptor.getValue();
+        final String stackTrace = (String)updateRecord.getFields().get(STACK_TRACE);
+
+        final String retrievedMessage = (String) updateRecord.getFields().get(EXCEPTION_MESSAGE);
         assertEquals(longMessage.substring(0, 255), retrievedMessage);
         assertTrue(stackTrace.startsWith(Exception.class.getName() + ": " + longMessage));
         assertTrue(stackTrace.contains(getClass().getName() + ".setConnectorInstanceFailureExceptionMessageGreaterThen255"));

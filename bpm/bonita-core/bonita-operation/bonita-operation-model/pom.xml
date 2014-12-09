@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-operation</artifactId>
 		<groupId>org.bonitasoft.engine.core.operation</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.5.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-operation-model</artifactId>
@@ -16,7 +16,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-model</artifactId>
+			<artifactId>bonita-expression-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

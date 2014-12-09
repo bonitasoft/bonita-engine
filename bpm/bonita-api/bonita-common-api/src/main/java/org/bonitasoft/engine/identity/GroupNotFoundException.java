@@ -16,13 +16,22 @@ package org.bonitasoft.engine.identity;
 import org.bonitasoft.engine.exception.NotFoundException;
 
 /**
+ * thrown when a {@link Group} is not found in the organization
+ *
  * @author Kai Lu
  * @author Matthieu Chaffotte
+ * @see Group
+ * @since 6.0.0
  */
 public class GroupNotFoundException extends NotFoundException {
 
     private static final long serialVersionUID = -3825194748072808390L;
 
+    /**
+     * creates a new instance with the cause of the exception
+     *
+     * @param cause the cause that raised this exception
+     */
     public GroupNotFoundException(final Throwable cause) {
         super(cause);
     }

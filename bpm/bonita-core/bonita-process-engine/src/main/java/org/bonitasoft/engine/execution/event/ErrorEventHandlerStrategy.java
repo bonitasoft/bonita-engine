@@ -70,7 +70,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -126,7 +126,6 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         updateBuilder.updateInterruptingEventId(eventInstance.getId());
         final SProcessInstance processInstance = processInstanceService.getProcessInstance(parentProcessInstanceId);
         processInstanceService.updateProcess(processInstance, updateBuilder.done());
-
     }
 
     @Override
@@ -148,23 +147,21 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         if (waitingErrorEvent != null) {
             eventsHandler.triggerCatchEvent(waitingErrorEvent, sThrowEventInstance.getId());
             hasActionToExecute = true;
-        } else {
-            final StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("No catch error event was defined to handle the error code '");
-            stringBuilder.append(errorTrigger.getErrorCode());
-            stringBuilder.append("' defined in the process [name: ");
-            stringBuilder.append(processDefinition.getName());
-            stringBuilder.append(", version: ");
-            stringBuilder.append(processDefinition.getVersion());
-            stringBuilder.append("]");
-            if (sEventDefinition != null) {
-                stringBuilder.append(", throw event: ");
-                stringBuilder.append(sEventDefinition.getName());
-            }
-            stringBuilder.append(". This throw error event will act as a Terminate Event.");
-            if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, stringBuilder.toString());
-            }
+        } else if (logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+                final StringBuilder logBuilder = new StringBuilder();
+                logBuilder.append("No catch error event was defined to handle the error code '");
+                logBuilder.append(errorTrigger.getErrorCode());
+                logBuilder.append("' defined in the process [name: ");
+                logBuilder.append(processDefinition.getName());
+                logBuilder.append(", version: ");
+                logBuilder.append(processDefinition.getVersion());
+                logBuilder.append("]");
+                if (sEventDefinition != null) {
+                    logBuilder.append(", throw event: ");
+                    logBuilder.append(sEventDefinition.getName());
+                }
+                logBuilder.append(". This throw error event will act as a Terminate Event.");
+                logger.log(this.getClass(), TechnicalLogSeverity.WARNING, logBuilder.toString());
         }
         return hasActionToExecute;
     }
@@ -191,7 +188,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         return waitingErrorEvent;
     }
 
-    private SWaitingErrorEvent getWaitingErrorEventFromBoundary(final SThrowEventInstance eventInstance,
+    protected SWaitingErrorEvent getWaitingErrorEventFromBoundary(final SThrowEventInstance eventInstance,
             final String errorCode, final SFlowNodeInstance flowNodeInstance) throws SBonitaException {
         final SFlowNodeInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SBoundaryEventInstanceBuilderFactory.class);
         // get the parent activity of the boundary
@@ -205,7 +202,15 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         final SActivityDefinition flowNode = (SActivityDefinition) processDefinition.getProcessContainer().getFlowNode(
                 flowNodeInstance.getFlowNodeDefinitionId());
         final List<SBoundaryEventDefinition> boundaryEventDefinitions = flowNode.getBoundaryEventDefinitions();
-        return getWaitingErrorEventFromBoundary(errorCode, flowNodeInstance, boundaryEventDefinitions);
+        SWaitingErrorEvent waitingErrorEvent;
+        if (flowNode.getLoopCharacteristics() == null) {
+            waitingErrorEvent = getWaitingErrorEventFromBoundary(errorCode, flowNodeInstance, boundaryEventDefinitions);
+        } else {
+            final long multipleInstanceActivityId = flowNodeInstance.getLogicalGroup(flowNodeKeyProvider.getParentActivityInstanceIndex());
+            final SFlowNodeInstance miActivityInstance = flowNodeInstanceService.getFlowNodeInstance(multipleInstanceActivityId);
+            waitingErrorEvent = getWaitingErrorEventFromBoundary(errorCode, miActivityInstance, boundaryEventDefinitions);
+        }
+        return waitingErrorEvent;
     }
 
     private SWaitingErrorEvent getWaitingErrorEventFromCallActivity(final SErrorEventTriggerDefinition errorTrigger,
@@ -234,7 +239,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         return waitingErrorEvent;
     }
 
-    private SWaitingErrorEvent getWaitingErrorEventFromBoundary(final String errorCode, final SFlowNodeInstance flowNodeInstance,
+    protected SWaitingErrorEvent getWaitingErrorEventFromBoundary(final String errorCode, final SFlowNodeInstance flowNodeInstance,
             final List<SBoundaryEventDefinition> boundaryEventDefinitions) throws SWaitingEventReadException {
         boolean canHandleError;
         String catchingErrorCode = errorCode;
@@ -250,7 +255,7 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
     }
 
     private SWaitingErrorEvent getWaitingErrorEventSubProcess(final SFlowElementContainerDefinition container, final long parentProcessInstanceId,
-            final String errorCode) throws SBonitaSearchException, SBPMEventHandlerException {
+            final String errorCode) throws SBonitaReadException, SBPMEventHandlerException {
         String catchingErrorCode = errorCode;
         boolean canHandleError = hasEventSubProcessCatchingError(container, catchingErrorCode);
         if (!canHandleError) {
@@ -293,7 +298,6 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
             if (currentErrorTrigger != null) {
                 found = true;
             }
-
         }
         return found;
     }
@@ -327,9 +331,8 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
                 final long rootProcessInstanceId = eventInstance.getLogicalGroup(eventInstanceKeyProvider.getRootProcessInstanceIndex());
                 final long parentProcessInstanceId = eventInstance.getLogicalGroup(eventInstanceKeyProvider.getParentProcessInstanceIndex());
                 final SWaitingErrorEventBuilder builder = builderFact.createNewWaitingErrorBoundaryEventInstance(processDefinition.getId(),
-                        rootProcessInstanceId, parentProcessInstanceId,
-                        eventInstance.getId(), errorEventTriggerDefinition.getErrorCode(), processDefinition.getName(),
-                        eventInstance.getFlowNodeDefinitionId(), eventInstance.getName(), boundary.getActivityInstanceId());
+                        rootProcessInstanceId, parentProcessInstanceId, eventInstance.getId(), errorEventTriggerDefinition.getErrorCode(),
+                        processDefinition.getName(), eventInstance.getFlowNodeDefinitionId(), eventInstance.getName(), boundary.getActivityInstanceId());
                 final SWaitingErrorEvent errorEvent = builder.done();
                 getEventInstanceService().createWaitingEvent(errorEvent);
                 break;
@@ -340,7 +343,6 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
             default:
                 throw new SWaitingEventCreationException(eventDefinition.getType() + " is not a catch event.");
         }
-
     }
 
     @Override
@@ -355,9 +357,8 @@ public class ErrorEventHandlerStrategy extends CoupleEventHandlerStrategy {
         final SWaitingErrorEventBuilderFactory builderFact = BuilderFactory.get(SWaitingErrorEventBuilderFactory.class);
         final SErrorEventTriggerDefinition trigger = (SErrorEventTriggerDefinition) sEventTriggerDefinition;
         final SWaitingErrorEventBuilder builder = builderFact.createNewWaitingErrorEventSubProcInstance(processDefinition.getId(),
-                parentProcessInstance.getId(),
-                parentProcessInstance.getRootProcessInstanceId(), trigger.getErrorCode(), processDefinition.getName(), eventDefinition.getId(),
-                eventDefinition.getName(), subProcessId);
+                parentProcessInstance.getId(), parentProcessInstance.getRootProcessInstanceId(), trigger.getErrorCode(), processDefinition.getName(),
+                eventDefinition.getId(), eventDefinition.getName(), subProcessId);
 
         final SWaitingErrorEvent event = builder.done();
         getEventInstanceService().createWaitingEvent(event);

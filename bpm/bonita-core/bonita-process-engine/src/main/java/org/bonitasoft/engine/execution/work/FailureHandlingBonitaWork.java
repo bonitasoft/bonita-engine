@@ -90,8 +90,8 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
             logFailureCause(loggerService, cause);
         } else {
             // final Edge case we cannot manage
-            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
-                loggerService.log(getClass(), TechnicalLogSeverity.WARNING, "The work [" + getDescription() + "] failed. The failure will be handled.");
+            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
+                loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "The work [" + getDescription() + "] failed. The failure will be handled.");
             }
             // To do before log, because we want to set the context of the exception.
             handleFailureWrappedWork(loggerService, e, context);
@@ -100,14 +100,20 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
     }
 
     private void logException(final TechnicalLoggerService loggerService, final Throwable e) {
+        if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
+            final StringBuilder logBuilder = new StringBuilder(e.getClass().getName());
+            logBuilder.append(" : \"");
+            final String message = e.getMessage();
+            if (message == null || message.isEmpty()) {
+                logBuilder.append("No message");
+            } else {
+                logBuilder.append(message);
+            }
+            logBuilder.append("\"");
+            loggerService.log(getClass(), TechnicalLogSeverity.ERROR, logBuilder.toString());
+        }
         if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
             loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "Exception : ", e);
-        } else {
-            String message = e.getMessage();
-            if (message == null || message.isEmpty()) {
-                message = "No message";
-            }
-            loggerService.log(getClass(), TechnicalLogSeverity.WARNING, e.getClass().getName() + " : \"" + message + "\"");
         }
     }
 
@@ -133,7 +139,7 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         if (!(cause instanceof SIllegalStateTransition)) {
             return false;
         }
-        SIllegalStateTransition e = (SIllegalStateTransition) cause;
+        final SIllegalStateTransition e = (SIllegalStateTransition) cause;
         return e.isTransitionFromTerminalState();
     }
 
@@ -142,4 +148,5 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
             loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "The work [" + getDescription() + "] failed to execute due to : ", cause);
         }
     }
+
 }

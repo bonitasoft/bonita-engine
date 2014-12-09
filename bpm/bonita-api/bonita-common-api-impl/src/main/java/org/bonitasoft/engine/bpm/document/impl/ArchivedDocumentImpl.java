@@ -16,37 +16,54 @@ package org.bonitasoft.engine.bpm.document.impl;
 import java.util.Date;
 
 import org.bonitasoft.engine.bpm.document.ArchivedDocument;
-import org.bonitasoft.engine.bpm.internal.NamedElementImpl;
 
 /**
  * @author Zhang Bole
+ * @author Baptiste Mesta
  */
-public class ArchivedDocumentImpl extends NamedElementImpl implements ArchivedDocument {
+public class ArchivedDocumentImpl extends DocumentImpl implements ArchivedDocument {
 
-    private static final long serialVersionUID = -6573747806944970703L;
-
+    private static final long serialVersionUID = -6573747806944970704L;
     private Date archiveDate;
-
-    private long processInstanceId;
-
     private long sourceObjectId;
 
-    private String contentStorageId;
-
-    private String documentURL;
-
-    private boolean hasContent;
-
-    private long documentAuthor;
-
-    private String documentContentFileName;
-
-    private String documentContentMimeType;
-
-    private Date documentCreationDate;
+    public ArchivedDocumentImpl() {
+        super();
+    }
 
     public ArchivedDocumentImpl(final String name) {
-        super(name);
+        super();
+        setName(name);
+    }
+
+    @Override
+    public String getDocumentURL() {
+        return getUrl();
+    }
+
+    @Override
+    public boolean getDocumentHasContent() {
+        return hasContent();
+    }
+
+    @Override
+    public long getDocumentAuthor() {
+        return getAuthor();
+    }
+
+    @Override
+    public String getDocumentContentMimeType() {
+        return getContentMimeType();
+    }
+
+    @Override
+    public String getDocumentContentFileName() {
+        return getFileName();
+    }
+
+    @Override
+    public Date getDocumentCreationDate() {
+        return getCreationDate();
     }
 
     @Override
@@ -54,22 +71,13 @@ public class ArchivedDocumentImpl extends NamedElementImpl implements ArchivedDo
         return archiveDate;
     }
 
-    public void setArchiveDate(final Date archiveDate) {
-        this.archiveDate = archiveDate;
-    }
-
-    @Override
-    public long getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public void setProcessInstanceId(final long processInstanceId) {
-        this.processInstanceId = processInstanceId;
-    }
-
     @Override
     public long getSourceObjectId() {
         return sourceObjectId;
+    }
+
+    public void setArchiveDate(final Date archiveDate) {
+        this.archiveDate = archiveDate;
     }
 
     public void setSourceObjectId(final long sourceObjectId) {
@@ -77,66 +85,42 @@ public class ArchivedDocumentImpl extends NamedElementImpl implements ArchivedDo
     }
 
     @Override
-    public long getDocumentAuthor() {
-        return documentAuthor;
-    }
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
 
-    public void setDocumentAuthor(final long documentAuthor) {
-        this.documentAuthor = documentAuthor;
-    }
+        final ArchivedDocumentImpl that = (ArchivedDocumentImpl) o;
 
-    @Override
-    public String getContentStorageId() {
-        return contentStorageId;
-    }
+        if (sourceObjectId != that.sourceObjectId) {
+            return false;
+        }
+        if (archiveDate != null ? !archiveDate.equals(that.archiveDate) : that.archiveDate != null) {
+            return false;
+        }
 
-    public void setContentStorageId(final String contentStorageId) {
-        this.contentStorageId = contentStorageId;
-    }
-
-    @Override
-    public String getDocumentURL() {
-        return documentURL;
-    }
-
-    public void setDocumentURL(final String documentURL) {
-        this.documentURL = documentURL;
+        return true;
     }
 
     @Override
-    public boolean getDocumentHasContent() {
-        return hasContent;
-    }
-
-    public void setDocumentHasContent(final boolean hasContent) {
-        this.hasContent = hasContent;
-    }
-
-    @Override
-    public String getDocumentContentFileName() {
-        return documentContentFileName;
-    }
-
-    public void setDocumentContentFileName(final String documentContentFileName) {
-        this.documentContentFileName = documentContentFileName;
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (archiveDate != null ? archiveDate.hashCode() : 0);
+        result = 31 * result + (int) (sourceObjectId ^ sourceObjectId >>> 32);
+        return result;
     }
 
     @Override
-    public String getDocumentContentMimeType() {
-        return documentContentMimeType;
+    public String toString() {
+        return "ArchivedDocumentImpl{" +
+                "archiveDate=" + archiveDate +
+                ", sourceObjectId=" + sourceObjectId +
+                super.toString() + "} ";
     }
-
-    public void setDocumentContentMimeType(final String documentContentMimeType) {
-        this.documentContentMimeType = documentContentMimeType;
-    }
-
-    @Override
-    public Date getDocumentCreationDate() {
-        return documentCreationDate;
-    }
-
-    public void setDocumentCreationDate(final Date documentCreationDate) {
-        this.documentCreationDate = documentCreationDate;
-    }
-
 }

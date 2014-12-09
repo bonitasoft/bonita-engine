@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,17 +16,36 @@ package org.bonitasoft.engine.bpm.process;
 import org.bonitasoft.engine.exception.ExecutionException;
 
 /**
+ * Thrown when a process cannot be enabled. This can happen if the process is already enabled, or if an unexpected error occurs on methods like {link
+ * {@link ProcessAPI#enableProcess(long)}.
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
+ * @version 6.3.5
+ * @since 6.0.0
  */
 public class ProcessEnablementException extends ExecutionException {
 
     private static final long serialVersionUID = 7175486722623260153L;
 
+    /**
+     * Constructs a new exception with the specified detail message.
+     *
+     * @param message
+     *        The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
+     */
     public ProcessEnablementException(final String message) {
         super(message);
     }
 
+    /**
+     * Constructs a new exception with the specified detail cause.
+     *
+     * @param cause
+     *        The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the
+     *        cause is nonexistent or unknown.)
+     */
     public ProcessEnablementException(final Throwable cause) {
         super(cause);
     }

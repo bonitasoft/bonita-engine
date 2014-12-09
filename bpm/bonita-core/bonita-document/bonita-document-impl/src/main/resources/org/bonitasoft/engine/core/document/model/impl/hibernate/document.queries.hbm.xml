@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+
+    <query name="getSMappedDocumentOfProcessWithName">
+        SELECT mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc
+        WHERE mappeddoc.processInstanceId = :processInstanceId
+        AND mappeddoc.name = :name
+        AND mappeddoc.index = -1
+    </query>
+
+
+    <query name="getDocumentCreatedBeforeList">
+        SELECT mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc
+        WHERE mappeddoc.processInstanceId = :processInstanceId
+        AND mappeddoc.name = :name
+        AND mappeddoc.document.creationDate &lt;= :time
+        ORDER BY mappeddoc.index ASC
+    </query>
+
+
+    <query name="getSMappedDocumentOfProcess">
+        SELECT mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc
+        WHERE mappeddoc.processInstanceId = :processInstanceId
+    </query>
+
+    <query name="getNumberOfSMappedDocumentOfProcess">
+        SELECT COUNT(mappeddoc)
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc
+        WHERE mappeddoc.processInstanceId = :processInstanceId
+    </query>
+
+    <query name="getSMappedDocumentOfProcessOrderedById">
+        SELECT mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc
+        WHERE mappeddoc.processInstanceId = :processInstanceId
+        ORDER BY mappeddoc.id
+    </query>
+
+    <query name="getNumberOfSMappedDocument">
+        SELECT COUNT(mappeddoc.id)
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc
+    </query>
+
+    <query name="searchSMappedDocument">
+        SELECT mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc
+    </query>
+
+
+    <query name="getNumberOfSMappedDocumentSupervisedBy">
+        SELECT COUNT(mappeddoc)
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc,
+        org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+        WHERE mappeddoc.processInstanceId = p.id
+        AND p.processDefinitionId IN (
+        SELECT supervisor.processDefId
+        FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+        WHERE (supervisor.userId = :userId)
+        OR (supervisor.id IN (
+        SELECT supervisor.id
+        FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+        org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+        WHERE um.userId = :userId
+        AND (
+        (supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+        OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+        OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId)
+        )
+        )
+        )
+        )
+    </query>
+
+    <query name="searchSMappedDocumentSupervisedBy">
+        SELECT mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc,
+        org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+        WHERE mappeddoc.processInstanceId = p.id
+        AND p.processDefinitionId IN (
+        SELECT supervisor.processDefId
+        FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor
+        WHERE (supervisor.userId = :userId)
+        OR (supervisor.id IN (
+        SELECT supervisor.id
+        FROM org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS supervisor,
+        org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl AS um
+        WHERE um.userId = :userId
+        AND (
+        (supervisor.groupId = um.groupId AND supervisor.roleId &lt;= 0)
+        OR (supervisor.roleId = um.roleId AND supervisor.groupId &lt;= 0)
+        OR (supervisor.roleId = um.roleId AND supervisor.groupId = um.groupId)
+        )
+        )
+        )
+        )
+    </query>
+
+    <query name="getDocumentList">
+        SELECT mappeddoc
+        FROM org.bonitasoft.engine.core.document.model.impl.SMappedDocumentImpl AS mappeddoc
+        WHERE mappeddoc.processInstanceId = :processInstanceId
+        AND mappeddoc.name = :name
+        AND mappeddoc.index > -1
+        ORDER BY mappeddoc.index ASC
+    </query>
+
+
+</hibernate-mapping>

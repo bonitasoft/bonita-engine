@@ -10,7 +10,7 @@
 
 	<groupId>org.bonitasoft.engine</groupId>
 	<artifactId>bonita-engine</artifactId>
-	<version>6.4.0-SNAPSHOT</version>
+	<version>6.5.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Bonita BPM Engine</name>
@@ -82,6 +82,7 @@
 		<jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
 		<!-- Tells Sonar where the Jacoco coverage result file is located for Integration Tests -->
 		<sonar.jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</sonar.jacoco.itReportPath>
+        <sonar.exclusions>**/*Test.java,**/*Tests.java,**/*IT.java</sonar.exclusions>
 	</properties>
 
 	<dependencyManagement>
@@ -183,6 +184,11 @@
 				<artifactId>btm-tomcat55-lifecycle</artifactId>
 				<version>2.1.4</version>
 			</dependency>
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>1.8.6</version>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -382,6 +388,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+				<module>bonita-integration-tests</module>
 			</modules>
 			<properties>
 				<maven.test.skip>false</maven.test.skip>
@@ -409,6 +416,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+				<module>bonita-integration-tests</module>
 			</modules>
 			<properties>
 				<skipTests>true</skipTests>
@@ -423,6 +431,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+				<module>bonita-integration-tests</module>
 			</modules>
 			<build>
 				<plugins>
@@ -446,6 +455,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+				<module>bonita-integration-tests</module>
 			</modules>
 			<properties>
 				<skipTests>true</skipTests>
@@ -475,6 +485,7 @@
 			<modules>
 				<module>services</module>
 				<module>bpm</module>
+				<module>bonita-integration-tests</module>
 			</modules>
 			<build>
 				<plugins>

@@ -37,22 +37,22 @@ public class ExpressionBuilderTest {
     }
 
     @Test(expected = InvalidExpressionException.class)
-    public void testInvalidOperator() throws Exception {
+    public void invalidOperator() throws Exception {
         new ExpressionBuilder().createComparisonExpression("comp1", intExpr, "||", intExpr);
     }
 
     @Test
-    public void testValidReturnTypesForBinaryOperator() throws Exception {
+    public void validReturnTypesForBinaryOperator() throws Exception {
         new ExpressionBuilder().createComparisonExpression("comp1", intExpr, ComparisonOperator.GREATER_THAN, longExpr);
     }
 
     @Test(expected = InvalidExpressionException.class)
-    public void testInvalidReturnTypesForBinaryOperator() throws Exception {
+    public void invalidReturnTypesForBinaryOperator() throws Exception {
         new ExpressionBuilder().createComparisonExpression("comp1", intExpr, ComparisonOperator.GREATER_THAN, string);
     }
 
     @Test(expected = InvalidExpressionException.class)
-    public void testInvalidReturnTypeForUnaryOperator() throws Exception {
+    public void invalidReturnTypeForUnaryOperator() throws Exception {
         new ExpressionBuilder().createLogicalComplementExpression("complement", intExpr);
     }
 

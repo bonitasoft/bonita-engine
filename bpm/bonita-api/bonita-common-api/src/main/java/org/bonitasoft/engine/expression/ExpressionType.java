@@ -44,6 +44,14 @@ public enum ExpressionType {
 
     TYPE_DOCUMENT,
 
+    /**
+     *
+     * expressions that return a list of document
+     *
+     * @since 6.4.0
+     */
+    TYPE_DOCUMENT_LIST,
+
     TYPE_ENGINE_CONSTANT,
 
     TYPE_LIST,

@@ -27,13 +27,13 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -42,7 +42,7 @@ import org.bonitasoft.engine.work.WorkService;
 
 /**
  * Restart handler for work {@link ExecuteConnectorOfProcess}
- * 
+ *
  * @author Baptiste Mesta
  */
 public class RestartProcessHandler implements TenantRestartHandler {
@@ -78,11 +78,11 @@ public class RestartProcessHandler implements TenantRestartHandler {
         @Override
         public Object call() throws Exception {
             for (int i = 0; i < 20 && iterator.hasNext(); i++) {
-                Long processId = iterator.next();
+                final Long processId = iterator.next();
                 try {
-                    SProcessInstance processInstance = processInstanceService.getProcessInstance(processId);
-                    SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
-                    ProcessInstanceState state = getState(processInstance.getStateId());
+                    final SProcessInstance processInstance = processInstanceService.getProcessInstance(processId);
+                    final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
+                    final ProcessInstanceState state = getState(processInstance.getStateId());
                     switch (state) {
                         case ABORTED:
                             handleCompletion(processInstance, state, logger, activityInstanceService, workService);
@@ -102,7 +102,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
                         default:
                             break;
                     }
-                } catch (SBonitaException e) {
+                } catch (final SBonitaException e) {
                     throw new RestartException("Unable to restart the process " + processId, e);
                 }
             }
@@ -116,27 +116,25 @@ public class RestartProcessHandler implements TenantRestartHandler {
     @Override
     public void beforeServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor)
             throws RestartException {
-        QueryOptions queryOptions = null;
-        List<SProcessInstance> processInstances;
         final ProcessInstanceService processInstanceService = tenantServiceAccessor.getProcessInstanceService();
         final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
-        long tenantId = tenantServiceAccessor.getTenantId();
+        final long tenantId = tenantServiceAccessor.getTenantId();
 
-        List<Long> ids = new ArrayList<Long>();
+        final List<Long> ids = new ArrayList<Long>();
         processInstancesByTenant.put(tenantId, ids);
-        queryOptions = new QueryOptions(0, 1000);
+        QueryOptions queryOptions = new QueryOptions(0, 1000, SProcessInstance.class, "id", OrderByType.ASC);
         try {
+            List<SProcessInstance> processInstances;
             do {
                 processInstances = processInstanceService.getProcessInstancesInStates(queryOptions, ProcessInstanceState.INITIALIZING,
                         ProcessInstanceState.COMPLETING, ProcessInstanceState.COMPLETED,
                         ProcessInstanceState.ABORTED, ProcessInstanceState.CANCELLED);
                 queryOptions = QueryOptions.getNextPage(queryOptions);
-                for (SProcessInstance sProcessInstance : processInstances) {
+                for (final SProcessInstance sProcessInstance : processInstances) {
                     ids.add(sProcessInstance.getId());
                 }
             } while (processInstances.size() == queryOptions.getNumberOfResults());
             logInfo(logger, "Found " + ids.size() + " process to restart on tenant " + tenantId);
-
         } catch (final SProcessInstanceReadException e) {
             handleException(e, "Unable to restart process: can't read process instances");
         }
@@ -164,17 +162,17 @@ public class RestartProcessHandler implements TenantRestartHandler {
         // call executeConnectors on enter on them (only case they can be in initializing)
         // get all process in completing
         // call executeConnectors on finish on them (only case they can be in completing)
-        TransactionService transactionService = platformServiceAccessor.getTransactionService();
-        long tenantId = tenantServiceAccessor.getTenantId();
-        ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
-        ProcessInstanceService processInstanceService = tenantServiceAccessor.getProcessInstanceService();
-        ProcessExecutor processExecutor = tenantServiceAccessor.getProcessExecutor();
-        TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
-        ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
-        WorkService workService = tenantServiceAccessor.getWorkService();
+        final TransactionService transactionService = platformServiceAccessor.getTransactionService();
+        final long tenantId = tenantServiceAccessor.getTenantId();
+        final ProcessDefinitionService processDefinitionService = tenantServiceAccessor.getProcessDefinitionService();
+        final ProcessInstanceService processInstanceService = tenantServiceAccessor.getProcessInstanceService();
+        final ProcessExecutor processExecutor = tenantServiceAccessor.getProcessExecutor();
+        final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
+        final ActivityInstanceService activityInstanceService = tenantServiceAccessor.getActivityInstanceService();
+        final WorkService workService = tenantServiceAccessor.getWorkService();
 
-        List<Long> list = processInstancesByTenant.get(tenantId);
-        Iterator<Long> iterator = list.iterator();
+        final List<Long> list = processInstancesByTenant.get(tenantId);
+        final Iterator<Long> iterator = list.iterator();
         logger.log(getClass(), TechnicalLogSeverity.INFO, "Restarting " + list.size() + " processes for tenant " + tenantId);
         ExecuteProcesses exec = null;
         try {
@@ -183,7 +181,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
                         iterator);
                 transactionService.executeInTransaction(exec);
             } while (iterator.hasNext());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RestartException("Unable to restart process instance", e);
         }
 
@@ -199,7 +197,7 @@ public class RestartProcessHandler implements TenantRestartHandler {
      * @throws SActivityReadException
      */
     private void handleCompletion(final SProcessInstance processInstance, final ProcessInstanceState state, final TechnicalLoggerService logger,
-            final ActivityInstanceService activityInstanceService, final WorkService workService) throws SActivityReadException, SBonitaException {
+            final ActivityInstanceService activityInstanceService, final WorkService workService) throws SBonitaException {
         logInfo(logger, "Restarting notification of finished process '" + processInstance.getName()
                 + "' with id " + processInstance.getId() + " in state " + state);
         // Only Error events set interruptedByEvent on SProcessInstance:

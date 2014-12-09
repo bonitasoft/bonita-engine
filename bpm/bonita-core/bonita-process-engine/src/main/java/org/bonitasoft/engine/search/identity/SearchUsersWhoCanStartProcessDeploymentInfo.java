@@ -21,7 +21,7 @@ import java.util.List;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.AbstractUserSearchEntity;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.descriptor.SearchUserDescriptor;
@@ -44,12 +44,12 @@ public class SearchUsersWhoCanStartProcessDeploymentInfo extends AbstractUserSea
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return processDefinitionService.getNumberOfUsersWhoCanStartProcessDeploymentInfo(processDefinitionId, searchOptions);
     }
 
     @Override
-    public List<SUser> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SUser> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return processDefinitionService.searchUsersWhoCanStartProcessDeploymentInfo(processDefinitionId, searchOptions);
     }
 

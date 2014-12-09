@@ -18,7 +18,7 @@ import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
  * The comment associated to a process instance
- * 
+ *
  * @author Hongwen Zang
  * @author Celine Souchet
  */

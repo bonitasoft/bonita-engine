@@ -21,42 +21,42 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class IdentityAPIImplTest {
-    
+
     @Mock
     private TenantServiceAccessor tenantAccessor;
-    
+
     @Mock
     private IdentityService identityService;
-    
+
     @Spy
     private IdentityAPIImpl identityAPI;
-    
+
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         doReturn(tenantAccessor).when(identityAPI).getTenantAccessor();
         given(tenantAccessor.getIdentityService()).willReturn(identityService);
     }
-    
+
     @Test
     public void getUserIdsWithCustomUserInfo_returns_the_value_returned_by_service() throws Exception {
         //given
         given(identityService.getUserIdsWithCustomUserInfo("skills", "Java", false, 0, 10)).willReturn(Arrays.asList(25L, 40L));
-        
+
         //when
-        List<Long> userIds = identityAPI.getUserIdsWithCustomUserInfo("skills", "Java", false, 0, 10);
+        final List<Long> userIds = identityAPI.getUserIdsWithCustomUserInfo("skills", "Java", false, 0, 10);
 
         //then
         assertThat(userIds).containsExactly(25L, 40L);
     }
 
-    @Test(expected = RetrieveException.class) //then
+    @Test(expected = RetrieveException.class)
+    //then
     public void getUserIdsWithCustomUserInfo_throws_RetriveException_when_service_throws_SBonitaException() throws Exception {
         //given
         given(identityService.getUserIdsWithCustomUserInfo(anyString(), anyString(), anyBoolean(), anyInt(), anyInt())).willThrow(new SIdentityException(""));
-        
+
         //when
         identityAPI.getUserIdsWithCustomUserInfo("skills", "Java", true, 0, 10);
     }

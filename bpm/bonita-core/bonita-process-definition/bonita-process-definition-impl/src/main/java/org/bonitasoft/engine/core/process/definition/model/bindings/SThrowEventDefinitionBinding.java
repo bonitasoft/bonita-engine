@@ -41,8 +41,7 @@ public abstract class SThrowEventDefinitionBinding extends SFlowNodeDefinitionBi
         super.setChildObject(name, value);
         if (XMLSProcessDefinition.THROW_MESSAGE_EVENT_TRIGGER_NODE.equals(name)) {
             messageEventTriggers.add((SThrowMessageEventTriggerDefinition) value);
-        }
-        if (XMLSProcessDefinition.THROW_SIGNAL_EVENT_TRIGGER_NODE.equals(name)) {
+        } else if (XMLSProcessDefinition.THROW_SIGNAL_EVENT_TRIGGER_NODE.equals(name)) {
             signalEventTriggers.add((SThrowSignalEventTriggerDefinition) value);
         }
     }

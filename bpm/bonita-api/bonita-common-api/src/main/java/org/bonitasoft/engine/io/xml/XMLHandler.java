@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2013 BonitaSoft S.A.
+ * Copyright (C) 2011-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -24,11 +24,11 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.xml.XMLConstants;
 import javax.xml.bind.ValidationException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,7 +43,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.w3c.dom.Document;
@@ -57,6 +56,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 /**
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class XMLHandler {
 
@@ -64,17 +64,18 @@ public class XMLHandler {
 
     private final List<Class<? extends ElementBinding>> bindings;
 
-    private final SchemaFactory factory;
-
-    private Schema schema;
+    private final Schema schema;
 
     private final DocumentBuilder documentBuilder;
 
     private final Transformer transformer;
 
-    public XMLHandler(final List<Class<? extends ElementBinding>> bindings) throws ParserConfigurationException, TransformerConfigurationException {
+    public XMLHandler(final List<Class<? extends ElementBinding>> bindings, final URL schemaURL) throws ParserConfigurationException,
+    TransformerConfigurationException, InvalidSchemaException, IOException {
         this.bindings = bindings;
-        factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+        schema = new SchemaLoader().loadSchema(schemaURL);
+
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
         documentBuilderFactory.setValidating(true);
@@ -114,9 +115,8 @@ public class XMLHandler {
         }
         if (parentNode == null) {
             return element;
-        } else {
-            return parentNode.appendChild(element);
         }
+        return parentNode.appendChild(element);
     }
 
     private Document getDocument(final XMLNode rootNode) {
@@ -129,19 +129,24 @@ public class XMLHandler {
     }
 
     public Object getObjectFromXML(final File file) throws XMLParseException, FileNotFoundException, IOException {
-        final InputStreamReader isr = new InputStreamReader(new FileInputStream(file), ENCODING);
-        Object objectFromXML = null;
+        FileInputStream inputStream = null;
+        InputStreamReader isr = null;
         try {
-            objectFromXML = getObjectFromXML(isr);
+            inputStream = new FileInputStream(file);
+            isr = new InputStreamReader(inputStream, ENCODING);
+            return getObjectFromXML(isr);
         } finally {
-            isr.close();
+            if (isr != null) {
+                isr.close();
+            }
+            if (inputStream != null) {
+                inputStream.close();
+            }
         }
-        return objectFromXML;
     }
 
     public Object getObjectFromXML(final Reader xmlReader) throws IOException, XMLParseException {
-        final BindingHandler handler;
-        handler = new BindingHandler(bindings);
+        final BindingHandler handler = new BindingHandler(bindings);
         final XMLParserErrorHandler errorhandler = new XMLParserErrorHandler();
         try {
             final XMLReader reader = XMLReaderFactory.createXMLReader();
@@ -155,16 +160,16 @@ public class XMLHandler {
         }
     }
 
-    public void setSchema(final InputStream schemaStream) throws InvalidSchemaException {
-        try {
-            schema = factory.newSchema(new StreamSource(schemaStream));
-        } catch (final SAXException e) {
-            throw new InvalidSchemaException(e);
-        }
-    }
-
     public void validate(final File file) throws ValidationException, IOException {
-        validate(new StreamSource(file));
+        // BS-9304 : If you create a new StreamSource with a file, the streamSource keep a lock on the file when there is an exception.
+        // If the file is temporary, the temporary file is never delete at the end of the jvm, even if you call all methods to delete its.
+        // So you need to use the InputStream to close it, even there is an exception, to unlock the file.
+        final InputStream openStream = file.toURI().toURL().openStream();
+        try {
+            validate(new StreamSource(openStream, file.toURI().toString()));
+        } finally {
+            openStream.close();
+        }
     }
 
     private void validate(final StreamSource source) throws ValidationException, IOException {
@@ -203,11 +208,21 @@ public class XMLHandler {
         OutputStreamWriter osw = null;
         try {
             osw = new OutputStreamWriter(outputStream, ENCODING);
-            this.write(rootNode, osw);
+            write(rootNode, osw);
+            osw.flush();
         } finally {
             if (osw != null) {
                 osw.close();
             }
+        }
+    }
+
+    public void write(final XMLNode rootNode, final Writer writer) throws IOException {
+        try {
+            final StreamResult sr = new StreamResult(writer);
+            write(rootNode, sr);
+        } catch (final Exception e) {
+            throw new IOException(e);
         }
     }
 
@@ -216,14 +231,4 @@ public class XMLHandler {
         final Source source = new DOMSource(document);
         transformer.transform(source, result);
     }
-
-    public void write(final XMLNode rootNode, final Writer writer) throws IOException {
-        try {
-            final StreamResult sr = new StreamResult(writer);
-            this.write(rootNode, sr);
-        } catch (final Exception e) {
-            throw new IOException(e);
-        }
-    }
-
 }

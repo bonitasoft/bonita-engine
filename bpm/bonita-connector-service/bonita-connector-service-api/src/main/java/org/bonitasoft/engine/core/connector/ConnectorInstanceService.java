@@ -27,7 +27,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAConnectorInst
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Elias Ricken de Medeiros
@@ -148,13 +148,13 @@ public interface ConnectorInstanceService {
      * @param searchOptions
      * @return
      */
-    long getNumberOfConnectorInstances(QueryOptions searchOptions) throws SBonitaSearchException;
+    long getNumberOfConnectorInstances(QueryOptions searchOptions) throws SBonitaReadException;
 
     /**
      * @param searchOptions
      * @return
      */
-    List<SConnectorInstance> searchConnectorInstances(QueryOptions searchOptions) throws SBonitaSearchException;
+    List<SConnectorInstance> searchConnectorInstances(QueryOptions searchOptions) throws SBonitaReadException;
 
     /**
      * @param connectorInstance
@@ -167,18 +167,18 @@ public interface ConnectorInstanceService {
      * @param searchOptions
      * @param persistenceService
      * @return
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
-    long getNumberArchivedConnectorInstance(QueryOptions searchOptions, ReadPersistenceService persistenceService) throws SBonitaSearchException;
+    long getNumberArchivedConnectorInstance(QueryOptions searchOptions, ReadPersistenceService persistenceService) throws SBonitaReadException;
 
     /**
      * @param searchOptions
      * @param persistenceService
      * @return
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      */
     List<SAConnectorInstance> searchArchivedConnectorInstance(QueryOptions searchOptions, ReadPersistenceService persistenceService)
-            throws SBonitaSearchException;
+            throws SBonitaReadException;
 
     /**
      * @param sConnectorInstance
@@ -198,10 +198,10 @@ public interface ConnectorInstanceService {
     /**
      * @param containerId
      * @param containerType
-     * @throws SBonitaSearchException
+     * @throws SBonitaReadException
      * @throws SConnectorInstanceDeletionException
      * @since 6.1
      */
-    void deleteArchivedConnectorInstances(long containerId, String containerType) throws SBonitaSearchException, SConnectorInstanceDeletionException;
+    void deleteArchivedConnectorInstances(long containerId, String containerType) throws SBonitaReadException, SConnectorInstanceDeletionException;
 
 }

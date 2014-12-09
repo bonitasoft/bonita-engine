@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.persistence.ArchivedPersistentObject;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.services.PersistenceService;
@@ -28,30 +29,51 @@ public class BatchArchiveCallable implements Callable<Void> {
 
     private final List<? extends ArchivedPersistentObject> archivedObjects;
 
-    public BatchArchiveCallable(final PersistenceService persistenceService, final List<ArchivedPersistentObject> archivedObjects) {
-        super();
+    public BatchArchiveCallable(final PersistenceService persistenceService, final ArchiveInsertRecord... records) {
         this.persistenceService = persistenceService;
-        this.archivedObjects = archivedObjects;
+        if (records == null) {
+            archivedObjects = new ArrayList<ArchivedPersistentObject>();
+        } else {
+            archivedObjects = createArchivedObjectsList(records);
+        }
+    }
+
+    /**
+     * @param time
+     * @param records
+     * @return
+     * @throws SRecorderException
+     */
+    protected List<ArchivedPersistentObject> createArchivedObjectsList(final ArchiveInsertRecord... records) {
+        final List<ArchivedPersistentObject> archivedObjects = new ArrayList<ArchivedPersistentObject>();
+        for (final ArchiveInsertRecord record : records) {
+            if (record != null) {
+                archivedObjects.add(record.getEntity());
+            }
+        }
+        return archivedObjects;
     }
 
     @Override
     public Void call() throws SPersistenceException {
-        if (this.archivedObjects != null && !this.archivedObjects.isEmpty()) {
+        if (hasObjects()) {
             try {
-                if (this.archivedObjects.size() == 1) {
-                    this.persistenceService.insert(archivedObjects.get(0));
+                if (archivedObjects.size() == 1) {
+                    persistenceService.insert(archivedObjects.get(0));
                 } else {
-                    this.persistenceService.insertInBatch(new ArrayList<PersistentObject>(this.archivedObjects));
+                    persistenceService.insertInBatch(new ArrayList<PersistentObject>(archivedObjects));
                 }
             } finally {
-                this.archivedObjects.clear();
+                // Do we still need to clear the list even if there was some Exceptions ?
+                // What happens with the retry ?
+                archivedObjects.clear();
             }
         }
         return null;
     }
 
     public boolean hasObjects() {
-        return this.archivedObjects != null && !this.archivedObjects.isEmpty();
+        return archivedObjects != null && !archivedObjects.isEmpty();
     }
 
 }

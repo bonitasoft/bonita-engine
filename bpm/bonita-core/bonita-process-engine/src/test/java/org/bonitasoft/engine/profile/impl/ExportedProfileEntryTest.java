@@ -18,7 +18,7 @@ public class ExportedProfileEntryTest {
     private ExportedProfileEntry entry3;
 
     @Test
-    public void testEqual_sameEntry() throws Exception {
+    public void testEqual_sameEntry() {
         // given
         entry1 = new ExportedProfileEntry(NAME);
         entry2 = new ExportedProfileEntry(NAME);
@@ -45,7 +45,7 @@ public class ExportedProfileEntryTest {
     }
 
     @Test
-    public void testEqual_with_null() throws Exception {
+    public void testEqual_with_null() {
         // given
         entry1 = new ExportedProfileEntry(NAME);
 
@@ -57,7 +57,7 @@ public class ExportedProfileEntryTest {
     }
 
     @Test
-    public void should_get_error() throws Exception {
+    public void should_get_error() {
         // given
         final ExportedProfileEntry entry = new ExportedProfileEntry(null);
 
@@ -70,7 +70,7 @@ public class ExportedProfileEntryTest {
     }
 
     @Test
-    public void should_get_no_error() throws Exception {
+    public void should_get_no_error() {
         // given
         final ExportedProfileEntry entry = new ExportedProfileEntry("name");
         entry.setPage("page");
@@ -85,7 +85,7 @@ public class ExportedProfileEntryTest {
 
     @Test
     public void should_has_error_when_page_is_null
-            () throws Exception {
+            () {
         // given
         final ExportedProfileEntry entry = new ExportedProfileEntry("name");
         entry.setPage(null);

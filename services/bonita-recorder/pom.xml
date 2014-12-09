@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>services</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.5.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>org.bonitasoft.engine.recorder</groupId>
@@ -15,7 +15,6 @@
 	<name>Bonita Recorder</name>
 
 	<modules>
-		<module>bonita-recorder-model</module>
 		<module>bonita-recorder-api</module>
 		<module>bonita-recorder-impl</module>
 	</modules>

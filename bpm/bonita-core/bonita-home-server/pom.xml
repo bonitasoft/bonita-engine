@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-core</artifactId>
 		<groupId>org.bonitasoft.engine.core</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.5.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-home-server</artifactId>
@@ -14,8 +14,8 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-common</artifactId>
+			<groupId>org.bonitasoft.engine.api</groupId>
+			<artifactId>bonita-common-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

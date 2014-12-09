@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-engine</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.5.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>services</artifactId>
@@ -14,9 +14,7 @@
 	<name>Bonita Engine Services</name>
 
 	<modules>
-		<module>bonita-jndi</module>
 		<module>bonita-commons</module>
-		<module>bonita-commons-test</module>
 		<module>bonita-log</module>
 		<module>bonita-recorder</module>
 		<module>bonita-identity</module>
@@ -25,12 +23,10 @@
 		<module>bonita-cache</module>
 		<module>bonita-classloader</module>
 		<module>bonita-scheduler</module>
-		<module>bonita-document</module>
 		<module>bonita-xml</module>
 		<module>bonita-events</module>
 		<module>bonita-dependency</module>
 		<module>bonita-platform</module>
-		<module>bonita-test-util</module>
 		<module>bonita-archive</module>
 		<module>bonita-authentication</module>
 		<module>bonita-session</module>
@@ -47,41 +43,12 @@
 		<module>bonita-profile</module>
 		<module>bonita-lock</module>
 		<module>bonita-work</module>
-		<module>bonita-services-test-conf</module>
 		<module>bonita-incident</module>
 		<module>bonita-builder</module>
 		<module>bonita-theme</module>
 		<module>bonita-page</module>
 		<module>bonita-time-tracker</module>
-	</modules>
-	
-	<profiles>
-		<profile>
-			<id>tests</id>
-			<modules>
-				<module>bonita-services-integration-tests</module>
+		<module>bonita-business-application</module>
 			</modules>
-		</profile>
 		
-		<profile>
-			<id>sonar</id>
-			<modules>
-				<module>bonita-services-integration-tests</module>
-			</modules>
-		</profile>
-		
-		<profile>
-			<id>all</id>
-			<modules>
-				<module>bonita-services-integration-tests</module>
-			</modules>
-		</profile>
-		
-		<profile>
-			<id>package-all</id>
-			<modules>
-				<module>bonita-services-integration-tests</module>
-			</modules>
-		</profile>
-	</profiles>
 </project>

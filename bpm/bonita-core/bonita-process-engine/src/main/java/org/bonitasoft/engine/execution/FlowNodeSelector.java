@@ -29,8 +29,8 @@ import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition
 public class FlowNodeSelector {
 
     
-    private Filter<SFlowNodeDefinition> selector;
-    private SProcessDefinition definition;
+    private final Filter<SFlowNodeDefinition> selector;
+    private final SProcessDefinition definition;
     private long subProcessDefinitionId = -1;
 
     public FlowNodeSelector(SProcessDefinition definition, Filter<SFlowNodeDefinition> filter) {

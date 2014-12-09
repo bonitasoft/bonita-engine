@@ -20,7 +20,7 @@ import java.io.Serializable;
  * 
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
- * @see ProcessDefinition
+ * @see org.bonitasoft.engine.bpm.process.ProcessDefinition
  * @see "The BPMN specification"
  */
 public interface ActorDefinition extends Serializable {

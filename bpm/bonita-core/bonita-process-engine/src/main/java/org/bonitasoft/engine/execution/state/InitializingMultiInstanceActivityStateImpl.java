@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,12 +13,7 @@
  **/
 package org.bonitasoft.engine.execution.state;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
-import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -31,19 +26,12 @@ import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
-import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
-import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.execution.StateBehaviors;
 import org.bonitasoft.engine.expression.model.SExpression;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
  * @author Matthieu Chaffotte
@@ -58,97 +46,45 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
 
     private final ActivityInstanceService activityInstanceService;
 
-    private final DataInstanceService dataInstanceService;
-
     private final StateBehaviors stateBehaviors;
 
     public InitializingMultiInstanceActivityStateImpl(final ExpressionResolverService expressionResolverService, final BPMInstancesCreator bpmInstancesCreator,
-            final ActivityInstanceService activityInstanceService, final DataInstanceService dataInstanceService, final StateBehaviors stateBehaviors) {
+            final ActivityInstanceService activityInstanceService, final StateBehaviors stateBehaviors) {
         this.expressionResolverService = expressionResolverService;
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.activityInstanceService = activityInstanceService;
-        this.dataInstanceService = dataInstanceService;
         this.stateBehaviors = stateBehaviors;
     }
 
     @Override
     public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
         try {
-            stateBehaviors.createAttachedBoundaryEvents(processDefinition, (SActivityInstance) flowNodeInstance);
+            final SMultiInstanceActivityInstance multiInstanceActivityInstance = (SMultiInstanceActivityInstance) flowNodeInstance;
+            stateBehaviors.createAttachedBoundaryEvents(processDefinition, multiInstanceActivityInstance);
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SActivityDefinition activity = (SActivityDefinition) processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
-            final SMultiInstanceActivityInstance multiInstanceActivity = (SMultiInstanceActivityInstance) activityInstanceService
-                    .getFlowNodeInstance(flowNodeInstance.getId());
             final SLoopCharacteristics loopCharacteristics = activity.getLoopCharacteristics();
-            bpmInstancesCreator.addChildDataContainer(flowNodeInstance);
+            bpmInstancesCreator.addChildDataContainer(multiInstanceActivityInstance);
             if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics) {
                 final SMultiInstanceLoopCharacteristics miLoop = (SMultiInstanceLoopCharacteristics) loopCharacteristics;
                 final SExpression loopCardinality = miLoop.getLoopCardinality();
-                int intLoopCardinality;
                 int numberOfInstanceMax = -1;
                 if (loopCardinality != null) {
-                    intLoopCardinality = (Integer) expressionResolverService.evaluate(loopCardinality, new SExpressionContext(multiInstanceActivity.getId(),
-                            DataInstanceContainer.ACTIVITY_INSTANCE.name(), processDefinition.getId()));
-                    activityInstanceService.setLoopCardinality(flowNodeInstance, intLoopCardinality);
-                    numberOfInstanceMax = intLoopCardinality;
-
+                    numberOfInstanceMax = (Integer) expressionResolverService.evaluate(loopCardinality,
+                            new SExpressionContext(multiInstanceActivityInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), processDefinition
+                                    .getId()));
+                    activityInstanceService.setLoopCardinality(multiInstanceActivityInstance, numberOfInstanceMax);
                 } else if (miLoop.getLoopDataInputRef() != null) {
-                    final SDataInstance loopDataInput = dataInstanceService.getDataInstance(miLoop.getLoopDataInputRef(), flowNodeInstance.getId(),
-                            DataInstanceContainer.ACTIVITY_INSTANCE.name());
-                    if (loopDataInput != null) {
-                        final Serializable value = loopDataInput.getValue();
-                        if (value instanceof List) {
-                            final List<?> loopDataInputCollection = (List<?>) value;
-                            numberOfInstanceMax = loopDataInputCollection.size();
-                            final String loopDataOutputRef = miLoop.getLoopDataOutputRef();
-                            if (loopDataOutputRef != null) {
-                                final SDataInstance loopDataOutput = dataInstanceService.getDataInstance(loopDataOutputRef, flowNodeInstance.getId(),
-                                        DataInstanceContainer.ACTIVITY_INSTANCE.name());
-                                if (loopDataOutput != null) {
-                                    final Serializable outValue = loopDataOutput.getValue();
-                                    if (outValue instanceof List) {
-                                        final List<?> loopDataOutputCollection = (List<?>) outValue;
-                                        if (loopDataOutputCollection.size() < numberOfInstanceMax) {
-                                            // output data is too small
-                                            final ArrayList<Object> newOutputList = new ArrayList<Object>(numberOfInstanceMax);
-                                            newOutputList.addAll(loopDataOutputCollection);
-                                            for (int i = loopDataOutputCollection.size(); i < numberOfInstanceMax; i++) {
-                                                newOutputList.add(null);
-                                            }
-                                            final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-                                            final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
-                                            updateDescriptor.addField(fact.getValueKey(), newOutputList);
-                                            dataInstanceService.updateDataInstance(loopDataOutput, updateDescriptor);
-                                        }
-                                    } else if (outValue == null) {
-                                        final ArrayList<Object> newOutputList = new ArrayList<Object>(numberOfInstanceMax);
-                                        for (int i = 0; i < numberOfInstanceMax; i++) {
-                                            newOutputList.add(null);
-                                        }
-                                        final EntityUpdateDescriptor updateDescriptor = new EntityUpdateDescriptor();
-                                        final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
-                                        updateDescriptor.addField(fact.getValueKey(), newOutputList);
-                                        dataInstanceService.updateDataInstance(loopDataOutput, updateDescriptor);
-                                    } else {
-                                        throw new SActivityStateExecutionException("The multi instance on activity " + flowNodeInstance.getName()
-                                                + " of process " + processDefinition.getName() + " " + processDefinition.getVersion()
-                                                + " have a loop data output which is not a java.util.List");
-                                    }
-                                }
-                            }
-                        } else {
-                            throw new SActivityStateExecutionException("The multi instance on activity " + flowNodeInstance.getName() + " of process "
-                                    + processDefinition.getName() + " " + processDefinition.getVersion()
-                                    + " have a loop data input which is not a java.util.List");
-                        }
-                    }
+                    numberOfInstanceMax = stateBehaviors.getNumberOfInstancesToCreateFromInputRef(processDefinition, multiInstanceActivityInstance, miLoop,
+                            numberOfInstanceMax);
+                    stateBehaviors.updateOutputData(processDefinition, multiInstanceActivityInstance, miLoop, numberOfInstanceMax);
                 }
                 if (numberOfInstanceMax < 0) {
                     throw new SActivityStateExecutionException("The multi instance on activity " + flowNodeInstance.getName() + " of process "
                             + processDefinition.getName() + " " + processDefinition.getVersion() + " did not have loop cardinality nor loop data input ref set");
                 }
-                createInnerInstances(bpmInstancesCreator, activityInstanceService, processDefinition.getId(), activity, flowNodeInstance,
-                        miLoop.isSequential() ? 1 : numberOfInstanceMax);
+                stateBehaviors.createInnerInstances(processDefinition.getId(), activity, multiInstanceActivityInstance, miLoop.isSequential() ? 1
+                        : numberOfInstanceMax);
             }
         } catch (final SActivityStateExecutionException e) {
             throw e;
@@ -156,28 +92,6 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
             throw new SActivityStateExecutionException(e);
         }
         return StateCode.DONE;
-    }
-
-    static List<SFlowNodeInstance> createInnerInstances(final BPMInstancesCreator bpmInstancesCreator, final ActivityInstanceService activityInstanceService,
-            final long processDefinitionId, final SActivityDefinition activity, final SFlowNodeInstance flowNodeInstance, final int numberOfInstanceToCreate)
-            throws SBonitaException {
-        final SMultiInstanceActivityInstanceBuilderFactory keyProvider = BuilderFactory.get(SMultiInstanceActivityInstanceBuilderFactory.class);
-        final long rootProcessInstanceId = flowNodeInstance.getLogicalGroup(keyProvider.getRootProcessInstanceIndex());
-        final long parentProcessInstanceId = flowNodeInstance.getLogicalGroup(keyProvider.getParentProcessInstanceIndex());
-        int nbOfcreatedInstances = 0;
-        final int nbOfInstances = ((SMultiInstanceActivityInstance) flowNodeInstance).getNumberOfInstances();
-        final ArrayList<SFlowNodeInstance> createdInstances = new ArrayList<SFlowNodeInstance>();
-        for (int i = nbOfInstances; i < nbOfInstances + numberOfInstanceToCreate; i++) {
-            createdInstances.add(bpmInstancesCreator.createFlowNodeInstance(processDefinitionId, flowNodeInstance.getRootContainerId(),
-                    flowNodeInstance.getId(), SFlowElementsContainerType.FLOWNODE, activity, rootProcessInstanceId, parentProcessInstanceId, true, i,
-                    SStateCategory.NORMAL, -1, null));
-            nbOfcreatedInstances++;
-        }
-        final SMultiInstanceActivityInstance multiInstanceActivityInstance = (SMultiInstanceActivityInstance) flowNodeInstance;
-        activityInstanceService.addMultiInstanceNumberOfActiveActivities(multiInstanceActivityInstance, nbOfcreatedInstances);
-        final int tokenCount = multiInstanceActivityInstance.getTokenCount() + nbOfcreatedInstances;
-        activityInstanceService.setTokenCount(multiInstanceActivityInstance, tokenCount);
-        return createdInstances;
     }
 
     @Override
@@ -229,4 +143,5 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
     public String getSystemComment(final SFlowNodeInstance flowNodeInstance) {
         return "";
     }
+
 }

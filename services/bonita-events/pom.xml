@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>services</artifactId>
 		<groupId>org.bonitasoft.engine</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.5.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>org.bonitasoft.engine.events</groupId>
@@ -15,8 +15,6 @@
 	<name>Bonita Event</name>
 
 	<modules>
-		<module>bonita-events-model</module>
-		<module>bonita-events-model-impl</module>
 		<module>bonita-events-api</module>
 		<module>bonita-events-api-impl</module>
 	</modules>

@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-expression</artifactId>
 		<groupId>org.bonitasoft.engine.expression</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.5.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-expression-api-impl</artifactId>
@@ -13,6 +13,11 @@
 	<name>Bonita Expression: Service Implementation</name>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-commons</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.expression</groupId>
 			<artifactId>bonita-expression-api</artifactId>
@@ -26,7 +31,6 @@
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
-			<version>1.8.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.log</groupId>
@@ -43,10 +47,16 @@
             <artifactId>bonita-time-tracker</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.sessionaccessor</groupId>
+            <artifactId>bonita-session-accessor-read</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -54,25 +64,10 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine</groupId>
-			<artifactId>bonita-commons-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- model impl in dependency in test because maybe we should not separate model and model impl for expression -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.cache</groupId>

@@ -63,11 +63,11 @@ public class ConnectorExecutorImplTest {
     public void should_execute_submit_callable() throws Exception {
         // given
         connectorExecutorImpl.setExecutor(executorService);
-        Future<?> future = mock(Future.class);
+        final Future<?> future = mock(Future.class);
         doReturn(future).when(executorService).submit(any(ExecuteConnectorCallable.class));
         doReturn(Collections.singletonMap("result", "resultValue")).when(future).get();
         // when
-        Map<String, Object> result = connectorExecutorImpl.execute(connector, Collections.<String, Object> singletonMap("key", "value"));
+        final Map<String, Object> result = connectorExecutorImpl.execute(connector, Collections.<String, Object> singletonMap("key", "value"));
 
         // then
         assertThat(result.size()).isEqualTo(1);
@@ -96,13 +96,13 @@ public class ConnectorExecutorImplTest {
     public void should_disconnect_rethrow_connector_exceptions() throws Exception {
         // given
         connectorExecutorImpl.setExecutor(executorService);
-        SConnectorException exception = new SConnectorException("myException");
+        final SConnectorException exception = new SConnectorException("myException");
         doThrow(exception).when(connector).disconnect();
         // when
         try {
             connectorExecutorImpl.disconnect(connector);
             fail("should have thrown the exception");
-        } catch (SConnectorException e) {
+        } catch (final SConnectorException e) {
             // then
             assertThat(e).isEqualTo(exception);
         }
@@ -112,7 +112,7 @@ public class ConnectorExecutorImplTest {
     public void should_disconnectSilently_only_logException() throws Exception {
         // given
         connectorExecutorImpl.setExecutor(executorService);
-        SConnectorException exception = new SConnectorException("myException");
+        final SConnectorException exception = new SConnectorException("myException");
         doThrow(exception).when(connector).disconnect();
         // when
         connectorExecutorImpl.disconnectSilently(connector);
@@ -153,7 +153,7 @@ public class ConnectorExecutorImplTest {
     }
 
     @Test
-    public void resume_should_await_termination_of_thread_pool() throws Exception {
+    public void resume_should_await_termination_of_thread_pool() {
         // when
         connectorExecutorImpl.resume();
 

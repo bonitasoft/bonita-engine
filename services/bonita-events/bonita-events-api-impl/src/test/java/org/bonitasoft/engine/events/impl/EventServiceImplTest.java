@@ -18,15 +18,12 @@ public class EventServiceImplTest extends EventServiceTest {
 
     @Override
     protected EventService instantiateEventServiceImplementation() {
-        TechnicalLoggerService logger = mockTechnicalLoggerService();
+        final TechnicalLoggerService logger = mockTechnicalLoggerService();
         return new EventServiceImpl(logger);
     }
 
-    /**
-     * @return
-     */
     protected TechnicalLoggerService mockTechnicalLoggerService() {
-        TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
+        final TechnicalLoggerService logger = mock(TechnicalLoggerService.class);
         when(logger.isLoggable(any(Class.class), any(TechnicalLogSeverity.class))).thenReturn(false);
         return logger;
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012, 2014 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,14 +15,15 @@ package org.bonitasoft.engine.bpm.flownode;
 
 import java.util.List;
 
+import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.operation.Operation;
 
 /**
  * An Activity is work that is performed within a Business Process. An Activity can be atomic or non-atomic
- * (compound). The types of Activities that are a part of a Process are: {@link TaskDefinition}, {@link SubProcessDefinition}, and
- * {@link CallActivityDefinition}, which allows the inclusion of re-usable Tasks and Processes.
- * 
+ * (compound). The types of Activities that are a part of a Process are: {@link TaskDefinition}, {@link org.bonitasoft.engine.bpm.process.SubProcessDefinition},
+ * and {@link CallActivityDefinition}, which allows the inclusion of re-usable Tasks and Processes.
+ *
  * @author Baptiste Mesta
  * @author Feng Hui
  * @author Matthieu Chaffotte
@@ -36,7 +37,12 @@ public interface ActivityDefinition extends FlowNodeDefinition {
     LoopCharacteristics getLoopCharacteristics();
 
     /**
-     * @return The list of the definition of datas on this activity
+     * @return The list of the definitions of business data of the activity.
+     */
+    List<BusinessDataDefinition> getBusinessDataDefinitions();
+
+    /**
+     * @return The list of the definition of data on this activity
      */
     List<DataDefinition> getDataDefinitions();
 
@@ -49,5 +55,9 @@ public interface ActivityDefinition extends FlowNodeDefinition {
      * @return The list of the definition of boundary events on this activity
      */
     List<BoundaryEventDefinition> getBoundaryEventDefinitions();
+
+    DataDefinition getDataDefinition(String name);
+
+    BusinessDataDefinition getBusinessDataDefinition(String name);
 
 }

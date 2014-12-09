@@ -36,9 +36,7 @@ public class AssignmentOperationExecutorStrategy implements OperationExecutorStr
 
     /**
      * Builds a new AssignmentOperationExecutorStrategy, which is the strategy to execute data assignment operations
-     * 
-     * @param dataInstanceService
-     *            how to access to the data
+     *
      */
     public AssignmentOperationExecutorStrategy() {
     }

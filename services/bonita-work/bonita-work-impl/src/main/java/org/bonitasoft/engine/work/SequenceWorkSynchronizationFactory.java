@@ -25,8 +25,8 @@ public class SequenceWorkSynchronizationFactory implements WorkSynchronizationFa
 
     @Override
     public AbstractWorkSynchronization getWorkSynchronization(final BonitaExecutorService executorService, final TechnicalLoggerService loggerService,
-            final SessionAccessor sessionAccessor) {
-        return new SequenceWorkSynchronization(executorService, loggerService, sessionAccessor);
+            final SessionAccessor sessionAccessor, final WorkService workService) {
+        return new SequenceWorkSynchronization(executorService, loggerService, sessionAccessor, workService);
     }
 
 }

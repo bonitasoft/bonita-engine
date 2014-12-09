@@ -21,11 +21,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class NormalStateTransitionsManagerTest {
 
-    private static int NORMAL_NON_TERMINAL_STATE_ID = 50;
+    private static final int NORMAL_NON_TERMINAL_STATE_ID = 50;
 
-    private static int NORMAL_TERMINAL_STATE_ID = 51;
+    private static final int NORMAL_TERMINAL_STATE_ID = 51;
 
-    private static long FLOW_NODE_INSTANCE_ID = 100;
+    private static final long FLOW_NODE_INSTANCE_ID = 100;
 
     @Mock
     private FlowNodeState normalNonTerminalState;

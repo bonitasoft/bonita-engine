@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -25,10 +25,12 @@ import java.util.Set;
 
 import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.NamedElement;
+import org.bonitasoft.engine.bpm.ObjectSeeker;
 import org.bonitasoft.engine.bpm.businessdata.BusinessDataDefinition;
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinition;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentDefinition;
+import org.bonitasoft.engine.bpm.document.DocumentListDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinition;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.EndEventDefinition;
@@ -69,6 +71,8 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
 
     private final List<DocumentDefinition> documentDefinitions;
 
+    private final List<DocumentListDefinition> documentListDefinitions;
+
     private final List<ConnectorDefinition> connectors;
 
     private final Map<String, FlowNodeDefinition> flowNodes;
@@ -84,6 +88,7 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
         dataDefinitions = new ArrayList<DataDefinition>();
         businessDataDefinitions = new ArrayList<BusinessDataDefinition>();
         documentDefinitions = new ArrayList<DocumentDefinition>();
+        documentListDefinitions = new ArrayList<DocumentListDefinition>();
         connectors = new ArrayList<ConnectorDefinition>();
         flowNodes = new HashMap<String, FlowNodeDefinition>();
     }
@@ -213,6 +218,10 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
     public List<DocumentDefinition> getDocumentDefinitions() {
         return Collections.unmodifiableList(documentDefinitions);
     }
+    @Override
+    public List<DocumentListDefinition> getDocumentListDefinitions() {
+        return Collections.unmodifiableList(documentListDefinitions);
+    }
 
     @Override
     public List<ConnectorDefinition> getConnectors() {
@@ -264,127 +273,23 @@ public class FlowElementContainerDefinitionImpl extends BaseElementImpl implemen
     public void addDocumentDefinition(final DocumentDefinition documentDefinition) {
         documentDefinitions.add(documentDefinition);
     }
+    public void addDocumentListDefinition(final DocumentListDefinition documentListDefinition) {
+        documentListDefinitions.add(documentListDefinition);
+    }
 
     public void addConnector(final ConnectorDefinition connectorDefinition) {
         connectors.add(connectorDefinition);
     }
 
+
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (activities == null ? 0 : activities.hashCode());
-        result = prime * result + (connectors == null ? 0 : connectors.hashCode());
-        result = prime * result + (dataDefinitions == null ? 0 : dataDefinitions.hashCode());
-        result = prime * result + (businessDataDefinitions == null ? 0 : businessDataDefinitions.hashCode());
-        result = prime * result + (documentDefinitions == null ? 0 : documentDefinitions.hashCode());
-        result = prime * result + (endEvents == null ? 0 : endEvents.hashCode());
-        result = prime * result + (gateways == null ? 0 : gateways.hashCode());
-        result = prime * result + (intermediateCatchEvents == null ? 0 : intermediateCatchEvents.hashCode());
-        result = prime * result + (intermediateThrowEvents == null ? 0 : intermediateThrowEvents.hashCode());
-        result = prime * result + (startEvents == null ? 0 : startEvents.hashCode());
-        result = prime * result + (transitions == null ? 0 : transitions.hashCode());
-        result = prime * result + (flowNodes == null ? 0 : flowNodes.hashCode());
-        return result;
+    public BusinessDataDefinition getBusinessDataDefinition(final String name) {
+        return ObjectSeeker.getNamedElement(businessDataDefinitions, name);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final FlowElementContainerDefinitionImpl other = (FlowElementContainerDefinitionImpl) obj;
-        if (activities == null) {
-            if (other.activities != null) {
-                return false;
-            }
-        } else if (!activities.equals(other.activities)) {
-            return false;
-        }
-        if (connectors == null) {
-            if (other.connectors != null) {
-                return false;
-            }
-        } else if (!connectors.equals(other.connectors)) {
-            return false;
-        }
-        if (dataDefinitions == null) {
-            if (other.dataDefinitions != null) {
-                return false;
-            }
-        } else if (!dataDefinitions.equals(other.dataDefinitions)) {
-            return false;
-        }
-        if (businessDataDefinitions == null) {
-            if (other.businessDataDefinitions != null) {
-                return false;
-            }
-        } else if (!businessDataDefinitions.equals(other.businessDataDefinitions)) {
-            return false;
-        }
-        if (documentDefinitions == null) {
-            if (other.documentDefinitions != null) {
-                return false;
-            }
-        } else if (!documentDefinitions.equals(other.documentDefinitions)) {
-            return false;
-        }
-        if (endEvents == null) {
-            if (other.endEvents != null) {
-                return false;
-            }
-        } else if (!endEvents.equals(other.endEvents)) {
-            return false;
-        }
-        if (gateways == null) {
-            if (other.gateways != null) {
-                return false;
-            }
-        } else if (!gateways.equals(other.gateways)) {
-            return false;
-        }
-        if (intermediateCatchEvents == null) {
-            if (other.intermediateCatchEvents != null) {
-                return false;
-            }
-        } else if (!intermediateCatchEvents.equals(other.intermediateCatchEvents)) {
-            return false;
-        }
-        if (intermediateThrowEvents == null) {
-            if (other.intermediateThrowEvents != null) {
-                return false;
-            }
-        } else if (!intermediateThrowEvents.equals(other.intermediateThrowEvents)) {
-            return false;
-        }
-        if (startEvents == null) {
-            if (other.startEvents != null) {
-                return false;
-            }
-        } else if (!startEvents.equals(other.startEvents)) {
-            return false;
-        }
-        if (transitions == null) {
-            if (other.transitions != null) {
-                return false;
-            }
-        } else if (!transitions.equals(other.transitions)) {
-            return false;
-        }
-        if (flowNodes == null) {
-            if (other.flowNodes != null) {
-                return false;
-            }
-        } else if (!flowNodes.equals(other.flowNodes)) {
-            return false;
-        }
-        return true;
+    public DataDefinition getDataDefinition(final String name) {
+        return ObjectSeeker.getNamedElement(dataDefinitions, name);
     }
 
 }

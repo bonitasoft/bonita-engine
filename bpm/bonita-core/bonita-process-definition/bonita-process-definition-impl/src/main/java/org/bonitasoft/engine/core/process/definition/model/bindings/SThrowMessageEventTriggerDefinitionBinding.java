@@ -51,17 +51,13 @@ public class SThrowMessageEventTriggerDefinitionBinding extends SMessageEventTri
         super.setChildObject(name, value);
         if (XMLSProcessDefinition.DATA_DEFINITION_NODE.equals(name)) {
             dataDefinitions.add((SDataDefinition) value);
-        }
-        if (XMLSProcessDefinition.TEXT_DATA_DEFINITION_NODE.equals(name)) {
+        } else if (XMLSProcessDefinition.TEXT_DATA_DEFINITION_NODE.equals(name)) {
             dataDefinitions.add((SDataDefinition) value);
-        }
-        if (XMLSProcessDefinition.XML_DATA_DEFINITION_NODE.equals(name)) {
+        } else if (XMLSProcessDefinition.XML_DATA_DEFINITION_NODE.equals(name)) {
             dataDefinitions.add((SDataDefinition) value);
-        }
-        if (XMLProcessDefinition.TARGET_PROCESS.equals(name)) {
+        } else if (XMLProcessDefinition.TARGET_PROCESS.equals(name)) {
             targetProcess = (SExpression) value;
-        }
-        if (XMLProcessDefinition.TARGET_FLOW_NODE.equals(name)) {
+        } else if (XMLProcessDefinition.TARGET_FLOW_NODE.equals(name)) {
             targetFlowNode = (SExpression) value;
         }
     }

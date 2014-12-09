@@ -23,25 +23,26 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 /**
  * Resets all "In Progress" BPMN Message couples so that they can be triggered again on next cron.
  * Restart work {@link ExecuteMessageCoupleWork}
- * 
+ *
  * @author Emmanuel Duchastenier
  */
 public class BPMEventWorksHandler implements TenantRestartHandler {
 
     @Override
-    public void beforeServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) throws RestartException {
+    public void beforeServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor)
+            throws RestartException {
         final EventInstanceService eventInstanceService = tenantServiceAccessor.getEventInstanceService();
-        TechnicalLoggerService technicalLoggerService = tenantServiceAccessor.getTechnicalLoggerService();
+        final TechnicalLoggerService technicalLoggerService = tenantServiceAccessor.getTechnicalLoggerService();
 
         try {
             // Reset of all SMessageInstance:
             logInfo(technicalLoggerService, "Reinitializing message instances in non-stable state to make them reworked by BPMEventHandlingJob");
-            int nbMessagesReset = eventInstanceService.resetProgressMessageInstances();
+            final int nbMessagesReset = eventInstanceService.resetProgressMessageInstances();
             logInfo(technicalLoggerService, nbMessagesReset + " message instances found and reset.");
 
             // Reset of all SWaitingMessageEvent:
             logInfo(technicalLoggerService, "Reinitializing waiting message events in non-stable state to make them reworked by BPMEventHandlingJob");
-            int nbWaitingEventsReset = eventInstanceService.resetInProgressWaitingEvents();
+            final int nbWaitingEventsReset = eventInstanceService.resetInProgressWaitingEvents();
             logInfo(technicalLoggerService, nbWaitingEventsReset + " waiting message events found and reset.");
 
         } catch (final SBonitaException e) {
@@ -58,6 +59,6 @@ public class BPMEventWorksHandler implements TenantRestartHandler {
     }
 
     @Override
-    public void afterServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) throws RestartException {
+    public void afterServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor) {
     }
 }

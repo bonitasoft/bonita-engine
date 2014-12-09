@@ -20,7 +20,7 @@ import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.EventCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.builder.BuilderFactory;
-import org.bonitasoft.engine.core.process.document.mapping.model.builder.SDocumentMappingBuilderFactory;
+import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilderFactory;
@@ -221,63 +221,63 @@ public class OrderAndFields {
      * @return
      */
     public static OrderAndField getOrderAndFieldForDocument(DocumentCriterion pagingCriterion) {
-        final SDocumentMappingBuilderFactory fact = BuilderFactory.get(SDocumentMappingBuilderFactory.class);
-        String field = null;
-        OrderByType order = null;
+        final SDocumentBuilderFactory fact = BuilderFactory.get(SDocumentBuilderFactory.class);
+        String field;
+        OrderByType order;
         if (pagingCriterion == null) {
             pagingCriterion = DocumentCriterion.DEFAULT;
         }
         switch (pagingCriterion) {
             case DEFAULT:
-                field = fact.getDocumentCreationDateKey();
+                field = "document." + fact.getCreationDateKey();
                 order = OrderByType.DESC;
                 break;
             case AUTHOR_ASC:
-                field = fact.getDocumentAuthorKey();
+                field = "document." + fact.getAuthorKey();
                 order = OrderByType.ASC;
                 break;
             case AUTHOR_DESC:
-                field = fact.getDocumentAuthorKey();
+                field = "document." + fact.getAuthorKey();
                 order = OrderByType.DESC;
                 break;
             case FILENAME_ASC:
-                field = fact.getDocumentContentFileNameKey();
+                field = "document." + fact.getFileNameKey();
                 order = OrderByType.ASC;
                 break;
             case FILENAME_DESC:
-                field = fact.getDocumentContentFileNameKey();
+                field = "document." + fact.getFileNameKey();
                 order = OrderByType.DESC;
                 break;
             case MIMETYPE_ASC:
-                field = fact.getDocumentContentMimeTypeKey();
+                field = "document." + fact.getMimeTypeKey();
                 order = OrderByType.ASC;
                 break;
             case MIMETYPE_DESC:
-                field = fact.getDocumentContentMimeTypeKey();
+                field = "document." + fact.getMimeTypeKey();
                 order = OrderByType.DESC;
                 break;
             case CREATION_DATE_ASC:
-                field = fact.getDocumentCreationDateKey();
+                field = "document." + fact.getCreationDateKey();
                 order = OrderByType.ASC;
                 break;
             case CREATION_DATE_DESC:
-                field = fact.getDocumentCreationDateKey();
+                field = "document." + fact.getCreationDateKey();
                 order = OrderByType.DESC;
                 break;
             case NAME_ASC:
-                field = fact.getDocumentNameKey();
+                field = fact.getNameKey();
                 order = OrderByType.ASC;
                 break;
             case NAME_DESC:
-                field = fact.getDocumentNameKey();
+                field = fact.getNameKey();
                 order = OrderByType.DESC;
                 break;
             case URL_ASC:
-                field = fact.getDocumentURLKey();
+                field = "document." + fact.getURLKey();
                 order = OrderByType.ASC;
                 break;
             case URL_DESC:
-                field = fact.getDocumentURLKey();
+                field = "document." + fact.getURLKey();
                 order = OrderByType.DESC;
                 break;
             default:

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -33,21 +33,21 @@ public class XMLNode {
 
     public XMLNode(final String name) {
         this.name = name;
-        this.attributes = new HashMap<String, String>();
-        this.childNodes = new ArrayList<XMLNode>();
+        attributes = new HashMap<String, String>();
+        childNodes = new ArrayList<XMLNode>();
     }
 
     public void addAttribute(final String name, final String value) {
-        this.attributes.put(name, value);
+        attributes.put(name, value);
     }
 
     public void addAttribute(final String name, final boolean value) {
-        this.attributes.put(name, new Boolean(value).toString());
+        attributes.put(name, Boolean.toString(value));
     }
 
     public void addChild(final XMLNode node) {
         if (node != null) {
-            this.childNodes.add(node);
+            childNodes.add(node);
         }
     }
 
@@ -55,20 +55,20 @@ public class XMLNode {
         if (name != null && content != null) {
             final XMLNode node = new XMLNode(name);
             node.setContent(content);
-            this.childNodes.add(node);
+            childNodes.add(node);
         }
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public Map<String, String> getAttributes() {
-        return this.attributes;
+        return attributes;
     }
 
     public List<XMLNode> getChildNodes() {
-        return this.childNodes;
+        return childNodes;
     }
 
     public void setContent(final String content) {
@@ -76,6 +76,7 @@ public class XMLNode {
     }
 
     public String getContent() {
-        return this.content;
+        return content;
     }
+
 }

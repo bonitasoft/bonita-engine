@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>bonita-events</artifactId>
 		<groupId>org.bonitasoft.engine.events</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.5.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-events-api</artifactId>
@@ -15,8 +15,8 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.bonitasoft.engine.events</groupId>
-			<artifactId>bonita-events-model</artifactId>
+			<groupId>org.bonitasoft.engine</groupId>
+			<artifactId>bonita-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

@@ -35,6 +35,7 @@ public class BoundaryEventDefinitionBuilder extends FlowElementContainerBuilder 
         activity.addBoundaryEventDefinition(boundaryEvent);
     }
 
+    @Override
     public BoundaryEventDefinitionBuilder addDescription(final String description) {
         boundaryEvent.setDescription(description);
         return this;
@@ -44,7 +45,7 @@ public class BoundaryEventDefinitionBuilder extends FlowElementContainerBuilder 
      * Sets the display description on this element.
      * 
      * @param displayDescription
-     *            expression representing the display description.
+     *        expression representing the display description.
      * @return
      */
     public BoundaryEventDefinitionBuilder addDisplayDescription(final Expression displayDescription) {
@@ -56,7 +57,7 @@ public class BoundaryEventDefinitionBuilder extends FlowElementContainerBuilder 
      * Sets the display name on this element.
      * 
      * @param displayName
-     *            expression representing the display name.
+     *        expression representing the display name.
      * @return
      */
     public BoundaryEventDefinitionBuilder addDisplayName(final Expression displayName) {
@@ -69,7 +70,7 @@ public class BoundaryEventDefinitionBuilder extends FlowElementContainerBuilder 
      * execution.
      * 
      * @param displayDescriptionAfterCompletion
-     *            expression representing the new display description after the event completion.
+     *        expression representing the new display description after the event completion.
      * @return
      */
     public BoundaryEventDefinitionBuilder addDisplayDescriptionAfterCompletion(final Expression displayDescriptionAfterCompletion) {
@@ -79,6 +80,7 @@ public class BoundaryEventDefinitionBuilder extends FlowElementContainerBuilder 
 
     /**
      * Adds a timer trigger on this boundary event.
+     * 
      * @param timerType timer type.
      * @param timerValue expression representing the timer value.
      * @return
@@ -89,6 +91,7 @@ public class BoundaryEventDefinitionBuilder extends FlowElementContainerBuilder 
 
     /**
      * Adds a message trigger on this boundary event.
+     * 
      * @param messageName name of the message to be received.
      * @return
      */
@@ -98,6 +101,7 @@ public class BoundaryEventDefinitionBuilder extends FlowElementContainerBuilder 
 
     /**
      * Adds a signal trigger on this boundary event.
+     * 
      * @param signalName name of the signal to be received.
      * @return
      */
@@ -107,6 +111,7 @@ public class BoundaryEventDefinitionBuilder extends FlowElementContainerBuilder 
 
     /**
      * Adds an error trigger on this boundary event.
+     * 
      * @param errorCode the error code to be caught.
      * @return
      */
@@ -116,6 +121,7 @@ public class BoundaryEventDefinitionBuilder extends FlowElementContainerBuilder 
 
     /**
      * Adds an error trigger on this boundary event. As no error code is specified all errors will be caught.
+     * 
      * @return
      */
     public CatchErrorEventTiggerDefinitionBuilder addErrorEventTrigger() {

@@ -32,7 +32,7 @@ public class DataLeftOperandHandlerTest {
     }
 
     @Test
-    public void handlerSupportsBatchUpdate() throws Exception {
+    public void handlerSupportsBatchUpdate() {
         assertThat(handler.supportBatchUpdate()).isTrue();
     }
 

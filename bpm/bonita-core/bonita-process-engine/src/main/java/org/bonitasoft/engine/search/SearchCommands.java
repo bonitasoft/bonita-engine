@@ -18,7 +18,7 @@ import java.util.List;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.command.model.SCommand;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.search.descriptor.SearchCommandDescriptor;
 
 /**
@@ -34,12 +34,12 @@ public class SearchCommands extends AbstractCommandSearchEntity {
     }
 
     @Override
-    public long executeCount(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public long executeCount(final QueryOptions searchOptions) throws SBonitaReadException {
         return commandService.getNumberOfCommands(searchOptions);
     }
 
     @Override
-    public List<SCommand> executeSearch(final QueryOptions searchOptions) throws SBonitaSearchException {
+    public List<SCommand> executeSearch(final QueryOptions searchOptions) throws SBonitaReadException {
         return commandService.searchCommands(searchOptions);
     }
 

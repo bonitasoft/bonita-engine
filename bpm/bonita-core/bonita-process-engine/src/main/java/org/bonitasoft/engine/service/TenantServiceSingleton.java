@@ -23,7 +23,7 @@ import org.bonitasoft.engine.service.impl.ServiceAccessorFactory;
  */
 public final class TenantServiceSingleton {
 
-    private static Map<Long, TenantServiceAccessor> instances = new HashMap<Long, TenantServiceAccessor>();
+    private static final Map<Long, TenantServiceAccessor> instances = new HashMap<Long, TenantServiceAccessor>();
 
     private TenantServiceSingleton() {
         super();
@@ -35,6 +35,16 @@ public final class TenantServiceSingleton {
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static TenantServiceAccessor getInstance() {
+        long tenantId;
+        try {
+            tenantId = ServiceAccessorFactory.getInstance().createSessionAccessor().getTenantId();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+        return getInstance(tenantId);
     }
 
     public static TenantServiceAccessor getInstance(final long tenantId) {

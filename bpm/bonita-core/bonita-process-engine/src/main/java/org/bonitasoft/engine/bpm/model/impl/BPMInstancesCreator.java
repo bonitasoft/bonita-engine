@@ -27,6 +27,7 @@ import org.bonitasoft.engine.api.impl.transaction.actor.GetActor;
 import org.bonitasoft.engine.api.impl.transaction.connector.CreateConnectorInstances;
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
 import org.bonitasoft.engine.api.impl.transaction.flownode.CreateGatewayInstance;
+import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
@@ -49,7 +50,6 @@ import org.bonitasoft.engine.core.process.definition.model.SMultiInstanceLoopCha
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SStandardLoopCharacteristics;
 import org.bonitasoft.engine.core.process.definition.model.SSubProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SUserTaskDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SBoundaryEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SEndEventDefinition;
 import org.bonitasoft.engine.core.process.definition.model.event.SIntermediateCatchEventDefinition;
@@ -67,6 +67,8 @@ import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SGatewayInstance;
+import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SManualTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
@@ -82,6 +84,7 @@ import org.bonitasoft.engine.core.process.instance.model.builder.SGatewayInstanc
 import org.bonitasoft.engine.core.process.instance.model.builder.SHumanTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SLoopActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SLoopActivityInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.builder.SManualTaskInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SManualTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
@@ -111,6 +114,7 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
+import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
@@ -149,13 +153,16 @@ public class BPMInstancesCreator {
 
     private final TransientDataService transientDataService;
 
+    private final ArchiveService archiveService;
+
     private final TechnicalLoggerService logger;
 
     public BPMInstancesCreator(final ActivityInstanceService activityInstanceService,
             final ActorMappingService actorMappingService, final GatewayInstanceService gatewayInstanceService,
             final EventInstanceService eventInstanceService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService,
-            final DataInstanceService dataInstanceService, final TechnicalLoggerService logger, final TransientDataService transientDataService) {
+            final DataInstanceService dataInstanceService, final TechnicalLoggerService logger, final TransientDataService transientDataService,
+            final ArchiveService archiveService) {
         super();
         this.activityInstanceService = activityInstanceService;
         this.actorMappingService = actorMappingService;
@@ -166,6 +173,7 @@ public class BPMInstancesCreator {
         this.dataInstanceService = dataInstanceService;
         this.logger = logger;
         this.transientDataService = transientDataService;
+        this.archiveService = archiveService;
     }
 
     public List<SFlowNodeInstance> createFlowNodeInstances(final Long processDefinitionId, final long rootContainerId, final long parentContainerId,
@@ -205,8 +213,9 @@ public class BPMInstancesCreator {
             parentContainerType = DataInstanceContainer.PROCESS_INSTANCE.toString();
         }
         try {
+            final boolean shouldArchiveMapping = ProcessArchiver.willBeArchived(flowNodeInstance, archiveService);
             dataInstanceService.addChildContainer(flowNodeInstance.getParentContainerId(), parentContainerType, flowNodeInstance.getId(),
-                    DataInstanceContainer.ACTIVITY_INSTANCE.toString());
+                    DataInstanceContainer.ACTIVITY_INSTANCE.toString(), shouldArchiveMapping);
         } catch (final SDataInstanceException e) {
             throw new SActivityStateExecutionException(e);
         }
@@ -346,10 +355,49 @@ public class BPMInstancesCreator {
     private SHumanTaskInstanceBuilder createManualTaskInstance(final long processDefinitionId, final long rootContainerId, final long parentContainerId,
             final SFlowElementsContainerType parentContainerType, final SFlowNodeDefinition sFlowNodeDefinition, final long rootProcessInstanceId,
             final long parentProcessInstanceId) throws SActorNotFoundException {
-        final SHumanTaskInstanceBuilder builder = createHumanTaskInstance(processDefinitionId, rootContainerId, parentContainerId, sFlowNodeDefinition,
+        final SHumanTaskDefinition humanTaskDefinition = (SHumanTaskDefinition) sFlowNodeDefinition;
+        final String actorName = humanTaskDefinition.getActorName();
+
+        final SActor actor = getActor(processDefinitionId, actorName);
+        final SHumanTaskInstanceBuilder builder = BuilderFactory.get(SManualTaskInstanceBuilderFactory.class).createNewManualTaskInstance(
+                humanTaskDefinition.getName(), humanTaskDefinition.getId(), rootContainerId, parentContainerId, actor.getId(), processDefinitionId,
                 rootProcessInstanceId, parentProcessInstanceId);
+        fillHumanTask(humanTaskDefinition, builder);
         updateActivityInstance(parentContainerId, parentContainerType, sFlowNodeDefinition, builder);
         return builder;
+    }
+
+    public SManualTaskInstance createManualTaskInstance(final long parentUserTaskId, final String name, final long flowNodeDefinitionId,
+            final String displayName, final long userId, final String description, final long dueDate, final STaskPriority priority)
+            throws SFlowNodeNotFoundException, SFlowNodeReadException {
+        final SHumanTaskInstance parentUserTask = (SHumanTaskInstance) activityInstanceService.getFlowNodeInstance(parentUserTaskId);
+        final SManualTaskInstanceBuilderFactory manualTaskInstanceBuilderFact = BuilderFactory.get(SManualTaskInstanceBuilderFactory.class);
+        final long processDefinitionId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilderFact.getProcessDefinitionIndex());
+        final long rootProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilderFact.getRootProcessInstanceIndex());
+        final long parentProcessInstanceId = parentUserTask.getLogicalGroup(manualTaskInstanceBuilderFact.getParentProcessInstanceIndex());
+        final SManualTaskInstanceBuilder builder = manualTaskInstanceBuilderFact.createNewManualTaskInstance(name, flowNodeDefinitionId,
+                parentUserTask.getRootContainerId(), parentUserTaskId, parentUserTask.getActorId(), processDefinitionId, rootProcessInstanceId,
+                parentProcessInstanceId);
+        builder.setParentContainerId(parentUserTaskId);
+        builder.setParentActivityInstanceId(parentUserTaskId);
+        builder.setAssigneeId(userId);
+        builder.setExpectedEndDate(dueDate);
+        builder.setDescription(description);
+        builder.setDisplayDescription(description);
+        builder.setDisplayName(displayName);
+        builder.setPriority(priority);
+        builder.setState(firstStateIds.get(builder.getFlowNodeType()), false, false, firstStateNames.get(builder.getFlowNodeType()));
+        return builder.done();
+    }
+
+    private SActor getActor(final long processDefinitionId, final String actorName) throws SActorNotFoundException {
+        final GetActor getSActor = new GetActor(actorMappingService, actorName, processDefinitionId);
+        try {
+            getSActor.execute();
+        } catch (final SBonitaException sbe) {
+            throw new SActorNotFoundException(sbe);
+        }
+        return getSActor.getResult();
     }
 
     private SIntermediateThrowEventInstanceBuilder createIntermediateThrowEventInstance(final long processDefinitionId, final long rootContainerId,
@@ -475,24 +523,15 @@ public class BPMInstancesCreator {
         final SHumanTaskDefinition humanTaskDefinition = (SHumanTaskDefinition) sFlowNodeDefinition;
         final String actorName = humanTaskDefinition.getActorName();
 
-        final GetActor getSActor = new GetActor(actorMappingService, actorName, processDefinitionId);
-        try {
-            getSActor.execute();
-        } catch (final SBonitaException sbe) {
-            throw new SActorNotFoundException(sbe);
-        }
-        final SActor actor = getSActor.getResult();
-        SHumanTaskInstanceBuilder builder;
-        if (sFlowNodeDefinition instanceof SUserTaskDefinition) {
-            builder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class).createNewUserTaskInstance(humanTaskDefinition.getName(),
-                    humanTaskDefinition.getId(), rootContainerId,
-                    parentContainerId, actor.getId(), processDefinitionId, rootProcessInstanceId, parentProcessInstanceId);
-        } else {
-            // manual task
-            builder = BuilderFactory.get(SManualTaskInstanceBuilderFactory.class).createNewManualTaskInstance(humanTaskDefinition.getName(),
-                    humanTaskDefinition.getId(), rootContainerId,
-                    parentContainerId, actor.getId(), processDefinitionId, rootProcessInstanceId, parentProcessInstanceId);
-        }
+        final SActor actor = getActor(processDefinitionId, actorName);
+        final SHumanTaskInstanceBuilder builder = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class).createNewUserTaskInstance(
+                humanTaskDefinition.getName(), humanTaskDefinition.getId(), rootContainerId, parentContainerId, actor.getId(), processDefinitionId,
+                rootProcessInstanceId, parentProcessInstanceId);
+        fillHumanTask(humanTaskDefinition, builder);
+        return builder;
+    }
+
+    private void fillHumanTask(final SHumanTaskDefinition humanTaskDefinition, final SHumanTaskInstanceBuilder builder) {
         // Creation date:
         builder.setReachedStateDate(System.currentTimeMillis());
         final Long expectedDuration = humanTaskDefinition.getExpectedDuration();
@@ -505,7 +544,6 @@ public class BPMInstancesCreator {
             final STaskPriority sPriority = STaskPriority.valueOf(priority);
             builder.setPriority(sPriority);
         }
-        return builder;
     }
 
     public void createConnectorInstances(final PersistentObject container, final List<SConnectorDefinition> connectors, final String containerType)
@@ -518,7 +556,7 @@ public class BPMInstancesCreator {
                     .createNewInstance(sConnectorDefinition.getName(), container.getId(), containerType,
                             sConnectorDefinition.getConnectorId(), sConnectorDefinition.getVersion(), sConnectorDefinition.getActivationEvent(),
                             executionOrder++)
-                    .done());
+                            .done());
         }
         final CreateConnectorInstances transaction = new CreateConnectorInstances(connectorInstances, connectorInstanceService);
         transaction.execute();
@@ -612,7 +650,7 @@ public class BPMInstancesCreator {
 
     private void createDataForProcess(final SProcessInstance processInstance, final SProcessDefinition processDefinition,
             final List<SDataInstance> sDataInstances)
-            throws SDataInstanceException, SFlowNodeNotFoundException, SFlowNodeReadException {
+                    throws SDataInstanceException, SFlowNodeNotFoundException, SFlowNodeReadException {
         if (!sDataInstances.isEmpty()) {
             for (final SDataInstance sDataInstance : sDataInstances) {
                 dataInstanceService.createDataInstance(sDataInstance);
@@ -626,12 +664,12 @@ public class BPMInstancesCreator {
                 if (SFlowNodeType.SUB_PROCESS.equals(caller.getType())) {
                     final SSubProcessActivityInstanceBuilderFactory keyProvider = BuilderFactory.get(SSubProcessActivityInstanceBuilderFactory.class);
                     dataInstanceService.addChildContainer(caller.getLogicalGroup(keyProvider.getParentProcessInstanceIndex()),
-                            DataInstanceContainer.PROCESS_INSTANCE.name(), processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name());
+                            DataInstanceContainer.PROCESS_INSTANCE.name(), processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(), true);
                 } else {
-                    dataInstanceService.createDataContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name());
+                    dataInstanceService.createDataContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(), true);
                 }
             } else {
-                dataInstanceService.createDataContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name());
+                dataInstanceService.createDataContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(), true);
             }
         }
     }
@@ -657,10 +695,8 @@ public class BPMInstancesCreator {
     }
 
     private void createDataInstances(final List<SDataDefinition> dataDefinitions, final long containerId, final DataInstanceContainer containerType,
-            final SExpressionContext expressionContext, final ExpressionResolverService expressionResolverService,
-            final DataInstanceService dataInstanceService, final TransientDataService transientDataService, final String loopDataInputRef, final int index,
-            final String dataInputRef, final long parentContainerId)
-            throws SDataInstanceException, SExpressionException {
+            final SExpressionContext expressionContext, final String loopDataInputRef, final int index, final String dataInputRef, final long parentContainerId)
+                    throws SDataInstanceException, SExpressionException {
         for (final SDataDefinition dataDefinition : dataDefinitions) {
             Serializable dataValue = null;
             if (dataDefinition.getName().equals(dataInputRef)) {
@@ -668,7 +704,10 @@ public class BPMInstancesCreator {
                         DataInstanceContainer.ACTIVITY_INSTANCE.name());// in a multi instance
                 if (dataInstance != null) {
                     try {
-                        dataValue = (Serializable) ((List<?>) dataInstance.getValue()).get(index);
+                        final List<Serializable> list = (List<Serializable>) dataInstance.getValue();
+                        if (!list.isEmpty()) {
+                            dataValue = list.get(index);
+                        }
                     } catch (final ClassCastException e) {
                         throw new SDataInstanceReadException("LoopDataInput ref named " + loopDataInputRef + " in " + containerId + " " + containerType
                                 + " is not a list or the value is not serializable.");
@@ -700,21 +739,17 @@ public class BPMInstancesCreator {
                 dataInstanceService.createDataInstance(dataInstance);
             }
         }
-
     }
 
     public void createDataInstances(final List<SDataDefinition> dataDefinitions, final long containerId, final DataInstanceContainer containerType,
-            final SExpressionContext expressionContext) throws SDataInstanceException,
-            SExpressionException {
-        createDataInstances(dataDefinitions, containerId, containerType, expressionContext, expressionResolverService, dataInstanceService,
-                transientDataService, null, -1, null, -1);
+            final SExpressionContext expressionContext) throws SDataInstanceException, SExpressionException {
+        createDataInstances(dataDefinitions, containerId, containerType, expressionContext, null, -1, null, -1);
     }
 
     private SDataInstance buildDataInstance(final SDataDefinition dataDefinition, final long dataContainerId, final DataInstanceContainer dataContainerType,
             final Serializable dataValue) throws SDataInstanceNotWellFormedException {
         return BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition).setContainerId(dataContainerId)
                 .setContainerType(dataContainerType.name()).setValue(dataValue).done();
-
     }
 
     public boolean createDataInstances(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
@@ -722,35 +757,46 @@ public class BPMInstancesCreator {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         final SActivityDefinition activityDefinition = (SActivityDefinition) processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
         if (activityDefinition != null) {// can be null if the activity was added in runtime
-            try {
-                final SLoopCharacteristics loopCharacteristics = activityDefinition.getLoopCharacteristics();
-                final SExpressionContext expressionContext;
-                if (sExpressionContext == null) {
-                    expressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
-                            processDefinition.getId());
-                } else {
-                    expressionContext = sExpressionContext;
-                }
-                final List<SDataDefinition> sDataDefinitions = activityDefinition.getSDataDefinitions();
-                if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics
-                        && ((SMultiInstanceLoopCharacteristics) loopCharacteristics).getDataInputItemRef() != null) {
-                    final SMultiInstanceLoopCharacteristics miLoop = (SMultiInstanceLoopCharacteristics) loopCharacteristics;
-                    createDataInstances(sDataDefinitions, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE, expressionContext,
-                            expressionResolverService, dataInstanceService, transientDataService, miLoop.getLoopDataInputRef(),
-                            flowNodeInstance.getLoopCounter(), miLoop.getDataInputItemRef(), flowNodeInstance.getParentContainerId());
-                } else {
-                    createDataInstances(sDataDefinitions, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE, expressionContext);
-                }
-                if (!sDataDefinitions.isEmpty() && logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
-                    final String message = "Initialized variables for flow node" + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
-                    logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
-                }
-                return sDataDefinitions.size() > 0;
-            } catch (final SBonitaException e) {
-                throw new SActivityStateExecutionException(e);
+            final SExpressionContext expressionContext;
+            if (sExpressionContext == null) {
+                expressionContext = new SExpressionContext(flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+                        processDefinition.getId());
+            } else {
+                expressionContext = sExpressionContext;
             }
+            return createDataInstances(processContainer, activityDefinition, flowNodeInstance, expressionContext);
         }
         return false;
+    }
+
+    private boolean createDataInstances(final SFlowElementContainerDefinition processContainer, final SActivityDefinition activityDefinition,
+            final SFlowNodeInstance flowNodeInstance, final SExpressionContext expressionContext) throws SActivityStateExecutionException {
+        final List<SDataDefinition> sDataDefinitions = activityDefinition.getSDataDefinitions();
+        final SLoopCharacteristics loopCharacteristics = activityDefinition.getLoopCharacteristics();
+        try {
+            if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics
+                    && (((SMultiInstanceLoopCharacteristics) loopCharacteristics).getDataInputItemRef() != null
+                    || ((SMultiInstanceLoopCharacteristics) loopCharacteristics).getDataOutputItemRef() != null)) {
+                createDataInstancesForMultiInstance(activityDefinition, flowNodeInstance, expressionContext);
+            } else {
+                createDataInstances(sDataDefinitions, flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE, expressionContext);
+            }
+            if (!sDataDefinitions.isEmpty() && logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
+                final String message = "Initialized variables for flow node" + LogMessageBuilder.buildFlowNodeContextMessage(flowNodeInstance);
+                logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, message);
+            }
+            return sDataDefinitions.size() > 0;
+        } catch (final SBonitaException e) {
+            throw new SActivityStateExecutionException(e);
+        }
+    }
+
+    protected void createDataInstancesForMultiInstance(final SActivityDefinition activityDefinition, final SFlowNodeInstance flowNodeInstance,
+            final SExpressionContext expressionContext) throws SDataInstanceException, SExpressionException {
+        final SLoopCharacteristics loopCharacteristics = activityDefinition.getLoopCharacteristics();
+        final SMultiInstanceLoopCharacteristics miLoop = (SMultiInstanceLoopCharacteristics) loopCharacteristics;
+        createDataInstances(activityDefinition.getSDataDefinitions(), flowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE, expressionContext,
+                miLoop.getLoopDataInputRef(), flowNodeInstance.getLoopCounter(), miLoop.getDataInputItemRef(), flowNodeInstance.getParentContainerId());
     }
 
     public TechnicalLoggerService getLogger() {

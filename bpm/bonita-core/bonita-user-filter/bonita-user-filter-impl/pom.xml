@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-user-filter</artifactId>
 		<groupId>org.bonitasoft.engine.core.filter</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.5.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-user-filter-impl</artifactId>
@@ -46,6 +46,26 @@
 		<dependency>
             <groupId>org.bonitasoft.engine.log</groupId>
             <artifactId>bonita-log-technical-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.process.definition</groupId>
+            <artifactId>bonita-process-definition-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.core</groupId>
+            <artifactId>bonita-expression-resolver-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.expression</groupId>
+            <artifactId>bonita-expression-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.api</groupId>
+            <artifactId>bonita-common-api</artifactId>
             <version>${project.version}</version>
         </dependency>
 	</dependencies>

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -40,24 +40,24 @@ import org.bonitasoft.engine.operation.Operation;
 
 /**
  * @author Baptiste Mesta
+ * @author Matthieu Chaffotte
  */
 public class ServerModelConvertor {
 
     public static SExpression convertExpression(final Expression value) {
         if (value == null) {
             return null;
-        } else {
-            final ArrayList<SExpression> dependencies = new ArrayList<SExpression>();
-            for (final Expression expression : value.getDependencies()) {
-                dependencies.add(convertExpression(expression));
-            }
-            try {
-                return BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setName(value.getName()).setContent(value.getContent())
-                        .setExpressionType(value.getExpressionType()).setInterpreter(value.getInterpreter()).setReturnType(value.getReturnType())
-                        .setDependencies(dependencies).done();
-            } catch (final SInvalidExpressionException e) {
-                throw new IllegalArgumentException("Error building SExpression", e);
-            }
+        }
+        final ArrayList<SExpression> dependencies = new ArrayList<SExpression>();
+        for (final Expression expression : value.getDependencies()) {
+            dependencies.add(convertExpression(expression));
+        }
+        try {
+            return BuilderFactory.get(SExpressionBuilderFactory.class).createNewInstance().setName(value.getName()).setContent(value.getContent())
+                    .setExpressionType(value.getExpressionType()).setInterpreter(value.getInterpreter()).setReturnType(value.getReturnType())
+                    .setDependencies(dependencies).done();
+        } catch (final SInvalidExpressionException e) {
+            throw new IllegalArgumentException("Error building SExpression", e);
         }
     }
 
@@ -99,23 +99,25 @@ public class ServerModelConvertor {
             builder.setDescription(dataDefinition.getDescription());
             builder.setTransient(dataDefinition.isTransientData());
             return builder.done();
-        } else {
-            final SDataDefinitionBuilderFactory fact = BuilderFactory.get(SDataDefinitionBuilderFactory.class);
-            SDataDefinitionBuilder builder = null;
-            if (dataDefinition instanceof TextDataDefinition) {
-                final TextDataDefinition textDataDefinition = (TextDataDefinition) dataDefinition;
-                builder = fact.createNewTextData(dataDefinition.getName()).setAsLongText(textDataDefinition.isLongText());
-            } else {
-                builder = fact.createNewInstance(dataDefinition.getName(), dataDefinition.getClassName());
-            }
-            builder.setDefaultValue(ServerModelConvertor.convertExpression(dataDefinition.getDefaultValueExpression()));
-            builder.setDescription(dataDefinition.getDescription());
-            builder.setTransient(dataDefinition.isTransientData());
-            return builder.done();
         }
+        final SDataDefinitionBuilderFactory fact = BuilderFactory.get(SDataDefinitionBuilderFactory.class);
+        SDataDefinitionBuilder builder = null;
+        if (dataDefinition instanceof TextDataDefinition) {
+            final TextDataDefinition textDataDefinition = (TextDataDefinition) dataDefinition;
+            builder = fact.createNewTextData(dataDefinition.getName()).setAsLongText(textDataDefinition.isLongText());
+        } else {
+            builder = fact.createNewInstance(dataDefinition.getName(), dataDefinition.getClassName());
+        }
+        builder.setDefaultValue(ServerModelConvertor.convertExpression(dataDefinition.getDefaultValueExpression()));
+        builder.setDescription(dataDefinition.getDescription());
+        builder.setTransient(dataDefinition.isTransientData());
+        return builder.done();
     }
 
     public static SBusinessDataDefinition convertBusinessDataDefinition(final BusinessDataDefinition businessDataDefinition) {
+        if (businessDataDefinition == null) {
+            return null;
+        }
         final SBusinessDataDefinitionBuilder builder = getSBusinessDataDefinitionBuilder(businessDataDefinition);
         builder.setDefaultValue(ServerModelConvertor.convertExpression(businessDataDefinition.getDefaultValueExpression()));
         builder.setDescription(businessDataDefinition.getDescription());

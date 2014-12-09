@@ -27,18 +27,19 @@ import org.bonitasoft.engine.command.system.CommandWithParameters;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityInstanceNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityReadException;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
+import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 /**
  * Specific Command to know if a user is involved in a specific human task.
  * The mandatory keys to set as parameter are "USER_ID_KEY" and "HUMAN_TASK_INSTANCE_ID_KEY".
- * 
+ *
  * @author Celine Souchet
  */
 public class IsInvolvedInHumanTask extends CommandWithParameters {
@@ -60,7 +61,6 @@ public class IsInvolvedInHumanTask extends CommandWithParameters {
         final long userId = getLongMandadoryParameter(parameters, USER_ID_KEY);
         final long humanTaskInstanceId = getLongMandadoryParameter(parameters, HUMAN_TASK_INSTANCE_ID_KEY);
 
-
         try {
             return isInvolvedInHumanTask(userId, humanTaskInstanceId, serviceAccessor);
         } catch (final SBonitaException e) {
@@ -69,9 +69,11 @@ public class IsInvolvedInHumanTask extends CommandWithParameters {
     }
 
     private Boolean isInvolvedInHumanTask(final long userId, final long humanTaskInstanceId, final TenantServiceAccessor serviceAccessor)
-            throws SActivityInstanceNotFoundException, SActivityReadException, SActorNotFoundException, SBonitaReadException {
+            throws SActivityInstanceNotFoundException, SActorNotFoundException, SBonitaReadException {
         final ActorMappingService actorMappingService = serviceAccessor.getActorMappingService();
         final ActivityInstanceService activityInstanceService = serviceAccessor.getActivityInstanceService();
+        SessionService sessionService = serviceAccessor.getSessionService();
+        SessionAccessor sessionAccessor = serviceAccessor.getSessionAccessor();
 
         long actorId = -1;
         long assigneeId = -1;
@@ -93,11 +95,12 @@ public class IsInvolvedInHumanTask extends CommandWithParameters {
             }
         }
 
-        final SSession session = getCurrentSession();
+        final long loggedUserId = sessionService.getLoggedUserFromSession(sessionAccessor);
+        //FIXME the command return true when: we give a user id != -1 and when the task is not assigned...
         if (userId != -1) {
             //in case we are performing a Do For (task assigned or not, we don't care
             return true;
-        } else if (session.getUserId() == assigneeId) {
+        } else if (loggedUserId == assigneeId) {
             //if user has the current task assigned
             return true;
         } else if (assigneeId == 0L) {
@@ -106,15 +109,6 @@ public class IsInvolvedInHumanTask extends CommandWithParameters {
             return actor.getScopeId() == processDefinitionId;
         }
         return false;
-    }
-
-    /**
-     * method created for stubbing purpose
-     * 
-     * @return current session
-     */
-    protected SSession getCurrentSession() {
-        return SessionInfos.getSession();
     }
 
 }

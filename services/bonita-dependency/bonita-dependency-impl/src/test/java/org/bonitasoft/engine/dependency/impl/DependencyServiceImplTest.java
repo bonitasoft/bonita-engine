@@ -43,6 +43,7 @@ import org.bonitasoft.engine.services.QueriableLoggerService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 
 /**
  * @author Celine Souchet
@@ -80,21 +81,21 @@ public class DependencyServiceImplTest {
     @Test
     public final void getDependencyById() throws SBonitaReadException, SDependencyNotFoundException {
         final SDependency sDependency = mock(SDependency.class);
-        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(sDependency);
+        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SDependency>> any())).thenReturn(sDependency);
 
         Assert.assertEquals(sDependency, dependencyServiceImpl.getDependency(456L));
     }
 
     @Test(expected = SDependencyNotFoundException.class)
     public final void getDependencyByIdNotExists() throws SBonitaReadException, SDependencyNotFoundException {
-        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(null);
+        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SDependency>> any())).thenReturn(null);
 
         dependencyServiceImpl.getDependency(456L);
     }
 
     @Test(expected = SDependencyNotFoundException.class)
     public final void getDependencyByIdThrowException() throws SBonitaReadException, SDependencyNotFoundException {
-        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SDependency>> any())).thenThrow(new SBonitaReadException(""));
 
         dependencyServiceImpl.getDependency(456L);
     }
@@ -105,14 +106,14 @@ public class DependencyServiceImplTest {
     @Test
     public final void getDependenciesByIds() throws SBonitaReadException, SDependencyException {
         final List<SDependency> sDependencies = new ArrayList<SDependency>();
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sDependencies);
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependency>> any())).thenReturn(sDependencies);
 
         Assert.assertEquals(sDependencies, dependencyServiceImpl.getDependencies(Collections.singletonList(456L)));
     }
 
     @Test(expected = SDependencyException.class)
     public final void getDependenciesByIdsThrowException() throws SBonitaReadException, SDependencyException {
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependency>> any())).thenThrow(new SBonitaReadException(""));
 
         dependencyServiceImpl.getDependencies(Collections.singletonList(456L));
     }
@@ -123,7 +124,7 @@ public class DependencyServiceImplTest {
     @Test
     public final void getDependenciesWithOptions() throws SBonitaReadException, SDependencyException {
         final List<SDependency> sDependencies = new ArrayList<SDependency>();
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sDependencies);
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependency>> any())).thenReturn(sDependencies);
 
         final QueryOptions options = new QueryOptions(0, 10);
         Assert.assertEquals(sDependencies, dependencyServiceImpl.getDependencies(options));
@@ -131,7 +132,7 @@ public class DependencyServiceImplTest {
 
     @Test(expected = SDependencyException.class)
     public final void getDependenciesWithOptionsThrowException() throws SBonitaReadException, SDependencyException {
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependency>> any())).thenThrow(new SBonitaReadException(""));
 
         final QueryOptions options = new QueryOptions(0, 10);
         dependencyServiceImpl.getDependencies(options);
@@ -145,17 +146,15 @@ public class DependencyServiceImplTest {
     @Test
     public final void getDependencyIds() throws SBonitaReadException, SDependencyException {
         final List<SDependency> sDependencies = new ArrayList<SDependency>();
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sDependencies);
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependency>> any())).thenReturn(sDependencies);
 
-        final QueryOptions options = new QueryOptions(0, 10);
         Assert.assertEquals(sDependencies, dependencyServiceImpl.getDependencyIds(54156L, ScopeType.PROCESS, 1, 100));
     }
 
     @Test(expected = SDependencyException.class)
     public final void getDependencyIdsThrowException() throws SBonitaReadException, SDependencyException {
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependency>> any())).thenThrow(new SBonitaReadException(""));
 
-        final QueryOptions options = new QueryOptions(0, 10);
         dependencyServiceImpl.getDependencyIds(54156L, ScopeType.PROCESS, 1, 100);
     }
 
@@ -165,21 +164,21 @@ public class DependencyServiceImplTest {
     @Test
     public final void getDependencyMappingById() throws SBonitaReadException, SDependencyMappingNotFoundException {
         final SDependencyMapping sDependencyMapping = mock(SDependencyMapping.class);
-        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(sDependencyMapping);
+        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SDependencyMapping>> any())).thenReturn(sDependencyMapping);
 
         Assert.assertEquals(sDependencyMapping, dependencyServiceImpl.getDependencyMapping(456L));
     }
 
     @Test(expected = SDependencyMappingNotFoundException.class)
     public final void getDependencyMappingByIdNotExists() throws SBonitaReadException, SDependencyMappingNotFoundException {
-        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenReturn(null);
+        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SDependencyMapping>> any())).thenReturn(null);
 
         dependencyServiceImpl.getDependencyMapping(456L);
     }
 
     @Test(expected = SDependencyMappingNotFoundException.class)
     public final void getDependencyMappingByIdThrowException() throws SBonitaReadException, SDependencyMappingNotFoundException {
-        when(persistenceService.selectById(any(SelectByIdDescriptor.class))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectById(Matchers.<SelectByIdDescriptor<SDependencyMapping>> any())).thenThrow(new SBonitaReadException(""));
 
         dependencyServiceImpl.getDependencyMapping(456L);
     }
@@ -191,7 +190,7 @@ public class DependencyServiceImplTest {
     @Test
     public final void getDependencyMappingsWithDependencyIdAndQueryOptions() throws SBonitaReadException, SDependencyException {
         final List<SDependencyMapping> sDependencyMappings = new ArrayList<SDependencyMapping>();
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sDependencyMappings);
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependencyMapping>> any())).thenReturn(sDependencyMappings);
 
         final QueryOptions options = new QueryOptions(0, 10);
         Assert.assertEquals(sDependencyMappings, dependencyServiceImpl.getDependencyMappings(54156L, options));
@@ -199,7 +198,7 @@ public class DependencyServiceImplTest {
 
     @Test(expected = SDependencyException.class)
     public final void getDependencyMappingsWithDependencyIdAndQueryOptionsThrowException() throws SBonitaReadException, SDependencyException {
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependency>> any())).thenThrow(new SBonitaReadException(""));
 
         final QueryOptions options = new QueryOptions(0, 10);
         dependencyServiceImpl.getDependencyMappings(54156L, options);
@@ -212,7 +211,7 @@ public class DependencyServiceImplTest {
     @Test
     public final void getDependencyMappingsWithOptions() throws SBonitaReadException, SDependencyException {
         final List<SDependencyMapping> sDependencyMappings = new ArrayList<SDependencyMapping>();
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sDependencyMappings);
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependencyMapping>> any())).thenReturn(sDependencyMappings);
 
         final QueryOptions options = new QueryOptions(0, 10);
         Assert.assertEquals(sDependencyMappings, dependencyServiceImpl.getDependencyMappings(options));
@@ -220,7 +219,7 @@ public class DependencyServiceImplTest {
 
     @Test(expected = SDependencyException.class)
     public final void getDependencyMappingsWithOptionsThrowException() throws SBonitaReadException, SDependencyException {
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependency>> any())).thenThrow(new SBonitaReadException(""));
 
         final QueryOptions options = new QueryOptions(0, 10);
         dependencyServiceImpl.getDependencyMappings(options);
@@ -237,7 +236,7 @@ public class DependencyServiceImplTest {
         when(artifactAccessor.artifactExists(any(ScopeType.class), any(Long.class))).thenReturn(true);
         final List<SDependencyMapping> sDependencyMappings = new ArrayList<SDependencyMapping>();
         sDependencyMappings.add(mock(SDependencyMapping.class));
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sDependencyMappings);
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependencyMapping>> any())).thenReturn(sDependencyMappings);
 
         final QueryOptions options = new QueryOptions(0, 10);
         Assert.assertEquals(Collections.emptyList(), dependencyServiceImpl.getDisconnectedDependencyMappings(artifactAccessor, options));
@@ -249,7 +248,7 @@ public class DependencyServiceImplTest {
         when(artifactAccessor.artifactExists(any(ScopeType.class), any(Long.class))).thenReturn(false);
         final List<SDependencyMapping> sDependencyMappings = new ArrayList<SDependencyMapping>();
         sDependencyMappings.add(mock(SDependencyMapping.class));
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenReturn(sDependencyMappings);
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependencyMapping>> any())).thenReturn(sDependencyMappings);
 
         final QueryOptions options = new QueryOptions(0, 10);
         Assert.assertEquals(sDependencyMappings, dependencyServiceImpl.getDisconnectedDependencyMappings(artifactAccessor, options));
@@ -258,7 +257,7 @@ public class DependencyServiceImplTest {
     @Test(expected = SDependencyException.class)
     public final void getDisconnectedDependencyMappingsThrowException() throws SBonitaReadException, SDependencyException {
         final ArtifactAccessor artifactAccessor = mock(ArtifactAccessor.class);
-        when(persistenceService.selectList(any(SelectListDescriptor.class))).thenThrow(new SBonitaReadException(""));
+        when(persistenceService.selectList(Matchers.<SelectListDescriptor<SDependency>> any())).thenThrow(new SBonitaReadException(""));
 
         final QueryOptions options = new QueryOptions(0, 10);
         dependencyServiceImpl.getDisconnectedDependencyMappings(artifactAccessor, options);
@@ -266,13 +265,13 @@ public class DependencyServiceImplTest {
 
     @Test(expected = SDependencyNotFoundException.class)
     public void deleteDependencyByNonExistingNameShouldThrowSDependencyNotFoundException() throws Exception {
-        when(persistenceService.selectOne(any(SelectOneDescriptor.class))).thenReturn(null);
+        when(persistenceService.selectOne(Matchers.<SelectOneDescriptor<SDependency>> any())).thenReturn(null);
         dependencyServiceImpl.deleteDependency("notFound");
     }
 
     @Test(expected = SDependencyNotFoundException.class)
     public void deleteDependencyWithReadExceptionShouldThrowSDependencyNotFoundException() throws Exception {
-        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+        doThrow(new SBonitaReadException("")).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<SDependency>> any());
         dependencyServiceImpl.deleteDependency("notFound");
     }
 

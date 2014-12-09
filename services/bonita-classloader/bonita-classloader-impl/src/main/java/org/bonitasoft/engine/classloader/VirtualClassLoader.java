@@ -86,7 +86,7 @@ public class VirtualClassLoader extends ClassLoader {
         }
         return getParent().getResource(name);
     }
-    
+
     @Override
     public Enumeration<URL> getResources(final String name) throws IOException {
         if (classloader != null) {
@@ -94,16 +94,16 @@ public class VirtualClassLoader extends ClassLoader {
         }
         return getParent().getResources(name);
     }
-    
-    public void release() {
+
+    public void destroy() {
         if (classloader != null) {
-            classloader.release();
+            classloader.destroy();
         }
     }
 
     @Override
     public String toString() {
-        return super.toString() + ", type=" + artifactType + ", id=" + artifactId + " delegate: " + this.classloader;
+        return super.toString() + ", type=" + artifactType + ", id=" + artifactId + " delegate: " + classloader;
     }
 
 }

@@ -14,6 +14,8 @@
 package org.bonitasoft.engine.classloader;
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -23,6 +25,7 @@ import java.util.regex.Pattern;
 
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
+import org.bonitasoft.engine.commons.io.IOUtil;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 
@@ -49,15 +52,24 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
 
     private final String temporaryFolder;
 
-    private final VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
+    private VirtualClassLoader virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
 
     private final Map<String, VirtualClassLoader> localClassLoaders = new HashMap<String, VirtualClassLoader>();
 
     private final Object mutex = new ClassLoaderServiceMutex();
 
+    private boolean shuttingDown = false;
+
     public ClassLoaderServiceImpl(final ParentClassLoaderResolver parentClassLoaderResolver, final String temporaryFolder, final TechnicalLoggerService logger) {
         this.parentClassLoaderResolver = parentClassLoaderResolver;
         this.logger = logger;
+        final String temporaryFolderName = buildTemporaryFolderName(temporaryFolder);
+        final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+        // BS-9304 : Create the temporary directory with the IOUtil class, to delete it at the end of the JVM
+        this.temporaryFolder = IOUtil.createTempDirectory(new File(temporaryFolderName, "bonita_engine_" + jvmName).toURI()).getAbsolutePath();
+    }
+
+    private String buildTemporaryFolderName(final String temporaryFolder) {
         String temporaryFolderName = temporaryFolder;
         if (temporaryFolder.startsWith("${") && temporaryFolder.contains("}")) {
             final Pattern pattern = Pattern.compile("^(.*)\\$\\{(.*)\\}(.*)$");
@@ -69,8 +81,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
             sb.append(matcher.group(3));
             temporaryFolderName = sb.toString();
         }
-
-        this.temporaryFolder = new File(temporaryFolderName, "bos-engine").getAbsolutePath();
+        return temporaryFolderName;
     }
 
     private static final class ClassLoaderServiceMutex {
@@ -104,6 +115,12 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         return getVirtualGlobalClassLoader();
     }
 
+    private void warnOnShuttingDown(final String key) {
+        if (shuttingDown && logger.isLoggable(getClass(), TechnicalLogSeverity.WARNING)) {
+            logger.log(getClass(), TechnicalLogSeverity.WARNING, "Using local classloader on after ClassLoaderService shuttingdown: " + key);
+        }
+    }
+
     @Override
     public ClassLoader getLocalClassLoader(final String type, final long id) {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
@@ -111,6 +128,7 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
         NullCheckingUtil.checkArgsNotNull(id, type);
         final String key = getKey(type, id);
+        warnOnShuttingDown(key);
         // here we have to manage the case of the "first" get to avoid creating 2 classloaders
         // we decided to do it in a "double" check manner
         // as it happens almost "never" (concurrency maybe on 2 or more threads but only on time...
@@ -128,6 +146,12 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "getLocalClassLoader"));
         }
+        // final VirtualClassLoader virtualClassLoader = localClassLoaders.get(key);
+        // final String newKey = getKey(virtualClassLoader.getArtifactType(), virtualClassLoader.getArtifactId());
+        // if (!key.equals(newKey)) {
+        // logger.log(this.getClass(), TechnicalLogSeverity.DEBUG, "***************** WARNING: getLocalClassLoader() returning wrong Local CL. key: " + newKey
+        // + "  *******************");
+        // }
         return localClassLoaders.get(key);
     }
 
@@ -139,48 +163,23 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         }
         NullCheckingUtil.checkArgsNotNull(id, type);
 
-        // // Remove the temporary folder
-        // final String localTemporaryFolder = getLocalTemporaryFolder(type, id);
-        // // new File(localTemporaryFolder).deleteOnExit();
-        // deleteDirOnExit(new File(localTemporaryFolder));
-
         // Remove the class loader
         final String key = getKey(type, id);
-        final VirtualClassLoader localClassLoader = localClassLoaders.get(key);
-        if (localClassLoader != null) {
-            localClassLoader.release();
-            localClassLoaders.remove(key);
-        }
+        destroyLocalClassLoader(key);
 
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeLocalClassLoader"));
         }
     }
 
-    private static void deleteDirOnExit(File dir) {
-        // call deleteOnExit for the folder first, so it will get deleted last
-        dir.deleteOnExit();
-        File[] files = dir.listFiles();
-        if (files != null) {
-            for (File f : files) {
-                if (f.isDirectory()) {
-                    deleteDirOnExit(f);
-                }
-                else {
-                    f.deleteOnExit();
-                }
-            }
-        }
-    }
-
-    private String getGlobalTemporaryFolder() {
+    private URI getGlobalTemporaryFolder() {
         final StringBuffer stb = new StringBuffer(temporaryFolder);
         stb.append(File.separator);
         stb.append(GLOBAL_FOLDER);
-        return stb.toString();
+        return new File(stb.toString()).toURI();
     }
 
-    private String getLocalTemporaryFolder(final String artifactType, final long artifactId) {
+    private URI getLocalTemporaryFolder(final String artifactType, final long artifactId) {
         final StringBuffer stb = new StringBuffer(temporaryFolder);
         stb.append(File.separator);
         stb.append(LOCAL_FOLDER);
@@ -188,7 +187,8 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         stb.append(artifactType);
         stb.append(File.separator);
         stb.append(artifactId);
-        return stb.toString();
+        return new File(stb.toString()).toURI();
+
     }
 
     @Override
@@ -200,15 +200,19 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
         final Set<String> keySet = new HashSet<String>(localClassLoaders.keySet());
         for (final String key : keySet) {
             if (key.startsWith(application + SEPARATOR)) {
-                final VirtualClassLoader localClassLoader = localClassLoaders.get(key);
-                if (localClassLoader != null) {
-                    localClassLoader.release();
-                }
-                localClassLoaders.remove(key);
+                destroyLocalClassLoader(key);
             }
         }
         if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
             logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "removeAllLocalClassLoaders"));
+        }
+    }
+
+    private void destroyLocalClassLoader(final String key) {
+        final VirtualClassLoader localClassLoader = localClassLoaders.get(key);
+        if (localClassLoader != null) {
+            localClassLoader.destroy();
+            localClassLoaders.remove(key);
         }
     }
 
@@ -219,17 +223,51 @@ public class ClassLoaderServiceImpl implements ClassLoaderService {
     @Override
     public void refreshGlobalClassLoader(final Map<String, byte[]> resources) {
         final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getGlobalClassLoader();
-        virtualClassloader.release();
-        virtualClassloader.setClassLoader(new BonitaClassLoader(resources, getGlobalClassLoaderType(), getGlobalClassLoaderId(), getGlobalTemporaryFolder(),
-                ClassLoaderServiceImpl.class.getClassLoader()));
+        refreshLocalClassLoader(virtualClassloader, resources, getGlobalClassLoaderType(), getGlobalClassLoaderId(), getGlobalTemporaryFolder(),
+                ClassLoaderServiceImpl.class.getClassLoader());
     }
 
     @Override
     public void refreshLocalClassLoader(final String type, final long id, final Map<String, byte[]> resources) {
         final VirtualClassLoader virtualClassloader = (VirtualClassLoader) getLocalClassLoader(type, id);
-        virtualClassloader.release();
-        virtualClassloader.setClassLoader(new BonitaClassLoader(resources, type, id, getLocalTemporaryFolder(type, id), new ParentRedirectClassLoader(
-                getGlobalClassLoader(), parentClassLoaderResolver, this, type, id)));
+        refreshLocalClassLoader(virtualClassloader, resources, type, id, getLocalTemporaryFolder(type, id), new ParentRedirectClassLoader(
+                getGlobalClassLoader(), parentClassLoaderResolver, this, type, id));
     }
 
+    private void refreshLocalClassLoader(final VirtualClassLoader virtualClassloader, final Map<String, byte[]> resources, final String type, final long id,
+            final URI temporaryFolder, final ClassLoader parent) {
+        virtualClassloader.destroy();
+        final BonitaClassLoader classloader = new BonitaClassLoader(resources, type, id, temporaryFolder, parent);
+        virtualClassloader.setClassLoader(classloader);
+    }
+
+    @Override
+    public void start() {
+        shuttingDown = false;
+        virtualGlobalClassLoader = new VirtualClassLoader(GLOBAL_TYPE, GLOBAL_ID, VirtualClassLoader.class.getClassLoader());
+    }
+
+    @Override
+    public void stop() {
+        shuttingDown = true;
+        destroyAllLocalClassLoaders();
+        virtualGlobalClassLoader.destroy();
+    }
+
+    private void destroyAllLocalClassLoaders() {
+        for (final VirtualClassLoader classLoader : localClassLoaders.values()) {
+            classLoader.destroy();
+        }
+        localClassLoaders.clear();
+    }
+
+    @Override
+    public void pause() {
+        // Nothing to do
+    }
+
+    @Override
+    public void resume() {
+        // Nothing to do
+    }
 }

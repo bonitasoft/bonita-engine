@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -36,7 +36,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
-import org.bonitasoft.engine.core.process.definition.model.builder.ServerModelConvertor;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.RetrieveException;
@@ -59,6 +58,7 @@ import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 /**
  * @author Elias Ricken de Medeiros
  * @author Vincent Elcrin
+ * @author Matthieu Chaffotte
  */
 public class ProcessStarter {
 
@@ -117,7 +117,7 @@ public class ProcessStarter {
 
         final SProcessInstance startedSProcessInstance;
         try {
-            final List<SOperation> sOperations = ServerModelConvertor.convertOperations(operations);
+            final List<SOperation> sOperations = ModelConvertor.convertOperations(operations);
             startedSProcessInstance =
                     processExecutor.start(starterUserId, starterSubstituteUserId, sOperations, operationContext, connectorsWithInput,
                             new FlowNodeSelector(sProcessDefinition, filter));
@@ -203,8 +203,8 @@ public class ProcessStarter {
             try {
                 final SUser starter = identityService.getUser(starterId);
                 final StringBuilder stb = new StringBuilder();
-                stb.append("The user " + SessionInfos.getUserNameFromSession() + " ");
-                stb.append("acting as delegate of the user " + starter.getUserName() + " ");
+                stb.append("The user ").append(SessionInfos.getUserNameFromSession()).append(" ");
+                stb.append("acting as delegate of the user ").append(starter.getUserName()).append(" ");
                 stb.append("has started the case.");
                 commentService.addSystemComment(sProcessInstance.getId(), stb.toString());
             } catch (final SBonitaException e) {

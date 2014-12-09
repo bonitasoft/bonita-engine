@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011-2012 BonitaSoft S.A.
+ * Copyright (C) 2011-2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -32,6 +32,7 @@ import org.w3c.dom.NodeList;
  * @author Feng Hui
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  */
 public class ExpressionBuilder {
 
@@ -92,7 +93,7 @@ public class ExpressionBuilder {
      * The name of the built expression is set to the value of the constant.
      *
      * @param value
-     *            the value of this CONSTANT expression
+     *        the value of this CONSTANT expression
      * @since 6.0
      */
     public Expression createConstantStringExpression(final String value) throws InvalidExpressionException {
@@ -108,7 +109,7 @@ public class ExpressionBuilder {
      * Build a constant expression with date type and value in ISO-8601 format
      *
      * @param value
-     *            a date defined with the ISO-8601 format
+     *        a date defined with the ISO-8601 format
      * @return The corresponding expression
      * @throws InvalidExpressionException
      * @since 6.0
@@ -147,14 +148,14 @@ public class ExpressionBuilder {
 
     /**
      * Builds an <code>Expression</code> that evaluates to a Business Object Server DAO.
-     * 
+     *
      * @param businessObjectDAOName
-     *            name of the DAO to evaluate.
+     *        name of the DAO to evaluate.
      * @param daoInterfaceClassName
-     *            class name of the interface of the DAO to instantiate.
+     *        class name of the interface of the DAO to instantiate.
      * @return the newly created expression.
      * @throws InvalidExpressionException
-     *             if the expression cannot be built because it is invalid.
+     *         if the expression cannot be built because it is invalid.
      */
     public Expression buildBusinessObjectDAOExpression(final String businessObjectDAOName, final String daoInterfaceClassName)
             throws InvalidExpressionException {
@@ -174,6 +175,12 @@ public class ExpressionBuilder {
 
     public Expression createDocumentReferenceExpression(final String documentName) throws InvalidExpressionException {
         return createNewInstance(documentName).setContent(documentName).setExpressionType(ExpressionType.TYPE_DOCUMENT).setReturnType(Document.class.getName())
+                .done();
+    }
+
+    public Expression createDocumentListExpression(final String documentListName) throws InvalidExpressionException {
+        return createNewInstance(documentListName).setContent(documentListName).setExpressionType(ExpressionType.TYPE_DOCUMENT_LIST)
+                .setReturnType(List.class.getName())
                 .done();
     }
 
@@ -201,7 +208,7 @@ public class ExpressionBuilder {
      *
      * @return the newly built {@link Expression}
      * @throws InvalidExpressionException
-     *             is name or returnType is not set or set to an empty String.
+     *         is name or returnType is not set or set to an empty String.
      * @author Emmanuel Duchastenier
      * @since 6.0
      */
@@ -276,7 +283,7 @@ public class ExpressionBuilder {
      * Sets the type of this expression.
      *
      * @param expressionType
-     *            the expression type to use.
+     *        the expression type to use.
      * @return this ExpressionBuilder itself, for chain calls.
      * @see ExpressionType
      */
@@ -289,10 +296,10 @@ public class ExpressionBuilder {
      * Sets the return type of the underlining expression.
      *
      * @param returnType
-     *            the return type to set on the expression.
+     *        the return type to set on the expression.
      * @return this ExpressionBuilder itself.
      * @throws IllegalArgumentException
-     *             if the return type is a primitive type
+     *         if the return type is a primitive type
      */
     public ExpressionBuilder setReturnType(final String returnType) throws IllegalArgumentException {
         if (INVALID_PRIMITIVE_TYPES.contains(returnType)) {
@@ -303,12 +310,20 @@ public class ExpressionBuilder {
     }
 
     public ExpressionBuilder setInterpreter(final String interpreter) {
-        expression.setInterpreter(interpreter);
+        if (interpreter == null) {
+            expression.setInterpreter("NONE");// interpreter,ExpressionInterpreter.GROOVY.toString()
+        } else {
+            expression.setInterpreter(interpreter);
+        }
         return this;
     }
 
     public ExpressionBuilder setDependencies(final List<Expression> dependencies) {
-        expression.setDependencies(dependencies);
+        if (dependencies == null) {
+            expression.setDependencies(new ArrayList<Expression>());
+        } else {
+            expression.setDependencies(dependencies);
+        }
         return this;
     }
 
@@ -348,7 +363,6 @@ public class ExpressionBuilder {
             final Expression exp = createNewInstance(name2).setContent(name2).setExpressionType(ExpressionType.TYPE_LIST).setReturnType(List.class.getName())
                     .setDependencies(list).done();
             deps.add(exp);
-
         }
         return createNewInstance(name).setContent(name).setExpressionType(ExpressionType.TYPE_LIST).setReturnType(List.class.getName()).setDependencies(deps)
                 .done();
@@ -361,32 +375,16 @@ public class ExpressionBuilder {
     public Expression createExpression(final String name, final String content, final String type, final String returnType, final String interpreter,
             final List<Expression> dependencies) throws InvalidExpressionException {
         createNewInstance(name).setContent(content).setExpressionType(type).setReturnType(returnType);
-        if (interpreter == null) {
-            setInterpreter("NONE");
-        } else {
-            setInterpreter(interpreter);
-        }
-        if (dependencies == null) {
-            setDependencies(new ArrayList<Expression>());
-        } else {
-            setDependencies(dependencies);
-        }
+        setInterpreter(interpreter);
+        setDependencies(dependencies);
         return done();
     }
 
     public Expression createExpression(final String name, final String content, final ExpressionType type, final String returnType, final String interpreter,
             final List<Expression> dependencies) throws InvalidExpressionException {
         createNewInstance(name).setContent(content).setExpressionType(type).setReturnType(returnType);
-        if (interpreter == null) {
-            setInterpreter("NONE");// interpreter,ExpressionInterpreter.GROOVY.toString()
-        } else {
-            setInterpreter(interpreter);
-        }
-        if (dependencies == null) {
-            setDependencies(new ArrayList<Expression>());
-        } else {
-            setDependencies(dependencies);
-        }
+        setInterpreter(interpreter);
+        setDependencies(dependencies);
         return done();
     }
 
@@ -523,16 +521,16 @@ public class ExpressionBuilder {
      * Create an expression to call a simple Java method (without parameters)
      *
      * @param name
-     *            the expression name
+     *        the expression name
      * @param methodName
-     *            the name of method to call
+     *        the name of method to call
      * @param returnType
-     *            the method return type
+     *        the method return type
      * @param entityExpression
-     *            the expression representing the entity (Java Object) where the method will be called
+     *        the expression representing the entity (Java Object) where the method will be called
      * @return the created expression
      * @throws InvalidExpressionException
-     *             if the created expression is invalid
+     *         if the created expression is invalid
      * @since 6.0
      */
     public Expression createJavaMethodCallExpression(final String name, final String methodName, final String returnType, final Expression entityExpression)
