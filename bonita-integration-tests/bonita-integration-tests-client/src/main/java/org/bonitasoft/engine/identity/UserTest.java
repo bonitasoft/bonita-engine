@@ -28,6 +28,7 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -1095,6 +1096,20 @@ public class UserTest extends CommonAPITest {
         }
 
         return stb.toString();
+    }
+
+    @Test
+    public void login_should_work_with_specific_characters() throws Exception {
+        final User jyri = createUser("Jyri", "1234");
+
+        final UserUpdater updater = new UserUpdater();
+        updater.setPassword("ñ1234");
+        getIdentityAPI().updateUser(jyri.getId(), updater);
+
+        final APISession apiSession = getLoginAPI().login("Jyri", "ñ1234");
+        assertThat(apiSession).isNotNull();
+
+        getIdentityAPI().deleteUser(jyri.getId());
     }
 
 }
