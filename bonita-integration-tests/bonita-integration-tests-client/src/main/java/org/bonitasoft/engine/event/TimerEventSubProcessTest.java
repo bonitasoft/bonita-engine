@@ -112,7 +112,7 @@ public class TimerEventSubProcessTest extends AbstractEventTest {
 
         assignAndExecuteStep(subStep, donaBenta.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.ABORTED);
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
 
         disableAndDeleteProcess(process.getId());
     }
