@@ -52,7 +52,7 @@ public class TenantQuartzJobListener extends AbstractQuartzJobListener {
 
     @Override
     public String getName() {
-        return "TenantQuartzJobListener_" + groupName + "_" + System.currentTimeMillis();
+        return "TenantQuartzJobListener_" + groupName;
     }
 
     @Override

@@ -13,7 +13,7 @@
  **/
 package org.bonitasoft.engine.scheduler.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -56,6 +56,7 @@ import org.bonitasoft.engine.transaction.TransactionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -147,12 +148,20 @@ public class JDBCJobListenerTest {
 
         doReturn(jobLogs).when(jobService).getJobLogs(JOB_DESCRIPTOR_ID, 0, 1);
 
+        long before = System.currentTimeMillis();
+
         // When
         jdbcJobListener.jobWasExecuted(context, exeption1);
 
         // Then
-        verify(jobService).updateJobLog(eq(jobLog), any(EntityUpdateDescriptor.class));
+        ArgumentCaptor<EntityUpdateDescriptor> captor = ArgumentCaptor.forClass(EntityUpdateDescriptor.class);
+        verify(jobService).updateJobLog(eq(jobLog), captor.capture());
         verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
+
+        EntityUpdateDescriptor updateDescriptor = captor.getValue();
+        assertThat((String) updateDescriptor.getFields().get("lastMessage")).contains(exeption1.getMessage());
+        assertThat((Long) updateDescriptor.getFields().get("lastUpdateDate")).isGreaterThanOrEqualTo(before);
+        assertThat(updateDescriptor.getFields().get("retryNumber")).isEqualTo(2L);
     }
 
     @Test
@@ -516,7 +525,7 @@ public class JDBCJobListenerTest {
         final String name = jdbcJobListener.getName();
 
         // Then
-        assertEquals("JDBCJobListener", name);
+        assertThat("JDBCJobListener").isEqualTo(name);
     }
 
     @Test
