@@ -32,6 +32,12 @@ import org.bonitasoft.engine.service.ModelConvertor;
 
 import com.bonitasoft.engine.bpm.breakpoint.Breakpoint;
 import com.bonitasoft.engine.bpm.breakpoint.impl.BreakpointImpl;
+import com.bonitasoft.engine.businessdata.MultipleBusinessDataReference;
+import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
+import com.bonitasoft.engine.businessdata.impl.MultipleBusinessDataReferenceImpl;
+import com.bonitasoft.engine.businessdata.impl.SimpleBusinessDataReferenceImpl;
+import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
+import com.bonitasoft.engine.core.process.instance.model.SSimpleRefBusinessDataInstance;
 import com.bonitasoft.engine.core.process.instance.model.breakpoint.SBreakpoint;
 import com.bonitasoft.engine.core.reporting.SReport;
 import com.bonitasoft.engine.core.reporting.SReportBuilder;
@@ -283,8 +289,7 @@ public final class SPModelConvertor extends ModelConvertor {
         final String displayName = (String) fields.get(PageField.DISPLAY_NAME);
         final String contentName = (String) fields.get(PageField.CONTENT_NAME);
         final SPageBuilder newSPageBuilder = BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
-                System.currentTimeMillis(), creatorUserId,
-                false, contentName, null);
+                System.currentTimeMillis(), creatorUserId, false, contentName);
         return newSPageBuilder.done();
     }
 
@@ -295,8 +300,16 @@ public final class SPModelConvertor extends ModelConvertor {
         final String displayName = (String) fields.get(PageField.DISPLAY_NAME);
         final String contentName = (String) fields.get(PageField.CONTENT_NAME);
         final SPageBuilder newSPageBuilder = BuilderFactory.get(SPageBuilderFactory.class).createNewInstance(name, description, displayName,
-                System.currentTimeMillis(), creatorUserId,
-                false, contentName, null);
+                System.currentTimeMillis(), creatorUserId, false, contentName);
         return newSPageBuilder.done();
     }
+
+    public static SimpleBusinessDataReference toSimpleBusinessDataReference(final SSimpleRefBusinessDataInstance sReference) {
+        return new SimpleBusinessDataReferenceImpl(sReference.getName(), sReference.getDataClassName(), sReference.getDataId());
+    }
+
+    public static MultipleBusinessDataReference toMultipleBusinessDataReference(final SMultiRefBusinessDataInstance sReference) {
+        return new MultipleBusinessDataReferenceImpl(sReference.getName(), sReference.getDataClassName(), sReference.getDataIds());
+    }
+
 }

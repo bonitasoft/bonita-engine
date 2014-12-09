@@ -49,9 +49,7 @@ public class BusinessArchiveFactory {
     }
 
     public static BusinessArchive readBusinessArchive(final InputStream inputStream) throws IOException, InvalidBusinessArchiveFormatException {
-        final File barFolder = File.createTempFile("tempBusinessArchive", "tmp");
-        barFolder.delete();
-        barFolder.mkdir();
+        final File barFolder = IOUtil.createTempDirectoryInDefaultTempDirectory("tempBusinessArchive");
         IOUtil.unzipToFolder(inputStream, barFolder);
 
         final BusinessArchive businessArchive = new BusinessArchive();
@@ -73,7 +71,7 @@ public class BusinessArchiveFactory {
 
     /**
      * Create a business archive from a valid file or folder
-     * 
+     *
      * @param barOrFolder
      * @return
      * @throws IOException
@@ -91,13 +89,13 @@ public class BusinessArchiveFactory {
                 }
             }
             return businessArchive;
-        } else {
-            final FileInputStream inputStream = new FileInputStream(barOrFolder);
-            try {
-                return readBusinessArchive(inputStream);
-            } finally {
-                inputStream.close();
-            }
+        }
+
+        final FileInputStream inputStream = new FileInputStream(barOrFolder);
+        try {
+            return readBusinessArchive(inputStream);
+        } finally {
+            inputStream.close();
         }
     }
 
@@ -105,10 +103,6 @@ public class BusinessArchiveFactory {
         if (folderPath.exists()) {
             if (!folderPath.isDirectory()) {
                 throw new IOException("unable to create Business archive on a file " + folderPath);
-                // } else {
-                // if (folderPath.listFiles().length > 0) {
-                // throw new IOException("unable to create Business archive on a non empty folder " + folderPath);
-                // }
             }
         } else {
             folderPath.mkdir();
@@ -119,9 +113,8 @@ public class BusinessArchiveFactory {
     }
 
     public static void writeBusinessArchiveToFile(final BusinessArchive businessArchive, final File businessArchiveFile) throws IOException {
-        final File tempFile = File.createTempFile("businessArchiveFolder", "tmp");// FIXME put it in tmp folder of the bonita home
-        tempFile.delete();
-        tempFile.mkdir();
+        // FIXME put it in tmp folder of the bonita home
+        final File tempFile = IOUtil.createTempDirectoryInDefaultTempDirectory("tempBarFolder");
         writeBusinessArchiveToFolder(businessArchive, tempFile);
         zipBarFolder(businessArchiveFile, tempFile);
         IOUtil.deleteDir(tempFile);

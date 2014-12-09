@@ -50,7 +50,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         super();
     }
 
-    public void generateBom(BusinessObjectModel bom, final File destDir) throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException, ClassNotFoundException {
+    public void generateBom(final BusinessObjectModel bom, final File destDir) throws IOException, JClassAlreadyExistsException, BusinessObjectModelValidationException, ClassNotFoundException {
         final BusinessObjectModelValidator validator = new BusinessObjectModelValidator();
         final ValidationStatus validationStatus = validator.validate(bom);
         if (!validationStatus.isOk()) {
@@ -60,11 +60,11 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         super.generate(destDir);
     }
 
-    private void buildJavaModelFromBom(BusinessObjectModel bom) throws JClassAlreadyExistsException, ClassNotFoundException {
+    private void buildJavaModelFromBom(final BusinessObjectModel bom) throws JClassAlreadyExistsException, ClassNotFoundException {
         if (bom == null) {
             throw new IllegalArgumentException("bom is null");
         }
-        final EntityCodeGenerator entityCodeGenerator = new EntityCodeGenerator(this,bom);
+        final EntityCodeGenerator entityCodeGenerator = new EntityCodeGenerator(this, bom);
         for (final BusinessObject bo : bom.getBusinessObjects()) {
             final JDefinedClass entity = entityCodeGenerator.addEntity(bo);
             addDAO(bo, entity);
@@ -93,17 +93,33 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
 
     private JMethod getSetterForParam(final JVar param, final JDefinedClass entity) {
         final String setterName = getSetterName(param);
-        return entity.getMethod(setterName, new JType[] { param.type() });
+        return findMethodWithSignature(param, entity, setterName);
+    }
+
+    private JMethod findMethodWithSignature(final JVar param, final JDefinedClass entity, final String name) {
+        for (final JMethod m : entity.methods()) {
+            if (!m.name().equals(name)) {
+                continue;
+            }
+
+            if (m.params().size() == 1) {
+                final JVar jVar = m.params().get(0);
+                if (jVar.type().equals(param.type()) || jVar.type().fullName().equals(param.type().fullName())) {
+                    return m;
+                }
+            }
+        }
+        return null;
     }
 
     private void addNotNullParamCheck(final JBlock methodBody, final JVar param) {
         methodBody._if(param.eq(JExpr._null()))._then()
-        ._throw(JExpr._new(getModel().ref(IllegalArgumentException.class)).arg(JExpr.lit(param.name() + " cannot be null")));
+                ._throw(JExpr._new(getModel().ref(IllegalArgumentException.class)).arg(JExpr.lit(param.name() + " cannot be null")));
     }
 
     protected abstract void addDAO(final BusinessObject bo, JDefinedClass entity) throws JClassAlreadyExistsException, ClassNotFoundException;
 
-    protected JDefinedClass createDAOInterface(final BusinessObject bo, final JDefinedClass entity) throws JClassAlreadyExistsException, ClassNotFoundException {
+    protected JDefinedClass createDAOInterface(final BusinessObject bo, final JDefinedClass entity) throws JClassAlreadyExistsException {
         final String daoInterfaceClassName = toDaoInterfaceClassname(bo);
         final JDefinedClass daoInterface = addInterface(daoInterfaceClassName);
         addInterface(daoInterface, BusinessObjectDAO.class.getName());
@@ -139,7 +155,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         return newInstanceMethod;
     }
 
-    protected JMethod createMethodForQuery(final JDefinedClass entity, final JDefinedClass targetClass, final Query query) throws ClassNotFoundException {
+    protected JMethod createMethodForQuery(final JDefinedClass entity, final JDefinedClass targetClass, final Query query) {
         final String methodName = query.getName();
         final JMethod queryMethod = createQueryMethod(entity, targetClass, methodName, query.getReturnType());
         for (final QueryParameter param : query.getQueryParameters()) {
@@ -149,8 +165,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         return queryMethod;
     }
 
-    private JMethod createQueryMethod(final JDefinedClass entity, final JDefinedClass targetClass, final String name, final String returnTypeName)
-            throws ClassNotFoundException {
+    private JMethod createQueryMethod(final JDefinedClass entity, final JDefinedClass targetClass, final String name, final String returnTypeName) {
         JType returnType;
         if (returnTypeName.equals(entity.fullName())) {
             returnType = entity;
@@ -168,7 +183,7 @@ public abstract class AbstractBDMCodeGenerator extends CodeGenerator {
         return bo.getQualifiedName() + DAO_SUFFIX;
     }
 
-    private void addOptionalPaginationParameters(final JMethod queryMethod, final String returnType) throws ClassNotFoundException {
+    private void addOptionalPaginationParameters(final JMethod queryMethod, final String returnType) {
         if (List.class.getName().equals(returnType)) {
             for (final String param : FORBIDDEN_PARAMETER_NAMES) {
                 queryMethod.param(getModel().ref(int.class.getName()), param);

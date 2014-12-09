@@ -61,13 +61,12 @@ public class ExecuteBDMQueryCommand extends TenantCommand {
             final List<? extends Serializable> list = businessDataRepository.findListByNamedQuery(queryName, resultClass, queryParameters, startIndex,
                     maxResults);
             return serializeResult((Serializable) list);
-        } else {
-            try {
-                final Serializable result = businessDataRepository.findByNamedQuery(queryName, resultClass, queryParameters);
-                return serializeResult(result);
-            } catch (final NonUniqueResultException e) {
-                throw new SCommandExecutionException(e);
-            }
+        }
+        try {
+            final Serializable result = businessDataRepository.findByNamedQuery(queryName, resultClass, queryParameters);
+            return serializeResult(result);
+        } catch (final NonUniqueResultException e) {
+            throw new SCommandExecutionException(e);
         }
     }
 

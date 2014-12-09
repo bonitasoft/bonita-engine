@@ -16,6 +16,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
@@ -28,6 +30,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import com.bonitasoft.manager.Features;
+import com.bonitasoft.manager.Manager;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
@@ -35,7 +39,6 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
 import org.bonitasoft.engine.persistence.SelectByIdDescriptor;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.recorder.SRecorderException;
@@ -45,6 +48,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -56,6 +60,7 @@ public class ReportingServiceImplTest {
 
     private static String lineSeparator = "\n";
 
+    @InjectMocks
     private ReportingServiceImpl reportingService;
 
     @Mock
@@ -70,11 +75,27 @@ public class ReportingServiceImplTest {
     @Mock
     private QueryPreProcessor preProcessor;
 
+    @Mock
+    private Manager manager;
+
+    @Mock
+    private DefaultReportImporter defaultProfileImporter;
+
+    @Mock
+    private EventService eventService;
+
+    @Mock
+    private TechnicalLoggerService technicalLoggerService;
+
+    @Mock
+    private QueriableLoggerService queriableLoggerService;
+
+    @Mock
+    private DataSource dataSource;
+
     @Before
     public void setUp() throws Exception {
-        DataSource dataSource = mock(DataSource.class);
         when(dataSource.getConnection()).thenReturn(connection);
-        reportingService = new ReportingServiceImpl(dataSource, persistence, preProcessor, recorder, mock(EventService.class), mock(TechnicalLoggerService.class), mock(QueriableLoggerService.class));
     }
 
     private SReport aReport(final long reportId) {
@@ -160,7 +181,7 @@ public class ReportingServiceImplTest {
         assertEquals(expectedReportNumber, numberOfReports);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void getNumberOfReportsThrowsException() throws SBonitaException {
         final QueryOptions options = mock(QueryOptions.class);
         when(persistence.getNumberOfEntities(SReport.class, options, null)).thenThrow(new SBonitaReadException("ouch!"));
@@ -181,7 +202,7 @@ public class ReportingServiceImplTest {
         assertEquals(expected, reports);
     }
 
-    @Test(expected = SBonitaSearchException.class)
+    @Test(expected = SBonitaReadException.class)
     public void searchReportsThrowsException() throws SBonitaException {
         final QueryOptions options = mock(QueryOptions.class);
         when(persistence.searchEntity(SReport.class, options, null)).thenThrow(new SBonitaReadException("ouch!"));
@@ -236,5 +257,29 @@ public class ReportingServiceImplTest {
         InOrder inOrder = inOrder(preProcessor, reportingServicespy);
         inOrder.verify(preProcessor).preProcessFor(Vendor.OTHER, "SELECT something FROM somewhere");
         inOrder.verify(reportingServicespy).executeQuery(anyString(), any(Statement.class));
+    }
+
+    @Test
+    public void should_start_import_default_report() throws Exception {
+        //given
+
+        //when
+        reportingService.start();
+
+        //then
+        verify(defaultProfileImporter,times(3)).invoke(anyString());
+    }
+
+    @Test
+    public void should_start_import_default_report_with_traceability_licence() throws Exception {
+        //given
+        doReturn(true).when(manager).isFeatureActive(Features.TRACEABILITY);
+        reportingService = new ReportingServiceImpl(dataSource,persistence,preProcessor,recorder,eventService,technicalLoggerService,queriableLoggerService,manager,defaultProfileImporter);
+
+        //when
+        reportingService.start();
+
+        //then
+        verify(defaultProfileImporter,times(4)).invoke(anyString());
     }
 }

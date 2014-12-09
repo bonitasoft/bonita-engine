@@ -19,15 +19,14 @@ import java.util.Map;
  * 
  * @author Emmanuel Duchastenier
  * @author Aurelien Pupier - This file need to be Serializable
+ * @see com.bonitasoft.engine.platform.Tenant
+ * @since 6.0.0
  */
-public class TenantCreator implements Serializable{
+public class TenantCreator implements Serializable {
 
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -6904933424057070693L;
+    private static final long serialVersionUID = -6904933424057070693L;
 
-	public enum TenantField {
+    public enum TenantField {
         NAME, DESCRIPTION, ICON_NAME, ICON_PATH, DEFAULT_TENANT,
 
         /**
@@ -73,11 +72,6 @@ public class TenantCreator implements Serializable{
         fields.put(TenantField.ICON_PATH, iconPath);
         return this;
     }
-
-    // public TenantCreator setCreatedBy(final String createdBy) {
-    // fields.put(TenantField.CREATED_BY, createdBy);
-    // return this;
-    // }
 
     public TenantCreator setDefaultTenant(final boolean defaultTenant) {
         fields.put(TenantField.DEFAULT_TENANT, defaultTenant);

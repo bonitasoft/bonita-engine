@@ -7,6 +7,15 @@
         		<entry key="ACTOR_CREATED:INTERNAL" value="true" />
         		<entry key="ACTOR_DELETED:INTERNAL" value="true" />
         		<entry key="ACTOR_UPDATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_CREATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_DELETED:INTERNAL" value="true" />
+                <entry key="APPLICATION_UPDATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_PAGE_CREATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_PAGE_DELETED:INTERNAL" value="true" />
+                <entry key="APPLICATION_PAGE_UPDATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_MENU_CREATED:INTERNAL" value="true" />
+                <entry key="APPLICATION_MENU_DELETED:INTERNAL" value="true" />
+                <entry key="APPLICATION_MENU_UPDATED:INTERNAL" value="true" />
         		<entry key="BREAKPOINT_CREATED:INTERNAL" value="true" />
         		<entry key="BREAKPOINT_DELETED:INTERNAL" value="true" />
         		<entry key="CATEGORY_CREATED:INTERNAL" value="true" />
@@ -97,6 +106,7 @@
         		<entry key="REF_BUSINESS_DATA_INSTANCE_DELETED:INTERNAL" value="true" />
         		<entry key="REPORT_CREATED:INTERNAL" value="true" />
         		<entry key="REPORT_DELETED:INTERNAL" value="true" />
+        		<entry key="REPORT_UPDATED:INTERNAL" value="true" />
         		<entry key="SCHEDULER_SCHEDULED:INTERNAL" value="false" />
         		<entry key="SUPERVISOR_CREATED:INTERNAL" value="true" />
         		<entry key="SUPERVISOR_DELETED:INTERNAL" value="true" />

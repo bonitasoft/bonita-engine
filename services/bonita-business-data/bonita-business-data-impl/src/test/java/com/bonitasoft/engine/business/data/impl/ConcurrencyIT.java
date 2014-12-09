@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.business.data.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -5,7 +13,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 import javax.naming.Context;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 import javax.transaction.UserTransaction;
 
@@ -38,7 +44,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import bitronix.tm.TransactionManagerServices;
 
-import com.bonitasoft.pojo.Employee;
+import com.company.pojo.Employee;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
@@ -65,7 +71,7 @@ public class ConcurrencyIT {
     private UserTransaction ut;
 
     @BeforeClass
-    public static void initializeBitronix() throws NamingException, SQLException {
+    public static void initializeBitronix() {
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
         TransactionManagerServices.getConfiguration().setJournal(null);
     }
@@ -100,7 +106,7 @@ public class ConcurrencyIT {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         businessDataRepository.stop();
 
         final JdbcTemplate jdbcTemplate = new JdbcTemplate(modelDatasource);

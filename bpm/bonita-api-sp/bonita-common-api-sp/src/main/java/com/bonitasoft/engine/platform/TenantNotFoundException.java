@@ -11,8 +11,13 @@ package com.bonitasoft.engine.platform;
 import org.bonitasoft.engine.exception.BonitaException;
 
 /**
+ * Thrown when an exception happens during the retrieving of a tenant
+ *
  * @author Lu Kai
  * @author Matthieu Chaffotte
+ * @see com.bonitasoft.engine.api.PlatformAPI#getTenantByName(String)
+ * @see com.bonitasoft.engine.api.PlatformAPI#getTenantById(long)
+ * @since 6.0.0
  */
 public class TenantNotFoundException extends BonitaException {
 

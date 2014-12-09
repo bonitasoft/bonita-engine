@@ -24,8 +24,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
+import org.bonitasoft.engine.api.impl.DocumentAPIImpl;
 import org.bonitasoft.engine.api.impl.ProcessAPIImpl;
-import org.bonitasoft.engine.api.impl.ProcessManagementAPIImplDelegate;
 import org.bonitasoft.engine.api.impl.SessionInfos;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsDefinitionLevel;
 import org.bonitasoft.engine.api.impl.transaction.expression.EvaluateExpressionsInstanceLevel;
@@ -44,6 +44,7 @@ import org.bonitasoft.engine.bpm.connector.ConnectorInstanceWithFailureInfo;
 import org.bonitasoft.engine.bpm.connector.ConnectorState;
 import org.bonitasoft.engine.bpm.connector.ConnectorStateReset;
 import org.bonitasoft.engine.bpm.connector.InvalidConnectorImplementationException;
+import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityExecutionException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
@@ -51,6 +52,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
+import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -119,7 +121,7 @@ import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.persistence.search.FilterOperationType;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
@@ -147,11 +149,18 @@ import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
 import com.bonitasoft.engine.bpm.parameter.impl.ParameterImpl;
 import com.bonitasoft.engine.bpm.process.Index;
 import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
+import com.bonitasoft.engine.businessdata.BusinessDataReference;
+import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
+import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
+import com.bonitasoft.engine.core.process.instance.model.SMultiRefBusinessDataInstance;
+import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstance;
+import com.bonitasoft.engine.core.process.instance.model.SSimpleRefBusinessDataInstance;
 import com.bonitasoft.engine.parameter.OrderBy;
 import com.bonitasoft.engine.parameter.ParameterService;
 import com.bonitasoft.engine.parameter.SParameter;
 import com.bonitasoft.engine.parameter.SParameterProcessNotFoundException;
 import com.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
+import com.bonitasoft.engine.service.SPModelConvertor;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.bonitasoft.engine.service.impl.LicenseChecker;
 import com.bonitasoft.engine.service.impl.ServiceAccessorFactory;
@@ -175,14 +184,13 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         }
     }
 
-    @Override
-    protected ProcessManagementAPIImplDelegate instantiateProcessManagementAPIDelegate() {
-        return new ProcessManagementAPIExtDelegate();
+    public ProcessAPIExt() {
+        super(new ProcessManagementAPIExtDelegate(), new DocumentAPIImpl());
     }
 
     @Override
     public void importParameters(final long processDefinitionId, final byte[] parameters) throws ImportParameterException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_PARAMETER);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.CREATE_PARAMETER);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         SProcessDefinition sDefinition = null;
         if (processDefinitionId > 0) {
@@ -349,28 +357,27 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ManualTaskInstance addManualUserTask(final ManualTaskCreator creator) throws CreationException, AlreadyExistsException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_MANUAL_TASK);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.CREATE_MANUAL_TASK);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
 
         final Map<ManualTaskField, Serializable> fields = creator.getFields();
-        final TaskPriority taskPriority = fields.get(ManualTaskField.PRIORITY) != null ? (TaskPriority) fields.get(ManualTaskField.PRIORITY)
-                : TaskPriority.NORMAL;
-        final long humanTaskId = (Long) fields.get(ManualTaskField.PARENT_TASK_ID);
+
+        final long parentHumanTaskId = (Long) fields.get(ManualTaskField.PARENT_TASK_ID);
         final long loggedUserId = SessionInfos.getUserIdFromSession();
         try {
-            final SActivityInstance activityInstance = getSActivityInstance(humanTaskId);
-            if (!(activityInstance instanceof SHumanTaskInstance)) {
+            final SActivityInstance parentActivityInstance = getSActivityInstance(parentHumanTaskId);
+            if (!(parentActivityInstance instanceof SHumanTaskInstance)) {
                 throw new CreationException("The parent activity is not a Human task");
             }
-            if (((SHumanTaskInstance) activityInstance).getAssigneeId() != loggedUserId) {
+            if (((SHumanTaskInstance) parentActivityInstance).getAssigneeId() != loggedUserId) {
                 throw new CreationException("Unable to create a child task from this task, it's not assigned to you!");
             }
 
-            final SManualTaskInstance createManualUserTask = createManualUserTask(activityInstanceService, fields, taskPriority, humanTaskId);
+            final SManualTaskInstance createManualUserTask = createManualUserTask(tenantAccessor, fields, parentHumanTaskId);
             executeFlowNode(loggedUserId, createManualUserTask.getId(), false /* wrapInTransaction */);// put it in ready
-            addActivityInstanceTokenCount(activityInstanceService, activityInstance);
+            addActivityInstanceTokenCount(activityInstanceService, parentActivityInstance);
 
             return ModelConvertor.toManualTask(createManualUserTask, flowNodeStateManager);
         } catch (final SBonitaException e) {
@@ -385,24 +392,31 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         activityInstanceService.setTokenCount(activityInstance, tokenCount);
     }
 
-    private SManualTaskInstance createManualUserTask(final ActivityInstanceService activityInstanceService, final Map<ManualTaskField, Serializable> fields,
-            final TaskPriority taskPriority, final long humanTaskId) throws SActivityCreationException, SFlowNodeNotFoundException, SFlowNodeReadException {
+    private SManualTaskInstance createManualUserTask(final TenantServiceAccessor tenantAccessor, final Map<ManualTaskField, Serializable> fields,
+            final long parentHumanTaskId) throws SFlowNodeNotFoundException, SFlowNodeReadException, SActivityCreationException {
+        final BPMInstancesCreator bpmInstancesCreator = tenantAccessor.getBPMInstancesCreator();
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+
         final Date dueDate = (Date) fields.get(ManualTaskField.DUE_DATE);
         long dueTime = 0L;
         if (dueDate != null) {
             dueTime = dueDate.getTime();
         }
-        final SManualTaskInstance createManualUserTask = activityInstanceService.createManualUserTask(humanTaskId,
+
+        final TaskPriority taskPriority = fields.get(ManualTaskField.PRIORITY) != null ? (TaskPriority) fields.get(ManualTaskField.PRIORITY)
+                : TaskPriority.NORMAL;
+
+        final SManualTaskInstance sManualTaskInstance = bpmInstancesCreator.createManualTaskInstance(parentHumanTaskId,
                 (String) fields.get(ManualTaskField.TASK_NAME), -1L,
                 (String) fields.get(ManualTaskField.DISPLAY_NAME), (Long) fields.get(ManualTaskField.ASSIGN_TO),
-                (String) fields.get(ManualTaskField.DESCRIPTION), dueTime,
-                STaskPriority.valueOf(taskPriority.name()));
-        return createManualUserTask;
+                (String) fields.get(ManualTaskField.DESCRIPTION), dueTime, STaskPriority.valueOf(taskPriority.name()));
+        activityInstanceService.createActivityInstance(sManualTaskInstance);
+        return sManualTaskInstance;
     }
 
     @Override
     public void deleteManualUserTask(final long manualTaskId) throws DeletionException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_MANUAL_TASK);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.CREATE_MANUAL_TASK);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
@@ -513,7 +527,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void setConnectorInstanceState(final Map<Long, ConnectorStateReset> connectorsToReset) throws UpdateException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.SET_CONNECTOR_STATE);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.SET_CONNECTOR_STATE);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         try {
@@ -539,7 +553,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public void setConnectorImplementation(final long processDefinitionId, final String connectorId, final String connectorVersion,
             final byte[] connectorImplementationArchive) throws InvalidConnectorImplementationException, UpdateException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.POST_DEPLOY_CONFIG);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.POST_DEPLOY_CONFIG);
 
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorService connectorService = tenantAccessor.getConnectorService();
@@ -570,7 +584,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public void replayActivity(final long activityInstanceId, final Map<Long, ConnectorStateReset> connectorsToReset) throws ActivityExecutionException,
     ActivityInstanceNotFoundException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.REPLAY_ACTIVITY);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.REPLAY_ACTIVITY);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
@@ -982,7 +996,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
                 || processDefinition.getStringIndexValue(3) != null || processDefinition.getStringIndexLabel(3) != null
                 || processDefinition.getStringIndexValue(4) != null || processDefinition.getStringIndexLabel(4) != null
                 || processDefinition.getStringIndexValue(5) != null || processDefinition.getStringIndexLabel(5) != null) {
-            LicenseChecker.getInstance().checkLicenceAndFeature(Features.SEARCH_INDEX);
+            LicenseChecker.getInstance().checkLicenseAndFeature(Features.SEARCH_INDEX);
         }
 
         return super.deploy(businessArchive);
@@ -1045,7 +1059,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public ConnectorInstanceWithFailureInfo getConnectorInstanceWithFailureInformation(final long connectorInstanceId)
             throws ConnectorInstanceNotFoundException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.REPLAY_ACTIVITY);
+        LicenseChecker.getInstance().checkLicenseAndFeature(Features.REPLAY_ACTIVITY);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         SConnectorInstanceWithFailureInfo serverObject;
@@ -1117,7 +1131,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final QueryOptions countOptions = new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS, null, filterOptions, null);
         try {
             return supervisorService.getNumberOfProcessSupervisors(countOptions);
-        } catch (final SBonitaSearchException e) {
+        } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
         }
     }
@@ -1201,6 +1215,45 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         return new EvaluateExpressionsInstanceLevelAndArchivedExt(expressions, containerId, containerType, processDefinitionId, time, expressionService,
                 getTenantAccessor()
                 .getBusinessDataRepository());
+    }
+
+    @Override
+    public BusinessDataReference getProcessBusinessDataReference(final String businessDataName, final long processInstanceId) throws DataNotFoundException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        try {
+            final RefBusinessDataService refBusinessDataService = tenantAccessor.getRefBusinessDataService();
+            final SRefBusinessDataInstance sReference = refBusinessDataService.getRefBusinessDataInstance(businessDataName,
+                    processInstanceId);
+            if (sReference instanceof SSimpleRefBusinessDataInstance) {
+                return SPModelConvertor.toSimpleBusinessDataReference((SSimpleRefBusinessDataInstance) sReference);
+            } else {
+                return SPModelConvertor.toMultipleBusinessDataReference((SMultiRefBusinessDataInstance) sReference);
+            }
+        } catch (final SRefBusinessDataInstanceNotFoundException srbdnfe) {
+            throw new DataNotFoundException(srbdnfe);
+        } catch (final SBonitaReadException sbre) {
+            throw new RetrieveException(sbre);
+        }
+    }
+
+    @Override
+    public List<BusinessDataReference> getProcessBusinessDataReferences(final long processInstanceId, final int startIndex, final int maxResults) {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        try {
+            final RefBusinessDataService refBusinessDataService = tenantAccessor.getRefBusinessDataService();
+            final List<SRefBusinessDataInstance> sReferences = refBusinessDataService.getRefBusinessDataInstances(processInstanceId, startIndex, maxResults);
+            final List<BusinessDataReference> references = new ArrayList<BusinessDataReference>();
+            for (final SRefBusinessDataInstance sReference : sReferences) {
+                if (sReference instanceof SSimpleRefBusinessDataInstance) {
+                    references.add(SPModelConvertor.toSimpleBusinessDataReference((SSimpleRefBusinessDataInstance) sReference));
+                } else {
+                    references.add(SPModelConvertor.toMultipleBusinessDataReference((SMultiRefBusinessDataInstance) sReference));
+                }
+            }
+            return references;
+        } catch (final SBonitaReadException sbre) {
+            throw new RetrieveException(sbre);
+        }
     }
 
 }

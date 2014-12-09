@@ -11,14 +11,18 @@ package com.bonitasoft.engine.core.reporting;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.bonitasoft.engine.commons.TenantLifecycleService;
+import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
+import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 
 /**
  * @author Matthieu Chaffotte
  */
-public interface ReportingService {
+public interface ReportingService extends TenantLifecycleService {
 
     String REPORT = "REPORT";
 
@@ -39,12 +43,13 @@ public interface ReportingService {
      */
     SReport getReportByName(String reportName) throws SBonitaReadException;
 
-    long getNumberOfReports(QueryOptions options) throws SBonitaSearchException;
+    long getNumberOfReports(QueryOptions options) throws SBonitaReadException;
 
-    List<SReport> searchReports(QueryOptions options) throws SBonitaSearchException;
+    List<SReport> searchReports(QueryOptions options) throws SBonitaReadException;
 
     void deleteReport(long reportId) throws SReportDeletionException, SReportNotFoundException;
 
     byte[] getReportContent(long reportId) throws SBonitaReadException, SReportNotFoundException;
 
+    SReport update(SReport report, EntityUpdateDescriptor entityUpdateDescriptor) throws SObjectModificationException;
 }

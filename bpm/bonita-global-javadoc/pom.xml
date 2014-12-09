@@ -1,109 +1,112 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<artifactId>bpm</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.5.0-SNAPSHOT</version>
 	</parent>
 
+    <name>Bonita Global Javadoc</name>
 	<artifactId>bonita-global-javadoc</artifactId>
-
-	<name>Bonita Global Javadoc</name>
-
-	<dependencies>
-		<dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-common-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-common-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.util</groupId>
-			<artifactId>bonita-client-util</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-common-api-sp</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-common-api-impl-sp</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.util</groupId>
-			<artifactId>bonita-client-util-sp</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>javadoc-jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<doctitle>Bonita BPM Engine ${project.version} API</doctitle>
-							<windowtitle>Bonita BPM Engine ${project.version} API</windowtitle>
-							<finalName>Bonita-BPM-Engine-${project.version}</finalName>
-        					<stylesheetfile>stylesheet.css</stylesheetfile>
-							<includeDependencySources>true</includeDependencySources>
-							<!-- cannot use generic "*.impl" because the package "*.process.impl" contains builders to be published -->
-							<excludePackageNames>
-								*.internal,
-								*.breakpoint,org.bonitasoft.engine.api.impl,
-								*.tcp,
-								*.actor.impl,
-								*.xml,
-								*.businessdata.impl,
-								*.category.impl,
-								*.comment.impl,
-								*.connector.impl,
-								*.data.impl,
-								*.document.impl,
-								*.parameter.impl,
-								*.supervisor.impl,
-								*.userfilter.impl,
-								*.entitymember.impl,
-								*.identity.impl,
-								*.io,
-								*.job.impl,
-								*.command.impl,
-								*.platform.impl,
-								*.profile.impl,
-								*.session.impl,
-								*.theme.impl,
-								*.log.impl,
-								*.monitoring.impl,
-								*.page.impl,
-								*.reporting.impl
-							</excludePackageNames>
-						</configuration>
-						</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
 	
-	<profiles>
-		<profile>
-			<id>javadoc</id>
-			<properties>
-				<maven.javadoc.skip>false</maven.javadoc.skip>
-			</properties>
-		</profile>
-	</profiles>
+    <dependencies>
+        <dependency>
+            <groupId>org.bonitasoft.engine.api</groupId>
+            <artifactId>bonita-common-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.api</groupId>
+            <artifactId>bonita-common-api-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.util</groupId>
+            <artifactId>bonita-client-util</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bonitasoft.engine.api</groupId>
+            <artifactId>bonita-common-api-sp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bonitasoft.engine.api</groupId>
+            <artifactId>bonita-common-api-impl-sp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bonitasoft.engine.util</groupId>
+            <artifactId>bonita-client-util-sp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>javadoc-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <doctitle>Bonita BPM Engine ${project.version} API</doctitle>
+                            <windowtitle>Bonita BPM Engine ${project.version} API</windowtitle>
+                            <finalName>Bonita-BPM-Engine-${project.version}</finalName>
+                            <stylesheetfile>stylesheet.css</stylesheetfile>
+                            <includeDependencySources>true</includeDependencySources>
+                            <!-- cannot use generic "*.impl" because the package "*.process.impl" contains builders to be published -->
+                            <excludePackageNames>
+                                *.internal,
+                                *.breakpoint,org.bonitasoft.engine.api.impl,
+                                *.tcp,
+                                *.actor.impl,
+                                *.xml,
+                                *.businessdata.impl,
+                                *.category.impl,
+                                *.comment.impl,
+                                *.connector.impl,
+                                *.data.impl,
+                                *.document.impl,
+                                *.parameter.impl,
+                                *.supervisor.impl,
+                                *.userfilter.impl,
+                                *.entitymember.impl,
+                                *.identity.impl,
+                                *.io,
+                                *.job.impl,
+                                *.command.impl,
+                                *.platform.impl,
+                                *.profile.impl,
+                                *.session.impl,
+                                *.theme.impl,
+                                *.log.impl,
+                                *.monitoring.impl,
+                                *.page.impl,
+                                *.reporting.impl,
+                                *.search.impl,
+                                *.expression.impl,
+                                *.operation.impl
+                            </excludePackageNames>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>javadoc</id>
+            <properties>
+                <maven.javadoc.skip>false</maven.javadoc.skip>
+            </properties>
+        </profile>
+    </profiles>
 </project>

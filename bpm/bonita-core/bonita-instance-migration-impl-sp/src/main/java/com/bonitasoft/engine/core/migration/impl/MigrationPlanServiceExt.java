@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -28,7 +28,6 @@ import org.bonitasoft.engine.persistence.ReadPersistenceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.recorder.Recorder;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.xml.ParserFactory;
 
 import com.bonitasoft.engine.core.process.instance.api.BreakpointService;
@@ -46,12 +45,9 @@ public class MigrationPlanServiceExt extends MigrationPlanServiceImpl {
     private final int interruptingStateId;
 
     public MigrationPlanServiceExt(final Recorder recorder, final ReadPersistenceService persistenceService, final EventService eventService,
-            final ParserFactory parserFactory,
-            final CacheService cacheService, final ReadSessionAccessor sessionAccessor, final ProcessInstanceService processInstanceService,
-            final BreakpointService breakpointService, final int interruptingStateId,
-            final QueriableLoggerService queriableLoggerService) {
-        super(recorder, persistenceService, eventService, parserFactory, cacheService, sessionAccessor,
-                processInstanceService, queriableLoggerService);
+            final ParserFactory parserFactory, final CacheService cacheService, final ProcessInstanceService processInstanceService,
+            final BreakpointService breakpointService, final int interruptingStateId, final QueriableLoggerService queriableLoggerService) {
+        super(recorder, persistenceService, eventService, parserFactory, cacheService, processInstanceService, queriableLoggerService);
         this.breakpointService = breakpointService;
         this.interruptingStateId = interruptingStateId;
     }

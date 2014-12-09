@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2014 Bonitasoft S.A.
+ * Bonitasoft is a trademark of Bonitasoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * Bonitasoft, 32 rue Gustave Eiffel 38000 Grenoble
+ * or Bonitasoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bdm.dao.client.resources.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -7,7 +15,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.bonitasoft.engine.bdm.dao.client.resources.utils.EntityGetter;
 import com.bonitasoft.engine.bdm.proxy.model.Address;
 import com.bonitasoft.engine.bdm.proxy.model.Employee;
 
@@ -81,7 +88,7 @@ public class EntityGetterTest {
 
         assertThat(namedQuery).isEqualTo("Employee.findManagerByEmployeePersistenceId");
     }
-    
+
     @Test
     public void should_be_able_to_determine_if_getter_return_a_list() throws Exception {
         Method multipleObjectGetter = Employee.class.getMethod("getAddresses");
@@ -90,7 +97,7 @@ public class EntityGetterTest {
 
         assertThat(isList).isTrue();
     }
-    
+
     @Test
     public void should_be_able_to_determine_if_getter_do_not_return_a_list() throws Exception {
         Method multipleObjectGetter = Employee.class.getMethod("getManager");

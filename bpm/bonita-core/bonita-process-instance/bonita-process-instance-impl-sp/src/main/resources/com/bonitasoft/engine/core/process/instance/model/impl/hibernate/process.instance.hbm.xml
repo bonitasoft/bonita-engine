@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false" default-access="field" package="com.bonitasoft.engine.core.process.instance.model.impl">
+
+    <filter-def name="tenantFilter" condition=":tenantId = tenantid">
+        <filter-param name="tenantId" type="long" />
+    </filter-def>
+
+    <class name="com.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl" table="breakpoint">
+        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+            <key-property name="tenantId" column="tenantid" type="long" />
+            <key-property name="id" column="id" type="long" />
+        </composite-id>
+        <property name="stateId" column="state_id" />
+        <property name="interruptedStateId" column="int_state_id" />
+        <property name="elementName" column="elem_name" />
+        <property name="isInstanceScope" column="inst_scope" />
+        <property name="instanceId" column="inst_id" />
+        <property name="definitionId" column="def_id" />
+        <filter name="tenantFilter" />
+    </class>
+
+    <class name="SRefBusinessDataInstanceImpl" abstract="true" table="ref_biz_data_inst">
+        <composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
+            <key-property name="tenantId" column="tenantid" type="long" />
+            <key-property name="id" column="id" type="long" />
+        </composite-id>
+        <discriminator column="kind" type="string" />
+        <property name="name" column="name" />
+        <property name="dataClassName" column="data_classname" />
+        <filter name="tenantFilter" />
+    </class>
+
+    <subclass name="SSimpleRefBusinessDataInstanceImpl" extends="SRefBusinessDataInstanceImpl" abstract="true">
+        <property name="dataId" column="data_id" />
+    </subclass>
+
+    <subclass name="SMultiRefBusinessDataInstanceImpl" extends="SRefBusinessDataInstanceImpl" abstract="true">
+        <list name="dataIds" table="multi_biz_data">
+            <key>
+                <column name="tenantid" />
+                <column name="id" />
+            </key>
+            <list-index column="idx" />
+            <element column="data_id" type="long" />
+        </list>
+    </subclass>
+
+    <subclass name="SProcessSimpleRefBusinessDataInstanceImpl" extends="SSimpleRefBusinessDataInstanceImpl" discriminator-value="proc_simple_ref">
+         <property name="processInstanceId" column="proc_inst_id" />
+    </subclass>
+
+    <subclass name="SProcessMultiRefBusinessDataInstanceImpl" extends="SMultiRefBusinessDataInstanceImpl" discriminator-value="proc_multi_ref">
+         <property name="processInstanceId" column="proc_inst_id" />
+    </subclass>
+
+     <subclass name="SFlowNodeSimpleRefBusinessDataInstanceImpl" extends="SSimpleRefBusinessDataInstanceImpl" discriminator-value="fn_simple_ref">
+         <property name="flowNodeInstanceId" column="fn_inst_id" />
+    </subclass>
+
+</hibernate-mapping>

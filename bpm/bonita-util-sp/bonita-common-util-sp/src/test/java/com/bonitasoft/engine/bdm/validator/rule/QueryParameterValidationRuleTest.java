@@ -1,3 +1,11 @@
+/*******************************************************************************
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
+ * BonitaSoft is a trademark of BonitaSoft SA.
+ * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
+ * For commercial licensing information, contact:
+ * BonitaSoft, 32 rue Gustave Eiffel – 38000 Grenoble
+ * or BonitaSoft US, 51 Federal Street, Suite 305, San Francisco, CA 94107
+ *******************************************************************************/
 package com.bonitasoft.engine.bdm.validator.rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,7 +21,7 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
 public class QueryParameterValidationRuleTest {
 
     @Test
-    public void checkRuleShouldForbidStartIndexAsQueryParameterName() throws Exception {
+    public void checkRuleShouldForbidStartIndexAsQueryParameterName() {
         QueryParameter queryParam = new QueryParameter("startIndex", Object.class.getName());
 
         ValidationStatus status = new QueryParameterValidationRule().validate(queryParam);
@@ -22,7 +30,7 @@ public class QueryParameterValidationRuleTest {
     }
 
     @Test
-    public void checkRuleShouldForbidMaxResultsAsQueryParameterName() throws Exception {
+    public void checkRuleShouldForbidMaxResultsAsQueryParameterName() {
         QueryParameter queryParam = new QueryParameter("maxResults", Object.class.getName());
 
         ValidationStatus status = new QueryParameterValidationRule().validate(queryParam);
@@ -32,7 +40,7 @@ public class QueryParameterValidationRuleTest {
     }
 
     @Test
-    public void aQueryParameterNameShouldHaveAName() throws Exception {
+    public void aQueryParameterNameShouldHaveAName() {
         QueryParameter queryParam = new QueryParameter();
 
         ValidationStatus status = new QueryParameterValidationRule().validate(queryParam);
@@ -41,7 +49,7 @@ public class QueryParameterValidationRuleTest {
     }
 
     @Test
-    public void aQueryParameterNameShouldHaveANonEmptyName() throws Exception {
+    public void aQueryParameterNameShouldHaveANonEmptyName() {
         QueryParameter queryParam = new QueryParameter("", Object.class.getName());
 
         ValidationStatus status = new QueryParameterValidationRule().validate(queryParam);
@@ -50,7 +58,7 @@ public class QueryParameterValidationRuleTest {
     }
 
     @Test
-    public void aQueryParameterNameShouldHaveAVAlidJavaIdentifierName() throws Exception {
+    public void aQueryParameterNameShouldHaveAVAlidJavaIdentifierName() {
         QueryParameter queryParam = new QueryParameter("1_manu", Object.class.getName());
 
         ValidationStatus status = new QueryParameterValidationRule().validate(queryParam);
@@ -59,7 +67,7 @@ public class QueryParameterValidationRuleTest {
     }
 
     @Test
-    public void aQueryParameterClassNameShouldHaveAName() throws Exception {
+    public void aQueryParameterClassNameShouldHaveAName() {
         QueryParameter queryParam = new QueryParameter("aValidParamName", null);
 
         ValidationStatus status = new QueryParameterValidationRule().validate(queryParam);
@@ -68,7 +76,7 @@ public class QueryParameterValidationRuleTest {
     }
 
     @Test
-    public void aQueryParameterClassNameShouldHaveANonEmptyName() throws Exception {
+    public void aQueryParameterClassNameShouldHaveANonEmptyName() {
         QueryParameter queryParam = new QueryParameter("aValidParamName", "");
 
         ValidationStatus status = new QueryParameterValidationRule().validate(queryParam);

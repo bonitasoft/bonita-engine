@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bpm</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.5.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-client-sp</artifactId>
@@ -15,17 +15,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.api</groupId>
 			<artifactId>bonita-client-api-local</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.bonitasoft.engine</groupId>
-					<artifactId>bonita-common</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-client-api-ejb2</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
@@ -99,7 +88,6 @@
 							<artifactSet>
 								<includes>
 									<include>org.bonitasoft.engine.api:bonita-client-api-local</include>
-									<include>org.bonitasoft.engine.api:bonita-client-api-ejb2</include>
 									<include>org.bonitasoft.engine.api:bonita-client-api-ejb3</include>
 									<include>org.bonitasoft.engine.api:bonita-client-api-http</include>
 									<include>org.bonitasoft.engine.api:bonita-client-api-tcp</include>
@@ -110,7 +98,7 @@
 							<outputDirectory>${project.build.directory}</outputDirectory>
 							<promoteTransitiveDependencies>true</promoteTransitiveDependencies>
 							<createDependencyReducedPom>true</createDependencyReducedPom>
-							<createSourcesJar>true</createSourcesJar>
+							<createSourcesJar>${create.sources.jar}</createSourcesJar>
 						</configuration>
 					</execution>
 				</executions>

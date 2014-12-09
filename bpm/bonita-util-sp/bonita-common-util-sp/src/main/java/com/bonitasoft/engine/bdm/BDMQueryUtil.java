@@ -71,12 +71,13 @@ public class BDMQueryUtil {
         return nameBuilder.toString();
     }
 
-    public static String getSimpleBusinessObjectName(String businessObjectName) {
-        final int lastIndexOf = businessObjectName.lastIndexOf(".");
+    public static String getSimpleBusinessObjectName(final String businessObjectName) {
+        String newBusinessObjectName = businessObjectName;
+        final int lastIndexOf = newBusinessObjectName.lastIndexOf(".");
         if (lastIndexOf != -1) {
-            businessObjectName = businessObjectName.substring(lastIndexOf + 1, businessObjectName.length());
+            newBusinessObjectName = newBusinessObjectName.substring(lastIndexOf + 1, newBusinessObjectName.length());
         }
-        return businessObjectName;
+        return newBusinessObjectName;
     }
 
     public static Query createQueryForUniqueConstraint(final BusinessObject businessObject, final UniqueConstraint uniqueConstraint) {
@@ -185,7 +186,7 @@ public class BDMQueryUtil {
         final String name = createQueryNameForLazyField(businessObject, field);
         final String content = createQueryContentForLazyField(businessObject.getQualifiedName(), field);
         final Query q = new Query(name, content, field.getReference().getQualifiedName());
-        if(field.isCollection()){
+        if (field.isCollection()) {
             q.setReturnType(List.class.getName());
         }
         q.addQueryParameter(Field.PERSISTENCE_ID, Long.class.getName());

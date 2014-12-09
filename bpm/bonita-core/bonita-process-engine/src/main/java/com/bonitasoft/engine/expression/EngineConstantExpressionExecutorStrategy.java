@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 - 2014 BonitaSoft S.A.
+ * Copyright (C) 2009, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -13,8 +13,8 @@ import org.bonitasoft.engine.api.impl.APIAccessorImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
 import org.bonitasoft.engine.sessionaccessor.STenantIdNotSetException;
+import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
 import com.bonitasoft.engine.api.impl.APIAccessorExt;
 
@@ -25,7 +25,7 @@ import com.bonitasoft.engine.api.impl.APIAccessorExt;
 public class EngineConstantExpressionExecutorStrategy extends org.bonitasoft.engine.expression.EngineConstantExpressionExecutorStrategy {
 
     public EngineConstantExpressionExecutorStrategy(final ActivityInstanceService activityInstanceService, final ProcessInstanceService processInstanceService,
-            final SessionService sessionService, final ReadSessionAccessor sessionAccessor) {
+            final SessionService sessionService, final SessionAccessor sessionAccessor) {
         super(activityInstanceService, processInstanceService, sessionService, sessionAccessor);
     }
 
@@ -36,7 +36,8 @@ public class EngineConstantExpressionExecutorStrategy extends org.bonitasoft.eng
 
     @Override
     protected APIAccessor getConnectorApiAccessor() throws STenantIdNotSetException {
-        long tenantId = sessionAccessor.getTenantId();
+        final long tenantId = getSessionAccessor().getTenantId();
         return new ConnectorAPIAccessorExt(tenantId);
     }
+
 }

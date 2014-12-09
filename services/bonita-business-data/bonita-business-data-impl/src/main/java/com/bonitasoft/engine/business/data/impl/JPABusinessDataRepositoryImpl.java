@@ -25,9 +25,10 @@ import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.persistence.metamodel.EntityType;
 
-import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
+import org.hibernate.Hibernate;
+import org.hibernate.proxy.HibernateProxy;
 
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
@@ -62,7 +63,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     @Override
-    public void start() throws SBonitaException {
+    public void start() {
         if (businessDataModelRepository.isDBMDeployed()) {
             entityManagerFactory = Persistence.createEntityManagerFactory(BDR_PERSISTENCE_UNIT, configuration);
         }
@@ -77,12 +78,12 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     }
 
     @Override
-    public void pause() throws SBonitaException {
+    public void pause() {
         stop();
     }
 
     @Override
-    public void resume() throws SBonitaException {
+    public void resume() {
         start();
     }
 
@@ -139,7 +140,6 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
         for (final Long primaryKey : primaryKeys) {
             final T entity = em.find(entityClass, primaryKey);
             if (entity != null) {
-                em.detach(entity);
                 entities.add(entity);
             }
         }
@@ -235,6 +235,16 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             return getEntityManager().merge(entity);
         }
         return null;
+    }
+
+    @Override
+    public Entity unwrap(final Entity wrapped) {
+        Entity entity = wrapped;
+        if (entity != null && entity instanceof HibernateProxy) {
+            Hibernate.initialize(entity);
+            entity = (Entity) ((HibernateProxy) entity).getHibernateLazyInitializer().getImplementation();
+        }
+        return entity;
     }
 
 }

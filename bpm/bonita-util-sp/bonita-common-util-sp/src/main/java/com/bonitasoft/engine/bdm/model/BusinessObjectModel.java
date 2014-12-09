@@ -75,7 +75,7 @@ public class BusinessObjectModel {
         }
         return constraints;
     }
-    
+
     public List<Index> getIndexes() {
         List<Index> indexes = new ArrayList<Index>();
         for (BusinessObject bo : businessObjects) {
@@ -83,7 +83,7 @@ public class BusinessObjectModel {
         }
         return indexes;
     }
-    
+
     @Override
     public int hashCode() {
         return new HashCodeBuilder().append(businessObjects).toHashCode();
@@ -96,9 +96,8 @@ public class BusinessObjectModel {
             return new EqualsBuilder()
                     .append(businessObjects, other.businessObjects)
                     .isEquals();
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Override

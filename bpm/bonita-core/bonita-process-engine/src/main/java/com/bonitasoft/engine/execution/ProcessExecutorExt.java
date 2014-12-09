@@ -30,7 +30,7 @@ import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.definition.model.SBusinessDataDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainerDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.document.api.ProcessDocumentService;
+import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
@@ -89,13 +89,13 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             final TransitionService transitionService, final EventInstanceService eventInstanceService, final ConnectorService connectorService,
             final ConnectorInstanceService connectorInstanceService, final ClassLoaderService classLoaderService, final OperationService operationService,
             final ExpressionResolverService expressionResolverService, final EventService eventService,
-            final Map<String, SProcessInstanceHandler<SEvent>> handlers, final ProcessDocumentService processDocumentService,
+            final Map<String, SProcessInstanceHandler<SEvent>> handlers, final DocumentService documentService,
             final ReadSessionAccessor sessionAccessor, final ContainerRegistry containerRegistry, final BPMInstancesCreator bpmInstancesCreator,
             final TokenService tokenService, final EventsHandler eventsHandler, final FlowNodeStateManager flowNodeStateManager,
             final BusinessDataRepository businessDataRepository, final RefBusinessDataService refBusinessDataService) {
         super(activityInstanceService, processInstanceService, logger, flowNodeExecutor, workService, processDefinitionService, gatewayInstanceService,
                 transitionService, eventInstanceService, connectorService, connectorInstanceService, classLoaderService, operationService,
-                expressionResolverService, eventService, handlers, processDocumentService, sessionAccessor, containerRegistry, bpmInstancesCreator,
+                expressionResolverService, eventService, handlers, documentService, sessionAccessor, containerRegistry, bpmInstancesCreator,
                 tokenService, eventsHandler, flowNodeStateManager);
         this.businessDataRepository = businessDataRepository;
         this.refBusinessDataService = refBusinessDataService;
@@ -106,7 +106,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             SExpressionContext expressionContext, final List<SOperation> operations, final Map<String, Object> context,
             final SFlowElementContainerDefinition processContainer, final List<ConnectorDefinitionWithInputValues> connectors,
             final FlowNodeSelector selectorForConnectorOnEnter)
-                    throws SProcessInstanceCreationException {
+            throws SProcessInstanceCreationException {
         if (expressionContext == null) {
             expressionContext = new SExpressionContext();
         }
@@ -144,12 +144,14 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
                         primaryKey = businessData.getPersistenceId();
                     }
                     final SRefBusinessDataInstanceBuilderFactory instanceFactory = BuilderFactory.get(SRefBusinessDataInstanceBuilderFactory.class);
-                    final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), primaryKey, bdd.getClassName())
+                    final SRefBusinessDataInstance instance = instanceFactory.createNewInstance(bdd.getName(), sInstance.getId(), primaryKey,
+                            bdd.getClassName())
                             .done();
                     refBusinessDataService.addRefBusinessDataInstance(instance);
                 }
             }
             createDocuments(sDefinition, sInstance, userId);
+            createDocumentLists(sDefinition, sInstance, userId, expressionContext, context);
             if (connectors != null) {
                 executeConnectors(sDefinition, sInstance, connectors);
             }
@@ -173,7 +175,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
     }
 
     private void initializeStringIndexes(final SProcessInstance sInstance, final SProcessDefinition sDefinition) throws SExpressionTypeUnknownException,
-    SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, SProcessInstanceModificationException {
+            SExpressionEvaluationException, SExpressionDependencyMissingException, SInvalidExpressionException, SProcessInstanceModificationException {
         final SExpressionContext contextDependency = new SExpressionContext(sInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
                 sDefinition.getId());
         boolean update = false;
@@ -199,6 +201,8 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
                     case 5:
                         updateBuilder.updateStringIndex5(String.valueOf(evaluate));
                         break;
+                    default:
+                        throw new IllegalStateException();
                 }
             }
         }

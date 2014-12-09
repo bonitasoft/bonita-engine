@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 BonitaSoft S.A.
+ * Copyright (C) 2009, 2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -22,7 +22,6 @@ import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.api.impl.AvailableOnStoppedNode;
 import org.bonitasoft.engine.api.impl.NodeConfiguration;
 import org.bonitasoft.engine.api.impl.PlatformAPIImpl;
-import org.bonitasoft.engine.api.impl.PlatformAPIImplDelegate;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
 import org.bonitasoft.engine.api.impl.transaction.StopServiceStrategy;
@@ -37,6 +36,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
+import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -55,17 +55,18 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.platform.SDeletingActivatedTenantException;
-import org.bonitasoft.engine.platform.STenantCreationException;
-import org.bonitasoft.engine.platform.STenantNotFoundException;
 import org.bonitasoft.engine.platform.StartNodeException;
 import org.bonitasoft.engine.platform.StopNodeException;
+import org.bonitasoft.engine.platform.exception.SDeletingActivatedTenantException;
+import org.bonitasoft.engine.platform.exception.STenantCreationException;
+import org.bonitasoft.engine.platform.exception.STenantNotFoundException;
 import org.bonitasoft.engine.platform.model.STenant;
 import org.bonitasoft.engine.platform.model.builder.STenantBuilderFactory;
+import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilder;
+import org.bonitasoft.engine.platform.model.builder.STenantUpdateBuilderFactory;
 import org.bonitasoft.engine.profile.ImportPolicy;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
-import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
@@ -76,15 +77,9 @@ import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
 
 import com.bonitasoft.engine.api.PlatformAPI;
-import com.bonitasoft.engine.api.impl.reports.DefaultReportList;
-import com.bonitasoft.engine.api.impl.reports.ReportDeployer;
 import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
 import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
 import com.bonitasoft.engine.api.impl.transaction.NotifyNodeStoppedTask;
-import com.bonitasoft.engine.api.impl.transaction.reporting.AddReport;
-import com.bonitasoft.engine.core.reporting.ReportingService;
-import com.bonitasoft.engine.core.reporting.SReportBuilder;
-import com.bonitasoft.engine.core.reporting.SReportBuilderFactory;
 import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantActivationException;
@@ -115,12 +110,15 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
 
     private static final String PROFILES_FILE_SP = "profiles-sp.xml";
 
+    private final LicenseChecker checker;
+
     public PlatformAPIExt() {
-        super();
+        this(LicenseChecker.getInstance());
     }
 
-    public PlatformAPIExt(final PlatformAPIImplDelegate delegate) {
-        super(delegate);
+    public PlatformAPIExt(final LicenseChecker checker) {
+        super();
+        this.checker = checker;
     }
 
     @Override
@@ -138,7 +136,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     @Override
     @CustomTransactions
     public final long createTenant(final TenantCreator creator) throws CreationException, AlreadyExistsException {
-        LicenseChecker.getInstance().checkLicenceAndFeature(Features.CREATE_TENANT);
+        checker.checkLicenseAndFeature(Features.CREATE_TENANT);
         PlatformServiceAccessor platformAccessor = null;
         // useless? done in create(Tenantcreator)
         try {
@@ -171,63 +169,12 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     @Override
     @CustomTransactions
     @AvailableOnStoppedNode
-    public void initializePlatform() throws CreationException {
-        PlatformServiceAccessor platformAccessor;
-        try {
-            platformAccessor = getPlatformAccessor();
-        } catch (final Exception e) {
-            throw new CreationException(e);
+    public void createPlatform() throws CreationException {
+        if (!checker.checkLicense()) {
+            throw new CreationException("The licence is not valid: " + checker.getErrorMessage());
         }
-        // 1 tx to create content and default tenant
-        super.initializePlatform();
-        final TransactionService transactionService = platformAccessor.getTransactionService();
-        final long tenantId;
-        try {
-            tenantId = transactionService.executeInTransaction(new Callable<Long>() {
-
-                @Override
-                public Long call() throws Exception {
-                    return getDefaultTenant().getId();
-                }
-            });
-
-        } catch (final TenantNotFoundException e) {
-            throw new CreationException(e);
-        } catch (final Exception e) {
-            throw new CreationException(e);
-        }
-        final TenantServiceAccessor tenantServiceAccessor = platformAccessor.getTenantServiceAccessor(tenantId);
-
-        long platformSessionId = -1;
-        SessionAccessor sessionAccessor = null;
-        try {
-            final ServiceAccessorFactory serviceAccessorFactory = ServiceAccessorFactory.getInstance();
-            sessionAccessor = serviceAccessorFactory.createSessionAccessor();
-            final SessionService sessionService = platformAccessor.getSessionService();
-            final SSession session = sessionService.createSession(tenantId, -1L, "dummy", true);
-
-            platformSessionId = sessionAccessor.getSessionId();
-            sessionAccessor.deleteSessionId();
-
-            sessionAccessor.setSessionInfo(session.getId(), session.getTenantId());
-
-            // This part is specific to SP: reporting.
-            transactionService.executeInTransaction(new Callable<Void>() {
-
-                @Override
-                public Void call() throws Exception {
-                    deployTenantReports(tenantId, tenantServiceAccessor);
-                    return null;
-                }
-
-            });
-        } catch (final Exception e) {
-            throw new CreationException(e);
-        } finally {
-            cleanSessionAccessor(sessionAccessor, platformSessionId);
-        }
+        super.createPlatform();
     }
-
     private long create(final TenantCreator creator) throws CreationException {
         final Map<com.bonitasoft.engine.platform.TenantCreator.TenantField, Serializable> tenantFields = creator.getFields();
         try {
@@ -296,9 +243,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                         // Create default commands
                         createDefaultCommands(tenantServiceAccessor);
 
-                        // Create default reports
-                        deployTenantReports(tenantId, tenantServiceAccessor);
-
                         // Create default profiles
                         createDefaultProfiles(tenantServiceAccessor);
 
@@ -322,15 +266,10 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.bonitasoft.engine.api.impl.PlatformAPIImpl#importProfiles(org.bonitasoft.engine.profile.ProfileService,
-     * org.bonitasoft.engine.identity.IdentityService, java.util.List, org.bonitasoft.engine.service.TenantServiceAccessor)
-     */
     @Override
     protected void importProfiles(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> profilesFromXML,
             final org.bonitasoft.engine.service.TenantServiceAccessor tenantServiceAccessor) throws ExecutionException {
-        PageService pageService = ((TenantServiceAccessor) tenantServiceAccessor).getPageService();
+        final PageService pageService = ((TenantServiceAccessor) tenantServiceAccessor).getPageService();
         new ProfilesImporterExt(profileService, identityService, pageService, profilesFromXML, ImportPolicy.FAIL_ON_DUPLICATES).importProfiles(-1);
     }
 
@@ -340,26 +279,6 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final SBonitaException e) {
             throw new CreationException(e);
         }
-
-    }
-
-    public void deployTenantReports(final long tenantId, final TenantServiceAccessor tenantAccessor) throws Exception {
-
-        final DefaultReportList reports = new DefaultReportList(tenantAccessor.getTechnicalLoggerService(), BonitaHomeServer.getInstance()
-                .getTenantReportFolder(tenantId));
-
-        reports.deploy(new ReportDeployer() {
-
-            @Override
-            public void deploy(final String name, final String description, final byte[] screenShot, final byte[] content) throws SBonitaException {
-                final ReportingService reportingService = tenantAccessor.getReportingService();
-                final SReportBuilder reportBuilder = BuilderFactory.get(SReportBuilderFactory.class).createNewInstance(name, /* system user */-1, true,
-                        description, screenShot);
-                final AddReport addReport = new AddReport(reportingService, reportBuilder.done(), content);
-                // Here we are already in a transaction, so we can call execute() directly:
-                addReport.execute();
-            }
-        });
     }
 
     // modify user name and password
@@ -434,7 +353,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
 
-            final NodeConfiguration nodeConfiguration = platformAccessor.getPlaformConfiguration();
+            final NodeConfiguration nodeConfiguration = platformAccessor.getPlatformConfiguration();
             sessionAccessor = ServiceAccessorFactory.getInstance().createSessionAccessor();
             final long sessionId = createSession(tenantId, sessionService);
 
@@ -445,10 +364,13 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
 
             final WorkService workService = tenantServiceAccessor.getWorkService();
+            final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
 
             final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService,
-                    platformAccessor.getTechnicalLoggerService(), workService, nodeConfiguration, tenantServiceAccessor.getTenantConfiguration());
+                    platformAccessor.getTechnicalLoggerService(), workService, connectorExecutor, nodeConfiguration, tenantServiceAccessor.getTenantConfiguration());
             transactionContent.execute();
+            //TODO remove me when bug that does not start services on tenant creation is fixed
+            tenantServiceAccessor.getReportingService().start();
             sessionService.deleteSession(sessionId);
         } catch (final TenantNotFoundException e) {
             log(platformAccessor, e, TechnicalLogSeverity.DEBUG);
@@ -667,8 +589,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                 modifyTechnicalUser(tenantId, username, password);
             }
             // update tenant in database
-            final EntityUpdateDescriptor changeDescriptor = getTenantUpdateDescriptor(udpater);
-            platformService.updateTenant(tenant, changeDescriptor);
+            final STenantUpdateBuilder tenantUpdateBuilder = getTenantUpdateDescriptor(udpater);
+            platformService.updateTenant(tenant, tenantUpdateBuilder.done());
             return SPModelConvertor.toTenant(tenant);
         } catch (final BonitaHomeNotSetException e) {
             throw new UpdateException(e);
@@ -681,33 +603,33 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private EntityUpdateDescriptor getTenantUpdateDescriptor(final TenantUpdater udpateDescriptor) {
-        final STenantBuilderFactory tenantBuilderFact = BuilderFactory.get(STenantBuilderFactory.class);
+    private STenantUpdateBuilder getTenantUpdateDescriptor(final TenantUpdater tenantUpdater) {
+        final STenantUpdateBuilderFactory updateBuilderFactory = BuilderFactory.get(STenantUpdateBuilderFactory.class);
+        final STenantUpdateBuilder updateDescriptor = updateBuilderFactory.createNewInstance();
 
-        final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
-        final Map<TenantField, Serializable> fields = udpateDescriptor.getFields();
+        final Map<TenantField, Serializable> fields = tenantUpdater.getFields();
         for (final Entry<TenantField, Serializable> field : fields.entrySet()) {
             switch (field.getKey()) {
                 case NAME:
-                    descriptor.addField(tenantBuilderFact.getNameKey(), field.getValue());
+                    updateDescriptor.setName((String) field.getValue());
                     break;
                 case DESCRIPTION:
-                    descriptor.addField(tenantBuilderFact.getDescriptionKey(), field.getValue());
+                    updateDescriptor.setDescription((String) field.getValue());
                     break;
                 case ICON_NAME:
-                    descriptor.addField(tenantBuilderFact.getIconNameKey(), field.getValue());
+                    updateDescriptor.setIconName((String) field.getValue());
                     break;
                 case ICON_PATH:
-                    descriptor.addField(tenantBuilderFact.getIconPathKey(), field.getValue());
+                    updateDescriptor.setIconPath((String) field.getValue());
                     break;
                 case STATUS:
-                    descriptor.addField(tenantBuilderFact.getStatusKey(), field.getValue());
+                    updateDescriptor.setStatus((String) field.getValue());
                     break;
                 default:
                     break;
             }
         }
-        return descriptor;
+        return updateDescriptor;
     }
 
     @Override
@@ -727,7 +649,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
     @CustomTransactions
     @AvailableOnStoppedNode
     public void startNode() throws StartNodeException {
-        LicenseChecker.getInstance().checkLicence();
+        checker.checkLicense();
         super.startNode();
     }
 
@@ -738,12 +660,11 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         super.stopNode();
         try {
             final PlatformServiceAccessor platformAccessor = getPlatformAccessor();
-            BroadcastService broadcastService = platformAccessor.getBroadcastService();
+            final BroadcastService broadcastService = platformAccessor.getBroadcastService();
             broadcastService.submit(new NotifyNodeStoppedTask());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new StopNodeException(e);
         }
-
     }
 
     public void stopNode(final String message) throws StopNodeException {
@@ -810,4 +731,5 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             }
         });
     }
+
 }

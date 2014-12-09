@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping auto-import="false">
+
+	<query name="getNumberOfBreakpoints">
+		SELECT COUNT(breakpoint)
+		FROM com.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl AS breakpoint
+	</query>
+
+	<query name="getBreakpoints">
+		SELECT breakpoint
+		FROM com.bonitasoft.engine.core.process.instance.model.breakpoint.impl.SBreakpointImpl AS breakpoint
+	</query>
+
+	<query name="getSRefBusinessDataInstance">
+		SELECT ref
+		FROM com.bonitasoft.engine.core.process.instance.model.impl.SRefBusinessDataInstanceImpl AS ref
+		WHERE ref.name = :name
+		AND ref.processInstanceId = :processInstanceId
+	</query>
+
+    <query name="getSRefBusinessDataInstancesOfProcess">
+        SELECT ref
+        FROM com.bonitasoft.engine.core.process.instance.model.impl.SRefBusinessDataInstanceImpl AS ref
+        WHERE ref.processInstanceId = :processInstanceId
+        ORDER BY ref.id
+    </query>
+
+    <query name="getSFlowNodeRefBusinessDataInstance">
+        SELECT ref
+        FROM com.bonitasoft.engine.core.process.instance.model.impl.SRefBusinessDataInstanceImpl AS ref
+        WHERE ref.name = :name
+        AND ref.flowNodeInstanceId = :flowNodeInstanceId
+    </query>
+
+    <query name="getNumberOfDataOfMultiRefBusinessData">
+        SELECT ref.dataIds.size
+        FROM com.bonitasoft.engine.core.process.instance.model.impl.SMultiRefBusinessDataInstanceImpl AS ref
+        WHERE ref.name = :name
+        AND ref.processInstanceId = :processInstanceId
+    </query>
+
+</hibernate-mapping>

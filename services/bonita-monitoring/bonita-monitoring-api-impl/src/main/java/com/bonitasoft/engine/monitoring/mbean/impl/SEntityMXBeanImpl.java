@@ -12,7 +12,6 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.events.model.HandlerUnregistrationException;
 import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.session.model.SSession;
@@ -104,7 +103,7 @@ public class SEntityMXBeanImpl implements SEntityMXBean {
     }
 
     @Override
-    public void stop() throws MBeanStopException, HandlerUnregistrationException {
+    public void stop() throws MBeanStopException {
         try {
             // Unregister the MXBean
             if (name != null) {

@@ -13,7 +13,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.CommandAPI;
-import org.bonitasoft.engine.api.EJB2ServerAPI;
 import org.bonitasoft.engine.api.EJB3ServerAPI;
 import org.bonitasoft.engine.api.HTTPServerAPI;
 import org.bonitasoft.engine.api.impl.ClientInterceptor;
@@ -39,8 +38,10 @@ import org.bonitasoft.engine.util.APITypeManager;
  * <li>{@link ReportingAPI},</li>
  * <li>{@link LogAPI},</li>
  * <li>{@link ThemeAPI}</li>
+ * <li>{@link PageAPI}</li>
+ * <li>{@link ApplicationAPI}</li>
  * </ul>
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
@@ -55,9 +56,6 @@ public final class TenantAPIAccessor {
             case EJB3:
                 parameters = APITypeManager.getAPITypeParameters();
                 return new EJB3ServerAPI(parameters);
-            case EJB2:
-                parameters = APITypeManager.getAPITypeParameters();
-                return new EJB2ServerAPI(parameters);
             case HTTP:
                 parameters = APITypeManager.getAPITypeParameters();
                 return new HTTPServerAPI(parameters);
@@ -68,7 +66,7 @@ public final class TenantAPIAccessor {
 
     /**
      * Refreshes the way the engine client communicates to the engine server.
-     * 
+     *
      * @see APITypeManager
      * @see ApiAccessType
      */
@@ -132,6 +130,10 @@ public final class TenantAPIAccessor {
 
     public static PageAPI getPageAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
         return getAPI(PageAPI.class, session);
+    }
+
+    public static ApplicationAPI getApplicationAPI(final APISession session) throws BonitaHomeNotSetException, ServerAPIException, UnknownAPITypeException {
+        return getAPI(ApplicationAPI.class, session);
     }
 
 }

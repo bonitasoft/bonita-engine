@@ -32,6 +32,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import com.bonitasoft.engine.page.PageService;
+import com.bonitasoft.engine.page.SInvalidPageZipMissingAPropertyException;
+import com.bonitasoft.engine.page.SInvalidPageZipException;
+import com.bonitasoft.engine.page.SInvalidPageZipInconsistentException;
+import com.bonitasoft.engine.page.SInvalidPageZipMissingIndexException;
+import com.bonitasoft.engine.page.SInvalidPageZipMissingPropertiesException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.exceptions.SObjectAlreadyExistsException;
 import org.bonitasoft.engine.commons.exceptions.SObjectModificationException;
@@ -68,7 +74,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import com.bonitasoft.engine.page.SInvalidPageTokenException;
-import com.bonitasoft.engine.page.SInvalidPageZipContentException;
 import com.bonitasoft.engine.page.SPage;
 import com.bonitasoft.engine.page.SPageContent;
 import com.bonitasoft.engine.page.SPageLogBuilder;
@@ -279,6 +284,25 @@ public class PageServiceImplTest {
     }
 
     @Test
+    public void start_should_import_provided_page_with_business_app() throws SBonitaException {
+        // given
+        // resource in the classpath bonita-groovy-example-page.zip
+        doReturn(null).when(pageServiceImpl).insertPage(any(SPage.class), any(byte[].class));
+        doReturn(true).when(manager).isFeatureActive(Features.BUSINESS_APPLICATIONS);
+        pageServiceImpl = spy(new PageServiceImpl(manager, readPersistenceService, recorder, eventService, technicalLoggerService, queriableLoggerService,
+                profileService));
+        // when
+        pageServiceImpl.start();
+
+        // then
+        verify(pageServiceImpl, times(3)).insertPage(any(SPage.class), any(byte[].class));
+        verify(pageServiceImpl, times(0)).updatePage(anyLong(), any(EntityUpdateDescriptor.class));
+        verify(pageServiceImpl, times(0)).updatePageContent(anyLong(), any(byte[].class), anyString());
+
+    }
+
+
+    @Test
     public void start_should_update_provided_page_if_different() throws SBonitaException {
         // given
         // resource in the classpath provided-page.properties and provided-page.zip
@@ -336,7 +360,7 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void getPageContent_should_update_properties_in_the_zip_if_exists() throws SBonitaException, IOException {
+    public void getPageContent_should_update_properties_in_the_zip_if_exists_and_keep_others() throws SBonitaException, IOException {
         // given: a zip with outdated properties
         final SPageImpl page = new SPageImpl("mypageUpdated", "mypageUpdated description", "mypageUpdated display name", System.currentTimeMillis(), -1, false,
                 System.currentTimeMillis(),
@@ -344,8 +368,10 @@ public class PageServiceImplTest {
                 CONTENT_NAME);
         page.setId(12);
         @SuppressWarnings("unchecked")
-        final byte[] content = IOUtil.zip(pair("Index.groovy", "content of the groovy".getBytes()),
-                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
+        final byte[] content = IOUtil.zip(
+                pair("Index.groovy", "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES,
+                        "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\naCustomProperty=plop\n".getBytes()));
         doReturn(new SPageContentBuilderFactoryImpl().createNewInstance(content).done()).when(readPersistenceService).selectById(
                 new SelectByIdDescriptor<SPageContent>("getPageContent",
                         SPageContent.class, 12));
@@ -361,6 +387,15 @@ public class PageServiceImplTest {
         assertThat(pageProperties.get("name")).isEqualTo("mypageUpdated");
         assertThat(pageProperties.get("displayName")).isEqualTo("mypageUpdated display name");
         assertThat(pageProperties.get("description")).isEqualTo("mypageUpdated description");
+        assertThat(pageProperties.get("aCustomProperty")).isEqualTo("plop");
+    }
+
+    @Test(expected = SObjectNotFoundException.class)
+    public void should_getPageContent_throw_not_found() throws SBonitaException, IOException {
+        //given
+        doReturn(null).when(readPersistenceService).selectById(new SelectByIdDescriptor<SPageContent>("getPageContent", SPageContent.class, 12));
+        //when
+        pageServiceImpl.getPageContent(12);
     }
 
     @Test
@@ -404,7 +439,7 @@ public class PageServiceImplTest {
         doAnswer(new Answer<Object>() {
 
             @Override
-            public Object answer(final InvocationOnMock invocation) throws Throwable {
+            public Object answer(final InvocationOnMock invocation) {
                 // Deletion OK
                 return null;
             }
@@ -522,30 +557,29 @@ public class PageServiceImplTest {
 
     @Test
     public void zipTest_not_a_zip() throws Exception {
-        exception.expect(SInvalidPageZipContentException.class);
+        exception.expect(SInvalidPageZipException.class);
         // given
         final byte[] content = "badContent".getBytes();
 
         // when
-        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
+        pageServiceImpl.readPageZip(content, false);
 
         // then exception
     }
 
     @Test
     public void zipTest_Bad_Content() throws Exception {
-        exception.expect(SInvalidPageZipContentException.class);
-        exception.expectMessage(PageServiceImpl.PAGE_CONTENT_DOES_NOT_CONTAINS_A_INDEX_GROOVY_OR_INDEX_HTML_FILE);
+        exception.expect(SInvalidPageZipMissingIndexException.class);
+        exception.expectMessage("Missing Index.groovy or index.html");
 
         // given
         final byte[] content = IOUtil.zip(Collections.singletonMap("aFile.txt", "hello".getBytes()));
 
         // when
-        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
+        pageServiceImpl.readPageZip(content, false);
 
         // then
         // exception
-
     }
 
     @Test
@@ -557,7 +591,7 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
 
         // when then
-        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
+        pageServiceImpl.readPageZip(content, false);
 
         // expected no exception
 
@@ -573,7 +607,7 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES, "name=mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
 
         // when then
-        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
+        pageServiceImpl.readPageZip(content, false);
 
     }
 
@@ -587,13 +621,13 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES, "displayName=mypage display name\ndescription=mypage description\n".getBytes()));
 
         // when then
-        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
+        pageServiceImpl.readPageZip(content, false);
 
     }
 
     @Test
     public void zipTest_page_properties_invalid_display_name() throws Exception {
-        exception.expect(SInvalidPageZipContentException.class);
+        exception.expect(SInvalidPageZipException.class);
 
         // given
         @SuppressWarnings("unchecked")
@@ -601,14 +635,14 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=\ndescription=mypage description\n".getBytes()));
 
         // when then
-        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
+        pageServiceImpl.readPageZip(content, false);
 
     }
 
     @Test
     public void zipTest_page_properties_no_display_name() throws Exception {
-        exception.expect(SInvalidPageZipContentException.class);
-        exception.expectMessage("display name is mandatory");
+        exception.expect(SInvalidPageZipMissingAPropertyException.class);
+        exception.expectMessage("Missing fields in the page.properties: " + PageService.PROPERTIES_DISPLAY_NAME);
 
         // given
         @SuppressWarnings("unchecked")
@@ -616,7 +650,7 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES, "name=custompage_mypage\ndescription=mypage description\n".getBytes()));
 
         // when
-        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
+        pageServiceImpl.readPageZip(content, false);
 
         // then exception
 
@@ -624,8 +658,7 @@ public class PageServiceImplTest {
 
     @Test
     public void zipTestGroovyWithWrongName() throws Exception {
-        exception.expect(SInvalidPageZipContentException.class);
-        exception.expectMessage(PageServiceImpl.PAGE_CONTENT_DOES_NOT_CONTAINS_A_INDEX_GROOVY_OR_INDEX_HTML_FILE);
+        exception.expect(SInvalidPageZipMissingIndexException.class);
 
         // given
         @SuppressWarnings("unchecked")
@@ -633,7 +666,7 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
 
         // when then
-        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
+        pageServiceImpl.readPageZip(content, false);
 
     }
 
@@ -645,31 +678,31 @@ public class PageServiceImplTest {
                 pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage final display name\ndescription=final mypage description\n".getBytes()));
 
         // when then
-        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
+        pageServiceImpl.readPageZip(content, false);
 
     }
 
     @Test
     public void zipTest_no_page_properties() throws Exception {
-        exception.expect(SInvalidPageZipContentException.class);
-        exception.expectMessage(PageServiceImpl.PAGE_CONTENT_DOES_NOT_CONTAINS_A_PAGE_PROPERTIES_FILE);
+        exception.expect(SInvalidPageZipMissingPropertiesException.class);
+        exception.expectMessage("Missing page.propeties");
 
         // given
         @SuppressWarnings("unchecked")
         final byte[] content = IOUtil.zip(pair(INDEX_HTML, "content of the groovy".getBytes()));
 
         // when then
-        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
+        pageServiceImpl.readPageZip(content, false);
 
     }
 
     @Test
     public void checkPageContentIsValid_null() throws Exception {
-        exception.expect(SInvalidPageZipContentException.class);
+        exception.expect(SInvalidPageZipException.class);
         // given
 
         // when
-        pageServiceImpl.loadPropertiesAndCheckZipConsistency(null, false);
+        pageServiceImpl.readPageZip(null, false);
 
         // then
 
@@ -677,11 +710,11 @@ public class PageServiceImplTest {
 
     @Test
     public void checkPageContentIsValid_badZip() throws Exception {
-        exception.expect(SInvalidPageZipContentException.class);
+        exception.expect(SInvalidPageZipException.class);
         // given
 
         // when
-        pageServiceImpl.loadPropertiesAndCheckZipConsistency("not a zip".getBytes(), false);
+        pageServiceImpl.readPageZip("not a zip".getBytes(), false);
 
         // then
 
@@ -692,13 +725,27 @@ public class PageServiceImplTest {
 
         // given
         @SuppressWarnings("unchecked")
-        byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
-                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));;
+        final byte[] content = IOUtil.zip(pair(INDEX_GROOVY, "content of the groovy".getBytes()),
+                pair(PAGE_PROPERTIES, "name=custompage_mypage\ndisplayName=mypage display name\ndescription=mypage description\n".getBytes()));
         // when
-        pageServiceImpl.loadPropertiesAndCheckZipConsistency(content, false);
+        pageServiceImpl.readPageZip(content, false);
 
         // then no exception
 
     }
+
+
+    @Test
+    public void should_redPageZip_call_the_internal_with_provided_false() throws SInvalidPageTokenException, SInvalidPageZipInconsistentException, SInvalidPageZipMissingAPropertyException, SInvalidPageZipMissingPropertiesException, SInvalidPageZipMissingIndexException {
+        byte[] content = {0, 1, 2};
+        doReturn(null).when(pageServiceImpl).readPageZip(content,false);
+
+        //when
+        pageServiceImpl.readPageZip(content);
+
+        //then
+        verify(pageServiceImpl).readPageZip(content,false);
+    }
+
 
 }

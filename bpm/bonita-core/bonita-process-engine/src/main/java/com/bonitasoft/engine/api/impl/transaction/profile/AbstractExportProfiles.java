@@ -25,7 +25,7 @@ import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
-import org.bonitasoft.engine.persistence.SBonitaSearchException;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.builder.SProfileBuilderFactory;
 import org.bonitasoft.engine.profile.builder.SProfileEntryBuilderFactory;
@@ -101,7 +101,7 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
         return profileNode;
     }
 
-    protected XMLNode getProfileEntriesXmlNode(final long profileId) throws SBonitaSearchException {
+    protected XMLNode getProfileEntriesXmlNode(final long profileId) throws SBonitaReadException {
         // parentId 0:folder or no child link
         int index = 0;
         List<SProfileEntry> sParentProfileEntries = searchProfileEntries(index, profileId, 0);
@@ -119,7 +119,7 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
         return null;
     }
 
-    private XMLNode getParentProfileEntryXmlNode(final SProfileEntry parentEntry, final long profileId) throws SBonitaSearchException {
+    private XMLNode getParentProfileEntryXmlNode(final SProfileEntry parentEntry, final long profileId) throws SBonitaReadException {
         final XMLNode parentProfileEntryNode = new XMLNode("parentProfileEntry");
         final String parentProfileEntryName = parentEntry.getName();
         parentProfileEntryNode.addAttribute("name", parentProfileEntryName);
@@ -138,7 +138,7 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
     }
 
     private XMLNode getChildrenProfileEntryXmlNode(final long profileId, final long parentId, final String parentProfileEntryName)
-            throws SBonitaSearchException {
+            throws SBonitaReadException {
         int index = 0;
         List<SProfileEntry> sChildrenProfileEntries = searchProfileEntries(index, profileId, parentId);
         if (sChildrenProfileEntries != null && sChildrenProfileEntries.size() > 0) {
@@ -267,13 +267,13 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
         return null;
     }
 
-    protected List<SProfile> searchProfiles(final int fromIndex) throws SBonitaSearchException {
+    protected List<SProfile> searchProfiles(final int fromIndex) throws SBonitaReadException {
         final QueryOptions queryOptions = new QueryOptions(fromIndex * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS, Collections.singletonList(new OrderByOption(
                 SProfile.class, SProfileBuilderFactory.NAME, OrderByType.ASC)), Collections.<FilterOption> emptyList(), null);
         return profileService.searchProfiles(queryOptions);
     }
 
-    protected List<SProfileEntry> searchProfileEntries(final int fromIndex, final long profileId, final long parentId) throws SBonitaSearchException {
+    protected List<SProfileEntry> searchProfileEntries(final int fromIndex, final long profileId, final long parentId) throws SBonitaReadException {
         final List<OrderByOption> orderByOptions = Collections
                 .singletonList(new OrderByOption(SProfileEntry.class, SProfileEntryBuilderFactory.INDEX, OrderByType.ASC));
         final List<FilterOption> filters = new ArrayList<FilterOption>();
@@ -283,7 +283,7 @@ public abstract class AbstractExportProfiles implements TransactionContentWithRe
         return profileService.searchProfileEntries(queryOptions);
     }
 
-    private List<SProfileMember> searchProfileMembers(final int fromIndex, final long profileId, final String querySuffix) throws SBonitaSearchException {
+    private List<SProfileMember> searchProfileMembers(final int fromIndex, final long profileId, final String querySuffix) throws SBonitaReadException {
         final QueryOptions queryOptions = new QueryOptions(fromIndex * NUMBER_OF_RESULTS, NUMBER_OF_RESULTS, Collections.singletonList(new OrderByOption(
                 SProfileMember.class, SProfileMemberBuilderFactory.ID, OrderByType.ASC)), Collections.singletonList(new FilterOption(SProfileMember.class,
                 SProfileEntryBuilderFactory.PROFILE_ID, profileId)), null);
