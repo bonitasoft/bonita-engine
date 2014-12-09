@@ -45,6 +45,7 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ReceiveTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
@@ -296,7 +297,7 @@ public class ReceiveTasksIT extends CommonAPITest {
         assertEquals(1, searchResult.getCount());
 
         getProcessAPI().cancelProcessInstance(receiveMessageProcessInstance.getId());
-        waitForProcessToFinish(receiveMessageProcessInstance, TestStates.CANCELLED);
+        waitForProcessToBeInState(receiveMessageProcessInstance, ProcessInstanceState.CANCELLED);
 
         searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(ArchivedActivityInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId());

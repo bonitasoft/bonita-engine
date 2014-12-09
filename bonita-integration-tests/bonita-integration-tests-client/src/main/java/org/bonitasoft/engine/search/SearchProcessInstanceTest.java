@@ -1160,7 +1160,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
 
         // execute user task and wait the parent process to finish (state aborted)
         waitForUserTaskAndExecuteIt(subProcTaskName, procInstWithEventSubProc, user);
-        waitForProcessToFinish(procInstWithEventSubProc, TestStates.ABORTED);
+        waitForProcessToBeInState(procInstWithEventSubProc, ProcessInstanceState.ABORTED);
         return procWithEventSubProcess;
     }
 
@@ -1178,7 +1178,7 @@ public class SearchProcessInstanceTest extends CommonAPITest {
         final ProcessInstance processInstanceToCancel = getProcessAPI().startProcess(simpleProcess.getId());
         waitForUserTask(userTaskName, processInstanceToCancel);
         getProcessAPI().cancelProcessInstance(processInstanceToCancel.getId());
-        waitForProcessToFinish(processInstanceToCancel, TestStates.CANCELLED);
+        waitForProcessToBeInState(processInstanceToCancel, ProcessInstanceState.CANCELLED);
         return simpleProcess;
     }
 

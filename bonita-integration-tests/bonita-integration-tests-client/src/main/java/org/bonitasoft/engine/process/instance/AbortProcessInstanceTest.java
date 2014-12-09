@@ -7,6 +7,7 @@ import java.util.List;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
@@ -72,7 +73,7 @@ public class AbortProcessInstanceTest extends AbstractProcessInstanceTest {
         assignAndExecuteStep(humanTaskInst2ToExecute, pedro.getId());
 
         // the target process instances that exceed the max loop must be in aborted state
-        waitForProcessToFinish(procInstToAbort, TestStates.ABORTED);
+        waitForProcessToBeInState(procInstToAbort, ProcessInstanceState.ABORTED);
 
         // task1 not executed must be in aborted state
         waitForArchivedActivity(humanTaskInst1ToAbort.getId(), TestStates.ABORTED);

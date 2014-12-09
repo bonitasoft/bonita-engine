@@ -8,6 +8,7 @@ import org.bonitasoft.engine.bpm.flownode.LoopActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.SignalEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
@@ -75,7 +76,7 @@ public class SignalBoundaryEventTest extends AbstractEventTest {
         getProcessAPI().sendSignal("MySignal");
         waitForUserTaskAndExecuteIt(EXCEPTION_STEP, processInstance, donaBenta);
 
-        waitForProcessToFinish(calledProcessInstance, TestStates.ABORTED);
+        waitForProcessToBeInState(calledProcessInstance, ProcessInstanceState.ABORTED);
         waitForProcessToFinish(processInstance);
 
         waitForArchivedActivity(calledStep.getId(), TestStates.ABORTED);

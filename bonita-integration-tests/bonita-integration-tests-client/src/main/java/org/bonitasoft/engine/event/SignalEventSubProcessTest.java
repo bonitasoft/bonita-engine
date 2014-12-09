@@ -183,7 +183,7 @@ public class SignalEventSubProcessTest extends WaitingEventTest {
 
         assignAndExecuteStep(subStep, donaBenta.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.ABORTED);
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
 
         disableAndDeleteProcess(process);
     }
@@ -217,7 +217,7 @@ public class SignalEventSubProcessTest extends WaitingEventTest {
         waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
         assignAndExecuteStep(subStep, donaBenta.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(calledProcInst, TestStates.ABORTED);
+        waitForProcessToBeInState(calledProcInst, ProcessInstanceState.ABORTED);
 
         waitForUserTaskAndExecuteIt("step2", processInstance, donaBenta);
         waitForProcessToFinish(processInstance);

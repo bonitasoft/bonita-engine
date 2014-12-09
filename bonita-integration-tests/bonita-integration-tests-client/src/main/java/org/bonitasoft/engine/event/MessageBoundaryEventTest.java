@@ -10,6 +10,7 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.MessageEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -75,7 +76,7 @@ public class MessageBoundaryEventTest extends AbstractEventTest {
                     new ExpressionBuilder().createConstantStringExpression(BOUNDARY_NAME), null);
 
             waitForUserTaskAndExecuteIt("exceptionStep", processInstance, donaBenta);
-            waitForProcessToFinish(calledProcessInstance, TestStates.ABORTED);
+            waitForProcessToBeInState(calledProcessInstance, ProcessInstanceState.ABORTED);
             waitForProcessToFinish(processInstance);
 
             waitForArchivedActivity(calledStep.getId(), TestStates.ABORTED);

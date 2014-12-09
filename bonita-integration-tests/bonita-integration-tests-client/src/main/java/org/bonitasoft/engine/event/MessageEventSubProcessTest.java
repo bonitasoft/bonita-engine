@@ -27,6 +27,7 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceSearchDescriptor;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.SubProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.SubProcessDefinitionBuilder;
@@ -110,7 +111,7 @@ public class MessageEventSubProcessTest extends WaitingEventTest {
         assignAndExecuteStep(subStep, donaBenta.getId());
         waitForArchivedActivity(eventSubProcessActivity.getId(), TestStates.NORMAL_FINAL);
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.ABORTED);
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
 
         // check that the transition wasn't taken
         checkWasntExecuted(processInstance, "end");
@@ -256,7 +257,7 @@ public class MessageEventSubProcessTest extends WaitingEventTest {
 
         assignAndExecuteStep(subStep, donaBenta.getId());
         waitForProcessToFinish(subProcInst);
-        waitForProcessToFinish(processInstance, TestStates.ABORTED);
+        waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
 
         disableAndDeleteProcess(process.getId());
     }
@@ -292,7 +293,7 @@ public class MessageEventSubProcessTest extends WaitingEventTest {
             waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
             assignAndExecuteStep(subStep, donaBenta.getId());
             waitForProcessToFinish(subProcInst);
-            waitForProcessToFinish(calledProcInst, TestStates.ABORTED);
+            waitForProcessToBeInState(calledProcInst, ProcessInstanceState.ABORTED);
 
             waitForUserTaskAndExecuteIt("step2", processInstance, donaBenta);
             waitForProcessToFinish(processInstance);

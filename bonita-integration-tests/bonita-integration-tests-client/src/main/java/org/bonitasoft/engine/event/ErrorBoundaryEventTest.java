@@ -26,6 +26,7 @@ import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.MultiInstanceActivityInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.TestStates;
@@ -161,7 +162,7 @@ public class ErrorBoundaryEventTest extends AbstractEventTest {
         waitForArchivedActivity(calledStep2.getId(), TestStates.ABORTED);
         final FlowNodeInstance executionStep = waitForFlowNodeInReadyState(processInstance, EXCEPTION_STEP, false);
         waitForProcessToFinish(calledProcessInstanceL0);
-        waitForProcessToFinish(calledProcessInstanceL1, TestStates.ABORTED);
+        waitForProcessToBeInState(calledProcessInstanceL1, ProcessInstanceState.ABORTED);
 
         assignAndExecuteStep(executionStep.getId(), donaBenta.getId());
         waitForProcessToFinish(processInstance);
