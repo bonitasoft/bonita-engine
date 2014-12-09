@@ -1092,7 +1092,7 @@ public interface ProcessRuntimeAPI {
      * The last archived instance is returned.
      *
      * @param processInstanceId
-     *        The identifier of the process instance.
+     *        The identifier of the source process instance, i.e. not an archived version, the original process instance id.
      * @return The archived process instance.
      * @throws ArchivedProcessInstanceNotFoundException
      *         If no archived process instance can be found with the provided Id.
