@@ -21,13 +21,16 @@ import static org.bonitasoft.engine.test.persistence.builder.ProcessInstanceBuil
 import static org.bonitasoft.engine.test.persistence.builder.UserBuilder.aUser;
 import static org.bonitasoft.engine.test.persistence.builder.UserMembershipBuilder.aUserMembership;
 import static org.bonitasoft.engine.test.persistence.builder.UserTaskInstanceBuilder.aUserTask;
+import static org.bonitasoft.engine.test.persistence.builder.archive.ArchivedUserTaskInstanceBuilder.anArchivedUserTask;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionDeployInfoImpl;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -263,6 +266,63 @@ public class FlowNodeInstanceTests {
 
         // Then
         assertThat(numberOfHumanTaskInstances).isEqualTo(2);
+    }
+
+    @Test
+    public void getNumberOfFlownodesInStateForProcessInstance_should_return_results_aggregated_by_state() {
+        // Given
+        buildAndAddUserTaskWithParentAndRootProcessInstanceId("etape1", 147L, 0L, 3);
+        buildAndAddUserTaskWithParentAndRootProcessInstanceId("etape1", 147L, 0L, 3);
+        buildAndAddUserTaskWithParentAndRootProcessInstanceId("etape1", 0L, 147L, 221); // should not be selected because it is a flownode in a sub-process
+        buildAndAddUserTaskWithParentAndRootProcessInstanceId("etape2", 147L, 0L, 3);
+        buildAndAddUserTaskWithParentAndRootProcessInstanceId("etape1", 147L, 0L, 4);
+
+        List<Map<String, Object>> numberOfFlownodesInState = repository.getNumberOfFlowNodesInStateForProcessInstance(147L, 3);
+        assertThat(numberOfFlownodesInState).hasSize(2);
+        for (Map<String, Object> line : numberOfFlownodesInState) {
+            String flownodename = (String) line.get("name");
+            Long numberof = (Long) line.get("numberof");
+            if (flownodename.equals("etape1")) {
+                assertThat(numberof).isEqualTo(2L);
+            } else {
+                assertThat(flownodename).isEqualTo("etape2");
+                assertThat(numberof).isEqualTo(1L);
+            }
+        }
+    }
+
+    private SFlowNodeInstance buildAndAddUserTaskWithParentAndRootProcessInstanceId(final String taskName, final long containingProcessInstanceId,
+            final long rootProcessInstanceId, int stateId) {
+        return repository.add(aUserTask().withName(taskName).withStateExecuting(false).withStable(true).withTerminal(false).withDeleted(false)
+                .withLogicalGroup4(containingProcessInstanceId).withLogicalGroup2(rootProcessInstanceId).withStateId(stateId).build());
+    }
+
+    @Test
+    public void getNumberOfArchivedFlownodesInStateForProcessInstance_should_return_results_aggregated_by_state() {
+        // Given
+        buildAndAddArchivedUserTaskWithParentAndRootProcessInstanceId("etape1", 147L, 0L, 2);
+        buildAndAddArchivedUserTaskWithParentAndRootProcessInstanceId("etape1", 147L, 0L, 2);
+        buildAndAddArchivedUserTaskWithParentAndRootProcessInstanceId("etape1", 0L, 147L, 221); // should not be selected because it is a flownode in a sub-process
+        buildAndAddArchivedUserTaskWithParentAndRootProcessInstanceId("etape2", 147L, 0L, 2);
+        buildAndAddArchivedUserTaskWithParentAndRootProcessInstanceId("etape1", 147L, 0L, 4);
+
+        List<Map<String, Object>> numberOfArchivedFlowNodesInState = repository.getNumberOfArchivedFlowNodesInStateForProcessInstance(147L, 2);
+        assertThat(numberOfArchivedFlowNodesInState).hasSize(2);
+        for (Map<String, Object> line : numberOfArchivedFlowNodesInState) {
+            String flownodename = (String) line.get("name");
+            Long numberof = (Long) line.get("numberof");
+            if (flownodename.equals("etape1")) {
+                assertThat(numberof).isEqualTo(2L);
+            } else {
+                assertThat(flownodename).isEqualTo("etape2");
+                assertThat(numberof).isEqualTo(1L);
+            }
+        }
+    }
+
+    private SAFlowNodeInstance buildAndAddArchivedUserTaskWithParentAndRootProcessInstanceId(String taskName, long containingProcessInstanceId, long rootProcessInstanceId, int stateId) {
+        return repository.add(anArchivedUserTask().withName(taskName).withLogicalGroup4(containingProcessInstanceId).withLogicalGroup2(rootProcessInstanceId)
+                .withStateId(stateId).build());
     }
 
     @Test

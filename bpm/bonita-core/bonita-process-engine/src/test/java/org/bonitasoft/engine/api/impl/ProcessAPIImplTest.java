@@ -51,6 +51,7 @@ import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.DocumentAPI;
+import org.bonitasoft.engine.api.FlownodeCounters;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementations;
 import org.bonitasoft.engine.bpm.connector.ConnectorCriterion;
 import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
@@ -229,6 +230,40 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getSearchEntitiesDescriptor()).thenReturn(searchEntitiesDescriptor);
         when(tenantAccessor.getEventInstanceService()).thenReturn(eventInstanceService);
         when(tenantAccessor.getFlowNodeStateManager()).thenReturn(flowNodeStateManager);
+    }
+
+    @Test
+    public void getFlownodeStateCounters_should_build_proper_counters() throws Exception {
+        final long processInstanceId = 9811L;
+        Map<String, Long> failedFlownodes = new HashMap<String, Long>(2);
+        failedFlownodes.put("step1", 2L);
+        failedFlownodes.put("step2", 1L);
+        when(activityInstanceService.getNumberOfFlownodesInState(processInstanceId, 3)).thenReturn(failedFlownodes);
+
+        Map<String, Long> readyTasks = new HashMap<String, Long>(2);
+        readyTasks.put("step1", 1L);
+        readyTasks.put("step3", 7L);
+        when(activityInstanceService.getNumberOfFlownodesInState(processInstanceId, 4)).thenReturn(readyTasks);
+
+        Map<String, Long> completedFlownodes = new HashMap<String, Long>(2);
+        completedFlownodes.put("step2", 1L);
+        completedFlownodes.put("step3", 2L);
+        when(activityInstanceService.getNumberOfArchivedFlownodesInState(processInstanceId, 2)).thenReturn(completedFlownodes);
+
+        Map<String, FlownodeCounters> flownodeStateCounters = processAPI.getFlownodeStateCounters(processInstanceId);
+        assertThat(flownodeStateCounters.size()).isEqualTo(3);
+
+        assertThat(flownodeStateCounters.get("step1").getNumberOfFailedFlownodes()).isEqualTo(2L);
+        assertThat(flownodeStateCounters.get("step1").getNumberOfReadyTasks()).isEqualTo(1L);
+        assertThat(flownodeStateCounters.get("step1").getNumberOfCompletedFlownodes()).isEqualTo(0L);
+
+        assertThat(flownodeStateCounters.get("step2").getNumberOfFailedFlownodes()).isEqualTo(1L);
+        assertThat(flownodeStateCounters.get("step2").getNumberOfReadyTasks()).isEqualTo(0L);
+        assertThat(flownodeStateCounters.get("step2").getNumberOfCompletedFlownodes()).isEqualTo(1L);
+
+        assertThat(flownodeStateCounters.get("step3").getNumberOfFailedFlownodes()).isEqualTo(0L);
+        assertThat(flownodeStateCounters.get("step3").getNumberOfReadyTasks()).isEqualTo(7L);
+        assertThat(flownodeStateCounters.get("step3").getNumberOfCompletedFlownodes()).isEqualTo(2L);
     }
 
     @Test

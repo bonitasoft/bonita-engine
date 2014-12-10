@@ -480,8 +480,17 @@
 		WHERE aa.rootContainerId = :rootContainerId
         ORDER BY aa.id
 	</query>
-	
-	
+
+
+	<query name="getNumberOfSAFlowNodesInStateForProcessInstance">
+		SELECT new map(name AS name, count(aa) AS numberof)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl AS aa
+		WHERE logicalGroup4 = :parentProcessInstanceId
+		AND stateId = :stateId
+		GROUP BY name
+		ORDER BY name ASC
+	</query>
+
 	<query name="getNumberOfSATransitionInstance">
 		SELECT COUNT(at)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl AS at

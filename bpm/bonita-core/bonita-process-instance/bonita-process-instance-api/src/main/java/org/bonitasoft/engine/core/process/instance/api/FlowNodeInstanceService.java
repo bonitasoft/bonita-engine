@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.core.process.instance.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
@@ -161,9 +162,32 @@ public interface FlowNodeInstanceService {
             throws SBonitaReadException;
 
     /**
+     * Counts the number of flownode instances in a specific state. Only considers flownodes direcly contained in given process instance, not flownodes in
+     * sub-process instances.
+     *
+     * @param processInstanceId the ID of the process instance to search flownodes for.
+     * @param stateId the ID of the state of the flownodes to search for.
+     * @return a map of &lt;flownodename, number of rows with that name&gt;
+     * @throws SBonitaReadException if a read exception occurs.
+     */
+    Map<String, Long> getNumberOfFlownodesInState(final long processInstanceId, final int stateId) throws SBonitaReadException;
+
+    /**
+     * Counts the number of archived flownode instances in a specific state. Only considers archived flownodes direcly contained in given process instance, not
+     * flownodes in sub-process instances.
+     *
+     * @param processInstanceId the ID of the process instance to search flownodes for. This is the ID of the process instance before it was archived
+     *        (corresponding to the sourceObjectId in the archives)
+     * @param stateId the ID of the state of the flownodes to search for.
+     * @return a map of &lt;flownodename, number of rows with that name&gt;
+     * @throws SBonitaReadException if a read exception occurs.
+     */
+    public Map<String, Long> getNumberOfArchivedFlownodesInState(final long processInstanceId, final int stateId) throws SBonitaReadException;
+
+    /**
      * Set execute by for the specific flow node instance
      *
-     * @param flowNodeInstance
+     * @param sFlowNodeInstance
      *        the flowNodeInstance will be updated
      * @param userId
      *        value for executedBy
@@ -175,7 +199,7 @@ public interface FlowNodeInstanceService {
     /**
      * Set execute by delegate for the specific flow node instance
      *
-     * @param flowNodeInstance
+     * @param sFlowNodeInstance
      *        the flowNodeInstance will be updated
      * @param executerSubstituteId
      *        value for executedBySubstitute
@@ -256,7 +280,6 @@ public interface FlowNodeInstanceService {
 
     /**
      * @param archivedFlowNodeInstanceId
-     * @param persistenceService
      * @return
      * @throws SFlowNodeReadException
      * @throws SFlowNodeNotFoundException

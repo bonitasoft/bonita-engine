@@ -61,6 +61,8 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
@@ -71,6 +73,7 @@ import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * <code>ProcessRuntimeAPI</code> deals with Process runtime notions such as starting a new instance of a process, retrieving and executing tasks, accessing to
@@ -355,7 +358,7 @@ public interface ProcessRuntimeAPI {
      * Delete all archived process instance (different states) of the source identifier list.
      * Passing {@link Integer#MAX_VALUE} identifiers is discouraged as the amount of operations may be large and may thus result in timeout operation.
      *
-     * @param processInstanceIds
+     * @param sourceProcessInstanceIds
      *        Identifiers corresponding to {@link ArchivedProcessInstance#getSourceObjectId()}.
      * @return The number of {@link ArchivedProcessInstance}s that have been deleted in any state. For example, process instance can be archived is several
      *         states: Cancelled, Aborted, Completed, Failed
@@ -369,7 +372,7 @@ public interface ProcessRuntimeAPI {
      * Delete all archived process instance (different states) corresponding to the source identifier.
      * Passing {@link Integer#MAX_VALUE} identifiers is discouraged as the amount of operations may be large and may thus result in timeout operation.
      *
-     * @param processInstanceId
+     * @param sourceProcessInstanceId
      *        Identifier corresponding to {@link ArchivedProcessInstance#getSourceObjectId()}.
      * @return The number of {@link ArchivedProcessInstance}s that have been deleted in any state. For example, process instance can be archived is several
      *         states: Cancelled, Aborted, Completed, Failed
@@ -1718,7 +1721,7 @@ public interface ProcessRuntimeAPI {
      * Search for comments related to the specified process instance.
      *
      * @param searchOptions
-     *        The options used to search for comments. See {@link org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptorr} for valid fields for searching
+     *        The options used to search for comments. See {@link org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor} for valid fields for searching
      *        and sorting.
      * @return The matching comments.
      * @throws InvalidSessionException
@@ -2378,6 +2381,18 @@ public interface ProcessRuntimeAPI {
      * @since 6.3.3
      */
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Retrieve, for a given process instance, the current counters on flownodes. Please note: this method does not count the flownodes of sub-process instances
+     * of the given process instance.
+     * See {@link org.bonitasoft.engine.api.FlownodeCounters} for details on the counters retrieved.
+     * 
+     * @param processInstanceId ID of the process instance of which to retrieve the current indicators.
+     * @return A map of counters: the key is the name of the flownode, as defined at design-time. the value is the current counters for this flownode.
+     * @since 6.5
+     * @see org.bonitasoft.engine.api.FlownodeCounters
+     */
+    Map<String, FlownodeCounters> getFlownodeStateCounters(long processInstanceId);
 
     /**
      * Search the {@link TimerEventTriggerInstance} on the specific {@link ProcessInstance}.

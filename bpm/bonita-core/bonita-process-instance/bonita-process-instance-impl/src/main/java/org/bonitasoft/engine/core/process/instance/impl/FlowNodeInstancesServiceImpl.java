@@ -16,6 +16,7 @@ package org.bonitasoft.engine.core.process.instance.impl;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -404,6 +405,44 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
             final QueryOptions queryOptions) throws SBonitaReadException {
         final Map<String, Object> parameters = Collections.singletonMap("supervisorId", (Object) supervisorId);
         return getPersistenceService().searchEntity(entityClass, SUPERVISED_BY, queryOptions, parameters);
+    }
+
+    @Override
+    public Map<String, Long> getNumberOfFlownodesInState(final long parentProcessInstanceId, final int stateId) throws SBonitaReadException {
+        final HashMap<String, Object> parameters = new HashMap<String, Object>(2);
+        parameters.put("parentProcessInstanceId", parentProcessInstanceId);
+        parameters.put("stateId", (Integer) stateId);
+        final QueryOptions queryOptions = new QueryOptions(0, Integer.MAX_VALUE);
+        final List<Map<String, Object>> result = persistenceService.selectList(new SelectListDescriptor<Map<String, Object>>(
+                "getNumberOfFlowNodesInStateForProcessInstance", parameters, SFlowNodeInstance.class, queryOptions));
+        if (result != null && result.size() > 0) {
+            return getFlownodeCountersFromQuery(result);
+        }
+        return null;
+    }
+
+    @Override
+    public Map<String, Long> getNumberOfArchivedFlownodesInState(final long parentProcessInstanceId, final int stateId) throws SBonitaReadException {
+        final HashMap<String, Object> parameters = new HashMap<String, Object>(2);
+        parameters.put("parentProcessInstanceId", parentProcessInstanceId);
+        parameters.put("stateId", (Integer) stateId);
+        final QueryOptions queryOptions = new QueryOptions(0, Integer.MAX_VALUE);
+        final List<Map<String, Object>> result = persistenceService.selectList(new SelectListDescriptor<Map<String, Object>>(
+                "getNumberOfSAFlowNodesInStateForProcessInstance", parameters, SAFlowNodeInstance.class, queryOptions));
+        if (result != null && result.size() > 0) {
+            return getFlownodeCountersFromQuery(result);
+        }
+        return null;
+    }
+
+    private Map<String, Long> getFlownodeCountersFromQuery(final List<Map<String, Object>> lines) {
+        Map<String, Long> counters = new HashMap<String, Long>(lines.size());
+        for (final Map<String, Object> line : lines) {
+            final String flownodeName = (String) line.get("name");
+            final Long number = (Long) line.get("numberof");
+            counters.put(flownodeName, number);
+        }
+        return counters;
     }
 
     @Override

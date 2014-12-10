@@ -46,6 +46,16 @@
         ORDER BY f.id ASC
 	</query>
 
+	<query name="getNumberOfFlowNodesInStateForProcessInstance">
+		SELECT new map(name AS name, count(f) AS numberof)
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
+		WHERE logicalGroup4 = :parentProcessInstanceId
+		AND stateId = :stateId
+		AND deleted = FALSE
+		GROUP BY name
+		ORDER BY name ASC
+	</query>
+
 	<query name="getOpenActivitiesFromProcessInstance">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
