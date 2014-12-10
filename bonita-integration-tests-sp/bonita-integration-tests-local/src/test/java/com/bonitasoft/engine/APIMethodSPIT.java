@@ -8,7 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import org.bonitasoft.engine.test.APIMethodTest;
+import org.bonitasoft.engine.test.APIMethodIT;
 import org.junit.Test;
 
 import com.bonitasoft.engine.api.ApplicationAPI;
@@ -21,7 +21,7 @@ import com.bonitasoft.engine.api.impl.ProcessAPIExt;
 import com.bonitasoft.engine.api.impl.ReportingAPIExt;
 
 @SuppressWarnings("javadoc")
-public class APIMethodSPTest extends APIMethodTest {
+public class APIMethodSPIT extends APIMethodIT {
 
     @Override
     @Test
@@ -38,12 +38,6 @@ public class APIMethodSPTest extends APIMethodTest {
     public void checkAllMethodsOfMonitoringAPIContainsSerializableParameters() {
         checkAllParametersAreSerializable(MonitoringAPIImpl.class);
     }
-
-    // @Override
-    // @Test
-    // public void checkAllMethodsOfPlatformAPIContainsSerializableParameters() {
-    // checkAllParametersAreSerializable(PlatformAPIExt.class);
-    // }
 
     @Test
     public void checkAllMethodsOfPlatformMonitoringAPIContainsSerializableParameters() {
