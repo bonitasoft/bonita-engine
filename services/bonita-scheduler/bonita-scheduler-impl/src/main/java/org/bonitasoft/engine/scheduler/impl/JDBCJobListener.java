@@ -34,11 +34,11 @@ import org.bonitasoft.engine.scheduler.SchedulerExecutor;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.StatelessJob;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
+import org.bonitasoft.engine.scheduler.exception.jobDescriptor.SJobDescriptorReadException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogCreationException;
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogUpdatingException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
-import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -58,6 +58,8 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
 
     private final TechnicalLoggerService logger;
 
+    private final JobLogCreator jobLogCreator;
+
     private final SchedulerService schedulerService;
 
     private final SchedulerExecutor schedulerExecutor;
@@ -68,7 +70,7 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
 
     public JDBCJobListener(final SchedulerService schedulerService, final JobService jobService, final SchedulerExecutor schedulerExecutor,
             final SessionAccessor sessionAccessor, final TransactionService transactionService, final IncidentService incidentService,
-            final TechnicalLoggerService logger) {
+            final TechnicalLoggerService logger, final JobLogCreator jobLogCreator) {
         super();
         this.schedulerService = schedulerService;
         this.jobService = jobService;
@@ -77,6 +79,7 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
         this.transactionService = transactionService;
         this.incidentService = incidentService;
         this.logger = logger;
+        this.jobLogCreator = jobLogCreator;
     }
 
     @Override
@@ -169,12 +172,12 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
     }
 
     private void setJobLog(final Exception jobException, final Long jobDescriptorId) throws SBonitaReadException, SJobLogUpdatingException,
-            SJobLogCreationException {
+            SJobLogCreationException, SJobDescriptorReadException {
         final List<SJobLog> jobLogs = jobService.getJobLogs(jobDescriptorId, 0, 1);
         if (!jobLogs.isEmpty()) {
             updateJobLog(jobException, jobLogs);
         } else {
-            createJobLog(jobException, jobDescriptorId);
+            jobLogCreator.createJobLog(jobException, jobDescriptorId);
         }
     }
 
@@ -190,14 +193,6 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
                 logger.log(this.getClass(), TechnicalLogSeverity.WARNING, e);
             }
         }
-    }
-
-    private void createJobLog(final Exception jobException, final Long jobDescriptorId) throws SJobLogCreationException {
-        final SJobLogImpl jobLog = new SJobLogImpl(jobDescriptorId);
-        jobLog.setLastMessage(getStackTrace(jobException));
-        jobLog.setRetryNumber(0L);
-        jobLog.setLastUpdateDate(System.currentTimeMillis());
-        jobService.createJobLog(jobLog);
     }
 
     private void updateJobLog(final Exception jobException, final List<SJobLog> jobLogs) throws SJobLogUpdatingException {

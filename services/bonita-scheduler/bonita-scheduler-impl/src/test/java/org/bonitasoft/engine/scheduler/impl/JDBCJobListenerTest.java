@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -99,6 +98,9 @@ public class JDBCJobListenerTest {
     @Mock
     private IncidentService incidentService;
 
+    @Mock
+    private JobLogCreator jobLogCreator;
+
     @InjectMocks
     private JDBCJobListener jdbcJobListener;
 
@@ -135,7 +137,7 @@ public class JDBCJobListenerTest {
         jdbcJobListener.jobWasExecuted(context, exeption1);
 
         // Then
-        verify(jobService).createJobLog(argThat(new SJobLogMatcher(JOB_DESCRIPTOR_ID, Exception.class.getName(), 0)));
+        verify(jobLogCreator).createJobLog(exeption1, JOB_DESCRIPTOR_ID);
         verify(transactionService).registerBonitaSynchronization(any(BonitaTransactionSynchronizationImpl.class));
     }
 
