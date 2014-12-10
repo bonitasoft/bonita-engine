@@ -29,9 +29,6 @@ public class MD5CredentialsEncrypter implements CredentialsEncrypter {
 
     @Override
     public boolean check(final String password, final String hashPassword) {
-        System.out.println("Given password: " + password);
-        System.out.println("Hashed password: " + hashPassword);
-
         final String hashedPassword = hash(password);
         return hashedPassword.equals(hashPassword);
     }
