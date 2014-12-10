@@ -418,7 +418,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         if (result != null && result.size() > 0) {
             return getFlownodeCountersFromQuery(result);
         }
-        return null;
+        return Collections.emptyMap();
     }
 
     @Override
@@ -432,7 +432,7 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
         if (result != null && result.size() > 0) {
             return getFlownodeCountersFromQuery(result);
         }
-        return null;
+        return Collections.emptyMap();
     }
 
     private Map<String, Long> getFlownodeCountersFromQuery(final List<Map<String, Object>> lines) {

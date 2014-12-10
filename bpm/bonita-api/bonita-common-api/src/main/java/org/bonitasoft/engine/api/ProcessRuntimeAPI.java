@@ -2388,8 +2388,9 @@ public interface ProcessRuntimeAPI {
      * See {@link org.bonitasoft.engine.api.FlownodeCounters} for details on the counters retrieved.
      * 
      * @param processInstanceId ID of the process instance of which to retrieve the current indicators.
-     * @return A map of counters: the key is the name of the flownode, as defined at design-time. the value is the current counters for this flownode.
-     * @since 6.5
+     * @return A map of counters: the key is the name of the flownode, as defined at design-time. the value is the current counters for this flownode. If no
+     *         results, returns an empty Map.
+     * @since 6.5.0
      * @see org.bonitasoft.engine.api.FlownodeCounters
      */
     Map<String, FlownodeCounters> getFlownodeStateCounters(long processInstanceId);

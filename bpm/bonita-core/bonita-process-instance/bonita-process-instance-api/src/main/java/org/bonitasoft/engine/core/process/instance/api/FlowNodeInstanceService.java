@@ -167,7 +167,7 @@ public interface FlowNodeInstanceService {
      *
      * @param processInstanceId the ID of the process instance to search flownodes for.
      * @param stateId the ID of the state of the flownodes to search for.
-     * @return a map of &lt;flownodename, number of rows with that name&gt;
+     * @return a map of &lt;flownodename, number of rows with that name&gt;. If no results, returns an empty Map.
      * @throws SBonitaReadException if a read exception occurs.
      */
     Map<String, Long> getNumberOfFlownodesInState(final long processInstanceId, final int stateId) throws SBonitaReadException;
@@ -179,7 +179,7 @@ public interface FlowNodeInstanceService {
      * @param processInstanceId the ID of the process instance to search flownodes for. This is the ID of the process instance before it was archived
      *        (corresponding to the sourceObjectId in the archives)
      * @param stateId the ID of the state of the flownodes to search for.
-     * @return a map of &lt;flownodename, number of rows with that name&gt;
+     * @return a map of &lt;flownodename, number of rows with that name&gt;. If no results, returns an empty Map.
      * @throws SBonitaReadException if a read exception occurs.
      */
     public Map<String, Long> getNumberOfArchivedFlownodesInState(final long processInstanceId, final int stateId) throws SBonitaReadException;
