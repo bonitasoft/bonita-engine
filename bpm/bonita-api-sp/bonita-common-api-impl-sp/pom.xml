@@ -39,7 +39,7 @@
             <groupId>com.sap</groupId>
             <artifactId>sapjco</artifactId>
             <version>3.0.3</version><!-- Update version for local tests if needed -->
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
