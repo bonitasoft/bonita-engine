@@ -597,17 +597,12 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
     @Test
     public void isInvolvedInProcessInstanceWithInvalidUser() throws Exception {
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithActorAndThreeHumanStepsAndThreeTransition();
-        final BusinessArchive businessArchive1 = new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done();
-        final ProcessDefinition processDefinition = getProcessAPI().deploy(businessArchive1);
-
-        addUserToFirstActorOfProcess(user.getId(), processDefinition);
-        getProcessAPI().enableProcess(processDefinition.getId());
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("step2", processInstance);
         try {
-            final long beinglessUserId = user.getId() + 1;
-            getProcessAPI().isInvolvedInProcessInstance(beinglessUserId, processInstance.getId());
+            getProcessAPI().isInvolvedInProcessInstance(999999999999L, processInstance.getId());
         } finally {
             disableAndDeleteProcess(processDefinition);
         }

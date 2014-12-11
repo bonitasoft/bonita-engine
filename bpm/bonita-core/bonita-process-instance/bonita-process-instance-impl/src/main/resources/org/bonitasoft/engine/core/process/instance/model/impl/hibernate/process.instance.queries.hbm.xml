@@ -1226,6 +1226,20 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
 	</query>
 	
+	<query name="getNumberOfSProcessInstancewithSUserTaskInstance">
+		SELECT COUNT(DISTINCT p)
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+			 org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
+		WHERE p.id = a.logicalGroup4
+	</query>
+	
+	<query name="searchSProcessInstancewithSUserTaskInstance">
+		SELECT DISTINCT p
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+			 org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
+		WHERE p.id = a.logicalGroup4
+	</query>
+	
 	<query name="getNumberOfSProcessInstanceFailed">
 		SELECT COUNT(DISTINCT p)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
