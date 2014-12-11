@@ -38,6 +38,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAManua
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceLogBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.core.process.instance.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.events.EventActionType;
@@ -408,41 +409,27 @@ public abstract class FlowNodeInstancesServiceImpl implements FlowNodeInstanceSe
     }
 
     @Override
-    public Map<String, Long> getNumberOfFlownodesInState(final long parentProcessInstanceId, final int stateId) throws SBonitaReadException {
+    public List<SFlowNodeInstanceStateCounter> getNumberOfFlownodesInAllStates(final long parentProcessInstanceId) throws SBonitaReadException {
         final HashMap<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("parentProcessInstanceId", parentProcessInstanceId);
-        parameters.put("stateId", (Integer) stateId);
-        final QueryOptions queryOptions = new QueryOptions(0, Integer.MAX_VALUE);
-        final List<Map<String, Object>> result = persistenceService.selectList(new SelectListDescriptor<Map<String, Object>>(
-                "getNumberOfFlowNodesInStateForProcessInstance", parameters, SFlowNodeInstance.class, queryOptions));
+        final List<SFlowNodeInstanceStateCounter> result = persistenceService.selectList(new SelectListDescriptor<SFlowNodeInstanceStateCounter>(
+                "getNumberOfFlowNodesInAllStates", parameters, SFlowNodeInstance.class, new QueryOptions(0, Integer.MAX_VALUE)));
         if (result != null && result.size() > 0) {
-            return getFlownodeCountersFromQuery(result);
+            return result;
         }
-        return Collections.emptyMap();
+        return Collections.emptyList();
     }
 
     @Override
-    public Map<String, Long> getNumberOfArchivedFlownodesInState(final long parentProcessInstanceId, final int stateId) throws SBonitaReadException {
+    public List<SFlowNodeInstanceStateCounter> getNumberOfArchivedFlownodesInAllStates(final long parentProcessInstanceId) throws SBonitaReadException {
         final HashMap<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("parentProcessInstanceId", parentProcessInstanceId);
-        parameters.put("stateId", (Integer) stateId);
-        final QueryOptions queryOptions = new QueryOptions(0, Integer.MAX_VALUE);
-        final List<Map<String, Object>> result = persistenceService.selectList(new SelectListDescriptor<Map<String, Object>>(
-                "getNumberOfSAFlowNodesInStateForProcessInstance", parameters, SAFlowNodeInstance.class, queryOptions));
+        final List<SFlowNodeInstanceStateCounter> result = persistenceService.selectList(new SelectListDescriptor<SFlowNodeInstanceStateCounter>(
+                "getNumberOfArchivedFlowNodesInAllStates", parameters, SAFlowNodeInstance.class, new QueryOptions(0, Integer.MAX_VALUE)));
         if (result != null && result.size() > 0) {
-            return getFlownodeCountersFromQuery(result);
+            return result;
         }
-        return Collections.emptyMap();
-    }
-
-    private Map<String, Long> getFlownodeCountersFromQuery(final List<Map<String, Object>> lines) {
-        Map<String, Long> counters = new HashMap<String, Long>(lines.size());
-        for (final Map<String, Object> line : lines) {
-            final String flownodeName = (String) line.get("name");
-            final Long number = (Long) line.get("numberof");
-            counters.put(flownodeName, number);
-        }
-        return counters;
+        return Collections.emptyList();
     }
 
     @Override

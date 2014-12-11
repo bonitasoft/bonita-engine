@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.SFlowNodeInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.impl.SUserTaskInstanceBuilderFactoryImpl;
@@ -318,20 +319,20 @@ public class ActivityInstanceServiceImplTest {
     }
 
     @Test
-    public void getNumberOfFlownodesInState_should_return_empty_collections_if_no_results() throws SBonitaReadException {
+    public void getNumberOfFlownodesInAllStates_should_return_empty_collections_if_no_results() throws SBonitaReadException {
         when(persistenceService.selectList(Matchers.<SelectListDescriptor<Map<String, Object>>> any())).thenReturn(
                 Collections.<Map<String, Object>> emptyList());
 
-        Map<String, Long> numberOfFlownodesInState = activityInstanceServiceImpl.getNumberOfFlownodesInState(2L, 1);
+        List<SFlowNodeInstanceStateCounter> numberOfFlownodesInState = activityInstanceServiceImpl.getNumberOfFlownodesInAllStates(2L);
         assertThat(numberOfFlownodesInState).isEmpty();
     }
 
     @Test
-    public void getNumberOfArchivedFlownodesInState_should_return_empty_collections_if_no_results() throws SBonitaReadException {
+    public void getNumberOfArchivedFlownodesInAllStates_should_return_empty_collections_if_no_results() throws SBonitaReadException {
         when(persistenceService.selectList(Matchers.<SelectListDescriptor<Map<String, Object>>> any())).thenReturn(
                 Collections.<Map<String, Object>> emptyList());
 
-        Map<String, Long> numberOfFlownodesInState = activityInstanceServiceImpl.getNumberOfArchivedFlownodesInState(2L, 1);
+        List<SFlowNodeInstanceStateCounter> numberOfFlownodesInState = activityInstanceServiceImpl.getNumberOfArchivedFlownodesInAllStates(2L);
         assertThat(numberOfFlownodesInState).isEmpty();
     }
 

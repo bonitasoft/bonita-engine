@@ -64,6 +64,7 @@ public abstract class FlowNodeInstanceBuilder<T extends SFlowNodeInstanceImpl, B
         persistent.setStateCategory(stateCategory);
         persistent.setStateExecuting(stateExecuting);
         persistent.setStateId(stateId);
+        persistent.setStateName(stateName);
         persistent.setTerminal(terminal);
         persistent.setTokenRefId(tokenRefId);
         persistent.setLogicalGroup(0, logicalGroup1);

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -74,21 +75,19 @@ public class FlowNodeInstanceRepository extends TestRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Map<String, Object>> getNumberOfFlowNodesInStateForProcessInstance(final long processInstanceId, int stateId) {
+    public List<SFlowNodeInstanceStateCounter> getNumberOfArchivedFlowNodesInAllStates(long processInstanceId) {
         getSessionWithTenantFilter();
-        Query namedQuery = getNamedQuery("getNumberOfFlowNodesInStateForProcessInstance");
+        Query namedQuery = getNamedQuery("getNumberOfArchivedFlowNodesInAllStates");
         namedQuery.setParameter("parentProcessInstanceId", processInstanceId);
-        namedQuery.setParameter("stateId", stateId);
-        return (List<Map<String, Object>>) namedQuery.list();
+        return (List<SFlowNodeInstanceStateCounter>) namedQuery.list();
     }
 
     @SuppressWarnings("unchecked")
-    public List<Map<String, Object>> getNumberOfArchivedFlowNodesInStateForProcessInstance(long processInstanceId, int stateId) {
+    public List<SFlowNodeInstanceStateCounter> getNumberOfFlowNodesInAllStates(long processInstanceId) {
         getSessionWithTenantFilter();
-        Query namedQuery = getNamedQuery("getNumberOfSAFlowNodesInStateForProcessInstance");
+        Query namedQuery = getNamedQuery("getNumberOfFlowNodesInAllStates");
         namedQuery.setParameter("parentProcessInstanceId", processInstanceId);
-        namedQuery.setParameter("stateId", stateId);
-        return (List<Map<String, Object>>) namedQuery.list();
+        return (List<SFlowNodeInstanceStateCounter>) namedQuery.list();
     }
 
 }

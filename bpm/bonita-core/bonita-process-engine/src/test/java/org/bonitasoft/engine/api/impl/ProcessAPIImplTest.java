@@ -26,14 +26,7 @@ import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.Serializable;
@@ -51,7 +44,6 @@ import org.bonitasoft.engine.actor.mapping.ActorMappingService;
 import org.bonitasoft.engine.actor.mapping.SActorNotFoundException;
 import org.bonitasoft.engine.actor.mapping.model.SActor;
 import org.bonitasoft.engine.api.DocumentAPI;
-import org.bonitasoft.engine.api.FlownodeCounters;
 import org.bonitasoft.engine.api.impl.transaction.connector.GetConnectorImplementations;
 import org.bonitasoft.engine.bpm.connector.ConnectorCriterion;
 import org.bonitasoft.engine.bpm.connector.ConnectorImplementationDescriptor;
@@ -89,6 +81,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
@@ -233,37 +226,35 @@ public class ProcessAPIImplTest {
     }
 
     @Test
-    public void getFlownodeStateCounters_should_build_proper_counters() throws Exception {
+    public void getFlownodeStateCounters_should_build_proper_journal_and_archived_counters() throws Exception {
         final long processInstanceId = 9811L;
-        Map<String, Long> failedFlownodes = new HashMap<String, Long>(2);
-        failedFlownodes.put("step1", 2L);
-        failedFlownodes.put("step2", 1L);
-        when(activityInstanceService.getNumberOfFlownodesInState(processInstanceId, 3)).thenReturn(failedFlownodes);
+        List<SFlowNodeInstanceStateCounter> flownodes = new ArrayList<SFlowNodeInstanceStateCounter>(4);
+        flownodes.add(new SFlowNodeInstanceStateCounter("step1", "completed", 2L));
+        flownodes.add(new SFlowNodeInstanceStateCounter("step2", "completed", 4L));
+        flownodes.add(new SFlowNodeInstanceStateCounter("step1", "ready", 1L));
+        flownodes.add(new SFlowNodeInstanceStateCounter("step3", "failed", 8L));
+        when(activityInstanceService.getNumberOfFlownodesInAllStates(processInstanceId)).thenReturn(flownodes);
 
-        Map<String, Long> readyTasks = new HashMap<String, Long>(2);
-        readyTasks.put("step1", 1L);
-        readyTasks.put("step3", 7L);
-        when(activityInstanceService.getNumberOfFlownodesInState(processInstanceId, 4)).thenReturn(readyTasks);
+        List<SFlowNodeInstanceStateCounter> archivedFlownodes = new ArrayList<SFlowNodeInstanceStateCounter>(4);
+        flownodes.add(new SFlowNodeInstanceStateCounter("step2", "aborted", 3L));
+        when(activityInstanceService.getNumberOfArchivedFlownodesInAllStates(processInstanceId)).thenReturn(archivedFlownodes);
 
-        Map<String, Long> completedFlownodes = new HashMap<String, Long>(2);
-        completedFlownodes.put("step2", 1L);
-        completedFlownodes.put("step3", 2L);
-        when(activityInstanceService.getNumberOfArchivedFlownodesInState(processInstanceId, 2)).thenReturn(completedFlownodes);
-
-        Map<String, FlownodeCounters> flownodeStateCounters = processAPI.getFlownodeStateCounters(processInstanceId);
+        Map<String, Map<String, Long>> flownodeStateCounters = processAPI.getFlownodeStateCounters(processInstanceId);
         assertThat(flownodeStateCounters.size()).isEqualTo(3);
 
-        assertThat(flownodeStateCounters.get("step1").getNumberOfFailedFlownodes()).isEqualTo(2L);
-        assertThat(flownodeStateCounters.get("step1").getNumberOfReadyTasks()).isEqualTo(1L);
-        assertThat(flownodeStateCounters.get("step1").getNumberOfCompletedFlownodes()).isEqualTo(0L);
+        Map<String, Long> step1 = flownodeStateCounters.get("step1");
+        assertThat(step1.size()).isEqualTo(2);
+        assertThat(step1.get("completed")).isEqualTo(2L);
+        assertThat(step1.get("ready")).isEqualTo(1L);
 
-        assertThat(flownodeStateCounters.get("step2").getNumberOfFailedFlownodes()).isEqualTo(1L);
-        assertThat(flownodeStateCounters.get("step2").getNumberOfReadyTasks()).isEqualTo(0L);
-        assertThat(flownodeStateCounters.get("step2").getNumberOfCompletedFlownodes()).isEqualTo(1L);
+        Map<String, Long> step2 = flownodeStateCounters.get("step2");
+        assertThat(step2.size()).isEqualTo(2);
+        assertThat(step2.get("aborted")).isEqualTo(3L);
+        assertThat(step2.get("completed")).isEqualTo(4L);
 
-        assertThat(flownodeStateCounters.get("step3").getNumberOfFailedFlownodes()).isEqualTo(0L);
-        assertThat(flownodeStateCounters.get("step3").getNumberOfReadyTasks()).isEqualTo(7L);
-        assertThat(flownodeStateCounters.get("step3").getNumberOfCompletedFlownodes()).isEqualTo(2L);
+        Map<String, Long> step3 = flownodeStateCounters.get("step3");
+        assertThat(step3.size()).isEqualTo(1);
+        assertThat(step3.get("failed")).isEqualTo(8L);
     }
 
     @Test

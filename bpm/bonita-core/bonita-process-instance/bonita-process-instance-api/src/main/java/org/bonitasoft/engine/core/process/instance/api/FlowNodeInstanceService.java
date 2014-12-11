@@ -14,7 +14,6 @@
 package org.bonitasoft.engine.core.process.instance.api;
 
 import java.util.List;
-import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeDeletionException;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeModificationException;
@@ -26,6 +25,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
@@ -162,27 +162,25 @@ public interface FlowNodeInstanceService {
             throws SBonitaReadException;
 
     /**
-     * Counts the number of flownode instances in a specific state. Only considers flownodes direcly contained in given process instance, not flownodes in
-     * sub-process instances.
+     * Counts the number of flownode instances in all states. Only considers flownodes direcly contained in given process instance, not flownodes in
+     * sub-process instances. Results are counted per flownode name and per state.
      *
      * @param processInstanceId the ID of the process instance to search flownodes for.
-     * @param stateId the ID of the state of the flownodes to search for.
      * @return a map of &lt;flownodename, number of rows with that name&gt;. If no results, returns an empty Map.
      * @throws SBonitaReadException if a read exception occurs.
      */
-    Map<String, Long> getNumberOfFlownodesInState(final long processInstanceId, final int stateId) throws SBonitaReadException;
+    List<SFlowNodeInstanceStateCounter> getNumberOfFlownodesInAllStates(final long processInstanceId) throws SBonitaReadException;
 
     /**
      * Counts the number of archived flownode instances in a specific state. Only considers archived flownodes direcly contained in given process instance, not
-     * flownodes in sub-process instances.
+     * flownodes in sub-process instances. Results are counted per flownode name and per state.
      *
      * @param processInstanceId the ID of the process instance to search flownodes for. This is the ID of the process instance before it was archived
      *        (corresponding to the sourceObjectId in the archives)
-     * @param stateId the ID of the state of the flownodes to search for.
      * @return a map of &lt;flownodename, number of rows with that name&gt;. If no results, returns an empty Map.
      * @throws SBonitaReadException if a read exception occurs.
      */
-    public Map<String, Long> getNumberOfArchivedFlownodesInState(final long processInstanceId, final int stateId) throws SBonitaReadException;
+    public List<SFlowNodeInstanceStateCounter> getNumberOfArchivedFlownodesInAllStates(final long processInstanceId) throws SBonitaReadException;
 
     /**
      * Set execute by for the specific flow node instance

@@ -2385,15 +2385,14 @@ public interface ProcessRuntimeAPI {
     /**
      * Retrieve, for a given process instance, the current counters on flownodes. Please note: this method does not count the flownodes of sub-process instances
      * of the given process instance.
-     * See {@link org.bonitasoft.engine.api.FlownodeCounters} for details on the counters retrieved.
      * 
      * @param processInstanceId ID of the process instance of which to retrieve the current indicators.
-     * @return A map of counters: the key is the name of the flownode, as defined at design-time. the value is the current counters for this flownode. If no
-     *         results, returns an empty Map.
+     * @return A map of counters: the key is the name of the flownode, as defined at design-time. the value is the current counters for this flownode, that is,
+     *         a map of &lt;state name, number of current flownode in that state&gt;
+     *         If no results, returns an empty Map.
      * @since 6.5.0
-     * @see org.bonitasoft.engine.api.FlownodeCounters
      */
-    Map<String, FlownodeCounters> getFlownodeStateCounters(long processInstanceId);
+    Map<String, Map<String, Long>> getFlownodeStateCounters(long processInstanceId);
 
     /**
      * Search the {@link TimerEventTriggerInstance} on the specific {@link ProcessInstance}.

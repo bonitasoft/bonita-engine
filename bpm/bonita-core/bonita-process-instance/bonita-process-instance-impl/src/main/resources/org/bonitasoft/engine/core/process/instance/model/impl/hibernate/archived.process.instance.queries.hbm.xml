@@ -481,14 +481,13 @@
         ORDER BY aa.id
 	</query>
 
-
-	<query name="getNumberOfSAFlowNodesInStateForProcessInstance">
-		SELECT new map(name AS name, count(aa) AS numberof)
+	<query name="getNumberOfArchivedFlowNodesInAllStates">
+		SELECT new list(name AS name, stateName AS statename, count(aa) AS numberof)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl AS aa
 		WHERE logicalGroup4 = :parentProcessInstanceId
-		AND stateId = :stateId
-		GROUP BY name
-		ORDER BY name ASC
+		AND terminal = TRUE
+		GROUP BY name, stateName
+		ORDER BY name ASC, stateName ASC
 	</query>
 
 	<query name="getNumberOfSATransitionInstance">

@@ -67,6 +67,7 @@ public abstract class ArchivedFlowNodeInstanceBuilder<T extends SAFlowNodeInstan
         persistent.setRootContainerId(rootContainerId);
         persistent.setStable(stable);
         persistent.setStateId(stateId);
+        persistent.setStateName(stateName);
         persistent.setTerminal(terminal);
         persistent.setLogicalGroup(0, logicalGroup1);
         persistent.setLogicalGroup(1, logicalGroup2);
