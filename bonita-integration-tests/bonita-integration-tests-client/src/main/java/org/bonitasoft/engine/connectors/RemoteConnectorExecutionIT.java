@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -44,6 +45,8 @@ import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.DocumentsSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.ErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
@@ -97,6 +100,8 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
     private static final String FLOWNODE = "flowNode";
 
     private static final String PROCESS = "process";
+
+    public static final String TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID = "testConnectorThatThrowException";
 
     @Test
     public void executeConnectorWithJNDILookupAndAPICall() throws Exception {
@@ -1373,4 +1378,56 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         getIdentityAPI().deleteUser("myUser");
 
     }
+
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.CONNECTOR, keywords = { "connector instance", "connector failure" }, jira = "BS-11877")
+    @Test
+    public void getConnectorWithFailureInformationOnConnectorExecution() throws Exception {
+        //given
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithFailingConnector();
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final ActivityInstance failedTask = waitForTaskToFail(processInstance);
+        final SearchResult<ConnectorInstance> searchResult = getProcessAPI().searchConnectorInstances(
+                getFirst100ConnectorInstanceSearchOptions(failedTask.getId(), FLOWNODE).done());
+        Assertions.assertThat(searchResult.getCount()).isEqualTo(1);
+        Assertions.assertThat(searchResult.getResult().get(0).getState()).isEqualTo(ConnectorState.FAILED);
+
+
+        //when
+        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        builder.sort(ArchivedFlowNodeInstanceSearchDescriptor.ORIGINAL_FLOW_NODE_ID, Order.ASC);
+        builder.filter(ArchivedFlowNodeInstanceSearchDescriptor.ORIGINAL_FLOW_NODE_ID, failedTask.getId());
+        builder.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, "executing");
+        SearchResult<ArchivedFlowNodeInstance> archivedFlowNodeInstanceSearchResult = getProcessAPI().searchArchivedFlowNodeInstances(builder.done());
+
+        //then
+        Assertions.assertThat(archivedFlowNodeInstanceSearchResult.getCount()).isEqualTo(1);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    private ProcessDefinition deployAndEnableProcessWithFailingConnector() throws BonitaException, IOException {
+        final Expression normal = new ExpressionBuilder().createConstantStringExpression(TestConnectorThatThrowException.NORMAL);
+        final Expression defaultValueExpression = new ExpressionBuilder().createConstantStringExpression("initial");
+        final String dataName = "myVar";
+
+        final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        designProcessDefinition.addActor(ACTOR_NAME);
+        designProcessDefinition.addShortTextData(dataName, defaultValueExpression);
+        designProcessDefinition
+                .addAutomaticTask("step1")
+                .addConnector("myConnector", TEST_CONNECTOR_THAT_THROW_EXCEPTION_ID, "1.0", ConnectorEvent.ON_ENTER)
+                .addInput("kind", normal)
+                .addOutput(new LeftOperandBuilder().createNewInstance().setName(dataName).done(), OperatorType.ASSIGNMENT, "=", "",
+                        new ExpressionBuilder().createInputExpression("output1", String.class.getName()));
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorThatThrowException(designProcessDefinition, ACTOR_NAME, user);
+        return processDefinition;
+    }
+
+    public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorThatThrowException(final ProcessDefinitionBuilder processDefinitionBuilder,
+                                                                                               final String actor, final User user) throws BonitaException, IOException {
+        return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actor, user, null,
+                "TestConnectorThatThrowException.impl", TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
+    }
+
 }
