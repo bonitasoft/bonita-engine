@@ -312,7 +312,7 @@
 			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl AS aa2
 			WHERE aa2.sourceObjectId = aa.sourceObjectId
 		)
-	</query>  
+	</query>
 	
 	<query name="searchSAManualTaskInstancewithSAActivityInstance">
 		SELECT aa
@@ -482,7 +482,7 @@
 	</query>
 
 	<query name="getNumberOfArchivedFlowNodesInAllStates">
-		SELECT new list(name AS name, stateName AS statename, count(aa) AS numberof)
+		SELECT new org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter(name AS name, stateName AS statename, count(aa) AS numberof)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl AS aa
 		WHERE logicalGroup4 = :parentProcessInstanceId
 		AND terminal = TRUE

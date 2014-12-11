@@ -47,7 +47,7 @@
 	</query>
 
 	<query name="getNumberOfFlowNodesInAllStates">
-		SELECT new org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceStateCounter(name AS name, stateName AS statename, count(f) AS numberof)
+		SELECT new org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter(name AS name, stateName AS statename, count(f) AS numberof)
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
 		WHERE logicalGroup4 = :parentProcessInstanceId
 		AND deleted = FALSE
