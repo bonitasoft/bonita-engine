@@ -11,7 +11,7 @@
 	<artifactId>bonita-core</artifactId>
 	<packaging>pom</packaging>
 
-    <name>Bonita Engine Core Services</name>
+    <name>Bonita Engine SP Core Services</name>
 
 	<modules>
 		<module>bonita-instance-migration-impl-sp</module>
