@@ -453,15 +453,15 @@ public class DocumentAPIImpl implements DocumentAPI {
     }
 
     @Override
-    public void deleteContentOfArchivedDocument(final long documentId) throws DocumentException, DocumentNotFoundException {
+    public void deleteContentOfArchivedDocument(final long archivedDocumentId) throws DocumentException, DocumentNotFoundException {
         final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
         final DocumentService documentService = tenantAccessor.getDocumentService();
         try {
-            documentService.deleteContentOfArchivedDocument(documentId);
+            documentService.deleteContentOfArchivedDocument(archivedDocumentId);
         } catch (final SObjectNotFoundException e) {
-            throw new DocumentNotFoundException("The document with id " + documentId + " could not be found", e);
+            throw new DocumentNotFoundException("The document with id " + archivedDocumentId + " could not be found", e);
         } catch (final SBonitaException e) {
-            throw new DocumentException("Unable to delete content of all version of the document " + documentId, e);
+            throw new DocumentException("Unable to delete content of all version of the document " + archivedDocumentId, e);
         }
     }
 

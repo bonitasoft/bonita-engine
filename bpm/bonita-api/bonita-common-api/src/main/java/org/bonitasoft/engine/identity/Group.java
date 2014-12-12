@@ -18,66 +18,66 @@ import java.util.Date;
 import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
- * represents a Group inside the organization.
+ * Represents a group inside the organization.
  *
  * @author Lu Kai, Bole Zhang, Matthieu Chaffotte
- * @see GroupAPI
+ * @see org.bonitasoft.engine.api.GroupAPI
  * @since 6.0.0
  */
 public interface Group extends BonitaObject {
 
     /**
-     * @return the group's id
+     * @return The identifier of the group.
      */
     long getId();
 
     /**
-     * @return the group's name
+     * @return The name of the group.
      */
     String getName();
 
     /**
-     * @return the group's name to display
+     * @return The identifier of the group to display.
      */
     String getDisplayName();
 
     /**
-     * @return the group's description
+     * @return The description of the group.
      */
     String getDescription();
 
     /**
-     * @return the group's icon name
+     * @return The group's icon name
      */
     String getIconName();
 
     /**
-     * @return the group's icon file path
+     * @return The group's icon file path
      */
     String getIconPath();
 
     /**
-     * @return the id of the user that created the group
+     * @return The identifier of the user that created the group
      */
     long getCreatedBy();
 
     /**
-     * @return the group's creation's date
+     * @return The group's creation's date
      */
     Date getCreationDate();
 
     /**
-     * @return the group's last update date
+     * @return The group's last update date
      */
     Date getLastUpdate();
 
     /**
-     * @return the group's path
+     * @return The group's path
      */
     String getParentPath();
 
     /**
-     * @return the group's full path (i.e. with its parent path)
+     * @return The group's full path (i.e. with its parent path)
      */
     String getPath();
 

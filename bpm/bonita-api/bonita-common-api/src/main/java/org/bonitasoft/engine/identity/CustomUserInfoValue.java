@@ -16,30 +16,34 @@ package org.bonitasoft.engine.identity;
 import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
- * A {@link CustomUserInfoValue} defines the value of {@link CustomUserInfoDefinition} for a given {@link User}
+ * A {@code CustomUserInfoValue} defines the value of a {@link CustomUserInfoDefinition} for a given {@link User}
  *
  * @author Elias Ricken de Medeiros
  * @see CustomUserInfoDefinition
- * @see CustomUserInfoValue
  * @see User
  * @since 6.3
  */
 public interface CustomUserInfoValue extends BonitaObject {
 
     /**
-     * @return the user identifier
+     * Retrieves the {@link User} identifier
+     * @return the {@code User} identifier
      * @since 6.3
+     * @see org.bonitasoft.engine.identity.User
      */
     long getUserId();
 
     /**
-     * @return the custom user info definition identifier
+     * Retrieves the related {@link CustomUserInfoDefinition} identifier
+     * @return the related {@link CustomUserInfoDefinition} identifier
      * @since 6.3
+     * @see org.bonitasoft.engine.identity.CustomUserInfoDefinition
      */
     long getDefinitionId();
 
     /**
-     * @return the custom user info value
+     * Retrieves the {@code CustomUserInfoValue} value
+     * @return the {@code CustomUserInfoValue} value
      * @since 6.3
      */
     String getValue();

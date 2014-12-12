@@ -357,7 +357,7 @@ public interface DocumentService {
      * @throws SObjectNotFoundException
      * @since 6.4.0
      */
-    void deleteContentOfArchivedDocument(long documentId) throws SObjectNotFoundException, SBonitaReadException, SRecorderException;
+    void deleteContentOfArchivedDocument(long archivedDocumentId) throws SObjectNotFoundException, SBonitaReadException, SRecorderException;
 
     /**
      * update the document having the documentId with this new version

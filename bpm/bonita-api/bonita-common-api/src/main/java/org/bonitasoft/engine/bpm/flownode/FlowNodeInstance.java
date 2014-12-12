@@ -20,6 +20,8 @@ import org.bonitasoft.engine.bpm.DescriptionElement;
  * @author Baptiste Mesta
  * @author Elias Ricken de Medeiros
  * @author Celine Souchet
+ * @since 6.0.0
+ * @version 6.4.1
  */
 public interface FlowNodeInstance extends DescriptionElement, BaseElement {
 
