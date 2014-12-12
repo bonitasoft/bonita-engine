@@ -373,7 +373,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
      * @param shouldArchive
      *        true if we create an archived version of the mapping
      * @throws SRecorderException
-     * @throws SDefinitiveArchiveNotFound
      */
     protected SDataInstanceVisibilityMapping insertDataInstanceVisibilityMapping(final long containerId, final String containerType, final String dataName,
             final long dataInstanceId, final long archiveDate, final boolean shouldArchive) throws SRecorderException {
