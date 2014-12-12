@@ -19,6 +19,8 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceI
 import org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
+import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
@@ -60,7 +62,7 @@ public class TestRepository {
     }
 
     protected Session getSessionWithTenantFilter() {
-        Session session = getSession();
+        final Session session = getSession();
         session.enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         return session;
     }
@@ -183,6 +185,11 @@ public class TestRepository {
     public SJobDescriptor addJobDescriptor(final SJobDescriptorImpl jobDescriptor) {
         getSession().save(jobDescriptor);
         return (SJobDescriptor) getSession().get(jobDescriptor.getClass(), new PersistentObjectId(jobDescriptor.getId(), jobDescriptor.getTenantId()));
+    }
+
+    public SADataInstance add(final SADataInstanceImpl dataInstance) {
+        getSession().save(dataInstance);
+        return (SADataInstance) getSession().get(dataInstance.getClass(), new PersistentObjectId(dataInstance.getId(), dataInstance.getTenantId()));
     }
 
 }
