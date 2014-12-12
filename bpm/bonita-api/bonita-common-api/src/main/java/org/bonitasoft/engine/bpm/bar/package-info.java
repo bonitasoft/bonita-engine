@@ -1,7 +1,7 @@
 /**
  * 
  *     <p>
- *      Contains {@link org.bonitasoft.engine.bpm.bar.BusinessArchive} class
+ *      Contains classes and interfaces related to the Java representation of a {@code business archive} (*.bar)
  *     </p>
  * 
  */
