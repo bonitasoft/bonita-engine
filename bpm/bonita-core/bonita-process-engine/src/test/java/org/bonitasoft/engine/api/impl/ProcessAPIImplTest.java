@@ -235,8 +235,8 @@ public class ProcessAPIImplTest {
         flownodes.add(new SFlowNodeInstanceStateCounter("step3", "failed", 8L));
         when(activityInstanceService.getNumberOfFlownodesInAllStates(processInstanceId)).thenReturn(flownodes);
 
-        List<SFlowNodeInstanceStateCounter> archivedFlownodes = new ArrayList<SFlowNodeInstanceStateCounter>(4);
-        flownodes.add(new SFlowNodeInstanceStateCounter("step2", "aborted", 3L));
+        List<SFlowNodeInstanceStateCounter> archivedFlownodes = new ArrayList<SFlowNodeInstanceStateCounter>(1);
+        archivedFlownodes.add(new SFlowNodeInstanceStateCounter("step2", "aborted", 3L));
         when(activityInstanceService.getNumberOfArchivedFlownodesInAllStates(processInstanceId)).thenReturn(archivedFlownodes);
 
         Map<String, Map<String, Long>> flownodeStateCounters = processAPI.getFlownodeStateCounters(processInstanceId);

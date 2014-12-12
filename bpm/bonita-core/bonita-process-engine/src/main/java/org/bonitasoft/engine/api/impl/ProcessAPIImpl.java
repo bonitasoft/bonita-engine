@@ -4056,7 +4056,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 countersForProcessInstance.put(flownodeName, flownodeCounters);
             }
             // Archived flownodes:
-            final List<SFlowNodeInstanceStateCounter> archivedFlownodes = serviceAccessor.getActivityInstanceService().getNumberOfFlownodesInAllStates(
+            final List<SFlowNodeInstanceStateCounter> archivedFlownodes = serviceAccessor.getActivityInstanceService().getNumberOfArchivedFlownodesInAllStates(
                     processInstanceId);
             for (SFlowNodeInstanceStateCounter nodeCounter : archivedFlownodes) {
                 String flownodeName = nodeCounter.getFlownodeName();
