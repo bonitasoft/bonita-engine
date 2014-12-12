@@ -6,9 +6,9 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-        CancelProcessInstanceTest.class,
-        AbortProcessInstanceTest.class,
-        ProcessInstanceTest.class
+        CancelProcessInstanceIT.class,
+        AbortProcessInstanceIT.class,
+        ProcessInstanceIT.class
 })
 public class ProcessInstanceTests {
 

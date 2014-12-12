@@ -12,3 +12,6 @@ CREATE TABLE arch_document_mapping (
   PRIMARY KEY (tenantid, ID)
 )
 GO
+
+CREATE INDEX idx_a_doc_mp_pr_id ON arch_document_mapping (processinstanceid, tenantid)
+GO

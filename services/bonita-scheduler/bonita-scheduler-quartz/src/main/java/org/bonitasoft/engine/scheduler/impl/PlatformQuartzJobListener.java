@@ -35,7 +35,7 @@ public class PlatformQuartzJobListener extends AbstractQuartzJobListener {
 
     @Override
     public String getName() {
-        return "PlatformQuartzJobListener_" + System.currentTimeMillis();
+        return "PlatformQuartzJobListener";
     }
 
     @Override

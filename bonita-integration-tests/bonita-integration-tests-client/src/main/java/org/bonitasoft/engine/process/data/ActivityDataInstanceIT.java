@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
@@ -32,28 +32,11 @@ import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionType;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
-import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-public class ActivityDataInstanceIT extends CommonAPITest {
-
-    protected User user;
-
-    @Before
-    public void before() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
-        user = createUser("pedro", "secreto");
-    }
-
-    @After
-    public void after() throws Exception {
-        deleteUser(user);
-        logoutOnTenant();
-    }
+public class ActivityDataInstanceIT extends TestWithUser {
 
     @Test
     public void getDataFromActivity() throws Exception {

@@ -9,7 +9,7 @@ import static org.junit.Assert.fail;
 import java.util.Date;
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
@@ -21,32 +21,15 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-public class ProcessDataInstanceIT extends CommonAPITest {
-
-    protected User user;
-
-    @Before
-    public void before() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
-        user = createUser("pedro", "secreto");
-    }
-
-    @After
-    public void after() throws Exception {
-        deleteUser(user);
-        logoutOnTenant();
-    }
+public class ProcessDataInstanceIT extends TestWithUser {
 
     @Test
     public void getIntegerDataInstanceFromProcess() throws Exception {

@@ -6,36 +6,18 @@ import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.data.DataDefinition;
 import org.bonitasoft.engine.bpm.flownode.ActivityDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.AutomaticTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
-import org.bonitasoft.engine.identity.User;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-public class ActivityDataDefinitionIT extends CommonAPITest {
-
-    protected User user;
-
-    @Before
-    public void before() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
-        user = createUser("pedro", "secreto");
-    }
-
-    @After
-    public void after() throws Exception {
-        deleteUser(user);
-        logoutOnTenant();
-    }
+public class ActivityDataDefinitionIT extends TestWithUser {
 
     @Test
     public void getDataDefinitionsHavingComplexeInitialValue() throws Exception {
