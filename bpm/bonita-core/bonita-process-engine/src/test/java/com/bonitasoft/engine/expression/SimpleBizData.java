@@ -11,6 +11,10 @@ class SimpleBizData implements Entity {
 
     private final Long id;
 
+    public SimpleBizData() {
+        id = null;
+    }
+
     public SimpleBizData(final Long id) {
         this.id = id;
     }

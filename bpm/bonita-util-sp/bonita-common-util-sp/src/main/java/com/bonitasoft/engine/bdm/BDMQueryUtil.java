@@ -31,6 +31,10 @@ import com.bonitasoft.engine.bdm.model.field.SimpleField;
  */
 public class BDMQueryUtil {
 
+    private static final char BLANK_SPACE = ' ';
+
+    private static final String NEW_LINE = "\n";
+
     private static final String SELECT = "SELECT ";
 
     private static final String FROM = "FROM ";
@@ -200,13 +204,15 @@ public class BDMQueryUtil {
         if (field == null) {
             throw new IllegalArgumentException("field cannot be null");
         }
-        final String simpleName = getSimpleBusinessObjectName(businessObjectName);
-        final char var = Character.toLowerCase(simpleName.charAt(0));
-        final StringBuilder builder = new StringBuilder();
-        builder.append(SELECT).append(var).append(".").append(field.getName()).append("\n");
-        builder.append(FROM).append(simpleName).append(' ').append(var).append("\n");
-        builder.append(buildWhere(var, Field.PERSISTENCE_ID));
-        return builder.toString().trim();
+        final String boName = getSimpleBusinessObjectName(businessObjectName);
+        final String boAlias = boName.toLowerCase() + "_0";
+        final String fieldName = field.getName();
+        final String fieldAlias = fieldName.toLowerCase() + "_1";
+
+        return String.format("SELECT %s FROM %s %s JOIN %s.%s as %s WHERE %s.%s= :%s", fieldAlias, boName, boAlias,
+                boAlias,
+                fieldName, fieldAlias, boAlias, Field.PERSISTENCE_ID, Field.PERSISTENCE_ID);
+
     }
 
     public static String createQueryNameForLazyField(final BusinessObject businessObject, final RelationField field) {
@@ -262,8 +268,8 @@ public class BDMQueryUtil {
 
     private static String buildSelectFrom(final String simpleName, final char var) {
         final StringBuilder builder = new StringBuilder();
-        builder.append(SELECT).append(var).append("\n");
-        builder.append(FROM).append(simpleName).append(' ').append(var).append("\n");
+        builder.append(SELECT).append(var).append(NEW_LINE);
+        builder.append(FROM).append(simpleName).append(' ').append(var).append(NEW_LINE);
         return builder.toString();
     }
 
@@ -289,7 +295,7 @@ public class BDMQueryUtil {
 
     private static String buildCompareField(final char prefix, final String paramName) {
         final StringBuilder builder = new StringBuilder();
-        builder.append(prefix).append('.').append(paramName).append("= :").append(paramName).append("\n");
+        builder.append(prefix).append('.').append(paramName).append("= :").append(paramName).append(NEW_LINE);
         return builder.toString();
     }
 
