@@ -187,6 +187,19 @@ public class JPABusinessDataRepositoryImplITest {
     }
 
     @Test
+    public void should_get_employees_by_id() throws Exception {
+        final String lastName = "Kangaroo";
+        Employee emp1 = addEmployeeToRepository(anEmployee().withLastName(lastName).build());
+        Employee emp2 = addEmployeeToRepository(anEmployee().withLastName(lastName).build());
+        Employee emp3 = addEmployeeToRepository(anEmployee().withLastName(lastName).build());
+        
+        List<Employee> emps = businessDataRepository.findByIds(Employee.class, Arrays.asList(emp1.getPersistenceId(), emp2.getPersistenceId()));
+        
+        assertThat(emps).contains(emp1, emp2);
+        assertThat(emps).doesNotContain(emp3);
+    }
+    
+    @Test
     public void returnNullnWhenFindingAnUnknownEmployee() throws Exception {
         final Map<String, Serializable> parameters = Collections.singletonMap("lastName", (Serializable) "Unknown_lastName");
         assertThat(businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters)).isNull();
