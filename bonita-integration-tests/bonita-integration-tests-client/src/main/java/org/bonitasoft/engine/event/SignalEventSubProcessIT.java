@@ -59,10 +59,9 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         final ActivityInstance subStep = waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance);
 
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
-        final String dataName = "content";
-        expressions.put(new ExpressionBuilder().createDataExpression(dataName, String.class.getName()), new HashMap<String, Serializable>(0));
+        expressions.put(new ExpressionBuilder().createDataExpression(SHORT_DATA_NAME, String.class.getName()), new HashMap<String, Serializable>(0));
         final Map<String, Serializable> expressionResults = getProcessAPI().evaluateExpressionsOnActivityInstance(subStep.getId(), expressions);
-        assertEquals("childActivityVar", expressionResults.get(dataName));
+        assertEquals("childActivityVar", expressionResults.get(SHORT_DATA_NAME));
 
         disableAndDeleteProcess(process);
     }
@@ -176,10 +175,10 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         final ActivityInstance subStep = waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance);
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
         checkProcessDataInstance("count", subProcInst.getId(), 1);
-        checkProcessDataInstance("content", subProcInst.getId(), "childVar");
+        checkProcessDataInstance(SHORT_DATA_NAME, subProcInst.getId(), "childVar");
         checkProcessDataInstance("value", subProcInst.getId(), 10.0);
-        checkProcessDataInstance("content", processInstance.getId(), "parentVar");
-        checkActivityDataInstance("content", subStep.getId(), "childActivityVar");
+        checkProcessDataInstance(SHORT_DATA_NAME, processInstance.getId(), "parentVar");
+        checkActivityDataInstance(SHORT_DATA_NAME, subStep.getId(), "childActivityVar");
 
         assignAndExecuteStep(subStep, user);
         waitForProcessToFinish(subProcInst);

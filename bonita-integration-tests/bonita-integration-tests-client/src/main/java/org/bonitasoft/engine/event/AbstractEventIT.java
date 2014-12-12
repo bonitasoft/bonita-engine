@@ -74,7 +74,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public static final String INT_DATA_NAME = "count";
 
-    public static final String SHORT_DATA_NAME = "content";
+    public static final String SHORT_DATA_NAME = "short_data_name";
 
     public static final String SUB_PROCESS_START_NAME = "subProcessStart";
 

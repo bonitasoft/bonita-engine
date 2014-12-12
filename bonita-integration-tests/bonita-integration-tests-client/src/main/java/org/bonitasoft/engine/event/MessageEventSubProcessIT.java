@@ -197,7 +197,7 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "message" }, jira = "ENGINE-536")
     @Test
-    public void messageEventSubProcessWithCorrelation() throws Exception {
+    public void messageEventSubProcessTriggeredWithCorrelation() throws Exception {
         final Expression correlationKey = new ExpressionBuilder().createConstantStringExpression("productName");
         final Expression catchCorrelationValue = new ExpressionBuilder().createDataExpression(SHORT_DATA_NAME, String.class.getName());
 
@@ -215,6 +215,35 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance.getId());
 
         disableAndDeleteProcess(process.getId());
+    }
+
+    @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "message",
+            "intermediate throw event" }, jira = "BS-11096")
+    @Test
+    public void messageEventSubProcessTriggeredWithCorrelationAndIntermediateThrowEvent() throws Exception {
+        // Correlation
+        final Expression correlationKey = new ExpressionBuilder().createConstantStringExpression("productName");
+        final Expression correlationValue = new ExpressionBuilder().createDataExpression(SHORT_DATA_NAME, String.class.getName());
+
+        // Sender
+        final Expression targetReceiverProcessExpression = new ExpressionBuilder().createConstantStringExpression("ProcessWithEventSubProcess");
+        final ProcessDefinitionBuilder senderBuilder = new ProcessDefinitionBuilder().createNewInstance("SenderEndMessageEvent", "1.0");
+        senderBuilder.addActor(ACTOR_NAME).addShortTextData(SHORT_DATA_NAME, new ExpressionBuilder().createConstantStringExpression("parentVar"));
+        senderBuilder.addIntermediateThrowEvent(THROW_MESSAGE_TASK_NAME).addMessageEventTrigger(MESSAGE_NAME, targetReceiverProcessExpression)
+                .addCorrelation(correlationKey, correlationValue);
+        final ProcessDefinition senderProcessDefinition = deployAndEnableProcessWithActor(senderBuilder.done(), ACTOR_NAME, user);
+
+        // Receiver
+        final ProcessDefinition receiverProcessDefinition = deployAndEnableProcessWithMessageEventSubProcessAndData(Collections
+                .singletonList(new BEntry<Expression, Expression>(correlationKey, correlationValue)));
+        final ProcessInstance receiverProcessInstance = getProcessAPI().startProcess(receiverProcessDefinition.getId());
+        waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, receiverProcessInstance);
+
+        // send message to start event sub process
+        getProcessAPI().startProcess(senderProcessDefinition.getId());
+        waitForUserTask(SUB_PROCESS_USER_TASK_NAME, receiverProcessInstance.getId());
+
+        disableAndDeleteProcess(senderProcessDefinition, receiverProcessDefinition);
     }
 
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "message" }, jira = "ENGINE-536")
