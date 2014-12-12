@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.bonitasoft.engine.io.IOUtil;
-import org.bonitasoft.engine.test.BPMLocalTest;
+import org.bonitasoft.engine.test.BPMLocalIT;
 import org.junit.Test;
 
 public class TestShades {
@@ -20,7 +20,7 @@ public class TestShades {
     @Test
     public void testShades() throws IOException {
         String mvn = System.getProperty("path.to.mvn", "mvn");// to be overwritten in CI
-        String version = BPMLocalTest.getBonitaVersion();
+        String version = BPMLocalIT.getBonitaVersion();
 
         // print properties for debugging purpose
         System.out.println("mvn path used: " + mvn);

@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
@@ -47,7 +47,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.CollectionUtils;
 
-public class PendingTasksIT extends CommonAPITest {
+public class PendingTasksIT extends TestWithTechnicalUser {
 
     private static final String JACK = "jack";
 
@@ -55,19 +55,21 @@ public class PendingTasksIT extends CommonAPITest {
 
     private User jack;
 
+    @Override
     @Before
-    public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+    public void before() throws Exception {
+        super.before();
         john = createUser(USERNAME, PASSWORD);
         jack = createUser(JACK, PASSWORD);
     }
 
+    @Override
     @After
-    public void afterTest() throws BonitaException {
+    public void after() throws Exception {
         deleteUser(USERNAME);
         deleteUser(JACK);
         VariableStorage.clearAll();
-        logoutOnTenant();
+        super.after();
     }
 
     @Test

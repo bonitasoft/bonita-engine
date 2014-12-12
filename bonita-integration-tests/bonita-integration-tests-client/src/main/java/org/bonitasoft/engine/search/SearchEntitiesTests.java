@@ -6,10 +6,10 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-        SearchProcessInstanceTest.class,
-        SearchActivityInstanceTest.class,
-        SearchCommentTest.class,
-        SearchProcessDefinitionTest.class,
+        SearchProcessInstanceIT.class,
+        SearchActivityInstanceIT.class,
+        SearchCommentIT.class,
+        SearchProcessDefinitionIT.class,
         SearchProcessDeploymentInfosCanBeStartedByUsersManagedByIT.class,
         SearchProcessDeploymentInfosCanBeStartedByIT.class,
         SearchUncategorizedProcessDeploymentInfosCanBeStartedByIT.class,

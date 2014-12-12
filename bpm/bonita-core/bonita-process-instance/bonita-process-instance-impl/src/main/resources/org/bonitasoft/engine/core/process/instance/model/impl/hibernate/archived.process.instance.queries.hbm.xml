@@ -245,32 +245,32 @@
 	<query name="getNumberOfSAProcessInstancewithSUserTaskInstance">
 		select COUNT(DISTINCT ap)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
-		org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS usertask
+		org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
 		WHERE ap.archiveDate = (
 			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa2
 			WHERE aa2.sourceObjectId = ap.sourceObjectId
 		)
 		AND ap.stateId != 8
 		AND (ap.startedBy = :userId
-			OR (usertask.rootContainerId = ap.sourceObjectId
-				AND usertask.stable = TRUE
-				AND usertask.assigneeId = :userId) 
+			OR (a.rootContainerId = ap.sourceObjectId
+				AND a.stable = TRUE
+				AND a.assigneeId = :userId) 
 		)
   	</query>
   
   	<query name="searchSAProcessInstancewithSUserTaskInstance">
 		select DISTINCT ap
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
-		org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS usertask
+		org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
 		WHERE ap.archiveDate = (
 			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa2
 			WHERE aa2.sourceObjectId = ap.sourceObjectId
 		)
 		AND ap.stateId != 8
 		AND (ap.startedBy = :userId
-			OR (usertask.rootContainerId = ap.sourceObjectId
-				AND usertask.stable = TRUE
-				AND usertask.assigneeId = :userId) 
+			OR (a.rootContainerId = ap.sourceObjectId
+				AND a.stable = TRUE
+				AND a.assigneeId = :userId) 
 		)
 	</query>
 

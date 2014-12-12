@@ -31,7 +31,6 @@ import org.bonitasoft.engine.jobs.CleanInvalidSessionsJob;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.JobRegister;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
@@ -91,21 +90,11 @@ public final class ActivateTenant implements TransactionContent {
         if (tenantWasActivated) {
             workService.start();
             connectorExecutor.start();
-            addTenantJobListener();
             startEventHandling();
             startCleanInvalidSessionsJob();
             final List<JobRegister> jobsToRegister = tenantConfiguration.getJobsToRegister();
             for (final JobRegister jobRegister : jobsToRegister) {
                 registerJob(jobRegister);
-            }
-        }
-    }
-
-    private void addTenantJobListener() throws SBonitaException {
-        if (!schedulerService.isStarted()) {
-            final List<AbstractBonitaTenantJobListener> jobListeners = tenantConfiguration.getJobListeners();
-            if (!jobListeners.isEmpty()) {
-                schedulerService.addJobListener(jobListeners, String.valueOf(tenantId));
             }
         }
     }

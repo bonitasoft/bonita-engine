@@ -212,7 +212,7 @@ public class OperationBuilder {
      * @param docName
      *        the name of the document list
      * @param expression
-     *        the expression that returns a list of {@link DocumentValue}
+     *        the expression that returns a list of {@link org.bonitasoft.engine.bpm.document.DocumentValue}
      * @return the newly created <code>Operation</code>.
      */
     public Operation createSetDocumentList(final String docName, final Expression expression) {

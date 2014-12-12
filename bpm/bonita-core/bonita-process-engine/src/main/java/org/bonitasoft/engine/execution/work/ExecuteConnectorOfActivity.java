@@ -16,10 +16,8 @@ package org.bonitasoft.engine.execution.work;
 import java.util.Map;
 
 import org.bonitasoft.engine.api.impl.transaction.event.CreateEventInstance;
-import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.connector.ConnectorInstanceService;
 import org.bonitasoft.engine.core.connector.ConnectorResult;
 import org.bonitasoft.engine.core.connector.exception.SConnectorDefinitionNotFoundException;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -34,15 +32,12 @@ import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventT
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SThrowErrorEventTriggerDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilder;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SEndEventInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
-import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.execution.archive.ProcessArchiver;
 import org.bonitasoft.engine.execution.event.EventsHandler;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -92,17 +87,11 @@ public class ExecuteConnectorOfActivity extends ExecuteConnectorWork {
     @Override
     protected void setContainerInFail(final Map<String, Object> context) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
-        final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final ArchiveService archiveService = tenantAccessor.getArchiveService();
         final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
-        final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
 
         final SFlowNodeInstance intTxflowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-        ProcessArchiver.archiveFlowNodeInstance(intTxflowNodeInstance, false, processDefinitionId, processInstanceService, processDefinitionService,
-                archiveService, dataInstanceService, activityInstanceService, connectorInstanceService);
         activityInstanceService.setState(intTxflowNodeInstance, flowNodeStateManager.getFailedState());
         final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
         tenantAccessor.getFlowNodeExecutor().executeState(processDefinition, intTxflowNodeInstance, flowNodeStateManager.getFailedState());

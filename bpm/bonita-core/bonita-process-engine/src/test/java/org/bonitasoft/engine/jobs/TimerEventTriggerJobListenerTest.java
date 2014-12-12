@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -75,6 +76,7 @@ public class TimerEventTriggerJobListenerTest {
         context.put(AbstractBonitaJobListener.TRIGGER_NAME, TRIGGER_NAME);
         context.put(AbstractBonitaJobListener.TENANT_ID, TENANT_ID);
         context.put(AbstractBonitaJobListener.BOS_JOB, mock(StatelessJob.class));
+        context.put(AbstractBonitaJobListener.JOB_TYPE, TriggerTimerEventJob.class.getName());
     }
 
     /**
@@ -95,6 +97,23 @@ public class TimerEventTriggerJobListenerTest {
 
         // then
         verify(eventInstanceService).deleteEventTriggerInstance(sTimerEventTriggerInstance);
+    }
+
+    @Test
+    public final void jobWasExecuted_should_not_search_for_event_triggers_when_executed_job_was_not_TimerEventJob() throws Exception {
+        // Given
+        final STimerEventTriggerInstance sTimerEventTriggerInstance = mock(STimerEventTriggerInstance.class);
+        final List<STimerEventTriggerInstance> timerEventTriggerInstances = Collections.singletonList(sTimerEventTriggerInstance);
+        doReturn(timerEventTriggerInstances).when(eventInstanceService).searchEventTriggerInstances(eq(STimerEventTriggerInstance.class),
+                any(QueryOptions.class));
+
+        context.put(AbstractBonitaJobListener.JOB_TYPE, "AnotherJob");
+
+        // When
+        timerEventTriggerJobListener.jobWasExecuted(context, null);
+
+        // then
+        verify(eventInstanceService, never()).searchEventTriggerInstances(same(STimerEventTriggerInstance.class), any(QueryOptions.class));
     }
 
     @Test

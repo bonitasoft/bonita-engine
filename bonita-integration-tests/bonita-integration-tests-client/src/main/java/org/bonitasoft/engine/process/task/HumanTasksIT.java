@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
@@ -30,25 +30,9 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-public class HumanTasksIT extends CommonAPITest {
-
-    protected User user;
-
-    @Before
-    public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
-        user = createUser(USERNAME, PASSWORD);
-    }
-
-    @After
-    public void after() throws Exception {
-        deleteUser(user);
-        logoutOnTenant();
-    }
+public class HumanTasksIT extends TestWithUser {
 
     @Test
     public void cannotGetHumanTaskInstances() throws Exception {

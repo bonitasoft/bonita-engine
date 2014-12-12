@@ -26,7 +26,7 @@ public interface Comment extends BonitaObject {
 
     /**
      * @return The identifier of the tenant
-     * @deprecated As of 6.1 use {@link APISession#getTenantId()} instead
+     * @deprecated As of 6.1 use {@link org.bonitasoft.engine.session.APISession#getTenantId()} instead
      */
     @Deprecated
     long getTenantId();
