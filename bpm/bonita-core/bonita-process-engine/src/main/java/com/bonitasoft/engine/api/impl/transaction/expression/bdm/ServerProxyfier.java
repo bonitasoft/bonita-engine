@@ -50,6 +50,9 @@ public class ServerProxyfier {
     }
 
     private Entity proxifyEntity(final Entity entity) {
+        if (entity == null) {
+            return null;
+        }
         final ProxyFactory factory = new ProxyFactory();
         factory.setSuperclass(entity.getClass());
         factory.setFilter(new AllMethodFilter());
@@ -62,6 +65,9 @@ public class ServerProxyfier {
 
     @SuppressWarnings("unchecked")
     public <T extends Entity> List<T> proxify(final List<T> entities) {
+        if (entities == null) {
+            return null;
+        }
         return (List<T>) proxifyEntities((List<Entity>) entities);
     }
 
