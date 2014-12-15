@@ -8,6 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.data;
 
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
@@ -27,6 +29,7 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -935,11 +938,27 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         waitForUserTask("step2", instance.getId());
         final String employeeToString = getEmployeesToString("myEmployees", instance.getId());
-        assertThat(employeeToString).isEqualTo("Employee [firstName=[Jane, John], lastName=[Smith, Smith]]");
+        
+        assertThat(firstNames(employeeToString)).containsOnlyOnce("Jane", "John");
+        assertThat(lastNames(employeeToString)).containsExactly("Smith", "Smith");
 
         disableAndDeleteProcess(processDefinition);
     }
+    
+    private String[] firstNames(String employeeToString) {
+        String firstNames = substringAfter(employeeToString, "firstName=[");
+        firstNames = substringBefore(firstNames, "], lastName=");
+        return StringUtils.split(firstNames, ", ");
+    }
+    
+    private String[] lastNames(String employeeToString) {
+        String lastNames = substringAfter(employeeToString, "lastName=[");
+        lastNames = substringBefore(lastNames, "]]");
+        return StringUtils.split(lastNames, ", ");
+    }
 
+
+    
     @Test
     public void useMultipleBusinessDataInACallActivityWithSequentialMultiInstance() throws Exception {
         ProcessDefinitionBuilderExt builder = new ProcessDefinitionBuilderExt().createNewInstance("UpdateEmployee", "1.2-beta");
