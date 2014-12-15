@@ -1201,12 +1201,14 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         final HumanTaskInstance userTask = waitForUserTask("step1", instance.getId());
         String employeeToString = getEmployeesToString("myEmployees", instance.getId());
-        assertThat(employeeToString).isEqualTo("Employee [firstName=[], lastName=[]]");
+        assertThat(firstNames(employeeToString)).isEmpty();
+        assertThat(lastNames(employeeToString)).isEmpty();
 
         assignAndExecuteStep(userTask, matti.getId());
         waitForUserTask("step2", instance.getId());
         employeeToString = getEmployeesToString("myEmployees", instance.getId());
-        assertThat(employeeToString).isEqualTo("Employee [firstName=[Jane, John], lastName=[Doe, Doe]]");
+        assertThat(firstNames(employeeToString)).containsOnlyOnce("Jane", "John");
+        assertThat(lastNames(employeeToString)).containsExactly("Doe", "Doe");
 
         disableAndDeleteProcess(definition.getId());
     }
