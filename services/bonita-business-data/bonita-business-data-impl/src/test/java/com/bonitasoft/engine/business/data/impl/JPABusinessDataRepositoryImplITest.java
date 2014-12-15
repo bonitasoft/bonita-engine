@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -197,6 +198,15 @@ public class JPABusinessDataRepositoryImplITest {
         
         assertThat(emps).contains(emp1, emp2);
         assertThat(emps).doesNotContain(emp3);
+    }
+    
+    @Test
+    public void should_return_an_empty_list_when_getting_entities_with_empty_ids_list() throws Exception {
+       ArrayList<Long> emptyIdsList = new ArrayList<Long>();
+        
+        List<Employee> emps = businessDataRepository.findByIds(Employee.class, emptyIdsList);
+        
+        assertThat(emps).isEmpty();
     }
     
     @Test

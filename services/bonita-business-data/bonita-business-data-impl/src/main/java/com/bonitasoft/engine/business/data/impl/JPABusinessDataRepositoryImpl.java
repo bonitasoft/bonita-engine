@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.business.data.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -138,6 +139,9 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     @Override
     public <T extends Entity> List<T> findByIds(final Class<T> entityClass, final List<Long> primaryKeys) {
+        if (primaryKeys == null || primaryKeys.isEmpty()) {
+            return new ArrayList<T>();
+        }
         final EntityManager em = getEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<T> criteriaQuery = cb.createQuery(entityClass);
