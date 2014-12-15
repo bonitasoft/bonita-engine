@@ -21,6 +21,9 @@ import static org.mockito.Mockito.when;
 import java.util.Date;
 
 import org.bonitasoft.engine.data.definition.model.SDataDefinition;
+import org.bonitasoft.engine.data.definition.model.STextDataDefinition;
+import org.bonitasoft.engine.data.definition.model.SXMLDataDefinition;
+import org.bonitasoft.engine.data.instance.model.SXMLDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
 import org.bonitasoft.engine.data.instance.model.exceptions.SDataInstanceNotWellFormedException;
 import org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl;
@@ -31,6 +34,7 @@ import org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SIntegerDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SLongDataInstanceImpl;
+import org.bonitasoft.engine.data.instance.model.impl.SLongTextDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl;
 import org.junit.Test;
@@ -82,12 +86,31 @@ public class SDataInstanceBuilderFactoryImplTest {
         testSpecificDataType(Object.class.getName(), SXMLObjectDataInstanceImpl.class);
     }
 
-    private void testSpecificDataType(String dataTypeName, Class<? extends SDataInstanceImpl> dataInstanceClass) throws SDataInstanceNotWellFormedException {
-        SDataDefinition dataDefinition = mock(SDataDefinition.class);
+    private void testSpecificDataType(final String dataTypeName, final Class<? extends SDataInstanceImpl> dataInstanceClass)
+            throws SDataInstanceNotWellFormedException {
+        final SDataDefinition dataDefinition = mock(SDataDefinition.class);
         when(dataDefinition.getClassName()).thenReturn(dataTypeName);
 
-        SDataInstanceBuilder newInstance = new SDataInstanceBuilderFactoryImpl().createNewInstance(dataDefinition);
+        final SDataInstanceBuilder newInstance = new SDataInstanceBuilderFactoryImpl().createNewInstance(dataDefinition);
 
         assertThat(newInstance.done()).isInstanceOf(dataInstanceClass);
+    }
+
+    @Test
+    public void createNewInstanceHandlesXMLType() throws Exception {
+        assertThat(new SDataInstanceBuilderFactoryImpl().createNewInstance(mock(SXMLDataDefinition.class)).done()).isInstanceOf(SXMLDataInstance.class);
+    }
+
+    @Test
+    public void createNewInstanceHandlesShortTextType() throws Exception {
+        assertThat(new SDataInstanceBuilderFactoryImpl().createNewInstance(mock(STextDataDefinition.class)).done()).isInstanceOf(
+                SShortTextDataInstanceImpl.class);
+    }
+
+    @Test
+    public void createNewInstanceHandlesLongTextType() throws Exception {
+        final STextDataDefinition dataDef = mock(STextDataDefinition.class);
+        when(dataDef.isLongText()).thenReturn(true);
+        assertThat(new SDataInstanceBuilderFactoryImpl().createNewInstance(dataDef).done()).isInstanceOf(SLongTextDataInstanceImpl.class);
     }
 }
