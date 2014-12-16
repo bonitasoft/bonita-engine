@@ -11,10 +11,8 @@ package com.bonitasoft.engine.command;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,20 +20,13 @@ import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.command.SCommandExecutionException;
 import org.bonitasoft.engine.command.SCommandParameterizationException;
 
-import com.bonitasoft.engine.api.rest.Link;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 /**
  * @author Matthieu Chaffotte
@@ -43,7 +34,7 @@ import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 public class GetBusinessDataByIdCommand extends TenantCommand {
 
     private static final String EMPTY_OBJECT = "{}";
-    
+
     public static final String ENTITY_CLASS_NAME = "entityClassName";
     public static final String BUSINESS_DATA_ID = "businessDataId";
     public static final String BUSINESS_DATA_URI_PATTERN = "businessDataURIPattern";
@@ -51,16 +42,18 @@ public class GetBusinessDataByIdCommand extends TenantCommand {
 
     private final ObjectMapper mapper;
 
+    private final EntitySerializer serializer;
+
     public GetBusinessDataByIdCommand() {
-        mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        final Hibernate4Module hbm = new Hibernate4Module();
-        hbm.enable(Hibernate4Module.Feature.FORCE_LAZY_LOADING);
-        mapper.registerModule(hbm);
+        this(new ObjectMapper());
     }
 
     protected GetBusinessDataByIdCommand(final ObjectMapper mapper) {
         this.mapper = mapper;
+        serializer = new EntitySerializer();
+        final SimpleModule hbm = new SimpleModule();
+        hbm.addSerializer(serializer);
+        mapper.registerModule(hbm);
     }
 
     @Override
@@ -70,17 +63,19 @@ public class GetBusinessDataByIdCommand extends TenantCommand {
         final Long identifier = getLongMandadoryParameter(parameters, BUSINESS_DATA_ID);
         final String entityClassName = getStringMandadoryParameter(parameters, ENTITY_CLASS_NAME);
         final String businessDataURIPattern = getStringMandadoryParameter(parameters, BUSINESS_DATA_URI_PATTERN);
+        serializer.setPatternURI(businessDataURIPattern);
         final Class<? extends Entity> entityClass = loadClass(entityClassName);
         try {
             final Entity entity = businessDataRepository.findById(entityClass, identifier);
             final String childName = getParameter(parameters, BUSINESS_DATA_CHILD_NAME);
             if (childName != null && !childName.isEmpty()) {
-                return serializeChildResult(entity, childName, businessDataURIPattern, businessDataRepository);
-            } else {
-                return serializeResult(entity, businessDataURIPattern);
+                return serializeChildEntity(entity, childName, businessDataURIPattern, businessDataRepository);
             }
+            return serializeEntity(entity);
         } catch (final SBusinessDataNotFoundException sbdnfe) {
             throw new SCommandExecutionException(new DataNotFoundException(sbdnfe));
+        } catch (final ClassNotFoundException e) {
+            throw new SCommandExecutionException(e);
         }
     }
 
@@ -93,45 +88,10 @@ public class GetBusinessDataByIdCommand extends TenantCommand {
         }
     }
 
-    private String serializeResult(final Entity entity, final String businessDataURIPattern) throws SCommandExecutionException {
-        final List<Link> links = buildLinks(entity, businessDataURIPattern);
-        final JsonNode jsonNode = buildJsonNode(entity, links);
-        return serializeResult(jsonNode);
-    }
-
-    private JsonNode buildJsonNode(final Entity result, final List<Link> links) {
-        final JsonNode jsonNode = mapper.valueToTree(result);
-        if (!links.isEmpty()) {
-            final ArrayNode linksNode = ((ObjectNode) jsonNode).putArray("links");
-            for (final Link link : links) {
-                linksNode.addPOJO(link);
-            }
-        }
-        return jsonNode;
-    }
-
-    private List<Link> buildLinks(final Entity result, final String businessDataURIPattern) {
-        final List<Link> links = new ArrayList<Link>();
-        for (final Field entityField : result.getClass().getDeclaredFields()) {
-            if (entityField.getAnnotation(JsonIgnore.class) != null) {
-                final String uri = buildURI(result, businessDataURIPattern, entityField);
-                final Link link = new Link(entityField.getName(), uri);
-                links.add(link);
-            }
-        }
-        return links;
-    }
-
-    private String buildURI(final Entity result, final String businessDataURIPattern, final Field entityField) {
-        String uri = businessDataURIPattern.replace("{className}", result.getClass().getName());
-        uri = uri.replace("{id}", result.getPersistenceId().toString());
-        return uri.replace("{field}", entityField.getName());
-    }
-
-    private String serializeResult(final JsonNode jsonNode) throws SCommandExecutionException {
+    private String serializeEntity(final Entity entity) throws SCommandExecutionException {
         try {
             final StringWriter writer = new StringWriter();
-            mapper.writeValue(writer, jsonNode);
+            mapper.writeValue(writer, entity);
             return writer.toString();
         } catch (final JsonProcessingException jpe) {
             throw new SCommandExecutionException(jpe);
@@ -140,38 +100,41 @@ public class GetBusinessDataByIdCommand extends TenantCommand {
         }
     }
 
-    private String serializeChildResult(final Entity entity, final String fieldName, final String businessDataURIPattern,
-            final BusinessDataRepository businessDataRepository) throws SCommandExecutionException {
+    private String serializeEntityList(final List<Entity> entities) throws SCommandExecutionException {
+        try {
+            final StringWriter writer = new StringWriter();
+            mapper.writeValue(writer, entities);
+            return writer.toString();
+        } catch (final JsonProcessingException jpe) {
+            throw new SCommandExecutionException(jpe);
+        } catch (final IOException ioe) {
+            throw new SCommandExecutionException(ioe);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Serializable serializeChildEntity(final Entity entity, final String fieldName, final String businessDataURIPattern,
+            final BusinessDataRepository businessDataRepository) throws SCommandExecutionException, ClassNotFoundException {
         final Method method;
-        final Object child;
         try {
             final String getterName = buildGetterMethodName(fieldName);
             method = entity.getClass().getMethod(getterName);
-            child = method.invoke(entity);
+            final Object child = method.invoke(entity);
+            if (child == null) {
+                return EMPTY_OBJECT;
+            }
+            if (child instanceof Entity) {
+                return serializeEntity((Entity) child);
+            } else if (child instanceof List) {
+                final Class<?> type = (Class<?>) ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0];
+                if (Entity.class.isAssignableFrom(type)) {
+                    return serializeEntityList((List<Entity>) child);
+                }
+            }
+            throw new SCommandExecutionException(fieldName + " is not a valid attribute of entity " + entity.getClass());
         } catch (final Exception e) {
             throw new SCommandExecutionException(fieldName + " is not a valid attribute of entity " + entity.getClass(), e);
         }
-        
-        if (child == null) {
-            return EMPTY_OBJECT;
-        } else if (child instanceof Entity) {
-            final Entity unwrap = businessDataRepository.unwrap((Entity) child);
-            return serializeResult(unwrap, businessDataURIPattern);
-        } else if (child instanceof List) {
-            final Class<?> type = (Class<?>) ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0];
-            if (Entity.class.isAssignableFrom(type)) {
-                final ArrayNode arrayNode = new ArrayNode(JsonNodeFactory.instance);
-                final List<Entity> entities = (List<Entity>) child;
-                for (final Entity entity2 : entities) {
-                    final List<Link> links = buildLinks(entity2, businessDataURIPattern);
-                    final JsonNode jsonNode = buildJsonNode(entity2, links);
-                    arrayNode.add(jsonNode);
-                }
-                return serializeResult(arrayNode);
-            }
-        }
-        throw new SCommandExecutionException("the type of " + fieldName + " must be an instance of either " + Entity.class.getName() + " or "
-                + List.class.getName() + " of " + Entity.class.getName());
     }
 
     private String buildGetterMethodName(final String fieldName) {

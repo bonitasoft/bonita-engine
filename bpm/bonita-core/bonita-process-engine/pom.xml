@@ -89,11 +89,6 @@
             <version>3.0.1</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-hibernate4</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
@@ -157,11 +152,6 @@
             <groupId>com.bonitasoft.engine.application</groupId>
             <artifactId>bonita-business-application-impl</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

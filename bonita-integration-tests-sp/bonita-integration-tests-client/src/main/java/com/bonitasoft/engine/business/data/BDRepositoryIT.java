@@ -85,6 +85,7 @@ import com.bonitasoft.engine.businessdata.SimpleBusinessDataReference;
 
 public class BDRepositoryIT extends CommonAPISPTest {
 
+    private static final String COUNTRY_QUALIF_NAME = "org.bonita.pojo.Country";
     private static final String ADDRESS_QUALIF_NAME = "org.bonita.pojo.Address";
     private static final String EMPLOYEE_QUALIF_CLASSNAME = "org.bonita.pojo.Employee";
 
@@ -102,7 +103,7 @@ public class BDRepositoryIT extends CommonAPISPTest {
         name.setType(FieldType.STRING);
 
         final BusinessObject countryBO = new BusinessObject();
-        countryBO.setQualifiedName("org.bonita.pojo.Country");
+        countryBO.setQualifiedName(COUNTRY_QUALIF_NAME);
         countryBO.addField(name);
 
         final SimpleField street = new SimpleField();
@@ -1140,21 +1141,27 @@ public class BDRepositoryIT extends CommonAPISPTest {
     public void commandGetBusinessData_should_return_a_simple_lazy_child() throws Exception {
         final Expression employeeExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewEmployee", "import " + EMPLOYEE_QUALIF_CLASSNAME
                 + "; import org.bonita.pojo.Address; Employee e = new Employee(); e.firstName = 'Alphonse';"
-                + " e.lastName = 'Dupond'; e.setAddress(myAddress); return e;", EMPLOYEE_QUALIF_CLASSNAME,
+                + " e.lastName = 'Dupond'; e.setAddress(myAddress);e.addToAddresses(myAddress); return e;", EMPLOYEE_QUALIF_CLASSNAME,
                 new ExpressionBuilder().createBusinessDataExpression("myAddress", ADDRESS_QUALIF_NAME));
         final Expression addressExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewAddress",
                 "import org.bonita.pojo.Address; import org.bonita.pojo.Country; "
-                        + "Country c = new Country(); c.name='France'; "
-                        + "Address a = new Address(); a.street='32, rue Gustave Eiffel'; a.city='Grenoble'; a.country = c; a;",
+                        + "Address a = new Address(); a.street='32, rue Gustave Eiffel'; a.city='Grenoble'; a.country = myCountry ; a;",
                 ADDRESS_QUALIF_NAME);
+        final Expression countryExpression = new ExpressionBuilder().createGroovyScriptExpression("createNewCountry",
+                "import org.bonita.pojo.Country; "
+                        + "Country c = new Country(); c.name='France'; "
+                        + " c;",
+                COUNTRY_QUALIF_NAME);
 
         final ProcessDefinitionBuilderExt processDefinitionBuilder = new ProcessDefinitionBuilderExt().createNewInstance(
                 "rest", "1.0");
         final String bizDataName = "myEmployee";
-        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIF_CLASSNAME, null);
+        processDefinitionBuilder.addBusinessData("myCountry", COUNTRY_QUALIF_NAME, null);
         processDefinitionBuilder.addBusinessData("myAddress", ADDRESS_QUALIF_NAME, null);
+        processDefinitionBuilder.addBusinessData(bizDataName, EMPLOYEE_QUALIF_CLASSNAME, null);
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addAutomaticTask("step1")
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myCountry"), OperatorType.ASSIGNMENT, null, null, countryExpression)
                 .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.ASSIGNMENT, null, null, addressExpression)
                 .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand(bizDataName), OperatorType.ASSIGNMENT, null, null, employeeExpression);
         processDefinitionBuilder.addUserTask("step2", ACTOR_NAME);
@@ -1173,11 +1180,17 @@ public class BDRepositoryIT extends CommonAPISPTest {
         parameters.put("entityClassName", EMPLOYEE_QUALIF_CLASSNAME);
         parameters.put("businessDataChildName", "address");
         parameters.put("businessDataURIPattern", "/businessdata/{className}/{id}/{field}");
-        final String result = (String) getCommandAPI().execute("getBusinessDataById", parameters);
+        final String resultWithChildName = (String) getCommandAPI().execute("getBusinessDataById", parameters);
 
-        assertThat(result).as("Address should have the right street and city").contains("\"street\" : \"32, rue Gustave Eiffel\"")
-                .contains("\"city\" : \"Grenoble\"")
-                .contains("\"rel\" : \"country\"");
+        assertThat(resultWithChildName).as("Address should have the right street and city").contains("\"street\":\"32, rue Gustave Eiffel\"")
+                .contains("\"city\":\"Grenoble\"");
+        assertThat(resultWithChildName).as("Address should have a link to country ")
+                .contains("\"rel\":\"country\"");
+
+        parameters.remove("businessDataChildName");
+
+        final String resultWithoutChildName = (String) getCommandAPI().execute("getBusinessDataById", parameters);
+        assertThat(resultWithoutChildName).as("should have a link to lazy country object").contains("\"rel\":\"country\"");
 
         disableAndDeleteProcess(definition.getId());
     }

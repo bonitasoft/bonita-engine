@@ -5,6 +5,7 @@ import javax.persistence.Id;
 import javax.persistence.Version;
 
 import com.bonitasoft.engine.bdm.Entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Address implements Entity {
 
@@ -16,6 +17,9 @@ public class Address implements Entity {
 
     @Version
     private Long persistenceVersion;
+
+    @JsonIgnore
+    private Country country;
 
     private String street;
 
@@ -43,6 +47,14 @@ public class Address implements Entity {
 
     public void setPersistenceVersion(final Long persistenceVersion) {
         this.persistenceVersion = persistenceVersion;
+    }
+
+    public Country getCountry() {
+        return country;
+    }
+
+    public void setCountry(final Country country) {
+        this.country = country;
     }
 
 }
