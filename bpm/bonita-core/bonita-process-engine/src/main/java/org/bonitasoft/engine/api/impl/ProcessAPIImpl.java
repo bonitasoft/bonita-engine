@@ -272,6 +272,7 @@ import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -4038,6 +4039,44 @@ public class ProcessAPIImpl implements ProcessAPI {
             throw new SearchException(sbe);
         }
         return searcher.getResult();
+    }
+
+    @Override
+    public Map<String, Map<String, Long>> getFlownodeStateCounters(long processInstanceId) {
+        final TenantServiceAccessor serviceAccessor = getTenantAccessor();
+        final HashMap<String, Map<String, Long>> countersForProcessInstance = new HashMap<String, Map<String, Long>>();
+        try {
+            // Active flownodes:
+            final List<SFlowNodeInstanceStateCounter> flownodes = serviceAccessor.getActivityInstanceService().getNumberOfFlownodesInAllStates(
+                    processInstanceId);
+            for (SFlowNodeInstanceStateCounter nodeCounter : flownodes) {
+                String flownodeName = nodeCounter.getFlownodeName();
+                Map<String, Long> flownodeCounters = getFlownodeCounters(countersForProcessInstance, flownodeName);
+                flownodeCounters.put(nodeCounter.getStateName(), nodeCounter.getNumberOf());
+                countersForProcessInstance.put(flownodeName, flownodeCounters);
+            }
+            // Archived flownodes:
+            final List<SFlowNodeInstanceStateCounter> archivedFlownodes = serviceAccessor.getActivityInstanceService().getNumberOfArchivedFlownodesInAllStates(
+                    processInstanceId);
+            for (SFlowNodeInstanceStateCounter nodeCounter : archivedFlownodes) {
+                String flownodeName = nodeCounter.getFlownodeName();
+                Map<String, Long> flownodeCounters = getFlownodeCounters(countersForProcessInstance, flownodeName);
+                flownodeCounters.put(nodeCounter.getStateName(), nodeCounter.getNumberOf());
+                countersForProcessInstance.put(flownodeName, flownodeCounters);
+            }
+        } catch (SBonitaReadException e) {
+            throw new RetrieveException(e);
+        }
+        return countersForProcessInstance;
+    }
+
+    private Map<String, Long> getFlownodeCounters(HashMap<String, Map<String, Long>> counters, String flownodeName) {
+        Map<String, Long> flownodeCounters = counters.get(flownodeName);
+        if (flownodeCounters == null) {
+            flownodeCounters = new HashMap<String, Long>();
+            counters.put(flownodeName, flownodeCounters);
+        }
+        return flownodeCounters;
     }
 
     @Override
