@@ -25,6 +25,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
@@ -161,9 +162,30 @@ public interface FlowNodeInstanceService {
             throws SBonitaReadException;
 
     /**
+     * Counts the number of flownode instances in all states. Only considers flownodes direcly contained in given process instance, not flownodes in
+     * sub-process instances. Results are counted per flownode name and per state.
+     *
+     * @param processInstanceId the ID of the process instance to search flownodes for.
+     * @return a map of &lt;flownodename, number of rows with that name&gt;. If no results, returns an empty Map.
+     * @throws SBonitaReadException if a read exception occurs.
+     */
+    List<SFlowNodeInstanceStateCounter> getNumberOfFlownodesInAllStates(final long processInstanceId) throws SBonitaReadException;
+
+    /**
+     * Counts the number of archived flownode instances in a specific state. Only considers archived flownodes direcly contained in given process instance, not
+     * flownodes in sub-process instances. Results are counted per flownode name and per state.
+     *
+     * @param processInstanceId the ID of the process instance to search flownodes for. This is the ID of the process instance before it was archived
+     *        (corresponding to the sourceObjectId in the archives)
+     * @return a map of &lt;flownodename, number of rows with that name&gt;. If no results, returns an empty Map.
+     * @throws SBonitaReadException if a read exception occurs.
+     */
+    public List<SFlowNodeInstanceStateCounter> getNumberOfArchivedFlownodesInAllStates(final long processInstanceId) throws SBonitaReadException;
+
+    /**
      * Set execute by for the specific flow node instance
      *
-     * @param flowNodeInstance
+     * @param sFlowNodeInstance
      *        the flowNodeInstance will be updated
      * @param userId
      *        value for executedBy
@@ -175,7 +197,7 @@ public interface FlowNodeInstanceService {
     /**
      * Set execute by delegate for the specific flow node instance
      *
-     * @param flowNodeInstance
+     * @param sFlowNodeInstance
      *        the flowNodeInstance will be updated
      * @param executerSubstituteId
      *        value for executedBySubstitute
@@ -256,7 +278,6 @@ public interface FlowNodeInstanceService {
 
     /**
      * @param archivedFlowNodeInstanceId
-     * @param persistenceService
      * @return
      * @throws SFlowNodeReadException
      * @throws SFlowNodeNotFoundException
