@@ -1,9 +1,9 @@
 CREATE TABLE job_desc (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
-  jobclassname VARCHAR2(100) NOT NULL,
-  jobname VARCHAR2(100) NOT NULL,
-  description VARCHAR2(50),
+  jobclassname VARCHAR2(100 CHAR) NOT NULL,
+  jobname VARCHAR2(100 CHAR) NOT NULL,
+  description VARCHAR2(50 CHAR),
   PRIMARY KEY (tenantid, id)
 );
 
@@ -11,7 +11,7 @@ CREATE TABLE job_param (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   jobDescriptorId NUMBER(19, 0) NOT NULL,
-  key_ VARCHAR2(50) NOT NULL,
+  key_ VARCHAR2(50 CHAR) NOT NULL,
   value_ BLOB NOT NULL,
   PRIMARY KEY (tenantid, id)
 );

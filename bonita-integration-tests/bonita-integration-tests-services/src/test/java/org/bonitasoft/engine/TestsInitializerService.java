@@ -4,6 +4,7 @@ import javax.naming.Context;
 
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.test.util.PlatformUtil;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -58,8 +59,12 @@ public class TestsInitializerService {
         platformService = servicesBuilder.buildPlatformService();
         schedulerService = servicesBuilder.buildSchedulerService();
 
-        TestUtil.createPlatform(transactionService, platformService);
-
+        try {
+            TestUtil.createPlatform(transactionService, platformService);
+        } catch (final Exception e) {
+            PlatformUtil.deletePlatform(servicesBuilder.buildTransactionService(), platformService);
+            TestUtil.createPlatform(transactionService, platformService);
+        }
         System.out.println("==== Finished initialization (took " + (System.currentTimeMillis() - startTime) / 1000 + "s)  ===");
     }
 
