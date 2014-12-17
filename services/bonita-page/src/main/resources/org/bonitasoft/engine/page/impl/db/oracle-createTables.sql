@@ -11,6 +11,6 @@ CREATE TABLE page (
   lastUpdatedBy NUMBER(19, 0) NOT NULL,
   contentName VARCHAR2(50 CHAR) NOT NULL,
   content BLOB,
-  UNIQUE (tenantId, name),
+  CONSTRAINT UK_Page UNIQUE (tenantId, name),
   PRIMARY KEY (tenantId, id)
 );

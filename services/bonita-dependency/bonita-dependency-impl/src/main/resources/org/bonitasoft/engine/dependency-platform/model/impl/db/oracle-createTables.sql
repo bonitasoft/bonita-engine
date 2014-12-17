@@ -12,7 +12,7 @@ CREATE TABLE pdependencymapping (
   artifactid NUMBER(19, 0) NOT NULL,
   artifacttype VARCHAR2(50 CHAR) NOT NULL,
   dependencyid NUMBER(19, 0) NOT NULL,
-  UNIQUE (dependencyid, artifactid, artifacttype),
+  CONSTRAINT UK_PDependency_Mapping UNIQUE (dependencyid, artifactid, artifacttype),
   PRIMARY KEY (id)
 );
 ALTER TABLE pdependencymapping ADD CONSTRAINT fk_pdepmapping_depid FOREIGN KEY (dependencyid) REFERENCES pdependency(id) ON DELETE CASCADE;

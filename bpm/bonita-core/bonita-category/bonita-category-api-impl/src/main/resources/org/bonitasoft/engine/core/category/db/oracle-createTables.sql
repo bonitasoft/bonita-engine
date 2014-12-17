@@ -6,7 +6,7 @@ CREATE TABLE category (
   description VARCHAR2(1024 CHAR),
   creationDate NUMBER(19, 0) NOT NULL,
   lastUpdateDate NUMBER(19, 0) NOT NULL,
-  UNIQUE (tenantid, name),
+  CONSTRAINT UK_Category UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)
 );
 

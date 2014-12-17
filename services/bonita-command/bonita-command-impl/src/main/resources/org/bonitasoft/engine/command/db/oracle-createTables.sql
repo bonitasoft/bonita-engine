@@ -5,6 +5,6 @@ CREATE TABLE command (
   description VARCHAR2(1024 CHAR),
   IMPLEMENTATION VARCHAR2(100 CHAR) NOT NULL,
   system NUMBER(1),
-  UNIQUE (tenantid, name),
+  CONSTRAINT UK_Command UNIQUE (tenantid, name),
   PRIMARY KEY (tenantid, id)
 );

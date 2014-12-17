@@ -16,7 +16,7 @@ CREATE TABLE business_app (
 );
 
 ALTER TABLE business_app ADD CONSTRAINT pk_business_app PRIMARY KEY (tenantid, id);
-ALTER TABLE business_app ADD CONSTRAINT uk_app_token_version UNIQUE (tenantId, token, version);
+ALTER TABLE business_app ADD CONSTRAINT UK_Business_app UNIQUE (tenantId, token, version);
 
 CREATE INDEX idx_app_token ON business_app (token, tenantid);
 CREATE INDEX idx_app_profile ON business_app (profileId, tenantid);
@@ -31,7 +31,7 @@ CREATE TABLE business_app_page (
 );
 
 ALTER TABLE business_app_page ADD CONSTRAINT pk_business_app_page PRIMARY KEY (tenantid, id);
-ALTER TABLE business_app_page ADD CONSTRAINT uk_app_page_appId_token UNIQUE (tenantId, applicationId, token);
+ALTER TABLE business_app_page ADD CONSTRAINT UK_Business_app_page UNIQUE (tenantId, applicationId, token);
 
 CREATE INDEX idx_app_page_token ON business_app_page (applicationId, token, tenantid);
 CREATE INDEX idx_app_page_pageId ON business_app_page (pageId, tenantid);

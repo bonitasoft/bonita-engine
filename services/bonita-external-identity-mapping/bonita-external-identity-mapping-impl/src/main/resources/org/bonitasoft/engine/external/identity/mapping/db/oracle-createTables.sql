@@ -6,6 +6,6 @@ CREATE TABLE external_identity_mapping (
   userId NUMBER(19, 0) NOT NULL,
   groupId NUMBER(19, 0) NOT NULL,
   roleId NUMBER(19, 0) NOT NULL,
-  UNIQUE (tenantid, kind, externalId, userId, groupId, roleId),
+  CONSTRAINT UK_External_Identity_Mapping UNIQUE (tenantid, kind, externalId, userId, groupId, roleId),
   PRIMARY KEY (tenantid, id)
 );

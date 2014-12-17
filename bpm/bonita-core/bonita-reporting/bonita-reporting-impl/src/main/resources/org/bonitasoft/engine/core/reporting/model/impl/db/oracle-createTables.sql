@@ -9,6 +9,6 @@ CREATE TABLE report (
   lastModificationDate NUMBER(19, 0) NOT NULL,
   screenshot BLOB,
   content BLOB,
-  UNIQUE (tenantId, name),
+  CONSTRAINT UK_Report UNIQUE (tenantId, name),
   PRIMARY KEY (tenantId, id)
 );

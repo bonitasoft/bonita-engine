@@ -29,7 +29,7 @@ CREATE TABLE data_mapping (
 	containerType VARCHAR2(60 CHAR),
 	dataName VARCHAR2(50 CHAR),
 	dataInstanceId NUMBER(19, 0) NOT NULL,
-	UNIQUE (tenantId, containerId, containerType, dataName),
+	CONSTRAINT UK_Data_mapping UNIQUE (tenantId, containerId, containerType, dataName),
 	PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx_datamapp_container ON data_mapping (containerId, containerType, tenantId);

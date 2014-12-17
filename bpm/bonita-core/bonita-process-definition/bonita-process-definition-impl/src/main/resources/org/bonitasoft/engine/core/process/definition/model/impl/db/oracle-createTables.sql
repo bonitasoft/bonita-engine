@@ -1,5 +1,5 @@
 CREATE TABLE process_definition (
-  tenantid NUMBER(19, 0) NOT NULL,
+  tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   processId NUMBER(19, 0) NOT NULL,
   name VARCHAR2(150 CHAR) NOT NULL,
@@ -15,6 +15,6 @@ CREATE TABLE process_definition (
   lastUpdateDate NUMBER(19, 0),
   categoryId NUMBER(19, 0),
   iconPath VARCHAR2(255 CHAR),
-  PRIMARY KEY (tenantid, id),
-  UNIQUE (tenantid, name, version)
+  PRIMARY KEY (tenantId, id),
+  CONSTRAINT UK_Process_Definition UNIQUE (tenantId, name, version)
 );

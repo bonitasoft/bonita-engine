@@ -10,7 +10,7 @@ CREATE TABLE group_ (
   createdBy NUMBER(19, 0),
   creationDate NUMBER(19, 0),
   lastUpdate NUMBER(19, 0),
-  UNIQUE (tenantid, parentPath, name),
+  CONSTRAINT UK_Group UNIQUE (tenantid, parentPath, name),
   PRIMARY KEY (tenantid, id)
 );
 
@@ -25,7 +25,7 @@ CREATE TABLE role (
   createdBy NUMBER(19, 0),
   creationDate NUMBER(19, 0),
   lastUpdate NUMBER(19, 0),
-  UNIQUE (tenantid, name),
+  CONSTRAINT UK_Role UNIQUE (tenantId, name),
   PRIMARY KEY (tenantid, id)
 );
 
@@ -48,7 +48,7 @@ CREATE TABLE user_ (
   creationDate NUMBER(19, 0),
   lastUpdate NUMBER(19, 0),
   lastConnection NUMBER(19, 0),
-  UNIQUE (tenantid, userName),
+  CONSTRAINT UK_User  UNIQUE (tenantid, userName),
   PRIMARY KEY (tenantid, id)
 );
 
@@ -81,7 +81,7 @@ CREATE TABLE custom_usr_inf_def (
   id NUMBER(19, 0) NOT NULL,
   name VARCHAR2(75 CHAR) NOT NULL,
   description VARCHAR2(1024 CHAR),
-  UNIQUE (tenantid, name),
+  CONSTRAINT UK_Custom_Usr_Inf_Def UNIQUE (tenantId, name),
   PRIMARY KEY (tenantid, id)
 );
 

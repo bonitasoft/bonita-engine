@@ -8,7 +8,7 @@ CREATE TABLE profile (
   createdBy NUMBER(19, 0) NOT NULL,
   lastUpdateDate NUMBER(19, 0) NOT NULL,
   lastUpdatedBy NUMBER(19, 0) NOT NULL,
-  UNIQUE (tenantId, name),
+  CONSTRAINT UK_Profile UNIQUE (tenantId, name),
   PRIMARY KEY (tenantId, id)
 );
 

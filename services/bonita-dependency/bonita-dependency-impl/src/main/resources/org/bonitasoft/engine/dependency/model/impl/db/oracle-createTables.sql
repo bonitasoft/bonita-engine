@@ -5,7 +5,7 @@ CREATE TABLE dependency (
   description VARCHAR2(1024 CHAR),
   filename VARCHAR2(255 CHAR) NOT NULL,
   value_ BLOB NOT NULL,
-  UNIQUE (tenantId, name),
+  CONSTRAINT UK_Dependency UNIQUE (tenantId, name),
   PRIMARY KEY (tenantid, id)
 );
 CREATE INDEX idx_dependency_name ON dependency (name);
@@ -16,7 +16,7 @@ CREATE TABLE dependencymapping (
   artifactid NUMBER(19, 0) NOT NULL,
   artifacttype VARCHAR2(50 CHAR) NOT NULL,
   dependencyid NUMBER(19, 0) NOT NULL,
-  UNIQUE (tenantid, dependencyid, artifactid, artifacttype),
+  CONSTRAINT UK_Dependency_Mapping UNIQUE (tenantid, dependencyid, artifactid, artifacttype),
   PRIMARY KEY (tenantid, id)
 );
 ALTER TABLE dependencymapping ADD CONSTRAINT fk_depmapping_depid FOREIGN KEY (tenantid, dependencyid) REFERENCES dependency(tenantid, id) ON DELETE CASCADE;

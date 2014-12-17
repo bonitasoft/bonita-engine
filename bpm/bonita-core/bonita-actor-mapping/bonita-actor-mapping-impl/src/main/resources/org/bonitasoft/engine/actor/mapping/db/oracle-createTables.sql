@@ -6,7 +6,7 @@ CREATE TABLE actor (
   displayName VARCHAR2(75 CHAR),
   description VARCHAR2(1024 CHAR),
   initiator NUMBER(1),
-  UNIQUE (tenantid, id, scopeId, name),
+  CONSTRAINT UK_Actor UNIQUE (tenantid, id, scopeId, name),
   PRIMARY KEY (tenantid, id)
 );
 
