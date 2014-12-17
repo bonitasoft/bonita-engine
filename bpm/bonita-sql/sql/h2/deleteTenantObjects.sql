@@ -7,6 +7,7 @@ DELETE FROM arch_process_comment WHERE tenantid = ${tenantid};
 DELETE FROM process_comment WHERE tenantid = ${tenantid};
 DELETE FROM process_definition WHERE tenantid = ${tenantid};
 DELETE FROM arch_document_mapping WHERE tenantid = ${tenantid};
+DELETE FROM document WHERE tenantid = ${tenantid};
 DELETE FROM document_mapping WHERE tenantid = ${tenantid};
 DELETE FROM arch_flownode_instance WHERE tenantid = ${tenantid};
 DELETE FROM arch_process_instance WHERE tenantid = ${tenantid};

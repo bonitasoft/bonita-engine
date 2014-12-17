@@ -113,19 +113,28 @@ CREATE TABLE arch_document_mapping (
   archiveDate BIGINT NOT NULL,
   PRIMARY KEY (tenantid, ID)
 );
+CREATE TABLE document (
+  tenantid BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  author BIGINT,
+  creationdate BIGINT NOT NULL,
+  hascontent BOOLEAN NOT NULL,
+  filename VARCHAR(255),
+  mimetype VARCHAR(255),
+  url VARCHAR(1024),
+  content LONGBLOB NULL,
+  PRIMARY KEY (tenantid, id)
+);
 CREATE TABLE document_mapping (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
-  processinstanceid BIGINT,
-  documentName VARCHAR(50) NOT NULL,
-  documentAuthor BIGINT,
-  documentCreationDate BIGINT NOT NULL,
-  documentHasContent BOOLEAN NOT NULL,
-  documentContentFileName VARCHAR(255),
-  documentContentMimeType VARCHAR(255),
-  contentStorageId VARCHAR(50),
-  documentURL VARCHAR(255),
-  PRIMARY KEY (tenantid, ID)
+  processinstanceid BIGINT NOT NULL,
+  documentid BIGINT NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  description TEXT,
+  version VARCHAR(10) NOT NULL,
+  index_ INT NOT NULL,
+  PRIMARY KEY (tenantid, id)
 );
 CREATE TABLE arch_process_instance (
   tenantid BIGINT NOT NULL,

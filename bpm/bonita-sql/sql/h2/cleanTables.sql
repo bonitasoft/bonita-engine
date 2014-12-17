@@ -8,6 +8,7 @@ DELETE FROM arch_process_comment;
 DELETE FROM process_comment;
 DELETE FROM process_definition;
 DELETE FROM arch_document_mapping;
+DELETE FROM document;
 DELETE FROM document_mapping;
 DELETE FROM arch_transition_instance;
 
