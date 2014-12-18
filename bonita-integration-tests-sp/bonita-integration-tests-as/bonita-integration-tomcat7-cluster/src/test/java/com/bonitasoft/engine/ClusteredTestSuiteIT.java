@@ -11,11 +11,11 @@ package com.bonitasoft.engine;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bonitasoft.engine.BonitaSuiteRunner;
-import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
@@ -31,9 +31,9 @@ public class ClusteredTestSuiteIT {
     public static void beforeAll() throws Exception {
         System.err.println("=================== ClusteredTestSuiteIT.beforeClass()");
         changeToNode2();
-        PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
-        PlatformSession platformSession = platformLoginAPI.login("platformAdmin", "platform");
-        PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
+        final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
+        final PlatformSession platformSession = platformLoginAPI.login("platformAdmin", "platform");
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
         BPMTestSPUtil.setDefaultTenantId(platformAPI.getDefaultTenant().getId());
         platformLoginAPI.logout(platformSession);
         changeToNode1();
@@ -41,9 +41,9 @@ public class ClusteredTestSuiteIT {
 
     public static void afterAll() throws Exception {
         changeToNode2();
-        PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
-        PlatformSession platformSession = platformLoginAPI.login("platformAdmin", "platform");
-        PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
+        final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
+        final PlatformSession platformSession = platformLoginAPI.login("platformAdmin", "platform");
+        final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
         platformAPI.stopNode();
         changeToNode1();
         platformAPI.stopNode();
@@ -62,7 +62,7 @@ public class ClusteredTestSuiteIT {
     }
 
     private static void setConnectionPort(final String port) {
-        Map<String, String> parameters = new HashMap<String, String>(2);
+        final Map<String, String> parameters = new HashMap<String, String>(2);
         parameters.put("server.url", "http://localhost:" + port);
         parameters.put("application.name", "bonita");
         APITypeManager.setAPITypeAndParams(ApiAccessType.HTTP, parameters);

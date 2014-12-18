@@ -14,8 +14,6 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
-import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
-import org.bonitasoft.engine.BonitaTestRunner;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
 import org.bonitasoft.engine.api.internal.ServerAPI;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
@@ -41,6 +39,8 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.bonitasoft.engine.test.WaitUntil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.bonitasoft.engine.theme.ThemeType;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

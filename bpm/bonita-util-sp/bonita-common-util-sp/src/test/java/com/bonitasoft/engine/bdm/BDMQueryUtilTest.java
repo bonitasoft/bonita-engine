@@ -42,6 +42,11 @@ public class BDMQueryUtilTest {
 
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void should_createQueryNameForUniqueConstraint_throwException_when_null_value() {
+        BDMQueryUtil.createQueryNameForUniqueConstraint(null);
+    }
+
     @Test
     public void should_createQueryContentForUniqueConstraint_return_query_content_with_parameters() {
         final UniqueConstraint uniqueConstraint = new UniqueConstraint();
@@ -244,7 +249,8 @@ public class BDMQueryUtilTest {
         // then:
         assertThat(query).isNotNull();
         assertThat(query.getName()).isEqualTo("findManagerByEmployeePersistenceId");
-        assertThat(query.getContent()).isEqualTo("SELECT e.manager\nFROM Employee e\nWHERE e.persistenceId= :persistenceId");
+        assertThat(query.getContent()).isEqualTo(
+                "SELECT manager_1 FROM Employee employee_0 JOIN employee_0.manager as manager_1 WHERE employee_0.persistenceId= :persistenceId");
         assertThat(query.getReturnType()).isEqualTo(bo.getQualifiedName());
         assertThat(query.getQueryParameters()).extracting("name", "className").contains(tuple(Field.PERSISTENCE_ID, Long.class.getName()));
 
@@ -253,7 +259,8 @@ public class BDMQueryUtilTest {
         // then:
         assertThat(query).isNotNull();
         assertThat(query.getName()).isEqualTo("findAddressesByEmployeePersistenceId");
-        assertThat(query.getContent()).isEqualTo("SELECT e.addresses\nFROM Employee e\nWHERE e.persistenceId= :persistenceId");
+        assertThat(query.getContent()).isEqualTo(
+                "SELECT addresses_1 FROM Employee employee_0 JOIN employee_0.addresses as addresses_1 WHERE employee_0.persistenceId= :persistenceId");
         assertThat(query.getReturnType()).isEqualTo(List.class.getName());
         assertThat(query.getQueryParameters()).extracting("name", "className").contains(tuple(Field.PERSISTENCE_ID, Long.class.getName()));
     }

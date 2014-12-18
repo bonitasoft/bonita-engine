@@ -15,7 +15,7 @@ import javax.persistence.Version;
 @NamedQueries({
     @NamedQuery(name = "Skill.findBySkill", query = "SELECT s\nFROM Skill s\nWHERE s.skill= :skill\nORDER BY s.persistenceId"),
     @NamedQuery(name = "Skill.find", query = "SELECT s\nFROM Skill s\nORDER BY s.persistenceId"),
-    @NamedQuery(name = "Skill.findSkillsByEmployeePersistenceId", query = "SELECT e.skills\nFROM Employee e\nWHERE e.persistenceId= :persistenceId")
+    @NamedQuery(name = "Skill.findSkillsByEmployeePersistenceId", query = "SELECT skills_1 FROM Employee employee_0 JOIN employee_0.skills as skills_1 WHERE employee_0.persistenceId= :persistenceId")
 })
 public class Skill
     implements com.bonitasoft.engine.bdm.Entity
