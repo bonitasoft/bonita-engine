@@ -14,15 +14,16 @@
 package org.bonitasoft.engine.test.persistence.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 
 /**
  * @author Elias Ricken de Medeiros
- *
  */
 public class FlowNodeInstanceRepository extends TestRepository {
 
@@ -30,12 +31,13 @@ public class FlowNodeInstanceRepository extends TestRepository {
         super(sessionFactory);
     }
 
+    @SuppressWarnings("unchecked")
     public List<Long> getFlowNodeInstanceIdsToRestart(final QueryOptions queryOptions) {
         getSessionWithTenantFilter();
         final Query namedQuery = getNamedQuery("getFlowNodeInstanceIdsToRestart");
         namedQuery.setMaxResults(queryOptions.getNumberOfResults());
         namedQuery.setFirstResult(queryOptions.getFromIndex());
-        return namedQuery.list();
+        return (List<Long>) namedQuery.list();
     }
 
     public long getNumberOfSHumanTaskInstanceAssignedAndPendingByRootProcessFor(final long rootProcessDefinitionId, final long userId) {
@@ -70,6 +72,22 @@ public class FlowNodeInstanceRepository extends TestRepository {
         namedQuery = getSession().createQuery(namedQuery.getQueryString() + " ORDER BY a.name");
         namedQuery.setParameter("rootProcessDefinitionId", rootProcessDefinitionId);
         return namedQuery.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<SFlowNodeInstanceStateCounter> getNumberOfArchivedFlowNodesInAllStates(long processInstanceId) {
+        getSessionWithTenantFilter();
+        Query namedQuery = getNamedQuery("getNumberOfArchivedFlowNodesInAllStates");
+        namedQuery.setParameter("parentProcessInstanceId", processInstanceId);
+        return (List<SFlowNodeInstanceStateCounter>) namedQuery.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<SFlowNodeInstanceStateCounter> getNumberOfFlowNodesInAllStates(long processInstanceId) {
+        getSessionWithTenantFilter();
+        Query namedQuery = getNamedQuery("getNumberOfFlowNodesInAllStates");
+        namedQuery.setParameter("parentProcessInstanceId", processInstanceId);
+        return (List<SFlowNodeInstanceStateCounter>) namedQuery.list();
     }
 
 }
