@@ -111,33 +111,40 @@ GO
 CREATE TABLE arch_document_mapping (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
-  processinstanceid NUMERIC(19, 0),
   sourceObjectId NUMERIC(19, 0),
-  documentName NVARCHAR(50) NOT NULL,
-  documentAuthor NUMERIC(19, 0),
-  documentCreationDate NUMERIC(19, 0) NOT NULL,
-  documentHasContent BIT NOT NULL,
-  documentContentFileName NVARCHAR(255),
-  documentContentMimeType NVARCHAR(255),
-  contentStorageId NVARCHAR(50),
-  documentURL NVARCHAR(255),
+  processinstanceid NUMERIC(19, 0) NOT NULL,
+  documentid NUMERIC(19, 0) NOT NULL,
+  name NVARCHAR(50) NOT NULL,
+  description NVARCHAR(MAX),
+  version NVARCHAR(10) NOT NULL,
+  index_ INT NOT NULL,
   archiveDate NUMERIC(19, 0) NOT NULL,
-  PRIMARY KEY (tenantid, ID)
+  PRIMARY KEY (tenantid, id)
+)
+GO
+CREATE TABLE document (
+  tenantid NUMERIC(19, 0) NOT NULL,
+  id NUMERIC(19, 0) NOT NULL,
+  author NUMERIC(19, 0),
+  creationdate NUMERIC(19, 0) NOT NULL,
+  hascontent BIT NOT NULL,
+  filename NVARCHAR(255),
+  mimetype NVARCHAR(255),
+  url NVARCHAR(1024),
+  content VARBINARY(MAX) NULL,
+  PRIMARY KEY (tenantid, id)
 )
 GO
 CREATE TABLE document_mapping (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
-  processinstanceid NUMERIC(19, 0),
-  documentName NVARCHAR(50) NOT NULL,
-  documentAuthor NUMERIC(19, 0),
-  documentCreationDate NUMERIC(19, 0) NOT NULL,
-  documentHasContent BIT NOT NULL,
-  documentContentFileName NVARCHAR(255),
-  documentContentMimeType NVARCHAR(255),
-  contentStorageId NVARCHAR(50),
-  documentURL NVARCHAR(255),
-  PRIMARY KEY (tenantid, ID)
+  processinstanceid NUMERIC(19, 0) NOT NULL,
+  documentid NUMERIC(19, 0) NOT NULL,
+  name NVARCHAR(50) NOT NULL,
+  description NVARCHAR(MAX),
+  version NVARCHAR(10) NOT NULL,
+  index_ INT NOT NULL,
+  PRIMARY KEY (tenantid, id)
 )
 GO
 CREATE TABLE arch_process_instance (
@@ -394,15 +401,16 @@ GO
 CREATE TABLE event_trigger_instance (
 	tenantid NUMERIC(19, 0) NOT NULL,
   	id NUMERIC(19, 0) NOT NULL,
-  	eventInstanceId NUMERIC(19, 0) NOT NULL,
   	kind NVARCHAR(15) NOT NULL,
-  	timerType NVARCHAR(10),
-  	timerValue NUMERIC(19, 0),
+  	eventInstanceId NUMERIC(19, 0) NOT NULL,
+  	eventInstanceName NVARCHAR(50),
   	messageName NVARCHAR(255),
   	targetProcess NVARCHAR(255),
   	targetFlowNode NVARCHAR(255),
   	signalName NVARCHAR(255),
   	errorCode NVARCHAR(255),
+  	executionDate NUMERIC(19, 0), 
+  	jobTriggerName NVARCHAR(255),
   	PRIMARY KEY (tenantid, id)
 )
 GO
@@ -559,12 +567,12 @@ CREATE TABLE processsupervisor (
   PRIMARY KEY (tenantid, id)
 )
 GO
+
 CREATE TABLE business_app (
   tenantId NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
-  name NVARCHAR(50) NOT NULL,
+  token NVARCHAR(50) NOT NULL,
   version NVARCHAR(50) NOT NULL,
-  path NVARCHAR(255) NOT NULL,
   description NVARCHAR(MAX),
   iconPath NVARCHAR(255),
   creationDate NUMERIC(19, 0) NOT NULL,
@@ -573,16 +581,21 @@ CREATE TABLE business_app (
   updatedBy NUMERIC(19, 0) NOT NULL,
   state NVARCHAR(30) NOT NULL,
   homePageId NUMERIC(19, 0),
+  profileId NUMERIC(19, 0),
   displayName NVARCHAR(255) NOT NULL
 )
 GO
 
 ALTER TABLE business_app ADD CONSTRAINT pk_business_app PRIMARY KEY (tenantid, id)
 GO
-ALTER TABLE business_app ADD CONSTRAINT uk_app_name_version UNIQUE (tenantId, name, version)
+ALTER TABLE business_app ADD CONSTRAINT uk_app_token_version UNIQUE (tenantId, token, version)
 GO
 
-CREATE INDEX idx_app_name ON business_app (name, tenantid)
+CREATE INDEX idx_app_token ON business_app (token, tenantid)
+GO
+CREATE INDEX idx_app_profile ON business_app (profileId, tenantid)
+GO
+CREATE INDEX idx_app_homepage ON business_app (homePageId, tenantid)
 GO
 
 CREATE TABLE business_app_page (
@@ -590,21 +603,42 @@ CREATE TABLE business_app_page (
   id NUMERIC(19, 0) NOT NULL,
   applicationId NUMERIC(19, 0) NOT NULL,
   pageId NUMERIC(19, 0) NOT NULL,
-  name NVARCHAR(255) NOT NULL
+  token NVARCHAR(255) NOT NULL
 )
 GO
 
 ALTER TABLE business_app_page ADD CONSTRAINT pk_business_app_page PRIMARY KEY (tenantid, id)
 GO
-ALTER TABLE business_app_page ADD CONSTRAINT uk_app_page_appId_name UNIQUE (tenantId, applicationId, name)
+ALTER TABLE business_app_page ADD CONSTRAINT uk_app_page_appId_token UNIQUE (tenantId, applicationId, token)
 GO
 
-CREATE INDEX idx_app_page_name ON business_app_page (applicationId, name, tenantid)
+CREATE INDEX idx_app_page_token ON business_app_page (applicationId, token, tenantid)
 GO
 CREATE INDEX idx_app_page_pageId ON business_app_page (pageId, tenantid)
 GO
 
--- forein keys are create in bonita-persistence-db/postCreateStructure.sql
+CREATE TABLE business_app_menu (
+  tenantId NUMERIC(19, 0) NOT NULL,
+  id NUMERIC(19, 0) NOT NULL,
+  displayName NVARCHAR(255) NOT NULL,
+  applicationId NUMERIC(19, 0) NOT NULL,
+  applicationPageId NUMERIC(19, 0),
+  parentId NUMERIC(19, 0),
+  index_ NUMERIC(19, 0)
+)
+GO
+
+ALTER TABLE business_app_menu ADD CONSTRAINT pk_business_app_menu PRIMARY KEY (tenantid, id)
+GO
+
+CREATE INDEX idx_app_menu_app ON business_app_menu (applicationId, tenantid)
+GO
+CREATE INDEX idx_app_menu_page ON business_app_menu (applicationPageId, tenantid)
+GO
+CREATE INDEX idx_app_menu_parent ON business_app_menu (parentId, tenantid)
+GO
+-- foreign keys are create in bonita-persistence-db/postCreateStructure.sql
+
 CREATE TABLE command (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -814,12 +848,12 @@ CREATE TABLE user_ (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
   enabled BIT NOT NULL,
-  userName NVARCHAR(50) NOT NULL,
+  userName NVARCHAR(255) NOT NULL,
   password NVARCHAR(60),
-  firstName NVARCHAR(50),
-  lastName NVARCHAR(50),
+  firstName NVARCHAR(255),
+  lastName NVARCHAR(255),
   title NVARCHAR(50),
-  jobTitle NVARCHAR(50),
+  jobTitle NVARCHAR(255),
   managerUserId NUMERIC(19, 0),
   delegeeUserName NVARCHAR(50),
   iconName NVARCHAR(50),
@@ -846,7 +880,7 @@ CREATE TABLE user_contactinfo (
   fax NVARCHAR(50),
   building NVARCHAR(50),
   room NVARCHAR(50),
-  address NVARCHAR(50),
+  address NVARCHAR(255),
   zipCode NVARCHAR(50),
   city NVARCHAR(50),
   state NVARCHAR(50),

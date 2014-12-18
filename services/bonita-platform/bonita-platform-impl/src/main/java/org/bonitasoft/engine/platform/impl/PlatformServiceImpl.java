@@ -150,7 +150,8 @@ public class PlatformServiceImpl implements PlatformService {
 
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, final Recorder recorder,
             final List<TenantPersistenceService> tenantPersistenceServices, final TechnicalLoggerService logger,
-            final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties, final DataSource datasource, final List<File> sqlFolders) {
+            final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties, final DataSource datasource,
+            final List<File> sqlFolders) {
         this.platformPersistenceService = platformPersistenceService;
         this.tenantPersistenceServices = tenantPersistenceServices;
         this.logger = logger;
@@ -168,9 +169,9 @@ public class PlatformServiceImpl implements PlatformService {
     public void createTables() throws SPlatformCreationException {
         try {
             executeSQLResources(asList("createTables.sql", "createQuartzTables.sql", "postCreateStructure.sql"));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new SPlatformCreationException(e);
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new SPlatformCreationException(e);
         }
     }
@@ -181,7 +182,7 @@ public class PlatformServiceImpl implements PlatformService {
      * @throws SPlatformCreationException
      */
     protected void executeSQLResources(final List<String> sqlFiles) throws IOException, SQLException {
-        executeSQLResources(sqlFiles, Collections.<String, String>emptyMap());
+        executeSQLResources(sqlFiles, Collections.<String, String> emptyMap());
     }
 
     /**
@@ -201,8 +202,8 @@ public class PlatformServiceImpl implements PlatformService {
      * @throws SPersistenceException
      */
     protected void executeSQLResource(final String sqlFile, final Map<String, String> replacements) throws IOException, SQLException {
-        for (File sqlFolder : sqlFolders) {
-            File sqlResource = new File(sqlFolder, sqlFile);
+        for (final File sqlFolder : sqlFolders) {
+            final File sqlResource = new File(sqlFolder, sqlFile);
 
             if (sqlResource.exists()) {
                 final String fileContent = new String(IOUtil.getAllContentFrom(sqlResource));
@@ -235,16 +236,21 @@ public class PlatformServiceImpl implements PlatformService {
             for (final String command : commands) {
                 if (command.trim().length() > 0) {
                     final Statement stmt = connection.createStatement();
+                    String filledCommand = null;
                     try {
                         if (logger.isLoggable(getClass(), TechnicalLogSeverity.TRACE)) {
                             logger.log(getClass(), TechnicalLogSeverity.TRACE, command);
                         }
-                        final String filledCommand = fillTemplate(command, replacements);
+                        filledCommand = fillTemplate(command, replacements);
                         if (logger.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
                             logger.log(getClass(), TechnicalLogSeverity.DEBUG, "Executing the following command : " + filledCommand);
                         }
 
                         stmt.execute(filledCommand);
+                    } catch (final SQLException e) {
+                        // Just log the Failing command in case of ERROR:
+                        logger.log(getClass(), TechnicalLogSeverity.ERROR, "Following SQL command failed: " + filledCommand);
+                        throw e;
                     } finally {
                         stmt.close();
                     }
@@ -272,7 +278,6 @@ public class PlatformServiceImpl implements PlatformService {
         }
         return trimmedCommand;
     }
-
 
     private Connection getConnection() throws SQLException {
         return datasource.getConnection();
@@ -341,9 +346,9 @@ public class PlatformServiceImpl implements PlatformService {
     private void initializeTenant(final STenant tenant) throws STenantCreationException {
         try {
             executeSQLResources(asList("initTenantTables.sql"), buildReplacements(tenant));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new STenantCreationException(e);
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new STenantCreationException(e);
         }
 
@@ -365,9 +370,9 @@ public class PlatformServiceImpl implements PlatformService {
         // Read the files initTables.sql from ${bonita.home}/server/sql/${db.vendor}
         try {
             executeSQLResources(asList("initTables.sql"));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new SPlatformCreationException(e);
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new SPlatformCreationException(e);
         }
     }
@@ -413,9 +418,9 @@ public class PlatformServiceImpl implements PlatformService {
     public void deleteTables() throws SPlatformDeletionException {
         try {
             executeSQLResources(asList("preDropStructure.sql", "dropQuartzTables.sql", "dropTables.sql"));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new SPlatformDeletionException(e);
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new SPlatformDeletionException(e);
         }
     }
@@ -454,9 +459,9 @@ public class PlatformServiceImpl implements PlatformService {
 
         try {
             executeSQLResources(asList("deleteTenantObjects.sql"), replacements);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new STenantDeletionException(e);
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new STenantDeletionException(e);
         }
     }
@@ -795,9 +800,9 @@ public class PlatformServiceImpl implements PlatformService {
         try {
             // TODO Rename the file to cleanTenantTables
             executeSQLResources(asList("cleanTables.sql"));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new STenantUpdateException(e);
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             throw new STenantUpdateException(e);
         }
 

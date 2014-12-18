@@ -11,7 +11,7 @@
 
 	<artifactId>bonita-integration-tests-services-bpm</artifactId>
 
-    <name>Bonita Service BPM Integration Tests</name>
+    <name>Bonita Integration Tests Service BPM</name>
 
 	<properties>
 		<bonita.home>${project.build.directory}/test-classes/home</bonita.home>
@@ -642,7 +642,7 @@
                                     <type>zip</type>
                                 </artifactItem>
 							</artifactItems>
-							<outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+							<outputDirectory>${project.build.directory}/server</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>

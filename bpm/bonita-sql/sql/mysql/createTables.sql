@@ -100,32 +100,38 @@ CREATE TABLE process_definition (
 CREATE TABLE arch_document_mapping (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
-  processinstanceid BIGINT,
   sourceObjectId BIGINT,
-  documentName VARCHAR(50) NOT NULL,
-  documentAuthor BIGINT,
-  documentCreationDate BIGINT NOT NULL,
-  documentHasContent BOOLEAN NOT NULL,
-  documentContentFileName VARCHAR(255),
-  documentContentMimeType VARCHAR(255),
-  contentStorageId VARCHAR(50),
-  documentURL VARCHAR(255),
+  processinstanceid BIGINT NOT NULL,
+  documentid BIGINT NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  description TEXT,
+  version VARCHAR(10) NOT NULL,
+  index_ INT NOT NULL,
   archiveDate BIGINT NOT NULL,
-  PRIMARY KEY (tenantid, ID)
+  PRIMARY KEY (tenantid, id)
+) ENGINE = INNODB;
+CREATE TABLE document (
+  tenantid BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  author BIGINT,
+  creationdate BIGINT NOT NULL,
+  hascontent BOOLEAN NOT NULL,
+  filename VARCHAR(255),
+  mimetype VARCHAR(255),
+  url VARCHAR(1024),
+  content LONGBLOB NULL,
+  PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 CREATE TABLE document_mapping (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
-  processinstanceid BIGINT,
-  documentName VARCHAR(50) NOT NULL,
-  documentAuthor BIGINT,
-  documentCreationDate BIGINT NOT NULL,
-  documentHasContent BOOLEAN NOT NULL,
-  documentContentFileName VARCHAR(255),
-  documentContentMimeType VARCHAR(255),
-  contentStorageId VARCHAR(50),
-  documentURL VARCHAR(255),
-  PRIMARY KEY (tenantid, ID)
+  processinstanceid BIGINT NOT NULL,
+  documentid BIGINT NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  description TEXT,
+  version VARCHAR(10) NOT NULL,
+  index_ INT NOT NULL,
+  PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 CREATE TABLE arch_process_instance (
   tenantid BIGINT NOT NULL,
@@ -361,15 +367,16 @@ CREATE INDEX idx_ci_container_activation ON connector_instance (tenantid, contai
 CREATE TABLE event_trigger_instance (
 	tenantid BIGINT NOT NULL,
   	id BIGINT NOT NULL,
-  	eventInstanceId BIGINT NOT NULL,
   	kind VARCHAR(15) NOT NULL,
-  	timerType VARCHAR(10),
-  	timerValue BIGINT,
+  	eventInstanceId BIGINT NOT NULL,
+  	eventInstanceName VARCHAR(50),
   	messageName VARCHAR(255),
   	targetProcess VARCHAR(255),
   	targetFlowNode VARCHAR(255),
   	signalName VARCHAR(255),
   	errorCode VARCHAR(255),
+  	executionDate BIGINT, 
+  	jobTriggerName VARCHAR(255),
   	PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 
@@ -506,12 +513,12 @@ CREATE TABLE processsupervisor (
   UNIQUE (tenantid, processDefId, userId, groupId, roleId),
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
+
 CREATE TABLE business_app (
   tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
-  name VARCHAR(50) NOT NULL,
+  token VARCHAR(50) NOT NULL,
   version VARCHAR(50) NOT NULL,
-  path VARCHAR(255) NOT NULL,
   description TEXT,
   iconPath VARCHAR(255),
   creationDate BIGINT NOT NULL,
@@ -520,29 +527,48 @@ CREATE TABLE business_app (
   updatedBy BIGINT NOT NULL,
   state VARCHAR(30) NOT NULL,
   homePageId BIGINT,
+  profileId BIGINT,
   displayName VARCHAR(255) NOT NULL
 ) ENGINE = INNODB;
 
 ALTER TABLE business_app ADD CONSTRAINT pk_business_app PRIMARY KEY (tenantid, id);
-ALTER TABLE business_app ADD CONSTRAINT uk_app_name_version UNIQUE (tenantId, name, version);
+ALTER TABLE business_app ADD CONSTRAINT uk_app_token_version UNIQUE (tenantId, token, version);
 
-CREATE INDEX idx_app_name ON business_app (name, tenantid);
+CREATE INDEX idx_app_token ON business_app (token, tenantid);
+CREATE INDEX idx_app_profile ON business_app (profileId, tenantid);
+CREATE INDEX idx_app_homepage ON business_app (homePageId, tenantid);
 
 CREATE TABLE business_app_page (
   tenantId BIGINT NOT NULL,
   id BIGINT NOT NULL,
   applicationId BIGINT NOT NULL,
   pageId BIGINT NOT NULL,
-  name VARCHAR(255) NOT NULL
+  token VARCHAR(255) NOT NULL
 ) ENGINE = INNODB;
 
 ALTER TABLE business_app_page ADD CONSTRAINT pk_business_app_page PRIMARY KEY (tenantid, id);
-ALTER TABLE business_app_page ADD CONSTRAINT uk_app_page_appId_name UNIQUE (tenantId, applicationId, name);
+ALTER TABLE business_app_page ADD CONSTRAINT uk_app_page_appId_token UNIQUE (tenantId, applicationId, token);
 
-CREATE INDEX idx_app_page_name ON business_app_page (applicationId, name, tenantid);
+CREATE INDEX idx_app_page_token ON business_app_page (applicationId, token, tenantid);
 CREATE INDEX idx_app_page_pageId ON business_app_page (pageId, tenantid);
 
--- forein keys are create in bonita-persistence-db/postCreateStructure.sql
+CREATE TABLE business_app_menu (
+  tenantId BIGINT NOT NULL,
+  id BIGINT NOT NULL,
+  displayName VARCHAR(255) NOT NULL,
+  applicationId BIGINT NOT NULL,
+  applicationPageId BIGINT,
+  parentId BIGINT,
+  index_ BIGINT
+) ENGINE = INNODB;
+
+ALTER TABLE business_app_menu ADD CONSTRAINT pk_business_app_menu PRIMARY KEY (tenantid, id);
+
+CREATE INDEX idx_app_menu_app ON business_app_menu (applicationId, tenantid);
+CREATE INDEX idx_app_menu_page ON business_app_menu (applicationPageId, tenantid);
+CREATE INDEX idx_app_menu_parent ON business_app_menu (parentId, tenantid);
+-- foreign keys are create in bonita-persistence-db/postCreateStructure.sql
+
 CREATE TABLE command (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -727,12 +753,12 @@ CREATE TABLE user_ (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
   enabled BOOLEAN NOT NULL,
-  userName VARCHAR(50) NOT NULL,
+  userName VARCHAR(255) NOT NULL,
   password VARCHAR(60),
-  firstName VARCHAR(50),
-  lastName VARCHAR(50),
+  firstName VARCHAR(255),
+  lastName VARCHAR(255),
   title VARCHAR(50),
-  jobTitle VARCHAR(50),
+  jobTitle VARCHAR(255),
   managerUserId BIGINT,
   delegeeUserName VARCHAR(50),
   iconName VARCHAR(50),
@@ -757,7 +783,7 @@ CREATE TABLE user_contactinfo (
   fax VARCHAR(50),
   building VARCHAR(50),
   room VARCHAR(50),
-  address VARCHAR(50),
+  address VARCHAR(255),
   zipCode VARCHAR(50),
   city VARCHAR(50),
   state VARCHAR(50),
@@ -981,6 +1007,6 @@ CREATE TABLE theme (
   cssContent LONGBLOB,
   type VARCHAR(50) NOT NULL,
   lastUpdateDate BIGINT NOT NULL,
-  CONSTRAINT UK_Theme UNIQUE (tenantId, isDefault, type),
+  CONSTRAINT "UK_Theme" UNIQUE (tenantId, isDefault, type),
   PRIMARY KEY (tenantId, id)
 ) ENGINE = INNODB;

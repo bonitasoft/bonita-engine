@@ -17,6 +17,8 @@ DELETE FROM process_definition
 GO
 DELETE FROM arch_document_mapping
 GO
+DELETE FROM document
+GO
 DELETE FROM document_mapping
 GO
 DELETE FROM arch_transition_instance
@@ -69,9 +71,11 @@ DELETE FROM report
 GO
 DELETE FROM processsupervisor
 GO
-DELETE FROM business_app
+DELETE FROM business_app_menu
 GO
 DELETE FROM business_app_page
+GO
+DELETE FROM business_app
 GO
 DELETE FROM command
 GO

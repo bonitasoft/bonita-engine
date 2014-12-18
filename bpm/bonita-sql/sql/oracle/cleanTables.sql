@@ -8,6 +8,7 @@ DELETE FROM arch_process_comment;
 DELETE FROM process_comment;
 DELETE FROM process_definition;
 DELETE FROM arch_document_mapping;
+DELETE FROM document;
 DELETE FROM document_mapping;
 DELETE FROM arch_transition_instance;
 
@@ -41,8 +42,9 @@ DELETE FROM process_instance;
 DELETE FROM breakpoint;
 DELETE FROM report;
 DELETE FROM processsupervisor;
-DELETE FROM business_app;
+DELETE FROM business_app_menu;
 DELETE FROM business_app_page;
+DELETE FROM business_app;
 DELETE FROM command;
 DELETE FROM arch_data_mapping;
 

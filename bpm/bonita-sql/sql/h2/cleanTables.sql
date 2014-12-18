@@ -42,8 +42,9 @@ DELETE FROM process_instance;
 DELETE FROM breakpoint;
 DELETE FROM report;
 DELETE FROM processsupervisor;
-DELETE FROM business_app;
+DELETE FROM business_app_menu;
 DELETE FROM business_app_page;
+DELETE FROM business_app;
 DELETE FROM command;
 DELETE FROM arch_data_mapping;
 

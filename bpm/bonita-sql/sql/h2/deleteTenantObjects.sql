@@ -29,6 +29,7 @@ DELETE FROM report WHERE tenantid = ${tenantid};
 DELETE FROM processsupervisor WHERE tenantid = ${tenantid};
 DELETE FROM business_app WHERE tenantid = ${tenantid};
 DELETE FROM business_app_page WHERE tenantid = ${tenantid};
+DELETE FROM business_app_menu WHERE tenantid = ${tenantid};
 DELETE FROM command WHERE tenantid = ${tenantid};
 DELETE FROM arch_data_mapping WHERE tenantid = ${tenantid};
 DELETE FROM arch_data_instance WHERE tenantid = ${tenantid};

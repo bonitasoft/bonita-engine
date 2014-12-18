@@ -11,7 +11,7 @@
 
 	<artifactId>bonita-integration-tests-services</artifactId>
 
-	<name>Bonita Service Integration Tests</name>
+	<name>Bonita Integration Tests Service</name>
 
 	<dependencies>
 

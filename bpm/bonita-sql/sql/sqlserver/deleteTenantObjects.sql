@@ -16,6 +16,8 @@ DELETE FROM process_definition WHERE tenantid = ${tenantid}
 GO
 DELETE FROM arch_document_mapping WHERE tenantid = ${tenantid}
 GO
+DELETE FROM document WHERE tenantid = ${tenantid}
+GO
 DELETE FROM document_mapping WHERE tenantid = ${tenantid}
 GO
 DELETE FROM arch_flownode_instance WHERE tenantid = ${tenantid}
@@ -57,6 +59,8 @@ GO
 DELETE FROM business_app WHERE tenantid = ${tenantid}
 GO
 DELETE FROM business_app_page WHERE tenantid = ${tenantid}
+GO
+DELETE FROM business_app_menu WHERE tenantid = ${tenantid}
 GO
 DELETE FROM command WHERE tenantid = ${tenantid}
 GO

@@ -100,32 +100,38 @@ CREATE TABLE process_definition (
 CREATE TABLE arch_document_mapping (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
-  processinstanceid NUMBER(19, 0),
   sourceObjectId NUMBER(19, 0),
-  documentName VARCHAR2(50) NOT NULL,
-  documentAuthor NUMBER(19, 0),
-  documentCreationDate NUMBER(19, 0) NOT NULL,
-  documentHasContent NUMBER(1) NOT NULL,
-  documentContentFileName VARCHAR2(255),
-  documentContentMimeType VARCHAR2(255),
-  contentStorageId VARCHAR2(50),
-  documentURL VARCHAR2(255),
+  processinstanceid NUMBER(19, 0) NOT NULL,
+  documentid NUMBER(19, 0) NOT NULL,
+  name VARCHAR2(50) NOT NULL,
+  description VARCHAR2(1024),
+  version VARCHAR2(10) NOT NULL,
+  index_ INT NOT NULL,
   archiveDate NUMBER(19, 0) NOT NULL,
-  PRIMARY KEY (tenantid, ID)
+  PRIMARY KEY (tenantid, id)
+);
+CREATE TABLE document (
+  tenantid NUMBER(19, 0) NOT NULL,
+  id NUMBER(19, 0) NOT NULL,
+  author NUMBER(19, 0),
+  creationdate NUMBER(19, 0) NOT NULL,
+  hascontent NUMBER(1) NOT NULL,
+  filename VARCHAR2(255),
+  mimetype VARCHAR2(255),
+  url VARCHAR2(1024),
+  content BLOB NULL,
+  PRIMARY KEY (tenantid, id)
 );
 CREATE TABLE document_mapping (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
-  processinstanceid NUMBER(19, 0),
-  documentName VARCHAR2(50) NOT NULL,
-  documentAuthor NUMBER(19, 0),
-  documentCreationDate NUMBER(19, 0) NOT NULL,
-  documentHasContent NUMBER(1) NOT NULL,
-  documentContentFileName VARCHAR2(255),
-  documentContentMimeType VARCHAR2(255),
-  contentStorageId VARCHAR2(50),
-  documentURL VARCHAR2(255),
-  PRIMARY KEY (tenantid, ID)
+  processinstanceid NUMBER(19, 0) NOT NULL,
+  documentid NUMBER(19, 0) NOT NULL,
+  name VARCHAR2(50) NOT NULL,
+  description VARCHAR2(1024),
+  version VARCHAR2(10) NOT NULL,
+  index_ INT NOT NULL,
+  PRIMARY KEY (tenantid, id)
 );
 CREATE TABLE arch_process_instance (
   tenantid NUMBER(19, 0) NOT NULL,
@@ -361,15 +367,16 @@ CREATE INDEX idx_ci_container_activation ON connector_instance (tenantid, contai
 CREATE TABLE event_trigger_instance (
 	tenantid NUMBER(19, 0) NOT NULL,
   	id NUMBER(19, 0) NOT NULL,
-  	eventInstanceId NUMBER(19, 0) NOT NULL,
   	kind VARCHAR2(15) NOT NULL,
-  	timerType VARCHAR2(10),
-  	timerValue NUMBER(19, 0),
+  	eventInstanceId NUMBER(19, 0) NOT NULL,
+  	eventInstanceName VARCHAR2(50),
   	messageName VARCHAR2(255),
   	targetProcess VARCHAR2(255),
   	targetFlowNode VARCHAR2(255),
   	signalName VARCHAR2(255),
   	errorCode VARCHAR2(255),
+  	executionDate NUMBER(19, 0), 
+  	jobTriggerName VARCHAR2(255),
   	PRIMARY KEY (tenantid, id)
 );
 
@@ -506,12 +513,12 @@ CREATE TABLE processsupervisor (
   UNIQUE (tenantid, processDefId, userId, groupId, roleId),
   PRIMARY KEY (tenantid, id)
 );
+
 CREATE TABLE business_app (
   tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
-  name VARCHAR2(50) NOT NULL,
+  token VARCHAR2(50) NOT NULL,
   version VARCHAR2(50) NOT NULL,
-  path VARCHAR2(255) NOT NULL,
   description VARCHAR22(1024),
   iconPath VARCHAR2(255),
   creationDate NUMBER(19, 0) NOT NULL,
@@ -520,27 +527,46 @@ CREATE TABLE business_app (
   updatedBy NUMBER(19, 0) NOT NULL,
   state VARCHAR2(30) NOT NULL,
   homePageId NUMBER(19, 0),
+  profileId NUMBER(19, 0),
   displayName VARCHAR2(255) NOT NULL
 );
 
 ALTER TABLE business_app ADD CONSTRAINT pk_business_app PRIMARY KEY (tenantid, id);
-ALTER TABLE business_app ADD CONSTRAINT uk_app_name_version UNIQUE (tenantId, name, version);
+ALTER TABLE business_app ADD CONSTRAINT uk_app_token_version UNIQUE (tenantId, token, version);
 
-CREATE INDEX idx_app_name ON business_app (name, tenantid);
+CREATE INDEX idx_app_token ON business_app (token, tenantid);
+CREATE INDEX idx_app_profile ON business_app (profileId, tenantid);
+CREATE INDEX idx_app_homepage ON business_app (homePageId, tenantid);
 
 CREATE TABLE business_app_page (
   tenantId NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   applicationId NUMBER(19, 0) NOT NULL,
   pageId NUMBER(19, 0) NOT NULL,
-  name VARCHAR2(255) NOT NULL
+  token VARCHAR2(255) NOT NULL
 );
 
 ALTER TABLE business_app_page ADD CONSTRAINT pk_business_app_page PRIMARY KEY (tenantid, id);
-ALTER TABLE business_app_page ADD CONSTRAINT uk_app_page_appId_name UNIQUE (tenantId, applicationId, name);
+ALTER TABLE business_app_page ADD CONSTRAINT uk_app_page_appId_token UNIQUE (tenantId, applicationId, token);
 
-CREATE INDEX idx_app_page_name ON business_app_page (applicationId, name, tenantid);
+CREATE INDEX idx_app_page_token ON business_app_page (applicationId, token, tenantid);
 CREATE INDEX idx_app_page_pageId ON business_app_page (pageId, tenantid);
+
+CREATE TABLE business_app_menu (
+  tenantId NUMBER(19, 0) NOT NULL,
+  id NUMBER(19, 0) NOT NULL,
+  displayName VARCHAR2(255) NOT NULL,
+  applicationId NUMBER(19, 0) NOT NULL,
+  applicationPageId NUMBER(19, 0),
+  parentId NUMBER(19, 0),
+  index_ NUMBER(19, 0)
+);
+
+ALTER TABLE business_app_menu ADD CONSTRAINT pk_business_app_menu PRIMARY KEY (tenantid, id);
+
+CREATE INDEX idx_app_menu_app ON business_app_menu (applicationId, tenantid);
+CREATE INDEX idx_app_menu_page ON business_app_menu (applicationPageId, tenantid);
+CREATE INDEX idx_app_menu_parent ON business_app_menu (parentId, tenantid);
 
 CREATE TABLE command (
   tenantid NUMBER(19, 0) NOT NULL,
@@ -723,12 +749,12 @@ CREATE TABLE user_ (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   enabled NUMBER(1) NOT NULL,
-  userName VARCHAR2(50) NOT NULL,
+  userName VARCHAR2(255) NOT NULL,
   password VARCHAR2(60),
-  firstName VARCHAR2(50),
-  lastName VARCHAR2(50),
+  firstName VARCHAR2(255),
+  lastName VARCHAR2(255),
   title VARCHAR2(50),
-  jobTitle VARCHAR2(50),
+  jobTitle VARCHAR2(255),
   managerUserId NUMBER(19, 0),
   delegeeUserName VARCHAR2(50),
   iconName VARCHAR2(50),
@@ -752,7 +778,7 @@ CREATE TABLE user_contactinfo (
   fax VARCHAR2(50),
   building VARCHAR2(50),
   room VARCHAR2(50),
-  address VARCHAR2(50),
+  address VARCHAR2(255),
   zipCode VARCHAR2(50),
   city VARCHAR2(50),
   state VARCHAR2(50),

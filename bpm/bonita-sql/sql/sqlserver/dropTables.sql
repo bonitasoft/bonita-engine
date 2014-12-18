@@ -16,6 +16,8 @@ DROP TABLE process_definition
 GO
 DROP TABLE arch_document_mapping
 GO
+DROP TABLE document
+GO
 DROP TABLE document_mapping
 GO
 DROP TABLE arch_flownode_instance
@@ -57,6 +59,8 @@ GO
 DROP TABLE business_app
 GO
 DROP TABLE business_app_page
+GO
+DROP TABLE business_app_menu
 GO
 DROP TABLE command
 GO

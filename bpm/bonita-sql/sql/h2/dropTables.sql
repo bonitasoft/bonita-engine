@@ -29,6 +29,7 @@ DROP TABLE report;
 DROP TABLE processsupervisor;
 DROP TABLE business_app;
 DROP TABLE business_app_page;
+DROP TABLE business_app_menu;
 DROP TABLE command;
 DROP TABLE arch_data_instance;
 DROP TABLE arch_data_mapping;
