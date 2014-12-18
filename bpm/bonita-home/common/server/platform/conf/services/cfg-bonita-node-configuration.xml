@@ -30,7 +30,12 @@
 			</list>
 		</property>
 	</bean>
-	
+
+	<bean id="jobLogCreator" class="org.bonitasoft.engine.scheduler.impl.JobLogCreator">
+		<constructor-arg name="jobService" ref="jobService" />
+		<constructor-arg name="logger" ref="platformTechnicalLoggerService"/>
+	</bean>
+
 	<bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
 		<constructor-arg name="schedulerService" ref="scheduler" />
 		<constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
@@ -39,6 +44,7 @@
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="incidentService" ref="incidentService" />
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+		<constructor-arg name="jobLogCreator" ref="jobLogCreator"/>
 	</bean>
 
 	<bean id="loggerJobListener" class="org.bonitasoft.engine.scheduler.impl.TechnicalLoggerJobListener">

@@ -16,7 +16,8 @@ package org.bonitasoft.engine.bpm.flownode.impl;
 /**
  * @author Matthieu Chaffotte
  * @author Celine Souchet
- * @deprecated since 6.2.3
+ * @deprecated in this package since 6.2.3. Instead use {@link org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition}
+ * @see org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition
  */
 @Deprecated
 public interface FlowElementContainerDefinition extends org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition {

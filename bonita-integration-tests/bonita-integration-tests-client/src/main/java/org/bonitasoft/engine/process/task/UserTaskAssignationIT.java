@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -29,7 +29,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class UserTaskAssignationIT extends CommonAPITest {
+public class UserTaskAssignationIT extends TestWithTechnicalUser {
 
     private static final String JOHN = "john";
 
@@ -45,9 +45,10 @@ public class UserTaskAssignationIT extends CommonAPITest {
 
     private HumanTaskInstance step2;
 
+    @Override
     @Before
-    public void beforeTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+    public void before() throws Exception {
+        super.before();
         john = createUser(JOHN, "bpm");
         jack = createUser(JACK, "bpm");
         loginOnDefaultTenantWith(JOHN, "bpm");
@@ -57,14 +58,15 @@ public class UserTaskAssignationIT extends CommonAPITest {
         step2 = waitForUserTask("step2", processInstance);
     }
 
+    @Override
     @After
-    public void afterTest() throws BonitaException {
+    public void after() throws Exception {
         disableAndDeleteProcess(processDefinition);
 
         deleteUser(JOHN);
         deleteUser(JACK);
         VariableStorage.clearAll();
-        logoutOnTenant();
+        super.after();
     }
 
     @Test

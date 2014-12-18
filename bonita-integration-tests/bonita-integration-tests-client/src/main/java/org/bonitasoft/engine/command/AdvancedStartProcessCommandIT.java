@@ -5,12 +5,10 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2.0 of the License, or
  * (at your option) any later version.
- * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -27,7 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.document.DocumentValue;
@@ -47,7 +45,6 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
-import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.operation.OperationBuilder;
@@ -55,7 +52,6 @@ import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -63,7 +59,7 @@ import org.junit.Test;
  * Date: 11/12/13
  * Time: 09:45
  */
-public class AdvancedStartProcessCommandIT extends CommonAPITest {
+public class AdvancedStartProcessCommandIT extends TestWithUser {
 
     private static final String CONNECTOR_OUTPUT_NAME = "output1";
 
@@ -71,28 +67,16 @@ public class AdvancedStartProcessCommandIT extends CommonAPITest {
 
     private static final String CONNECTOR_WITH_OUTPUT_ID = "org.bonitasoft.connector.testConnectorWithOutput";
 
-    private User john;
-
     private final SimpleProcessDesigner designer = new SimpleProcessDesigner(getProcessDefinitionBuilder());
 
     private final TestUtils wrapper = new TestUtils(this);
 
     private final ProcessDeployer processDeployer = getProcessDeployer();
 
-    @Before
-    public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
-        john = createUser(USERNAME, PASSWORD);
-        logoutOnTenant();
-        loginOnDefaultTenantWith(USERNAME, PASSWORD);
-    }
-
     @After
     public void afterTest() throws BonitaException {
         processDeployer.clean();
-        deleteUser(USERNAME);
         VariableStorage.clearAll();
-        logoutOnTenant();
     }
 
     @Test
@@ -104,7 +88,7 @@ public class AdvancedStartProcessCommandIT extends CommonAPITest {
                 .then(new UserTask("step 3"))
                 .end());
 
-        final TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 2");
+        final TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), "step 2");
 
         process.expect("step 2").toBeReady();
         process.expect("start", "step 1").toNotHaveArchives();
@@ -122,7 +106,7 @@ public class AdvancedStartProcessCommandIT extends CommonAPITest {
                 .then(new UserTask("step 3"))
                 .end());
 
-        final TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(),
+        final TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(),
                 "step 2",
                 Arrays.asList(createSetDataOperation("variable", "Done!")),
                 Collections.<String, Serializable> emptyMap());
@@ -134,14 +118,14 @@ public class AdvancedStartProcessCommandIT extends CommonAPITest {
     public void should_be_able_to_start_a_sequential_process_with_a_document() throws Exception {
         final ProcessDefinitionBuilder builder = getProcessDefinitionBuilder();
         builder.addDocumentDefinition("document");
-        ProcessDefinition processDefinition = processDeployer.deploy(designer
+        final ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"))
                 .then(new UserTask("step 2"))
                 .then(new UserTask("step 3"))
                 .end());
 
-        final TestUtils.Process process = startProcess(john.getId(),
+        final TestUtils.Process process = startProcess(user.getId(),
                 processDefinition.getId(),
                 "step 2",
                 Collections.singletonList(new OperationBuilder().createSetDocument("document",
@@ -161,8 +145,8 @@ public class AdvancedStartProcessCommandIT extends CommonAPITest {
                 .then(new UserTask("step 2"), new UserTask("step 3"))
                 .end());
 
-        final TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 1");
-        process.execute(john, "step 1", "step 2", "step 3");
+        final TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), "step 1");
+        process.execute(user, "step 1", "step 2", "step 3");
 
         process.isExpected().toFinish();
         process.expect("start").toNotHaveArchives();
@@ -177,8 +161,8 @@ public class AdvancedStartProcessCommandIT extends CommonAPITest {
                 .then(new UserTask("step 3"))
                 .end());
 
-        final TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 2");
-        process.execute(john, "step 2", "step 3");
+        final TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), "step 2");
+        process.execute(user, "step 2", "step 3");
 
         process.isExpected().toFinish();
         process.expect("start").toNotHaveArchives();
@@ -188,7 +172,7 @@ public class AdvancedStartProcessCommandIT extends CommonAPITest {
     @Test
     public void should_be_able_to_start_a_process_with_an_exclusive_split() throws Exception {
         final Expression condition = new ExpressionBuilder().createConstantBooleanExpression(true);
-        ProcessDefinition processDefinition = processDeployer.deploy(designer
+        final ProcessDefinition processDefinition = processDeployer.deploy(designer
                 .start()
                 .then(new UserTask("step 1"))
                 .then(new Gateway("exclusive", GatewayType.EXCLUSIVE))
@@ -197,8 +181,8 @@ public class AdvancedStartProcessCommandIT extends CommonAPITest {
                         new UserTask("step 3").when("exclusive", meet(condition)))
                 .end());
 
-        final TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 1");
-        process.execute(john, "step 1", "step 3");
+        final TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), "step 1");
+        process.execute(user, "step 1", "step 3");
 
         process.isExpected().toFinish();
         process.expect("start").toNotHaveArchives();
@@ -216,8 +200,8 @@ public class AdvancedStartProcessCommandIT extends CommonAPITest {
                 .then(new UserTask("step 4"))
                 .end());
 
-        final TestUtils.Process process = startProcess(john.getId(), processDefinition.getId(), "step 1");
-        process.execute(john, "step 1", "step 2", "step 3", "step 4");
+        final TestUtils.Process process = startProcess(user.getId(), processDefinition.getId(), "step 1");
+        process.execute(user, "step 1", "step 2", "step 3", "step 4");
 
         process.isExpected().toFinish();
         process.expect("start").toNotHaveArchives();
@@ -259,12 +243,12 @@ public class AdvancedStartProcessCommandIT extends CommonAPITest {
         return new ProcessDeployer() {
 
             @Override
-            public ProcessDefinition deploy(DesignProcessDefinition design) throws BonitaException {
-                return deployAndEnableProcessWithActor(design, "actor", john);
+            public ProcessDefinition deploy(final DesignProcessDefinition design) throws BonitaException {
+                return deployAndEnableProcessWithActor(design, "actor", user);
             }
 
             @Override
-            public void clean(ProcessDefinition processDefinition) throws BonitaException {
+            public void clean(final ProcessDefinition processDefinition) throws BonitaException {
                 disableAndDeleteProcess(processDefinition);
             }
         };
@@ -284,12 +268,12 @@ public class AdvancedStartProcessCommandIT extends CommonAPITest {
                         new ExpressionBuilder().createInputExpression(CONNECTOR_OUTPUT_NAME, String.class.getName()));
         processDefinitionBuilder.addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, ACTOR_NAME, john,
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndConnector(processDefinitionBuilder, ACTOR_NAME, user,
                 "TestConnectorWithOutput.impl", TestConnectorWithOutput.class, "TestConnectorWithOutput.jar");
 
         // Start the process with the command on the step2
         final Map<String, Serializable> parametersCommand = new HashMap<String, Serializable>();
-        parametersCommand.put("started_by", john.getId());
+        parametersCommand.put("started_by", user.getId());
         parametersCommand.put("process_definition_id", processDefinition.getId());
         parametersCommand.put("activity_name", "step2");
         // command API execution

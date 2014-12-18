@@ -79,7 +79,7 @@ public class FlowNodeInstanceTests {
                 .withId(ROOT_PROCESS_INSTANCE_ID).build());
     }
 
-    protected void buildAndCreateProcessDefinition(final long id, long processDefinitionId, final String processName) {
+    protected void buildAndCreateProcessDefinition(final long id, final long processDefinitionId, final String processName) {
         final SProcessDefinitionDeployInfoImpl sProcessDefinitionDeployInfoImpl = new SProcessDefinitionDeployInfoImpl();
         sProcessDefinitionDeployInfoImpl.setId(id);
         sProcessDefinitionDeployInfoImpl.setName(processName);
