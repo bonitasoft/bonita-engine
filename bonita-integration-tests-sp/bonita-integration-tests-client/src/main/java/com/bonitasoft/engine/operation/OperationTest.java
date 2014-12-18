@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.bar.xml.StringIndex;
 import org.bonitasoft.engine.bpm.data.DataInstance;
@@ -29,11 +29,9 @@ import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.AutomaticTaskDefinitionBuilder;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.ExpressionConstants;
-import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.LeftOperand;
 import org.bonitasoft.engine.operation.LeftOperandBuilder;
 import org.bonitasoft.engine.operation.Operation;
@@ -43,8 +41,6 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.bonitasoft.engine.xml.DocumentManager;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -54,27 +50,7 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 /**
  * @author Baptiste Mesta
  */
-public class OperationTest extends CommonAPITest {
-
-    private static final String JOHN = "john";
-
-    private User john;
-
-    @After
-    public void afterTest() throws BonitaException {
-        logoutOnTenant();
-        loginOnDefaultTenantWithDefaultTechnicalUser();
-        deleteUser(JOHN);
-        logoutOnTenant();
-    }
-
-    @Before
-    public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
-        john = createUser(JOHN, "bpm");
-        logoutOnTenant();
-        loginOnDefaultTenantWith(JOHN, "bpm");
-    }
+public class OperationTest extends TestWithUser {
 
     @Test
     public void executeStringOperationOnData() throws Exception {
@@ -124,7 +100,7 @@ public class OperationTest extends CommonAPITest {
         designProcessDefinition.setStringIndex(3, "label3", new ExpressionBuilder().createConstantStringExpression("value3"));
         designProcessDefinition.setStringIndex(4, "label4", new ExpressionBuilder().createConstantStringExpression("value4"));
         designProcessDefinition.setStringIndex(5, "label5", new ExpressionBuilder().createConstantStringExpression("value5"));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), actorName, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), actorName, user);
 
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance humanTaskInstance = waitForUserTask("step1", startProcess);
@@ -134,7 +110,7 @@ public class OperationTest extends CommonAPITest {
         assertEquals("value3", processInstance.getStringIndex3());
         assertEquals("value4", processInstance.getStringIndex4());
         assertEquals("value5", processInstance.getStringIndex5());
-        assignAndExecuteStep(humanTaskInstance, john.getId());
+        assignAndExecuteStep(humanTaskInstance, user.getId());
         waitForUserTask("step3", startProcess);
         processInstance = getProcessAPI().getProcessInstance(startProcess.getId());
         assertEquals("newValue1", processInstance.getStringIndex1());
@@ -162,13 +138,13 @@ public class OperationTest extends CommonAPITest {
         designProcessDefinition.addTransition("step1", "step2");
         designProcessDefinition.addTransition("step2", "step3");
         designProcessDefinition.setStringIndex(1, "label1", new ExpressionBuilder().createDataExpression("baseData", String.class.getName()));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), actorName, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), actorName, user);
 
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance humanTaskInstance = waitForUserTask("step1", startProcess);
         ProcessInstance processInstance = getProcessAPI().getProcessInstance(startProcess.getId());
         assertEquals("baseValue", processInstance.getStringIndex1());
-        assignAndExecuteStep(humanTaskInstance, john.getId());
+        assignAndExecuteStep(humanTaskInstance, user.getId());
         waitForUserTask("step3", startProcess);
         processInstance = getProcessAPI().getProcessInstance(startProcess.getId());
         assertEquals("changedData", processInstance.getStringIndex1());
@@ -271,7 +247,7 @@ public class OperationTest extends CommonAPITest {
         designProcessDefinition.setStringIndex(4, "label4", new ExpressionBuilder().createConstantStringExpression("value4"));
         designProcessDefinition.setStringIndex(5, "label5", new ExpressionBuilder().createConstantStringExpression("value5"));
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), delivery, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), delivery, user);
 
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         final HashMap<String, Integer> inverDataOrder = new HashMap<String, Integer>(dataName.size());
@@ -287,7 +263,7 @@ public class OperationTest extends CommonAPITest {
         }
 
         final ActivityInstance waitForStep0 = waitForUserTask("step0", startProcess);
-        assignAndExecuteStep(waitForStep0, john.getId());
+        assignAndExecuteStep(waitForStep0, user.getId());
 
         waitForUserTask("step2", startProcess).getId();
 
@@ -373,12 +349,12 @@ public class OperationTest extends CommonAPITest {
                 .addOperation(new OperationBuilder().createXPathOperation(variableName, xPathExpression, rightOperand)).addUserTask("step2", "Workers")
                 .addTransition("start", "step1").addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "Workers", john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "Workers", user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance waitForUserTask = waitForUserTask("step1", startProcess);
 
         assertEquals(defaultValue, getProcessAPI().getProcessDataInstance(variableName, startProcess.getId()).getValue());
-        assignAndExecuteStep(waitForUserTask, john.getId());
+        assignAndExecuteStep(waitForUserTask, user.getId());
 
         waitForUserTask("step2", startProcess);
 
@@ -405,7 +381,7 @@ public class OperationTest extends CommonAPITest {
         designProcessDefinition.addActor("Workers").addUserTask("step1", "Workers");
         designProcessDefinition.addAutomaticTask("start").addTransition("start", "step1");
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "Workers", john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "Workers", user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("step1", startProcess);
 
@@ -429,11 +405,11 @@ public class OperationTest extends CommonAPITest {
         designProcessDefinition.addActor("Workers").addUserTask("step1", "Workers").addOperation(leftOperand, OperatorType.ASSIGNMENT, "=", null, loggedUser);
         designProcessDefinition.addAutomaticTask("start").addUserTask("step2", "Workers").addTransition("start", "step1").addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "Workers", john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "Workers", user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", startProcess, john);
+        waitForUserTaskAndExecuteIt("step1", startProcess, user);
         waitForUserTask("step2", startProcess);
-        assertEquals(john.getId(), getProcessAPI().getProcessDataInstance("userId", startProcess.getId()).getValue());
+        assertEquals(user.getId(), getProcessAPI().getProcessDataInstance("userId", startProcess.getId()).getValue());
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -456,9 +432,9 @@ public class OperationTest extends CommonAPITest {
                 .addOperation(leftOperand, OperatorType.ASSIGNMENT, "=", null, defaultExpression);
         designProcessDefinition.addAutomaticTask("start").addUserTask("step2", "Workers").addTransition("start", "step1").addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "Workers", john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "Workers", user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", startProcess, john);
+        waitForUserTaskAndExecuteIt("step1", startProcess, user);
         waitForUserTask("step2", startProcess);
 
         final long numberOfUsers = getIdentityAPI().getNumberOfUsers();
@@ -481,7 +457,7 @@ public class OperationTest extends CommonAPITest {
         designProcessDefinition.addAutomaticTask("start").addUserTask("step2", "Workers").addTransition("start", "step1", defaultExpression)
                 .addTransition("step1", "step2");
 
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "Workers", john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "Workers", user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTask("step1", startProcess);
 
@@ -504,7 +480,7 @@ public class OperationTest extends CommonAPITest {
         task1Def.addOperation(new OperationBuilder().createJavaMethodOperation("myDatum", "append", "int",
                 new ExpressionBuilder().createConstantIntegerExpression(55)));
         task1Def.addUserTask("step2", ACTOR_NAME).addTransition("step1", "step2");
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ActivityInstance activityInstance = waitForUserTask("step2", processInstance);
@@ -533,9 +509,9 @@ public class OperationTest extends CommonAPITest {
                                 new ExpressionBuilder().createConstantStringExpression("myAddress")));
         designProcessDefinition.addAutomaticTask("start").addUserTask("step2", "Workers").addTransition("start", "step1").addTransition("step1", "step2");
         builder.setProcessDefinition(designProcessDefinition.done());
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "Workers", john);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "Workers", user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", startProcess, john);
+        waitForUserTaskAndExecuteIt("step1", startProcess, user);
         waitForUserTask("step2", startProcess);
         disableAndDeleteProcess(processDefinition);
     }

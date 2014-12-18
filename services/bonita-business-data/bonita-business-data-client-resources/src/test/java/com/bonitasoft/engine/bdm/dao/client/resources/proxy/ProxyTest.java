@@ -36,17 +36,17 @@ public class ProxyTest {
     @InjectMocks
     private Proxyfier proxyfier;
 
-    private TestEntity mockLazyLoaderToReturn(TestEntity entity) {
+    private TestEntity mockLazyLoaderToReturn(final TestEntity entity) {
         when(lazyLoader.load(any(Method.class), any(Long.class))).thenReturn(entity);
         return entity;
     }
 
     @Test
     public void should_load_object_when_method_is_lazy_and_object_is_not_loaded() {
-        TestEntity expectedEntity = mockLazyLoaderToReturn(new TestEntity());
+        final TestEntity expectedEntity = mockLazyLoaderToReturn(new TestEntity());
         final TestEntity entity = proxyfier.proxify(new TestEntity());
 
-        TestEntity lazyEntity = entity.getLazyEntity();
+        final TestEntity lazyEntity = entity.getLazyEntity();
 
         verify(lazyLoader).load(any(Method.class), any(Long.class));
         assertThat(lazyEntity).isEqualTo(expectedEntity);
@@ -75,26 +75,12 @@ public class ProxyTest {
     }
 
     @Test
-    public void should_not_load_entity_when_it_has_been_already_loaded_before_proxyfication() {
-        final TestEntity alreadySetEntity = new TestEntity();
-        alreadySetEntity.setName("aDeepName");
-        TestEntity entity = new TestEntity();
-        entity.setLazyEntity(alreadySetEntity);
-        entity = proxyfier.proxify(entity);
-
-        final TestEntity loadedEntity = entity.getLazyEntity();
-
-        verifyZeroInteractions(lazyLoader);
-        assertThat(loadedEntity.getName()).isEqualTo(alreadySetEntity.getName());
-    }
-
-    @Test
     public void should_not_load_object_which_has_been_already_lazy_loaded() {
-        TestEntity expectedEntity = mockLazyLoaderToReturn(new TestEntity());
+        final TestEntity expectedEntity = mockLazyLoaderToReturn(new TestEntity());
         final TestEntity entity = proxyfier.proxify(new TestEntity());
 
         entity.getLazyEntity();
-        TestEntity lazyEntity = entity.getLazyEntity();
+        final TestEntity lazyEntity = entity.getLazyEntity();
 
         verify(lazyLoader, times(1)).load(any(Method.class), any(Long.class));
         assertThat(lazyEntity).isEqualTo(expectedEntity);
@@ -111,11 +97,11 @@ public class ProxyTest {
 
     @Test
     public void should_not_load_object_that_has_been_set_by_a_setter() {
-        TestEntity expectedEntity = new TestEntity();
+        final TestEntity expectedEntity = new TestEntity();
         final TestEntity entity = proxyfier.proxify(new TestEntity());
 
         entity.setLazyEntity(expectedEntity);
-        TestEntity lazyEntity = entity.getLazyEntity();
+        final TestEntity lazyEntity = entity.getLazyEntity();
 
         verifyZeroInteractions(lazyLoader);
         assertThat(lazyEntity).isEqualTo(expectedEntity);

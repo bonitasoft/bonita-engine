@@ -48,6 +48,8 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerProxyfier;
+import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.core.process.instance.api.RefBusinessDataService;
 import com.bonitasoft.engine.core.process.instance.api.exceptions.SRefBusinessDataInstanceNotFoundException;
@@ -57,6 +59,9 @@ import com.bonitasoft.engine.core.process.instance.model.SRefBusinessDataInstanc
 
 @RunWith(MockitoJUnitRunner.class)
 public class BusinessDataExpressionExecutorStrategyTest {
+
+    @Mock
+    ServerProxyfier proxyfier;
 
     @Mock
     private BusinessDataRepository businessDataRepository;
@@ -143,9 +148,10 @@ public class BusinessDataExpressionExecutorStrategyTest {
         final SExpressionImpl buildBusinessDataExpression = buildBusinessDataExpression(refBizData.getName());
         when(flowNodeInstanceService.getProcessInstanceId(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name())).thenReturn(processInstanceId);
 
-        final Object fetchedBizData = businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null, ContainerState.ACTIVE);
+        final Entity fetchedBizData = (Entity) businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null,
+                ContainerState.ACTIVE);
 
-        assertThat(fetchedBizData).isEqualTo(expectedBizData);
+        assertThat(unProxyfyIdNeeded(fetchedBizData)).isEqualTo(expectedBizData);
     }
 
     @Test(expected = SExpressionEvaluationException.class)
@@ -173,9 +179,11 @@ public class BusinessDataExpressionExecutorStrategyTest {
         when(businessDataRepository.findByIds(SimpleBizData.class, Arrays.asList(bizData.getId()))).thenReturn(Arrays.asList(bizData));
         when(flowNodeInstanceService.getProcessInstanceId(proccessInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name())).thenReturn(proccessInstanceId);
 
-        final Object fetchedBizData = businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null, ContainerState.ACTIVE);
+        @SuppressWarnings("unchecked")
+        final List<Entity> fetchedBizDataList = (List<Entity>) businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null,
+                ContainerState.ACTIVE);
 
-        assertThat(fetchedBizData).isEqualTo(Arrays.asList(bizData));
+        assertThat(unProxyfyIdNeeded(fetchedBizDataList.get(0))).isEqualTo(bizData);
     }
 
     @Test
@@ -203,11 +211,18 @@ public class BusinessDataExpressionExecutorStrategyTest {
         final SRefBusinessDataInstance refBizData = createARefBizDataInRepository(expectedBizData, flowNode.getParentProcessInstanceId());
         final HashMap<String, Object> context = buildBusinessDataExpressionContext(flowNode.getId(), DataInstanceContainer.PROCESS_INSTANCE);
         final SExpressionImpl buildBusinessDataExpression = buildBusinessDataExpression(refBizData.getName());
+
         when(flowNodeInstanceService.getProcessInstanceId(456L, DataInstanceContainer.PROCESS_INSTANCE.name())).thenReturn(1234L);
 
-        final Object fetchedBizData = businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null, ContainerState.ACTIVE);
+        final Entity fetchedBizData = (Entity) businessDataExpressionExecutorStrategy.evaluate(buildBusinessDataExpression, context, null,
+                ContainerState.ACTIVE);
+        assertThat(unProxyfyIdNeeded(fetchedBizData)).isEqualTo(expectedBizData);
+    }
 
-        assertThat(fetchedBizData).isEqualTo(expectedBizData);
+    private SimpleBizData unProxyfyIdNeeded(final Entity fetchedBizData) {
+        final SimpleBizData unProxyfyIfNeeded;
+        unProxyfyIfNeeded = (SimpleBizData) ServerProxyfier.unProxyfyIfNeeded(fetchedBizData);
+        return unProxyfyIfNeeded;
     }
 
     @Test

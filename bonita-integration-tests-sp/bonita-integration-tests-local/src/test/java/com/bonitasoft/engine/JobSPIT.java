@@ -13,16 +13,16 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.test.CommonAPILocalTest;
+import org.bonitasoft.engine.test.CommonAPILocalIT;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JobSPTests extends CommonAPILocalTest {
+public class JobSPIT extends CommonAPILocalIT {
 
     @After
     public void afterTest() throws Exception {
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     @Before
@@ -32,11 +32,11 @@ public class JobSPTests extends CommonAPILocalTest {
 
     @Test
     public void check_DeleteBatchJob_is_registered() throws Exception {
-        Callable<Boolean> callable = new Callable<Boolean>() {
+        final Callable<Boolean> callable = new Callable<Boolean>() {
 
             @Override
             public Boolean call() throws Exception {
-                List<String> jobs = getTenantAccessor().getSchedulerService().getJobs();
+                final List<String> jobs = getTenantAccessor().getSchedulerService().getJobs();
                 System.out.println("registered jobs=" + jobs);
                 return jobs.contains("DeleteBatchJob");
             }

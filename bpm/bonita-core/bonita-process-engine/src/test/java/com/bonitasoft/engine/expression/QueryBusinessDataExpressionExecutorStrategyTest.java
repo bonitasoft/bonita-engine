@@ -43,6 +43,9 @@ public class QueryBusinessDataExpressionExecutorStrategyTest {
     @InjectMocks
     private QueryBusinessDataExpressionExecutorStrategy strategy;
 
+    @Mock
+    private Entity entity;
+
     private Map<String, Object> buildContext() {
         final Map<String, Object> context = new HashMap<String, Object>();
         context.put("containerId", 784654l);
@@ -116,6 +119,7 @@ public class QueryBusinessDataExpressionExecutorStrategyTest {
 
     @Test
     public void evaluate_should_return_a_result_after_querying_with_parameters() throws Exception {
+
         final SExpressionImpl dependencyFirstNameExpression = new SExpressionImpl("firstName", "John", null, String.class.getName(), null, null);
         final SExpressionImpl dependencyLastNameExpression = new SExpressionImpl("lastName", "Doe", null, String.class.getName(), null, null);
         final List<SExpression> dependencies = new ArrayList<SExpression>();
@@ -126,12 +130,13 @@ public class QueryBusinessDataExpressionExecutorStrategyTest {
         final Map<Integer, Object> resolvedExpressions = new HashMap<Integer, Object>();
         resolvedExpressions.put(dependencyFirstNameExpression.getDiscriminant(), "John");
         resolvedExpressions.put(dependencyLastNameExpression.getDiscriminant(), "Doe");
-
-        strategy.evaluate(expression, buildContext(), resolvedExpressions, ContainerState.ACTIVE);
-
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("firstName", "John");
         parameters.put("lastName", "Doe");
+        when(businessDataRepository.findByNamedQuery("getEmployeeByFirstNameAndLastName", Entity.class, parameters)).thenReturn(entity);
+
+        strategy.evaluate(expression, buildContext(), resolvedExpressions, ContainerState.ACTIVE);
+
         verify(businessDataRepository).findByNamedQuery("getEmployeeByFirstNameAndLastName", Entity.class, parameters);
     }
 
