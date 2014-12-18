@@ -20,13 +20,15 @@ import org.bonitasoft.engine.recorder.RecorderTest;
 import org.bonitasoft.engine.scheduler.impl.QuartzSchedulerExecutorITest;
 import org.bonitasoft.engine.session.PlatformSessionServiceTest;
 import org.bonitasoft.engine.session.SessionServiceTest;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.xml.ParserTest;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 // FIXME add platformtest suite
-@RunWith(Suite.class)
+// FIXME abstract impl test suites
+@RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
         CacheServiceTest.class,
         PersistenceTests.class,
@@ -57,10 +59,11 @@ import org.junit.runners.Suite.SuiteClasses;
 })
 /**
  * Do not run this test suite alone. Use AllTestsWithJNDI instead.
- * 
+ *
  * @author Emmanuel Duchastenier
  *
  */
+@Initializer(TestsInitializerService.class)
 public class AllTests {
 
 }

@@ -73,7 +73,7 @@ public class TimerEventTriggerJobListener extends AbstractBonitaTenantJobListene
     @Override
     public void jobWasExecuted(final Map<String, Serializable> context, final Exception jobException) {
         final StatelessJob bosJob = (StatelessJob) context.get(BOS_JOB);
-        if (bosJob == null) {
+        if (bosJob == null || !isTimerEventJob(context)) {
             return;
         }
 
@@ -86,6 +86,10 @@ public class TimerEventTriggerJobListener extends AbstractBonitaTenantJobListene
                         "An exception occurs during the deleting of the timer event trigger '" + triggerName + "'.", e);
             }
         }
+    }
+
+    private boolean isTimerEventJob(final Map<String, Serializable> context) {
+        return context.get(JOB_TYPE).equals(TriggerTimerEventJob.class.getName());
     }
 
     void deleteTimerEventTrigger(final String triggerName) throws SBonitaException {

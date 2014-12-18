@@ -22,7 +22,7 @@ import static org.junit.Assert.fail;
 
 import java.util.concurrent.TimeoutException;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -35,13 +35,13 @@ import org.bonitasoft.engine.search.SearchResult;
  */
 public class StepExpectation {
 
-    private CommonAPITest testCase;
+    private CommonAPIIT testCase;
 
     private ProcessInstance process;
 
     private String[] steps;
 
-    public StepExpectation(CommonAPITest testCase, ProcessInstance process, String... steps) {
+    public StepExpectation(CommonAPIIT testCase, ProcessInstance process, String... steps) {
         this.testCase = testCase;
         this.process = process;
         this.steps = steps;

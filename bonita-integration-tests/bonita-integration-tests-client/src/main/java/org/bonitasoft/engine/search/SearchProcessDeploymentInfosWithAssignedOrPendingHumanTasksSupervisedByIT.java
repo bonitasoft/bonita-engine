@@ -19,14 +19,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -38,7 +37,7 @@ import org.junit.Test;
 /**
  * @author Celine Souchet
  */
-public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedByIT extends CommonAPITest {
+public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervisedByIT extends TestWithTechnicalUser {
 
     private List<ProcessDefinition> enabledProcessDefinitions;
 
@@ -46,18 +45,19 @@ public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksSupervis
 
     private ProcessSupervisor supervisor;
 
+    @Override
     @After
-    public void afterTest() throws BonitaException {
+    public void after() throws Exception {
         deleteSupervisor(supervisor);
         disableAndDeleteProcess(enabledProcessDefinitions);
         deleteUsers(users);
-
-        logoutOnTenant();
+        super.after();
     }
 
+    @Override
     @Before
-    public void beforeTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+    public void before() throws Exception {
+        super.before();
         // create users
         users = new ArrayList<User>(2);
         users.add(createUser("chicobento", "bpm"));

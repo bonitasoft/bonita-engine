@@ -64,7 +64,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
@@ -73,7 +73,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(final Date startDate) {
         this.startDate = startDate;
     }
 
@@ -82,7 +82,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return startedBy;
     }
 
-    public void setStartedBy(long startedBy) {
+    public void setStartedBy(final long startedBy) {
         this.startedBy = startedBy;
     }
 
@@ -91,7 +91,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return startedBySubstitute;
     }
 
-    public void setStartedBySubstitute(long startedBySubstitute) {
+    public void setStartedBySubstitute(final long startedBySubstitute) {
         this.startedBySubstitute = startedBySubstitute;
     }
 
@@ -102,7 +102,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
     }
 
     @Deprecated
-    public void setStartedByDelegate(long startedByDelegate) {
+    public void setStartedByDelegate(final long startedByDelegate) {
         setStartedBySubstitute(startedByDelegate);
     }
 
@@ -111,7 +111,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(final Date endDate) {
         this.endDate = endDate;
     }
 
@@ -120,7 +120,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return archiveDate;
     }
 
-    public void setArchiveDate(Date archiveDate) {
+    public void setArchiveDate(final Date archiveDate) {
         this.archiveDate = archiveDate;
     }
 
@@ -129,7 +129,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return lastUpdate;
     }
 
-    public void setLastUpdate(Date lastUpdate) {
+    public void setLastUpdate(final Date lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
 
@@ -138,7 +138,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return sourceObjectId;
     }
 
-    public void setSourceObjectId(long sourceObjectId) {
+    public void setSourceObjectId(final long sourceObjectId) {
         this.sourceObjectId = sourceObjectId;
     }
 
@@ -147,7 +147,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return stateId;
     }
 
-    public void setStateId(int stateId) {
+    public void setStateId(final int stateId) {
         this.stateId = stateId;
     }
 
@@ -156,7 +156,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return processDefinitionId;
     }
 
-    public void setProcessDefinitionId(long processDefinitionId) {
+    public void setProcessDefinitionId(final long processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
     }
 
@@ -165,7 +165,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
@@ -174,7 +174,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return rootProcessInstanceId;
     }
 
-    public void setRootProcessInstanceId(long rootProcessInstanceId) {
+    public void setRootProcessInstanceId(final long rootProcessInstanceId) {
         this.rootProcessInstanceId = rootProcessInstanceId;
     }
 
@@ -183,7 +183,7 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
         return callerId;
     }
 
-    public void setCallerId(long callerId) {
+    public void setCallerId(final long callerId) {
         this.callerId = callerId;
     }
 

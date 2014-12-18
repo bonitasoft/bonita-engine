@@ -37,7 +37,7 @@ import org.junit.rules.ExpectedException;
 /**
  * @author Baptiste Mesta
  */
-public class PermissionAPIIT extends CommonAPILocalTest {
+public class PermissionAPIIT extends CommonAPILocalIT {
 
     private File securityScriptsFolder;
     @Rule

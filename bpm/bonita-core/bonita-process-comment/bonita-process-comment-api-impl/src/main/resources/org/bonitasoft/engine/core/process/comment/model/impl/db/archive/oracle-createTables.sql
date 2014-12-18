@@ -4,7 +4,7 @@ CREATE TABLE arch_process_comment(
   userId NUMBER(19, 0),
   processInstanceId NUMBER(19, 0) NOT NULL,
   postDate NUMBER(19, 0) NOT NULL,
-  content VARCHAR2(255) NOT NULL,
+  content VARCHAR2(255 CHAR) NOT NULL,
   archiveDate NUMBER(19, 0) NOT NULL,
   sourceObjectId NUMBER(19, 0) NOT NULL,
   PRIMARY KEY (tenantid, id)

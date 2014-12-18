@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
@@ -23,7 +23,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connectors.VariableStorage;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
@@ -44,7 +43,7 @@ import org.junit.Test;
  * @author Baptiste Mesta
  * @author Yanyan Liu
  */
-public class UserFilterIT extends CommonAPITest {
+public class UserFilterIT extends TestWithTechnicalUser {
 
     private static final String JOHN = "john";
 
@@ -58,23 +57,25 @@ public class UserFilterIT extends CommonAPITest {
 
     private User james;
 
-    @After
-    public void afterTest() throws BonitaException {
-        deleteUser(JOHN);
-        deleteUser(JACK);
-        deleteUser(JAMES);
-        VariableStorage.clearAll();
-        logoutOnTenant();
-    }
-
+    @Override
     @Before
-    public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+    public void before() throws Exception {
+        super.before();
         john = createUser(JOHN, "bpm");
         jack = createUser(JACK, "bpm");
         james = createUser(JAMES, "bpm");
         logoutOnTenant();
         loginOnDefaultTenantWith(JOHN, "bpm");
+    }
+
+    @Override
+    @After
+    public void after() throws Exception {
+        deleteUser(JOHN);
+        deleteUser(JACK);
+        deleteUser(JAMES);
+        VariableStorage.clearAll();
+        super.after();
     }
 
     @Test
@@ -180,14 +181,15 @@ public class UserFilterIT extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployProcessWithTestFilter(designProcessDefinition, ACTOR_NAME, john, "TestFilterWithAutoAssign");
 
-        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         assertTrue(new CheckNbAssignedTaskOf(getProcessAPI(), 50, 5000, false, 1, jack).waitUntil());
         List<HumanTaskInstance> tasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
         assertEquals(0, tasks.size());
         tasks = getProcessAPI().getAssignedHumanTaskInstances(jack.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
-        SearchResult<Comment> commentSearchResult = getProcessAPI().searchComments(new SearchOptionsBuilder(0, 10).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId()).done());
+        final SearchResult<Comment> commentSearchResult = getProcessAPI().searchComments(
+                new SearchOptionsBuilder(0, 10).filter(SearchCommentsDescriptor.PROCESS_INSTANCE_ID, processInstance.getId()).done());
         assertThat(commentSearchResult.getResult()).hasSize(1);
         assertThat(commentSearchResult.getResult().get(0).getContent()).isEqualTo("The task \"A task to test user filter\" is now assigned to jack");
         disableAndDeleteProcess(processDefinition);

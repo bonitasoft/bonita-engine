@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskDefinition;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
@@ -17,7 +17,6 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connectors.VariableStorage;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.filter.UserFilter;
 import org.bonitasoft.engine.identity.Group;
@@ -30,7 +29,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class GetPossibleUsersOfPendingHumanTaskIT extends CommonAPITest {
+public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser {
 
     private static final String JOHN = "john";
 
@@ -44,24 +43,26 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends CommonAPITest {
 
     private Role role;
 
-    @After
-    public void afterTest() throws BonitaException {
-        deleteUser(JOHN);
-        deleteUser(JACK);
-        deleteGroups(group);
-        deleteRoles(role);
-        VariableStorage.clearAll();
-        logoutOnTenant();
-    }
-
+    @Override
     @Before
-    public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+    public void before() throws Exception {
+        super.before();
         john = createUser(JOHN, "bpm");
         jack = createUser(JACK, "bpm");
         group = createGroup("group");
         role = createRole("role");
         loginOnDefaultTenantWith(JOHN, "bpm");
+    }
+
+    @Override
+    @After
+    public void after() throws Exception {
+        deleteUser(JOHN);
+        deleteUser(JACK);
+        deleteGroups(group);
+        deleteRoles(role);
+        VariableStorage.clearAll();
+        super.after();
     }
 
     @Cover(jira = "ENGINE-1819", classes = { User.class, HumanTaskInstance.class }, concept = BPMNConcept.ACTIVITIES, keywords = { "possible users",

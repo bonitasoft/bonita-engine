@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actormappings:actorMappings xmlns:actormappings="http://www.bonitasoft.org/ns/actormapping/6.0">
-	<actorMapping name="Delivery men">
+	<actorMapping name="Employee actor">
 		<roles>
 			<role>dev</role>
 		</roles>

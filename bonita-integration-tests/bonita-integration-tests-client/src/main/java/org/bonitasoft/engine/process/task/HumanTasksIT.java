@@ -8,12 +8,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityStates;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.ActivationState;
@@ -30,25 +31,9 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-public class HumanTasksIT extends CommonAPITest {
-
-    protected User user;
-
-    @Before
-    public void before() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
-        user = createUser(USERNAME, PASSWORD);
-    }
-
-    @After
-    public void after() throws Exception {
-        deleteUser(user);
-        logoutOnTenant();
-    }
+public class HumanTasksIT extends TestWithUser {
 
     @Test
     public void cannotGetHumanTaskInstances() throws Exception {
@@ -61,6 +46,27 @@ public class HumanTasksIT extends CommonAPITest {
 
         final List<HumanTaskInstance> humanTaskInstances = getProcessAPI().getHumanTaskInstances(pi2.getId(), "initTsk2", 0, 10);
         assertTrue(humanTaskInstances.isEmpty());
+        disableAndDeleteProcess(processDef1);
+    }
+
+    @Cover(classes = { FlowNodeInstance.class }, concept = BPMNConcept.ACTIVITIES, jira = "BS-6831", keywords = { "Non-ASCII characters", "Oracle",
+            "Column too short" })
+    @Test
+    public void can_creatte_FlowNodeInstance_with_several_non_ascii_characters() throws Exception {
+        final String taskDisplayName = "Žingsnis, kuriame paraiškos teikėjas gali laisvai užpildyti duomenis, ąčęė";
+        final String taskName = "task1क्तु क्तु क्तु क्तु क्तु paraiškos teikėjas Ž";
+
+        final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        processBuilder.addActor(ACTOR_NAME);
+        processBuilder.addUserTask(taskName, ACTOR_NAME)
+                .addDisplayName(new ExpressionBuilder().createConstantStringExpression(taskDisplayName))
+                .addDescription("description");
+
+        final ProcessDefinition processDef1 = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
+        getProcessAPI().startProcess(processDef1.getId());
+        final HumanTaskInstance task1 = waitForUserTask(taskName);
+        assertEquals(taskDisplayName, task1.getDisplayName());
+
         disableAndDeleteProcess(processDef1);
     }
 
@@ -370,4 +376,5 @@ public class HumanTasksIT extends CommonAPITest {
 
         disableAndDeleteProcess(processDefinition);
     }
+
 }

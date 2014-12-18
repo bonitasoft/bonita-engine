@@ -19,13 +19,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor;
-import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.identity.Group;
 import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
@@ -40,7 +39,7 @@ import org.junit.Test;
 /**
  * @author Celine Souchet
  */
-public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForIT extends CommonAPITest {
+public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForIT extends TestWithTechnicalUser {
 
     private List<ProcessDefinition> enabledProcessDefinitions;
 
@@ -52,20 +51,21 @@ public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksForIT ex
 
     private List<UserMembership> userMemberships = null;
 
+    @Override
     @After
-    public void afterTest() throws BonitaException {
+    public void after() throws Exception {
         disableAndDeleteProcess(enabledProcessDefinitions);
         deleteUserMemberships(userMemberships);
         deleteUsers(users);
         deleteGroups(groups);
         deleteRoles(roles);
-
-        logoutOnTenant();
+        super.after();
     }
 
+    @Override
     @Before
-    public void beforeTest() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+    public void before() throws Exception {
+        super.before();
         // create users
         users = new ArrayList<User>(2);
         users.add(createUser("chicobento", "bpm"));

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.category.CategoryCriterion;
@@ -41,7 +41,7 @@ import org.junit.Test;
 /**
  * @author Celine Souchet
  */
-public class SearchUncategorizedProcessDeploymentInfosCanBeStartedByIT extends CommonAPITest {
+public class SearchUncategorizedProcessDeploymentInfosCanBeStartedByIT extends TestWithTechnicalUser {
 
     private List<ProcessDefinition> enabledProcessDefinitions;
 
@@ -57,23 +57,10 @@ public class SearchUncategorizedProcessDeploymentInfosCanBeStartedByIT extends C
 
     private List<UserMembership> userMemberships = null;
 
-    @After
-    public void afterTest() throws BonitaException {
-        disableAndDeleteProcess(enabledProcessDefinitions);
-        deleteProcess(disabledProcessDefinitions);
-        deleteCategories(categories);
-        deleteUserMemberships(userMemberships);
-        deleteUsers(users);
-        deleteGroups(groups);
-        deleteRoles(roles);
-
-        logoutOnTenant();
-    }
-
+    @Override
     @Before
-    public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
-
+    public void before() throws Exception {
+        super.before();
         categories = new ArrayList<Category>();
 
         users = new ArrayList<User>(6);
@@ -100,6 +87,19 @@ public class SearchUncategorizedProcessDeploymentInfosCanBeStartedByIT extends C
         enabledProcessDefinitions = new ArrayList<ProcessDefinition>(4);
         disabledProcessDefinitions = new ArrayList<ProcessDefinition>(1);
         createProcessesDefForSearchProcessUserCanStart();
+    }
+
+    @Override
+    @After
+    public void after() throws Exception {
+        disableAndDeleteProcess(enabledProcessDefinitions);
+        deleteProcess(disabledProcessDefinitions);
+        deleteCategories(categories);
+        deleteUserMemberships(userMemberships);
+        deleteUsers(users);
+        deleteGroups(groups);
+        deleteRoles(roles);
+        super.after();
     }
 
     @Test

@@ -11,3 +11,5 @@ CREATE TABLE arch_document_mapping (
   archiveDate INT8 NOT NULL,
   PRIMARY KEY (tenantid, ID)
 );
+
+CREATE INDEX idx_a_doc_mp_pr_id ON arch_document_mapping (processinstanceid, tenantid);
