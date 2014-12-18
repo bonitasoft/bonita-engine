@@ -53,20 +53,19 @@ public class HumanTasksIT extends TestWithUser {
             "Column too short" })
     @Test
     public void can_creatte_FlowNodeInstance_with_several_non_ascii_characters() throws Exception {
-        final String taskName = "Žingsnis, kuriame paraiškos te";
-        //        final String taskName = "Žingsnis, kuriame paraiškos teikėjas gali laisvai užpildyti duomenis, ąčęė";
-        final DesignProcessDefinition designProcessDef1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList(taskName),
-                Arrays.asList(true));
+        final String taskDisplayName = "Žingsnis, kuriame paraiškos teikėjas gali laisvai užpildyti duomenis, ąčęė";
+        final String taskName = "task1क्तु क्तु क्तु क्तु क्तु paraiškos teikėjas Ž";
+
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME);
-        processBuilder.addUserTask("task1क्तु क्तु क्तु क्तु क्तु क्तु क्तु क्तु", ACTOR_NAME)
-                .addDisplayName(new ExpressionBuilder().createConstantStringExpression(taskName))
+        processBuilder.addUserTask(taskName, ACTOR_NAME)
+                .addDisplayName(new ExpressionBuilder().createConstantStringExpression(taskDisplayName))
                 .addDescription("description");
 
-        final ProcessDefinition processDef1 = deployAndEnableProcessWithActor(designProcessDef1, ACTOR_NAME, user);
+        final ProcessDefinition processDef1 = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
         getProcessAPI().startProcess(processDef1.getId());
         final HumanTaskInstance task1 = waitForUserTask(taskName);
-        assertEquals(taskName, task1.getDisplayName());
+        assertEquals(taskDisplayName, task1.getDisplayName());
 
         disableAndDeleteProcess(processDef1);
     }
