@@ -32,10 +32,13 @@ import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.flownode.ArchivedUserTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.EventTriggerInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerEventTriggerInstance;
+import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
 import org.bonitasoft.engine.core.process.definition.model.event.trigger.SEventTriggerType;
+import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefinitionImpl;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SEventTriggerInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.trigger.SThrowErrorEventTriggerInstance;
@@ -285,5 +288,67 @@ public class ModelConvertorTest {
         assertEquals(sTimerEventTriggerInstance.getId(), eventTriggerInstance.getId());
         assertEquals(sTimerEventTriggerInstance.getEventInstanceName(), eventTriggerInstance.getEventInstanceName());
         assertEquals(sTimerEventTriggerInstance.getExecutionDate(), eventTriggerInstance.getExecutionDate().getTime());
+    }
+
+    @Test
+    public void toArchivedProcessInstance_can_convert() {
+        // Given
+        final SAProcessInstanceImpl saProcessInstance = new SAProcessInstanceImpl();
+        saProcessInstance.setCallerId(-1L);
+        saProcessInstance.setDescription("description");
+        saProcessInstance.setEndDate(1345646L);
+        saProcessInstance.setId(98L);
+        saProcessInstance.setLastUpdate(8L);
+        saProcessInstance.setMigrationPlanId(9L);
+        saProcessInstance.setName("name2");
+        saProcessInstance.setProcessDefinitionId(9L);
+        saProcessInstance.setRootProcessInstanceId(9745L);
+        saProcessInstance.setSourceObjectId(741L);
+        saProcessInstance.setStartDate(8864564156L);
+        saProcessInstance.setStartedBy(46L);
+        saProcessInstance.setStartedBySubstitute(962L);
+        saProcessInstance.setStateId(4);
+        saProcessInstance.setStringIndex1("stringIndex1");
+        saProcessInstance.setStringIndex2("stringIndex2");
+        saProcessInstance.setStringIndex3("stringIndex3");
+        saProcessInstance.setStringIndex4("stringIndex4");
+        saProcessInstance.setStringIndex5("stringIndex5");
+        saProcessInstance.setTenantId(514L);
+
+        final SProcessDefinitionImpl sProcessDefinition = new SProcessDefinitionImpl("name", "version");
+        sProcessDefinition.setStringIndex(1, "label1", null);
+        sProcessDefinition.setStringIndex(2, "label2", null);
+        sProcessDefinition.setStringIndex(3, "label3", null);
+        sProcessDefinition.setStringIndex(4, "label4", null);
+        sProcessDefinition.setStringIndex(5, "label5", null);
+
+        // Then
+        final ArchivedProcessInstance archivedProcessInstance = ModelConvertor.toArchivedProcessInstance(saProcessInstance, sProcessDefinition);
+
+        // When
+        assertNotNull(archivedProcessInstance);
+        assertEquals(saProcessInstance.getCallerId(), archivedProcessInstance.getCallerId());
+        assertEquals(saProcessInstance.getId(), archivedProcessInstance.getId());
+        assertEquals(saProcessInstance.getDescription(), archivedProcessInstance.getDescription());
+        assertEquals(saProcessInstance.getEndDate(), archivedProcessInstance.getEndDate().getTime());
+        assertEquals(saProcessInstance.getLastUpdate(), archivedProcessInstance.getLastUpdate().getTime());
+        assertEquals(saProcessInstance.getName(), archivedProcessInstance.getName());
+        assertEquals(saProcessInstance.getProcessDefinitionId(), archivedProcessInstance.getProcessDefinitionId());
+        assertEquals(saProcessInstance.getRootProcessInstanceId(), archivedProcessInstance.getRootProcessInstanceId());
+        assertEquals(saProcessInstance.getSourceObjectId(), archivedProcessInstance.getSourceObjectId());
+        assertEquals(saProcessInstance.getStartDate(), archivedProcessInstance.getStartDate().getTime());
+        assertEquals(saProcessInstance.getStartedBy(), archivedProcessInstance.getStartedBy());
+        assertEquals(saProcessInstance.getStartedBySubstitute(), archivedProcessInstance.getStartedBySubstitute());
+        assertEquals(saProcessInstance.getStateId(), archivedProcessInstance.getStateId());
+        assertEquals(sProcessDefinition.getStringIndexLabel(1), archivedProcessInstance.getStringIndexLabel(1));
+        assertEquals(saProcessInstance.getStringIndex1(), archivedProcessInstance.getStringIndexValue(1));
+        assertEquals(sProcessDefinition.getStringIndexLabel(2), archivedProcessInstance.getStringIndexLabel(2));
+        assertEquals(saProcessInstance.getStringIndex2(), archivedProcessInstance.getStringIndexValue(2));
+        assertEquals(sProcessDefinition.getStringIndexLabel(3), archivedProcessInstance.getStringIndexLabel(3));
+        assertEquals(saProcessInstance.getStringIndex3(), archivedProcessInstance.getStringIndexValue(3));
+        assertEquals(sProcessDefinition.getStringIndexLabel(4), archivedProcessInstance.getStringIndexLabel(4));
+        assertEquals(saProcessInstance.getStringIndex4(), archivedProcessInstance.getStringIndexValue(4));
+        assertEquals(sProcessDefinition.getStringIndexLabel(5), archivedProcessInstance.getStringIndexLabel(5));
+        assertEquals(saProcessInstance.getStringIndex5(), archivedProcessInstance.getStringIndexValue(5));
     }
 }

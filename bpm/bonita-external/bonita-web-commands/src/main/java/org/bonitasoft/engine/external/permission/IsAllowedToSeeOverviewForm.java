@@ -39,7 +39,7 @@ import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
  * Specific Command to ckeck if the user given can see a overview form of a ProcesInstance with the processInstanceId given.
- * 
+ *
  * @author Zhao Na
  * @author Celine Souchet
  */
@@ -82,10 +82,10 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
             }
         } catch (final SBonitaException e) {
             final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
-                    searchEntitiesDescriptor, processInstanceId, 0, 5);
+                    tenantAccessor.getProcessDefinitionService(), searchEntitiesDescriptor, processInstanceId, 0, 5);
             try {
                 getArchivedProcessInstanceList.execute();
-            } catch (SCommandExecutionException e1) {
+            } catch (final SCommandExecutionException e1) {
                 throw e1;
             } catch (final SBonitaException e1) {
                 e.setProcessInstanceIdOnContext(processInstanceId);
@@ -120,7 +120,7 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
             try {
                 searchOpenProcessInstances.execute();
                 processInstanceRes = searchOpenProcessInstances.getResult();
-            } catch (SCommandExecutionException e) {
+            } catch (final SCommandExecutionException e) {
                 throw e;
             } catch (final SBonitaException sbe) {
                 throw new SCommandExecutionException("No processInstance that involves user :" + userId
@@ -130,10 +130,11 @@ public class IsAllowedToSeeOverviewForm extends TenantCommand {
                 isHas = true;
             } else {
                 final SearchArchivedProcessInstancesInvolvingUser archivedSearcher = new SearchArchivedProcessInstancesInvolvingUser(userId,
-                        processInstanceService, searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(), searchOptions);
+                        processInstanceService, tenantAccessor.getProcessDefinitionService(),
+                        searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(), searchOptions);
                 try {
                     archivedSearcher.execute();
-                } catch (SCommandExecutionException e) {
+                } catch (final SCommandExecutionException e) {
                     throw e;
                 } catch (final SBonitaException e) {
                     throw new SCommandExecutionException("No archived processInstance that involves user :" + userId
