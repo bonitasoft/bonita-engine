@@ -146,6 +146,7 @@ s/fk_arch_transition_instance_tenantId/fk_ATrans_tenId/g
 /idx_user_name/d
 /idx_user_contactinfo/d
 /idx_p_metadata_def_name/d
+/idx_custom_usr_inf_def_name/d
 /--/d
 
 /fk_evtTrig_fln_Id_idx/d
