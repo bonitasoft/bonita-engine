@@ -55,6 +55,26 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
 
     private long callerId;
 
+    private String stringIndexValue1;
+
+    private String stringIndexValue2;
+
+    private String stringIndexValue3;
+
+    private String stringIndexValue4;
+
+    private String stringIndexValue5;
+
+    private String stringIndexLabel1;
+
+    private String stringIndexLabel2;
+
+    private String stringIndexLabel3;
+
+    private String stringIndexLabel4;
+
+    private String stringIndexLabel5;
+
     public ArchivedProcessInstanceImpl(final String name) {
         super(name);
     }
@@ -185,6 +205,86 @@ public class ArchivedProcessInstanceImpl extends NamedElementImpl implements Arc
 
     public void setCallerId(final long callerId) {
         this.callerId = callerId;
+    }
+
+    public void setStringIndexValue(final int index, final String value) {
+        switch (index) {
+            case 1:
+                stringIndexValue1 = value;
+                break;
+            case 2:
+                stringIndexValue2 = value;
+                break;
+            case 3:
+                stringIndexValue3 = value;
+                break;
+            case 4:
+                stringIndexValue4 = value;
+                break;
+            case 5:
+                stringIndexValue5 = value;
+                break;
+            default:
+                throw new IndexOutOfBoundsException("string index value must be between 1 and 5 (included)");
+        }
+    }
+
+    @Override
+    public String getStringIndexValue(final int index) {
+        switch (index) {
+            case 1:
+                return stringIndexValue1;
+            case 2:
+                return stringIndexValue2;
+            case 3:
+                return stringIndexValue3;
+            case 4:
+                return stringIndexValue4;
+            case 5:
+                return stringIndexValue5;
+            default:
+                throw new IndexOutOfBoundsException("string index value must be between 1 and 5 (included)");
+        }
+    }
+
+    public void setStringIndexLabel(final int index, final String label) {
+        switch (index) {
+            case 1:
+                stringIndexLabel1 = label;
+                break;
+            case 2:
+                stringIndexLabel2 = label;
+                break;
+            case 3:
+                stringIndexLabel3 = label;
+                break;
+            case 4:
+                stringIndexLabel4 = label;
+                break;
+            case 5:
+                stringIndexLabel5 = label;
+                break;
+            default:
+                throw new IndexOutOfBoundsException("string index label must be between 1 and 5 (included)");
+        }
+    }
+
+    @Override
+    public String getStringIndexLabel(final int index) {
+        switch (index) {
+            case 1:
+                return stringIndexLabel1;
+            case 2:
+                return stringIndexLabel2;
+            case 3:
+                return stringIndexLabel3;
+            case 4:
+                return stringIndexLabel4;
+            case 5:
+                return stringIndexLabel5;
+            default:
+                throw new IndexOutOfBoundsException("string index label must be between 1 and 5 (included)");
+        }
     }
 
     @Override

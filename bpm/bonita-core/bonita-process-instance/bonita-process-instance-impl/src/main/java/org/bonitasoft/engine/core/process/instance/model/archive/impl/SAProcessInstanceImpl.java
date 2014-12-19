@@ -92,7 +92,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return processDefinitionId;
     }
 
-    public void setProcessDefinitionId(long processDefinitionId) {
+    public void setProcessDefinitionId(final long processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
     }
 
@@ -101,7 +101,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
@@ -110,7 +110,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return stateId;
     }
 
-    public void setStateId(int stateId) {
+    public void setStateId(final int stateId) {
         this.stateId = stateId;
     }
 
@@ -119,7 +119,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return startDate;
     }
 
-    public void setStartDate(long startDate) {
+    public void setStartDate(final long startDate) {
         this.startDate = startDate;
     }
 
@@ -128,15 +128,16 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return startedBy;
     }
 
-    public void setStartedBy(long startedBy) {
+    public void setStartedBy(final long startedBy) {
         this.startedBy = startedBy;
     }
 
+    @Override
     public long getStartedBySubstitute() {
         return startedBySubstitute;
     }
 
-    public void setStartedBySubstitute(long startedBySubstitute) {
+    public void setStartedBySubstitute(final long startedBySubstitute) {
         this.startedBySubstitute = startedBySubstitute;
     }
 
@@ -145,7 +146,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return endDate;
     }
 
-    public void setEndDate(long endDate) {
+    public void setEndDate(final long endDate) {
         this.endDate = endDate;
     }
 
@@ -154,7 +155,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return lastUpdate;
     }
 
-    public void setLastUpdate(long lastUpdate) {
+    public void setLastUpdate(final long lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
 
@@ -163,7 +164,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return rootProcessInstanceId;
     }
 
-    public void setRootProcessInstanceId(long rootProcessInstanceId) {
+    public void setRootProcessInstanceId(final long rootProcessInstanceId) {
         this.rootProcessInstanceId = rootProcessInstanceId;
     }
 
@@ -172,7 +173,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return callerId;
     }
 
-    public void setCallerId(long callerId) {
+    public void setCallerId(final long callerId) {
         this.callerId = callerId;
     }
 
@@ -181,7 +182,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return stringIndex1;
     }
 
-    public void setStringIndex1(String stringIndex1) {
+    public void setStringIndex1(final String stringIndex1) {
         this.stringIndex1 = stringIndex1;
     }
 
@@ -190,7 +191,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return stringIndex2;
     }
 
-    public void setStringIndex2(String stringIndex2) {
+    public void setStringIndex2(final String stringIndex2) {
         this.stringIndex2 = stringIndex2;
     }
 
@@ -199,7 +200,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return stringIndex3;
     }
 
-    public void setStringIndex3(String stringIndex3) {
+    public void setStringIndex3(final String stringIndex3) {
         this.stringIndex3 = stringIndex3;
     }
 
@@ -208,7 +209,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return stringIndex4;
     }
 
-    public void setStringIndex4(String stringIndex4) {
+    public void setStringIndex4(final String stringIndex4) {
         this.stringIndex4 = stringIndex4;
     }
 
@@ -217,7 +218,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return stringIndex5;
     }
 
-    public void setStringIndex5(String stringIndex5) {
+    public void setStringIndex5(final String stringIndex5) {
         this.stringIndex5 = stringIndex5;
     }
 
@@ -226,7 +227,7 @@ public class SAProcessInstanceImpl extends SANamedElementImpl implements SAProce
         return migrationPlanId;
     }
 
-    public void setMigrationPlanId(long migrationPlanId) {
+    public void setMigrationPlanId(final long migrationPlanId) {
         this.migrationPlanId = migrationPlanId;
     }
 
