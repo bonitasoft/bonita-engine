@@ -61,6 +61,8 @@ import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
 import org.bonitasoft.engine.exception.NotFoundException;
+import org.bonitasoft.engine.exception.ProcessInstanceHierarchicalDeletionException;
+import org.bonitasoft.engine.exception.RetrieveException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
@@ -71,6 +73,7 @@ import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.session.InvalidSessionException;
 
 /**
  * <code>ProcessRuntimeAPI</code> deals with Process runtime notions such as starting a new instance of a process, retrieving and executing tasks, accessing to
@@ -1836,8 +1839,10 @@ public interface ProcessRuntimeAPI {
      * Check whether a specified user is involved in a process instance.<br/>
      * User A is involved with a process instance if any of the following is true:
      * <ul>
+     * <li>user A has started the process instance</li>
      * <li>a task in the process instance is assigned to user A</li>
      * <li>a task in the process instance is pending for user A</li>
+     * <li>the process instance has been started by a user managed by user A</li>
      * <li>a task in the process instance is assigned to a user managed by user A</li>
      * <li>a task in the process instance is pending for a user managed by user A</li>
      * </ul>

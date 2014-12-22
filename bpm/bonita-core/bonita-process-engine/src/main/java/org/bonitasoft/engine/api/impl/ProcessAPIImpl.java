@@ -2783,10 +2783,13 @@ public class ProcessAPIImpl implements ProcessAPI {
     public boolean isInvolvedInProcessInstance(final long userId, final long processInstanceId) throws ProcessInstanceNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+
         try {
-            //search if user ahas started the instance
             final ProcessInstance processInstance = getProcessInstance(processInstanceId);
-            if (userId == processInstance.getStartedBy()) {
+            if (isUserProcessInstanceInitiator(userId, processInstance)) {
+                return true;
+            }
+            if (isUserManagerOfProcessInstanceInitiator(userId, processInstance.getStartedBy())) {
                 return true;
             }
 
@@ -2832,6 +2835,24 @@ public class ProcessAPIImpl implements ProcessAPI {
             // no rollback, read only method
             throw new BonitaRuntimeException(e);// TODO refactor Exceptions!!!!!!!!!!!!!!!!!!!
         }
+    }
+
+    private boolean isUserManagerOfProcessInstanceInitiator(final long userId, final long startedByUserId) {
+        final IdentityService identityService = getTenantAccessor().getIdentityService();
+        SUser sUser;
+        try {
+            sUser = identityService.getUser(startedByUserId);
+        } catch (final SUserNotFoundException e) {
+            return false;
+        }
+        if (userId == sUser.getManagerUserId()) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isUserProcessInstanceInitiator(final long userId, final ProcessInstance processInstance) {
+        return userId == processInstance.getStartedBy();
     }
 
     private void checkIfProcessInstanceExistsWhenNoHumanTask(final long processInstanceId) throws SBonitaReadException, SProcessInstanceReadException,

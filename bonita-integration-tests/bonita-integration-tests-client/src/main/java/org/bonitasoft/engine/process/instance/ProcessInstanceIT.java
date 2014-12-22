@@ -588,7 +588,8 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
     public void isInvolvedInProcessInstance() throws Exception {
         //given
         //user and manager
-        final User jim = createUser(new UserCreator("jim", "bpm"));
+        final User managerOfJim = createUser(new UserCreator("managerOfJim", "bpm"));
+        final User jim = createUser(new UserCreator("jim", "bpm").setManagerUserId(managerOfJim.getId()));
 
         final User managerOfJohn = createUser(new UserCreator("managerOfJohn", "bpm"));
         final User john = createUser(new UserCreator("john", "bpm").setManagerUserId(managerOfJohn.getId()));
@@ -624,7 +625,7 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
 
         //map user, group, role, and membership to that actor
         final ActorInstance actor = getProcessAPI().getActors(processDefinition.getId(), 0, 1, ActorCriterion.NAME_ASC).get(0);
-        getProcessAPI().addUserToActor(actor.getId(), jim.getId());
+        final ActorMember jimActorMember = getProcessAPI().addUserToActor(actor.getId(), jim.getId());
         getProcessAPI().addUserToActor(actor.getId(), john.getId());
         getProcessAPI().addGroupToActor(actor.getId(), jackGroup.getId());
         getProcessAPI().addRoleToActor(actor.getId(), jamesRole.getId());
@@ -633,6 +634,7 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         logoutThenloginAs(jim.getUserName(), "bpm");
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        getProcessAPI().removeActorMember(jimActorMember.getId());
 
         //then
         assertThat(getProcessAPI().isInvolvedInProcessInstance(john.getId(), processInstance.getId())).as("directly mapped user should be involed").isTrue();
@@ -649,9 +651,11 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         assertThat(getProcessAPI().isInvolvedInProcessInstance(managerOfToto.getId(), processInstance.getId())).as(
                 "manager of user mapped using membership should be involed").isTrue();
         assertThat(getProcessAPI().isInvolvedInProcessInstance(user.getId(), processInstance.getId())).as("not mapped user should not be involved").isFalse();
+        assertThat(getProcessAPI().isInvolvedInProcessInstance(managerOfJim.getId(), processInstance.getId())).as(
+                "should the manager of process instance initiator be involved").isTrue();
 
         //clean
-        deleteUsers(john, jack, james, toto, managerOfJohn, managerOfJames, managerOfJack, managerOfToto, jim);
+        deleteUsers(john, jack, james, toto, managerOfJohn, managerOfJames, managerOfJack, managerOfToto, jim, managerOfJim);
         deleteGroups(jackGroup, jamesGroup, totoGroup);
         deleteRoles(jackRole, jamesRole, totoRole);
 
