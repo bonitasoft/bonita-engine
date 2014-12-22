@@ -278,6 +278,7 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskInstanceBuilderFactory;
@@ -2783,6 +2784,27 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         try {
+            //search if user ahas started the instance
+            final ProcessInstance processInstance = getProcessInstance(processInstanceId);
+            if (userId == processInstance.getStartedBy()) {
+                return true;
+            }
+
+            final List<OrderByOption> archivedOrderByOptions = Arrays.asList(new OrderByOption(SAHumanTaskInstance.class, "id", OrderByType.ASC));
+            final List<FilterOption> archivedFilterOptions = Arrays.asList(new FilterOption(SAHumanTaskInstance.class, "logicalGroup4", processInstanceId));
+            QueryOptions archivedQueryOptions = new QueryOptions(0, BATCH_SIZE, archivedOrderByOptions, archivedFilterOptions, null);
+
+            List<SAHumanTaskInstance> sArchivedHumanTasks = activityInstanceService.searchArchivedTasks(archivedQueryOptions);
+            while (!sArchivedHumanTasks.isEmpty()) {
+                for (final SAHumanTaskInstance sArchivedHumanTask : sArchivedHumanTasks) {
+                    if (userId == sArchivedHumanTask.getAssigneeId()) {
+                        return true;
+                    }
+                }
+                archivedQueryOptions = QueryOptions.getNextPage(archivedQueryOptions);
+                sArchivedHumanTasks = activityInstanceService.searchArchivedTasks(archivedQueryOptions);
+            }
+
             final List<OrderByOption> orderByOptions = Arrays.asList(new OrderByOption(SHumanTaskInstance.class, "id", OrderByType.ASC));
             final List<FilterOption> filterOptions = Arrays.asList(new FilterOption(SHumanTaskInstance.class, "logicalGroup4", processInstanceId));
             QueryOptions queryOptions = new QueryOptions(0, BATCH_SIZE, orderByOptions, filterOptions, null);
@@ -2793,15 +2815,16 @@ public class ProcessAPIImpl implements ProcessAPI {
                     if (userId == sHumanTaskInstance.getAssigneeId()) {
                         return true;
                     }
-                    final boolean isActorMemberOrManagerOfActorMember = checkIfUserIsActorMemberOrManagerOfActorMember(userId,
-                            sHumanTaskInstance.getActorId());
-                    if (isActorMemberOrManagerOfActorMember) {
+                    if (checkIfUserIsActorMemberOrManagerOfActorMember(userId,
+                            sHumanTaskInstance.getActorId())) {
                         return true;
                     }
                 }
                 queryOptions = QueryOptions.getNextPage(queryOptions);
                 sHumanTaskInstances = activityInstanceService.searchHumanTasks(queryOptions);
             }
+
+            //search in archived human tasks
 
             checkIfProcessInstanceExistsWhenNoHumanTask(processInstanceId);
             return false;
