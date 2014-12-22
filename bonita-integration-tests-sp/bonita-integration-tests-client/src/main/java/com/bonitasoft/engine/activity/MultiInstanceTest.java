@@ -95,7 +95,7 @@ public class MultiInstanceTest extends CommonAPISPTest {
         }
         Thread.sleep(200);
         checkNbPendingTaskOf(0, john);
-        waitForProcessToFinishAndBeArchived(processInstance);
+        waitForProcessToFinish(processInstance);
 
         final int nbAbortedActivities = (numberOfTask - numberOfTaskToCompleteMI) * 3 + numberOfTaskToCompleteMI * 2; // parent and 2 children for non completed
         // tasks + 2 children for completed one

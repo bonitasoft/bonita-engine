@@ -241,7 +241,7 @@ public class ClusterTests extends CommonAPISPTest {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
         try {
             // then: node2 should finish the work
-            waitForProcessToFinishAndBeArchived(pi);
+            waitForProcessToFinish(pi);
         } finally {
             // cleanup
             disableAndDeleteProcess(pd);
