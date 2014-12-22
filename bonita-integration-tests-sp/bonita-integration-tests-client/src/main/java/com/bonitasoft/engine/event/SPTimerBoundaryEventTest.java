@@ -9,7 +9,6 @@
 package com.bonitasoft.engine.event;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 
@@ -119,7 +118,7 @@ public class SPTimerBoundaryEventTest extends CommonAPISPTest {
             }
 
             assignAndExecuteStep(exceptionStep, donaBenta.getId());
-            assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
+            waitForProcessToFinish(processInstance);
         } finally {
             disableAndDeleteProcess(processDefinition);
         }
