@@ -204,7 +204,7 @@ public class ActivityDataInstanceIT extends TestWithUser {
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 200);
         final ActivityInstance activityInstance = activities.iterator().next();
         assignAndExecuteStep(activityInstance, user.getId());
-        assertTrue("process was not completed", waitForProcessToFinishAndBeArchived(processInstance));
+        waitForProcessToFinish(processInstance);
 
         // retrieve data after process has finished
         try {

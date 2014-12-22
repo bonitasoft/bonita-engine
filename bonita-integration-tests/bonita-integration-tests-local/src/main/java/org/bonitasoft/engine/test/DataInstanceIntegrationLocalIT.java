@@ -1,7 +1,6 @@
 package org.bonitasoft.engine.test;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
@@ -106,11 +105,10 @@ public class DataInstanceIntegrationLocalIT extends CommonAPILocalIT {
         final long tStep1Id = waitForUserTask("tStep1", callingProcessInstance).getId();
         assertNotNull(getProcessAPI().getActivityDataInstance("data", tStep1Id).getValue());
         assignAndExecuteStep(tStep1Id, cebolinha.getId());
-        assertTrue("parent process was not archived", waitForProcessToFinishAndBeArchived(callingProcessInstance));
+        waitForProcessToFinish(callingProcessInstance);
 
         // Clean up
-        disableAndDeleteProcess(callingProcessDefinition);
-        disableAndDeleteProcess(targetProcessDefinition);
+        disableAndDeleteProcess(callingProcessDefinition, targetProcessDefinition);
     }
 
     @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Custom data on process",
@@ -160,11 +158,10 @@ public class DataInstanceIntegrationLocalIT extends CommonAPILocalIT {
         final HumanTaskInstance step1 = waitForUserTask("Step1", callingProcessInstance);
         assertNotNull(getProcessAPI().getProcessDataInstance(dataName, step1.getParentProcessInstanceId()).getValue());
         assignAndExecuteStep(step1, cebolinha.getId());
-        assertTrue("parent process was not archived", waitForProcessToFinishAndBeArchived(callingProcessInstance));
+        waitForProcessToFinish(callingProcessInstance);
 
         // Clean up
-        disableAndDeleteProcess(callingProcessDefinition);
-        disableAndDeleteProcess(targetProcessDefinition);
+        disableAndDeleteProcess(callingProcessDefinition, targetProcessDefinition);
     }
 
     private BusinessArchiveBuilder addClasspathRessource(final ProcessDefinitionBuilder targetProcessDefinitionBuilder)

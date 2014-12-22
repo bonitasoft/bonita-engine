@@ -255,7 +255,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
 
         // Execute pending task
         waitForUserTaskAndExecuteIt("step1", processInstance, user);
-        assertTrue("process was not completed", waitForProcessToFinishAndBeArchived(processInstance));
+        waitForProcessToFinish(processInstance);
 
         // retrieve data after process has finished
         try {

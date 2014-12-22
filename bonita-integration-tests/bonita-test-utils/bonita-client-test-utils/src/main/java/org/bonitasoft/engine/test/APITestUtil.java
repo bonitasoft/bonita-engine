@@ -129,7 +129,6 @@ import org.bonitasoft.engine.test.wait.WaitForDataValue;
 import org.bonitasoft.engine.test.wait.WaitForEvent;
 import org.bonitasoft.engine.test.wait.WaitForFinalArchivedActivity;
 import org.bonitasoft.engine.test.wait.WaitForPendingTasks;
-import org.bonitasoft.engine.test.wait.WaitProcessToFinishAndBeArchived;
 import org.junit.After;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -823,14 +822,6 @@ public class APITestUtil extends PlatformTestUtil {
         assertEquals(displayDescription, saUserTaskInstance.getDisplayDescription());
     }
 
-    @Deprecated
-    private void waitForProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance, final TestStates state)
-            throws Exception {
-        final WaitProcessToFinishAndBeArchived waitProcessToFinishAndBeArchived = new WaitProcessToFinishAndBeArchived(repeatEach, timeout, false,
-                processInstance, getProcessAPI(), state);
-        assertTrue(waitProcessToFinishAndBeArchived.waitUntil());
-    }
-
     public void waitForProcessToFinish(final ProcessInstance processInstance) throws Exception {
         waitForProcessToFinish(processInstance.getId());
     }
@@ -857,17 +848,6 @@ public class APITestUtil extends PlatformTestUtil {
                 DEFAULT_TIMEOUT);
     }
 
-    @Deprecated
-    private boolean waitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance) throws Exception {
-        final boolean waitUntil = new WaitProcessToFinishAndBeArchived(repeatEach, timeout, processInstance, processAPI).waitUntil();
-        if (!waitUntil) {
-            printFlowNodes(processInstance);
-            printArchivedFlowNodes(processInstance);
-        }
-        assertTrue("Process was not finished", waitUntil);
-        return waitUntil;
-    }
-
     protected void printArchivedFlowNodes(final ProcessInstance processInstance) throws SearchException {
         System.err.println("Archived flownodes: ");
         final List<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(
@@ -882,11 +862,6 @@ public class APITestUtil extends PlatformTestUtil {
                 new SearchOptionsBuilder(0, 100).filter(FlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId()).done())
                 .getResult();
         System.err.println(flownodes);
-    }
-
-    @Deprecated
-    public boolean waitForProcessToFinishAndBeArchived(final ProcessInstance processInstance) throws Exception {
-        return waitProcessToFinishAndBeArchived(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance);
     }
 
     private Long waitForFlowNode(final long processInstanceId, final TestStates state, final String flowNodeName, final boolean useRootProcessInstance,

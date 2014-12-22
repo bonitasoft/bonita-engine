@@ -316,9 +316,9 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         checkProcessInstanceIsArchived(processInstance3);
         assertEquals(numberOfProcessInstancesBefore + 3, getProcessAPI().getNumberOfArchivedProcessInstances());
 
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance1));
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance2));
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance3));
+        waitForProcessToFinish(processInstance1);
+        waitForProcessToFinish(processInstance2);
+        waitForProcessToFinish(processInstance3);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -614,7 +614,6 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
 
         final ProcessDefinitionBuilder processBuilder1 = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder1.addActor(ACTOR_NAME);
-
 
         // 1 instance of process def:
         final DesignProcessDefinition designProcessDefinition = processBuilder1.addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME)

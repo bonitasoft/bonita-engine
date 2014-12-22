@@ -154,7 +154,7 @@ public class SendTaskIT extends TestWithUser {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        waitForProcessToFinish(sendMessageProcessInstance);
         final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(sendMessageProcessInstance.getId(), 0,
                 10, ActivityInstanceCriterion.LAST_UPDATE_DESC);
         assertTrue(archivedActivityInstances.get(0) instanceof ArchivedSendTaskInstance);
@@ -198,7 +198,7 @@ public class SendTaskIT extends TestWithUser {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        waitForProcessToFinish(sendMessageProcessInstance);
         forceMatchingOfEvents();
         waitForUserTask("step1", receiveMessageProcessInstance);
 
