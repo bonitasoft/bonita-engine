@@ -50,7 +50,6 @@ DELETE FROM queriablelog_p WHERE tenantid = ${tenantid};
 DELETE FROM queriable_log WHERE tenantid = ${tenantid};
 DELETE FROM page WHERE tenantid = ${tenantid};
 DELETE FROM sequence WHERE tenantid = ${tenantid};
-DROP INDEX indexProfileEntry;
 DELETE FROM profilemember WHERE tenantid = ${tenantid};
 DELETE FROM profileentry WHERE tenantid = ${tenantid};
 DELETE FROM profile WHERE tenantid = ${tenantid};

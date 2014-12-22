@@ -102,8 +102,6 @@ DELETE FROM page WHERE tenantid = ${tenantid}
 GO
 DELETE FROM sequence WHERE tenantid = ${tenantid}
 GO
-DROP INDEX IF EXISTS indexProfileEntry
-GO
 DELETE FROM profilemember WHERE tenantid = ${tenantid}
 GO
 DELETE FROM profileentry WHERE tenantid = ${tenantid}

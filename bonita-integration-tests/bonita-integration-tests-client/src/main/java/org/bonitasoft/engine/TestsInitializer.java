@@ -15,7 +15,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class TestsInitializer {
 
-    private static final String BONITA_HOME_DEFAULT_PATH = "../../bpm/bonita-home/target/home";
+    private static final String BONITA_HOME_DEFAULT_PATH = "target/home";
 
     private static final String BONITA_HOME_PROPERTY = "bonita.home";
 
@@ -44,7 +44,7 @@ public class TestsInitializer {
         System.out.println("=========  INITIALIZATION OF TEST ENVIRONMENT =======");
         System.out.println("=====================================================");
 
-        long startTime = System.currentTimeMillis();
+        final long startTime = System.currentTimeMillis();
         setSystemPropertyIfNotSet(BONITA_HOME_PROPERTY, BONITA_HOME_DEFAULT_PATH);
         setupSpringContext();
         initPlatformAndTenant();
