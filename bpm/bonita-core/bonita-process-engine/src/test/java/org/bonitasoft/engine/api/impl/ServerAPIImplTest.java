@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.bonitasoft.engine.api.internal.ServerWrappedException;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -47,6 +48,9 @@ import org.bonitasoft.engine.service.APIAccessResolver;
 import org.bonitasoft.engine.session.Session;
 import org.bonitasoft.engine.session.impl.APISessionImpl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.transaction.BonitaTransactionSynchronization;
+import org.bonitasoft.engine.transaction.STransactionNotFoundException;
+import org.bonitasoft.engine.transaction.UserTransactionService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -118,7 +122,7 @@ public class ServerAPIImplTest {
         }
     }
 
-    @Test(expected = BonitaRuntimeException.class)
+    @Test(expected = ServerAPIRuntimeException.class)
     public void invokeAPIWithInvalidChecksShouldNotInvokeAnything() throws Throwable {
         // given:
         final String apiInterfaceName = "apiInterfaceName";
@@ -131,15 +135,25 @@ public class ServerAPIImplTest {
         APIAccessResolver accessResolver = mock(APIAccessResolver.class);
         when(accessResolver.getAPIImplementation(apiInterfaceName)).thenReturn(new Object());
         final ServerAPIImpl mockedServerAPIImpl = PowerMockito.spy(new ServerAPIImpl(true, accessResolver));
-        doThrow(BonitaRuntimeException.class).when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session), false);
-
+        doThrow(BonitaRuntimeException.class).when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session), eq(false));
+        doReturn(new UserTransactionService(){
+            @Override
+            public <T> T executeInTransaction(Callable<T> callable) throws Exception {
+                return callable.call();
+            }
+            @Override
+            public void registerBonitaSynchronization(BonitaTransactionSynchronization txSync) throws STransactionNotFoundException {
+            }
+            @Override
+            public void registerBeforeCommitCallable(Callable<Void> callable) throws STransactionNotFoundException {
+            }
+        }).when(mockedServerAPIImpl).selectUserTransactionService(any(Session.class),any(ServerAPIImpl.SessionType.class));
         try {
             // when:
             mockedServerAPIImpl.invokeAPI(apiInterfaceName, methodName, classNameParameters, parametersValues, session);
         } finally {
             // then:
             verify(mockedServerAPIImpl, never()).invokeAPI(any(Object[].class), anyString(), any(Method.class));
-            verify(mockedServerAPIImpl, never()).invokeAPIInTransaction(any(Object[].class), anyString(), any(Method.class), any(Session.class), apiInterfaceName);
         }
     }
 
@@ -156,7 +170,7 @@ public class ServerAPIImplTest {
         FakeAPI apiImpl = new FakeAPI();
         when(accessResolver.getAPIImplementation(apiInterfaceName)).thenReturn(apiImpl);
         final ServerAPIImpl mockedServerAPIImpl = PowerMockito.spy(new ServerAPIImpl(true, accessResolver));
-        doNothing().when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session), false);
+        doNothing().when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session), eq(false));
 
         try {
             // when:
@@ -164,7 +178,7 @@ public class ServerAPIImplTest {
         } finally {
             // then:
             verify(mockedServerAPIImpl).invokeAPI(parametersValues, apiImpl, FakeAPI.class.getMethod(methodName));
-            verify(mockedServerAPIImpl, never()).invokeAPIInTransaction(any(Object[].class), anyString(), any(Method.class), any(Session.class), apiInterfaceName);
+            verify(mockedServerAPIImpl, never()).invokeAPIInTransaction(any(Object[].class), anyString(), any(Method.class), any(Session.class), anyString());
         }
     }
 
@@ -181,7 +195,7 @@ public class ServerAPIImplTest {
         FakeAPI apiImpl = new FakeAPI();
         when(accessResolver.getAPIImplementation(apiInterfaceName)).thenReturn(apiImpl);
         final ServerAPIImpl mockedServerAPIImpl = PowerMockito.spy(new ServerAPIImpl(true, accessResolver));
-        doNothing().when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session), false);
+        doNothing().when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session), eq(false));
         doReturn(null).when(mockedServerAPIImpl).invokeAPI(parametersValues, apiImpl, FakeAPI.class.getMethod(methodName));
 
         try {
@@ -190,7 +204,7 @@ public class ServerAPIImplTest {
         } finally {
             // then:
             verify(mockedServerAPIImpl).invokeAPI(parametersValues, apiImpl, FakeAPI.class.getMethod(methodName));
-            verify(mockedServerAPIImpl, never()).invokeAPIInTransaction(any(Object[].class), anyString(), any(Method.class), any(Session.class), apiInterfaceName);
+            verify(mockedServerAPIImpl, never()).invokeAPIInTransaction(any(Object[].class), anyString(), any(Method.class), any(Session.class), anyString());
         }
     }
 
@@ -207,7 +221,7 @@ public class ServerAPIImplTest {
         FakeAPI apiImpl = new FakeAPI();
         when(accessResolver.getAPIImplementation(apiInterfaceName)).thenReturn(apiImpl);
         final ServerAPIImpl mockedServerAPIImpl = PowerMockito.spy(new ServerAPIImpl(true, accessResolver));
-        doNothing().when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session), false);
+        doNothing().when(mockedServerAPIImpl).checkMethodAccessibility(any(), eq(apiInterfaceName), any(Method.class), eq(session), eq(false));
         doReturn(null).when(mockedServerAPIImpl).invokeAPIInTransaction(parametersValues, apiImpl, FakeAPI.class.getMethod(methodName), session, apiInterfaceName);
 
         try {

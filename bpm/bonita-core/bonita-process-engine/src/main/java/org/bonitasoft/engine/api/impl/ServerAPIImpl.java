@@ -78,7 +78,7 @@ public class ServerAPIImpl implements ServerAPI {
 
     private TechnicalLoggerService technicalLogger;
 
-    private enum SessionType {
+    protected enum SessionType {
         PLATFORM, API;
     }
 
@@ -275,7 +275,7 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
-    private Object invokeAPIOutsideTransaction(Object[] parametersValues, Object apiImpl, Method method, String apiInterfaceName, Session session) throws Throwable {
+    protected Object invokeAPIOutsideTransaction(Object[] parametersValues, Object apiImpl, Method method, String apiInterfaceName, Session session) throws Throwable {
         checkMethodAccessibility(apiImpl, apiInterfaceName, method, session, /* Not in transaction */false);
         return invokeAPI(parametersValues, apiImpl, method);
     }
