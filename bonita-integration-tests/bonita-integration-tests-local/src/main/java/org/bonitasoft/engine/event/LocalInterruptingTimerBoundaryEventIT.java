@@ -79,13 +79,13 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
         // when
-        waitForUserTaskAndExecuteIt("step1", processInstance, getUser());
+        waitForUserTaskAndExecuteIt("step1", processInstance, user);
 
         // then
         waitForFlowNodeInState(processInstance, "timer", TestStates.ABORTED, false);
         assertThat(containsTimerJob(getJobName(boundaryId))).isFalse();
 
-        waitForUserTaskAndExecuteIt("step2", processInstance, getUser());
+        waitForUserTaskAndExecuteIt("step2", processInstance, user);
         waitForProcessToFinish(processInstance);
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
@@ -116,13 +116,13 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
         // when
-        waitForUserTaskAndExecuteIt("stepCA", processInstance, getUser());
+        waitForUserTaskAndExecuteIt("stepCA", processInstance, user);
 
         // then
         waitForFlowNodeInState(processInstance, "timer", TestStates.ABORTED, false);
         assertThat(containsTimerJob(getJobName(boundaryId))).isFalse();
 
-        waitForUserTaskAndExecuteIt(PARENT_PROCESS_USER_TASK_NAME, processInstance, getUser());
+        waitForUserTaskAndExecuteIt(PARENT_PROCESS_USER_TASK_NAME, processInstance, user);
         waitForProcessToFinish(processInstance);
         checkFlowNodeWasntExecuted(processInstance.getId(), EXCEPTION_STEP);
 
@@ -155,7 +155,7 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         waitForFlowNodeInState(processInstance, "timer", TestStates.ABORTED, false);
         assertThat(containsTimerJob(getJobName(boundaryId))).isFalse();
 
-        waitForUserTaskAndExecuteIt("step2", processInstance, getUser());
+        waitForUserTaskAndExecuteIt("step2", processInstance, user);
         waitForProcessToFinish(processInstance);
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
@@ -188,7 +188,7 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         waitForFlowNodeInState(processInstance, "timer", TestStates.ABORTED, false);
         assertThat(containsTimerJob(getJobName(boundaryId))).isFalse();
 
-        waitForUserTaskAndExecuteIt("step2", processInstance, getUser());
+        waitForUserTaskAndExecuteIt("step2", processInstance, user);
         waitForProcessToFinish(processInstance);
         checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
 
@@ -218,7 +218,7 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         waitForFlowNodeInState(processInstance, "timer", TestStates.ABORTED, false);
         assertThat(containsTimerJob(getJobName(boundaryId))).isFalse();
 
-        waitForUserTaskAndExecuteIt("step2", processInstance, getUser());
+        waitForUserTaskAndExecuteIt("step2", processInstance, user);
         waitForProcessToFinish(processInstance);
         checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
 

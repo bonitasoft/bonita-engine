@@ -31,16 +31,13 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
     public void timerBoundaryEventTriggered() throws Exception {
         final int timerDuration = 1000;
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEvent(timerDuration, true, "step1", "exceptionStep", "step2");
-
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-
-        final ActivityInstance waitForStep1 = waitForUserTask("step1", processInstance.getId());
-        assertNotNull(waitForStep1);
+        waitForUserTask("step1", processInstance.getId());
 
         // wait timer trigger
-        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, getUser());
-        waitForProcessToFinishAndBeArchived(processInstance);
-        waitForArchivedActivity(waitForStep1.getId(), TestStates.ABORTED);
+        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, user);
+        waitForFlowNodeInState(processInstance, "step1", TestStates.ABORTED, true);
+        waitForProcessToFinish(processInstance);
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "step2");
 
@@ -59,9 +56,8 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
         processDefinitionBuilder.addTransition("timer", "timerStep");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        waitForFlowNodeInFailedState(processInstance, "step1");
 
-        final ActivityInstance waitForTaskToFail = waitForTaskToFail(processInstance);
-        assertEquals("step1", waitForTaskToFail.getName());
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -85,8 +81,8 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
         assertNotNull(waitForStepCA);
         // wait timer trigger
         // check that the exception flow was taken
-        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, getUser());
-        waitForProcessToFinishAndBeArchived(processInstance);
+        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, user);
+        waitForProcessToFinish(processInstance);
 
         final ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStepCA.getId());
         assertEquals(TestStates.ABORTED.getStateName(), archActivityInst.getState());
@@ -109,13 +105,12 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
         // start the process and wait the timer to trigger
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance multiInstance = waitForUserTask(multiTaskName, processInstance.getId());
+        waitForUserTask(multiTaskName, processInstance.getId());
         // wait timer trigger
         // check that the exception flow was taken
-        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, getUser());
-        waitForProcessToFinishAndBeArchived(processInstance);
-
-        waitForArchivedActivity(multiInstance.getId(), TestStates.ABORTED);
+        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, user);
+        waitForFlowNodeInState(processInstance, multiTaskName, TestStates.ABORTED, true);
+        waitForProcessToFinish(processInstance);
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "step2");
 
@@ -132,15 +127,14 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
         // deploy a process with a interrupting timer boundary event attached to a parallel multi-instance
         final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration, true, "step1", loopCardinality,
-                isSequential,
-                "step2", "exceptionStep");
+                isSequential, "step2", "exceptionStep");
 
         // start the process and wait for process to be triggered
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
         // wait timer trigger
-        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, getUser());
-        waitForProcessToFinishAndBeArchived(processInstance);
+        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, user);
+        waitForProcessToFinish(processInstance);
 
         final ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(step1.getId());
         assertEquals(TestStates.ABORTED.getStateName(), archActivityInst.getState());
@@ -164,15 +158,14 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
         // start the process and wait timer to trigger
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance activityInLoop = waitForUserTask(loopActivityName, processInstance.getId());
+        waitForUserTask(loopActivityName, processInstance.getId());
         Thread.sleep(timerDuration); // wait timer trigger
 
         // verify that the exception flow was taken
-        waitForUserTaskAndExecuteIt(exceptionFlowStepName, processInstance, getUser());
-        waitForProcessToFinish(processInstance);
-
+        waitForUserTaskAndExecuteIt(exceptionFlowStepName, processInstance, user);
         // verify that the normal flow was aborted
-        waitForArchivedActivity(activityInLoop.getId(), TestStates.ABORTED);
+        waitForFlowNodeInState(processInstance, loopActivityName, TestStates.ABORTED, true);
+        waitForProcessToFinish(processInstance);
 
         checkFlowNodeWasntExecuted(processInstance.getId(), normalFlowStepName);
 
@@ -188,15 +181,34 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // Wait and execute the step1 with a timer boundary event
-        final HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
-        getProcessAPI().assignUserTask(step1.getId(), getUser().getId());
+        waitForUserTaskAndAssigneIt("step1", processInstance, user);
 
         // wait timer trigger
-        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, getUser());
-        waitForProcessToFinishAndBeArchived(processInstance);
+        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, user);
+        waitForFlowNodeInState(processInstance, "step1", TestStates.ABORTED, true);
+        waitForProcessToFinish(processInstance);
 
-        // Check that step1 is aborted
-        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "Timer boundary event" }, jira = "BS-9355")
+    @Test
+    public void timerBoundaryEventNotTriggeredOnParallelMultiInstance() throws Exception {
+        final long timerDuration = 180;
+        final int loopCardinality = 2;
+        final boolean isSequential = false;
+        final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration, true, "step1", loopCardinality,
+                isSequential, "step2", "exceptionStep");
+
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        executeRemainingSequencialMultiInstancesOrLoop("step1", processInstance, loopCardinality);
+
+        Thread.sleep(timerDuration); // if step1 wasn't be executed the timer would triggered
+
+        waitForUserTaskAndExecuteIt("step2", processInstance, user);
+        waitForProcessToFinish(processInstance);
+
+        checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");
 
         disableAndDeleteProcess(processDefinition);
     }
