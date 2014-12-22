@@ -64,7 +64,6 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
@@ -115,10 +114,8 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
-import org.bonitasoft.engine.test.check.CheckNbOfActivities;
 import org.bonitasoft.engine.test.check.CheckNbOfArchivedActivities;
 import org.bonitasoft.engine.test.check.CheckNbOfArchivedActivityInstances;
-import org.bonitasoft.engine.test.check.CheckNbOfHumanTasks;
 import org.bonitasoft.engine.test.check.CheckNbOfOpenActivities;
 import org.bonitasoft.engine.test.check.CheckNbOfProcessInstances;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
@@ -129,7 +126,6 @@ import org.bonitasoft.engine.test.wait.WaitForDataValue;
 import org.bonitasoft.engine.test.wait.WaitForEvent;
 import org.bonitasoft.engine.test.wait.WaitForFinalArchivedActivity;
 import org.bonitasoft.engine.test.wait.WaitForPendingTasks;
-import org.bonitasoft.engine.test.wait.WaitProcessToFinishAndBeArchived;
 import org.junit.After;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -823,14 +819,6 @@ public class APITestUtil extends PlatformTestUtil {
         assertEquals(displayDescription, saUserTaskInstance.getDisplayDescription());
     }
 
-    @Deprecated
-    private void waitForProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance, final TestStates state)
-            throws Exception {
-        final WaitProcessToFinishAndBeArchived waitProcessToFinishAndBeArchived = new WaitProcessToFinishAndBeArchived(repeatEach, timeout, false,
-                processInstance, getProcessAPI(), state);
-        assertTrue(waitProcessToFinishAndBeArchived.waitUntil());
-    }
-
     public void waitForProcessToFinish(final ProcessInstance processInstance) throws Exception {
         waitForProcessToFinish(processInstance.getId());
     }
@@ -857,17 +845,6 @@ public class APITestUtil extends PlatformTestUtil {
                 DEFAULT_TIMEOUT);
     }
 
-    @Deprecated
-    private boolean waitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance) throws Exception {
-        final boolean waitUntil = new WaitProcessToFinishAndBeArchived(repeatEach, timeout, processInstance, processAPI).waitUntil();
-        if (!waitUntil) {
-            printFlowNodes(processInstance);
-            printArchivedFlowNodes(processInstance);
-        }
-        assertTrue("Process was not finished", waitUntil);
-        return waitUntil;
-    }
-
     protected void printArchivedFlowNodes(final ProcessInstance processInstance) throws SearchException {
         System.err.println("Archived flownodes: ");
         final List<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(
@@ -882,11 +859,6 @@ public class APITestUtil extends PlatformTestUtil {
                 new SearchOptionsBuilder(0, 100).filter(FlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId()).done())
                 .getResult();
         System.err.println(flownodes);
-    }
-
-    @Deprecated
-    public boolean waitForProcessToFinishAndBeArchived(final ProcessInstance processInstance) throws Exception {
-        return waitProcessToFinishAndBeArchived(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance);
     }
 
     private Long waitForFlowNode(final long processInstanceId, final TestStates state, final String flowNodeName, final boolean useRootProcessInstance,
@@ -1016,16 +988,6 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     @Deprecated
-    public WaitForEvent waitForEventInWaitingState(final long processInstanceId, final String eventName) throws Exception {
-        return waitForEvent(processInstanceId, eventName, TestStates.WAITING);
-    }
-
-    @Deprecated
-    public WaitForEvent waitForEvent(final long processInstanceId, final String eventName, final TestStates state) throws Exception {
-        return waitForEvent(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstanceId, eventName, state);
-    }
-
-    @Deprecated
     public WaitForEvent waitForEvent(final ProcessInstance processInstance, final String eventName, final TestStates state) throws Exception {
         return waitForEvent(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance.getId(), eventName, state);
     }
@@ -1036,18 +998,6 @@ public class APITestUtil extends PlatformTestUtil {
         final WaitForEvent waitForEvent = new WaitForEvent(repeatEach, timeout, eventName, processInstanceId, state, getProcessAPI());
         assertTrue("Expected 1 activities in " + state + " state", waitForEvent.waitUntil());
         return waitForEvent;
-    }
-
-    public List<ProcessDefinition> createNbProcessDefinitionWithHumanAndAutomaticAndDeployWithActor(final int nbProcess, final User user,
-            final List<String> stepNames, final List<Boolean> isHuman) throws InvalidProcessDefinitionException, BonitaException {
-        final List<ProcessDefinition> processDefinitions = new ArrayList<ProcessDefinition>();
-        final List<DesignProcessDefinition> designProcessDefinitions = BuildTestUtil.buildNbProcessDefinitionWithHumanAndAutomatic(nbProcess, stepNames,
-                isHuman);
-
-        for (final DesignProcessDefinition designProcessDefinition : designProcessDefinitions) {
-            processDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition, BuildTestUtil.ACTOR_NAME, user));
-        }
-        return processDefinitions;
     }
 
     @Deprecated
@@ -1095,25 +1045,6 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     @Deprecated
-    public CheckNbOfActivities checkNbOfActivitiesInReadyState(final ProcessInstance processInstance, final int nbActivities) throws Exception {
-        return checkNbOfActivitiesInInterruptingState(processInstance, nbActivities, TestStates.READY);
-    }
-
-    @Deprecated
-    public CheckNbOfActivities checkNbOfActivitiesInInterruptingState(final ProcessInstance processInstance, final int nbActivities) throws Exception {
-        return checkNbOfActivitiesInInterruptingState(processInstance, nbActivities, TestStates.INTERRUPTED);
-    }
-
-    @Deprecated
-    public CheckNbOfActivities checkNbOfActivitiesInInterruptingState(final ProcessInstance processInstance, final int nbActivities, final TestStates state)
-            throws Exception {
-        final CheckNbOfActivities checkNbOfActivities = new CheckNbOfActivities(getProcessAPI(), DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, false, processInstance,
-                nbActivities, state);
-        assertTrue("Expected " + nbActivities + " activities in " + state + " state", checkNbOfActivities.waitUntil());
-        return checkNbOfActivities;
-    }
-
-    @Deprecated
     public void checkProcessInstanceIsArchived(final ProcessInstance processInstance) throws Exception {
         checkProcessInstanceIsArchived(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance);
     }
@@ -1121,21 +1052,6 @@ public class APITestUtil extends PlatformTestUtil {
     @Deprecated
     private void checkProcessInstanceIsArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance) throws Exception {
         assertTrue(new CheckProcessInstanceIsArchived(repeatEach, timeout, processInstance.getId(), getProcessAPI()).waitUntil());
-    }
-
-    @Deprecated
-    public CheckNbOfHumanTasks checkNbOfHumanTasks(final int nbHumanTaks) throws Exception {
-        return checkNbOfHumanTasks(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, nbHumanTaks);
-    }
-
-    @Deprecated
-    private CheckNbOfHumanTasks checkNbOfHumanTasks(final int repeatEach, final int timeout, final int nbHumanTaks) throws Exception {
-        final CheckNbOfHumanTasks checkNbOfHumanTasks = new CheckNbOfHumanTasks(repeatEach, timeout, false, nbHumanTaks, new SearchOptionsBuilder(0, 15)
-                .filter(HumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.READY_STATE).sort(HumanTaskInstanceSearchDescriptor.NAME, Order.DESC)
-                .done(), getProcessAPI());
-        final boolean waitUntil = checkNbOfHumanTasks.waitUntil();
-        assertTrue("Expected " + nbHumanTaks + " Human tasks in ready state, but found " + checkNbOfHumanTasks.getHumanTaskInstances().getCount(), waitUntil);
-        return checkNbOfHumanTasks;
     }
 
     @Deprecated
@@ -1306,7 +1222,7 @@ public class APITestUtil extends PlatformTestUtil {
                 if (ActivationState.ENABLED.equals(processDeploymentInfo.getActivationState())) {
                     getProcessAPI().disableProcess(processDeploymentInfo.getProcessId());
                 }
-                getProcessAPI().deleteProcess(processDeploymentInfo.getProcessId());
+                getProcessAPI().deleteProcessDefinition(processDeploymentInfo.getProcessId());
             }
             messages.add(processBuilder.toString());
         }
@@ -1550,6 +1466,18 @@ public class APITestUtil extends PlatformTestUtil {
         }
         assertNotNull(archivedDataInstance);
         return archivedDataInstance;
+    }
+
+    public List<ProcessDefinition> createNbProcessDefinitionWithHumanAndAutomaticAndDeployWithActor(final int nbProcess, final User user,
+            final List<String> stepNames, final List<Boolean> isHuman) throws InvalidProcessDefinitionException, BonitaException {
+        final List<ProcessDefinition> processDefinitions = new ArrayList<ProcessDefinition>();
+        final List<DesignProcessDefinition> designProcessDefinitions = BuildTestUtil.buildNbProcessDefinitionWithHumanAndAutomatic(nbProcess, stepNames,
+                isHuman);
+
+        for (final DesignProcessDefinition designProcessDefinition : designProcessDefinitions) {
+            processDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition, BuildTestUtil.ACTOR_NAME, user));
+        }
+        return processDefinitions;
     }
 
 }

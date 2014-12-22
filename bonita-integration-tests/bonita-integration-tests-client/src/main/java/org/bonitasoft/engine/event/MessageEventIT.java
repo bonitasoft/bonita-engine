@@ -71,7 +71,7 @@ public class MessageEventIT extends AbstractEventIT {
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        waitForProcessToFinish(sendMessageProcessInstance);
         forceMatchingOfEvents();
         waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
 
@@ -91,7 +91,7 @@ public class MessageEventIT extends AbstractEventIT {
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        waitForProcessToFinish(sendMessageProcessInstance);
         forceMatchingOfEvents();
         waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
 
@@ -109,7 +109,7 @@ public class MessageEventIT extends AbstractEventIT {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(START_WITH_MESSAGE_PROCESS_NAME, "startEvent");
         // the message will be send before the target process is deployed
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        waitForProcessToFinish(sendMessageProcessInstance);
 
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
         forceMatchingOfEvents();
@@ -135,7 +135,7 @@ public class MessageEventIT extends AbstractEventIT {
         waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        waitForProcessToFinish(sendMessageProcessInstance);
         forceMatchingOfEvents();
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME);
 
@@ -150,7 +150,7 @@ public class MessageEventIT extends AbstractEventIT {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithEndMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME);
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithIntermediateCatchMessageEvent(null, null, null);
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        waitForProcessToFinish(sendMessageProcessInstance);
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
         Thread.sleep(100);// small sleep but don't wait for the event to be waiting, it might happen that that event is already matched at this point
@@ -198,7 +198,7 @@ public class MessageEventIT extends AbstractEventIT {
                 sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("docNumber", "1", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
                         buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance1));
+        waitForProcessToFinish(sendMessageProcessInstance1);
         forceMatchingOfEvents();
         assertNotNull(waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1.getId()));
         waitForEventInWaitingState(receiveMessageProcessInstance2, CATCH_EVENT_NAME);
@@ -208,7 +208,7 @@ public class MessageEventIT extends AbstractEventIT {
                 sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("docNumber", "2", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
                         buildAssignOperation("lastName", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance2));
+        waitForProcessToFinish(sendMessageProcessInstance2);
 
         assertNotNull(waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance2.getId()));
 
@@ -240,7 +240,7 @@ public class MessageEventIT extends AbstractEventIT {
 
         // instantiate a process containing whom the targetProcess is of the ProcessDefinition receiveMessageProcess
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance1));
+        waitForProcessToFinish(sendMessageProcessInstance1);
         forceMatchingOfEvents();
 
         final HumanTaskInstance waitForUserTask = waitForUserTask(CATCH_MESSAGE_STEP1_NAME);
@@ -287,7 +287,7 @@ public class MessageEventIT extends AbstractEventIT {
 
         // instantiate a process containing correlations matching with receiveMessageProcessInstance1
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance1));
+        waitForProcessToFinish(sendMessageProcessInstance1);
         forceMatchingOfEvents();
 
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
@@ -326,7 +326,7 @@ public class MessageEventIT extends AbstractEventIT {
                 sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("docNumber", "1", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
                         buildAssignOperation("lastName", "Doe 2", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance1));
+        waitForProcessToFinish(sendMessageProcessInstance1);
         forceMatchingOfEvents();
         // 1 sec because it's an assert false and we forced matching of event
         assertFalse(new WaitForStep(DEFAULT_REPEAT_EACH, 500, CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1.getId(), getProcessAPI()).waitUntil());
@@ -336,7 +336,7 @@ public class MessageEventIT extends AbstractEventIT {
                 sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("docNumber", "1", Integer.class.getName(), ExpressionType.TYPE_CONSTANT),
                         buildAssignOperation("lastName", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance2));
+        waitForProcessToFinish(sendMessageProcessInstance2);
         forceMatchingOfEvents();
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
 
@@ -368,7 +368,7 @@ public class MessageEventIT extends AbstractEventIT {
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        waitForProcessToFinish(sendMessageProcessInstance);
         forceMatchingOfEvents();
         waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
 
@@ -400,7 +400,7 @@ public class MessageEventIT extends AbstractEventIT {
         waitForEventInWaitingState(catchMessageProcessInstance, CATCH_EVENT_NAME);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        waitForProcessToFinish(sendMessageProcessInstance);
         forceMatchingOfEvents();
         checkNbPendingTaskOf(2, user);
 
@@ -434,7 +434,7 @@ public class MessageEventIT extends AbstractEventIT {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        waitForProcessToFinish(sendMessageProcessInstance);
         forceMatchingOfEvents();
 
         // at the first test some time the cron job time some time before executing
@@ -477,7 +477,7 @@ public class MessageEventIT extends AbstractEventIT {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        waitForProcessToFinish(sendMessageProcessInstance);
         forceMatchingOfEvents();
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
 
@@ -500,7 +500,7 @@ public class MessageEventIT extends AbstractEventIT {
     public void messageSentProcessFinishBeforeReceiveProcessIsEnabled() throws Exception {
         final ProcessDefinition sendMessageProcess = deployAndEnableProcessWithIntermediateThrowMessageEvent(CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME);
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        waitForProcessToFinish(sendMessageProcessInstance);
 
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithIntermediateCatchMessageEvent(null, null, null);
 
@@ -553,7 +553,7 @@ public class MessageEventIT extends AbstractEventIT {
         waitForEventInWaitingState(receiveMessageProcessInstance, CATCH_EVENT_NAME);
 
         final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess1.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance1));
+        waitForProcessToFinish(sendMessageProcessInstance1);
         forceMatchingOfEvents();
         waitForUserTask(CATCH_MESSAGE_STEP1_NAME);
 

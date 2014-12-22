@@ -1,9 +1,7 @@
 package org.bonitasoft.engine.event;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.EndEventInstance;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
 import org.bonitasoft.engine.bpm.flownode.impl.internal.MultiInstanceLoopCharacteristics;
@@ -35,8 +33,7 @@ public class EndEventIT extends AbstractEventIT {
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
+        waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(definition);
     }
@@ -90,9 +87,9 @@ public class EndEventIT extends AbstractEventIT {
         builder.addUserTask("step1", ACTOR_NAME);
         builder.addEndEvent("stop").addTerminateEventTrigger();
         builder.addTransition("step1", "stop");
-        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, getUser());
+        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
-        waitForUserTaskAndExecuteIt("step1", startProcess, getUser());
+        waitForUserTaskAndExecuteIt("step1", startProcess, user);
         waitForProcessToFinish(startProcess);
         disableAndDeleteProcess(process);
     }
@@ -107,13 +104,13 @@ public class EndEventIT extends AbstractEventIT {
         builder.addEndEvent("stop").addTerminateEventTrigger();
         builder.addTransition("step1", "stop");
         builder.addTransition("step2", "stop");
-        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, getUser());
-        final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
-        final ActivityInstance userTask = waitForUserTask("step2", startProcess.getId());
-        waitForUserTaskAndExecuteIt("step1", startProcess, getUser());
+        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
+        waitForUserTask("step2", processInstance.getId());
+        waitForUserTaskAndExecuteIt("step1", processInstance, user);
         // should finish even if we don't execute step2
-        waitForProcessToFinish(startProcess);
-        waitForArchivedActivity(userTask.getId(), TestStates.ABORTED);
+        waitForFlowNodeInState(processInstance, "step2", TestStates.ABORTED, true);
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(process);
     }
 
@@ -129,13 +126,13 @@ public class EndEventIT extends AbstractEventIT {
         builder.addTransition("step1", "stop");
         builder.addTransition("step2", "step3");
         builder.addTransition("step3", "stop");
-        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, getUser());
-        final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
-        final ActivityInstance userTask = waitForUserTask("step2", startProcess.getId());
-        waitForUserTaskAndExecuteIt("step1", startProcess, getUser());
+        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
+        waitForUserTask("step2", processInstance.getId());
+        waitForUserTaskAndExecuteIt("step1", processInstance, user);
         // should finish even if we don't execute step2
-        waitForProcessToFinish(startProcess);
-        waitForArchivedActivity(userTask.getId(), TestStates.ABORTED);
+        waitForFlowNodeInState(processInstance, "step2", TestStates.ABORTED, true);
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(process);
     }
 
@@ -148,14 +145,17 @@ public class EndEventIT extends AbstractEventIT {
         builder.addUserTask("step1", ACTOR_NAME);
         builder.addEndEvent("stop").addTerminateEventTrigger();
         builder.addTransition("step1", "stop");
-        for (int i = 2; i < 15; i++) {
+        for (int i = 2; i < 6; i++) {
             builder.addUserTask("step" + i, ACTOR_NAME);
             builder.addTransition("step" + i, "stop");
         }
-        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, getUser());
+        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
-        checkNbOfHumanTasks(14);
-        waitForUserTaskAndExecuteIt("step1", startProcess, getUser());
+        waitForUserTask("step2", startProcess);
+        waitForUserTask("step3", startProcess);
+        waitForUserTask("step4", startProcess);
+        waitForUserTask("step5", startProcess);
+        waitForUserTaskAndExecuteIt("step1", startProcess, user);
         // should finish even if we don't execute step2
         waitForProcessToFinish(startProcess);
         disableAndDeleteProcess(process);
@@ -185,11 +185,11 @@ public class EndEventIT extends AbstractEventIT {
         builder.addActor(ACTOR_NAME).addUserTask("step1", ACTOR_NAME).addMultiInstance(true, new ExpressionBuilder().createConstantIntegerExpression(3));
         builder.addEndEvent("stop").addTerminateEventTrigger().addTransition("step1", "stop");
 
-        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, getUser());
+        final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
 
         for (int i = 0; i < 3; i++) {
-            waitForUserTaskAndExecuteIt("step1", processInstance, getUser());
+            waitForUserTaskAndExecuteIt("step1", processInstance, user);
         }
 
         waitForProcessToFinish(processInstance);

@@ -55,7 +55,7 @@ public class LoopIT extends TestWithUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(instance));
+        waitForProcessToFinish(instance);
         final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(instance.getId(), 0, 100,
                 ActivityInstanceCriterion.NAME_ASC);
         assertEquals(2, archivedActivityInstances.size());

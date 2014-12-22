@@ -270,8 +270,8 @@ public class ProcessManagementIT extends TestWithUser {
         // one archive for each change in the activity state. For automatic tasks we have initializingAndexecuting, completed
         checkNbOfArchivedActivityInstances(processInstance1, 2 * 2);
         checkNbOfArchivedActivityInstances(processInstance2, 3 * 2);
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance1));
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance2));
+        waitForProcessToFinish(processInstance1);
+        waitForProcessToFinish(processInstance2);
         disableAndDeleteProcess(processDefinition1, processDefinition2);
     }
 
@@ -331,7 +331,7 @@ public class ProcessManagementIT extends TestWithUser {
                 assertEquals("task3", archivedActivityInstances.get(desc3 * nbOfStates + i).getName());
             }
         }
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance2));
+        waitForProcessToFinish(processInstance2);
         disableAndDeleteProcess(processDefinition2);
     }
 

@@ -174,7 +174,9 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
                 ConnectorEvent.ON_ENTER);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        checkNbOfHumanTasks(3);
+        waitForUserTask("multi", processInstance);
+        waitForUserTask("multi", processInstance);
+        waitForUserTask("multi", processInstance);
 
         // Check the data value
         final DataInstance globalData = getProcessAPI().getProcessDataInstance(globalDataName, processInstance.getId());
@@ -1391,13 +1393,12 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         Assertions.assertThat(searchResult.getCount()).isEqualTo(1);
         Assertions.assertThat(searchResult.getResult().get(0).getState()).isEqualTo(ConnectorState.FAILED);
 
-
         //when
-        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(ArchivedFlowNodeInstanceSearchDescriptor.ORIGINAL_FLOW_NODE_ID, Order.ASC);
         builder.filter(ArchivedFlowNodeInstanceSearchDescriptor.ORIGINAL_FLOW_NODE_ID, failedTask.getId());
         builder.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, "executing");
-        SearchResult<ArchivedFlowNodeInstance> archivedFlowNodeInstanceSearchResult = getProcessAPI().searchArchivedFlowNodeInstances(builder.done());
+        final SearchResult<ArchivedFlowNodeInstance> archivedFlowNodeInstanceSearchResult = getProcessAPI().searchArchivedFlowNodeInstances(builder.done());
 
         //then
         Assertions.assertThat(archivedFlowNodeInstanceSearchResult.getCount()).isEqualTo(1);
@@ -1425,7 +1426,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorThatThrowException(final ProcessDefinitionBuilder processDefinitionBuilder,
-                                                                                               final String actor, final User user) throws BonitaException, IOException {
+            final String actor, final User user) throws BonitaException, IOException {
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actor, user, null,
                 "TestConnectorThatThrowException.impl", TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
     }

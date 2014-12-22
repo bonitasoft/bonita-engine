@@ -135,7 +135,7 @@ public class ReceiveTasksIT extends TestWithUser {
         assertEquals(1, searchResult.getCount());
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        waitForProcessToFinish(sendMessageProcessInstance);
         forceMatchingOfEvents();
         waitForUserTask("userTask1", receiveMessageProcessInstance);
 
@@ -167,7 +167,7 @@ public class ReceiveTasksIT extends TestWithUser {
                 "waitForMessage", null, null, null, null);
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        waitForProcessToFinish(sendMessageProcessInstance);
 
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
                 "delivery", user, "m3", null, null, null);
@@ -199,8 +199,8 @@ public class ReceiveTasksIT extends TestWithUser {
                     "waitForMessage", null, null, null, null);
             final ProcessInstance sendMessageProcessInstance1 = getProcessAPI().startProcess(sendMessageProcess1.getId());
             final ProcessInstance sendMessageProcessInstance2 = getProcessAPI().startProcess(sendMessageProcess2.getId());
-            assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance1));
-            assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance2));
+            waitForProcessToFinish(sendMessageProcessInstance1);
+            waitForProcessToFinish(sendMessageProcessInstance2);
 
             receiveMessageProcess = deployAndEnableProcessWithReceivedTask("receiveMessageProcess", "waitForMessage", "userTask1",
                     "delivery", user, "m4", null, null, null);
@@ -243,7 +243,7 @@ public class ReceiveTasksIT extends TestWithUser {
 
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId(),
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
-        assertTrue(waitForProcessToFinishAndBeArchived(sendMessageProcessInstance));
+        waitForProcessToFinish(sendMessageProcessInstance);
         forceMatchingOfEvents();
         final HumanTaskInstance step1 = waitForUserTask("userTask1", receiveMessageProcessInstance);
 

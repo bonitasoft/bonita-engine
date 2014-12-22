@@ -305,7 +305,6 @@ public class CallActivityIT extends TestWithTechnicalUser {
             assignAndExecuteStep(read, cascao.getId());
 
             waitForProcessToFinish(mainProcessInstance);
-            assertThat(waitForProcessToFinishAndBeArchived(mainProcessInstance)).as("parent process was not archived").isTrue();
         } finally {
             disableAndDeleteProcess(mainProcessDefinition, receiveProcessDefinition, sendProcessDefinition);
         }
@@ -372,7 +371,6 @@ public class CallActivityIT extends TestWithTechnicalUser {
             assertThat(copyMsg.getValue()).isEqualTo("data");
             assignAndExecuteStep(read, cascao.getId());
             waitForProcessToFinish(mainProcessInstance);
-            assertThat(waitForProcessToFinishAndBeArchived(mainProcessInstance)).as("parent process was not archived").isTrue();
         } finally {
             disableAndDeleteProcess(mainProcessDefinition, receiveProcessDefinition, sendProcessDefinition);
         }
@@ -420,8 +418,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
          */
         assertThat(getProcessAPI().getProcessDataInstance("dataInitWithCNumber", callingProcessInstance.getId()).getValue()).isEqualTo(Integer.valueOf(10));
 
-        disableAndDeleteProcess(callingProcessDef);
-        disableAndDeleteProcess(targetProcessDef);
+        disableAndDeleteProcess(callingProcessDef, targetProcessDef);
     }
 
     /*
@@ -483,18 +480,14 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
         activityInstance = waitForUserTask("step1", callingProcessInstance);
         checkOutputOperations(addOutputOperations, callingProcessInstance);
-        assertThat(waitForProcessToFinishAndBeArchived(targetPI)).as("target process was not archived").isTrue();
+        waitForProcessToFinish(targetPI);
         assertThat(activityInstance.getParentProcessInstanceId()).isEqualTo(callingProcessInstance.getId());
 
         assignAndExecuteStep(activityInstance, cascao.getId());
 
         waitForProcessToFinish(callingProcessInstance);
-        assertThat(waitForProcessToFinishAndBeArchived(callingProcessInstance)).as("parent process was not archived").isTrue();
 
-        disableAndDeleteProcess(callingProcessDef);
-        disableAndDeleteProcess(targetProcessDef1);
-        disableAndDeleteProcess(targetProcessDef2);
-        disableAndDeleteProcess(targetProcessDef3);
+        disableAndDeleteProcess(callingProcessDef, targetProcessDef1, targetProcessDef2, targetProcessDef3);
     }
 
     private List<Operation> getStartOperations() throws InvalidExpressionException {
@@ -525,51 +518,35 @@ public class CallActivityIT extends TestWithTechnicalUser {
     }
 
     private void variableMultiLevelCallActivity(final int nbLevel) throws Exception {
-
         final ProcessDefinition[] processDefLevels = new ProcessDefinition[nbLevel];
 
-        for (int i = 0; i < nbLevel; i++) {
-            if (i != nbLevel - 1) {
-                processDefLevels[i] = getProcessWithCallActivity(ACTOR_NAME, false, false, "processLevel" + i, "processLevel" + (i + 1), 0, PROCESS_VERSION);
-            } else {
-                processDefLevels[i] = getSimpleProcess(ACTOR_NAME, "processLevel" + i, PROCESS_VERSION, false);
-            }
-
+        for (int i = 0; i < nbLevel - 1; i++) {
+            processDefLevels[i] = getProcessWithCallActivity(ACTOR_NAME, false, false, "processLevel" + i, "processLevel" + (i + 1), 0, PROCESS_VERSION);
         }
+        processDefLevels[nbLevel - 1] = getSimpleProcess(ACTOR_NAME, "processLevel" + (nbLevel - 1), PROCESS_VERSION, false);
 
         final List<Operation> operations = getStartOperations();
-
         assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
+
         final ProcessInstance[] procInstLevels = new ProcessInstance[nbLevel];
         procInstLevels[0] = getProcessAPI().startProcess(processDefLevels[0].getId(), operations, null);
         checkNbOfProcessInstances(nbLevel, ProcessInstanceCriterion.NAME_DESC);
         final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, nbLevel, ProcessInstanceCriterion.NAME_ASC); // if nbLevel>10 use
-                                                                                                                                           // CREATION_DATE_ASC
         assertThat(processInstances).hasSize(nbLevel);
-
-        // for (int i = 0; i < nbLevel; i++) {
-        // System.out.println("processInstance of level : " + i + "\nContent : " + processInstances.get(i));
-        // }
 
         for (int i = 0; i < nbLevel; i++) {
             procInstLevels[i] = processInstances.get(i);
             assertThat(procInstLevels[i].getProcessDefinitionId()).as("Level of process : " + i).isEqualTo(processDefLevels[i].getId());
         }
 
-        for (int i = nbLevel - 1; i >= 0; i--) {
-            if (i == nbLevel - 1) {
-                waitForStepAndExecuteIt(procInstLevels[0], "tStep1", cebolinha, procInstLevels[i]);
-            } else {
-                waitForStepAndExecuteIt(procInstLevels[0], "step1", cascao, procInstLevels[i], procInstLevels[i + 1]);
-                assertThat(waitForProcessToFinishAndBeArchived(procInstLevels[i + 1])).as("process of level " + i + " was not archived").isTrue();
-            }
+        waitForUserTaskAndExecuteIt("tStep1", procInstLevels[0], cebolinha);
+        waitForProcessToFinish(procInstLevels[nbLevel - 1]);
+        for (int i = nbLevel - 2; i >= 0; i--) {
+            waitForUserTaskAndExecuteIt("step1", procInstLevels[0], cascao);
+            waitForProcessToFinish(procInstLevels[i]);
         }
 
-        assertThat(waitForProcessToFinishAndBeArchived(procInstLevels[0])).as("root process was not archived").isTrue();
-
-        for (int i = 0; i < nbLevel; i++) {
-            disableAndDeleteProcess(processDefLevels[i]);
-        }
+        disableAndDeleteProcess(processDefLevels);
     }
 
     /*
@@ -579,22 +556,6 @@ public class CallActivityIT extends TestWithTechnicalUser {
     @Test
     public void multiLevelCallActivity() throws Exception {
         variableMultiLevelCallActivity(10);
-    }
-
-    private void waitForStepAndExecuteIt(final ProcessInstance rootProcessInstance, final String userTaskName, final User user,
-            final ProcessInstance actualProcessInstance, final ProcessInstance... childProcessInstances) throws Exception {
-        final HumanTaskInstance humanTaskInstance = waitForUserTask(userTaskName, rootProcessInstance);
-        if (childProcessInstances != null) {
-            for (final ProcessInstance childProcessInstance : childProcessInstances) {
-                assertThat(waitForProcessToFinishAndBeArchived(childProcessInstance)).as("target process was not archived: " + childProcessInstance.getName())
-                        .isTrue();
-            }
-        }
-
-        assertThat(humanTaskInstance.getRootContainerId()).isEqualTo(rootProcessInstance.getId());
-        assertThat(humanTaskInstance.getParentProcessInstanceId()).isEqualTo(actualProcessInstance.getId());
-        // execute step in the target process
-        assignAndExecuteStep(humanTaskInstance, user.getId());
     }
 
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity" }, jira = "")
@@ -613,7 +574,6 @@ public class CallActivityIT extends TestWithTechnicalUser {
     }
 
     private void callActivityInALoop(final int nbLoop) throws Exception {
-
         final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
         final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "targetProcess", nbLoop,
                 PROCESS_VERSION);
@@ -629,15 +589,14 @@ public class CallActivityIT extends TestWithTechnicalUser {
             if (i != 0) {
                 assertThat(targetPILoopExecs[i - 1].getId()).isNotEqualTo(targetPILoopExecs[i].getId());
             }
-            waitForStepAndExecuteIt(callingProcessInstance, "tStep1", cebolinha, targetPILoopExecs[i]); // i-th loop execution
-            assertThat(waitForProcessToFinishAndBeArchived(targetPILoopExecs[i])).isTrue();
+            waitForUserTaskAndExecuteIt("tStep1", callingProcessInstance, cebolinha); // i-th loop execution
+            waitForProcessToFinish(targetPILoopExecs[i]);
         }
 
-        waitForStepAndExecuteIt(callingProcessInstance, "step1", cascao, callingProcessInstance, targetPILoopExecs[0]);
-        assertThat(waitForProcessToFinishAndBeArchived(callingProcessInstance)).as("parent process was not archived").isTrue();
+        waitForUserTaskAndExecuteIt("step1", callingProcessInstance, cascao);
+        waitForProcessToFinish(callingProcessInstance);
 
-        disableAndDeleteProcess(callingProcessDef);
-        disableAndDeleteProcess(targetProcessDef);
+        disableAndDeleteProcess(callingProcessDef, targetProcessDef);
     }
 
     /*
@@ -670,21 +629,18 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
         final FlowNodeInstance callActivityInstance = waitForFlowNodeInExecutingState(callingProcessInstance, "callActivity", true);
 
-        waitForStepAndExecuteIt(callingProcessInstance, "tStep1", cebolinha, targetPI); // first loop execution
+        waitForUserTaskAndExecuteIt("tStep1", callingProcessInstance, cebolinha); // first loop execution
         waitForProcessToFinish(targetPI);
-        assertThat(waitForProcessToFinishAndBeArchived(targetPI)).isTrue();
 
         final WaitForFinalArchivedActivity waitForFinalArchivedActivity = waitForFinalArchivedActivity("callActivity", callingProcessInstance);
         assertThat(waitForFinalArchivedActivity.getResult().getType()).isEqualTo(FlowNodeType.CALL_ACTIVITY);
-        assertThat(waitForProcessToFinishAndBeArchived(targetPI)).isTrue();
         final List<ArchivedProcessInstance> archivedProcessInstanceList = getProcessAPI().getArchivedProcessInstances(targetPI.getId(), 0, 20);
 
         final ArchivedProcessInstance firstProcessInstanceArchive = archivedProcessInstanceList.get(0);
         assertThat(firstProcessInstanceArchive.getRootProcessInstanceId()).isEqualTo(callingProcessInstance.getId());
         assertThat(firstProcessInstanceArchive.getCallerId()).isEqualTo(callActivityInstance.getId());
 
-        disableAndDeleteProcess(callingProcessDef);
-        disableAndDeleteProcess(targetProcessDef);
+        disableAndDeleteProcess(callingProcessDef, targetProcessDef);
     }
 
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Process Version" }, jira = "")
@@ -698,22 +654,18 @@ public class CallActivityIT extends TestWithTechnicalUser {
     public void callActivityUsingInexistingVersion() throws Exception {
         final ProcessDefinition callingProcessDef = getProcessWithCallActivity("delivery", false, false, "callingProcess", "targetProcess", 0,
                 "unexisting_version_4.0");
-
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
 
         final ActivityInstance failedTask = waitForTaskToFail(callingProcessInstance);
         assertThat(failedTask.getName()).isEqualTo("callActivity");
 
         disableAndDeleteProcess(callingProcessDef);
-
     }
 
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Delete" }, jira = "ENGINE-1132")
     @Test
     public void deleteProcessInstanceThatIsCalledByCallActivity() throws Exception {
-
         final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
-
         final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "targetProcess", 0, PROCESS_VERSION);
 
         assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
@@ -735,10 +687,8 @@ public class CallActivityIT extends TestWithTechnicalUser {
                 // ok
             }
         } finally {
-            disableAndDeleteProcess(callingProcessDef);
-            disableAndDeleteProcess(targetProcessDef1);
+            disableAndDeleteProcess(callingProcessDef, targetProcessDef1);
         }
-
     }
 
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Delete" }, jira = "ENGINE-1132")
@@ -807,13 +757,12 @@ public class CallActivityIT extends TestWithTechnicalUser {
             // execute step in the target process
             assignAndExecuteStep(tStep1, cebolinha.getId());
             final HumanTaskInstance step1 = waitForUserTask("step1", callingProcessInstance);
-            assertThat(waitForProcessToFinishAndBeArchived(targetPI)).as("target process was not archived").isTrue();
+            waitForProcessToFinish(targetPI);
             assertThat(step1.getParentProcessInstanceId()).isEqualTo(callingProcessInstance.getId());
             assignAndExecuteStep(step1, cascao.getId());
-            assertThat(waitForProcessToFinishAndBeArchived(callingProcessInstance)).as("parent process was not archived").isTrue();
+            waitForProcessToFinish(callingProcessInstance);
         } finally {
-            disableAndDeleteProcess(callingProcessDef);
-            disableAndDeleteProcess(targetProcessDef);
+            disableAndDeleteProcess(callingProcessDef, targetProcessDef);
         }
     }
 
@@ -860,13 +809,12 @@ public class CallActivityIT extends TestWithTechnicalUser {
             // execute step in the target process
             assignAndExecuteStep(tStep1, cebolinha.getId());
             final HumanTaskInstance step1 = waitForUserTask("step1", callingProcessInstance);
-            assertThat(waitForProcessToFinishAndBeArchived(targetPI)).as("target process was not archived").isTrue();
+            waitForProcessToFinish(targetPI);
             assertThat(step1.getParentProcessInstanceId()).isEqualTo(callingProcessInstance.getId());
             assignAndExecuteStep(step1, cascao.getId());
-            assertThat(waitForProcessToFinishAndBeArchived(callingProcessInstance)).as("parent process was not archived").isTrue();
+            waitForProcessToFinish(callingProcessInstance);
         } finally {
-            disableAndDeleteProcess(callingProcessDef);
-            disableAndDeleteProcess(targetProcessDef);
+            disableAndDeleteProcess(callingProcessDef, targetProcessDef);
         }
     }
 
@@ -932,8 +880,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
             assertThat(archivedProcessInstances).hasSize(1);
             assertThat(archivedProcessInstances.get(0).getSourceObjectId()).isEqualTo(callingProcessInstance.getId());
         } finally {
-            disableAndDeleteProcess(callingProcessDefinition);
-            disableAndDeleteProcess(targetProcessDefinition);
+            disableAndDeleteProcess(callingProcessDefinition, targetProcessDefinition);
         }
     }
 
@@ -941,7 +888,6 @@ public class CallActivityIT extends TestWithTechnicalUser {
     @Cover(classes = { SubProcessDefinition.class }, concept = BPMNConcept.EVENT_SUBPROCESS, keywords = { "event sub-process", "container hierarchy" }, jira = "ENGINE-1899")
     public void getProcessDefinitionIdFromActivityInstanceId() throws Exception {
         // check that real root process definition is retrieved (taken from parent process instance)
-
         // Build target process
         final ProcessDefinitionBuilder targetProcessDefBuilder = new ProcessDefinitionBuilder().createNewInstance("targetProcess", PROCESS_VERSION);
         targetProcessDefBuilder.addActor(ACTOR_NAME);
@@ -966,14 +912,12 @@ public class CallActivityIT extends TestWithTechnicalUser {
         processDefBuilder.addTransition("callActivity", "end");
         final ProcessDefinition callingProcessDefinition = deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
-
         final ActivityInstance userTask = waitForUserTask("tStep1", callingProcessInstance.getId());
 
         final long processDefinitionId = getProcessAPI().getProcessDefinitionIdFromActivityInstanceId(userTask.getId());
         assertThat(processDefinitionId).isEqualTo(targetProcessDefinition.getId());
 
-        disableAndDeleteProcess(callingProcessDefinition);
-        disableAndDeleteProcess(targetProcessDefinition);
+        disableAndDeleteProcess(callingProcessDefinition, targetProcessDefinition);
     }
 
     @Cover(classes = { CallActivityInstance.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Engine constant" }, jira = "ENGINE-1009")
@@ -1007,8 +951,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
             final ActivityInstance activityInstance = waitForUserTask("tStep1", callingProcessInstance);
             assertThat(getProcessAPI().getActivityDataInstance("rootProcId", activityInstance.getId()).getValue()).isEqualTo(callingProcessInstance.getId());
         } finally {
-            disableAndDeleteProcess(callingProcessDefinition);
-            disableAndDeleteProcess(targetProcessDefinition);
+            disableAndDeleteProcess(callingProcessDefinition, targetProcessDefinition);
         }
     }
 
@@ -1060,8 +1003,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
             assertThat(getProcessAPI().getActivityDataInstance("valueOnCallOnEnter", activityInstance.getId()).getValue()).isEqualTo("parentDefault");
             assertThat(getProcessAPI().getActivityDataInstance("valueOnCallOnFinish", activityInstance.getId()).getValue()).isEqualTo("subModified");
         } finally {
-            disableAndDeleteProcess(callingProcessDefinition);
-            disableAndDeleteProcess(targetProcessDefinition);
+            disableAndDeleteProcess(callingProcessDefinition, targetProcessDefinition);
         }
     }
 

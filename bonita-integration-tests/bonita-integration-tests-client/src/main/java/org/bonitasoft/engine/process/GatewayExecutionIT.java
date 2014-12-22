@@ -136,7 +136,7 @@ public class GatewayExecutionIT extends TestWithUser {
 
         assignAndExecuteStep(step2, user);
         assignAndExecuteStep(step3, user);
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -261,7 +261,7 @@ public class GatewayExecutionIT extends TestWithUser {
         assertEquals("step4", humanTaskInstance2.getName());
         assignAndExecuteStep(humanTaskInstance2, user.getId());
 
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -597,7 +597,7 @@ public class GatewayExecutionIT extends TestWithUser {
 
         assignAndExecuteStep(step3, user.getId());
         waitForUserTaskAndExecuteIt("step4", processInstance, user);
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -720,7 +720,7 @@ public class GatewayExecutionIT extends TestWithUser {
         waitForUserTaskAndExecuteIt("step5", processInstance, user);
         waitForUserTaskAndExecuteIt("step5", processInstance, user);
 
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -747,7 +747,7 @@ public class GatewayExecutionIT extends TestWithUser {
         // we should have 1 elements ready:
         waitForUserTaskAndExecuteIt("step5", processInstance, user);
 
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -776,7 +776,7 @@ public class GatewayExecutionIT extends TestWithUser {
         waitForUserTaskAndExecuteIt("step5", processInstance, user);
         waitForUserTaskAndExecuteIt("step5", processInstance, user);
 
-        assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
+        waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -960,7 +960,7 @@ public class GatewayExecutionIT extends TestWithUser {
             for (final HumanTaskInstance humanTaskInstance : pendingTasks) {
                 getProcessAPI().executeFlowNode(humanTaskInstance.getId());
             }
-            assertTrue(waitForProcessToFinishAndBeArchived(processInstance));
+            waitForProcessToFinish(processInstance);
         }
         disableAndDeleteProcess(processDefinition);
     }

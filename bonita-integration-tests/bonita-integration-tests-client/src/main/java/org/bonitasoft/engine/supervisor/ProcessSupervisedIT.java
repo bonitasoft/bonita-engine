@@ -338,7 +338,7 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         buildAndAttachDocument(processInstance);
 
         skipTasks(processInstance);
-        waitForProcessToFinishAndBeArchived(processInstance);
+        waitForProcessToFinish(processInstance);
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
         searchOptionsBuilder.filter(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId());
@@ -451,7 +451,7 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         getProcessAPI().assignUserTask(pendingTask.getId(), john.getId());
         getProcessAPI().executeFlowNode(matti.getId(), pendingTask.getId());
 
-        waitForProcessToFinishAndBeArchived(processInstance);
+        waitForProcessToFinish(processInstance);
         result = getProcessAPI().searchOpenProcessInstancesInvolvingUser(john.getId(), searchOptions.done());
         assertNotNull(result);
         assertEquals(0, result.getCount());
@@ -473,7 +473,7 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
             skipTask(activityInstanceId);
         }
 
-        waitForProcessToFinishAndBeArchived(processInstance);
+        waitForProcessToFinish(processInstance);
 
         // test supervisor
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
