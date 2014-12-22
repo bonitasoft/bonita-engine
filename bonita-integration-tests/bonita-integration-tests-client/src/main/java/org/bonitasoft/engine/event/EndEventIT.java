@@ -145,13 +145,16 @@ public class EndEventIT extends AbstractEventIT {
         builder.addUserTask("step1", ACTOR_NAME);
         builder.addEndEvent("stop").addTerminateEventTrigger();
         builder.addTransition("step1", "stop");
-        for (int i = 2; i < 15; i++) {
+        for (int i = 2; i < 6; i++) {
             builder.addUserTask("step" + i, ACTOR_NAME);
             builder.addTransition("step" + i, "stop");
         }
         final ProcessDefinition process = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(process.getId());
-        checkNbOfHumanTasks(14);
+        waitForUserTask("step2", startProcess);
+        waitForUserTask("step3", startProcess);
+        waitForUserTask("step4", startProcess);
+        waitForUserTask("step5", startProcess);
         waitForUserTaskAndExecuteIt("step1", startProcess, user);
         // should finish even if we don't execute step2
         waitForProcessToFinish(startProcess);
