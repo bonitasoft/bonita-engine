@@ -194,17 +194,14 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.EVENTS, keywords = { "Timer boundary event" }, jira = "BS-9355")
     @Test
     public void timerBoundaryEventNotTriggeredOnParallelMultiInstance() throws Exception {
-        final long timerDuration = 180;
+        final long timerDuration = 2500;
         final int loopCardinality = 2;
         final boolean isSequential = false;
         final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration, true, "step1", loopCardinality,
                 isSequential, "step2", "exceptionStep");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        executeRemainingSequencialMultiInstancesOrLoop("step1", processInstance, loopCardinality);
-
-        Thread.sleep(timerDuration); // if step1 wasn't be executed the timer would triggered
-
+        waitForUserTasksAndExecuteIt("step1", processInstance, loopCardinality);
         waitForUserTaskAndExecuteIt("step2", processInstance, user);
         waitForProcessToFinish(processInstance);
 

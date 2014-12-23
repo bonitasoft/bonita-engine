@@ -120,7 +120,7 @@ public class NonInterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
         // execute multi-instances and verify that normal flow continues
         assignAndExecuteStep(multiInstance, user.getId());
-        executeRemainingSequencialMultiInstancesOrLoop(multiTaskName, processInstance, loopCardinality - 1);
+        waitForUserTasksAndExecuteIt(multiTaskName, processInstance, loopCardinality - 1);
         final ActivityInstance normalFlowStep = waitForUserTask(normalFlowTaskName, processInstance);
 
         // execute exception flow and normal flow and verify that the process completes
@@ -186,7 +186,7 @@ public class NonInterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
         // execute all loop activities and verify that the nomal flow continues
         assignAndExecuteStep(loop, user.getId());
-        executeRemainingSequencialMultiInstancesOrLoop(loopActivityName, processInstance, loopMax - 1);
+        waitForUserTasksAndExecuteIt(loopActivityName, processInstance, loopMax - 1);
         final ActivityInstance normalFlowStep = waitForUserTask(normalFlowStepName, processInstance);
 
         // execute the exception flow and the normal flow and verify that the process completes

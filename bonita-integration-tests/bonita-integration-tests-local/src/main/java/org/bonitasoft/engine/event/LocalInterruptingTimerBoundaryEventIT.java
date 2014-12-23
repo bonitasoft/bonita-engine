@@ -149,7 +149,7 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
         // when
-        executeRemainingSequencialMultiInstancesOrLoop("step1", processInstance, loopCardinality);
+        waitForUserTasksAndExecuteIt("step1", processInstance, loopCardinality);
 
         // then
         waitForFlowNodeInState(processInstance, "timer", TestStates.ABORTED, false);
@@ -182,7 +182,7 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
         // when
-        executeRemainingSequencialMultiInstancesOrLoop("step1", processInstance, loopCardinality);
+        waitForUserTasksAndExecuteIt("step1", processInstance, loopCardinality);
 
         // then
         waitForFlowNodeInState(processInstance, "timer", TestStates.ABORTED, false);
@@ -212,7 +212,7 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
         assertThat(containsTimerJob(getJobName(boundaryId))).isTrue();
 
         // when
-        executeRemainingSequencialMultiInstancesOrLoop("step1", processInstance, loopMax);
+        waitForUserTasksAndExecuteIt("step1", processInstance, loopMax);
 
         // then
         waitForFlowNodeInState(processInstance, "timer", TestStates.ABORTED, false);
