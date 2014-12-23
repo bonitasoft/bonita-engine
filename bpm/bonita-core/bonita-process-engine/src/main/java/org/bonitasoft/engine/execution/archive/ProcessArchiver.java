@@ -85,11 +85,7 @@ public class ProcessArchiver {
             final ConnectorInstanceService connectorInstanceService) throws SArchivingException {
         final SAProcessInstance saProcessInstance = BuilderFactory.get(SAProcessInstanceBuilderFactory.class).createNewInstance(processInstance).done();
         final long archiveDate = saProcessInstance.getEndDate();
-        try {
-            dataInstanceService.removeContainer(processInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.toString());
-        } catch (final SDataInstanceException e) {
-            throw new SArchivingException("Unable to delete data mapping.", e);
-        }
+
         SProcessDefinition processDefinition = null;
         try {
             processDefinition = processDefinitionService.getProcessDefinition(processInstance.getProcessDefinitionId());
@@ -329,7 +325,6 @@ public class ProcessArchiver {
                         archiveConnectors(connectorInstanceService, archiveDate, intTxflowNodeInstance.getId(), SConnectorInstance.FLOWNODE_TYPE);
                     }
                 }
-                dataInstanceService.removeContainer(intTxflowNodeInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.toString());
 
                 // then archive the flow node instance:
                 archiveFlowNodeInstance(intTxflowNodeInstance, archiveService, archiveDate);

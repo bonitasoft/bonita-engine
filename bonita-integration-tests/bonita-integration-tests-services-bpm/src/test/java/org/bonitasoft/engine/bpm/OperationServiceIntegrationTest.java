@@ -60,7 +60,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     /**
      * Assign a new value to a String Variable. Using an expression which is a constant.
      * variableName = "afterUpdate"
-     *
+     * 
      * @throws Exception
      */
     @Test
@@ -89,7 +89,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     /**
      * Assign a new value to a List Variable. Using an expression which is a constant.
      * variableName.add("afterUpdate");
-     *
+     * 
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
@@ -185,7 +185,6 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     private void insertDataInstance(final SDataInstance dataInstance) throws SBonitaException {
         transactionService.begin();
         dataInstanceService.createDataInstance(dataInstance);
-        dataInstanceService.createDataContainer(dataInstance.getContainerId(), dataInstance.getContainerType(), true);
         transactionService.complete();
     }
 

@@ -21,18 +21,6 @@
 		<filter name="tenantFilter" />
 	</class>
 
-	<class name="SDataInstanceVisibilityMappingImpl" table="data_mapping">
-		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">
-			<key-property name="tenantId" column="tenantid" type="long" />
-			<key-property name="id" column="id" type="long" />
-		</composite-id>
-		<property name="containerId" column="containerId" type="long"/>
-		<property name="containerType" column="containerType"  type="string" />
-		<property name="dataName" column="dataName" type="string" />
-		<property name="dataInstanceId" column="dataInstanceId" type="long" />
-		<filter name="tenantFilter" />
-	</class>
-
 	<subclass name="SIntegerDataInstanceImpl" abstract="false" discriminator-value="SIntegerDataInstanceImpl" extends="SDataInstanceImpl">
 		<property name="value" column="intValue" />
 	</subclass>

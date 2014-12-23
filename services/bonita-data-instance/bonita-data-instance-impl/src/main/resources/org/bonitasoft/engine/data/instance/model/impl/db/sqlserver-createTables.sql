@@ -25,17 +25,3 @@ GO
 CREATE INDEX idx_datai_container ON data_instance (containerId, containerType, tenantId)
 GO
 
-CREATE TABLE data_mapping (
-    tenantid NUMERIC(19, 0) NOT NULL,
-	id NUMERIC(19, 0) NOT NULL,
-	containerId NUMERIC(19, 0),
-	containerType NVARCHAR(60),
-	dataName NVARCHAR(50),
-	dataInstanceId NUMERIC(19, 0) NOT NULL,
-	UNIQUE (tenantId, containerId, containerType, dataName),
-	PRIMARY KEY (tenantid, id)
-)
-GO
-
-CREATE INDEX idx_datamapp_container ON data_mapping (containerId, containerType, tenantId)
-GO

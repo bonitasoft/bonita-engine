@@ -17,31 +17,6 @@
 		AND dataInstance.containerType = :containerType
 	</query>
 
-	<query name="getDataInstanceIdFromMapping">
-		SELECT data_mapping.dataInstanceId
-		FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl AS data_mapping
-		WHERE data_mapping.dataName = :dataName
-		AND data_mapping.containerId = :containerId
-		AND data_mapping.containerType = :containerType
-	</query>
-	
-	<query name="getDataInstanceIdsFromMapping">
-		SELECT data_mapping.dataInstanceId
-		FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl AS data_mapping
-		WHERE data_mapping.dataName IN (:dataNames)
-		AND data_mapping.containerId = :containerId
-		AND data_mapping.containerType = :containerType
-		ORDER BY data_mapping.tenantId, data_mapping.id
-	</query>
-
-	<query name="getDataInstanceVisibilityMappings">
-		SELECT data_mapping
-		FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl AS data_mapping
-		WHERE data_mapping.containerId = :containerId
-		AND data_mapping.containerType = :containerType
-		ORDER BY data_mapping.dataInstanceId
-	</query>
-
 	<query name="getDataInstancesByContainer">
 		SELECT dataInstance
 		FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
@@ -51,10 +26,10 @@
 
 
 	<query name="getNumberOfDataInstancesForContainer">
-		SELECT count(data_mapping.id)
-		FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl AS data_mapping
-		WHERE data_mapping.containerId = :containerId
-		AND data_mapping.containerType = :containerType
+		SELECT count(dataInstance)
+        FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+        WHERE dataInstance.containerId = :containerId
+        AND dataInstance.containerType = :containerType
 	</query>
 	
 </hibernate-mapping>

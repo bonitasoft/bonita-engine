@@ -302,7 +302,6 @@ public abstract class DataInstanceServiceTest extends CommonServiceTest {
                 true);
         insertDataInstance(data2Instance);
         getTransactionService().begin();
-        dataInstanceService.createDataContainer(containerId, containerType, true);
         getTransactionService().complete();
 
         final List<String> dataNames = new ArrayList<String>(2);

@@ -26,8 +26,12 @@ import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.CollectionUtil;
 import org.bonitasoft.engine.commons.LogUtil;
 import org.bonitasoft.engine.commons.NullCheckingUtil;
+import org.bonitasoft.engine.commons.Pair;
+import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
+import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SCreateDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
@@ -35,13 +39,9 @@ import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.exception.SDeleteDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SUpdateDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
-import org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
-import org.bonitasoft.engine.data.instance.model.archive.SADataInstanceVisibilityMapping;
 import org.bonitasoft.engine.data.instance.model.archive.builder.SADataInstanceBuilderFactory;
-import org.bonitasoft.engine.data.instance.model.archive.builder.SADataInstanceVisibilityMappingBuilderFactory;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
-import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceVisibilityMappingBuilderFactory;
 import org.bonitasoft.engine.events.model.SDeleteEvent;
 import org.bonitasoft.engine.events.model.SEvent;
 import org.bonitasoft.engine.events.model.SInsertEvent;
@@ -67,7 +67,7 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 /**
  * General mechanism for lookup is to look in specific flow node to search a data instance. When refering to "local" data instance, it means the lookup is
  * performed only on the specific element, and not on inherited data for parent containers.
- *
+ * 
  * @author Zhao Na
  * @author Elias Ricken de Medeiros
  * @author Feng Hui
@@ -129,103 +129,61 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public SDataInstance getDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceException {
+    public SDataInstance getDataInstance(final String dataName, final long containerId, final String containerType,
+            final ParentContainerResolver parentContainerResolver) throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataName, containerType);
-        try {
-            final long dataInstanceId = getDataInstanceDataVisibilityMapping(dataName, containerId, containerType);
-            return getDataInstance(dataInstanceId);
-        } catch (final SBonitaReadException e) {
-            throw new SDataInstanceReadException("No data found with name " + dataName + "  neither on container " + containerId + " with type "
+        Pair<Long, String> currentContainer = new Pair<Long, String>(containerId, containerType);
+        SDataInstance dataInstance = null;
+        do {
+            dataInstance = internalGetLocalDataInstance(dataName, currentContainer.getLeft(), currentContainer.getRight());
+            if (dataInstance == null) {
+                try {
+                    currentContainer = parentContainerResolver.getParentContainer(currentContainer);
+                } catch (SObjectNotFoundException e) {
+                    throw new SDataInstanceNotFoundException(e);
+                } catch (SObjectReadException e) {
+                    throw new SDataInstanceNotFoundException(e);
+                }
+            }
+        } while (dataInstance == null && currentContainer != null);
+
+        if (dataInstance == null) {
+            throw new SDataInstanceNotFoundException("No data found with name " + dataName + "  neither on container " + containerId + " with type "
                     + containerType
-                    + " nor in its parents", e);
+                    + " nor in its parents");
         }
-    }
-
-    private long getDataInstanceDataVisibilityMapping(final String dataName, final long containerId, final String containerType) throws SBonitaReadException {
-        final HashMap<String, Object> parameters = new HashMap<String, Object>(3);
-        parameters.put("dataName", dataName);
-        parameters.put("containerId", containerId);
-        parameters.put("containerType", containerType);
-        final SelectOneDescriptor<Long> selectOneDescriptor = new SelectOneDescriptor<Long>("getDataInstanceIdFromMapping", parameters,
-                SDataInstanceVisibilityMapping.class);
-        final Long dataInstanceId = persistenceService.selectOne(selectOneDescriptor);
-        if (dataInstanceId == null) {
-            final StringBuilder stb = new StringBuilder("DataInstance with name not found from mapping: [name: ");
-            stb.append(dataName).append(", container type: ").append(containerType);
-            stb.append(", container id: ").append(containerId).append(']');
-            throw new SBonitaReadException(stb.toString(), null, selectOneDescriptor);
-        }
-        return dataInstanceId;
-    }
-
-    private List<Long> getDataInstanceDataVisibilityMapping(final List<String> dataNames, final long containerId, final String containerType)
-            throws SBonitaReadException {
-        final HashMap<String, Object> parameters = new HashMap<String, Object>(3);
-        parameters.put("dataNames", dataNames);
-        parameters.put("containerId", containerId);
-        parameters.put("containerType", containerType);
-        final SelectListDescriptor<Long> selectListDescriptor = new SelectListDescriptor<Long>("getDataInstanceIdsFromMapping", parameters,
-                SDataInstanceVisibilityMapping.class, new QueryOptions(0, dataNames.size()));
-        return persistenceService.selectList(selectListDescriptor);
-    }
-
-    protected long getSADataInstanceDataVisibilityMapping(final String dataName, final long containerId, final String containerType)
-            throws SBonitaReadException {
-        final HashMap<String, Object> parameters = new HashMap<String, Object>(3);
-        parameters.put("dataName", dataName);
-        parameters.put("containerId", containerId);
-        parameters.put("containerType", containerType);
-        final SelectOneDescriptor<Long> selectOneDescriptor = new SelectOneDescriptor<Long>("getSADataInstanceIdFromMapping", parameters,
-                SADataInstanceVisibilityMapping.class);
-        final Long dataInstanceId = persistenceService.selectOne(selectOneDescriptor);
-        if (dataInstanceId == null) {
-            final StringBuilder stb = new StringBuilder("DataInstance with name not found from mapping: [name: ");
-            stb.append(dataName).append(", container type: ").append(containerType);
-            stb.append(", container id: ").append(containerId).append(']');
-            throw new SBonitaReadException(stb.toString(), null, selectOneDescriptor);
-        }
-        return dataInstanceId;
-    }
-
-    protected List<Long> getSADataInstanceDataVisibilityMapping(final List<String> dataNames, final long containerId, final String containerType)
-            throws SBonitaReadException {
-        final HashMap<String, Object> parameters = new HashMap<String, Object>(3);
-        parameters.put("dataNames", dataNames);
-        parameters.put("containerId", containerId);
-        parameters.put("containerType", containerType);
-        final SelectListDescriptor<Long> selectListDescriptor = new SelectListDescriptor<Long>("getSADataInstanceIdsFromMapping", parameters,
-                SADataInstanceVisibilityMapping.class, new QueryOptions(0, dataNames.size()));
-        return persistenceService.selectList(selectListDescriptor);
+        return dataInstance;
     }
 
     @Override
-    public List<SDataInstance> getDataInstances(final long containerId, final String containerType, final int fromIndex, final int numberOfResults)
+    public List<SDataInstance> getDataInstances(final long containerId, final String containerType,
+            final ParentContainerResolver parentContainerResolver, final int fromIndex, final int numberOfResults)
             throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(containerType);
-        try {
-            final List<SDataInstanceVisibilityMapping> mappings = getDataInstanceVisibilityMappings(containerId, containerType, fromIndex, numberOfResults);
-            final ArrayList<SDataInstance> dataInstances = new ArrayList<SDataInstance>(mappings.size());
-            for (final SDataInstanceVisibilityMapping mapping : mappings) {
-                dataInstances.add(getDataInstance(mapping.getDataInstanceId()));
-            }
-            return dataInstances;
-        } catch (final SBonitaReadException e) {
-            throw new SDataInstanceReadException("Unable to read data mappings of the container with type " + containerType + " and id " + containerId, e);
-        }
-    }
-
-    protected List<SDataInstanceVisibilityMapping> getDataInstanceVisibilityMappings(final long containerId, final String containerType, final int fromIndex,
-            final int numberOfResults) throws SBonitaReadException {
-        final HashMap<String, Object> parameters = new HashMap<String, Object>(2);
-        parameters.put("containerId", containerId);
-        parameters.put("containerType", containerType);
-        final SelectListDescriptor<SDataInstanceVisibilityMapping> selectDescriptor = new SelectListDescriptor<SDataInstanceVisibilityMapping>(
-                "getDataInstanceVisibilityMappings", parameters, SDataInstanceVisibilityMapping.class, new QueryOptions(fromIndex, numberOfResults));
-        return persistenceService.selectList(selectDescriptor);
+        // try {
+        // final List<SDataInstanceVisibilityMapping> mappings = getDataInstanceVisibilityMappings(containerId, containerType, fromIndex, numberOfResults);
+        // final ArrayList<SDataInstance> dataInstances = new ArrayList<SDataInstance>(mappings.size());
+        // for (final SDataInstanceVisibilityMapping mapping : mappings) {
+        // dataInstances.add(getDataInstance(mapping.getDataInstanceId()));
+        // }
+        // return dataInstances;
+        // } catch (final SBonitaReadException e) {
+        // throw new SDataInstanceReadException("Unable to read data mappings of the container with type " + containerType + " and id " + containerId, e);
+        // }
+        return getLocalDataInstances(containerId, containerType, fromIndex, numberOfResults);
     }
 
     @Override
     public SDataInstance getLocalDataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceReadException {
+        final SDataInstance dataInstance = internalGetLocalDataInstance(dataName, containerId, containerType);
+        if (dataInstance == null) {
+            throw new SDataInstanceReadException("No data instance found");
+        }
+        return dataInstance;
+    }
+
+    private SDataInstance internalGetLocalDataInstance(final String dataName, final long containerId, final String containerType)
+            throws SDataInstanceReadException {
         NullCheckingUtil.checkArgsNotNull(dataName, containerType);
         final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
         final Map<String, Object> paraMap = CollectionUtil.buildSimpleMap(fact.getNameKey(), dataName);
@@ -236,9 +194,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             final SDataInstance dataInstance = persistenceService.selectOne(new SelectOneDescriptor<SDataInstance>("getDataInstancesByNameAndContainer",
                     paraMap,
                     SDataInstance.class, SDataInstance.class)); // conditions :and not or
-            if (dataInstance == null) {
-                throw new SDataInstanceReadException("No data instance found");
-            }
             return dataInstance;
         } catch (final SBonitaReadException e) {
             throw new SDataInstanceReadException("Unable to check if a data instance already exists: " + e.getMessage(), e);
@@ -265,155 +220,25 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public void addChildContainer(final long parentContainerId, final String parentContainerType, final long containerId, final String containerType,
-            final boolean shouldArchiveMapping)
-            throws SDataInstanceException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "addChildContainer");
-        try {
-            // insert mappings from parent element
-            final List<SDataInstanceVisibilityMapping> mappings = insertMappingForLocalElement(containerId, containerType, shouldArchiveMapping);
-            final ArrayList<String> localData = new ArrayList<String>(mappings.size());
-            for (final SDataInstanceVisibilityMapping sDataInstanceVisibilityMapping : mappings) {
-                localData.add(sDataInstanceVisibilityMapping.getDataName());
-            }
-            final long archivedDate = System.currentTimeMillis();
-            final int batchSize = 80;
-            int currentIndex = 0;
-            List<SDataInstance> parentVisibleDataInstances = getDataInstances(parentContainerId, parentContainerType, currentIndex, batchSize);
-            while (parentVisibleDataInstances.size() > 0) {
-                for (final SDataInstance parentData : parentVisibleDataInstances) {
-                    if (!localData.contains(parentData.getName())) {
-                        insertDataInstanceVisibilityMapping(containerId, containerType, parentData.getName(), parentData.getId(), archivedDate,
-                                shouldArchiveMapping);
-                    }
-                }
-                currentIndex += batchSize;
-                parentVisibleDataInstances = getDataInstances(parentContainerId, parentContainerType, currentIndex, batchSize);
-            }
-            logAfterMethod(TechnicalLogSeverity.TRACE, "addChildContainer");
-        } catch (final SRecorderException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "addChildContainer", e);
-            throw new SDataInstanceException(e);
-        }
-    }
-
-    @Override
-    public void removeContainer(final long containerId, final String containerType) throws SDataInstanceException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "removeContainer");
-        try {
-            List<SDataInstanceVisibilityMapping> visibilityMappings;
-            do {
-                visibilityMappings = getDataInstanceVisibilityMappings(containerId, containerType, 0, 100);
-                for (final SDataInstanceVisibilityMapping sDataInstanceVisibilityMapping : visibilityMappings) {
-                    deleteDataInstanceVisibilityMapping(sDataInstanceVisibilityMapping);
-                }
-            } while (visibilityMappings.size() > 0);
-            logAfterMethod(TechnicalLogSeverity.TRACE, "removeContainer");
-        } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "removeContainer", e);
-            throw new SDataInstanceReadException(e);
-        }
-
-    }
-
-    private void deleteDataInstanceVisibilityMapping(final SDataInstanceVisibilityMapping sDataInstanceVisibilityMapping) throws SDataInstanceException {
-        final DeleteRecord record = new DeleteRecord(sDataInstanceVisibilityMapping);
-        final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATA_VISIBILITY_MAPPING).done();
-        try {
-            recorder.recordDelete(record, deleteEvent);
-        } catch (final SRecorderException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "deleteDataInstanceVisibilityMapping", e);
-            throw new SDataInstanceException(e);
-        }
-    }
-
-    @Override
-    public List<SDataInstanceVisibilityMapping> createDataContainer(final long containerId, final String containerType, final boolean shouldArchiveMapping)
-            throws SDataInstanceException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "createDataContainer");
-        try {
-            final List<SDataInstanceVisibilityMapping> listSDataInstanceVisibilityMapping = insertMappingForLocalElement(containerId, containerType,
-                    shouldArchiveMapping);
-            logAfterMethod(TechnicalLogSeverity.TRACE, "createDataContainer");
-            return listSDataInstanceVisibilityMapping;
-        } catch (final SRecorderException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "createDataContainer", e);
-            throw new SDataInstanceException(e);
-        }
-    }
-
-    protected List<SDataInstanceVisibilityMapping> insertMappingForLocalElement(final long containerId, final String containerType,
-            final boolean shouldArchiveMapping) throws SRecorderException,
-            SDataInstanceException {
-        final int batchSize = 50;
-        int currentIndex = 0;
-        final long archiveDate = System.currentTimeMillis();
-        List<SDataInstance> localDataInstances = getLocalDataInstances(containerId, containerType, 0, batchSize);
-        final List<SDataInstanceVisibilityMapping> mappings = new ArrayList<SDataInstanceVisibilityMapping>(localDataInstances.size());
-        while (localDataInstances != null && localDataInstances.size() > 0) {
-            for (final SDataInstance sDataInstance : localDataInstances) {
-                mappings.add(insertDataInstanceVisibilityMapping(containerId, containerType, sDataInstance.getName(), sDataInstance.getId(), archiveDate,
-                        shouldArchiveMapping));
-            }
-            currentIndex += batchSize;
-            localDataInstances = getLocalDataInstances(containerId, containerType, currentIndex, batchSize);
-        }
-        return mappings;
-    }
-
-    /**
-     * Insert mapping to be able to tell which is the data that is visible from the container:
-     * i.e. with the given name on the given container the visible data have the id given by the visibility mapping
-     *
-     * @param containerId
-     * @param containerType
-     * @param dataName
-     * @param dataInstanceId
-     * @param archiveDate
-     * @param shouldArchive
-     *        true if we create an archived version of the mapping
-     * @throws SRecorderException
-     * @throws SDefinitiveArchiveNotFound
-     */
-    protected SDataInstanceVisibilityMapping insertDataInstanceVisibilityMapping(final long containerId, final String containerType, final String dataName,
-            final long dataInstanceId, final long archiveDate, final boolean shouldArchive) throws SRecorderException {
-        final SDataInstanceVisibilityMapping mapping = createDataInstanceVisibilityMapping(containerId, containerType, dataName, dataInstanceId);
-        final InsertRecord record = new InsertRecord(mapping);
-        final SInsertEvent insertEvent = (SInsertEvent) BuilderFactory.get(SEventBuilderFactory.class).createInsertEvent(DATA_VISIBILITY_MAPPING).done();
-        recorder.recordInsert(record, insertEvent);
-        // add archived mapping also because when the data change the archive mapping will be used to retrieve old value
-        final SADataInstanceVisibilityMapping archivedMapping = BuilderFactory.get(SADataInstanceVisibilityMappingBuilderFactory.class)
-                .createNewInstance(containerId, containerType, dataName, dataInstanceId, mapping.getId()).done();
-        if (shouldArchive) {
-            archiveService.recordInsert(archiveDate, new ArchiveInsertRecord(archivedMapping));
-        }
-        return mapping;
-    }
-
-    protected SDataInstanceVisibilityMapping createDataInstanceVisibilityMapping(final long containerId, final String containerType, final String dataName,
-            final long dataInstanceId) {
-        return BuilderFactory.get(SDataInstanceVisibilityMappingBuilderFactory.class).createNewInstance(containerId, containerType, dataName, dataInstanceId)
-                .done();
-    }
-
-    @Override
-    public SADataInstance getSADataInstance(final long containerId, final String containerType, final String dataName, final long time)
+    public SADataInstance getSADataInstance(final long containerId, final String containerType,
+            final ParentContainerResolver parentContainerResolver, final String dataName, final long time)
             throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getSADataInstance");
-        try {
-            final long dataInstanceId = getSADataInstanceDataVisibilityMapping(dataName, containerId, containerType);
-            final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-            final Map<String, Object> parameters = new HashMap<String, Object>(2);
-            parameters.put("dataInstanceId", dataInstanceId);
-            parameters.put("time", time);
-            final SADataInstance saDataInstance = readPersistenceService.selectOne(new SelectOneDescriptor<SADataInstance>(
-                    "getSADataInstanceByDataInstanceIdAndArchiveDate", parameters, SADataInstance.class));
-            logAfterMethod(TechnicalLogSeverity.TRACE, "getSADataInstance");
-            return saDataInstance;
-        } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getSADataInstance", e);
-            throw new SDataInstanceReadException("Unable to read SADataInstance", e);
-        }
+        // try {
+        // final long dataInstanceId = getSADataInstanceDataVisibilityMapping(dataName, containerId, containerType);
+        // final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+        // final Map<String, Object> parameters = new HashMap<String, Object>(2);
+        // parameters.put("dataInstanceId", dataInstanceId);
+        // parameters.put("time", time);
+        // final SADataInstance saDataInstance = readPersistenceService.selectOne(new SelectOneDescriptor<SADataInstance>(
+        // "getSADataInstanceByDataInstanceIdAndArchiveDate", parameters, SADataInstance.class));
+        // logAfterMethod(TechnicalLogSeverity.TRACE, "getSADataInstance");
+        // return saDataInstance;
+        // } catch (final SBonitaReadException e) {
+        // logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getSADataInstance", e);
+        // throw new SDataInstanceReadException("Unable to read SADataInstance", e);
+        // }
+        return null;
     }
 
     @Override
@@ -452,7 +277,8 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public SADataInstance getLastSADataInstance(final String dataName, final long containerId, final String containerType) throws SDataInstanceException {
+    public SADataInstance getLastSADataInstance(final String dataName, final long containerId, final String containerType,
+            final ParentContainerResolver parentContainerResolver) throws SDataInstanceException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance");
         final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         final Map<String, Object> parameters = new HashMap<String, Object>(1);
@@ -496,13 +322,14 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public long getNumberOfDataInstances(final long containerId, final DataInstanceContainer containerType) throws SDataInstanceReadException {
+    public long getNumberOfDataInstances(final long containerId, final DataInstanceContainer containerType,
+            final ParentContainerResolver parentContainerResolver) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getNumberOfDataInstances");
         final HashMap<String, Object> parameters = new HashMap<String, Object>(2);
         parameters.put("containerId", containerId);
         parameters.put("containerType", containerType.toString());
         final SelectOneDescriptor<Long> selectOneDescriptor = new SelectOneDescriptor<Long>("getNumberOfDataInstancesForContainer", parameters,
-                SDataInstanceVisibilityMapping.class);
+                SDataInstance.class);
         Long dataInstanceId;
         try {
             dataInstanceId = persistenceService.selectOne(selectOneDescriptor);
@@ -515,47 +342,55 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public List<SDataInstance> getDataInstances(final List<String> dataNames, final long containerId, final String containerType)
+    public List<SDataInstance> getDataInstances(final List<String> dataNames, final long containerId, final String containerType,
+            final ParentContainerResolver parentContainerResolver)
             throws SDataInstanceException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getDataInstances");
         NullCheckingUtil.checkArgsNotNull(dataNames, containerType);
         if (dataNames.isEmpty()) {
             return Collections.emptyList();
         }
-        try {
-            final List<Long> dataInstanceIds = getDataInstanceDataVisibilityMapping(dataNames, containerId, containerType);
-            final ArrayList<SDataInstance> finalResult = new ArrayList<SDataInstance>(dataNames.size());
-            finalResult.addAll(getDataInstances(dataInstanceIds));
-            logAfterMethod(TechnicalLogSeverity.TRACE, "getDataInstances");
-            return finalResult;
-        } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstances", e);
-            throw new SDataInstanceReadException("Unable to find the data in the data mapping with name = " + dataNames + ", containerId = " + containerId
-                    + ", containerType = " + containerType, e);
+        // try {
+        // final List<Long> dataInstanceIds = getDataInstanceDataVisibilityMapping(dataNames, containerId, containerType);
+        // final ArrayList<SDataInstance> finalResult = new ArrayList<SDataInstance>(dataNames.size());
+        // finalResult.addAll(getDataInstances(dataInstanceIds));
+        // logAfterMethod(TechnicalLogSeverity.TRACE, "getDataInstances");
+        // return finalResult;
+        // } catch (final SBonitaReadException e) {
+        // logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstances", e);
+        // throw new SDataInstanceReadException("Unable to find the data in the data mapping with name = " + dataNames + ", containerId = " + containerId
+        // + ", containerType = " + containerType, e);
+        // }
+        final ArrayList<SDataInstance> finalResult = new ArrayList<SDataInstance>(dataNames.size());
+        for (String dataName : dataNames) {
+            finalResult.add(getDataInstance(dataName, containerId, containerType, parentContainerResolver));
         }
+        return finalResult;
     }
 
     @Override
-    public List<SADataInstance> getSADataInstances(final long containerId, final String containerType, final List<String> dataNames, final long time)
+    public List<SADataInstance> getSADataInstances(final long containerId, final String containerType,
+            final ParentContainerResolver parentContainerResolver, final List<String> dataNames, final long time)
             throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getSADataInstances");
         if (dataNames.isEmpty()) {
             return Collections.emptyList();
         }
-        try {
-            final List<Long> dataInstanceIds = getSADataInstanceDataVisibilityMapping(dataNames, containerId, containerType);
-            final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-            final Map<String, Object> parameters = new HashMap<String, Object>(2);
-            parameters.put("dataInstanceIds", dataInstanceIds);
-            parameters.put("time", time);
-            final List<SADataInstance> listSADataInstance = readPersistenceService.selectList(new SelectListDescriptor<SADataInstance>(
-                    "getSADataInstancesByDataInstanceIdAndArchiveDate", parameters, SADataInstance.class, new QueryOptions(0, dataInstanceIds.size())));
-            logAfterMethod(TechnicalLogSeverity.TRACE, "getSADataInstances");
-            return listSADataInstance;
-        } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getSADataInstances", e);
-            throw new SDataInstanceReadException("Unable to read SADataInstance", e);
-        }
+        // try {
+        // final List<Long> dataInstanceIds = getSADataInstanceDataVisibilityMapping(dataNames, containerId, containerType);
+        // final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+        // final Map<String, Object> parameters = new HashMap<String, Object>(2);
+        // parameters.put("dataInstanceIds", dataInstanceIds);
+        // parameters.put("time", time);
+        // final List<SADataInstance> listSADataInstance = readPersistenceService.selectList(new SelectListDescriptor<SADataInstance>(
+        // "getSADataInstancesByDataInstanceIdAndArchiveDate", parameters, SADataInstance.class, new QueryOptions(0, dataInstanceIds.size())));
+        // logAfterMethod(TechnicalLogSeverity.TRACE, "getSADataInstances");
+        // return listSADataInstance;
+        // } catch (final SBonitaReadException e) {
+        // logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getSADataInstances", e);
+        // throw new SDataInstanceReadException("Unable to read SADataInstance", e);
+        // }
+        return Collections.emptyList();
     }
 
     @Override
@@ -598,43 +433,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
                 deleteSADataInstance(sDataInstance);
             }
         } while (!sDataInstances.isEmpty());
-        deleteArchivedContainer(containerId, containerType);
-    }
-
-    private void deleteArchivedContainer(final long containerId, final String containerType) throws SDataInstanceException {
-        try {
-            List<SADataInstanceVisibilityMapping> visibilityMappings;
-            do {
-                visibilityMappings = getSADataInstanceVisibilityMappings(containerId, containerType, 0, 100);
-                for (final SADataInstanceVisibilityMapping sDataInstanceVisibilityMapping : visibilityMappings) {
-                    deleteSADataInstanceVisibilityMapping(sDataInstanceVisibilityMapping);
-                }
-            } while (visibilityMappings.size() > 0);
-        } catch (final SBonitaReadException e) {
-            throw new SDataInstanceReadException(e);
-        }
-    }
-
-    private void deleteSADataInstanceVisibilityMapping(final SADataInstanceVisibilityMapping sDataInstanceVisibilityMapping) throws SDataInstanceException {
-        final DeleteRecord record = new DeleteRecord(sDataInstanceVisibilityMapping);
-        final SDeleteEvent deleteEvent = (SDeleteEvent) BuilderFactory.get(SEventBuilderFactory.class).createDeleteEvent(DATA_VISIBILITY_MAPPING).done();
-        try {
-            recorder.recordDelete(record, deleteEvent);
-        } catch (final SRecorderException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "deleteSADataInstanceVisibilityMapping", e);
-            throw new SDataInstanceException(e);
-        }
-    }
-
-    protected List<SADataInstanceVisibilityMapping> getSADataInstanceVisibilityMappings(final long containerId, final String containerType,
-            final int fromIndex, final int numberOfResults) throws SBonitaReadException {
-        final HashMap<String, Object> parameters = new HashMap<String, Object>(2);
-        parameters.put("containerId", containerId);
-        parameters.put("containerType", containerType);
-        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfResults, SADataInstanceVisibilityMapping.class, "id", OrderByType.ASC);
-        final SelectListDescriptor<SADataInstanceVisibilityMapping> selectDescriptor = new SelectListDescriptor<SADataInstanceVisibilityMapping>(
-                "getSADataInstanceVisibilityMappings", parameters, SADataInstanceVisibilityMapping.class, queryOptions);
-        return persistenceService.selectList(selectDescriptor);
     }
 
     @Override
@@ -650,7 +448,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
                 sDataInstances = getLocalDataInstances(containerId, dataInstanceContainerType, 0, deleteBatchSize);
             }
         }
-        removeContainer(containerId, dataInstanceContainerType);
     }
 
     private void logBeforeMethod(final TechnicalLogSeverity technicalLogSeverity, final String methodName) {

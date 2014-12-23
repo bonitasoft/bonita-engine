@@ -24,17 +24,3 @@ CREATE TABLE arch_data_instance (
 );
 CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId,containerId, sourceObjectId);
 CREATE INDEX idx2_arch_data_instance ON arch_data_instance (sourceObjectId, containerId, archiveDate, id, tenantId);
-
-CREATE TABLE arch_data_mapping (
-    tenantid NUMBER(19, 0) NOT NULL,
-	id NUMBER(19, 0) NOT NULL,
-	containerId NUMBER(19, 0),
-	containerType VARCHAR2(60 CHAR),
-	dataName VARCHAR2(50 CHAR),
-	dataInstanceId NUMBER(19, 0) NOT NULL,
-	archiveDate NUMBER(19, 0) NOT NULL,
-	sourceObjectId NUMBER(19, 0) NOT NULL,
-	PRIMARY KEY (tenantid, id)
-);
-CREATE INDEX idx1_arch_data_mapping ON arch_data_mapping (tenantId,containerId, dataInstanceId, sourceObjectId);
-CREATE INDEX idx2_arch_data_mapping ON arch_data_mapping (containerId, containerType, tenantid);

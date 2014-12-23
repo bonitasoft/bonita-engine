@@ -10,10 +10,10 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **
+ ** 
  * @since 6.2
  */
-package org.bonitasoft.engine.core.operation.impl;
+package org.bonitasoft.engine.operation;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -21,6 +21,7 @@ import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
@@ -35,8 +36,11 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
 
     private final DataInstanceService dataInstanceService;
 
-    public DataLeftOperandHandler(final DataInstanceService dataInstanceService) {
+    private final ParentContainerResolver parentContainerResolver;
+
+    public DataLeftOperandHandler(final DataInstanceService dataInstanceService, final ParentContainerResolver parentContainerResolver) {
         this.dataInstanceService = dataInstanceService;
+        this.parentContainerResolver = parentContainerResolver;
     }
 
     @Override
@@ -106,7 +110,7 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
     }
 
     protected SDataInstance getDataInstance(final String dataInstanceName, final long containerId, final String containerType) throws SDataInstanceException {
-        return dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType);
+        return dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType, parentContainerResolver);
     }
 
     @Override

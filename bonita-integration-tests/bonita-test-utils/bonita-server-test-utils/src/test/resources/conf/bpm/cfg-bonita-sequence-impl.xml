@@ -9,9 +9,7 @@
 				<entry key="30" value="10000" /><!-- queriable log -->
 				<entry key="31" value="200000" /><!-- queriable log parameter -->
 				<entry key="10020" value="5000" /><!-- data -->
-				<entry key="10021" value="5000" /><!-- DataInstanceVisibilityMapping -->
 				<entry key="20050" value="25000" /><!-- archived data --><!-- 5 change by data -->
-				<entry key="20051" value="25000" /><!-- SADataInstanceVisibilityMapping -->
 				<entry key="10060" value="20000" /><!-- comment -->
 				<entry key="10080" value="20000" /><!-- SAComment -->
 				<entry key="10110" value="20000" /><!-- TokenCount -->
@@ -107,7 +105,6 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl" value="10020" />
-				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" value="10021" />
 				<entry key="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" value="10070" />
 				<entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl" value="10090" />
 				<entry key="org.bonitasoft.engine.actor.mapping.model.impl.SActorImpl" value="10000" />
@@ -165,7 +162,6 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl" value="20050" />
-				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" value="20051" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl" value="20010" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl" value="20011" />
 				<entry key="org.bonitasoft.engine.core.process.instance.model.archive.impl.SAActivityInstanceImpl" value="20011" />

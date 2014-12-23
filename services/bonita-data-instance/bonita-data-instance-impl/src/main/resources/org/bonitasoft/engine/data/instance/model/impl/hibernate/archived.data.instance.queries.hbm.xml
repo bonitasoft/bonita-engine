@@ -45,29 +45,6 @@
 		ORDER BY sa.archiveDate DESC
 	</query>
 
-	<query name="getSADataInstanceIdFromMapping">
-		SELECT saDataInstanceVisibilityMapping.dataInstanceId
-		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl AS saDataInstanceVisibilityMapping
-		WHERE saDataInstanceVisibilityMapping.dataName = :dataName
-		AND saDataInstanceVisibilityMapping.containerId = :containerId
-		AND saDataInstanceVisibilityMapping.containerType = :containerType
-	</query>
-
-	<query name="getSADataInstanceIdsFromMapping">
-		SELECT saDataInstanceVisibilityMapping.dataInstanceId
-		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl AS saDataInstanceVisibilityMapping
-		WHERE saDataInstanceVisibilityMapping.dataName IN (:dataNames)
-		AND saDataInstanceVisibilityMapping.containerId = :containerId
-		AND saDataInstanceVisibilityMapping.containerType = :containerType
-	</query>
-
-	<query name="getSADataInstanceVisibilityMappings">
-		SELECT saDataInstanceVisibilityMapping
-		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl AS saDataInstanceVisibilityMapping
-		WHERE saDataInstanceVisibilityMapping.containerId = :containerId
-		AND saDataInstanceVisibilityMapping.containerType = :containerType
-	</query>
-
 	<query name="getLocalSADataInstances">
 		SELECT sa
 		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS sa
