@@ -13,6 +13,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -159,7 +160,7 @@ public class ServerAPIExtTest {
                 FakeTenantLevelAPI.class.getMethod("platformAPIMethod", new Class[0]), session, false);
 
         // Then:
-        verify(serverAPIExtSpy, never()).isTenantAvailable(anyLong(), any(Session.class), false);
+        verify(serverAPIExtSpy, never()).isTenantAvailable(anyLong(), any(Session.class), eq(false));
     }
 
     @Test
