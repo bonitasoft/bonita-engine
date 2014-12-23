@@ -279,8 +279,8 @@ public abstract class AbstractEventIT extends TestWithUser {
      * @since 6.0
      */
     public ProcessDefinition deployAndEnableProcessMultiInstanceWithBoundaryEvent(final long timerValue, final boolean interrupting,
-            final String multiTaskName,
-            final int loopCardinality, final boolean isSequential, final String normalFlowTaskName, final String exceptionFlowTaskName) throws BonitaException {
+            final String multiTaskName, final int loopCardinality, final boolean isSequential, final String normalFlowTaskName,
+            final String exceptionFlowTaskName) throws BonitaException {
         final Expression timerExpr = new ExpressionBuilder().createConstantLongExpression(timerValue);
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithMultiInstanceAndBoundaryEvent", "1.0");
@@ -338,7 +338,7 @@ public abstract class AbstractEventIT extends TestWithUser {
         return deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
     }
 
-    protected void executeRemainingSequencialMultiInstancesOrLoop(final String taskName, final ProcessInstance processInstance, final int nbOfRemainingInstances)
+    protected void waitForUserTasksAndExecuteIt(final String taskName, final ProcessInstance processInstance, final int nbOfRemainingInstances)
             throws Exception {
         for (int i = 0; i < nbOfRemainingInstances; i++) {
             waitForUserTaskAndExecuteIt(taskName, processInstance, user);
