@@ -89,6 +89,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEve
 import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
@@ -341,7 +342,7 @@ public class ProcessAPIImplTest {
         doReturn("foo").when(sDataFoo).getName();
         final SDataInstance sDataBar = mock(SDataInstance.class);
         doReturn("bar").when(sDataBar).getName();
-        doReturn(asList(sDataFoo, sDataBar)).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString());
+        doReturn(asList(sDataFoo, sDataBar)).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString(), null);
 
         // Then update the data instances
         final Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
@@ -359,7 +360,7 @@ public class ProcessAPIImplTest {
     public void should_updateProcessDataInstances_call_DataInstance_on_non_existing_data_throw_UpdateException() throws Exception {
         final long processInstanceId = 42l;
         doReturn(null).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
-        doThrow(new SDataInstanceReadException("Mocked")).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString());
+        doThrow(new SDataInstanceReadException("Mocked")).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString(), null);
 
         // Then update the data instances
         final Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
@@ -601,13 +602,14 @@ public class ProcessAPIImplTest {
         when(processDefinitionService.getProcessDefinition(anyLong())).thenReturn(processDef);
         final SActivityInstance activityInstance = mock(SActivityInstance.class);
         when(activityInstanceService.getActivityInstance(anyLong())).thenReturn(activityInstance);
+        final ParentContainerResolver parentContainerResolver = mock(ParentContainerResolver.class);
         final SFlowElementContainerDefinition flowElementContainerDefinition = mock(SFlowElementContainerDefinition.class);
         when(processDef.getProcessContainer()).thenReturn(flowElementContainerDefinition);
         when(flowElementContainerDefinition.getFlowNode(anyLong())).thenReturn(mock(SActivityDefinition.class));
 
         final SDataInstance dataInstance = mock(SDataInstance.class);
         when(dataInstanceService.getDataInstances(anyListOf(String.class), anyLong(),
-                eq(DataInstanceContainer.ACTIVITY_INSTANCE.toString()))).thenReturn(Arrays.asList(dataInstance));
+                eq(DataInstanceContainer.ACTIVITY_INSTANCE.toString()), parentContainerResolver)).thenReturn(Arrays.asList(dataInstance));
 
         doReturn(mock(SOperation.class)).when(processAPI).convertOperation(operation);
 

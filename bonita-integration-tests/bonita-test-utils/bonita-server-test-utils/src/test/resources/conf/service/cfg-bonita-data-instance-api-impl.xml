@@ -5,13 +5,12 @@
 		<constructor-arg name="recorder" ref="tenantRecorderSync" />
 		<constructor-arg name="persistenceService" ref="persistenceService" />
 		<constructor-arg name="archiveService" ref="archiveService" />
-        <constructor-arg name="processInstanceService" ref="processInstanceService" />
-        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService" />
 		<constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
 	</bean>
 
 	<bean id="dataExpressionExecutorStrategy" class="org.bonitasoft.engine.data.instance.api.DataExpressionExecutorStrategy">
 		<constructor-arg name="dataService" ref="dataInstanceService" />
+		<constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
 	</bean>
 
 </beans>

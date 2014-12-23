@@ -28,6 +28,7 @@
 
     <bean id="dataLeftOperandHandler" class="org.bonitasoft.engine.core.operation.impl.DataLeftOperandHandler">
         <constructor-arg name="dataInstanceService" ref="dataInstanceService"/>
+        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
     </bean>
 
     <bean id="transientDataLeftOperandHandler" class="org.bonitasoft.engine.operation.TransientDataLeftOperandHandler">
