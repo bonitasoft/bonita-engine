@@ -32,10 +32,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.api.ProcessAPI;
 
-public class ProcessSupervisedTest extends CommonAPISPTest {
+public class ProcessSupervisedTest extends CommonAPISPIT {
 
     private List<User> users;
 
@@ -83,7 +83,7 @@ public class ProcessSupervisedTest extends CommonAPISPTest {
     public void searchArchivedFlowNodeInstancesSupervisedBy() throws Exception {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(0).getId());
         final User user = users.get(0);
-        waitForUserTaskAndExecuteIt("userTask1", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "userTask1", user);
         waitForProcessToFinish(processInstance);
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -158,7 +158,7 @@ public class ProcessSupervisedTest extends CommonAPISPTest {
         final List<FlowNodeInstance> result = searchFlowNodeInstancesSupervisedBy.getResult();
         assertEquals("userTask1", result.get(0).getName());
 
-        waitForUserTaskAndExecuteIt("userTask1", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "userTask1", user);
         waitForProcessToFinish(processInstance);
 
         builder = new SearchOptionsBuilder(0, 10);
@@ -176,14 +176,14 @@ public class ProcessSupervisedTest extends CommonAPISPTest {
         final ActivityInstance failedTask = waitForTaskToFail(processInstance);
         assertEquals(failingTaskName, failedTask.getName());
 
-        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
+        final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         // builder.filter("status", "failed");
         builder.sort(ActivityInstanceSearchDescriptor.NAME, Order.ASC);
         SearchResult<FlowNodeInstance> searchFlowNodeInstancesSupervisedBy = getProcessAPI().searchFlowNodeInstancesSupervisedBy(
                 user.getId(), builder.done());
         assertEquals(0, searchFlowNodeInstancesSupervisedBy.getCount());
 
-        ProcessSupervisor failedProcessSupervisor = getProcessAPI().createProcessSupervisorForUser(processDefinitions.get(1).getId(), user.getId());
+        final ProcessSupervisor failedProcessSupervisor = getProcessAPI().createProcessSupervisorForUser(processDefinitions.get(1).getId(), user.getId());
 
         searchFlowNodeInstancesSupervisedBy = getProcessAPI().searchFlowNodeInstancesSupervisedBy(
                 user.getId(), builder.done());
@@ -199,7 +199,7 @@ public class ProcessSupervisedTest extends CommonAPISPTest {
     public void searchArchivedActivityInstancesSupervisedByShouldFind2Activities() throws Exception {
         final User user = users.get(0);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(0).getId());
-        waitForUserTaskAndExecuteIt("userTask1", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "userTask1", user);
         waitForProcessToFinish(processInstance);
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -219,7 +219,7 @@ public class ProcessSupervisedTest extends CommonAPISPTest {
         final User user = users.get(0);
         final ProcessDefinition processDefinition = processDefinitions.get(0);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("userTask1", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "userTask1", user);
         waitForProcessToFinish(processInstance);
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);

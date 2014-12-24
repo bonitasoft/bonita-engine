@@ -43,12 +43,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.BuildTestUtilSP;
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
-public class ProcessManagementTest extends CommonAPISPTest {
+public class ProcessManagementTest extends CommonAPISPIT {
 
     private User john;
 
@@ -75,7 +75,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         final ProcessInstance processInstance = getProcessAPI().startProcess(john.getId(), processDefinition.getId());
 
         // make userTask1 as parentTask
-        final ActivityInstance parentTask = waitForUserTaskAndAssigneIt(userTaskName, processInstance, john);
+        final ActivityInstance parentTask = waitForUserTaskAndAssigneIt(processInstance, userTaskName, john);
         final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
         assertEquals(1, toDoTasks.size());
         assertEquals(userTaskName, toDoTasks.get(0).getName());
@@ -147,8 +147,8 @@ public class ProcessManagementTest extends CommonAPISPTest {
         final User jack = createUser("jack", "bpm");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("userTask0", processInstance);
-        final HumanTaskInstance userTask1 = waitForUserTaskAndAssigneIt("userTask1", processInstance, john);
+        waitForUserTask(processInstance, "userTask0");
+        final HumanTaskInstance userTask1 = waitForUserTaskAndAssigneIt(processInstance, "userTask1", john);
 
         // add sub task
         final Date dueDate = new Date(System.currentTimeMillis());
@@ -160,8 +160,8 @@ public class ProcessManagementTest extends CommonAPISPTest {
                 TaskPriority.LOWEST);
         getProcessAPI().addManualUserTask(taskCreator);
 
-        waitForUserTask("newTask'1", processInstance);
-        waitForUserTask("newTask'2", processInstance);
+        waitForUserTask(processInstance, "newTask'1");
+        waitForUserTask(processInstance, "newTask'2");
 
         assertEquals(2, getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null).size());
         assertEquals(1, getProcessAPI().getAssignedHumanTaskInstances(jack.getId(), 0, 10, null).size());
@@ -193,7 +193,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(john.getId(), processDefinition.getId());
-        final HumanTaskInstance parentTask = waitForUserTaskAndAssigneIt("userTask", processInstance, john);
+        final HumanTaskInstance parentTask = waitForUserTaskAndAssigneIt(processInstance, "userTask", john);
 
         // add sub task
         final Date dueDate = new Date(System.currentTimeMillis());
@@ -205,8 +205,8 @@ public class ProcessManagementTest extends CommonAPISPTest {
                 TaskPriority.ABOVE_NORMAL);
         final ManualTaskInstance manualUserTask2 = getProcessAPI().addManualUserTask(taskCreator);
 
-        waitForUserTask("newManualTask1", processInstance);
-        waitForUserTask("newManualTask2", processInstance);
+        waitForUserTask(processInstance, "newManualTask1");
+        waitForUserTask(processInstance, "newManualTask2");
 
         // archive sub task:
         // archive first children tasks:
@@ -216,7 +216,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         getProcessAPI().executeFlowNode(manualUserTask2.getId());
         waitForFlowNodeInCompletedState(processInstance, "newManualTask2", true);
 
-        executeFlowNodeUntilEnd(parentTask.getId());
+        getProcessAPI().executeFlowNode(parentTask.getId());
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -233,7 +233,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         processBuilder.addActor(ACTOR_NAME).addDescription("test process with archived sub tasks").addUserTask(userTaskName, ACTOR_NAME);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, userWhoCreateTheManualTask);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance parentTask = waitForUserTaskAndAssigneIt(userTaskName, processInstance, userWhoCreateTheManualTask);
+        final ActivityInstance parentTask = waitForUserTaskAndAssigneIt(processInstance, userTaskName, userWhoCreateTheManualTask);
 
         // Add sub task
         final ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newManualTask1", john.getId(), "add new manual user task",
@@ -247,7 +247,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         // archive first children tasks:
         getProcessAPI().executeFlowNode(manualUserTask.getId());
 
-        executeFlowNodeUntilEnd(parentTask.getId());
+        getProcessAPI().executeFlowNode(parentTask.getId());
         waitForProcessToFinish(processInstance);
 
         final ArchivedActivityInstance archivedActivityInstance = getProcessAPI().getArchivedActivityInstance(manualUserTask.getId());
@@ -336,7 +336,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
                 .buildProcessDefinitionWithFailedConnectorOnUserTask("testArchiveTaskShouldArchiveSubtasks");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorThatThrowException(processBuilder, ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(john.getId(), processDefinition.getId());
-        final ActivityInstance parentTask = waitForUserTaskAndAssigneIt("StepWithFailedConnector", processInstance, john);
+        final ActivityInstance parentTask = waitForUserTaskAndAssigneIt(processInstance, "StepWithFailedConnector", john);
 
         // add sub task
         final ManualTaskCreator taskCreator = new ManualTaskCreator(parentTask.getId(), "newManualTask1").setAssignTo(john.getId());
@@ -365,7 +365,7 @@ public class ProcessManagementTest extends CommonAPISPTest {
         processBuilder.addActor(ACTOR_NAME).addDescription("test Archive Task Should Archive Subtasks").addUserTask(userTaskName, ACTOR_NAME);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(john.getId(), processDefinition.getId());
-        final ActivityInstance parentTask = waitForUserTaskAndAssigneIt(userTaskName, processInstance, john);
+        final ActivityInstance parentTask = waitForUserTaskAndAssigneIt(processInstance, userTaskName, john);
 
         // add sub task
         final Date dueDate = new Date(System.currentTimeMillis());

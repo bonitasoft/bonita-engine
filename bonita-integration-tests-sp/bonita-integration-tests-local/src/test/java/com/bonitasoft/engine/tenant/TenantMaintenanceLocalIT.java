@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.TestsInitializerSP;
 
 /**
@@ -34,7 +34,7 @@ import com.bonitasoft.engine.TestsInitializerSP;
  */
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializerSP.class)
-public class TenantMaintenanceLocalIT extends CommonAPISPTest {
+public class TenantMaintenanceLocalIT extends CommonAPISPIT {
 
     protected User USER;
 

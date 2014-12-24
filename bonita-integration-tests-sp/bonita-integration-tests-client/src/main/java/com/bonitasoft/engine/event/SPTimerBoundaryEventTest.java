@@ -31,12 +31,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
 @SuppressWarnings("javadoc")
-public class SPTimerBoundaryEventTest extends CommonAPISPTest {
+public class SPTimerBoundaryEventTest extends CommonAPISPIT {
 
     private User donaBenta;
 
@@ -99,7 +99,7 @@ public class SPTimerBoundaryEventTest extends CommonAPISPTest {
         final ProcessDefinition processDefinition = deployProcessWithBoundaryEvent(timerDuration, false);
         try {
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-            final ActivityInstance step1 = waitForUserTask("step1", processInstance);
+            final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
 
             ManualTaskInstance manualUserTask = null;
             if (addChild) {
@@ -109,7 +109,7 @@ public class SPTimerBoundaryEventTest extends CommonAPISPTest {
                 manualUserTask = getProcessAPI().addManualUserTask(taskCreator);
             }
 
-            final HumanTaskInstance exceptionStep = waitForUserTask("exceptionStep", processInstance);
+            final HumanTaskInstance exceptionStep = waitForUserTask(processInstance, "exceptionStep");
 
             ArchivedActivityInstance archActivityInst = waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
             if (manualUserTask != null) {

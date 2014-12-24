@@ -30,10 +30,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 
-public class HiddenTaskTest extends CommonAPISPTest {
+public class HiddenTaskTest extends CommonAPISPIT {
 
     private ProcessDefinition processDefinition;
 

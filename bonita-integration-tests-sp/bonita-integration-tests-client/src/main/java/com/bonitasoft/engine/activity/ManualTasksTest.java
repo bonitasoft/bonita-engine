@@ -23,11 +23,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
-public class ManualTasksTest extends CommonAPISPTest {
+public class ManualTasksTest extends CommonAPISPIT {
 
     private static final String JOHN = "john";
 
@@ -35,14 +35,14 @@ public class ManualTasksTest extends CommonAPISPTest {
     public void afterTest() throws BonitaException {
         deleteUser(JOHN);
         VariableStorage.clearAll();
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     @Before
     public void beforeTest() throws BonitaException {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         createUser(JOHN, "bpm");
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith(JOHN, "bpm");
     }
 
@@ -58,7 +58,7 @@ public class ManualTasksTest extends CommonAPISPTest {
         final User user = createUser("login1", "password");
         final ProcessDefinition processDefinition = deployProcessWithUserTask(user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance task = waitForUserTask("Request", startProcess.getId());
+        final ActivityInstance task = waitForUserTask(startProcess, "Request");
         final long taskId = task.getId();
         loginOnDefaultTenantWithDefaultTechnicalUser();
         loginOnDefaultTenantWith("login1", "password");

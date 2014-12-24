@@ -129,8 +129,8 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorThatThrowException(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
-        final ActivityInstance step2 = waitForUserTask("step2", processInstance);
+        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
+        final ActivityInstance step2 = waitForUserTask(processInstance, "step2");
         final List<ConnectorInstance> connectorInstances = getProcessAPI().getConnectorInstancesOfActivity(step1.getId(), 0, 10,
                 ConnectorInstanceCriterion.DEFAULT);
         assertThat(connectorInstances, nameAre("myConnector1", "myConnector2", "myConnector3", "myConnector4", "myConnector5", "myConnector6"));
@@ -196,7 +196,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorThatThrowException(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step1", processInstance);
+        waitForUserTask(processInstance, "step1");
         final List<ConnectorInstance> connectorInstances = getProcessAPI().getConnectorInstancesOfProcess(processInstance.getId(), 0, 10,
                 ConnectorInstanceCriterion.DEFAULT);
         assertThat(connectorInstances, nameAre("myConnector1", "myConnector2", "myConnector3", "myConnector4", "myConnector5", "myConnector6"));
@@ -534,7 +534,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         designProcessDefinition.addUserTask("step1", ACTOR_NAME).addShortTextData(dataName, dataDefaultValueExpression);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
+        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
 
         // execute connector with operations:
         // connector return param1="welcome Lily and Lucy and Mett"
@@ -581,13 +581,12 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorEngineExecutionContext(processDefinitionBuilderExt,
                 ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
+        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
 
         final Map<String, Serializable> res = getProcessAPI().executeConnectorOnActivityInstance(
                 "org.bonitasoft.connector.testConnectorEngineExecutionContext", "1.0", Collections.<String, Expression> emptyMap(),
                 Collections.<String, Map<String, Serializable>> emptyMap(), Collections.singletonList(operation),
                 Collections.<String, Serializable> emptyMap(), step1.getId());
-
         assertEquals(processDefinition.getId(), res.get("externalData"));
 
         // Clean up
@@ -609,7 +608,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         designProcessDefinition.addUserTask("step1", ACTOR_NAME).addLongData(dataName, new ExpressionBuilder().createConstantLongExpression(5L));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
+        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
 
         final List<Operation> operations = new ArrayList<Operation>();
         operations
@@ -650,8 +649,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         designProcessDefinition.addUserTask("step1", ACTOR_NAME).addShortTextData("valueOfInput3", input3DefaultExpression);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
-        assignAndExecuteStep(step1, user);
+        final ActivityInstance step1 = waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         waitForProcessToFinish(processInstance);
 
         // execute connector with operations:
@@ -690,8 +688,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorEngineExecutionContext(processDefinitionBuilderExt,
                 ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
-        assignAndExecuteStep(step1, user);
+        final ActivityInstance step1 = waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         waitForProcessToFinish(processInstance);
 
         final Map<String, Serializable> res = getProcessAPI().executeConnectorOnCompletedActivityInstance(
@@ -724,7 +721,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         waitForProcessToFinish(processInstance);
 
         // execute connector with operations:
@@ -766,7 +763,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorEngineExecutionContext(processDefinitionBuilderExt,
                 ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         waitForProcessToFinish(processInstance);
 
         final Map<String, Serializable> res = getProcessAPI().executeConnectorOnCompletedProcessInstance(
@@ -799,7 +796,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step1", processInstance);
+        waitForUserTask(processInstance, "step1");
 
         // execute connector with operations:
         // connector return param1="welcome Lily and Lucy and Mett"
@@ -843,7 +840,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorEngineExecutionContext(processDefinitionBuilderExt,
                 ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step1", processInstance);
+        waitForUserTask(processInstance, "step1");
 
         final Map<String, Serializable> res = getProcessAPI().executeConnectorOnProcessInstance(
                 "org.bonitasoft.connector.testConnectorEngineExecutionContext", "1.0", Collections.<String, Expression> emptyMap(),
@@ -884,10 +881,10 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // check first value is "Mett", then it's changed to "not Mett"
-        final ActivityInstance step0 = waitForUserTask("step0", processInstance);
+        final ActivityInstance step0 = waitForUserTask(processInstance, "step0");
         assertEquals("Mett", getProcessAPI().getProcessDataInstance(NAME_INPUT3, processInstance.getId()).getValue());
         assignAndExecuteStep(step0, user);
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
+        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
         assertEquals("not Mett", getProcessAPI().getProcessDataInstance(NAME_INPUT3, processInstance.getId()).getValue());
 
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
@@ -925,7 +922,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final HumanTaskInstance step0 = waitForUserTask("step0", processInstance);
+        final HumanTaskInstance step0 = waitForUserTask(processInstance, "step0");
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
         final Map<String, Map<String, Serializable>> inputValues = getInputValues(NAME_INPUT_MAIN, Arrays.asList(NAME_INPUT1, NAME_INPUT2),
                 Arrays.asList(VALUE_INPUT1, VALUE_INPUT2));
@@ -963,7 +960,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final HumanTaskInstance step0 = waitForUserTask("step0", processInstance);
+        final HumanTaskInstance step0 = waitForUserTask(processInstance, "step0");
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
         final Map<String, Map<String, Serializable>> inputValues = getInputValues(NAME_INPUT_MAIN, Arrays.asList(NAME_INPUT1, NAME_INPUT2),
                 Arrays.asList(VALUE_INPUT1, VALUE_INPUT2));
@@ -997,7 +994,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance activity = waitForUserTask("step0", processInstance);
+        final HumanTaskInstance activity = waitForUserTask(processInstance, "step0");
 
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
         connectorInputParameters.put("returnNotSerializableOutput", new ExpressionBuilder().createConstantBooleanExpression(true));
@@ -1035,10 +1032,9 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         designProcessDefinition.addTransition("step0", "step1");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance activity = waitForUserTask("step0", processInstance);
-        assignAndExecuteStep(activity, user);
+        final ActivityInstance activity = waitForUserTaskAndExecuteIt(processInstance, "step0", user);
         // step0 should be completed
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
+        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
 
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
         final Map<String, Map<String, Serializable>> inputValues = getInputValues(NAME_INPUT_MAIN, Arrays.asList(NAME_INPUT1, NAME_INPUT2),
@@ -1078,7 +1074,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final ActivityInstance activity = waitForUserTask("step0", processInstance);
+        final ActivityInstance activity = waitForUserTask(processInstance, "step0");
         final long activityId = activity.getId();
         final List<DataInstance> activityDataInstances = getProcessAPI().getActivityDataInstances(activityId, 0, 5);
 
@@ -1127,7 +1123,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        waitForUserTaskAndExecuteIt("step0", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step0", user);
         waitForProcessToFinish(processInstance);
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
         final Map<String, Map<String, Serializable>> inputValues = getInputValues(NAME_INPUT_MAIN, Arrays.asList(NAME_INPUT1, NAME_INPUT2),
@@ -1164,7 +1160,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final ActivityInstance activity = waitForUserTask("step0", processInstance);
+        final ActivityInstance activity = waitForUserTask(processInstance, "step0");
         // verify the retrieved data
         final List<DataInstance> processDataInstances = getProcessAPI().getProcessDataInstances(processInstance.getId(), 0, 5);
 
@@ -1210,8 +1206,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-
-        waitForUserTask("step0", processInstance);
+        waitForUserTask(processInstance, "step0");
 
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
         final Map<String, Map<String, Serializable>> inputValues = getInputValues(NAME_INPUT_MAIN, Arrays.asList(NAME_INPUT1, NAME_INPUT2),
@@ -1245,8 +1240,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         designProcessDefinition.addShortTextData(NAME_INPUT3, input3DefaultExpression);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithExternalTestConnectorAndActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-
-        waitForUserTask("step0", processInstance);
+        waitForUserTask(processInstance, "step0");
 
         final Map<String, Expression> connectorInputParameters = getConnectorInputParameters(NAME_INPUT_MAIN, mainExp);
         connectorInputParameters.put("returnNotSerializableOutput", new ExpressionBuilder().createConstantBooleanExpression(true));
@@ -1473,7 +1467,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
 
     private void waitForStep2AndCheckDataInstanceValue(final String exptectedValue, final String dataName, final ProcessInstance procInst) throws Exception,
             DataNotFoundException {
-        waitForUserTask("step2", procInst);
+        waitForUserTask(procInst, "step2");
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(dataName, procInst.getId());
         assertEquals(exptectedValue, dataInstance.getValue());
     }
@@ -1513,7 +1507,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorWithOutputAndParameter(definitionBuilder, ACTOR_NAME, user,
                 Collections.singletonMap("key1", "Hello world!"));
         final ProcessInstance instance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step1", instance);
+        waitForUserTask(instance, "step1");
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(processData, instance.getId());
         assertEquals("Hello world!", dataInstance.getValue());
@@ -1535,7 +1529,7 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnector(designProcessDefinition, ACTOR_NAME, user);
         for (int i = 0; i < 10; i++) {
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-            waitForUserTaskAndExecuteIt("step0", processInstance, user);
+            waitForUserTaskAndExecuteIt(processInstance, "step0", user);
         }
         for (int i = 0; i < 10; i++) {
             getProcessAPI().startProcess(processDefinition.getId());
@@ -1550,19 +1544,17 @@ public class RemoteConnectorExecutionTestSP extends ConnectorExecutionTest {
         final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActorAndTestConnector2(designProcessDefinition, ACTOR_NAME, userForTenant2);
         for (int i = 0; i < 10; i++) {
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition2.getId());
-            waitForUserTaskAndExecuteIt("step0", processInstance, userForTenant2);
+            waitForUserTaskAndExecuteIt(processInstance, "step0", userForTenant2);
         }
         for (int i = 0; i < 10; i++) {
             getProcessAPI().startProcess(processDefinition2.getId());
         }
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
-
-        waitForUserTask("step0", processInstance2.getId());
+        waitForUserTask(processInstance2.getId(), "step0");
         getProcessAPI().deleteProcessInstances(processDefinition2.getId());
 
         // Clean up
         BPMTestSPUtil.deactivateAndDeleteTenant(tenant2Id);
-
         loginOnDefaultTenantWithDefaultTechnicalUser();
         disableAndDeleteProcess(processDefinition);
     }

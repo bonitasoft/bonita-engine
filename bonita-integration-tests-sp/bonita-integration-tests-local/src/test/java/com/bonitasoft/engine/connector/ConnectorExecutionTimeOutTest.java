@@ -93,7 +93,7 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorWithCustomType(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = this.waitForUserTask("step1", process);
+        final ActivityInstance step1 = waitForUserTask(process, "step1");
         final Map<String, Expression> params = Collections.emptyMap();
         final Map<String, Map<String, Serializable>> input = Collections.emptyMap();
         final Map<String, Serializable> results = getProcessAPI().executeConnectorOnActivityInstance("connectorWithCustomType", "1.0.0", params, input,

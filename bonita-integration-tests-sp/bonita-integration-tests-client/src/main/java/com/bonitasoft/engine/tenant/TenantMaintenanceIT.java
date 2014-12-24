@@ -45,7 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bonitasoft.engine.BPMTestSPUtil;
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.TestsInitializerSP;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
@@ -55,7 +55,7 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
  */
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializerSP.class)
-public class TenantMaintenanceIT extends CommonAPISPTest {
+public class TenantMaintenanceIT extends CommonAPISPIT {
 
     private static final String CRON_EXPRESSION_EACH_SECOND = "*/1 * * * * ?";
 
@@ -159,7 +159,7 @@ public class TenantMaintenanceIT extends CommonAPISPTest {
 
         // Start a process instance. The connector should work.
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
+        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
 
         final Map<String, Serializable> res = getProcessAPI().executeConnectorOnActivityInstance(
                 "org.bonitasoft.connector.testConnectorEngineExecutionContext", "1.0", Collections.<String, Expression> emptyMap(),
