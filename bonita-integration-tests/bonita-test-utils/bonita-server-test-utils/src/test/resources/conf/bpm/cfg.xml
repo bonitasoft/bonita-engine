@@ -140,6 +140,7 @@
         <constructor-arg name="workService" ref="workService"/>
         <constructor-arg name="tokenService" ref="tokenService"/>
         <constructor-arg name="identityService" ref="identityService"/>
+        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
     </bean>
 
     <bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">
