@@ -419,14 +419,12 @@ public class ActivityCommandExtTest extends CommonAPISPIT {
         final String mainInputName1 = "param1";
 
         final ProcessInstance parentProcessInstance = getProcessAPI().startProcess(parentProcessDefinition.getId());
-        final ActivityInstance step2 = waitForUserTask("step2");
-        getProcessAPI().assignUserTask(step2.getId(), businessUser.getId());
+        final ActivityInstance step2 = waitForUserTaskAndAssigneIt("step2", businessUser);
 
         // Expressions
         final Expression input1Expression = new ExpressionBuilder().createInputExpression(inputName1, String.class.getName());
         final Expression mainExp = new ExpressionBuilder().createExpression(mainInputName1, "'Welcome '+valueOfInput1",
-                ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(),
-                String.class.getName(), "GROOVY", Arrays.asList(input1Expression));
+                ExpressionType.TYPE_READ_ONLY_SCRIPT.toString(), String.class.getName(), "GROOVY", Arrays.asList(input1Expression));
 
         final HashMap<String, Serializable> fieldValues = new HashMap<String, Serializable>();
         fieldValues.put(inputName1, "Lily");

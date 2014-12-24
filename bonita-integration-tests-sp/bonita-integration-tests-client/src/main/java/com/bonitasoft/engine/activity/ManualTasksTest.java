@@ -10,7 +10,6 @@ package com.bonitasoft.engine.activity;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -58,8 +57,7 @@ public class ManualTasksTest extends CommonAPISPIT {
         final User user = createUser("login1", "password");
         final ProcessDefinition processDefinition = deployProcessWithUserTask(user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance task = waitForUserTask(startProcess, "Request");
-        final long taskId = task.getId();
+        final long taskId = waitForUserTask(startProcess, "Request");
         loginOnDefaultTenantWithDefaultTechnicalUser();
         loginOnDefaultTenantWith("login1", "password");
         getProcessAPI().assignUserTask(taskId, user.getId());

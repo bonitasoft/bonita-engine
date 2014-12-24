@@ -34,7 +34,6 @@ import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.data.DataInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ConfigurationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -369,11 +368,11 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
 
-        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         final String employeeToString = getEmployeeToString("myEmployee", processInstance.getId());
         assertThat(employeeToString).isEqualTo("Employee [firstName=Jane, lastName=Doe]");
 
-        assignAndExecuteStep(userTask, matti);
+        assignAndExecuteStep(step1Id, matti);
         waitForUserTask(processInstance, "step2");
         final String people = getEmployeeToString(secondBizData, processInstance.getId());
         assertThat(people).isEqualTo("Employee [firstName=Jane, lastName=Doe]");
@@ -807,7 +806,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
 
-        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
         expressions.put(new ExpressionBuilder().createQueryBusinessDataExpression("countEmployee", "Employee.countEmployee", Long.class.getName()),
                 Collections.<String, Serializable> emptyMap());
@@ -816,7 +815,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
         assertThat(result.get("countEmployee")).isEqualTo(1L);
 
-        assignAndExecuteStep(userTask, matti.getId());
+        assignAndExecuteStep(step1Id, matti);
         waitForUserTask(processInstance, "step2");
         result = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
         assertThat(result.get("countEmployee")).isEqualTo(0L);
@@ -883,11 +882,11 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
 
-        final HumanTaskInstance userTask = waitForUserTask(instance, "step1");
+        final long step1Id = waitForUserTask(instance, "step1");
         String employeeToString = getEmployeesToString("myEmployees", instance.getId());
         assertThat(employeeToString).isEqualTo("Employee [firstName=[Jane, John], lastName=[Doe, Doe]]");
 
-        assignAndExecuteStep(userTask, matti.getId());
+        assignAndExecuteStep(step1Id, matti);
         waitForUserTask(instance, "step2");
         employeeToString = getEmployeesToString("myEmployees", instance.getId());
         assertThat(employeeToString).isEqualTo("Employee [firstName=[Jane, John, Jack], lastName=[Doe, Doe, Doe]]");
@@ -1202,12 +1201,12 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
 
-        final HumanTaskInstance userTask = waitForUserTask(instance, "step1");
+        final long step1Id = waitForUserTask(instance, "step1");
         String employeeToString = getEmployeesToString("myEmployees", instance.getId());
         assertThat(firstNames(employeeToString)).isEmpty();
         assertThat(lastNames(employeeToString)).isEmpty();
 
-        assignAndExecuteStep(userTask, matti.getId());
+        assignAndExecuteStep(step1Id, matti);
         waitForUserTask(instance, "step2");
         employeeToString = getEmployeesToString("myEmployees", instance.getId());
         assertThat(firstNames(employeeToString)).containsOnlyOnce("Jane", "John");

@@ -93,11 +93,11 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorWithCustomType(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask(process, "step1");
+        final long step1Id = waitForUserTask(process, "step1");
         final Map<String, Expression> params = Collections.emptyMap();
         final Map<String, Map<String, Serializable>> input = Collections.emptyMap();
         final Map<String, Serializable> results = getProcessAPI().executeConnectorOnActivityInstance("connectorWithCustomType", "1.0.0", params, input,
-                step1.getId());
+                step1Id);
 
         // execute command:
         final String commandName = "getUpdatedVariableValuesForActivityInstance";
@@ -115,7 +115,7 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
         final HashMap<String, Serializable> currentvalues = new HashMap<String, Serializable>();
         currentvalues.put("value", "test");
         commandParameters.put("CURRENT_VARIABLE_VALUES_MAP_KEY", currentvalues);
-        commandParameters.put("ACTIVITY_INSTANCE_ID_KEY", step1.getId());
+        commandParameters.put("ACTIVITY_INSTANCE_ID_KEY", step1Id);
         @SuppressWarnings("unchecked")
         final Map<String, Serializable> updatedVariable = (Map<String, Serializable>) getCommandAPI().execute(commandName, commandParameters);
         assertEquals("value", updatedVariable.get("value"));

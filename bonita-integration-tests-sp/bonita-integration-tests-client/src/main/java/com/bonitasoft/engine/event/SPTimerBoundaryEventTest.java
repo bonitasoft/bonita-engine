@@ -12,9 +12,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
 
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
@@ -99,25 +97,25 @@ public class SPTimerBoundaryEventTest extends CommonAPISPIT {
         final ProcessDefinition processDefinition = deployProcessWithBoundaryEvent(timerDuration, false);
         try {
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-            final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
+            final long step1Id = waitForUserTask(processInstance, "step1");
 
             ManualTaskInstance manualUserTask = null;
             if (addChild) {
-                getProcessAPI().assignUserTask(step1.getId(), donaBenta.getId());
-                final ManualTaskCreator taskCreator = buildManualTaskCreator(step1.getId(), "childOfStep1", donaBenta.getId(), "child task",
+                getProcessAPI().assignUserTask(step1Id, donaBenta.getId());
+                final ManualTaskCreator taskCreator = buildManualTaskCreator(step1Id, "childOfStep1", donaBenta.getId(), "child task",
                         new Date(), TaskPriority.NORMAL);
                 manualUserTask = getProcessAPI().addManualUserTask(taskCreator);
             }
 
-            final HumanTaskInstance exceptionStep = waitForUserTask(processInstance, "exceptionStep");
+            final long exceptionStepId = waitForUserTask(processInstance, "exceptionStep");
 
-            ArchivedActivityInstance archActivityInst = waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
+            ArchivedActivityInstance archActivityInst = waitForArchivedActivity(step1Id, TestStates.ABORTED);
             if (manualUserTask != null) {
                 archActivityInst = getProcessAPI().getArchivedActivityInstance(manualUserTask.getId());
                 assertEquals(TestStates.ABORTED.getStateName(), archActivityInst.getState());
             }
 
-            assignAndExecuteStep(exceptionStep, donaBenta.getId());
+            assignAndExecuteStep(exceptionStepId, donaBenta);
             waitForProcessToFinish(processInstance);
         } finally {
             disableAndDeleteProcess(processDefinition);

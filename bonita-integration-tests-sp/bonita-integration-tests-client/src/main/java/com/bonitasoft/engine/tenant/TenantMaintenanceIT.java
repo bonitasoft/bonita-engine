@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -159,12 +158,12 @@ public class TenantMaintenanceIT extends CommonAPISPIT {
 
         // Start a process instance. The connector should work.
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
 
         final Map<String, Serializable> res = getProcessAPI().executeConnectorOnActivityInstance(
                 "org.bonitasoft.connector.testConnectorEngineExecutionContext", "1.0", Collections.<String, Expression> emptyMap(),
                 Collections.<String, Map<String, Serializable>> emptyMap(), Collections.singletonList(operation),
-                Collections.<String, Serializable> emptyMap(), step1.getId());
+                Collections.<String, Serializable> emptyMap(), step1Id);
 
         assertEquals(processDefinition.getId(), res.get("externalData"));
 

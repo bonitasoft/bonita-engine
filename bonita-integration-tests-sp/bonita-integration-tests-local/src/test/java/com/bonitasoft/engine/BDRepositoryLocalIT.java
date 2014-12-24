@@ -163,7 +163,7 @@ public class BDRepositoryLocalIT extends CommonAPISPIT {
 
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        final HumanTaskInstance humanTaskInstance = waitForUserTask(processInstance, TASK_HUMAN_TASK);
+        final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(processInstance, TASK_HUMAN_TASK);
 
         //then
         verifyLazyAddressesCount(humanTaskInstance, 2);
