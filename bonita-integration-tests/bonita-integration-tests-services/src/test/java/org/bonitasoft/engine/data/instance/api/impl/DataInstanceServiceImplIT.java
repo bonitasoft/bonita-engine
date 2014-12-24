@@ -20,6 +20,7 @@ import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.data.instance.DataInstanceServiceTest;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.TenantHibernatePersistenceService;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -32,15 +33,16 @@ public class DataInstanceServiceImplIT extends DataInstanceServiceTest {
 
     private static DataInstanceServiceImpl dataInstanceServiceImpl;
 
+    private static ParentContainerResolver parentContainerResolver;
+
     @BeforeClass
     public static void setupImplementation() {
         final Recorder recorder = getServicesBuilder().buildTenantRecorder();
-        final ProcessInstanceService processInstanceService = getServicesBuilder().buildProcessInstanceService();
-        final FlowNodeInstanceService activityInstanceService = getServicesBuilder().buildActivityInstanceService();
         final TenantHibernatePersistenceService persistenceService = getServicesBuilder().buildTenantPersistenceService();
         final TechnicalLoggerService technicalLoggerService = getServicesBuilder().buildTechnicalLoggerService();
         final ArchiveService archiveService = getServicesBuilder().buildArchiveService();
-        dataInstanceServiceImpl = new DataInstanceServiceImpl(recorder, persistenceService, archiveService, processInstanceService, activityInstanceService,
+        parentContainerResolver = getServicesBuilder().buildParentContainerResolver();
+        dataInstanceServiceImpl = new DataInstanceServiceImpl(recorder, persistenceService, archiveService,
                 technicalLoggerService);
         final CacheService cacheService = getServicesBuilder().buildCacheService();
         try {

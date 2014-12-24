@@ -31,5 +31,32 @@
         WHERE dataInstance.containerId = :containerId
         AND dataInstance.containerType = :containerType
 	</query>
+
+	<query name="getDataInstancesOfContainers">
+		SELECT dataInstance
+		FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+		WHERE
+		dataInstance.containerType = 'ACTIVITY_INSTANCE' AND dataInstance.containerId in(:activityInstanceContainerIds)
+		OR
+		dataInstance.containerType = 'PROCESS_INSTANCE' AND dataInstance.containerId in(:processInstanceContainerIds)
+		OR
+		dataInstance.containerType = 'MESSAGE_INSTANCE' AND dataInstance.containerId in(:messageInstanceContainerIds)
+	</query>
+
+	<query name="getDataInstanceWithNameOfContainers">
+		SELECT dataInstance
+		FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+		WHERE
+		dataInstance.name = :dataName
+		AND
+		(
+		dataInstance.containerType = 'ACTIVITY_INSTANCE' AND dataInstance.containerId in(:activityInstanceContainerIds)
+		OR
+		dataInstance.containerType = 'PROCESS_INSTANCE' AND dataInstance.containerId in(:processInstanceContainerIds)
+		OR
+		dataInstance.containerType = 'MESSAGE_INSTANCE' AND dataInstance.containerId in(:messageInstanceContainerIds)
+		)
+	</query>
+
 	
 </hibernate-mapping>

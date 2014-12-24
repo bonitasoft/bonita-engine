@@ -23,6 +23,7 @@ import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilde
 import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.SXMLDataInstance;
@@ -55,10 +56,13 @@ public abstract class DataInstanceServiceTest extends CommonServiceTest {
 
     protected DataInstanceService dataInstanceService;
 
+    protected static ParentContainerResolver parentContainerResolver;
+
     protected abstract DataInstanceService getDataInstanceServiceImplementation();
 
     static {
         expressionService = getServicesBuilder().buildExpressionService();
+        parentContainerResolver = getServicesBuilder().buildParentContainerResolver();
     }
 
     @Before
@@ -308,7 +312,7 @@ public abstract class DataInstanceServiceTest extends CommonServiceTest {
         dataNames.add(instance1Name);
         dataNames.add(instance2Name);
         getTransactionService().begin();
-        final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(dataNames, containerId, containerType);
+        final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(dataNames, containerId, containerType, parentContainerResolver);
         getTransactionService().complete();
         assertEquals(2, dataInstances.size());
         assertThat("Not all data instances have been found", Arrays.asList(dataInstances.get(0), dataInstances.get(1)),
@@ -318,7 +322,7 @@ public abstract class DataInstanceServiceTest extends CommonServiceTest {
     @Test
     public void getSADataInstancesWithEmptyList() throws Exception {
         getTransactionService().begin();
-        final List<SADataInstance> dataInstances = dataInstanceService.getSADataInstances(13544L, "dummyContainerType", Arrays.<String> asList(), 1111111L);
+        final List<SADataInstance> dataInstances = dataInstanceService.getSADataInstances(13544L, "dummyContainerType", parentContainerResolver, Arrays.<String> asList(), 1111111L);
         getTransactionService().complete();
         assertEquals(0, dataInstances.size());
     }

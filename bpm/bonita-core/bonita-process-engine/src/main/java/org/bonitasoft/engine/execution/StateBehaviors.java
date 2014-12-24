@@ -186,7 +186,7 @@ public class StateBehaviors {
 
     private final TokenService tokenService;
 
-    private final ParentContainerResolver parentContainerResolver;
+    protected final ParentContainerResolver parentContainerResolver;
 
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
             final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,

@@ -1,5 +1,8 @@
 package org.bonitasoft.engine.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
@@ -29,38 +32,50 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
     }
 
     @Override
-    public Pair<Long, String> getParentContainer(final Pair<Long, String> container) throws SObjectNotFoundException, SObjectReadException {
-        final long containerId = container.getLeft();
-        final String containerType = container.getRight();
-        if (DataInstanceContainer.ACTIVITY_INSTANCE.name().equals(containerType)) {
-            SFlowNodeInstance flowNodeInstance;
-            try {
-                flowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(containerId);
-            } catch (SFlowNodeNotFoundException e) {
-                throw new SObjectNotFoundException(e);
-            } catch (SFlowNodeReadException e) {
-                throw new SObjectReadException(e);
-            }
-            return new Pair<Long, String>(flowNodeInstance.getParentContainerId(), getContainerType(flowNodeInstance.getParentContainerType()));
-        } else if (DataInstanceContainer.MESSAGE_INSTANCE.name().equals(containerType)) {
-            return null;
-        } else if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(containerType)) {
-            try {
-                final SProcessInstance processInstance = processInstanceService.getProcessInstance(containerId);
-                final SFlowNodeType callerType = processInstance.getCallerType();
-                if (callerType.equals(SFlowNodeType.SUB_PROCESS)) {
-                    return new Pair<Long, String>(processInstance.getCallerId(), DataInstanceContainer.PROCESS_INSTANCE.name());
-                } else {
-                    return null;
+    public List<Pair<Long, String>> getContainerHierarchy(final Pair<Long, String> currentContainer) throws SObjectNotFoundException, SObjectReadException {
+        Pair<Long, String> container = new Pair<Long, String>(currentContainer.getLeft(), currentContainer.getRight());
+
+        final List<Pair<Long, String>> containerHierarchy = new ArrayList<Pair<Long, String>>();
+        containerHierarchy.add(container);
+
+
+        do {
+            if (DataInstanceContainer.ACTIVITY_INSTANCE.name().equals(container.getRight())) {
+                SFlowNodeInstance flowNodeInstance;
+                try {
+                    flowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(container.getLeft());
+                } catch (SFlowNodeNotFoundException e) {
+                    throw new SObjectNotFoundException(e);
+                } catch (SFlowNodeReadException e) {
+                    throw new SObjectReadException(e);
                 }
-            } catch (SProcessInstanceNotFoundException e) {
-                throw new SObjectNotFoundException(e);
-            } catch (SProcessInstanceReadException e) {
-                throw new SObjectReadException(e);
+                container = new Pair<Long, String>(flowNodeInstance.getParentContainerId(), getContainerType(flowNodeInstance.getParentContainerType()));
+                containerHierarchy.add(container);
+                if (flowNodeInstance.getParentContainerType().equals(SFlowElementsContainerType.PROCESS) && flowNodeInstance.getParentContainerId() == flowNodeInstance.getRootContainerId()) {
+                    container = null;
+                }
+            } else if (DataInstanceContainer.MESSAGE_INSTANCE.name().equals(container.getRight())) {
+                container = null;
+            } else if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(container.getRight())) {
+                try {
+                    final SProcessInstance processInstance = processInstanceService.getProcessInstance(container.getLeft());
+                    final SFlowNodeType callerType = processInstance.getCallerType();
+                    if (callerType != null && callerType.equals(SFlowNodeType.SUB_PROCESS)) {
+                        container = new Pair<Long, String>(processInstance.getCallerId(), DataInstanceContainer.PROCESS_INSTANCE.name());
+                        containerHierarchy.add(container);
+                    } else {
+                        container = null;
+                    }
+                } catch (SProcessInstanceNotFoundException e) {
+                    throw new SObjectNotFoundException(e);
+                } catch (SProcessInstanceReadException e) {
+                    throw new SObjectReadException(e);
+                }
+            } else {
+                throw new SObjectNotFoundException("Unknown container type: " + container.getRight());
             }
-        } else {
-            throw new SObjectNotFoundException("Unknown container type: " + containerType);
-        }
+        } while(container != null);
+        return containerHierarchy;
     }
 
     private String getContainerType(final SFlowElementsContainerType flowElementsContainerType) throws SObjectNotFoundException {

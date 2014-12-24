@@ -13,12 +13,7 @@
  **/
 package org.bonitasoft.engine.data.instance.api.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
@@ -132,27 +127,25 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     public SDataInstance getDataInstance(final String dataName, final long containerId, final String containerType,
             final ParentContainerResolver parentContainerResolver) throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataName, containerType);
-        Pair<Long, String> currentContainer = new Pair<Long, String>(containerId, containerType);
-        SDataInstance dataInstance = null;
-        do {
-            dataInstance = internalGetLocalDataInstance(dataName, currentContainer.getLeft(), currentContainer.getRight());
-            if (dataInstance == null) {
-                try {
-                    currentContainer = parentContainerResolver.getParentContainer(currentContainer);
-                } catch (SObjectNotFoundException e) {
-                    throw new SDataInstanceNotFoundException(e);
-                } catch (SObjectReadException e) {
-                    throw new SDataInstanceNotFoundException(e);
-                }
-            }
-        } while (dataInstance == null && currentContainer != null);
 
-        if (dataInstance == null) {
-            throw new SDataInstanceNotFoundException("No data found with name " + dataName + "  neither on container " + containerId + " with type "
-                    + containerType
-                    + " nor in its parents");
+        final String queryName = "getDataInstanceWithNameOfContainers";
+        final Map<String, Object> inputParameters = new HashMap<String, Object>();
+        inputParameters.put("dataName", dataName);
+        final List<SDataInstance> dataInstances = getSDatainstanceOfContainers(containerId, containerType, parentContainerResolver, queryName, inputParameters);
+        if (dataInstances.size() == 0) {
+            final StringBuilder stb = new StringBuilder("DataInstance with name not found: [name: ");
+            stb.append(dataName).append(", container type: ").append(containerType);
+            stb.append(", container id: ").append(containerId).append(']');
+            throw new SDataInstanceNotFoundException(stb.toString());
+        } else if (dataInstances.size() > 1) {
+            //should never happen but in case...
+            final StringBuilder stb = new StringBuilder("Several data have been retrieved for: [name: ");
+            stb.append(dataName).append(", container type: ").append(containerType);
+            stb.append(", container id: ").append(containerId).append(']');
+            throw new SDataInstanceReadException(stb.toString());
+        } else {
+            return dataInstances.get(0);
         }
-        return dataInstance;
     }
 
     @Override
@@ -160,17 +153,76 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             final ParentContainerResolver parentContainerResolver, final int fromIndex, final int numberOfResults)
             throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(containerType);
-        // try {
-        // final List<SDataInstanceVisibilityMapping> mappings = getDataInstanceVisibilityMappings(containerId, containerType, fromIndex, numberOfResults);
-        // final ArrayList<SDataInstance> dataInstances = new ArrayList<SDataInstance>(mappings.size());
-        // for (final SDataInstanceVisibilityMapping mapping : mappings) {
-        // dataInstances.add(getDataInstance(mapping.getDataInstanceId()));
-        // }
-        // return dataInstances;
-        // } catch (final SBonitaReadException e) {
-        // throw new SDataInstanceReadException("Unable to read data mappings of the container with type " + containerType + " and id " + containerId, e);
-        // }
-        return getLocalDataInstances(containerId, containerType, fromIndex, numberOfResults);
+        final String queryName = "getDataInstancesOfContainers";
+        final Map<String, Object> inputParameters = new HashMap<String, Object>();
+        final List<SDataInstance> dataInstances = getSDatainstanceOfContainers(containerId, containerType, parentContainerResolver, queryName, inputParameters);
+
+        //apply pagination
+        final int startIndex = Math.max(0, fromIndex);
+        final int toIndex = Math.min(dataInstances.size(), fromIndex + numberOfResults);
+
+        return dataInstances.subList(startIndex, toIndex);
+    }
+
+    private List<SDataInstance> getSDatainstanceOfContainers(long containerId, String containerType, ParentContainerResolver parentContainerResolver, String queryName, Map<String, Object> inputParameters) throws SDataInstanceNotFoundException, SDataInstanceReadException {
+        //getallContainers from me to root
+        final List<Pair<Long, String>> containerHierarchy;
+        try {
+            containerHierarchy = parentContainerResolver.getContainerHierarchy(new Pair<Long, String>(containerId, containerType));
+        } catch (SObjectNotFoundException e) {
+            throw new SDataInstanceNotFoundException(e);
+        } catch (SObjectReadException e) {
+            throw new SDataInstanceNotFoundException(e);
+        }
+
+        final List<Long> activityInstanceContainerIds = new ArrayList<Long>();
+        final List<Long> processInstanceContainerIds = new ArrayList<Long>();
+        final List<Long> messageInstanceContainerIds = new ArrayList<Long>();
+
+        for (Pair<Long, String> container : containerHierarchy) {
+            if (container.getRight().equals(DataInstanceContainer.ACTIVITY_INSTANCE)) {
+                activityInstanceContainerIds.add(container.getLeft());
+            } else if (container.getRight().equals(DataInstanceContainer.PROCESS_INSTANCE)) {
+                processInstanceContainerIds.add(container.getLeft());
+            } else if (container.getRight().equals(DataInstanceContainer.MESSAGE_INSTANCE)) {
+                messageInstanceContainerIds.add(container.getLeft());
+            }
+        }
+
+        //select all data instance about those containers
+        final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
+        inputParameters.put("activityInstanceContainerIds", activityInstanceContainerIds);
+        inputParameters.put("processInstanceContainerIds", processInstanceContainerIds);
+        inputParameters.put("messageInstanceContainerIds", messageInstanceContainerIds);
+
+        //gte all data of any of th possible containers
+        List<SDataInstance> dataInstances = null;
+        try {
+            dataInstances = persistenceService.selectList(new SelectListDescriptor<SDataInstance>(queryName, inputParameters, SDataInstance.class, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS)));
+        } catch (final SBonitaReadException e) {
+            throw new SDataInstanceReadException("Unable to check if a data instance already exists: " + e.getMessage(), e);
+        }
+
+        //order the retrieved list by container level
+        Collections.sort(dataInstances, new Comparator<SDataInstance>() {
+            @Override
+            public int compare(SDataInstance o1, SDataInstance o2) {
+                final Pair<Long, String> o1Container = new Pair<Long, String>(o1.getContainerId(), o1.getContainerType());
+                final Pair<Long, String> o2Container = new Pair<Long, String>(o2.getContainerId(), o2.getContainerType());
+                return containerHierarchy.indexOf(o1Container) - containerHierarchy.indexOf(o2Container);
+            }
+        });
+
+        //remove duplicates
+        SDataInstance previous = null;
+        final Iterator<SDataInstance> it = dataInstances.iterator();
+        while (it.hasNext()) {
+            SDataInstance current = it.next();
+            if (previous != null && previous.getName().equals(current.getName())) {
+                it.remove();
+            }
+        }
+        return dataInstances;
     }
 
     @Override
@@ -325,20 +377,14 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     public long getNumberOfDataInstances(final long containerId, final DataInstanceContainer containerType,
             final ParentContainerResolver parentContainerResolver) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getNumberOfDataInstances");
-        final HashMap<String, Object> parameters = new HashMap<String, Object>(2);
-        parameters.put("containerId", containerId);
-        parameters.put("containerType", containerType.toString());
-        final SelectOneDescriptor<Long> selectOneDescriptor = new SelectOneDescriptor<Long>("getNumberOfDataInstancesForContainer", parameters,
-                SDataInstance.class);
-        Long dataInstanceId;
+        final List<SDataInstance> dataInstances;
         try {
-            dataInstanceId = persistenceService.selectOne(selectOneDescriptor);
-        } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getNumberOfDataInstances", e);
+            dataInstances = getDataInstances(containerId, containerType.name(), parentContainerResolver, 0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
+        } catch (SDataInstanceException e) {
             throw new SDataInstanceReadException(e);
         }
         logAfterMethod(TechnicalLogSeverity.TRACE, "getNumberOfDataInstances");
-        return dataInstanceId;
+        return dataInstances.size();
     }
 
     @Override
