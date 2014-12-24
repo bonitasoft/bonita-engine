@@ -14,8 +14,10 @@
 package org.bonitasoft.engine.identity.model.builder.impl;
 
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.identity.model.SUserLogin;
 import org.bonitasoft.engine.identity.model.builder.SUserBuilder;
 import org.bonitasoft.engine.identity.model.impl.SUserImpl;
+import org.bonitasoft.engine.identity.model.impl.SUserLoginImpl;
 
 /**
  * @author Baptiste Mesta
@@ -106,7 +108,7 @@ public class SUserBuilderImpl implements SUserBuilder {
 
     @Override
     public SUserBuilder setLastConnection(final Long lastConnection) {
-        entity.setLastConnection(lastConnection);
+        ((SUserLoginImpl)entity.getSUserLogin()).setLastConnection(lastConnection);
         return this;
     }
 

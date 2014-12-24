@@ -47,7 +47,7 @@ public class SUserBuilderFactoryImpl implements SUserBuilderFactory {
 
     static final String LAST_UPDATE = "lastUpdate";
 
-    static final String LAST_CONNECTION = "lastConnection";
+    static final String LAST_CONNECTION = "sUserLogin.lastConnection";
 
     static final String CREATED_BY = "createdBy";
 

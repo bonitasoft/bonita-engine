@@ -238,6 +238,7 @@ import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
 import org.bonitasoft.engine.identity.model.SRole;
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.identity.model.SUserLogin;
 import org.bonitasoft.engine.identity.model.SUserMembership;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilder;
 import org.bonitasoft.engine.identity.model.builder.SContactInfoBuilderFactory;
@@ -909,8 +910,9 @@ public class ModelConvertor {
         if (managerUserId > 0 && userIdToUser != null) {
             user.setManagerUserName(userIdToUser.get(managerUserId).getUserName());
         }
-        if (sUser.getLastConnection() != null) {
-            user.setLastConnection(new Date(sUser.getLastConnection()));
+        SUserLogin sUserLogin = sUser.getSUserLogin();
+        if (sUserLogin != null && sUserLogin.getLastConnection() != null) {
+            user.setLastConnection(new Date(sUserLogin.getLastConnection()));
         }
         return user;
     }

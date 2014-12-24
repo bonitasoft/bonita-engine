@@ -256,7 +256,7 @@ public class UserIT extends TestWithTechnicalUser {
     @Test
     public void getUsersByIDs() throws BonitaException {
         final User userCreated1 = getIdentityAPI().createUser("zhang", "engine");
-        final User userCreated2 = getIdentityAPI().createUser("jmege", "engine");
+         final User userCreated2 = getIdentityAPI().createUser("jmege", "engine");
 
         final List<Long> userIds = new ArrayList<Long>();
         userIds.add(userCreated1.getId());
