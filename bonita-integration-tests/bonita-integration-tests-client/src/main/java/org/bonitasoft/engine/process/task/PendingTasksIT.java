@@ -16,7 +16,6 @@ import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
@@ -95,8 +94,8 @@ public class PendingTasksIT extends TestWithTechnicalUser {
 
         // Wait for tasks in READY state:
         waitForUserTask(processInstance, "step1");
-        final HumanTaskInstance step2 = waitForUserTask(processInstance, "step2");
-        final HumanTaskInstance step3 = waitForUserTask(processInstance, "step3");
+        final long step2Id = waitForUserTask(processInstance, "step2");
+        final long step3Id = waitForUserTask(processInstance, "step3");
         waitForUserTask(processInstance, "step4");
 
         // 2 tasks should already be pending for me:
@@ -106,14 +105,14 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         assertEquals(2, humanTasksSearch.getCount());
 
         // Force assigning 'task3' (DESC name sort) to me (event though I am not an actor for it):
-        getProcessAPI().assignUserTask(step3.getId(), user.getId());
+        getProcessAPI().assignUserTask(step3Id, user.getId());
 
         // 3 tasks should now be available for me:
         humanTasksSearch = getProcessAPI().searchMyAvailableHumanTasks(user.getId(), searchOptions);
         assertEquals(3, humanTasksSearch.getCount());
 
         // Force assigning 'task2' (DESC name sort) to someone else than me (event though he is not an actor for it):
-        getProcessAPI().assignUserTask(step2.getId(), user2.getId());
+        getProcessAPI().assignUserTask(step2Id, user2.getId());
 
         // 2 tasks should now be available for me:
         humanTasksSearch = getProcessAPI().searchMyAvailableHumanTasks(user.getId(), searchOptions);
@@ -206,8 +205,7 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         final User user = createUser("login", "password");
         final ProcessDefinition processDefinition = deployProcessWithUserTask(user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance task = waitForUserTask(startProcess, "Request");
-        final long taskId = task.getId();
+        final long taskId = waitForUserTask(startProcess, "Request");
         getProcessAPI().assignUserTask(taskId, user.getId());
         getProcessAPI().assignUserTask(taskId, user.getId());
         assertEquals(1, getProcessAPI().getAssignedHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT).size());
@@ -221,8 +219,7 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         final User user2 = createUser("login2", "password");
         final ProcessDefinition processDefinition = deployProcessWithUserTask(user1);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance task = waitForUserTask(startProcess, "Request");
-        final long taskId = task.getId();
+        final long taskId = waitForUserTask(startProcess, "Request");
         getProcessAPI().assignUserTask(taskId, user1.getId());
         getProcessAPI().assignUserTask(taskId, user2.getId());
         logoutOnTenant();
@@ -273,8 +270,7 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         final User user = createUser("login1", "password");
         final ProcessDefinition processDefinition = deployProcessWithUserTask(user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance task = waitForUserTask(startProcess, "Request");
-        final long taskId = task.getId();
+        final long taskId = waitForUserTask(startProcess, "Request");
         getProcessAPI().assignUserTask(taskId, user.getId());
         getProcessAPI().releaseUserTask(taskId);
         getProcessAPI().releaseUserTask(taskId);
@@ -400,12 +396,12 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         designProcessDefinition.addUserTask("step1", "acme");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", jaakko);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
 
-        final List<User> possibleUsers = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done()).getResult();
+        final List<User> possibleUsers = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(step1Id, builder.done()).getResult();
         assertEquals(1, possibleUsers.size());
         assertEquals(jaakko, possibleUsers.get(0));
 
@@ -431,12 +427,12 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         designProcessDefinition.addUserTask("step1", "acme");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", jaakko);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
 
-        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(step1Id, builder.done());
         assertEquals(1, searchResult.getCount());
         final List<User> possibleUsers = searchResult.getResult();
         assertEquals(1, possibleUsers.size());
@@ -464,12 +460,12 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         designProcessDefinition.addUserTask("step1", "acme");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", role);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
 
-        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(step1Id, builder.done());
         assertEquals(1, searchResult.getCount());
         final List<User> possibleUsers = searchResult.getResult();
         assertEquals(1, possibleUsers.size());
@@ -497,12 +493,12 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         designProcessDefinition.addUserTask("step1", "acme");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", group);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
 
-        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(step1Id, builder.done());
         assertEquals(1, searchResult.getCount());
         final List<User> possibleUsers = searchResult.getResult();
         assertEquals(1, possibleUsers.size());
@@ -530,17 +526,16 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         }
 
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("getPossible_pagination", "1.1");
-        final String actorName = "major";
         final String activityName = "step1";
-        designProcessDefinition.addActor(actorName);
-        designProcessDefinition.addUserTask(activityName, actorName);
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), actorName, users);
+        designProcessDefinition.addActor(ACTOR_NAME);
+        designProcessDefinition.addUserTask(activityName, ACTOR_NAME);
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, users);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask(processInstance, activityName);
+        final long step1Id = waitForUserTask(processInstance, activityName);
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 30);
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
 
-        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(step1Id, builder.done());
         assertEquals(21, searchResult.getCount());
         final List<User> possibleUsers = searchResult.getResult();
         // make sure the list is not limited to 20:
@@ -570,12 +565,12 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         designProcessDefinition.addUserTask("step1", "acme");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", group);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
 
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(UserSearchDescriptor.USER_NAME, Order.ASC);
 
-        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(step1Id, builder.done());
         assertEquals(2, searchResult.getCount());
         List<User> possibleUsers = searchResult.getResult();
 
@@ -586,7 +581,7 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         builder = new SearchOptionsBuilder(1, 10);
         builder.sort(UserSearchDescriptor.USER_NAME, Order.ASC);
 
-        searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(step1Id, builder.done());
         assertEquals(2, searchResult.getCount());
         possibleUsers = searchResult.getResult();
         assertEquals(1, possibleUsers.size());
@@ -623,12 +618,12 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         getProcessAPI().addUserToActor("acme", processDefinition, jack.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         waitForUserTask(processInstance, "step2");
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 2);
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
 
-        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        final SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(step1Id, builder.done());
         assertEquals(1, searchResult.getCount());
         final List<User> possibleUsers = searchResult.getResult();
 
@@ -659,13 +654,13 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         designProcessDefinition.addUserTask("step1", "acme");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "acme", group);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
 
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(UserSearchDescriptor.USER_NAME, Order.ASC);
         builder.searchTerm("jac");
 
-        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        SearchResult<User> searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(step1Id, builder.done());
         assertEquals(1, searchResult.getCount());
         List<User> possibleUsers = searchResult.getResult();
 
@@ -676,7 +671,7 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         builder.sort(UserSearchDescriptor.USER_NAME, Order.ASC);
         builder.searchTerm("jaa");
 
-        searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(userTask.getId(), builder.done());
+        searchResult = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(step1Id, builder.done());
         assertEquals(1, searchResult.getCount());
         possibleUsers = searchResult.getResult();
         assertEquals(1, possibleUsers.size());

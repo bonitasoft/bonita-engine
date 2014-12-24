@@ -24,13 +24,13 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEvent("MySignal");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         getProcessAPI().sendSignal("MySignal");
 
         waitForUserTaskAndExecuteIt(processInstance, EXCEPTION_STEP, user);
 
         waitForProcessToFinish(processInstance);
-        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
+        waitForArchivedActivity(step1Id, TestStates.ABORTED);
 
         checkWasntExecuted(processInstance, "step2");
 
@@ -45,7 +45,7 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTaskAndExecuteIt(processInstance, "step1", user);
-        final ActivityInstance waitForUserTask = waitForUserTask(processInstance, "step2");
+        final long step2 = waitForUserTask(processInstance, "step2");
 
         getProcessAPI().sendSignal("MySignal1");
 
@@ -53,7 +53,7 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 
-        assignAndExecuteStep(waitForUserTask, user.getId());
+        assignAndExecuteStep(step2, user);
 
         waitForProcessToFinish(processInstance);
         checkWasntExecuted(processInstance, EXCEPTION_STEP);
@@ -70,7 +70,7 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
         final ProcessDefinition calledProcessDefinition = deployAndEnableSimpleProcess("calledProcess", "calledStep");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance calledStep = waitForUserTask(processInstance, "calledStep");
+        final ActivityInstance calledStep = waitForUserTaskAndGetIt(processInstance, "calledStep");
         final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
 
         getProcessAPI().sendSignal("MySignal");
@@ -96,11 +96,10 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
         final ProcessDefinition calledProcessDefinition = deployAndEnableSimpleProcess("calledProcess", "calledStep");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance calledStep = waitForUserTask(processInstance, "calledStep");
+        final ActivityInstance calledStep = waitForUserTaskAndExecuteIt(processInstance, "calledStep", user);
         final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
-        assignAndExecuteStep(calledStep, user.getId());
 
-        final ActivityInstance step2 = waitForUserTask(processInstance, "step2");
+        final long step2Id = waitForUserTask(processInstance, "step2");
         waitForProcessToFinish(calledProcessInstance);
 
         getProcessAPI().sendSignal("MySignal");
@@ -109,7 +108,7 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 
-        assignAndExecuteStep(step2, user.getId());
+        assignAndExecuteStep(step2Id, user);
         waitForProcessToFinish(processInstance);
 
         checkWasntExecuted(processInstance, EXCEPTION_STEP);
@@ -128,12 +127,12 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         getProcessAPI().sendSignal("MySignal");
         waitForUserTaskAndExecuteIt(processInstance, EXCEPTION_STEP, user);
 
         waitForProcessToFinish(processInstance);
-        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
+        waitForArchivedActivity(step1Id, TestStates.ABORTED);
 
         checkWasntExecuted(processInstance, "step2");
 
@@ -152,7 +151,7 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
         for (int i = 0; i < loopCardinality; i++) {
             waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         }
-        final ActivityInstance waitForUserTask = waitForUserTask(processInstance, "step2");
+        final long step2Id = waitForUserTask(processInstance, "step2");
 
         getProcessAPI().sendSignal("MySignal1");
 
@@ -160,7 +159,7 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 
-        assignAndExecuteStep(waitForUserTask, user.getId());
+        assignAndExecuteStep(step2Id, user);
 
         waitForProcessToFinish(processInstance);
         checkWasntExecuted(processInstance, EXCEPTION_STEP);
@@ -178,12 +177,12 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         getProcessAPI().sendSignal("MySignal");
         waitForUserTaskAndExecuteIt(processInstance, EXCEPTION_STEP, user);
 
         waitForProcessToFinish(processInstance);
-        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
+        waitForArchivedActivity(step1Id, TestStates.ABORTED);
 
         checkWasntExecuted(processInstance, "step2");
 
@@ -202,7 +201,7 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
         for (int i = 0; i < loopCardinality; i++) {
             waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         }
-        final ActivityInstance waitForUserTask = waitForUserTask(processInstance, "step2");
+        final long step2 = waitForUserTask(processInstance, "step2");
 
         getProcessAPI().sendSignal("MySignal1");
 
@@ -210,7 +209,7 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 
-        assignAndExecuteStep(waitForUserTask, user.getId());
+        assignAndExecuteStep(step2, user);
 
         waitForProcessToFinish(processInstance);
         checkWasntExecuted(processInstance, EXCEPTION_STEP);
@@ -227,12 +226,12 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         getProcessAPI().sendSignal("MySignal");
         waitForUserTaskAndExecuteIt(processInstance, EXCEPTION_STEP, user);
 
         waitForProcessToFinish(processInstance);
-        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
+        waitForArchivedActivity(step1Id, TestStates.ABORTED);
 
         checkWasntExecuted(processInstance, "step2");
 
@@ -250,7 +249,7 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
         for (int i = 0; i < loopMax; i++) {
             waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         }
-        final ActivityInstance waitForUserTask = waitForUserTask(processInstance, "step2");
+        final long step2Id = waitForUserTask(processInstance, "step2");
 
         getProcessAPI().sendSignal("MySignal1");
 
@@ -258,7 +257,7 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
                 getProcessAPI());
         assertFalse(waitForExceptionStep.waitUntil());
 
-        assignAndExecuteStep(waitForUserTask, user.getId());
+        assignAndExecuteStep(step2Id, user);
 
         waitForProcessToFinish(processInstance);
         checkWasntExecuted(processInstance, EXCEPTION_STEP);

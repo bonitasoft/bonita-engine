@@ -15,8 +15,6 @@ import java.util.Map.Entry;
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.data.DataInstance;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -167,10 +165,8 @@ public class OperationIT extends TestWithUser {
                     getProcessAPI().getProcessDataInstance(dataIndex.getKey(), startProcess.getId()).getValue());
         }
 
-        final ActivityInstance waitForStep0 = waitForUserTask(startProcess, "step0");
-        assignAndExecuteStep(waitForStep0, user.getId());
-
-        waitForUserTask(startProcess, "step2").getId();
+        waitForUserTaskAndExecuteIt(startProcess, "step0", user);
+        waitForUserTask(startProcess, "step2");
 
         for (final Entry<String, Integer> dataIndex : inverDataOrder.entrySet()) {
             assertEquals("after execution of operation " + dataIndex.getKey(), valueAfter.get(dataIndex.getValue()),
@@ -289,7 +285,7 @@ public class OperationIT extends TestWithUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), "Workers", user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance step1 = waitForUserTask(startProcess, "step1");
+        final long step1Id = waitForUserTask(startProcess, "step1");
 
         i = 0;
         for (final String defaultValue : defaultValues) {
@@ -297,7 +293,7 @@ public class OperationIT extends TestWithUser {
             i++;
             assertEquals(defaultValue, getProcessAPI().getProcessDataInstance(variableName, startProcess.getId()).getValue());
         }
-        assignAndExecuteStep(step1, user.getId());
+        assignAndExecuteStep(step1Id, user);
 
         waitForUserTask(startProcess, "step2");
         i = 0;
@@ -433,8 +429,8 @@ public class OperationIT extends TestWithUser {
         task1Def.addUserTask("step2", ACTOR_NAME).addTransition("step1", "step2");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance activityInstance = waitForUserTask(processInstance, "step2");
-        final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("myDatum", activityInstance.getId());
+        final long step2Id = waitForUserTask(processInstance, "step2");
+        final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("myDatum", step2Id);
 
         assertEquals(StringBuilder.class, activityDataInstance.getValue().getClass());
         assertEquals("_55", activityDataInstance.getValue().toString());

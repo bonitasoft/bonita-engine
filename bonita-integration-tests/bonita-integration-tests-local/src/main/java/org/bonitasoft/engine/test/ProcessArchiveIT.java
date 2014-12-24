@@ -88,11 +88,11 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p2 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask(p1, "step1");
-        final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("activityData", step1.getId());
+        final long step1Id = waitForUserTask(p1, "step1");
+        final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("activityData", step1Id);
         final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance("procData", p1.getId());
         assertNotNull(activityDataInstance);
-        assignAndExecuteStep(step1, john.getId());
+        assignAndExecuteStep(step1Id, john.getId());
         waitForUserTaskAndExecuteIt(p2, "step1", john);
         waitForUserTaskAndExecuteIt(p3, "step1", john);
         setSessionInfo(getSession()); // the session was cleaned by api call. This must be improved
@@ -186,7 +186,7 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p2 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance p3 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask(p1, "step1");
+        final long step1Id = waitForUserTask(p1, "step1");
         getProcessAPI().addProcessComment(p1.getId(), "A cool comment on p1");
         getProcessAPI().addProcessComment(p2.getId(), "A cool comment on p2");
         getProcessAPI().addProcessComment(p3.getId(), "A cool comment on p3");
@@ -204,7 +204,7 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
                 return null;
             }
         });
-        assignAndExecuteStep(step1, john.getId());
+        assignAndExecuteStep(step1Id, john.getId());
         waitForUserTaskAndExecuteIt(p2, "step1", john);
         waitForUserTaskAndExecuteIt(p3, "step1", john);
         waitForProcessToFinish(p1);
@@ -258,8 +258,7 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
         final ProcessDefinition callingProcessDef = deployAndEnableProcess(callingProcess.getProcess());
 
         final ProcessInstance p1 = getProcessAPI().startProcess(callingProcessDef.getId());
-        final ActivityInstance userTask = waitForUserTask(p1, "step1");
-        assignAndExecuteStep(userTask, john.getId());
+        final ActivityInstance userTask = waitForUserTaskAndExecuteIt(p1, "step1", john);
         waitForProcessToFinish(p1);
         waitForArchivedActivity(userTask.getId(), TestStates.NORMAL_FINAL);
         final ArchivedActivityInstance archivedUserTask = getProcessAPI().getArchivedActivityInstance(userTask.getId());
@@ -287,8 +286,7 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", john);
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance userTask = waitForUserTask(p1, "step1");
-        assignAndExecuteStep(userTask, john.getId());
+        final ActivityInstance userTask = waitForUserTaskAndExecuteIt(p1, "step1", john);
         waitForProcessToFinish(p1);
         final ArchivedActivityInstance archivedUserTask = getProcessAPI().getArchivedActivityInstance(userTask.getId());
         assertEquals(archivedUserTask, getProcessAPI().getArchivedFlowNodeInstance(archivedUserTask.getId()));

@@ -72,7 +72,7 @@ public class GetUpdatedVariableValuesForProcessDefinitionIT extends TestWithTech
         try {
             final long processDefinitionId = processDefinition.getId();
             final ProcessInstance pi = getProcessAPI().startProcess(processDefinitionId);
-            final long activityInstanceId = waitForUserTask(pi, "step1").getId();
+            final long activityInstanceId = waitForUserTask(pi, "step1");
 
             // Let's update the value of data1 to 22. It should not be taken into account at process def level:
             getProcessAPI().updateActivityDataInstance(dataName1, activityInstanceId, 22);

@@ -2,7 +2,6 @@ package org.bonitasoft.engine.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -11,7 +10,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithUser;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.EventCriterion;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
 import org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventInstance;
@@ -45,8 +43,7 @@ public class TimerEventIT extends TestWithUser {
                 step2Name);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        final ActivityInstance userTask = waitForUserTask(processInstance, step1Name);
-        assignAndExecuteStep(userTask, getIdentityAPI().getUserByUserName(USERNAME).getId());
+        waitForUserTaskAndExecuteIt(processInstance, step1Name, user);
 
         waitForEventInWaitingState(processInstance, "intermediateCatchEvent");
         final long processInstanceId = processInstance.getId();
@@ -81,10 +78,7 @@ public class TimerEventIT extends TestWithUser {
                 step2Name);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        final ActivityInstance userTask = waitForUserTask(processInstance, step1Name);
-        assertNotNull(userTask);
-
-        assignAndExecuteStep(userTask, getIdentityAPI().getUserByUserName(USERNAME).getId());
+        waitForUserTaskAndExecuteIt(processInstance, step1Name, user);
 
         waitForFlowNodeInState(processInstance, "intermediateCatchEvent", TestStates.WAITING, true);
         final EventInstance eventInstance = getEventInstance(processInstance.getId(), "intermediateCatchEvent");

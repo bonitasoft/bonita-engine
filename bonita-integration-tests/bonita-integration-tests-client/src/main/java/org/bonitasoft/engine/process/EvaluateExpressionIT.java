@@ -279,8 +279,8 @@ public class EvaluateExpressionIT extends TestWithUser {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Activity instance" }, story = "Evaluate expression on activity instance.", jira = "ENGINE-1160")
     @Test
     public void evaluateExpressionsOnActivityInstance() throws Exception {
-        final HumanTaskInstance userTaskInstance = waitForUserTask(processInstance, STEP1_NAME);
-        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnActivityInstance(userTaskInstance.getId(), expressions);
+        final long step1Id = waitForUserTask(processInstance, STEP1_NAME);
+        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnActivityInstance(step1Id, expressions);
         assertEquals("Word-Excel", result.get("StringScript"));
         assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
         assertEquals("1plop", result.get("LongScript"));

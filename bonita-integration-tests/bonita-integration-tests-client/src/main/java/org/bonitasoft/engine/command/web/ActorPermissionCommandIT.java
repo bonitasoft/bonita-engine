@@ -18,7 +18,6 @@ import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -225,16 +224,16 @@ public class ActorPermissionCommandIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final HumanTaskInstance pendingTask = waitForUserTask(processInstance, "step2");
+        final long step2Id = waitForUserTask(processInstance, "step2");
         final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(user.getId(), processInstance.getId());
         // before execute
         assertFalse((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
-        assignAndExecuteStep(pendingTask, user.getId());
+        assignAndExecuteStep(step2Id, user);
         waitForProcessToFinish(processInstance);
         // after execute
         assertTrue((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
 
-        skipTask(pendingTask.getId());
+        skipTask(step2Id);
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -253,11 +252,11 @@ public class ActorPermissionCommandIT extends TestWithUser {
         logoutOnTenant();
         loginOnDefaultTenantWith("jack", "bpm");
 
-        final HumanTaskInstance pendingTask = waitForUserTask(processInstance, "step2");
+        final long step2Id = waitForUserTask(processInstance, "step2");
         final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(jack.getId(), processInstance.getId());
         // before execute
         assertFalse((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
-        assignAndExecuteStep(pendingTask, jack.getId());
+        assignAndExecuteStep(step2Id, jack);
         waitForUserTask(processInstance, "step3");
 
         // after execute

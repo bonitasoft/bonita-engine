@@ -14,7 +14,6 @@ import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.data.ArchivedDataInstance;
 import org.bonitasoft.engine.bpm.data.ArchivedDataNotFoundException;
 import org.bonitasoft.engine.bpm.data.DataInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -410,9 +409,8 @@ public class ProcessDataInstanceIT extends TestWithUser {
         archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "desc");
         assertEquals("desc", archivedDataInstance.getValue());
 
-        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step");
-        assignAndExecuteStep(userTask, user.getId());
-        waitForProcessToFinish(processInstance.getId());
+        waitForUserTaskAndExecuteIt(processInstance, "step", user);
+        waitForProcessToFinish(processInstance);
 
         archivedDataInstances = getProcessAPI().getArchivedProcessDataInstances(processInstance.getId(), 0, 10);
         assertEquals(3, archivedDataInstances.size());

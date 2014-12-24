@@ -285,16 +285,10 @@ public class ProcessDeletionIT extends TestWithUser {
 
         // start P3, the call activities will start instances of P2 a and P1
         final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcess.getId());
-        final ActivityInstance simpleTask = waitForUserTask(rootProcessInstance, simpleStepName);
-        final long simpleProcessInstanceId = simpleTask.getParentProcessInstanceId();
-
-        // execute simple task: p1 will finish
-        assignAndExecuteStep(simpleTask, user.getId());
+        final ActivityInstance simpleTask = waitForUserTaskAndExecuteIt(rootProcessInstance, simpleStepName, user);
 
         // execute intermediate task: p2 will finish
-        final ActivityInstance intermediateTask = waitForUserTask(rootProcessInstance, intermediateStepName);
-        final long intermediateProcessInstanceId = intermediateTask.getParentProcessInstanceId();
-        assignAndExecuteStep(intermediateTask, user.getId());
+        final ActivityInstance intermediateTask = waitForUserTaskAndExecuteIt(rootProcessInstance, intermediateStepName, user);
 
         // execute root task: p3 will finish
         waitForUserTaskAndExecuteIt(rootProcessInstance, rootStepName, user);
@@ -305,8 +299,8 @@ public class ProcessDeletionIT extends TestWithUser {
 
         // check that archived flow nodes were deleted.
         checkAllArchivedElementsWereDeleted(rootProcessInstance.getId());
-        checkAllArchivedElementsWereDeleted(intermediateProcessInstanceId);
-        checkAllArchivedElementsWereDeleted(simpleProcessInstanceId);
+        checkAllArchivedElementsWereDeleted(intermediateTask.getParentProcessInstanceId());
+        checkAllArchivedElementsWereDeleted(simpleTask.getParentProcessInstanceId());
     }
 
     private void checkAllArchivedElementsWereDeleted(final long processInstanceId) {
@@ -363,7 +357,7 @@ public class ProcessDeletionIT extends TestWithUser {
 
         // start P2, the call activities will start an instance of P1
         final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcess.getId());
-        final ActivityInstance simpleTask = waitForUserTask(rootProcessInstance, simpleStepName);
+        final ActivityInstance simpleTask = waitForUserTaskAndGetIt(rootProcessInstance, simpleStepName);
         final ProcessInstance simpleProcessInstance = getProcessAPI().getProcessInstance(simpleTask.getParentProcessInstanceId());
         assignAndExecuteStep(simpleTask, user.getId());
         waitForProcessToFinish(simpleProcessInstance);
@@ -410,9 +404,8 @@ public class ProcessDeletionIT extends TestWithUser {
 
         // start P2, the call activities will start an instance of P1
         final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcess.getId());
-        final ActivityInstance simpleTask = waitForUserTask(rootProcessInstance, simpleStepName);
+        final ActivityInstance simpleTask = waitForUserTaskAndExecuteIt(rootProcessInstance, simpleStepName, user);
         final ProcessInstance simpleProcessInstance = getProcessAPI().getProcessInstance(simpleTask.getParentProcessInstanceId());
-        assignAndExecuteStep(simpleTask, user.getId());
         waitForUserTask(rootProcessInstance, rootStepName);
         waitForProcessToFinish(simpleProcessInstance);
 
@@ -693,11 +686,11 @@ public class ProcessDeletionIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("ArchivedCommentsDeletion", userTaskName);
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance userTask = waitForUserTask(processInstance, userTaskName);
+        final long userTaskId = waitForUserTask(processInstance, userTaskName);
 
         // add a comment
         getProcessAPI().addProcessComment(processInstance.getId(), "just do it.");
-        assignAndExecuteStep(userTask, user.getId());
+        assignAndExecuteStep(userTaskId, user);
         waitForProcessToFinish(processInstance);
 
         SearchResult<ArchivedComment> searchResult = getProcessAPI().searchArchivedComments(new SearchOptionsBuilder(0, 10).done());
@@ -718,11 +711,11 @@ public class ProcessDeletionIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableSimpleProcess("ArchivedCommentsDeletion", userTaskName);
         processDefinitions.add(processDefinition); // To clean in the end
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance userTask = waitForUserTask(processInstance, userTaskName);
+        final long userTaskId = waitForUserTask(processInstance, userTaskName);
 
         // add a comment
         getProcessAPI().addProcessComment(processInstance.getId(), "just do it2.");
-        assignAndExecuteStep(userTask, user.getId());
+        assignAndExecuteStep(userTaskId, user);
         waitForProcessToFinish(processInstance);
 
         SearchResult<ArchivedComment> searchResult = getProcessAPI().searchArchivedComments(new SearchOptionsBuilder(0, 10).done());

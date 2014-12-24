@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.api.CommandAPI;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -119,17 +118,17 @@ public class UserPermissionCommandIT extends TestWithTechnicalUser {
         processBuilder1.addActor(actor13).addDescription("Classify files").addUserTask("userTask3", actor13);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder1.done(), actorUsers1);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask3 = waitForUserTask(processInstance, "userTask3");
-        final HumanTaskInstance userTask1 = waitForUserTask(processInstance, "userTask1");
+        final long userTask3Id = waitForUserTask(processInstance, "userTask3");
+        final long userTask1Id = waitForUserTask(processInstance, "userTask1");
 
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put("USER_ID_KEY", manager.getId());
-        parameters.put("HUMAN_TASK_INSTANCE_ID_KEY", userTask3.getId());
+        parameters.put("HUMAN_TASK_INSTANCE_ID_KEY", userTask3Id);
         Boolean isInvolvedInHumanTask = (Boolean) getCommandAPI().execute("isInvolvedInHumanTask", parameters);
         assertTrue(isInvolvedInHumanTask);
 
         parameters.put("USER_ID_KEY", manager.getId());
-        parameters.put("HUMAN_TASK_INSTANCE_ID_KEY", userTask1.getId());
+        parameters.put("HUMAN_TASK_INSTANCE_ID_KEY", userTask1Id);
         isInvolvedInHumanTask = (Boolean) getCommandAPI().execute("isInvolvedInHumanTask", parameters);
         assertTrue(isInvolvedInHumanTask);
 

@@ -15,7 +15,6 @@ package org.bonitasoft.engine.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -48,7 +47,7 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
 
         // when
-        final ActivityInstance subStep = waitForUserTask(processInstance, "subStep");
+        final ActivityInstance subStep = waitForUserTaskAndGetIt(processInstance, "subStep");
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
         final Date processStartDate = processInstance.getStartDate();
@@ -100,8 +99,7 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
         final int timerDuration = 2000;
         final ProcessDefinition process = deployAndEnableProcessWithTimerEventSubProcessAndData(timerDuration);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        final ActivityInstance subStep = waitForUserTask(processInstance, "subStep");
-        assertNotNull(subStep);
+        final ActivityInstance subStep = waitForUserTaskAndGetIt(processInstance, "subStep");
 
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
         checkProcessDataInstance("count", subProcInst.getId(), 1);
@@ -135,8 +133,8 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
         final ProcessDefinition targetProcess = deployAndEnableProcessWithTimerEventSubProcess(2000);
         final ProcessDefinition callerProcess = deployAndEnableProcessWithCallActivity(targetProcess.getName(), targetProcess.getVersion());
         final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcess.getId());
-        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
-        final ActivityInstance subStep = waitForUserTask(processInstance, "subStep");
+        final ActivityInstance step1 = waitForUserTaskAndGetIt(processInstance, "step1");
+        final ActivityInstance subStep = waitForUserTaskAndGetIt(processInstance, "subStep");
         final ProcessInstance calledProcInst = getProcessAPI().getProcessInstance(step1.getParentProcessInstanceId());
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 

@@ -17,7 +17,6 @@ import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstanceNotFoundException;
@@ -160,9 +159,9 @@ public class ProcessExecutionIT extends TestWithUser {
         assertTrue("The process instance must start between " + before + " and " + after + ", but was " + startDate, after >= startDate && startDate >= before);
         assertEquals(getSession().getUserId(), processInstance.getStartedBy());
 
-        final ActivityInstance step1 = waitForUserTask("step1");
+        final Long step1Id = waitForUserTask("step1");
         before = new Date().getTime();
-        assignAndExecuteStep(step1, user.getId());
+        assignAndExecuteStep(step1Id, user);
         waitForProcessToFinish(processInstance);
         after = new Date().getTime();
         final long endDate = getProcessAPI().getFinalArchivedProcessInstance(processInstance.getId()).getEndDate().getTime();
@@ -187,9 +186,9 @@ public class ProcessExecutionIT extends TestWithUser {
                 + processStartDate + ">", after >= processStartDate && processStartDate >= before);
         assertEquals(getSession().getUserId(), processInstance.getStartedBy());
 
-        final ActivityInstance step1 = waitForUserTask("step1");
+        final Long step1Id = waitForUserTask("step1");
         before = new Date().getTime();
-        assignAndExecuteStep(step1, user.getId());
+        assignAndExecuteStep(step1Id, user);
         waitForProcessToFinish(processInstance);
         after = new Date().getTime();
         final long lastUpdate = getProcessAPI().getFinalArchivedProcessInstance(processInstance.getId()).getLastUpdate().getTime();
@@ -206,13 +205,13 @@ public class ProcessExecutionIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
+        final Long step1Id = waitForUserTask(processInstance, "step1");
 
         final List<ArchivedProcessInstance> archs = getProcessAPI().getArchivedProcessInstances(processInstance.getId(), 0, 100);
         assertEquals(1, archs.size());
         assertEquals(TestStates.INITIALIZING.getStateName(), archs.get(0).getState());
 
-        assignAndExecuteStep(step1, user.getId());
+        assignAndExecuteStep(step1Id, user);
         waitForProcessToFinish(processInstance);
         final ArchivedProcessInstance archivedProcessInstance = getProcessAPI().getFinalArchivedProcessInstance(processInstance.getId());
         assertNotNull(archivedProcessInstance);
@@ -253,9 +252,9 @@ public class ProcessExecutionIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance step1 = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         final long before = new Date().getTime();
-        assignAndExecuteStep(step1, user.getId());
+        assignAndExecuteStep(step1Id, user.getId());
         waitForProcessToFinish(processInstance);
         final long after = new Date().getTime();
         final ArchivedProcessInstance archivedProcessInstance = getProcessAPI().getFinalArchivedProcessInstance(processInstance.getId());
@@ -264,9 +263,9 @@ public class ProcessExecutionIT extends TestWithUser {
         assertTrue("The process must be archived between " + before + " and " + after + ", but was " + archiveDate, after >= archiveDate
                 && archiveDate >= before);
 
-        final ArchivedActivityInstance archivedActivityInstance = getProcessAPI().getArchivedActivityInstance(step1.getId());
+        final ArchivedActivityInstance archivedActivityInstance = getProcessAPI().getArchivedActivityInstance(step1Id);
         assertNotNull(archivedActivityInstance);
-        assertEquals(step1.getId(), archivedActivityInstance.getSourceObjectId());
+        assertEquals(step1Id, archivedActivityInstance.getSourceObjectId());
         archiveDate = archivedActivityInstance.getArchiveDate().getTime();
         assertTrue("The step1 must be archived between " + before + " and " + after + ", but was " + archiveDate, after >= archiveDate && archiveDate >= before);
 
@@ -316,12 +315,12 @@ public class ProcessExecutionIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance waitForUserTask = waitForUserTask(processInstance, "step1");
-        final Date expectedEndDate = ((UserTaskInstance) waitForUserTask).getExpectedEndDate();
+        final ActivityInstance step1 = waitForUserTaskAndGetIt(processInstance, "step1");
+        final Date expectedEndDate = ((UserTaskInstance) step1).getExpectedEndDate();
         final Date now = new Date();
         assertNotSame(now, expectedEndDate);
-        getProcessAPI().updateDueDateOfTask(waitForUserTask.getId(), now);
-        final ActivityInstance activityInstance = getProcessAPI().getActivityInstance(waitForUserTask.getId());
+        getProcessAPI().updateDueDateOfTask(step1.getId(), now);
+        final ActivityInstance activityInstance = getProcessAPI().getActivityInstance(step1.getId());
         final Date expectedEndDate2 = ((UserTaskInstance) activityInstance).getExpectedEndDate();
         assertEquals(now, expectedEndDate2);
 
@@ -343,7 +342,7 @@ public class ProcessExecutionIT extends TestWithUser {
 
         try {
             // execute step 1 using john
-            final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
+            final ActivityInstance step1 = waitForUserTaskAndGetIt(processInstance, "step1");
             assertEquals(0, step1.getExecutedBy());
 
             getProcessAPI().assignUserTask(step1.getId(), jack.getId());

@@ -80,8 +80,7 @@ public class DataInstanceIntegrationLocalIT extends CommonAPILocalIT {
         targetProcessDefinitionBuilder.addEndEvent("tEnd");
         targetProcessDefinitionBuilder.addTransition("tStart", "tStep1").addTransition("tStep1", "tEnd");
         final ProcessDefinition targetProcessDefinition = deployAndEnableProcessWithActor(addClasspathRessource(targetProcessDefinitionBuilder).done(),
-                ACTOR_NAME,
-                cebolinha);
+                ACTOR_NAME, cebolinha);
 
         // Build main process
         final Expression defaultValueForEmployeeOnStep1 = new ExpressionBuilder().createGroovyScriptExpression("initEmployee",
@@ -95,14 +94,13 @@ public class DataInstanceIntegrationLocalIT extends CommonAPILocalIT {
         callingProcessDefinitionBuilder.addEndEvent("end");
         callingProcessDefinitionBuilder.addTransition("start", "step1").addTransition("step1", "callActivity").addTransition("callActivity", "end");
         final ProcessDefinition callingProcessDefinition = deployAndEnableProcessWithActor(addClasspathRessource(callingProcessDefinitionBuilder).done(),
-                ACTOR_NAME,
-                cascao);
+                ACTOR_NAME, cascao);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
 
-        final long step1Id = waitForUserTask(callingProcessInstance, "step1").getId();
+        final long step1Id = waitForUserTask(callingProcessInstance, "step1");
         assertNotNull(getProcessAPI().getActivityDataInstance("data", step1Id).getValue());
         assignAndExecuteStep(step1Id, cascao.getId());
-        final long tStep1Id = waitForUserTask(callingProcessInstance, "tStep1").getId();
+        final long tStep1Id = waitForUserTask(callingProcessInstance, "tStep1");
         assertNotNull(getProcessAPI().getActivityDataInstance("data", tStep1Id).getValue());
         assignAndExecuteStep(tStep1Id, cebolinha.getId());
         waitForProcessToFinish(callingProcessInstance);
@@ -148,14 +146,13 @@ public class DataInstanceIntegrationLocalIT extends CommonAPILocalIT {
         callingProcessDefinitionBuilder.addEndEvent("end");
         callingProcessDefinitionBuilder.addTransition("start", "callActivity").addTransition("callActivity", "Step1").addTransition("Step1", "end");
         final ProcessDefinition callingProcessDefinition = deployAndEnableProcessWithActor(addClasspathRessource(callingProcessDefinitionBuilder).done(),
-                ACTOR_NAME,
-                cebolinha);
+                ACTOR_NAME, cebolinha);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
 
-        final HumanTaskInstance humanTaskInstance = waitForUserTask(callingProcessInstance, "tStep1");
-        assertNotNull(getProcessAPI().getProcessDataInstance(dataName, humanTaskInstance.getParentProcessInstanceId()).getValue());
-        assignAndExecuteStep(humanTaskInstance, cebolinha.getId());
-        final HumanTaskInstance step1 = waitForUserTask(callingProcessInstance, "Step1");
+        final HumanTaskInstance tStep1 = waitForUserTaskAndGetIt(callingProcessInstance, "tStep1");
+        assertNotNull(getProcessAPI().getProcessDataInstance(dataName, tStep1.getParentProcessInstanceId()).getValue());
+        assignAndExecuteStep(tStep1, cebolinha.getId());
+        final HumanTaskInstance step1 = waitForUserTaskAndGetIt(callingProcessInstance, "Step1");
         assertNotNull(getProcessAPI().getProcessDataInstance(dataName, step1.getParentProcessInstanceId()).getValue());
         assignAndExecuteStep(step1, cebolinha.getId());
         waitForProcessToFinish(callingProcessInstance);

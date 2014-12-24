@@ -436,7 +436,7 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         // assign pending task to jack
         final ProcessInstance processInstance = getProcessAPI().startProcess(john.getId(), processDefinitionId);
         processInstances.add(processInstance);
-        final HumanTaskInstance pendingTask = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
 
         logoutOnTenant();
         loginOnDefaultTenantWith("john", PASSWORD);
@@ -448,8 +448,8 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         assertEquals(john.getId(), result.getResult().get(0).getStartedBy());
         assertEquals(matti.getId(), result.getResult().get(0).getStartedBySubstitute());
 
-        getProcessAPI().assignUserTask(pendingTask.getId(), john.getId());
-        getProcessAPI().executeFlowNode(matti.getId(), pendingTask.getId());
+        getProcessAPI().assignUserTask(step1Id, john.getId());
+        getProcessAPI().executeFlowNode(matti.getId(), step1Id);
 
         waitForProcessToFinish(processInstance);
         result = getProcessAPI().searchOpenProcessInstancesInvolvingUser(john.getId(), searchOptions.done());

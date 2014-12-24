@@ -374,13 +374,13 @@ public class DocumentIT extends TestWithUser {
                 .addDocumentResource(new BarResource("myPdf.pdf", pdfContent)).done();
         final ProcessInstance pi = deployAndEnableProcessWithActorAndStartIt(businessArchive, user);
         try {
-            final long step1 = waitForUserTask(pi, "step1").getId();
-            final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("myDocRef", step1);
+            final long step1Id = waitForUserTask(pi, "step1");
+            final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("myDocRef", step1Id);
             final Document docRef = (Document) activityDataInstance.getValue();
 
             final Document attachment = getAttachmentWithoutItsContent(pi);
             assertEquals(attachment, docRef);
-            assertEquals("myPdfModifiedName.pdf", getProcessAPI().getActivityDataInstance("docFileName", step1).getValue());
+            assertEquals("myPdfModifiedName.pdf", getProcessAPI().getActivityDataInstance("docFileName", step1Id).getValue());
         } finally {
             disableAndDeleteProcess(pi.getProcessDefinitionId());
         }
@@ -769,7 +769,7 @@ public class DocumentIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // before update
-        final HumanTaskInstance humanTaskInstance = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
         searchOptionsBuilder.filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId());
         final SearchOptions searchOptions = searchOptionsBuilder.done();
@@ -780,7 +780,7 @@ public class DocumentIT extends TestWithUser {
         assertEquals("Unmodified content", new String(documentContent));
 
         // update
-        assignAndExecuteStep(humanTaskInstance, user.getId());
+        assignAndExecuteStep(step1Id, user.getId());
         waitForUserTask(processInstance, "step3");
 
         // after update
@@ -817,13 +817,13 @@ public class DocumentIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // before update
-        final HumanTaskInstance humanTaskInstance = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         final Document initialDocument = getProcessAPI().getLastDocument(processInstance.getId(), "textFile");
         final byte[] documentContent = getProcessAPI().getDocumentContent(initialDocument.getContentStorageId());
         assertEquals("Unmodified content", new String(documentContent));
 
         // update
-        assignAndExecuteStep(humanTaskInstance, user.getId());
+        assignAndExecuteStep(step1Id, user.getId());
         waitForUserTask(processInstance, "step3");
 
         // after update
@@ -858,7 +858,7 @@ public class DocumentIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // before update
-        final HumanTaskInstance humanTaskInstance = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
         searchOptionsBuilder.filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId());
         final SearchOptions searchOptions = searchOptionsBuilder.done();
@@ -868,7 +868,7 @@ public class DocumentIT extends TestWithUser {
         assertEquals("http://www.example.com/original_url.txt", initialDocument.getUrl());
 
         // update
-        assignAndExecuteStep(humanTaskInstance, user.getId());
+        assignAndExecuteStep(step1Id, user.getId());
         waitForUserTask(processInstance, "step3");
 
         // after update
@@ -904,7 +904,7 @@ public class DocumentIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // before update
-        final HumanTaskInstance humanTaskInstance = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         // document value expression should return null when document don't exists
         assertNull(getProcessAPI().getProcessDataInstance("documentValue", processInstance.getId()).getValue());
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
@@ -914,7 +914,7 @@ public class DocumentIT extends TestWithUser {
         assertEquals(0, searchDocuments.getCount());
 
         // update
-        assignAndExecuteStep(humanTaskInstance, user.getId());
+        assignAndExecuteStep(step1Id, user);
         waitForUserTask(processInstance, "step3");
 
         // after update
@@ -976,7 +976,7 @@ public class DocumentIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // before update
-        final HumanTaskInstance humanTaskInstance = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
         searchOptionsBuilder.filter(DocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId());
         final SearchOptions searchOptions = searchOptionsBuilder.done();
@@ -984,7 +984,7 @@ public class DocumentIT extends TestWithUser {
         assertEquals(0, searchDocuments.getCount());
 
         // update
-        assignAndExecuteStep(humanTaskInstance, user.getId());
+        assignAndExecuteStep(step1Id, user);
         waitForUserTask(processInstance, "step3");
 
         // after update
@@ -1038,7 +1038,7 @@ public class DocumentIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        HumanTaskInstance humanTaskInstance = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         check(processInstance, 1, 2, 3, 4, 5, DocumentCriterion.NAME_ASC);
         check(processInstance, 5, 4, 3, 2, 1, DocumentCriterion.NAME_DESC);
         check(processInstance, 1, 4, 2, 3, 5, DocumentCriterion.FILENAME_ASC);
@@ -1051,15 +1051,15 @@ public class DocumentIT extends TestWithUser {
         final User john = createUser("john", "bpm");
         logoutOnTenant();
         loginOnDefaultTenantWith("john", "bpm");
-        assignAndExecuteStep(humanTaskInstance, john.getId());
-        humanTaskInstance = waitForUserTask(processInstance, "step2");
+        assignAndExecuteStep(step1Id, john.getId());
+        final long step2Id = waitForUserTask(processInstance, "step2");
 
         // user id of john > matti
         check(processInstance, 1, 3, 4, 5, 2, DocumentCriterion.AUTHOR_ASC);
         check(processInstance, 2, 1, 3, 4, 5, DocumentCriterion.AUTHOR_DESC);
 
         // Assign and execute step2
-        assignAndExecuteStep(humanTaskInstance, john.getId());
+        assignAndExecuteStep(step2Id, john.getId());
         waitForUserTask(processInstance, "step3");
 
         // special check because date can be too close depending on systems
@@ -1275,13 +1275,13 @@ public class DocumentIT extends TestWithUser {
         final ProcessDefinition caDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
 
         getProcessAPI().startProcess(caDefinition.getId());
-        final HumanTaskInstance taskInstance = waitForUserTask("step1");
+        final long step1Id = waitForUserTask("step1");
 
         final Expression expression = expressionBuilder.createDocumentReferenceExpression("document1");
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(5);
         expressions.put(expression, new HashMap<String, Serializable>());
 
-        final Map<String, Serializable> docsMap = getProcessAPI().evaluateExpressionsOnActivityInstance(taskInstance.getId(), expressions);
+        final Map<String, Serializable> docsMap = getProcessAPI().evaluateExpressionsOnActivityInstance(step1Id, expressions);
 
         assertNotNull(docsMap);
         final String fileName = ((Document) docsMap.get(expression.getName())).getContentFileName();
@@ -1348,7 +1348,7 @@ public class DocumentIT extends TestWithUser {
         final User john = createUser("john", "bpm");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "john", john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance step1 = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
 
         //we have a process with an initialized list and a non initialized list
 
@@ -1374,10 +1374,9 @@ public class DocumentIT extends TestWithUser {
         getProcessAPI().updateProcessDataInstance("doc2Id", processInstance.getId(), fileDocument.getId());
 
         //execute operation to update
-        assignAndExecuteStep(step1, john.getId());
-        final HumanTaskInstance updateStep = waitForUserTask(processInstance, "updateStep");
-        assignAndExecuteStep(updateStep, john.getId());
-        final HumanTaskInstance verifyStep = waitForUserTask("verifyStep");
+        assignAndExecuteStep(step1Id, john.getId());
+        waitForUserTaskAndExecuteIt(processInstance, "updateStep", john);
+        final HumanTaskInstance verifyStep = waitForUserTaskAndGetIt("verifyStep");
 
         //check with api methods
         invoices1 = getProcessAPI().getDocumentList(processInstance.getId(), "invoices", 0, 100);
@@ -1562,9 +1561,8 @@ public class DocumentIT extends TestWithUser {
         //add doc1_2 to list1 with good index
         getProcessAPI().addDocument(processInstance.getId(), "list1", "doc list", new DocumentValue("doc1_2").setIndex(0));
 
-        final HumanTaskInstance step1 = waitForUserTask("step1");
-        assignAndExecuteStep(step1, user.getId());
-        final HumanTaskInstance step2 = waitForUserTask("step2");
+        waitForUserTaskAndExecuteIt(processInstance, "step1", user);
+        final long step2Id = waitForUserTask(processInstance, "step2");
         //add doc1_3 to list1 at the end
         getProcessAPI().addDocument(processInstance.getId(), "list1", "doc list", new DocumentValue("doc1_3"));
         //add doc2 to list2
@@ -1599,7 +1597,7 @@ public class DocumentIT extends TestWithUser {
         assertThat(new String(getProcessAPI().getDocumentContent(initialList1.get(2).getContentStorageId()))).isEqualTo("hello2");
         assertThat(new String(getProcessAPI().getDocumentContent(initialList1.get(3).getContentStorageId()))).isEqualTo("hello3");
 
-        assignAndExecuteStep(step2, user.getId());
+        assignAndExecuteStep(step2Id, user.getId());
         waitForProcessToFinish(processInstance.getId());
 
         final List<Document> finalList1 = (List<Document>) getProcessAPI().evaluateExpressionOnCompletedProcessInstance(processInstance.getId(), expressions)

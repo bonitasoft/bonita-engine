@@ -100,8 +100,7 @@ public class HumanTasksIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDef.getId());
         logoutOnTenant();
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
-        final ActivityInstance task = waitForUserTask(processInstance, "initTask");
-        getProcessAPI().assignUserTask(task.getId(), user.getId());
+        final ActivityInstance task = waitForUserTaskAndAssigneIt(processInstance, "initTask", user);
         try {
             getProcessAPI().executeFlowNode(task.getId());
         } catch (final FlowNodeExecutionException e) {
@@ -313,7 +312,7 @@ public class HumanTasksIT extends TestWithUser {
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step1", ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        HumanTaskInstance step1 = waitForUserTask(processInstance, "step1");
+        HumanTaskInstance step1 = waitForUserTaskAndGetIt(processInstance, "step1");
         assertEquals(TaskPriority.NORMAL, step1.getPriority());
 
         final long step1Id = step1.getId();
@@ -335,8 +334,7 @@ public class HumanTasksIT extends TestWithUser {
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step1", ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        HumanTaskInstance step1 = waitForUserTask(processInstance, "step1");
-        assertEquals(ActivityStates.READY_STATE, step1.getState());
+        HumanTaskInstance step1 = waitForUserTaskAndGetIt(processInstance, "step1");
 
         final long activityInstanceId = step1.getId();
         getProcessAPI().setActivityStateById(activityInstanceId, 32);

@@ -141,7 +141,7 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final ActivityInstance userTask = waitForUserTask(processInstance.getId(), "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
         final SearchResult<ActivityInstance> searchActivities = getProcessAPI().searchActivities(
                 new SearchOptionsBuilder(0, 10).filter(ActivityInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId())
                         .filter(ActivityInstanceSearchDescriptor.STATE_NAME, "executing").done());
@@ -154,7 +154,7 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
         final MultiInstanceActivityInstance flowNode = (MultiInstanceActivityInstance) searchFlowNode.getResult().get(0);
         assertEquals(1, flowNode.getNumberOfActiveInstances());
 
-        assignAndExecuteStep(userTask, john.getId());
+        assignAndExecuteStep(step1Id, john);
         waitForProcessToFinish(processInstance);
 
         final SearchResult<ArchivedActivityInstance> searchArchivedActivities = getProcessAPI().searchArchivedActivities(
@@ -412,10 +412,10 @@ public class MultiInstanceIT extends TestWithTechnicalUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("Step1");
+        final long step1Id = waitForUserTask(processInstance, "Step1");
         waitForUserTaskAndExecuteIt(processInstance, "Step2", john);
         waitForProcessToFinish(processInstance);
-        final ArchivedActivityInstance archivedStep1 = getProcessAPI().getArchivedActivityInstance(step1.getId());
+        final ArchivedActivityInstance archivedStep1 = getProcessAPI().getArchivedActivityInstance(step1Id);
         assertEquals(ActivityStates.ABORTED_STATE, archivedStep1.getState());
 
         disableAndDeleteProcess(processDefinition);

@@ -12,7 +12,6 @@ import java.util.Set;
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.PlatformAPI;
 import org.bonitasoft.engine.api.PlatformAPIAccessor;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
@@ -131,11 +130,11 @@ public class GatewayExecutionIT extends TestWithUser {
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         // we should have 2 elements ready:
-        final HumanTaskInstance step2 = waitForUserTask(processInstance, "step2");
-        final HumanTaskInstance step3 = waitForUserTask(processInstance, "step3");
+        final long step2Id = waitForUserTask(processInstance, "step2");
+        final long step3Id = waitForUserTask(processInstance, "step3");
 
-        assignAndExecuteStep(step2, user);
-        assignAndExecuteStep(step3, user);
+        assignAndExecuteStep(step2Id, user);
+        assignAndExecuteStep(step3Id, user);
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
@@ -589,13 +588,13 @@ public class GatewayExecutionIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
 
         // we should have 2 elements ready:
-        final HumanTaskInstance step3 = waitForUserTask(processInstance, "step3");
+        final long step3Id = waitForUserTask(processInstance, "step3");
         waitForUserTaskAndExecuteIt(processInstance, "step2", user);
 
         final CheckNbPendingTaskOf checkNbPendingTaskOf2 = new CheckNbPendingTaskOf(getProcessAPI(), 50, 2000, true, 2, user);
         assertFalse("there was no pending task for john (expected step3)", checkNbPendingTaskOf2.waitUntil());
 
-        assignAndExecuteStep(step3, user.getId());
+        assignAndExecuteStep(step3Id, user);
         waitForUserTaskAndExecuteIt(processInstance, "step4", user);
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
@@ -635,8 +634,7 @@ public class GatewayExecutionIT extends TestWithUser {
 
         // execute step2
         waitForUserTask(processInstance, "step1");
-        final ActivityInstance step2 = waitForUserTask(processInstance, "step2");
-        assignAndExecuteStep(step2, user.getId());
+        waitForUserTaskAndExecuteIt(processInstance, "step2", user);
 
         // send signal to trigger boundary
         getProcessAPI().sendSignal("bip");
@@ -683,13 +681,12 @@ public class GatewayExecutionIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
 
         // execute step2
-        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
-        final ActivityInstance step2 = waitForUserTask(processInstance, "step2");
-        assignAndExecuteStep(step2, user.getId());
+        final long step1Id = waitForUserTask(processInstance, "step1");
+        waitForUserTaskAndExecuteIt(processInstance, "step2", user);
 
         waitForUserTask(processInstance, "exceptionStep");
         // step1 should still be here
-        assignAndExecuteStep(step1, user.getId());
+        assignAndExecuteStep(step1Id, user);
 
         // step3 should be ready event if exceptionStep is not
         waitForUserTask(processInstance, "step3");

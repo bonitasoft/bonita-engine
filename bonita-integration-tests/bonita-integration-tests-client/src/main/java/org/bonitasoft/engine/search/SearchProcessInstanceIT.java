@@ -11,7 +11,6 @@ import java.util.List;
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -224,7 +223,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         // assign pending task to jack
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, jack);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance pendingTask = waitForUserTask("step1");
+        final long step1Id = waitForUserTask("step1");
 
         final SearchOptionsBuilder searchOptions = BuildTestUtil.buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID,
                 Order.ASC);
@@ -234,7 +233,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         assertEquals(0, result.getCount());
 
         // assign
-        assignAndExecuteStep(pendingTask, jack.getId());
+        assignAndExecuteStep(step1Id, jack);
 
         // process finished: in worked on
         waitForProcessToFinish(processInstance);
@@ -270,7 +269,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
 
         logoutOnTenant();
         loginOnDefaultTenantWith(username, PASSWORD);
-        HumanTaskInstance pendingTask = waitForUserTask("step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
 
         final SearchOptionsBuilder searchOptions = BuildTestUtil.buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID,
                 Order.ASC);
@@ -280,15 +279,15 @@ public class SearchProcessInstanceIT extends TestWithUser {
         assertEquals(0, result.getCount());
 
         // assign
-        getProcessAPI().assignUserTask(pendingTask.getId(), jack.getId());
+        getProcessAPI().assignUserTask(step1Id, jack.getId());
 
         // after assigned: still not worked on
         result = getProcessAPI().searchOpenProcessInstancesInvolvingUser(jack.getId(), searchOptions.done());
         assertNotNull(result);
         assertEquals(0, result.getCount());
 
-        getProcessAPI().executeFlowNode(pendingTask.getId());
-        pendingTask = waitForUserTask("step2");
+        getProcessAPI().executeFlowNode(step1Id);
+        final long step2Id = waitForUserTask(processInstance, "step2");
 
         // one task was performed: the process is in "WorkedOn"
         result = getProcessAPI().searchOpenProcessInstancesInvolvingUser(jack.getId(), searchOptions.done());
@@ -300,7 +299,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         assertNotNull(result);
         assertEquals(0, result.getCount());
 
-        assignAndExecuteStep(pendingTask, jack.getId());
+        assignAndExecuteStep(step2Id, jack);
 
         // process finished: no more in worked on
         waitForProcessToFinish(processInstance);
@@ -417,7 +416,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         // assign pending task to jack
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, jack);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance pendingTask = waitForUserTask("step1");
+        final long step1Id = waitForUserTask("step1");
 
         final SearchOptionsBuilder searchOptions = BuildTestUtil.buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID,
                 Order.ASC);
@@ -425,7 +424,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesInvolvingUser(user.getId(), searchOptions.done());
         assertNotNull(result);
         assertEquals(1, result.getCount());
-        assignAndExecuteStep(pendingTask, jack.getId());
+        assignAndExecuteStep(step1Id, jack);
 
         // process finished: no more in worked on
         waitForProcessToFinish(processInstance);
@@ -456,7 +455,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
 
         logoutOnTenant();
         loginOnDefaultTenantWith("jack", "bpm");
-        HumanTaskInstance pendingTask = waitForUserTask("step1");
+        final long step1Id = waitForUserTask("step1");
 
         final SearchOptionsBuilder searchOptions = BuildTestUtil.buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID,
                 Order.ASC);
@@ -466,15 +465,15 @@ public class SearchProcessInstanceIT extends TestWithUser {
         assertEquals(0, result.getCount());
 
         // assign
-        getProcessAPI().assignUserTask(pendingTask.getId(), jack.getId());
+        getProcessAPI().assignUserTask(step1Id, jack.getId());
 
         // after assigned: still not worked on
         result = getProcessAPI().searchOpenProcessInstancesInvolvingUsersManagedBy(paul.getId(), searchOptions.done());
         assertNotNull(result);
         assertEquals(0, result.getCount());
 
-        getProcessAPI().executeFlowNode(pendingTask.getId());
-        pendingTask = waitForUserTask("step2");
+        getProcessAPI().executeFlowNode(step1Id);
+        final long step2Id = waitForUserTask("step2");
 
         // one task was performed: the process is in "WorkedOn"
         result = getProcessAPI().searchOpenProcessInstancesInvolvingUsersManagedBy(paul.getId(), searchOptions.done());
@@ -483,7 +482,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         final ProcessInstance processInstance2 = result.getResult().get(0);
         assertEquals(processInstance.getId(), processInstance2.getId());
 
-        assignAndExecuteStep(pendingTask, jack.getId());
+        assignAndExecuteStep(step2Id, jack);
 
         // process finished: no more in worked on
         waitForProcessToFinish(processInstance);
@@ -601,7 +600,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         // assign pending task to jack
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, jack);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance pendingTask = waitForUserTask("step1");
+        final long step1Id = waitForUserTask("step1");
 
         final SearchOptionsBuilder searchOptions = BuildTestUtil.buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID,
                 Order.ASC);
@@ -609,7 +608,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         SearchResult<ProcessInstance> result = getProcessAPI().searchOpenProcessInstancesInvolvingUsersManagedBy(paul.getId(), searchOptions.done());
         assertNotNull(result);
         assertEquals(1, result.getCount());
-        assignAndExecuteStep(pendingTask, jack.getId());
+        assignAndExecuteStep(step1Id, jack);
 
         // process finished: no more in worked on
         waitForProcessToFinish(processInstance);

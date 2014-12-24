@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
 import org.bonitasoft.engine.bpm.flownode.WaitingEventSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -54,16 +53,16 @@ public class CancelProcessInstanceIT extends AbstractProcessInstanceIT {
         final ProcessDefinition processDefinition = deployProcessWith2UserTasksAnd1AutoTask(taskName1, taskName2, "auto1");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance step1 = waitForUserTask(processInstance, taskName1);
-        final HumanTaskInstance step2 = waitForUserTask(processInstance, taskName2);
+        final long step1Id = waitForUserTask(processInstance, taskName1);
+        final long step2Id = waitForUserTask(processInstance, taskName2);
 
         getProcessAPI().cancelProcessInstance(processInstance.getId());
         waitForProcessToBeInState(processInstance, ProcessInstanceState.CANCELLED);
 
-        final ArchivedActivityInstance archivedTask1 = getProcessAPI().getArchivedActivityInstance(step1.getId());
+        final ArchivedActivityInstance archivedTask1 = getProcessAPI().getArchivedActivityInstance(step1Id);
         assertEquals(TestStates.CANCELLED.getStateName(), archivedTask1.getState());
 
-        final ArchivedActivityInstance archivedTask2 = getProcessAPI().getArchivedActivityInstance(step2.getId());
+        final ArchivedActivityInstance archivedTask2 = getProcessAPI().getArchivedActivityInstance(step2Id);
         assertEquals(TestStates.CANCELLED.getStateName(), archivedTask2.getState());
 
         disableAndDeleteProcess(processDefinition);

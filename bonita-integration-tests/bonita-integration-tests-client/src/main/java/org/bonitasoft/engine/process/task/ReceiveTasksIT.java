@@ -245,7 +245,7 @@ public class ReceiveTasksIT extends TestWithUser {
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         waitForProcessToFinish(sendMessageProcessInstance);
         forceMatchingOfEvents();
-        final HumanTaskInstance step1 = waitForUserTask(receiveMessageProcessInstance, "userTask1");
+        final HumanTaskInstance step1 = waitForUserTaskAndGetIt(receiveMessageProcessInstance, "userTask1");
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", step1.getRootContainerId());
         assertEquals("Doe", dataInstance.getValue());

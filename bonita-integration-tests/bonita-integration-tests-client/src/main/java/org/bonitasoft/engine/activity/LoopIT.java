@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessManagementAPI;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedLoopActivityInstance;
@@ -95,10 +94,10 @@ public class LoopIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         try {
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-            final ActivityInstance userTask = waitForUserTask(processInstance, activityName);
+            final long userTaskId = waitForUserTask(processInstance, activityName);
             final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
             expressions.put(new ExpressionBuilder().createConstantBooleanExpression(true), new HashMap<String, Serializable>(0));
-            getProcessAPI().evaluateExpressionsOnActivityInstance(userTask.getId(), expressions);
+            getProcessAPI().evaluateExpressionsOnActivityInstance(userTaskId, expressions);
         } finally {
             disableAndDeleteProcess(processDefinition);
         }
@@ -119,8 +118,8 @@ public class LoopIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         for (int i = 0; i < loopMax; i++) {
-            final HumanTaskInstance pendingTask = waitForUserTaskAndcheckPendingHumanTaskInstances("step1", processInstance);
-            assignAndExecuteStep(pendingTask, user.getId());
+            final long step1Id = waitForUserTaskAndcheckPendingHumanTaskInstances("step1", processInstance);
+            assignAndExecuteStep(step1Id, user);
         }
         waitForUserTaskAndcheckPendingHumanTaskInstances("step2", processInstance);
 
@@ -141,20 +140,20 @@ public class LoopIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         for (int i = 0; i < 3; i++) {
-            final HumanTaskInstance pendingTask = waitForUserTaskAndcheckPendingHumanTaskInstances("step1", processInstance);
-            assignAndExecuteStep(pendingTask, user.getId());
+            final long step1Id = waitForUserTaskAndcheckPendingHumanTaskInstances("step1", processInstance);
+            assignAndExecuteStep(step1Id, user);
         }
         waitForUserTaskAndcheckPendingHumanTaskInstances("step2", processInstance);
 
         disableAndDeleteProcess(processDefinition);
     }
 
-    private HumanTaskInstance waitForUserTaskAndcheckPendingHumanTaskInstances(final String userTaskName, final ProcessInstance processInstance)
+    private long waitForUserTaskAndcheckPendingHumanTaskInstances(final String userTaskName, final ProcessInstance processInstance)
             throws Exception {
-        final HumanTaskInstance pendingTask = waitForUserTask(processInstance, userTaskName);
+        final long pendingTaskId = waitForUserTask(processInstance, userTaskName);
         final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(1, pendingTasks.size());
-        return pendingTask;
+        return pendingTaskId;
     }
 
     @Test
@@ -180,8 +179,8 @@ public class LoopIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         for (int i = 0; i < 3; i++) {
-            final HumanTaskInstance pendingTask = waitForUserTaskAndcheckPendingHumanTaskInstances("step1", processInstance);
-            assignAndExecuteStep(pendingTask, user.getId());
+            final long step1Id = waitForUserTaskAndcheckPendingHumanTaskInstances("step1", processInstance);
+            assignAndExecuteStep(step1Id, user);
         }
         waitForUserTaskAndcheckPendingHumanTaskInstances("step2", processInstance);
 

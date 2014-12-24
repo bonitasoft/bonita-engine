@@ -354,7 +354,7 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         final DesignProcessDefinition processDefinition = builderProc.done();
         final ProcessDefinition mainProcess = deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(mainProcess.getId());
-        final HumanTaskInstance userTask = waitForUserTask("userSubTask");
+        final HumanTaskInstance userTask = waitForUserTaskAndGetIt("userSubTask");
 
         final List<Long> ids = getProcessAPI().getChildrenInstanceIdsOfProcessInstance(processInstance.getId(), 0, 10, ProcessInstanceCriterion.DEFAULT);
         assertThat(ids).isNotEmpty().hasSize(1).containsExactly(userTask.getParentProcessInstanceId());
@@ -842,11 +842,11 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(otherUser.getId(), processDefinition.getId(),
                 Collections.singletonList(integerOperation), Collections.<String, Serializable> singletonMap("page", "1"));
-        final HumanTaskInstance step1 = waitForUserTask(processInstance, "step1");
+        final long step1Id = waitForUserTask(processInstance, "step1");
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
-        final SearchResult<User> results = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(step1.getId(), builder.done());
+        final SearchResult<User> results = getProcessAPI().searchUsersWhoCanExecutePendingHumanTask(step1Id, builder.done());
         assertThat(results.getCount()).isSameAs(2L);
         assertThat(results.getResult()).isNotEmpty();
         assertThat(results.getResult().get(0).getId()).isEqualTo(user.getId());
