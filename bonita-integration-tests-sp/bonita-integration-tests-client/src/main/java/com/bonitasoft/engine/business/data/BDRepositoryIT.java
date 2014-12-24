@@ -767,6 +767,9 @@ public class BDRepositoryIT extends CommonAPISPTest {
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder
                 .addAutomaticTask("step1")
+                //                 .addOperation(
+                //                        new OperationBuilder().attachBusinessDataSetAttributeOperation(businessDataName2, expressionReturningBusinessData)(businessDataName, "setFirstName", String.class.getName(),
+                //                                new ExpressionBuilder().createConstantStringExpression("Manon")))
                 .addOperation(
                         new OperationBuilder().createBusinessDataSetAttributeOperation(businessDataName, "setFirstName", String.class.getName(),
                                 new ExpressionBuilder().createConstantStringExpression("Manon")))
@@ -935,9 +938,19 @@ public class BDRepositoryIT extends CommonAPISPTest {
 
         waitForUserTask("step2", instance.getId());
         final String employeeToString = getEmployeesToString("myEmployees", instance.getId());
-        assertThat(employeeToString).isEqualTo("Employee [firstName=[Jane, John], lastName=[Smith, Smith]]");
+
+        assertThat(firstNames(employeeToString)).containsOnlyOnce("Jane", "John");
+        assertThat(lastNames(employeeToString)).containsExactly("Smith", "Smith");
 
         disableAndDeleteProcess(processDefinition);
+    }
+
+    private String[] firstNames(final String employeeToString) {
+
+    private String[] lastNames(final String employeeToString) {
+        String lastNames = substringAfter(employeeToString, "lastName=[");
+        lastNames = substringBefore(lastNames, "]]");
+        return StringUtils.split(lastNames, ", ");
     }
 
     @Test
@@ -1156,9 +1169,18 @@ public class BDRepositoryIT extends CommonAPISPTest {
         parameters.put("businessDataURIPattern", "/businessdata/{className}/{id}/{field}");
         final String result = (String) getCommandAPI().execute("getBusinessDataById", parameters);
 
-        assertThat(result).as("Address should have the right street and city").contains("\"street\" : \"32, rue Gustave Eiffel\"")
-                .contains("\"city\" : \"Grenoble\"")
-                .contains("\"rel\" : \"country\"");
+        assertThat(resultWithChildName).as("Address should have the right street and city").contains("\"street\":\"32, rue Gustave Eiffel\"")
+                .contains("\"city\":\"Grenoble\"");
+        assertThat(resultWithChildName).as("Address should have a link to country ")
+                .contains("\"rel\":\"country\"");
+
+        parameters.remove("businessDataChildName");
+
+        final String resultWithoutChildName = (String) getCommandAPI().execute("getBusinessDataById", parameters);
+        assertThat(resultWithoutChildName).as("Address should have the right street and city").contains("\"street\":\"32, rue Gustave Eiffel\"")
+                .contains("\"city\":\"Grenoble\"");
+
+        assertThat(resultWithoutChildName).as("should have a link to lazy country object").contains("\"rel\":\"country\"");
 
         disableAndDeleteProcess(definition.getId());
     }

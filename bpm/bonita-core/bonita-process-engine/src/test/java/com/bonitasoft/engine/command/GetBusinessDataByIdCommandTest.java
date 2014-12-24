@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -28,7 +29,6 @@ import net.javacrumbs.jsonunit.assertj.JsonAssert;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.command.SCommandExecutionException;
-import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,8 +36,11 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
+import com.bonitasoft.engine.business.data.BusinessDataService;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
+import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import com.bonitasoft.engine.operation.pojo.Travel;
+import com.bonitasoft.engine.pojo.Address;
 import com.bonitasoft.engine.pojo.AddressBook;
 import com.bonitasoft.engine.pojo.Command;
 import com.bonitasoft.engine.pojo.CommandLine;
@@ -47,9 +50,18 @@ import com.bonitasoft.engine.service.TenantServiceAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hazelcast.core.Client;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GetBusinessDataByIdCommandTest {
+
+    private static final String PARAMETER_CHILDNAME = "lines";
+
+    private static final long PARAMETER_IDENTIFIER = 1983L;
+
+    private static final String PARAMETER_CLASS_NAME = Travel.class.getName();
+
+    private static final String PARAMETER_BUSINESSDATA_CLASS_URI_VALUE = "/businessdata/{className}/{id}/{field}";
 
     private GetBusinessDataByIdCommand command;
 
@@ -59,42 +71,97 @@ public class GetBusinessDataByIdCommandTest {
     @Mock
     private TenantServiceAccessor tenantServiceAccessor;
 
+    @Mock
+    private BusinessDataService businessDataService;
+
+    private Map<String, Serializable> parameters;
+
     @Before
     public void setUp() throws Exception {
         command = new GetBusinessDataByIdCommand();
-        when(tenantServiceAccessor.getBusinessDataRepository()).thenReturn(bdrService);
+        parameters = new HashMap<String, Serializable>();
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, PARAMETER_IDENTIFIER);
+        parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, PARAMETER_CLASS_NAME);
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        when(tenantServiceAccessor.getBusinessDataService()).thenReturn(businessDataService);
     }
+
 
     @Test
-    public void should_get_the_business_data_based_on_its_identifier() throws Exception {
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 1983L);
-        parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, Travel.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
-        final Travel travel = new Travel();
-        travel.setNbDays(45);
-        when(bdrService.findById(Travel.class, 1983L)).thenReturn(travel);
+    public void executeCommandWithEntity() throws Exception {
+        //when
+        command.execute(parameters, tenantServiceAccessor);
 
-        final String travelJson = (String) command.execute(parameters, tenantServiceAccessor);
-        JsonAssert.assertThatJson(travelJson).isEqualTo("{\"persistenceId\" : 1, \"persistenceVersion\" : 1, \"nbDays\" : 45 }");
+        //then
+        verify(businessDataService).getJsonEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
     }
 
-    @Test(expected = SCommandParameterizationException.class)
-    public void should_throw_exception_when_class_name_does_not_exist() throws Exception {
-        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 1983L);
-        parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, "com.bonitasoft.Employee");
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+    @Test(expected = SCommandExecutionException.class)
+    public void executeCommandWithEntityShloudThrowException() throws Exception {
+        //given
+        doThrow(SBusinessDataNotFoundException.class).when(businessDataService).getJsonEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
+        //when then exception
+        command.execute(parameters, tenantServiceAccessor);
+    }
+
+    @Test(expected = SCommandExecutionException.class)
+    public void executeCommandWithChildEntityShouldThrowException() throws Exception {
+        //given
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, PARAMETER_CHILDNAME);
+        doThrow(SBusinessDataRepositoryException.class).when(businessDataService).getJsonChildEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER,
+                PARAMETER_CHILDNAME,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        //when then exception
         command.execute(parameters, tenantServiceAccessor);
     }
 
     @Test
+    public void executeCommandWithEmptyChildName() throws Exception {
+        //given
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "");
+        doThrow(SBusinessDataRepositoryException.class).when(businessDataService).getJsonChildEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER,
+                PARAMETER_CHILDNAME,
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        //when
+        command.execute(parameters, tenantServiceAccessor);
+
+        //then
+        verify(businessDataService).getJsonEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+    }
+
+    @Test
+    public void executeCommandWithChildEntity() throws Exception {
+        //given
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, PARAMETER_CHILDNAME);
+
+        //when
+        command.execute(parameters, tenantServiceAccessor);
+
+        //then
+        verify(businessDataService).getJsonChildEntity(PARAMETER_CLASS_NAME, PARAMETER_IDENTIFIER, PARAMETER_CHILDNAME, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+    }
+
+
+    //@Test(expected = SCommandParameterizationException.class)
+    public void should_throw_exception_when_class_name_does_not_exist() throws Exception {
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 1983L);
+        parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, "com.bonitasoft.Employee");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        command.execute(parameters, tenantServiceAccessor);
+    }
+
+    //@Test
     public void should_throw_not_found_exception_when_not_found() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 1983L);
-        parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, Travel.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, PARAMETER_CLASS_NAME);
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
         when(bdrService.findById(Travel.class, 1983L)).thenThrow(new SBusinessDataNotFoundException("not found"));
 
         try {
@@ -105,12 +172,12 @@ public class GetBusinessDataByIdCommandTest {
         }
     }
 
-    @Test
+    //@Test
     public void should_get_the_business_data_in_lazymode_based_on_its_identifier() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 1983L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, AddressBook.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
         final AddressBook addressBook = new AddressBook();
         when(bdrService.findById(AddressBook.class, 1983L)).thenReturn(addressBook);
 
@@ -120,13 +187,13 @@ public class GetBusinessDataByIdCommandTest {
         JsonAssert.assertThatJson(json).isEqualTo(expectedJson);
     }
 
-    @Test
+    //@Test
     public void execute_should_return_the_list_child_of_an_entity() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 1983L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, Command.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "lines");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, PARAMETER_CHILDNAME);
         final Product pencil = new Product(687L, 1L, "Pencil");
         final Product paper = new Product(688L, 12L, "Paper");
         final Command command1 = new Command(1983L, 0L);
@@ -140,12 +207,12 @@ public class GetBusinessDataByIdCommandTest {
         JsonAssert.assertThatJson(json).isEqualTo(expectedJson);
     }
 
-    @Test
+    //@Test
     public void execute_should_return_the_child_of_an_entity() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 864L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, CommandLine.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "product");
         final Product pencil = new Product(687L, 1L, "Pencil");
         final CommandLine commandLine = new CommandLine(864L, 78L, pencil, 5);
@@ -158,12 +225,12 @@ public class GetBusinessDataByIdCommandTest {
         JsonAssert.assertThatJson(json).isEqualTo(expectedJson);
     }
 
-    @Test
+    //@Test
     public void execute_should_return_the_entity_if_child_name_is_empty() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 864L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, CommandLine.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "");
         final Product pencil = new Product(687L, 1L, "Pencil");
         final CommandLine commandLine = new CommandLine(864L, 78L, pencil, 5);
@@ -175,12 +242,12 @@ public class GetBusinessDataByIdCommandTest {
         JsonAssert.assertThatJson(json).isEqualTo(expectedJson);
     }
 
-    @Test(expected = SCommandExecutionException.class)
+    //@Test(expected = SCommandExecutionException.class)
     public void execute_should_throw_an_exception_if_field_does_not_exist() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 864L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, CommandLine.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "address");
         final Product pencil = new Product(687L, 1L, "Pencil");
         final CommandLine commandLine = new CommandLine(864L, 78L, pencil, 5);
@@ -189,12 +256,12 @@ public class GetBusinessDataByIdCommandTest {
         command.execute(parameters, tenantServiceAccessor);
     }
 
-    @Test(expected = SCommandExecutionException.class)
+    //@Test(expected = SCommandExecutionException.class)
     public void execute_should_throw_an_exception_if_field_is_not_an_entity_or_a_list_of_entity() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 864L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, CommandLine.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "persistenceVersion");
         final Product pencil = new Product(687L, 1L, "Pencil");
         final CommandLine commandLine = new CommandLine(864L, 78L, pencil, 5);
@@ -203,15 +270,15 @@ public class GetBusinessDataByIdCommandTest {
         command.execute(parameters, tenantServiceAccessor);
     }
 
-    @Test(expected = SCommandExecutionException.class)
+    //@Test(expected = SCommandExecutionException.class)
     public void execute_should_throw_an_exception_if_a_parse_exception_occurs_during_serialization() throws Exception {
         final ObjectMapper mapper = mock(ObjectMapper.class);
-        final GetBusinessDataByIdCommand command = new GetBusinessDataByIdCommand(mapper);
+        //        final GetBusinessDataByIdCommand command = new GetBusinessDataByIdCommand(mapper);
 
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 1983L);
-        parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, Travel.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, PARAMETER_CLASS_NAME);
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
         final Travel travel = new Travel();
         travel.setNbDays(45);
         when(bdrService.findById(Travel.class, 1983L)).thenReturn(travel);
@@ -220,15 +287,15 @@ public class GetBusinessDataByIdCommandTest {
         command.execute(parameters, tenantServiceAccessor);
     }
 
-    @Test(expected = SCommandExecutionException.class)
+    //@Test(expected = SCommandExecutionException.class)
     public void execute_should_throw_an_exception_if_an_io_exception_occurs_during_serialization() throws Exception {
         final ObjectMapper mapper = mock(ObjectMapper.class);
-        final GetBusinessDataByIdCommand command = new GetBusinessDataByIdCommand(mapper);
+        //        final GetBusinessDataByIdCommand command = new GetBusinessDataByIdCommand(mapper);
 
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 1983L);
-        parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, Travel.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, PARAMETER_CLASS_NAME);
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
         final Travel travel = new Travel();
         travel.setNbDays(45);
         when(bdrService.findById(Travel.class, 1983L)).thenReturn(travel);
@@ -237,12 +304,12 @@ public class GetBusinessDataByIdCommandTest {
         command.execute(parameters, tenantServiceAccessor);
     }
 
-    @Test(expected = SCommandExecutionException.class)
+    //@Test(expected = SCommandExecutionException.class)
     public void execute_should_throw_an_exception_if_field_is_a_list_but_not_of_entity() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 864L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, NameList.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "names");
         final NameList nameList = new NameList();
         nameList.setPersistenceId(864L);
@@ -251,13 +318,13 @@ public class GetBusinessDataByIdCommandTest {
 
         command.execute(parameters, tenantServiceAccessor);
     }
-    
-    @Test
+
+    //@Test
     public void should_return_empty_json_object_when_child_is_null() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 864L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, CommandLine.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "product");
         final CommandLine commandLine = new CommandLine(864L, 78L, null, 5);
         when(bdrService.findById(CommandLine.class, 864L)).thenReturn(commandLine);
@@ -266,6 +333,34 @@ public class GetBusinessDataByIdCommandTest {
 
         assertThatJson(json).isEqualTo("{}");
     }
-    
+
+    //@Test
+    public void execute_should_return_lazy_links_inside_members() throws Exception {
+
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 1983L);
+        parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, Client.class.getName());
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        final Client client = new Client();
+        final Address address = new Address();
+        final Country country = new Country(1L, 2L, "France");
+        address.setPersistenceId(864L);
+        address.setCountry(country);
+
+        client.setAddress(address);
+
+        client.getAddresses().add(address);
+        client.getAddresses().add(address);
+        client.getAddresses().add(address);
+
+        when(bdrService.findById(Client.class, 1983L)).thenReturn(client);
+
+        final String json = (String) command.execute(parameters, tenantServiceAccessor);
+        System.out.println(json);
+
+        final String expectedJson = IOUtils.toString(GetBusinessDataByIdCommandTest.class.getResource("/rest/ClientWithLinksInChildren.json"));
+        JsonAssert.assertThatJson(json).isEqualTo(expectedJson);
+    }
 
 }

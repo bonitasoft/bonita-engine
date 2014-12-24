@@ -35,9 +35,11 @@ import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JCodeModel;
+import com.sun.codemodel.JConditional;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
+import com.sun.codemodel.JFieldRef;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
@@ -164,6 +166,23 @@ public class CodeGenerator {
         final JMethod method = definedClass.method(JMod.PUBLIC, Void.TYPE, getSetterName(field));
         method.param(field.type(), field.name());
         method.body().assign(JExpr._this().ref(field.name()), JExpr.ref(field.name()));
+        return method;
+    }
+
+    public JMethod addListSetter(final JDefinedClass definedClass, final JFieldVar field) {
+        final JMethod method = definedClass.method(JMod.PUBLIC, Void.TYPE, getSetterName(field));
+        method.param(field.type(), field.name());
+
+        final JFieldRef thisField = JExpr._this().ref(field.name());
+
+        final JConditional ifListIsNull = method.body()._if(thisField.eq(JExpr._null()));
+        ifListIsNull._then().assign(JExpr._this().ref(field.name()), JExpr.ref(field.name()));
+        ifListIsNull._else().invoke(JExpr._this().ref(field.name()), "clear");
+        ifListIsNull._else().invoke(JExpr._this().ref(field.name()), "addAll").arg(field);
+
+        //._if(JExpr._this().ref(field.name().(JExpr._null()))._then()._return(JExpr.FALSE);
+        //ifRefIsNull._else(JExpr.ref(fieldVar.name()).invoke("equals").arg(other.ref(fieldVar.name())).not())._then()._return(JExpr.FALSE);
+
         return method;
     }
 

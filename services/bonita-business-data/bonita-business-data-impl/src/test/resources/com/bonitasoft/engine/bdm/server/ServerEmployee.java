@@ -1,26 +1,27 @@
-import java.util.ArrayList;
-import java.util.List;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OrderColumn;
-import javax.persistence.Table;
 import javax.persistence.Version;
+import org.hibernate.annotations.Index;
 
 
 /**
  * 
  */
-@javax.persistence.Entity(name = "Forecast")
-@Table(name = "FORECAST")
-@NamedQueries({
-    @NamedQuery(name = "Forecast.find", query = "SELECT f\nFROM Forecast f\nORDER BY f.persistenceId")
+@javax.persistence.Entity(name = "Employee")
+@org.hibernate.annotations.Table(appliesTo = "EMPLOYEE", indexes = {
+    @Index(name = "IDX_1", columnNames = {
+        "FIRSTNAME, LASTNAME"
+    })
 })
-public class Forecast
+@javax.persistence.Table(name = "EMPLOYEE")
+@NamedQueries({
+    @NamedQuery(name = "Employee.findByFirstName", query = "SELECT e\nFROM Employee e\nWHERE e.firstName= :firstName\nORDER BY e.persistenceId"),
+    @NamedQuery(name = "Employee.find", query = "SELECT e\nFROM Employee e\nORDER BY e.persistenceId")
+})
+public class Employee
     implements com.bonitasoft.engine.bdm.Entity
 {
 
@@ -29,12 +30,10 @@ public class Forecast
     private Long persistenceId;
     @Version
     private Long persistenceVersion;
-    @ElementCollection(fetch = FetchType.EAGER)
-    @OrderColumn
-    @Column(name = "TEMPERATURES", nullable = true)
-    private List<Double> temperatures = new ArrayList<Double>(10);
+    @Column(name = "FIRSTNAME", nullable = true)
+    private String firstName;
 
-    public Forecast() {
+    public Employee() {
     }
 
     public void setPersistenceId(Long persistenceId) {
@@ -53,27 +52,12 @@ public class Forecast
         return persistenceVersion;
     }
 
-    public void setTemperatures(List<Double> temperatures) {
-        if (this.temperatures == null) {
-            this.temperatures = temperatures;
-        } else {
-            this.temperatures.clear();
-            this.temperatures.addAll(temperatures);
-        }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public List<Double> getTemperatures() {
-        return temperatures;
-    }
-
-    public void addToTemperatures(Double addTo) {
-        List temperatures = getTemperatures();
-        temperatures.add(addTo);
-    }
-
-    public void removeFromTemperatures(Double removeFrom) {
-        List temperatures = getTemperatures();
-        temperatures.remove(removeFrom);
+    public String getFirstName() {
+        return firstName;
     }
 
     @Override
@@ -87,7 +71,7 @@ public class Forecast
         if (getClass()!= obj.getClass()) {
             return false;
         }
-        Forecast other = ((Forecast) obj);
+        Employee other = ((Employee) obj);
         if (persistenceId == null) {
             if (other.persistenceId!= null) {
                 return false;
@@ -106,12 +90,12 @@ public class Forecast
                 return false;
             }
         }
-        if (temperatures == null) {
-            if (other.temperatures!= null) {
+        if (firstName == null) {
+            if (other.firstName!= null) {
                 return false;
             }
         } else {
-            if (!temperatures.equals(other.temperatures)) {
+            if (!firstName.equals(other.firstName)) {
                 return false;
             }
         }
@@ -132,11 +116,11 @@ public class Forecast
             persistenceVersionCode = persistenceVersion.hashCode();
         }
         result = ((prime*result)+ persistenceVersionCode);
-        int temperaturesCode = 0;
-        if (temperatures!= null) {
-            temperaturesCode = temperatures.hashCode();
+        int firstNameCode = 0;
+        if (firstName!= null) {
+            firstNameCode = firstName.hashCode();
         }
-        result = ((prime*result)+ temperaturesCode);
+        result = ((prime*result)+ firstNameCode);
         return result;
     }
 
