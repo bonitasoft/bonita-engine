@@ -126,7 +126,7 @@ public class ProcessSupervisedTest extends CommonAPISPIT {
 
         // Start the parent process and execute the task of the sub process
         getProcessAPI().startProcess(processDefinitions.get(3).getId());
-        final HumanTaskInstance stepOfSubProcess = waitForUserTaskAndExecuteIt("stepOfSubProcess", parentProcessPM);
+        final HumanTaskInstance stepOfSubProcess = waitForUserTaskAndExecuteAndGetIt("stepOfSubProcess", parentProcessPM);
         waitForProcessToFinish(stepOfSubProcess.getParentProcessInstanceId());
 
         // Then
