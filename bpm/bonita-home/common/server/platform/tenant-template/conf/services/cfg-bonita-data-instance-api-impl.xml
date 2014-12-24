@@ -8,7 +8,7 @@
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService" />
     </bean>
 
-    <bean id="dataExpressionExecutorStrategy" class="org.bonitasoft.engine.data.instance.api.DataExpressionExecutorStrategy">
+    <bean id="dataExpressionExecutorStrategy" class="org.bonitasoft.engine.expression.DataExpressionExecutorStrategy">
         <constructor-arg name="dataService" ref="dataInstanceService" />
         <constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
     </bean>
