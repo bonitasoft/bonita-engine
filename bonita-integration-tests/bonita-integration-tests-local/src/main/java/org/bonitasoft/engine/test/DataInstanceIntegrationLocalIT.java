@@ -99,10 +99,10 @@ public class DataInstanceIntegrationLocalIT extends CommonAPILocalIT {
                 cascao);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
 
-        final long step1Id = waitForUserTask("step1", callingProcessInstance).getId();
+        final long step1Id = waitForUserTask(callingProcessInstance, "step1").getId();
         assertNotNull(getProcessAPI().getActivityDataInstance("data", step1Id).getValue());
         assignAndExecuteStep(step1Id, cascao.getId());
-        final long tStep1Id = waitForUserTask("tStep1", callingProcessInstance).getId();
+        final long tStep1Id = waitForUserTask(callingProcessInstance, "tStep1").getId();
         assertNotNull(getProcessAPI().getActivityDataInstance("data", tStep1Id).getValue());
         assignAndExecuteStep(tStep1Id, cebolinha.getId());
         waitForProcessToFinish(callingProcessInstance);
@@ -152,10 +152,10 @@ public class DataInstanceIntegrationLocalIT extends CommonAPILocalIT {
                 cebolinha);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDefinition.getId());
 
-        final HumanTaskInstance humanTaskInstance = waitForUserTask("tStep1", callingProcessInstance);
+        final HumanTaskInstance humanTaskInstance = waitForUserTask(callingProcessInstance, "tStep1");
         assertNotNull(getProcessAPI().getProcessDataInstance(dataName, humanTaskInstance.getParentProcessInstanceId()).getValue());
         assignAndExecuteStep(humanTaskInstance, cebolinha.getId());
-        final HumanTaskInstance step1 = waitForUserTask("Step1", callingProcessInstance);
+        final HumanTaskInstance step1 = waitForUserTask(callingProcessInstance, "Step1");
         assertNotNull(getProcessAPI().getProcessDataInstance(dataName, step1.getParentProcessInstanceId()).getValue());
         assignAndExecuteStep(step1, cebolinha.getId());
         waitForProcessToFinish(callingProcessInstance);

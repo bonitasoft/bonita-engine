@@ -55,11 +55,11 @@ public class SearchProcessInstanceIT extends TestWithUser {
         final ProcessInstance instance3 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance instance4 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance instance5 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step1", instance1);
-        waitForUserTask("step1", instance2);
-        waitForUserTask("step1", instance3);
-        waitForUserTask("step1", instance4);
-        waitForUserTask("step1", instance5);
+        waitForUserTask(instance1, "step1");
+        waitForUserTask(instance2, "step1");
+        waitForUserTask(instance3, "step1");
+        waitForUserTask(instance4, "step1");
+        waitForUserTask(instance5, "step1");
 
         // search and check result ASC
         final SearchOptionsBuilder searchOptions1 = BuildTestUtil.buildSearchOptions(processDefinition.getId(), 0, 2, ProcessInstanceSearchDescriptor.ID,
@@ -182,7 +182,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         // assign pending task to jack
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step1", user);
 
         final SearchOptionsBuilder searchOptions = BuildTestUtil.buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID,
                 Order.ASC);
@@ -191,7 +191,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         assertNotNull(result);
         assertEquals(0, result.getCount());
 
-        waitForUserTaskAndExecuteIt("step2", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step2", user);
 
         // process finished: no more in worked on
         waitForProcessToFinish(processInstance);
@@ -330,17 +330,17 @@ public class SearchProcessInstanceIT extends TestWithUser {
 
         logoutOnTenant();
         loginOnDefaultTenantWith(username, PASSWORD);
-        waitForUserTaskAndExecuteIt("step1", p1, jack);
-        waitForUserTaskAndExecuteIt("step1", p2, jack);
-        waitForUserTaskAndExecuteIt("step1", p3, jack);
+        waitForUserTaskAndExecuteIt(p1, "step1", jack);
+        waitForUserTaskAndExecuteIt(p2, "step1", jack);
+        waitForUserTaskAndExecuteIt(p3, "step1", jack);
         logoutOnTenant();
         loginOnDefaultTenantWith("john", PASSWORD);
-        waitForUserTaskAndExecuteIt("step1", p4, jack);
+        waitForUserTaskAndExecuteIt(p4, "step1", jack);
 
-        waitForUserTask("step2", p1);
-        waitForUserTask("step2", p2);
-        waitForUserTask("step2", p3);
-        waitForUserTask("step2", p4);
+        waitForUserTask(p1, "step2");
+        waitForUserTask(p2, "step2");
+        waitForUserTask(p3, "step2");
+        waitForUserTask(p4, "step2");
 
         final SearchOptionsBuilder searchOptions = BuildTestUtil.buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID,
                 Order.ASC);
@@ -378,10 +378,10 @@ public class SearchProcessInstanceIT extends TestWithUser {
         loginOnDefaultTenantWith("john", PASSWORD);
         final ProcessInstance p4 = getProcessAPI().startProcess(processDefinition.getId());
 
-        waitForUserTask("step1", p1);
-        waitForUserTask("step1", p2);
-        waitForUserTask("step1", p3);
-        waitForUserTask("step1", p4);
+        waitForUserTask(p1, "step1");
+        waitForUserTask(p2, "step1");
+        waitForUserTask(p3, "step1");
+        waitForUserTask(p4, "step1");
 
         final SearchOptionsBuilder searchOptions = BuildTestUtil.buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID,
                 Order.ASC);
@@ -516,17 +516,17 @@ public class SearchProcessInstanceIT extends TestWithUser {
 
         logoutOnTenant();
         loginOnDefaultTenantWith("jack", "bpm");
-        waitForUserTaskAndExecuteIt("step1", p1, jack);
-        waitForUserTaskAndExecuteIt("step1", p2, jack);
-        waitForUserTaskAndExecuteIt("step1", p3, jack);
+        waitForUserTaskAndExecuteIt(p1, "step1", jack);
+        waitForUserTaskAndExecuteIt(p2, "step1", jack);
+        waitForUserTaskAndExecuteIt(p3, "step1", jack);
         logoutOnTenant();
         loginOnDefaultTenantWith("john", "bpm");
-        waitForUserTaskAndExecuteIt("step1", p4, jack);
+        waitForUserTaskAndExecuteIt(p4, "step1", jack);
 
-        waitForUserTask("step2", p1);
-        waitForUserTask("step2", p2);
-        waitForUserTask("step2", p3);
-        waitForUserTask("step2", p4);
+        waitForUserTask(p1, "step2");
+        waitForUserTask(p2, "step2");
+        waitForUserTask(p3, "step2");
+        waitForUserTask(p4, "step2");
 
         final SearchOptionsBuilder searchOptions = BuildTestUtil.buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID,
                 Order.ASC);
@@ -566,11 +566,11 @@ public class SearchProcessInstanceIT extends TestWithUser {
         loginOnDefaultTenantWith("pierre", "bpm");
         final ProcessInstance p5 = getProcessAPI().startProcess(processDefinition.getId());
 
-        waitForUserTask("step1", p1);
-        waitForUserTask("step1", p2);
-        waitForUserTask("step1", p3);
-        waitForUserTask("step1", p4);
-        waitForUserTask("step1", p5);
+        waitForUserTask(p1, "step1");
+        waitForUserTask(p2, "step1");
+        waitForUserTask(p3, "step1");
+        waitForUserTask(p4, "step1");
+        waitForUserTask(p5, "step1");
 
         final SearchOptionsBuilder searchOptions = BuildTestUtil.buildSearchOptions(processDefinition.getId(), 0, 5, ProcessInstanceSearchDescriptor.ID,
                 Order.ASC);
@@ -633,11 +633,11 @@ public class SearchProcessInstanceIT extends TestWithUser {
         final ProcessInstance instance4 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance instance5 = getProcessAPI().startProcess(processDefinition.getId());
 
-        waitForUserTask("step1", instance1);
-        waitForUserTask("step1", instance2);
-        waitForUserTask("step1", instance3);
-        waitForUserTask("step1", instance4);
-        waitForUserTask("step1", instance5);
+        waitForUserTask(instance1, "step1");
+        waitForUserTask(instance2, "step1");
+        waitForUserTask(instance3, "step1");
+        waitForUserTask(instance4, "step1");
+        waitForUserTask(instance5, "step1");
 
         // test started by correct user
         final SearchOptionsBuilder searchOptions1 = BuildTestUtil.buildSearchOptions(processDefinition.getId(), 0, 10, ProcessInstanceSearchDescriptor.ID,
@@ -874,7 +874,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         final ProcessDefinition process1Definition = deployAndEnableProcessWithActor(designProcess1Definition, ACTOR_NAME, user);
 
         final ProcessInstance instance1 = getProcessAPI().startProcess(process1Definition.getId());
-        waitForUserTask("User task", instance1);
+        waitForUserTask(instance1, "User task");
 
         final SearchOptions opts = new SearchOptionsBuilder(0, 10).done();
         final SearchResult<ProcessInstance> processInstanceSearchResult = getProcessAPI().searchOpenProcessInstances(opts);
@@ -1075,11 +1075,11 @@ public class SearchProcessInstanceIT extends TestWithUser {
         final ProcessInstance procInstWithEventSubProc = getProcessAPI().startProcess(procWithEventSubProcess.getId());
 
         // wait for first step of parent process and send a signal that will launch the event sub-process
-        waitForUserTask(userTaskName, procInstWithEventSubProc);
+        waitForUserTask(procInstWithEventSubProc, userTaskName);
         getProcessAPI().sendSignal(signalName);
 
         // execute user task and wait the parent process to finish (state aborted)
-        waitForUserTaskAndExecuteIt(subProcTaskName, procInstWithEventSubProc, user);
+        waitForUserTaskAndExecuteIt(procInstWithEventSubProc, subProcTaskName, user);
         waitForProcessToBeInState(procInstWithEventSubProc, ProcessInstanceState.ABORTED);
         return procWithEventSubProcess;
     }
@@ -1091,12 +1091,12 @@ public class SearchProcessInstanceIT extends TestWithUser {
         final ProcessInstance processInstanceToComplete = getProcessAPI().startProcess(simpleProcess.getId());
 
         // execute user task and wait process to finish: the process will be in the state completed
-        waitForUserTaskAndExecuteIt(userTaskName, processInstanceToComplete, user);
+        waitForUserTaskAndExecuteIt(processInstanceToComplete, userTaskName, user);
         waitForProcessToFinish(processInstanceToComplete);
 
         // start another instance and cancel it: the process will be in the state canceled
         final ProcessInstance processInstanceToCancel = getProcessAPI().startProcess(simpleProcess.getId());
-        waitForUserTask(userTaskName, processInstanceToCancel);
+        waitForUserTask(processInstanceToCancel, userTaskName);
         getProcessAPI().cancelProcessInstance(processInstanceToCancel.getId());
         waitForProcessToBeInState(processInstanceToCancel, ProcessInstanceState.CANCELLED);
         return simpleProcess;
@@ -1128,7 +1128,7 @@ public class SearchProcessInstanceIT extends TestWithUser {
         final ProcessInstance procInst = getProcessAPI().startProcess(simpleProcess.getId());
 
         // execute it until the end
-        waitForUserTaskAndExecuteIt("step1", procInst, user);
+        waitForUserTaskAndExecuteIt(procInst, "step1", user);
         waitForProcessToFinish(procInst);
 
         // search archived process instances: all states must be retrieved
@@ -1156,9 +1156,9 @@ public class SearchProcessInstanceIT extends TestWithUser {
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefId);
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefId);
         final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefId);
-        waitForUserTaskAndAssigneIt("step1", processInstance1, user);
-        waitForUserTaskAndAssigneIt("step1", processInstance2, user);
-        waitForUserTaskAndAssigneIt("step1", processInstance3, otherUser);
+        waitForUserTaskAndAssigneIt(processInstance1, "step1", user);
+        waitForUserTaskAndAssigneIt(processInstance2, "step1", user);
+        waitForUserTaskAndAssigneIt(processInstance3, "step1", otherUser);
 
         final SearchOptions searchOptions = new SearchOptionsBuilder(0, 10)
                 .filter(ProcessInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefId)

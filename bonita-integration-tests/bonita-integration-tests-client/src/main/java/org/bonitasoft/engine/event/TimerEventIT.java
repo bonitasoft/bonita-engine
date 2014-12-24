@@ -45,7 +45,7 @@ public class TimerEventIT extends TestWithUser {
                 step2Name);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        final ActivityInstance userTask = waitForUserTask(step1Name, processInstance);
+        final ActivityInstance userTask = waitForUserTask(processInstance, step1Name);
         assignAndExecuteStep(userTask, getIdentityAPI().getUserByUserName(USERNAME).getId());
 
         waitForEventInWaitingState(processInstance, "intermediateCatchEvent");
@@ -63,7 +63,7 @@ public class TimerEventIT extends TestWithUser {
         }
         assertNull(eventInstance);// finished
 
-        waitForUserTask(step2Name, processInstance);
+        waitForUserTask(processInstance, step2Name);
 
         disableAndDeleteProcess(definition);
     }
@@ -81,7 +81,7 @@ public class TimerEventIT extends TestWithUser {
                 step2Name);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        final ActivityInstance userTask = waitForUserTask(step1Name, processInstance);
+        final ActivityInstance userTask = waitForUserTask(processInstance, step1Name);
         assertNotNull(userTask);
 
         assignAndExecuteStep(userTask, getIdentityAPI().getUserByUserName(USERNAME).getId());
@@ -90,7 +90,7 @@ public class TimerEventIT extends TestWithUser {
         final EventInstance eventInstance = getEventInstance(processInstance.getId(), "intermediateCatchEvent");
         checkIntermediateCatchEventInstance(eventInstance, "intermediateCatchEvent", TestStates.WAITING);
         // wait trigger activation
-        waitForUserTask(step2Name, processInstance);
+        waitForUserTask(processInstance, step2Name);
         final long now = System.currentTimeMillis();
         assertTrue("Event has triggered too early !" + (now - expectedDate), expectedDate <= now);
 
@@ -144,7 +144,7 @@ public class TimerEventIT extends TestWithUser {
         assertThat(secondProcessInstances.size()).as("should have started another instance").isGreaterThan(firstProcessInstances.size());
 
         //cleanup
-        waitForUserTask(stepName, secondProcessInstances.get(secondProcessInstances.size() - 1));
+        waitForUserTask(secondProcessInstances.get(secondProcessInstances.size() - 1), stepName);
         disableAndDeleteProcess(definition);
     }
 

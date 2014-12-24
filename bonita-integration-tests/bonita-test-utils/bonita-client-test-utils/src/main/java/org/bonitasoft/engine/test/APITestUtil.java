@@ -58,7 +58,6 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor;
@@ -714,22 +713,18 @@ public class APITestUtil extends PlatformTestUtil {
 
     public void assignAndExecuteStep(final long activityInstanceId, final long userId) throws BonitaException {
         getProcessAPI().assignUserTask(activityInstanceId, userId);
-        executeFlowNodeUntilEnd(activityInstanceId);
+        getProcessAPI().executeFlowNode(activityInstanceId);
     }
 
-    public void executeFlowNodeUntilEnd(final long flowNodeId) throws FlowNodeExecutionException {
-        getProcessAPI().executeFlowNode(flowNodeId);
+    public HumanTaskInstance waitForUserTask(final ProcessInstance processInstance, final String taskName) throws Exception {
+        return waitForUserTask(processInstance.getId(), taskName, DEFAULT_TIMEOUT);
     }
 
-    public HumanTaskInstance waitForUserTask(final String taskName, final ProcessInstance processInstance) throws Exception {
-        return waitForUserTask(taskName, processInstance.getId(), DEFAULT_TIMEOUT);
+    public HumanTaskInstance waitForUserTask(final long processInstanceId, final String taskName) throws Exception {
+        return waitForUserTask(processInstanceId, taskName, DEFAULT_TIMEOUT);
     }
 
-    public HumanTaskInstance waitForUserTask(final String taskName, final long processInstanceId) throws Exception {
-        return waitForUserTask(taskName, processInstanceId, DEFAULT_TIMEOUT);
-    }
-
-    private HumanTaskInstance waitForUserTask(final String taskName, final long processInstanceId, final int timeout) throws Exception {
+    private HumanTaskInstance waitForUserTask(final long processInstanceId, final String taskName, final int timeout) throws Exception {
         final Map<String, Serializable> readyTaskEvent;
         if (processInstanceId > 0) {
             readyTaskEvent = ClientEventUtil.getReadyFlowNodeEvent(processInstanceId, taskName);
@@ -743,7 +738,7 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     public HumanTaskInstance waitForUserTask(final String taskName) throws Exception {
-        return waitForUserTask(taskName, -1, DEFAULT_TIMEOUT);
+        return waitForUserTask(-1, taskName, DEFAULT_TIMEOUT);
     }
 
     public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final User user) throws Exception {
@@ -796,7 +791,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public StartProcessUntilStep startProcessAndWaitForTask(final long processDefinitionId, final String taskName) throws Exception {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitionId);
-        final ActivityInstance task = waitForUserTask(taskName, processInstance.getId());
+        final ActivityInstance task = waitForUserTask(processInstance.getId(), taskName);
         return new StartProcessUntilStep(processInstance, task);
     }
 
@@ -943,15 +938,15 @@ public class APITestUtil extends PlatformTestUtil {
         return getFlowNodeInstance(flowNodeInstanceId);
     }
 
-    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception {
-        final HumanTaskInstance humanTaskInstance = waitForUserTask(taskName, processInstance.getId(), DEFAULT_TIMEOUT);
+    public HumanTaskInstance waitForUserTaskAndExecuteIt(final ProcessInstance processInstance, final String taskName, final User user) throws Exception {
+        final HumanTaskInstance humanTaskInstance = waitForUserTask(processInstance.getId(), taskName, DEFAULT_TIMEOUT);
         assignAndExecuteStep(humanTaskInstance, user.getId());
         return humanTaskInstance;
     }
 
-    public HumanTaskInstance waitForUserTaskAndAssigneIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception,
+    public HumanTaskInstance waitForUserTaskAndAssigneIt(final ProcessInstance processInstance, final String taskName, final User user) throws Exception,
             UpdateException {
-        final HumanTaskInstance humanTaskInstance = waitForUserTask(taskName, processInstance.getId());
+        final HumanTaskInstance humanTaskInstance = waitForUserTask(processInstance.getId(), taskName);
         getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
         return humanTaskInstance;
     }

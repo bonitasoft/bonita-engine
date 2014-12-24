@@ -77,7 +77,7 @@ public class GatewayExecutionIT extends TestWithUser {
         // create gateway instance and transition instance and archive them
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
 
-        waitForUserTask("step4", processInstance);
+        waitForUserTask(processInstance, "step4");
 
         // test gateway instance, gateway instance has been deleted after archive
         final SearchOptionsBuilder builder0 = new SearchOptionsBuilder(0, 10);
@@ -131,8 +131,8 @@ public class GatewayExecutionIT extends TestWithUser {
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         // we should have 2 elements ready:
-        final HumanTaskInstance step2 = waitForUserTask("step2", processInstance);
-        final HumanTaskInstance step3 = waitForUserTask("step3", processInstance);
+        final HumanTaskInstance step2 = waitForUserTask(processInstance, "step2");
+        final HumanTaskInstance step3 = waitForUserTask(processInstance, "step3");
 
         assignAndExecuteStep(step2, user);
         assignAndExecuteStep(step3, user);
@@ -162,7 +162,7 @@ public class GatewayExecutionIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
 
         // then
-        waitForUserTaskAndExecuteIt("step4", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step4", user);
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
@@ -284,7 +284,7 @@ public class GatewayExecutionIT extends TestWithUser {
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         // we should have 1 elements ready:
-        waitForUserTaskAndExecuteIt("step2", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step2", user);
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -304,7 +304,7 @@ public class GatewayExecutionIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        waitForUserTaskAndExecuteIt("step1", startProcess, user);
+        waitForUserTaskAndExecuteIt(startProcess, "step1", user);
         waitForProcessToFinish(startProcess);
         disableAndDeleteProcess(processDefinition);
     }
@@ -440,7 +440,7 @@ public class GatewayExecutionIT extends TestWithUser {
         // retry the gateway
         getProcessAPI().retryTask(gateway.getId());
         // we should have step2 ready
-        waitForUserTask("step2", processInstance);
+        waitForUserTask(processInstance, "step2");
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -589,14 +589,14 @@ public class GatewayExecutionIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
 
         // we should have 2 elements ready:
-        final HumanTaskInstance step3 = waitForUserTask("step3", processInstance);
-        waitForUserTaskAndExecuteIt("step2", processInstance, user);
+        final HumanTaskInstance step3 = waitForUserTask(processInstance, "step3");
+        waitForUserTaskAndExecuteIt(processInstance, "step2", user);
 
         final CheckNbPendingTaskOf checkNbPendingTaskOf2 = new CheckNbPendingTaskOf(getProcessAPI(), 50, 2000, true, 2, user);
         assertFalse("there was no pending task for john (expected step3)", checkNbPendingTaskOf2.waitUntil());
 
         assignAndExecuteStep(step3, user.getId());
-        waitForUserTaskAndExecuteIt("step4", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step4", user);
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
@@ -634,17 +634,17 @@ public class GatewayExecutionIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
 
         // execute step2
-        waitForUserTask("step1", processInstance);
-        final ActivityInstance step2 = waitForUserTask("step2", processInstance);
+        waitForUserTask(processInstance, "step1");
+        final ActivityInstance step2 = waitForUserTask(processInstance, "step2");
         assignAndExecuteStep(step2, user.getId());
 
         // send signal to trigger boundary
         getProcessAPI().sendSignal("bip");
         // wait and execute exceptionStep
-        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "exceptionStep", user);
 
         // step3 should be ready
-        waitForUserTaskAndExecuteIt("step3", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step3", user);
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
@@ -683,16 +683,16 @@ public class GatewayExecutionIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
 
         // execute step2
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
-        final ActivityInstance step2 = waitForUserTask("step2", processInstance);
+        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
+        final ActivityInstance step2 = waitForUserTask(processInstance, "step2");
         assignAndExecuteStep(step2, user.getId());
 
-        waitForUserTask("exceptionStep", processInstance);
+        waitForUserTask(processInstance, "exceptionStep");
         // step1 should still be here
         assignAndExecuteStep(step1, user.getId());
 
         // step3 should be ready event if exceptionStep is not
-        waitForUserTask("step3", processInstance);
+        waitForUserTask(processInstance, "step3");
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -717,8 +717,8 @@ public class GatewayExecutionIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // we should have 2 elements ready:
-        waitForUserTaskAndExecuteIt("step5", processInstance, user);
-        waitForUserTaskAndExecuteIt("step5", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step5", user);
+        waitForUserTaskAndExecuteIt(processInstance, "step5", user);
 
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
@@ -745,7 +745,7 @@ public class GatewayExecutionIT extends TestWithUser {
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         // we should have 1 elements ready:
-        waitForUserTaskAndExecuteIt("step5", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step5", user);
 
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
@@ -772,9 +772,9 @@ public class GatewayExecutionIT extends TestWithUser {
         // test execution
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
         // we should have 3 elements ready:
-        waitForUserTaskAndExecuteIt("step5", processInstance, user);
-        waitForUserTaskAndExecuteIt("step5", processInstance, user);
-        waitForUserTaskAndExecuteIt("step5", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step5", user);
+        waitForUserTaskAndExecuteIt(processInstance, "step5", user);
+        waitForUserTaskAndExecuteIt(processInstance, "step5", user);
 
         waitForProcessToFinish(processInstance);
         disableAndDeleteProcess(processDefinition);
@@ -1018,8 +1018,8 @@ public class GatewayExecutionIT extends TestWithUser {
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("Step1", processInstance, user);
-        waitForUserTaskAndExecuteIt("Step3", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "Step1", user);
+        waitForUserTaskAndExecuteIt(processInstance, "Step3", user);
         waitForTaskToFail(processInstance);
         // should also get the exception...not yet in the task
         disableAndDeleteProcess(processDefinition);

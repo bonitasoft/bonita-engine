@@ -24,10 +24,10 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundarySignalEvent("MySignal");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
+        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
         getProcessAPI().sendSignal("MySignal");
 
-        waitForUserTaskAndExecuteIt(EXCEPTION_STEP, processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, EXCEPTION_STEP, user);
 
         waitForProcessToFinish(processInstance);
         waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
@@ -44,8 +44,8 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryMessageEvent("MySignal1");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance, user);
-        final ActivityInstance waitForUserTask = waitForUserTask("step2", processInstance);
+        waitForUserTaskAndExecuteIt(processInstance, "step1", user);
+        final ActivityInstance waitForUserTask = waitForUserTask(processInstance, "step2");
 
         getProcessAPI().sendSignal("MySignal1");
 
@@ -70,11 +70,11 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
         final ProcessDefinition calledProcessDefinition = deployAndEnableSimpleProcess("calledProcess", "calledStep");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance calledStep = waitForUserTask("calledStep", processInstance);
+        final ActivityInstance calledStep = waitForUserTask(processInstance, "calledStep");
         final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
 
         getProcessAPI().sendSignal("MySignal");
-        waitForUserTaskAndExecuteIt(EXCEPTION_STEP, processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, EXCEPTION_STEP, user);
 
         waitForProcessToBeInState(calledProcessInstance, ProcessInstanceState.ABORTED);
         waitForProcessToFinish(processInstance);
@@ -96,11 +96,11 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
         final ProcessDefinition calledProcessDefinition = deployAndEnableSimpleProcess("calledProcess", "calledStep");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance calledStep = waitForUserTask("calledStep", processInstance);
+        final ActivityInstance calledStep = waitForUserTask(processInstance, "calledStep");
         final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
         assignAndExecuteStep(calledStep, user.getId());
 
-        final ActivityInstance step2 = waitForUserTask("step2", processInstance);
+        final ActivityInstance step2 = waitForUserTask(processInstance, "step2");
         waitForProcessToFinish(calledProcessInstance);
 
         getProcessAPI().sendSignal("MySignal");
@@ -128,9 +128,9 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
+        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
         getProcessAPI().sendSignal("MySignal");
-        waitForUserTaskAndExecuteIt(EXCEPTION_STEP, processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, EXCEPTION_STEP, user);
 
         waitForProcessToFinish(processInstance);
         waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
@@ -150,9 +150,9 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         for (int i = 0; i < loopCardinality; i++) {
-            waitForUserTaskAndExecuteIt("step1", processInstance, user);
+            waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         }
-        final ActivityInstance waitForUserTask = waitForUserTask("step2", processInstance);
+        final ActivityInstance waitForUserTask = waitForUserTask(processInstance, "step2");
 
         getProcessAPI().sendSignal("MySignal1");
 
@@ -178,9 +178,9 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
+        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
         getProcessAPI().sendSignal("MySignal");
-        waitForUserTaskAndExecuteIt(EXCEPTION_STEP, processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, EXCEPTION_STEP, user);
 
         waitForProcessToFinish(processInstance);
         waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
@@ -200,9 +200,9 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         for (int i = 0; i < loopCardinality; i++) {
-            waitForUserTaskAndExecuteIt("step1", processInstance, user);
+            waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         }
-        final ActivityInstance waitForUserTask = waitForUserTask("step2", processInstance);
+        final ActivityInstance waitForUserTask = waitForUserTask(processInstance, "step2");
 
         getProcessAPI().sendSignal("MySignal1");
 
@@ -227,9 +227,9 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
+        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
         getProcessAPI().sendSignal("MySignal");
-        waitForUserTaskAndExecuteIt(EXCEPTION_STEP, processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, EXCEPTION_STEP, user);
 
         waitForProcessToFinish(processInstance);
         waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
@@ -248,9 +248,9 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         for (int i = 0; i < loopMax; i++) {
-            waitForUserTaskAndExecuteIt("step1", processInstance, user);
+            waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         }
-        final ActivityInstance waitForUserTask = waitForUserTask("step2", processInstance);
+        final ActivityInstance waitForUserTask = waitForUserTask(processInstance, "step2");
 
         getProcessAPI().sendSignal("MySignal1");
 

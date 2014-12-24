@@ -55,7 +55,7 @@ public class UserTaskAssignationIT extends TestWithTechnicalUser {
 
         processDefinition = deployAndEnableSimpleProcess();
         processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        step2 = waitForUserTask("step2", processInstance);
+        step2 = waitForUserTask(processInstance, "step2");
     }
 
     @Override
@@ -227,7 +227,7 @@ public class UserTaskAssignationIT extends TestWithTechnicalUser {
 
         // Release
         getProcessAPI().releaseUserTask(taskId);
-        task = waitForUserTask("step2", processInstance);
+        task = waitForUserTask(processInstance, "step2");
         assertFalse("Last update date not updated during release", previousUpdateDate.equals(task.getLastUpdateDate()));
         previousUpdateDate = task.getLastUpdateDate();
 

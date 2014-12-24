@@ -48,7 +48,7 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
 
         // when
-        final ActivityInstance subStep = waitForUserTask("subStep", processInstance);
+        final ActivityInstance subStep = waitForUserTask(processInstance, "subStep");
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
         final Date processStartDate = processInstance.getStartDate();
@@ -73,7 +73,7 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
         final int timerDuration = 6000;
         final ProcessDefinition process = deployAndEnableProcessWithTimerEventSubProcess(timerDuration);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         waitForProcessToFinish(processInstance);
         Thread.sleep(timerDuration);
 
@@ -88,8 +88,8 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
         final ProcessDefinition process = deployAndEnableProcessWithTimerEventSubProcess(timerDuration);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(process.getId());
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(process.getId());
-        waitForUserTask("subStep", processInstance1);
-        waitForUserTask("subStep", processInstance2);
+        waitForUserTask(processInstance1, "subStep");
+        waitForUserTask(processInstance2, "subStep");
 
         disableAndDeleteProcess(process.getId());
     }
@@ -100,7 +100,7 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
         final int timerDuration = 2000;
         final ProcessDefinition process = deployAndEnableProcessWithTimerEventSubProcessAndData(timerDuration);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        final ActivityInstance subStep = waitForUserTask("subStep", processInstance);
+        final ActivityInstance subStep = waitForUserTask(processInstance, "subStep");
         assertNotNull(subStep);
 
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
@@ -135,8 +135,8 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
         final ProcessDefinition targetProcess = deployAndEnableProcessWithTimerEventSubProcess(2000);
         final ProcessDefinition callerProcess = deployAndEnableProcessWithCallActivity(targetProcess.getName(), targetProcess.getVersion());
         final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcess.getId());
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
-        final ActivityInstance subStep = waitForUserTask("subStep", processInstance);
+        final ActivityInstance step1 = waitForUserTask(processInstance, "step1");
+        final ActivityInstance subStep = waitForUserTask(processInstance, "subStep");
         final ProcessInstance calledProcInst = getProcessAPI().getProcessInstance(step1.getParentProcessInstanceId());
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
@@ -145,7 +145,7 @@ public class TimerEventSubProcessIT extends AbstractEventIT {
         waitForProcessToFinish(subProcInst);
         waitForProcessToBeInState(calledProcInst, ProcessInstanceState.ABORTED);
 
-        waitForUserTaskAndExecuteIt("step2", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step2", user);
         waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(callerProcess.getId());

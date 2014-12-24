@@ -92,7 +92,7 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
     public void messageEventSubProcessTriggered() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithMessageEventSubProcess();
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        final ActivityInstance step1 = waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance);
+        final ActivityInstance step1 = waitForUserTask(processInstance, PARENT_PROCESS_USER_TASK_NAME);
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
         assertEquals(1, activities.size());
         checkNumberOfWaitingEvents(SUB_PROCESS_START_NAME, 1);
@@ -102,7 +102,7 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
                 new ExpressionBuilder().createConstantStringExpression(SUB_PROCESS_START_NAME), null);
 
         final FlowNodeInstance eventSubProcessActivity = waitForFlowNodeInExecutingState(processInstance, "eventSubProcess", false);
-        final ActivityInstance subStep = waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance);
+        final ActivityInstance subStep = waitForUserTask(processInstance, SUB_PROCESS_USER_TASK_NAME);
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
         checkNumberOfWaitingEvents("The parent process instance is supposed to be aborted, so no more waiting events are expected.", SUB_PROCESS_START_NAME, 0);
@@ -155,7 +155,7 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
 
         // Start and execute the Sender process
         final ProcessInstance processInstance = getProcessAPI().startProcess(senderProcessDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance);
+        final ActivityInstance step1 = waitForUserTask(processInstance, PARENT_PROCESS_USER_TASK_NAME);
         waitForPendingTasks(user.getId(), 2);
         checkNumberOfWaitingEventsInProcess(receiverProcessName, 2);
         assignAndExecuteStep(step1.getId(), user.getId());
@@ -166,7 +166,7 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(ProcessInstanceSearchDescriptor.NAME, receiverProcessName);
         final ProcessInstance receiverProcessInstance = getProcessAPI().searchOpenProcessInstances(searchOptionsBuilder.done()).getResult().get(0);
-        waitForUserTask(SUB_PROCESS_USER_TASK_NAME, receiverProcessInstance.getId());
+        waitForUserTask(receiverProcessInstance.getId(), SUB_PROCESS_USER_TASK_NAME);
         assertEquals(1, getProcessAPI().getNumberOfPendingHumanTaskInstances(user.getId()));
 
         // Clean-up
@@ -179,7 +179,7 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
     public void messageEventSubProcessNotTriggered() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithMessageEventSubProcess();
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        final ActivityInstance step1 = waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance);
+        final ActivityInstance step1 = waitForUserTask(processInstance, PARENT_PROCESS_USER_TASK_NAME);
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
         assertEquals(1, activities.size());
         checkNumberOfWaitingEvents(SUB_PROCESS_START_NAME, 1);
@@ -204,7 +204,7 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         final ProcessDefinition process = deployAndEnableProcessWithMessageEventSubProcessAndData(Collections.singletonList(new BEntry<Expression, Expression>(
                 correlationKey, catchCorrelationValue)));
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance);
+        waitForUserTask(processInstance, PARENT_PROCESS_USER_TASK_NAME);
 
         // send message to start event sub process
         final Expression throwCorrelationValue = new ExpressionBuilder().createConstantStringExpression("parentVar");// the default data value
@@ -212,7 +212,7 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
                 new ExpressionBuilder().createConstantStringExpression(SUB_PROCESS_START_NAME), null,
                 Collections.singletonMap(correlationKey, throwCorrelationValue));
 
-        waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance.getId());
+        waitForUserTask(processInstance.getId(), SUB_PROCESS_USER_TASK_NAME);
 
         disableAndDeleteProcess(process.getId());
     }
@@ -237,11 +237,11 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         final ProcessDefinition receiverProcessDefinition = deployAndEnableProcessWithMessageEventSubProcessAndData(Collections
                 .singletonList(new BEntry<Expression, Expression>(correlationKey, correlationValue)));
         final ProcessInstance receiverProcessInstance = getProcessAPI().startProcess(receiverProcessDefinition.getId());
-        waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, receiverProcessInstance);
+        waitForUserTask(receiverProcessInstance, PARENT_PROCESS_USER_TASK_NAME);
 
         // send message to start event sub process
         getProcessAPI().startProcess(senderProcessDefinition.getId());
-        waitForUserTask(SUB_PROCESS_USER_TASK_NAME, receiverProcessInstance.getId());
+        waitForUserTask(receiverProcessInstance.getId(), SUB_PROCESS_USER_TASK_NAME);
 
         disableAndDeleteProcess(senderProcessDefinition, receiverProcessDefinition);
     }
@@ -260,8 +260,8 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         getProcessAPI().sendMessage(MESSAGE_NAME, new ExpressionBuilder().createConstantStringExpression(process.getName()),
                 new ExpressionBuilder().createConstantStringExpression(SUB_PROCESS_START_NAME), null);
 
-        waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance1);
-        waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance2);
+        waitForUserTask(processInstance1, SUB_PROCESS_USER_TASK_NAME);
+        waitForUserTask(processInstance2, SUB_PROCESS_USER_TASK_NAME);
 
         disableAndDeleteProcess(process.getId());
     }
@@ -271,12 +271,12 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
     public void subProcessCanAccessParentData() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithMessageEventSubProcessAndData(null);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance.getId());
+        waitForUserTask(processInstance.getId(), PARENT_PROCESS_USER_TASK_NAME);
 
         getProcessAPI().sendMessage(MESSAGE_NAME, new ExpressionBuilder().createConstantStringExpression(process.getName()),
                 new ExpressionBuilder().createConstantStringExpression(SUB_PROCESS_START_NAME), null);
 
-        final ActivityInstance subStep = waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance.getId());
+        final ActivityInstance subStep = waitForUserTask(processInstance.getId(), SUB_PROCESS_USER_TASK_NAME);
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
         checkProcessDataInstance(INT_DATA_NAME, subProcInst.getId(), 1);
         checkProcessDataInstance(SHORT_DATA_NAME, subProcInst.getId(), "childVar");
@@ -310,12 +310,12 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
         final ProcessDefinition callerProcess = deployAndEnableProcessWithCallActivity(targetProcess.getName(), targetProcess.getVersion());
         final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcess.getId());
         try {
-            final ActivityInstance step1 = waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance);
+            final ActivityInstance step1 = waitForUserTask(processInstance, PARENT_PROCESS_USER_TASK_NAME);
 
             getProcessAPI().sendMessage(MESSAGE_NAME, new ExpressionBuilder().createConstantStringExpression(targetProcess.getName()),
                     new ExpressionBuilder().createConstantStringExpression(SUB_PROCESS_START_NAME), null);
 
-            final ActivityInstance subStep = waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance);
+            final ActivityInstance subStep = waitForUserTask(processInstance, SUB_PROCESS_USER_TASK_NAME);
             final ProcessInstance calledProcInst = getProcessAPI().getProcessInstance(step1.getParentProcessInstanceId());
             final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
@@ -324,7 +324,7 @@ public class MessageEventSubProcessIT extends AbstractWaitingEventIT {
             waitForProcessToFinish(subProcInst);
             waitForProcessToBeInState(calledProcInst, ProcessInstanceState.ABORTED);
 
-            waitForUserTaskAndExecuteIt("step2", processInstance, user);
+            waitForUserTaskAndExecuteIt(processInstance, "step2", user);
             waitForProcessToFinish(processInstance);
         } finally {
             disableAndDeleteProcess(callerProcess);

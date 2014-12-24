@@ -341,7 +341,7 @@ public abstract class AbstractEventIT extends TestWithUser {
     protected void waitForUserTasksAndExecuteIt(final String taskName, final ProcessInstance processInstance, final int nbOfRemainingInstances)
             throws Exception {
         for (int i = 0; i < nbOfRemainingInstances; i++) {
-            waitForUserTaskAndExecuteIt(taskName, processInstance, user);
+            waitForUserTaskAndExecuteIt(processInstance, taskName, user);
         }
     }
 

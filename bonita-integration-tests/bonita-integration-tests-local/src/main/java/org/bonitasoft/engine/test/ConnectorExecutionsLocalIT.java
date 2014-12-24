@@ -110,7 +110,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
 
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnector(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step2", processInstance);
+        waitForUserTask(processInstance, "step2");
         waitForVariableStorage(TestConnector.INPUT1, valueOfInput1);
 
         disableAndDeleteProcess(processDefinition);
@@ -138,13 +138,13 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
 
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnector3(processBuilder, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance task1 = waitForUserTask("step1", processInstance);
+        final ActivityInstance task1 = waitForUserTask(processInstance, "step1");
 
         waitForVariableStorage(TestConnector3.INPUT1, valueOfInput1);
         waitForVariableStorage(TestConnector3.INPUT2, valueOfInput2);
         assignAndExecuteStep(task1, userId);
 
-        final ActivityInstance task2 = waitForUserTask("step2", processInstance);
+        final ActivityInstance task2 = waitForUserTask(processInstance, "step2");
         assignAndExecuteStep(task2, userId);
 
         waitForProcessToFinish(processInstance);
@@ -199,9 +199,9 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
 
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnector3(processBuilder, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step1", user);
 
-        final ActivityInstance task2 = waitForUserTask("step2", processInstance);
+        final ActivityInstance task2 = waitForUserTask(processInstance, "step2");
         waitForVariableStorage(TestConnector3.INPUT1, valueOfInput1);
         waitForVariableStorage(TestConnector3.INPUT2, valueOfInput2);
 
@@ -273,13 +273,13 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnector3(processBuilder, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final ActivityInstance task1 = waitForUserTask("step1", processInstance);
+        final ActivityInstance task1 = waitForUserTask(processInstance, "step1");
         waitForVariableStorage(TestConnector3.INPUT1, valueOfInput1);
         waitForVariableStorage(TestConnector3.INPUT2, valueOfInput2);
 
         assignAndExecuteStep(task1, userId);
 
-        final ActivityInstance task2 = waitForUserTask("step2", processInstance);
+        final ActivityInstance task2 = waitForUserTask(processInstance, "step2");
         waitForVariableStorage(TestConnector3.INPUT1, valueOfInput1);
         waitForVariableStorage(TestConnector3.INPUT2, valueOfInput2);
         assignAndExecuteStep(task2, userId);
@@ -340,8 +340,8 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // wait for step containing the connector and execute it
-        final ActivityInstance step1 = waitForUserTaskAndExecuteIt(taskName, processInstance, user);
-        waitForUserTask("step2", processInstance);
+        final ActivityInstance step1 = waitForUserTaskAndExecuteIt(processInstance, taskName, user);
+        waitForUserTask(processInstance, "step2");
 
         // check that there are no more connector instances
         final SearchResult<ConnectorInstance> searchResult = searchConnectors(step1.getId(), ConnectorInstance.FLOWNODE_TYPE, 10);
@@ -391,7 +391,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // Assign human task with connector
-        final long step1Id = waitForUserTaskAndAssigneIt("step1", processInstance, user).getId();
+        final long step1Id = waitForUserTaskAndAssigneIt(processInstance, "step1", user).getId();
 
         // Check Ready state of human task
         final List<HumanTaskInstance> assignedTasks = getProcessAPI().getAssignedHumanTaskInstances(userId, 0, 10, null);
@@ -402,7 +402,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         assertFalse(waitUntil.waitUntil());
 
         // Run Started state of the human task
-        executeFlowNodeUntilEnd(step1Id);
+        getProcessAPI().executeFlowNode(step1Id);
         waitForArchivedActivity(step1Id, TestStates.NORMAL_FINAL);
 
         // Check that the "input1" variable has value for "valueOfInput1", in Started state of human task
@@ -440,7 +440,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // Assign human task with connector
-        final ActivityInstance step1 = waitForUserTaskAndAssigneIt("step1", processInstance, user);
+        final ActivityInstance step1 = waitForUserTaskAndAssigneIt(processInstance, "step1", user);
 
         // Check Ready state of human task
         assertEquals("ready", step1.getState());
@@ -451,7 +451,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
 
         // Run Started state of the human task
         getProcessAPI().executeFlowNode(step1.getId());
-        waitForUserTask("step2", processInstance);
+        waitForUserTask(processInstance, "step2");
 
         // Check that the "input1" variable has value for "valueOfInput1", in Started state of human task
         waitForVariableStorage(TestConnector.INPUT1, valueOfInput1);
@@ -498,9 +498,8 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
 
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnector(processBuilder, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-
         waitForVariableStorage(TestConnector.INPUT1, valueOfInput1);
-        waitForUserTask("step2", processInstance);
+        waitForUserTask(processInstance, "step2");
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -520,7 +519,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnector(processBuilder, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
+        final HumanTaskInstance step1 = waitForUserTask(processInstance, "step1");
         final WaitUntil waitUntil = waitForVariableStorage(50, 800, TestConnector.INPUT1, valueOfInput);
         assertFalse(waitUntil.waitUntil());
 
@@ -541,7 +540,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
 
         // execute the process
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt(taskName, processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, taskName, user);
         waitForProcessToFinish(processInstance);
 
         // check there are no connector instances
@@ -581,7 +580,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         waitForVariableStorage(TestConnector.INPUT1, valueOfInput1);
-        assertNotNull(waitForUserTask("step2", processInstance));
+        assertNotNull(waitForUserTask(processInstance, "step2"));
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -668,7 +667,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         getProcessAPI().enableProcess(processDefinition.getId());
 
         final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step2", process);
+        waitForUserTask(process, "step2");
         assertEquals("value", getProcessAPI().getProcessDataInstance("value", process.getId()).getValue());
 
         disableAndDeleteProcess(processDefinition);
@@ -701,7 +700,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         businessArchiveBuilder.setProcessDefinition(designProcessDefinition.done());
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchiveBuilder.done(), ACTOR_NAME, user);
         final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step2", process);
+        waitForUserTask(process, "step2");
         assertEquals("value", getProcessAPI().getProcessDataInstance("value", process.getId()).getValue());
 
         disableAndDeleteProcess(processDefinition);
@@ -819,7 +818,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
 
         BlockingConnector.semaphore.release();
 
-        final HumanTaskInstance userTask = waitForUserTask(userTaskName, processInstance.getId());
+        final HumanTaskInstance userTask = waitForUserTask(processInstance.getId(), userTaskName);
         BlockingConnector.semaphore.acquire();
         assignAndExecuteStep(userTask, userId);
         // Try to evaluate expression on non-completed activity:

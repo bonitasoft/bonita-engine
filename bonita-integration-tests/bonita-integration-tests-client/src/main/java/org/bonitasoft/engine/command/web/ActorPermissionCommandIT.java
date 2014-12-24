@@ -197,7 +197,7 @@ public class ActorPermissionCommandIT extends TestWithUser {
 
             processDefinitionIds.add(processDefinitionId);
             processInstanceIds.add(processInstance.getId());
-            waitForUserTask("step2", processInstance.getId());
+            waitForUserTask(processInstance.getId(), "step2");
         }
 
         final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(user.getId(), processInstanceIds.get(0));
@@ -225,7 +225,7 @@ public class ActorPermissionCommandIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final HumanTaskInstance pendingTask = waitForUserTask("step2", processInstance);
+        final HumanTaskInstance pendingTask = waitForUserTask(processInstance, "step2");
         final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(user.getId(), processInstance.getId());
         // before execute
         assertFalse((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
@@ -253,12 +253,12 @@ public class ActorPermissionCommandIT extends TestWithUser {
         logoutOnTenant();
         loginOnDefaultTenantWith("jack", "bpm");
 
-        final HumanTaskInstance pendingTask = waitForUserTask("step2", processInstance);
+        final HumanTaskInstance pendingTask = waitForUserTask(processInstance, "step2");
         final Map<String, Serializable> paras1 = prepareParametersWithArchivedDescriptor(jack.getId(), processInstance.getId());
         // before execute
         assertFalse((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));
         assignAndExecuteStep(pendingTask, jack.getId());
-        waitForUserTask("step3", processInstance);
+        waitForUserTask(processInstance, "step3");
 
         // after execute
         assertTrue((Boolean) getCommandAPI().execute(IS_ALLOWED_TO_SEE_OVERVIEW_FROM_CMD, paras1));

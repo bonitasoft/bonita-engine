@@ -45,7 +45,7 @@ public class ProcessDescriptionIT extends TestWithUser {
         final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance("booleanProcessData", processInstance.getId());
         assertEquals("descBooleanProcessData", processDataInstance.getDescription());
 
-        final ActivityInstance userTask = waitForUserTask("userTask", processInstance);
+        final ActivityInstance userTask = waitForUserTask(processInstance, "userTask");
         final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("booleanUserTaskData", userTask.getId());
         assertEquals("descBooleanUserTaskData", activityDataInstance.getDescription());
 

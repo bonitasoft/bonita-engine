@@ -75,8 +75,8 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(user.getId(), processDefinition.getId());
 
         // Wait for 2 activities in READY state:
-        waitForUserTask("userTask", processInstance);
-        waitForUserTask("secondTask", processInstance);
+        waitForUserTask(processInstance, "userTask");
+        waitForUserTask(processInstance, "secondTask");
 
         // Check that no tasks are archived yet:
         SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, 12);
@@ -125,12 +125,12 @@ public class SearchActivityInstanceIT extends TestWithUser {
                 .addUserTask("userTask6", ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, jack);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        final long stepId1 = waitForUserTask("userTask1", pi0).getId();
-        final long stepId2 = waitForUserTask("userTask2", pi0).getId();
-        final long stepId3 = waitForUserTask("userTask3", pi0).getId();
-        final long stepId4 = waitForUserTask("task4", pi0).getId();
-        final long stepId5 = waitForUserTask("userTask5", pi0).getId();
-        final long stepId6 = waitForUserTask("userTask6", pi0).getId();
+        final long stepId1 = waitForUserTask(pi0, "userTask1").getId();
+        final long stepId2 = waitForUserTask(pi0, "userTask2").getId();
+        final long stepId3 = waitForUserTask(pi0, "userTask3").getId();
+        final long stepId4 = waitForUserTask(pi0, "task4").getId();
+        final long stepId5 = waitForUserTask(pi0, "userTask5").getId();
+        final long stepId6 = waitForUserTask(pi0, "userTask6").getId();
         getProcessAPI().assignUserTask(stepId1, john.getId());
         getProcessAPI().assignUserTask(stepId2, john.getId());
         getProcessAPI().assignUserTask(stepId3, jack.getId());
@@ -209,10 +209,10 @@ public class SearchActivityInstanceIT extends TestWithUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final long stepId1 = waitForUserTask("userTask1", processInstance).getId();
-        final long stepId2 = waitForUserTask("userTask2", processInstance).getId();
-        final long stepId3 = waitForUserTask("userTask3", processInstance).getId();
-        final long stepId4 = waitForUserTask("task4", processInstance).getId();
+        final long stepId1 = waitForUserTask(processInstance, "userTask1").getId();
+        final long stepId2 = waitForUserTask(processInstance, "userTask2").getId();
+        final long stepId3 = waitForUserTask(processInstance, "userTask3").getId();
+        final long stepId4 = waitForUserTask(processInstance, "task4").getId();
         getProcessAPI().assignUserTask(stepId1, john.getId());
         getProcessAPI().assignUserTask(stepId2, john.getId());
         getProcessAPI().assignUserTask(stepId3, jack.getId());
@@ -274,11 +274,11 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessInstance pi3 = getProcessAPI().startProcess(processDef2.getId());
         final ProcessInstance pi4 = getProcessAPI().startProcess(processDef2.getId());
         final ProcessInstance pi5 = getProcessAPI().startProcess(processDef2.getId());
-        waitForUserTask("initTask1", pi1);
-        waitForUserTask("initTask1", pi2);
-        waitForUserTask("initTask2", pi3);
-        waitForUserTask("initTask2", pi4);
-        waitForUserTask("initTask2", pi5);
+        waitForUserTask(pi1, "initTask1");
+        waitForUserTask(pi2, "initTask1");
+        waitForUserTask(pi3, "initTask2");
+        waitForUserTask(pi4, "initTask2");
+        waitForUserTask(pi5, "initTask2");
 
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
         SearchResult<HumanTaskInstance> humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
@@ -455,7 +455,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, actorName, user);
         // -------- start process and wait for tasks
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask(taskName, processInstance);
+        waitForUserTask(processInstance, taskName);
 
         // -------- test pending task search methods
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -480,13 +480,13 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance pi2 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("userTask1", pi1);
-        waitForUserTaskAndAssigneIt("userTask2", pi1, user);
-        waitForUserTask("manualTask", pi1);
+        waitForUserTask(pi1, "userTask1");
+        waitForUserTaskAndAssigneIt(pi1, "userTask2", user);
+        waitForUserTask(pi1, "manualTask");
 
-        waitForUserTask("userTask1", pi2);
-        waitForUserTask("userTask2", pi2);
-        waitForUserTask("manualTask", pi2);
+        waitForUserTask(pi2, "userTask1");
+        waitForUserTask(pi2, "userTask2");
+        waitForUserTask(pi2, "manualTask");
 
         // finish the tasks
         final List<ActivityInstance> openedActivityInstances1 = getProcessAPI().getOpenActivityInstances(pi1.getId(), 0, 20, ActivityInstanceCriterion.DEFAULT);
@@ -597,10 +597,10 @@ public class SearchActivityInstanceIT extends TestWithUser {
                 .getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("userTask1", pi0);
+        final ActivityInstance step1 = waitForUserTask(pi0, "userTask1");
         Thread.sleep(1000);
 
-        final ActivityInstance step2 = waitForUserTask("userTask2", pi0);
+        final ActivityInstance step2 = waitForUserTask(pi0, "userTask2");
 
         SearchResult<ArchivedHumanTaskInstance> taskInstanceSearchResult;
         SearchOptionsBuilder builder;
@@ -655,11 +655,11 @@ public class SearchActivityInstanceIT extends TestWithUser {
                 .getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("userTask1", pi0);
+        final ActivityInstance step1 = waitForUserTask(pi0, "userTask1");
         getProcessAPI().assignUserTask(step1.getId(), user.getId());
-        final ActivityInstance step2 = waitForUserTask("userTask2", pi0);
+        final ActivityInstance step2 = waitForUserTask(pi0, "userTask2");
         assignAndExecuteStep(step2, user.getId());
-        waitForUserTask("userTask3", pi0);
+        waitForUserTask(pi0, "userTask3");
         SearchOptionsBuilder builder;
         builder = new SearchOptionsBuilder(0, 10).filter(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL, true);
         SearchResult<ArchivedFlowNodeInstance> searchFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(builder.done());
@@ -682,7 +682,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask(taskName, ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask(taskName, pi0);
+        waitForUserTask(pi0, taskName);
 
         final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(pi0.getId(), 0, 10);
         assertEquals(1, activityInstances.size());
@@ -732,8 +732,8 @@ public class SearchActivityInstanceIT extends TestWithUser {
         processBuilder.addTransition("Request2", "Approval2");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("Request", processInstance);
-        waitForUserTask("Request2", processInstance);
+        waitForUserTask(processInstance, "Request");
+        waitForUserTask(processInstance, "Request2");
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 20);
         searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.NAME, "Request2");
@@ -741,7 +741,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         assertEquals(1, humanTasksSearch.getCount());
         final HumanTaskInstance userTaskId = humanTasksSearch.getResult().get(0);
         assignAndExecuteStep(userTaskId, user.getId());
-        waitForUserTask("Approval2", processInstance);
+        waitForUserTask(processInstance, "Approval2");
 
         final List<HumanTaskInstance> userTaskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, activityInstanceCriterion);
         assertNotNull(userTaskInstances);
@@ -788,11 +788,11 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         // -------- start process and wait for tasks
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("userTask1", pi0);
-        waitForUserTaskAndAssigneIt("userTask2", pi0, user);
-        waitForUserTaskAndAssigneIt("userTask3", pi0, user);
-        waitForUserTask("task4", pi0);
-        waitForUserTask("userTask5", pi0);
+        waitForUserTask(pi0, "userTask1");
+        waitForUserTaskAndAssigneIt(pi0, "userTask2", user);
+        waitForUserTaskAndAssigneIt(pi0, "userTask3", user);
+        waitForUserTask(pi0, "task4");
+        waitForUserTask(pi0, "userTask5");
 
         // -------- test pending task search methods
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -834,11 +834,11 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, Arrays.asList(user, john));
         // -------- start process and wait for tasks
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("userTask1", pi0);
-        waitForUserTaskAndAssigneIt("userTask2", pi0, user);
-        waitForUserTaskAndAssigneIt("userTask3", pi0, user);
-        waitForUserTaskAndAssigneIt("task4", pi0, john);
-        waitForUserTask("userTask5", pi0);
+        waitForUserTask(pi0, "userTask1");
+        waitForUserTaskAndAssigneIt(pi0, "userTask2", user);
+        waitForUserTaskAndAssigneIt(pi0, "userTask3", user);
+        waitForUserTaskAndAssigneIt(pi0, "task4", john);
+        waitForUserTask(pi0, "userTask5");
 
         // -------- test assigned & pending task search methods
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -876,11 +876,11 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, Arrays.asList(user, john));
         // -------- start process and wait for tasks
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("userTask1", pi0);
-        waitForUserTaskAndAssigneIt("userTask2", pi0, user);
-        waitForUserTaskAndAssigneIt("userTask3", pi0, user);
-        waitForUserTaskAndAssigneIt("task4", pi0, john);
-        waitForUserTask("userTask5", pi0);
+        waitForUserTask(pi0, "userTask1");
+        waitForUserTaskAndAssigneIt(pi0, "userTask2", user);
+        waitForUserTaskAndAssigneIt(pi0, "userTask3", user);
+        waitForUserTaskAndAssigneIt(pi0, "task4", john);
+        waitForUserTask(pi0, "userTask5");
 
         // -------- test pending task search methods
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -921,12 +921,12 @@ public class SearchActivityInstanceIT extends TestWithUser {
                 .addUserTask("userTask6", ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, john);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("userTask1", pi0);
-        waitForUserTask("userTask2", pi0);
-        waitForUserTask("userTask3", pi0);
-        waitForUserTask("task4", pi0);
-        waitForUserTask("userTask5", pi0);
-        waitForUserTask("userTask6", pi0);
+        waitForUserTask(pi0, "userTask1");
+        waitForUserTask(pi0, "userTask2");
+        waitForUserTask(pi0, "userTask3");
+        waitForUserTask(pi0, "task4");
+        waitForUserTask(pi0, "userTask5");
+        waitForUserTask(pi0, "userTask6");
 
         // filter all *userTask*, managedBy jack:
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -983,10 +983,10 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         // -------- start process and wait for tasks
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("userTask", processInstance);
-        waitForUserTask("step1", processInstance);
-        waitForUserTask("etape1", processInstance);
-        waitForUserTask("tache", processInstance);
+        waitForUserTask(processInstance, "userTask");
+        waitForUserTask(processInstance, "step1");
+        waitForUserTask(processInstance, "etape1");
+        waitForUserTask(processInstance, "tache");
 
         // -------- test pending task search methods
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -1011,15 +1011,15 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDef = deployAndEnableProcessWithActor(designProcessDef, ACTOR_NAME, user);
         // start twice and get 2 processInstances for processDef
         final ProcessInstance pi1 = getProcessAPI().startProcess(processDef.getId());
-        waitForUserTask(taskName, pi1);
+        waitForUserTask(pi1, taskName);
         Thread.sleep(5);
         final long afterCreationTask1 = System.currentTimeMillis();
         final ProcessInstance pi2 = getProcessAPI().startProcess(processDef.getId());
-        waitForUserTask(taskName, pi2);
+        waitForUserTask(pi2, taskName);
         final long afterCreationTask2 = System.currentTimeMillis();
         Thread.sleep(5);
         final ProcessInstance pi3 = getProcessAPI().startProcess(processDef.getId());
-        waitForUserTask(taskName, pi3);
+        waitForUserTask(pi3, taskName);
 
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDef.getId());
@@ -1079,7 +1079,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
                 Arrays.asList(true));
         final ProcessDefinition processDef = deployAndEnableProcessWithActor(designProcessDef, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDef.getId());
-        waitForUserTask(taskName, processInstance);
+        waitForUserTask(processInstance, taskName);
 
         // Search apostrophe
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
@@ -1101,12 +1101,12 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         // -------- start process and wait for tasks
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step#1a", processInstance);
-        waitForUserTask("step#1_b", processInstance);
-        waitForUserTask("step#1_c", processInstance);
-        waitForUserTask("%step#2", processInstance);
-        waitForUserTask("mystep3", processInstance);
-        waitForUserTask("%step#4_a", processInstance);
+        waitForUserTask(processInstance, "step#1a");
+        waitForUserTask(processInstance, "step#1_b");
+        waitForUserTask(processInstance, "step#1_c");
+        waitForUserTask(processInstance, "%step#2");
+        waitForUserTask(processInstance, "mystep3");
+        waitForUserTask(processInstance, "%step#4_a");
 
         // -------- test pending task search methods
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -1160,7 +1160,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final List<ActivityInstance> activities = searchActivities.getResult();
         final ActivityInstance activity = activities.get(0);
         assertEquals("sendTask", activity.getName());
-        waitForUserTask("userTask", processInstance);
+        waitForUserTask(processInstance, "userTask");
 
         disableAndDeleteProcess(processDefinition);
     }

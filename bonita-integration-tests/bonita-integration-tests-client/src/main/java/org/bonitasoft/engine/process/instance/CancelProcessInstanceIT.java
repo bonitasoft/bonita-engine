@@ -54,8 +54,8 @@ public class CancelProcessInstanceIT extends AbstractProcessInstanceIT {
         final ProcessDefinition processDefinition = deployProcessWith2UserTasksAnd1AutoTask(taskName1, taskName2, "auto1");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance step1 = waitForUserTask(taskName1, processInstance);
-        final HumanTaskInstance step2 = waitForUserTask(taskName2, processInstance);
+        final HumanTaskInstance step1 = waitForUserTask(processInstance, taskName1);
+        final HumanTaskInstance step2 = waitForUserTask(processInstance, taskName2);
 
         getProcessAPI().cancelProcessInstance(processInstance.getId());
         waitForProcessToBeInState(processInstance, ProcessInstanceState.CANCELLED);

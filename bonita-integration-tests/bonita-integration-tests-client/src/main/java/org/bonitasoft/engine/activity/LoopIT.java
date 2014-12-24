@@ -76,7 +76,7 @@ public class LoopIT extends TestWithUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         waitForUserTask("step1");
 
         disableAndDeleteProcess(processDefinition);
@@ -95,7 +95,7 @@ public class LoopIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         try {
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-            final ActivityInstance userTask = waitForUserTask(activityName, processInstance);
+            final ActivityInstance userTask = waitForUserTask(processInstance, activityName);
             final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
             expressions.put(new ExpressionBuilder().createConstantBooleanExpression(true), new HashMap<String, Serializable>(0));
             getProcessAPI().evaluateExpressionsOnActivityInstance(userTask.getId(), expressions);
@@ -151,7 +151,7 @@ public class LoopIT extends TestWithUser {
 
     private HumanTaskInstance waitForUserTaskAndcheckPendingHumanTaskInstances(final String userTaskName, final ProcessInstance processInstance)
             throws Exception {
-        final HumanTaskInstance pendingTask = waitForUserTask(userTaskName, processInstance);
+        final HumanTaskInstance pendingTask = waitForUserTask(processInstance, userTaskName);
         final List<HumanTaskInstance> pendingTasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(1, pendingTasks.size());
         return pendingTask;
@@ -196,9 +196,9 @@ public class LoopIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithLoopAndUserTaskInPararallelAndTerminateEvent(loopName, userTaskName);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        waitForUserTask(loopName, processInstance.getId());
+        waitForUserTask(processInstance.getId(), loopName);
         // when
-        waitForUserTaskAndExecuteIt(userTaskName, processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, userTaskName, user);
 
         // then
         // executing the user task will terminate the process: the loop activity must be aborted

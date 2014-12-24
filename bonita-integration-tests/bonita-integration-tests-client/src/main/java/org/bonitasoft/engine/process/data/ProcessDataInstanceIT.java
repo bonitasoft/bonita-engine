@@ -254,7 +254,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
         assertEquals(1, processDataInstances.get(0).getValue());
 
         // Execute pending task
-        waitForUserTaskAndExecuteIt("step1", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         waitForProcessToFinish(processInstance);
 
         // retrieve data after process has finished
@@ -342,7 +342,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.getProcess(), "actor", user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         getProcessAPI().updateProcessDataInstance(dataName, processInstance.getId(), "2");
-        waitForUserTaskAndExecuteIt("step", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step", user);
         waitForProcessToFinish(processInstance);
 
         try {
@@ -410,7 +410,7 @@ public class ProcessDataInstanceIT extends TestWithUser {
         archivedDataInstance = getArchivedDataInstance(archivedDataInstances, "desc");
         assertEquals("desc", archivedDataInstance.getValue());
 
-        final HumanTaskInstance userTask = waitForUserTask("step", processInstance);
+        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step");
         assignAndExecuteStep(userTask, user.getId());
         waitForProcessToFinish(processInstance.getId());
 

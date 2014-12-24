@@ -32,10 +32,10 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
         final int timerDuration = 1000;
         final ProcessDefinition processDefinition = deployAndEnableProcessWithBoundaryTimerEvent(timerDuration, true, "step1", "exceptionStep", "step2");
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step1", processInstance.getId());
+        waitForUserTask(processInstance.getId(), "step1");
 
         // wait timer trigger
-        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "exceptionStep", user);
         waitForFlowNodeInState(processInstance, "step1", TestStates.ABORTED, true);
         waitForProcessToFinish(processInstance);
 
@@ -77,11 +77,11 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
         // start the root process and wait for boundary event trigger
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance waitForStepCA = waitForUserTask(simpleTaskName, processInstance.getId());
+        final ActivityInstance waitForStepCA = waitForUserTask(processInstance.getId(), simpleTaskName);
         assertNotNull(waitForStepCA);
         // wait timer trigger
         // check that the exception flow was taken
-        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "exceptionStep", user);
         waitForProcessToFinish(processInstance);
 
         final ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(waitForStepCA.getId());
@@ -105,10 +105,10 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
         // start the process and wait the timer to trigger
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask(multiTaskName, processInstance.getId());
+        waitForUserTask(processInstance.getId(), multiTaskName);
         // wait timer trigger
         // check that the exception flow was taken
-        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "exceptionStep", user);
         waitForFlowNodeInState(processInstance, multiTaskName, TestStates.ABORTED, true);
         waitForProcessToFinish(processInstance);
 
@@ -131,9 +131,9 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
         // start the process and wait for process to be triggered
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
+        final HumanTaskInstance step1 = waitForUserTask(processInstance, "step1");
         // wait timer trigger
-        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "exceptionStep", user);
         waitForProcessToFinish(processInstance);
 
         final ArchivedActivityInstance archActivityInst = getProcessAPI().getArchivedActivityInstance(step1.getId());
@@ -158,11 +158,11 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
         // start the process and wait timer to trigger
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask(loopActivityName, processInstance.getId());
+        waitForUserTask(processInstance.getId(), loopActivityName);
         Thread.sleep(timerDuration); // wait timer trigger
 
         // verify that the exception flow was taken
-        waitForUserTaskAndExecuteIt(exceptionFlowStepName, processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, exceptionFlowStepName, user);
         // verify that the normal flow was aborted
         waitForFlowNodeInState(processInstance, loopActivityName, TestStates.ABORTED, true);
         waitForProcessToFinish(processInstance);
@@ -181,10 +181,10 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // Wait and execute the step1 with a timer boundary event
-        waitForUserTaskAndAssigneIt("step1", processInstance, user);
+        waitForUserTaskAndAssigneIt(processInstance, "step1", user);
 
         // wait timer trigger
-        waitForUserTaskAndExecuteIt("exceptionStep", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "exceptionStep", user);
         waitForFlowNodeInState(processInstance, "step1", TestStates.ABORTED, true);
         waitForProcessToFinish(processInstance);
 
@@ -202,7 +202,7 @@ public class InterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         waitForUserTasksAndExecuteIt("step1", processInstance, loopCardinality);
-        waitForUserTaskAndExecuteIt("step2", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step2", user);
         waitForProcessToFinish(processInstance);
 
         checkFlowNodeWasntExecuted(processInstance.getId(), "exceptionStep");

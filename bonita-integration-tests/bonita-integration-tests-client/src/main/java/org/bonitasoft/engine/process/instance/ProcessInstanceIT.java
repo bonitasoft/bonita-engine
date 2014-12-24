@@ -175,11 +175,11 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         final ProcessInstance processInstance5 = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals(5, getProcessAPI().getNumberOfProcessInstances());
 
-        waitForUserTask("step1", processInstance1);
-        waitForUserTask("step1", processInstance2);
-        waitForUserTask("step1", processInstance3);
-        waitForUserTask("step1", processInstance4);
-        waitForUserTask("step1", processInstance5);
+        waitForUserTask(processInstance1, "step1");
+        waitForUserTask(processInstance2, "step1");
+        waitForUserTask(processInstance3, "step1");
+        waitForUserTask(processInstance4, "step1");
+        waitForUserTask(processInstance5, "step1");
         getProcessAPI().deleteProcessInstances(processDefinition.getId(), 0, 4);
         assertEquals(1, getProcessAPI().getNumberOfProcessInstances());
 
@@ -202,11 +202,11 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         final ProcessInstance processInstance5 = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals(5, getProcessAPI().getNumberOfProcessInstances());
 
-        waitForUserTask("step1", processInstance1);
-        waitForUserTask("step1", processInstance2);
-        waitForUserTask("step1", processInstance3);
-        waitForUserTask("step1", processInstance4);
-        waitForUserTask("step1", processInstance5);
+        waitForUserTask(processInstance1, "step1");
+        waitForUserTask(processInstance2, "step1");
+        waitForUserTask(processInstance3, "step1");
+        waitForUserTask(processInstance4, "step1");
+        waitForUserTask(processInstance5, "step1");
         getProcessAPI().deleteProcessInstances(processDefinition.getId());
         assertEquals(0, getProcessAPI().getNumberOfProcessInstances());
 
@@ -405,9 +405,9 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         assertEquals(initialProcessInstanceNb + 3, finalProcessInstanceNb);
 
         // Clean up
-        waitForUserTask("step1", processInstance1);
-        waitForUserTask("step1", processInstance2);
-        waitForUserTask("step1", processInstance3);
+        waitForUserTask(processInstance1, "step1");
+        waitForUserTask(processInstance2, "step1");
+        waitForUserTask(processInstance3, "step1");
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -558,7 +558,7 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
 
         final ActorMember jackActorMember = getProcessAPI().addUserToActor(actor.getId(), jack.getId());
         logoutThenloginAs(jack.getUserName(), "bpm");
-        waitForUserTaskAndExecuteIt("step1", processInstance, jack);
+        waitForUserTaskAndExecuteIt(processInstance, "step1", jack);
         getProcessAPI().removeActorMember(jackActorMember.getId());
 
         assertThat(getProcessAPI().isInvolvedInProcessInstance(john.getId(), processInstanceId)).as("should be involved as case initiator").isTrue();
@@ -570,7 +570,7 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
 
         getProcessAPI().addUserToActor(actor.getId(), james.getId());
         logoutThenloginAs(james.getUserName(), "bpm");
-        waitForUserTaskAndAssigneIt("step2", processInstance, james);
+        waitForUserTaskAndAssigneIt(processInstance, "step2", james);
         assertThat(getProcessAPI().isInvolvedInProcessInstance(john.getId(), processInstanceId)).as("should be involved as case initiator").isTrue();
         assertThat(getProcessAPI().isInvolvedInProcessInstance(jim.getId(), processInstanceId)).as("should not be involved as not in actor member")
                 .isFalse();
@@ -672,7 +672,7 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step2", processInstance);
+        waitForUserTask(processInstance, "step2");
         try {
             getProcessAPI().isInvolvedInProcessInstance(999999999999L, processInstance.getId());
         } finally {
@@ -687,7 +687,7 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("step1", ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step1", processInstance);
+        waitForUserTask(processInstance, "step1");
 
         final long processInstanceId = processInstance.getId();
         processInstance = getProcessAPI().getProcessInstance(processInstanceId);
@@ -713,12 +713,12 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
 
         // Start process instance first time, and complete it
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("initTask1", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "initTask1", user);
         waitForProcessToFinish(processInstance);
 
         // Start process instance second time
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("initTask1", processInstance2, user);
+        waitForUserTaskAndExecuteIt(processInstance2, "initTask1", user);
         waitForProcessToFinish(processInstance2);
 
         disableAndDeleteProcess(processDefinition);
@@ -842,7 +842,7 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(otherUser.getId(), processDefinition.getId(),
                 Collections.singletonList(integerOperation), Collections.<String, Serializable> singletonMap("page", "1"));
-        final HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
+        final HumanTaskInstance step1 = waitForUserTask(processInstance, "step1");
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.sort(UserSearchDescriptor.LAST_NAME, Order.DESC);
@@ -864,8 +864,8 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
                 Lists.newArrayList(user));
         final ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", pi, user);
-        waitForUserTaskAndExecuteIt("step2", pi, user);
+        waitForUserTaskAndExecuteIt(pi, "step1", user);
+        waitForUserTaskAndExecuteIt(pi, "step2", user);
 
         waitForProcessToFinish(pi);
         disableAndDeleteProcess(processDefinition);
@@ -880,8 +880,8 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
                 Lists.newArrayList(user));
         final ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", pi, user);
-        waitForUserTaskAndExecuteIt("step2", pi, user);
+        waitForUserTaskAndExecuteIt(pi, "step1", user);
+        waitForUserTaskAndExecuteIt(pi, "step2", user);
 
         waitForProcessToFinish(pi);
         disableAndDeleteProcess(processDefinition);
@@ -896,8 +896,8 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
                 Lists.newArrayList(user));
         final ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", pi, user);
-        waitForUserTaskAndExecuteIt("step3", pi, user);
+        waitForUserTaskAndExecuteIt(pi, "step1", user);
+        waitForUserTaskAndExecuteIt(pi, "step3", user);
 
         waitForProcessToFinish(pi);
         disableAndDeleteProcess(processDefinition);
@@ -910,12 +910,12 @@ public class ProcessInstanceIT extends AbstractProcessInstanceIT {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, Lists.newArrayList(ACTOR_NAME, ACTOR_NAME),
                 Lists.newArrayList(user));
         final ProcessInstance pi = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", pi, user);
+        waitForUserTaskAndExecuteIt(pi, "step1", user);
         final long nbDeleted = getProcessAPI().deleteArchivedProcessInstances(processDefinition.getId(), 0, 10);
 
         // there is one archived process instance deleted because the former process_instance state has been archived
         assertThat(nbDeleted).isEqualTo(1);
-        waitForUserTaskAndExecuteIt("step2", pi, user);
+        waitForUserTaskAndExecuteIt(pi, "step2", user);
         waitForProcessToFinish(pi);
         disableAndDeleteProcess(processDefinition);
     }

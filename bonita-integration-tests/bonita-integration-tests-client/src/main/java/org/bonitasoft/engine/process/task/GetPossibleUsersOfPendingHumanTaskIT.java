@@ -75,7 +75,7 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
                 Arrays.asList(true));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, jack);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
+        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step1");
 
         final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfPendingHumanTask(userTask.getId(), 0, 10);
         assertEquals(1, possibleUsers.size());
@@ -94,7 +94,7 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
                 Arrays.asList(true));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, jack);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
+        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step1");
 
         final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfPendingHumanTask(userTask.getId(), 0, 10);
         assertEquals(1, possibleUsers.size());
@@ -114,7 +114,7 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
                 Arrays.asList(true));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, role);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
+        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step1");
 
         final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfPendingHumanTask(userTask.getId(), 0, 10);
         assertEquals(1, possibleUsers.size());
@@ -135,7 +135,7 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
                 Arrays.asList(true));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, group);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
+        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step1");
 
         final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfPendingHumanTask(userTask.getId(), 0, 10);
         assertEquals(1, possibleUsers.size());
@@ -162,7 +162,7 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
                 Arrays.asList(true));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, users);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
+        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step1");
 
         final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfPendingHumanTask(userTask.getId(), 0, 30);
         // make sure the list is not limited to 20:
@@ -188,7 +188,7 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
                 Arrays.asList(true));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, group);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
+        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step1");
 
         List<User> possibleUsers = getProcessAPI().getPossibleUsersOfPendingHumanTask(userTask.getId(), 0, 10);
         assertEquals(2, possibleUsers.size());
@@ -226,8 +226,8 @@ public class GetPossibleUsersOfPendingHumanTaskIT extends TestWithTechnicalUser 
         getProcessAPI().addUserToActor(ACTOR_NAME, processDefinition, jack.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
-        final HumanTaskInstance userTask = waitForUserTask("step1", processInstance);
-        waitForUserTask("step2", processInstance);
+        final HumanTaskInstance userTask = waitForUserTask(processInstance, "step1");
+        waitForUserTask(processInstance, "step2");
         final List<User> possibleUsers = getProcessAPI().getPossibleUsersOfPendingHumanTask(userTask.getId(), 0, 2);
         assertEquals(1, possibleUsers.size());
         assertEquals(john, possibleUsers.get(0));

@@ -41,15 +41,15 @@ public class NonInterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
         // start the process and wait for timer to trigger
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance waitForStep1 = waitForUserTask("step1", processInstance.getId());
+        final ActivityInstance waitForStep1 = waitForUserTask(processInstance.getId(), "step1");
         Thread.sleep(timerDuration); // wait timer trigger
 
         // check that the exception flow was taken
-        final HumanTaskInstance exceptionFlowStep = waitForUserTask("exceptionStep", processInstance);
+        final HumanTaskInstance exceptionFlowStep = waitForUserTask(processInstance, "exceptionStep");
 
         // execute the task containing the boundary and verify that the normal flow continues
         assignAndExecuteStep(waitForStep1, user.getId());
-        final HumanTaskInstance normalFlowStep = waitForUserTask("step2", processInstance);
+        final HumanTaskInstance normalFlowStep = waitForUserTask(processInstance, "step2");
 
         // execute exception flow step and normal flow step and verify that the process has finished
         assignAndExecuteStep(exceptionFlowStep, user.getId());
@@ -76,15 +76,15 @@ public class NonInterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
         // start the root process and wait for boundary event triggering
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance stepCA = waitForUserTask(simpleTaskName, processInstance.getId());
+        final ActivityInstance stepCA = waitForUserTask(processInstance.getId(), simpleTaskName);
         Thread.sleep(timerDuration); // wait timer trigger
 
         // check that the exception flow was taken
-        final ActivityInstance exceptionFlowStep = waitForUserTask(EXCEPTION_STEP, processInstance.getId());
+        final ActivityInstance exceptionFlowStep = waitForUserTask(processInstance.getId(), EXCEPTION_STEP);
 
         // execute the user task of p1 and check that the normal flow also was taken
         assignAndExecuteStep(stepCA, user.getId());
-        final ActivityInstance normalFlowStep = waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance.getId());
+        final ActivityInstance normalFlowStep = waitForUserTask(processInstance.getId(), PARENT_PROCESS_USER_TASK_NAME);
 
         // execute exception flow and normal flow and verify that the process completes
         assignAndExecuteStep(exceptionFlowStep, user.getId());
@@ -112,16 +112,16 @@ public class NonInterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
         // start the process and wait the timer to trigger
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance multiInstance = waitForUserTask(multiTaskName, processInstance);
+        final ActivityInstance multiInstance = waitForUserTask(processInstance, multiTaskName);
         Thread.sleep(timerDuration); // wait timer trigger
 
         // check that the exception flow was taken
-        final ActivityInstance exceptionFlowStep = waitForUserTask(exceptionFlowTaskName, processInstance);
+        final ActivityInstance exceptionFlowStep = waitForUserTask(processInstance, exceptionFlowTaskName);
 
         // execute multi-instances and verify that normal flow continues
         assignAndExecuteStep(multiInstance, user.getId());
         waitForUserTasksAndExecuteIt(multiTaskName, processInstance, loopCardinality - 1);
-        final ActivityInstance normalFlowStep = waitForUserTask(normalFlowTaskName, processInstance);
+        final ActivityInstance normalFlowStep = waitForUserTask(processInstance, normalFlowTaskName);
 
         // execute exception flow and normal flow and verify that the process completes
         assignAndExecuteStep(exceptionFlowStep, user.getId());
@@ -146,14 +146,14 @@ public class NonInterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
         // start the process and wait for process to be triggered
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask(multiTaskName, processInstance);
+        waitForUserTask(processInstance, multiTaskName);
 
         // verify that the exception flow was taken
-        final HumanTaskInstance exceptionFlowStep = waitForUserTask("exceptionStep", processInstance);
+        final HumanTaskInstance exceptionFlowStep = waitForUserTask(processInstance, "exceptionStep");
 
         // execute multi-instance and verify that normal flow continues
         executeRemainingParallelMultiInstances(multiTaskName, processInstance, loopCardinality);
-        final ActivityInstance normalTask = waitForUserTask(normalTaskName, processInstance);
+        final ActivityInstance normalTask = waitForUserTask(processInstance, normalTaskName);
 
         // execute exception flow and normal flow and verify the process completes
         assignAndExecuteStep(exceptionFlowStep, user.getId());
@@ -178,16 +178,16 @@ public class NonInterruptingTimerBoundaryEventIT extends AbstractEventIT {
 
         // start the process and wait timer to trigger
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance loop = waitForUserTask(loopActivityName, processInstance);
+        final ActivityInstance loop = waitForUserTask(processInstance, loopActivityName);
         Thread.sleep(timerDuration); // wait timer trigger
 
         // verify that the exception flow was taken
-        final ActivityInstance exceptionStep = waitForUserTask(exceptionFlowStepName, processInstance);
+        final ActivityInstance exceptionStep = waitForUserTask(processInstance, exceptionFlowStepName);
 
         // execute all loop activities and verify that the nomal flow continues
         assignAndExecuteStep(loop, user.getId());
         waitForUserTasksAndExecuteIt(loopActivityName, processInstance, loopMax - 1);
-        final ActivityInstance normalFlowStep = waitForUserTask(normalFlowStepName, processInstance);
+        final ActivityInstance normalFlowStep = waitForUserTask(processInstance, normalFlowStepName);
 
         // execute the exception flow and the normal flow and verify that the process completes
         assignAndExecuteStep(exceptionStep, user.getId());
