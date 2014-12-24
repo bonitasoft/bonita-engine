@@ -721,16 +721,28 @@ public class APITestUtil extends PlatformTestUtil {
         getProcessAPI().executeFlowNode(activityInstanceId);
     }
 
-    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final User user) throws Exception {
+    public HumanTaskInstance waitForUserTaskAndExecuteAndGetIt(final String taskName, final User user) throws Exception {
         final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(taskName);
         assignAndExecuteStep(humanTaskInstance, user);
         return humanTaskInstance;
     }
 
-    public HumanTaskInstance waitForUserTaskAndExecuteIt(final ProcessInstance processInstance, final String taskName, final User user) throws Exception {
+    public long waitForUserTaskAndExecuteIt(final String taskName, final User user) throws Exception {
+        final long humanTaskInstanceId = waitForUserTask(taskName);
+        assignAndExecuteStep(humanTaskInstanceId, user);
+        return humanTaskInstanceId;
+    }
+
+    public HumanTaskInstance waitForUserTaskAndExecuteAndGetIt(final ProcessInstance processInstance, final String taskName, final User user) throws Exception {
         final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(processInstance.getId(), taskName, DEFAULT_TIMEOUT);
-        assignAndExecuteStep(humanTaskInstance, user.getId());
+        assignAndExecuteStep(humanTaskInstance, user);
         return humanTaskInstance;
+    }
+
+    public long waitForUserTaskAndExecuteIt(final ProcessInstance processInstance, final String taskName, final User user) throws Exception {
+        final long humanTaskInstanceId = waitForUserTask(processInstance.getId(), taskName, DEFAULT_TIMEOUT);
+        assignAndExecuteStep(humanTaskInstanceId, user);
+        return humanTaskInstanceId;
     }
 
     public HumanTaskInstance waitForUserTaskAndAssigneIt(final String taskName, final User user) throws Exception,

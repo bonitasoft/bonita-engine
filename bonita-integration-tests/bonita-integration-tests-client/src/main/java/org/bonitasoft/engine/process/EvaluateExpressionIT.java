@@ -28,7 +28,6 @@ import java.util.Map;
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -222,8 +221,8 @@ public class EvaluateExpressionIT extends TestWithUser {
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Completed activity" }, story = "Evaluate an expression on completed activity instance.", jira = "")
     @Test
     public void evaluateExpressionsOnCompletedActivityInstance() throws Exception {
-        final HumanTaskInstance userTaskInstance = waitForUserTaskAndExecuteIt(processInstance, STEP1_NAME, user);
-        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnCompletedActivityInstance(userTaskInstance.getId(), expressions);
+        final long step1Id = waitForUserTaskAndExecuteIt(processInstance, STEP1_NAME, user);
+        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnCompletedActivityInstance(step1Id, expressions);
         assertEquals("Word-Excel", result.get("StringScript"));
         assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
         assertEquals("1plop", result.get("LongScript"));

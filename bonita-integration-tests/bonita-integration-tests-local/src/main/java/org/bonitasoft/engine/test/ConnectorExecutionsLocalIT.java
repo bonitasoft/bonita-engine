@@ -336,11 +336,11 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // wait for step containing the connector and execute it
-        final ActivityInstance step1 = waitForUserTaskAndExecuteIt(processInstance, taskName, user);
+        final long step1Id = waitForUserTaskAndExecuteIt(processInstance, taskName, user);
         waitForUserTask(processInstance, "step2");
 
         // check that there are no more connector instances
-        final SearchResult<ConnectorInstance> searchResult = searchConnectors(step1.getId(), ConnectorInstance.FLOWNODE_TYPE, 10);
+        final SearchResult<ConnectorInstance> searchResult = searchConnectors(step1Id, ConnectorInstance.FLOWNODE_TYPE, 10);
         assertEquals(0, searchResult.getCount());
 
         // clean up

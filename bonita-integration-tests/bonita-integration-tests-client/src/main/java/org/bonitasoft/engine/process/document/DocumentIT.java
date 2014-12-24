@@ -458,14 +458,13 @@ public class DocumentIT extends TestWithUser {
             final Document afterUpdate = getAttachmentWithoutItsContent(processInstance);
             assertNotSame(beforeUpdate, afterUpdate);
 
-            final HumanTaskInstance step1 = waitForUserTaskAndExecuteIt(processInstance, "step1", user);
-            waitForArchivedActivity(step1.getId(), TestStates.NORMAL_FINAL);
+            final long step1Id = waitForUserTaskAndExecuteIt(processInstance, "step1", user);
+            waitForArchivedActivity(step1Id, TestStates.NORMAL_FINAL);
 
             final Document doc2 = BuildTestUtil.buildDocument(beforeUpdate.getName());
             getProcessAPI().attachNewDocumentVersion(processInstance.getId(), beforeUpdate.getName(), doc2.getContentFileName(), doc2.getContentMimeType(),
                     "contentOfTheDoc".getBytes());
-            final Document documentAtActivityInstanciation = getProcessAPI().getDocumentAtActivityInstanceCompletion(step1.getId(),
-                    beforeUpdate.getName());
+            final Document documentAtActivityInstanciation = getProcessAPI().getDocumentAtActivityInstanceCompletion(step1Id, beforeUpdate.getName());
             assertEquals(afterUpdate, documentAtActivityInstanciation);
         } finally {
             disableAndDeleteProcess(processInstance.getProcessDefinitionId());

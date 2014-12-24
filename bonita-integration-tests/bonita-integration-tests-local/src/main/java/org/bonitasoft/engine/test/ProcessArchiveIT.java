@@ -258,7 +258,7 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
         final ProcessDefinition callingProcessDef = deployAndEnableProcess(callingProcess.getProcess());
 
         final ProcessInstance p1 = getProcessAPI().startProcess(callingProcessDef.getId());
-        final ActivityInstance userTask = waitForUserTaskAndExecuteIt(p1, "step1", john);
+        final ActivityInstance userTask = waitForUserTaskAndExecuteAndGetIt(p1, "step1", john);
         waitForProcessToFinish(p1);
         waitForArchivedActivity(userTask.getId(), TestStates.NORMAL_FINAL);
         final ArchivedActivityInstance archivedUserTask = getProcessAPI().getArchivedActivityInstance(userTask.getId());
@@ -286,9 +286,9 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, "actor", john);
         final ProcessInstance p1 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance userTask = waitForUserTaskAndExecuteIt(p1, "step1", john);
+        final long userTaskId = waitForUserTaskAndExecuteIt(p1, "step1", john);
         waitForProcessToFinish(p1);
-        final ArchivedActivityInstance archivedUserTask = getProcessAPI().getArchivedActivityInstance(userTask.getId());
+        final ArchivedActivityInstance archivedUserTask = getProcessAPI().getArchivedActivityInstance(userTaskId);
         assertEquals(archivedUserTask, getProcessAPI().getArchivedFlowNodeInstance(archivedUserTask.getId()));
         disableAndDeleteProcess(processDefinition);
     }

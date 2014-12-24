@@ -285,10 +285,10 @@ public class ProcessDeletionIT extends TestWithUser {
 
         // start P3, the call activities will start instances of P2 a and P1
         final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcess.getId());
-        final ActivityInstance simpleTask = waitForUserTaskAndExecuteIt(rootProcessInstance, simpleStepName, user);
+        final ActivityInstance simpleTask = waitForUserTaskAndExecuteAndGetIt(rootProcessInstance, simpleStepName, user);
 
         // execute intermediate task: p2 will finish
-        final ActivityInstance intermediateTask = waitForUserTaskAndExecuteIt(rootProcessInstance, intermediateStepName, user);
+        final ActivityInstance intermediateTask = waitForUserTaskAndExecuteAndGetIt(rootProcessInstance, intermediateStepName, user);
 
         // execute root task: p3 will finish
         waitForUserTaskAndExecuteIt(rootProcessInstance, rootStepName, user);
@@ -404,7 +404,7 @@ public class ProcessDeletionIT extends TestWithUser {
 
         // start P2, the call activities will start an instance of P1
         final ProcessInstance rootProcessInstance = getProcessAPI().startProcess(rootProcess.getId());
-        final ActivityInstance simpleTask = waitForUserTaskAndExecuteIt(rootProcessInstance, simpleStepName, user);
+        final ActivityInstance simpleTask = waitForUserTaskAndExecuteAndGetIt(rootProcessInstance, simpleStepName, user);
         final ProcessInstance simpleProcessInstance = getProcessAPI().getProcessInstance(simpleTask.getParentProcessInstanceId());
         waitForUserTask(rootProcessInstance, rootStepName);
         waitForProcessToFinish(simpleProcessInstance);

@@ -96,7 +96,7 @@ public class SignalBoundaryEventIT extends AbstractEventIT {
         final ProcessDefinition calledProcessDefinition = deployAndEnableSimpleProcess("calledProcess", "calledStep");
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance calledStep = waitForUserTaskAndExecuteIt(processInstance, "calledStep", user);
+        final ActivityInstance calledStep = waitForUserTaskAndExecuteAndGetIt(processInstance, "calledStep", user);
         final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep.getParentProcessInstanceId());
 
         final long step2Id = waitForUserTask(processInstance, "step2");

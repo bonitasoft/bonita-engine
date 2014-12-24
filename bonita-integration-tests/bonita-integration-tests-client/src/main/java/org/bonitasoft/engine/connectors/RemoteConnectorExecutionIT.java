@@ -1069,7 +1069,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         // start parent
         final ProcessInstance processInstance = getProcessAPI().startProcess(callingProcess.getId());
 
-        final HumanTaskInstance step1 = waitForUserTaskAndExecuteIt("step1", user);
+        final HumanTaskInstance step1 = waitForUserTaskAndExecuteAndGetIt("step1", user);
         // the connector must trigger this exception step of the calling process
         waitForUserTaskAndExecuteIt(processInstance, "errorTask", user);
         waitForProcessToFinish(processInstance);

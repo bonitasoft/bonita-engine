@@ -287,8 +287,8 @@ public class ErrorEventSubProcessIT extends AbstractWaitingEventIT {
 
         // Start the caller process
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitions.get(1).getId());
-        final HumanTaskInstance stepBeforeFailedConnector = waitForUserTaskAndExecuteIt("StepBeforeFailedConnector", user);
-        final ActivityInstance subStep = waitForUserTaskAndExecuteIt("SubStep", user);
+        final HumanTaskInstance stepBeforeFailedConnector = waitForUserTaskAndExecuteAndGetIt("StepBeforeFailedConnector", user);
+        final ActivityInstance subStep = waitForUserTaskAndExecuteAndGetIt("SubStep", user);
 
         waitForProcessToFinish(subStep.getParentProcessInstanceId());
         waitForProcessToBeInState(processInstance, ProcessInstanceState.ABORTED);
