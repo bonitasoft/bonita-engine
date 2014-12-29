@@ -450,13 +450,12 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         if (dataNames.isEmpty()) {
             return Collections.emptyList();
         }
-        final ArrayList<SDataInstance> finalResult = new ArrayList<SDataInstance>(dataNames.size());
-        for (String dataName : dataNames) {
-            //FIXME one query only
-            final SDataInstance dataInstance = getDataInstance(dataName, containerId, containerType, parentContainerResolver);
-            finalResult.add(dataInstance);
-        }
-        return finalResult;
+
+        final String queryName = "getDataInstanceWithNamesOfContainers";
+        final Map<String, Object> inputParameters = new HashMap<String, Object>();
+        inputParameters.put("dataNames", dataNames);
+        final List<SDataInstance> dataInstances = getSDatainstanceOfContainers(containerId, containerType, parentContainerResolver, queryName, inputParameters);
+        return dataInstances;
     }
 
     @Override

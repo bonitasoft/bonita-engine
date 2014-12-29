@@ -58,5 +58,22 @@
 		)
 	</query>
 
+	<query name="getDataInstanceWithNamesOfContainers">
+		SELECT dataInstance
+		FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+		WHERE
+		dataInstance.name in (:dataNames)
+		AND
+		(
+		dataInstance.containerType = 'ACTIVITY_INSTANCE' AND dataInstance.containerId in(:activityInstanceContainerIds)
+		OR
+		dataInstance.containerType = 'PROCESS_INSTANCE' AND dataInstance.containerId in(:processInstanceContainerIds)
+		OR
+		dataInstance.containerType = 'MESSAGE_INSTANCE' AND dataInstance.containerId in(:messageInstanceContainerIds)
+		)
+	</query>
+
+
+
 	
 </hibernate-mapping>
