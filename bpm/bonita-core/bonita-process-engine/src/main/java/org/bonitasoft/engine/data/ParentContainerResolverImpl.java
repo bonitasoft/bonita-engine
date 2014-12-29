@@ -61,14 +61,23 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
                 container = null;
             } else if (DataInstanceContainer.PROCESS_INSTANCE.name().equals(container.getRight())) {
                 try {
-                    final SProcessInstance processInstance = processInstanceService.getProcessInstance(container.getLeft());
-                    final SFlowNodeType callerType = processInstance.getCallerType();
-                    if (callerType != null && callerType.equals(SFlowNodeType.SUB_PROCESS)) {
-                        container = new Pair<Long, String>(processInstance.getCallerId(), DataInstanceContainer.PROCESS_INSTANCE.name());
-                        containerHierarchy.add(container);
-                    } else {
-                        container = null;
-                    }
+                        final SProcessInstance processInstance = processInstanceService.getProcessInstance(container.getLeft());
+                        final SFlowNodeType callerType = processInstance.getCallerType();
+                        if (callerType != null && callerType.equals(SFlowNodeType.SUB_PROCESS)) {
+                            final SFlowNodeInstance callerFlowNodeInstance;
+                            try {
+                                callerFlowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(processInstance.getCallerId());
+                            } catch (SFlowNodeNotFoundException e) {
+                                throw new SObjectNotFoundException(e);
+                            } catch (SFlowNodeReadException e) {
+                                throw new SObjectReadException(e);
+                            }
+                            final long callerProcessInstanceId = callerFlowNodeInstance.getParentProcessInstanceId();
+                            container = new Pair<Long, String>(callerProcessInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name());
+                            containerHierarchy.add(container);
+                        } else {
+                            container = null;
+                        }
                 } catch (SProcessInstanceNotFoundException e) {
                     throw new SObjectNotFoundException(e);
                 } catch (SProcessInstanceReadException e) {
