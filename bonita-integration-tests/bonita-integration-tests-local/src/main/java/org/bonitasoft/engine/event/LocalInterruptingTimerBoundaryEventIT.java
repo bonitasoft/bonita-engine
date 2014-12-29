@@ -170,7 +170,7 @@ public class LocalInterruptingTimerBoundaryEventIT extends AbstractEventIT {
     public void timerBoundaryEventNotTriggeredOnParallelMultiInstance() throws Exception {
         // given
         final long timerDuration = 20000;
-        final int loopCardinality = 1;
+        final int loopCardinality = 2;
         final boolean isSequential = false;
         final ProcessDefinition processDefinition = deployAndEnableProcessMultiInstanceWithBoundaryEvent(timerDuration, true, "step1", loopCardinality,
                 isSequential, "step2", "exceptionStep");
