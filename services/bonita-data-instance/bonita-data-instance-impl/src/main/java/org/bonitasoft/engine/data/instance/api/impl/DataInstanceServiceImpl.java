@@ -180,11 +180,11 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         final List<Long> messageInstanceContainerIds = new ArrayList<Long>();
 
         for (Pair<Long, String> container : containerHierarchy) {
-            if (container.getRight().equals(DataInstanceContainer.ACTIVITY_INSTANCE)) {
+            if (container.getRight().equals(DataInstanceContainer.ACTIVITY_INSTANCE.name())) {
                 activityInstanceContainerIds.add(container.getLeft());
-            } else if (container.getRight().equals(DataInstanceContainer.PROCESS_INSTANCE)) {
+            } else if (container.getRight().equals(DataInstanceContainer.PROCESS_INSTANCE.name())) {
                 processInstanceContainerIds.add(container.getLeft());
-            } else if (container.getRight().equals(DataInstanceContainer.MESSAGE_INSTANCE)) {
+            } else if (container.getRight().equals(DataInstanceContainer.MESSAGE_INSTANCE.name())) {
                 messageInstanceContainerIds.add(container.getLeft());
             }
         }
