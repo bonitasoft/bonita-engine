@@ -366,26 +366,31 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         }
     }
 
+
     @Override
     public SADataInstance getSADataInstance(final long sourceObjectId, final long time) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getSADataInstance");
-        // TODO
-        return null;
+        try {
+            final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
+            final Map<String, Object> parameters = new HashMap<String, Object>(2);
+            parameters.put("dataInstanceId", sourceObjectId);
+            parameters.put("time", time);
+            final SADataInstance saDataInstance = readPersistenceService.selectOne(new SelectOneDescriptor<SADataInstance>(
+                    "getSADataInstanceByDataInstanceIdAndArchiveDate", parameters, SADataInstance.class));
+            logAfterMethod(TechnicalLogSeverity.TRACE, "getSADataInstance");
+            return saDataInstance;
+        } catch (final SBonitaReadException e) {
+            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getSADataInstance", e);
+            throw new SDataInstanceReadException("Unable to read SADataInstance", e);
+        }
     }
 
-    @Override
-    public SADataInstance getLastSADataInstance(final long dataInstanceId) throws SDataInstanceReadException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance");
-        // TODO
-        return null;
-    }
 
     @Override
     public SADataInstance getLastSADataInstance(final String dataName, final long containerId, final String containerType,
             final ParentContainerResolver parentContainerResolver) throws SDataInstanceException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance");
-        // TODO
-        return null;
+        return getSADataInstance(containerId, containerType, parentContainerResolver, dataName, System.currentTimeMillis());
     }
 
     @Override

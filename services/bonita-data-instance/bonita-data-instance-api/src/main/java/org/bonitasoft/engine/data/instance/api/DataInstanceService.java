@@ -199,15 +199,6 @@ public interface DataInstanceService {
     long getNumberOfDataInstances(long containerId, DataInstanceContainer containerType,
             final ParentContainerResolver parentContainerResolver) throws SDataInstanceException;
 
-    /**
-     * Get the last SADataInstance object for the specific dataInstance
-     * 
-     * @param dataInstanceId
-     *            Identifier of dataInstance
-     * @return a SADataInstance object
-     * @throws SDataInstanceException
-     */
-    SADataInstance getLastSADataInstance(long dataInstanceId) throws SDataInstanceException;
 
     /**
      * Gets the last archived SADataInstance object for the named data in the container.
