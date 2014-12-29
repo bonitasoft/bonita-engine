@@ -77,7 +77,7 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
             } else {
                 throw new SObjectNotFoundException("Unknown container type: " + container.getRight());
             }
-        } while(container != null);
+        } while (container != null);
         return containerHierarchy;
     }
 
@@ -127,12 +127,16 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
                 try {
                     final SAProcessInstance processInstance = processInstanceService.getLastArchivedProcessInstance(container.getLeft());
                     final long callerId = processInstance.getCallerId();
-                    final SAFlowNodeInstance flowNodeInstance = flowNodeInstanceService.getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, callerId);
+                    if (callerId >= 0) {
+                        final SAFlowNodeInstance flowNodeInstance = flowNodeInstanceService.getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, callerId);
 
-                    final SFlowNodeType callerType = flowNodeInstance.getType();
-                    if (callerType != null && callerType.equals(SFlowNodeType.SUB_PROCESS)) {
-                        container = new Pair<Long, String>(processInstance.getCallerId(), DataInstanceContainer.PROCESS_INSTANCE.name());
-                        containerHierarchy.add(container);
+                        final SFlowNodeType callerType = flowNodeInstance.getType();
+                        if (callerType != null && callerType.equals(SFlowNodeType.SUB_PROCESS)) {
+                            container = new Pair<Long, String>(processInstance.getCallerId(), DataInstanceContainer.PROCESS_INSTANCE.name());
+                            containerHierarchy.add(container);
+                        } else {
+                            container = null;
+                        }
                     } else {
                         container = null;
                     }
@@ -142,7 +146,7 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
             } else {
                 throw new SObjectNotFoundException("Unknown container type: " + container.getRight());
             }
-        } while(container != null);
+        } while (container != null);
         return containerHierarchy;
     }
 

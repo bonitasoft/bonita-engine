@@ -392,11 +392,11 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     public List<SADataInstance> getSADataInstances(final long containerId, final String containerType,
                                                    final ParentContainerResolver parentContainerResolver, final List<String> dataNames, final long time)
             throws SDataInstanceReadException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "getSADataInstancesWithNames");
+        logBeforeMethod(TechnicalLogSeverity.TRACE, "getSADataInstances");
         if (dataNames.isEmpty()) {
             return Collections.emptyList();
         }
-        final String queryName = "getDataInstancesOfContainers";
+        final String queryName = "getArchivedDataInstancesWithNameOfContainers";
         final Map<String, Object> inputParameters = new HashMap<String, Object>();
         inputParameters.put("time", time);
         inputParameters.put("dataNames", dataNames);
@@ -447,6 +447,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         }
         final ArrayList<SDataInstance> finalResult = new ArrayList<SDataInstance>(dataNames.size());
         for (String dataName : dataNames) {
+            //FIXME one query only
             final SDataInstance dataInstance = getDataInstance(dataName, containerId, containerType, parentContainerResolver);
             finalResult.add(dataInstance);
         }

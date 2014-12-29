@@ -812,10 +812,10 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
                         new ExpressionBuilder().createDataExpression("b", String.class.getName()),
                         new ExpressionBuilder().createDataExpression("c", String.class.getName())), Collections.<String, Serializable> emptyMap());
         expressions.put(new ExpressionBuilder().createDataExpression("a", String.class.getName()), Collections.<String, Serializable> emptyMap());
-        final Map<String, Serializable> evaluateExpressionsAtProcessInstanciation = getProcessAPI().evaluateExpressionsAtProcessInstanciation(
+        final Map<String, Serializable> evaluateExpressionsAtProcessInstantiation = getProcessAPI().evaluateExpressionsAtProcessInstanciation(
                 processInstance.getId(), expressions);
-        assertEquals("avaluebvaluecvalue", evaluateExpressionsAtProcessInstanciation.get("ascripte"));
-        assertEquals("avalue", evaluateExpressionsAtProcessInstanciation.get("a"));
+        assertEquals("avaluebvaluecvalue", evaluateExpressionsAtProcessInstantiation.get("ascripte"));
+        assertEquals("avalue", evaluateExpressionsAtProcessInstantiation.get("a"));
 
         BlockingConnector.semaphore.release();
 
@@ -833,8 +833,8 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
 
         waitForProcessToFinish(processInstance.getId());
         getProcessAPI().evaluateExpressionsAtProcessInstanciation(processInstance.getId(), expressions);
-        assertEquals("avaluebvaluecvalue", evaluateExpressionsAtProcessInstanciation.get("ascripte"));
-        assertEquals("avalue", evaluateExpressionsAtProcessInstanciation.get("a"));
+        assertEquals("avaluebvaluecvalue", evaluateExpressionsAtProcessInstantiation.get("ascripte"));
+        assertEquals("avalue", evaluateExpressionsAtProcessInstantiation.get("a"));
 
         disableAndDeleteProcess(processDefinition);
     }
