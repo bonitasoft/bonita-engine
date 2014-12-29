@@ -14,12 +14,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bonitasoft.engine.TestWithTechnicalUser;
-import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
-import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
-import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
-import org.bonitasoft.engine.bpm.process.ProcessDeployException;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisorSearchDescriptor;
@@ -69,25 +65,23 @@ public class SupervisorIT extends TestWithTechnicalUser {
     @After
     public void after() throws Exception {
         deleteSupervisors(supervisors);
-        deleteProcess(processDefinitions);
+        disableAndDeleteProcess(processDefinitions);
         deleteUsers(users);
         deleteRoles(roles);
         deleteGroups(groups);
         super.after();
     }
 
-    private void createProcessDefinitions() throws InvalidProcessDefinitionException, ProcessDeployException, InvalidBusinessArchiveFormatException,
-            AlreadyExistsException {
+    private void createProcessDefinitions() throws BonitaException {
         processDefinitions = new ArrayList<ProcessDefinition>();
         processDefinitions.add(createProcessDefinition("myProcess1"));
         processDefinitions.add(createProcessDefinition("myProcess2"));
     }
 
-    private ProcessDefinition createProcessDefinition(final String processName) throws InvalidProcessDefinitionException, ProcessDeployException,
-            InvalidBusinessArchiveFormatException, AlreadyExistsException {
+    private ProcessDefinition createProcessDefinition(final String processName) throws BonitaException {
         // test process definition with no supervisor
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance(processName, "1.0").done();
-        return getProcessAPI().deploy(new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
+        return deployAndEnableProcess(designProcessDefinition);
     }
 
     private void createUsers() throws BonitaException {

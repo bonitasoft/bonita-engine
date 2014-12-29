@@ -18,6 +18,7 @@ import org.bonitasoft.engine.bpm.bar.BusinessArchive;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.TaskPriority;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -36,7 +37,6 @@ import org.bonitasoft.engine.identity.UserMembership;
 import org.bonitasoft.engine.identity.UserNotFoundException;
 import org.bonitasoft.engine.identity.UserSearchDescriptor;
 import org.bonitasoft.engine.search.Order;
-import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -76,19 +76,17 @@ public class PendingTasksIT extends TestWithTechnicalUser {
         final User user = createUser("Barnabooth", "Strongwood");
         final User user2 = createUser("Unknown", "Stranger");
         final Group group = createGroup("un_used");
+
         // Process def with 2 instances:
+        final String otherActor = "NotForMe";
         final ProcessDefinitionBuilder processBuilder1 = new ProcessDefinitionBuilder().createNewInstance("My_Process_with_branches", "1.0");
-        final String actorName = "1_Furniture assembly";
-        final String otherActor = "2_NotForMe";
-        processBuilder1.addActor(actorName).addActor(otherActor);
-        final DesignProcessDefinition designProcessDefinition = processBuilder1.addUserTask("step1", actorName).addUserTask("step2", actorName)
-                .addUserTask("step3", otherActor).addUserTask("step4", otherActor).getProcess();
+        processBuilder1.addActor(ACTOR_NAME).addActor(otherActor);
+        processBuilder1.addUserTask("step1", ACTOR_NAME).addUserTask("step2", ACTOR_NAME).addUserTask("step3", otherActor).addUserTask("step4", otherActor);
         final ProcessDefinition processDefinition = getProcessAPI().deploy(
-                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(designProcessDefinition).done());
+                new BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processBuilder1.done()).done());
         final List<ActorInstance> actors = getProcessAPI().getActors(processDefinition.getId(), 0, 2, ActorCriterion.NAME_ASC);
         getProcessAPI().addUserToActor(actors.get(0).getId(), user.getId());
         getProcessAPI().addGroupToActor(actors.get(1).getId(), group.getId());
-        // addUserToFirstActorOfProcess(user.getId(), processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
@@ -100,27 +98,27 @@ public class PendingTasksIT extends TestWithTechnicalUser {
 
         // 2 tasks should already be pending for me:
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
-        final SearchOptions searchOptions = searchOptionsBuilder.done();
-        SearchResult<HumanTaskInstance> humanTasksSearch = getProcessAPI().searchMyAvailableHumanTasks(user.getId(), searchOptions);
+        searchOptionsBuilder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        SearchResult<HumanTaskInstance> humanTasksSearch = getProcessAPI().searchMyAvailableHumanTasks(user.getId(), searchOptionsBuilder.done());
         assertEquals(2, humanTasksSearch.getCount());
 
         // Force assigning 'task3' (DESC name sort) to me (event though I am not an actor for it):
         getProcessAPI().assignUserTask(step3Id, user.getId());
 
         // 3 tasks should now be available for me:
-        humanTasksSearch = getProcessAPI().searchMyAvailableHumanTasks(user.getId(), searchOptions);
+        humanTasksSearch = getProcessAPI().searchMyAvailableHumanTasks(user.getId(), searchOptionsBuilder.done());
         assertEquals(3, humanTasksSearch.getCount());
 
         // Force assigning 'task2' (DESC name sort) to someone else than me (event though he is not an actor for it):
         getProcessAPI().assignUserTask(step2Id, user2.getId());
 
         // 2 tasks should now be available for me:
-        humanTasksSearch = getProcessAPI().searchMyAvailableHumanTasks(user.getId(), searchOptions);
+        humanTasksSearch = getProcessAPI().searchMyAvailableHumanTasks(user.getId(), searchOptionsBuilder.done());
         assertEquals(2, humanTasksSearch.getCount());
 
+        disableAndDeleteProcess(processDefinition);
         deleteUsers(user, user2);
         deleteGroups(group);
-        disableAndDeleteProcess(processDefinition);
     }
 
     @Test
