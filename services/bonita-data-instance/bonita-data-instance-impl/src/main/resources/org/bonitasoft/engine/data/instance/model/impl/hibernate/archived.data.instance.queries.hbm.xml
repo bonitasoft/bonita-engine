@@ -69,4 +69,19 @@
 		ORDER BY sa.archiveDate DESC
 	</query>
 
+
+	<query name="getArchivedDataInstancesOfContainers">
+		SELECT dataInstance
+		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS dataInstance
+		WHERE
+		dataInstance.containerType = 'ACTIVITY_INSTANCE' AND dataInstance.containerId in(:activityInstanceContainerIds)
+		OR
+		dataInstance.containerType = 'PROCESS_INSTANCE' AND dataInstance.containerId in(:processInstanceContainerIds)
+		OR
+		dataInstance.containerType = 'MESSAGE_INSTANCE' AND dataInstance.containerId in(:messageInstanceContainerIds)
+		AND
+		dataInstance.archiveDate &lt;= :time
+	</query>
+
+
 </hibernate-mapping>

@@ -214,12 +214,14 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         });
 
         //remove duplicates
-        SDataInstance previous = null;
+        Set<String> alreadyUsedNames = new HashSet<String>();
         final Iterator<SDataInstance> it = dataInstances.iterator();
         while (it.hasNext()) {
             SDataInstance current = it.next();
-            if (previous != null && previous.getName().equals(current.getName())) {
+            if (alreadyUsedNames.contains(current.getName())) {
                 it.remove();
+            } else {
+                alreadyUsedNames.add(current.getName());
             }
         }
         return dataInstances;
@@ -271,87 +273,134 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         }
     }
 
+    private List<SADataInstance> getSADatainstanceOfContainers(long containerId, String containerType, ParentContainerResolver parentContainerResolver, String queryName, Map<String, Object> inputParameters) throws SDataInstanceReadException {
+        //getallContainers from me to root
+        final List<Pair<Long, String>> containerHierarchy;
+        try {
+            containerHierarchy = parentContainerResolver.getArchivedContainerHierarchy(new Pair<Long, String>(containerId, containerType));
+        } catch (SObjectNotFoundException e) {
+            throw new SDataInstanceReadException(e);
+        } catch (SObjectReadException e) {
+            throw new SDataInstanceReadException(e);
+        }
+
+        final List<Long> activityInstanceContainerIds = new ArrayList<Long>();
+        final List<Long> processInstanceContainerIds = new ArrayList<Long>();
+        final List<Long> messageInstanceContainerIds = new ArrayList<Long>();
+
+        for (Pair<Long, String> container : containerHierarchy) {
+            if (container.getRight().equals(DataInstanceContainer.ACTIVITY_INSTANCE.name())) {
+                activityInstanceContainerIds.add(container.getLeft());
+            } else if (container.getRight().equals(DataInstanceContainer.PROCESS_INSTANCE.name())) {
+                processInstanceContainerIds.add(container.getLeft());
+            } else if (container.getRight().equals(DataInstanceContainer.MESSAGE_INSTANCE.name())) {
+                messageInstanceContainerIds.add(container.getLeft());
+            }
+        }
+
+        //select all data instance about those containers
+        final SDataInstanceBuilderFactory fact = BuilderFactory.get(SDataInstanceBuilderFactory.class);
+        inputParameters.put("activityInstanceContainerIds", activityInstanceContainerIds);
+        inputParameters.put("processInstanceContainerIds", processInstanceContainerIds);
+        inputParameters.put("messageInstanceContainerIds", messageInstanceContainerIds);
+
+        //gte all data of any of th possible containers
+        List<SADataInstance> dataInstances = null;
+        try {
+            dataInstances = persistenceService.selectList(new SelectListDescriptor<SADataInstance>(queryName, inputParameters, SADataInstance.class, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS)));
+        } catch (final SBonitaReadException e) {
+            throw new SDataInstanceReadException("Unable to check if a data instance already exists: " + e.getMessage(), e);
+        }
+
+        //order the retrieved list by container level and by archive date
+        Collections.sort(dataInstances, new Comparator<SADataInstance>() {
+            @Override
+            public int compare(SADataInstance o1, SADataInstance o2) {
+                final Pair<Long, String> o1Container = new Pair<Long, String>(o1.getContainerId(), o1.getContainerType());
+                final Pair<Long, String> o2Container = new Pair<Long, String>(o2.getContainerId(), o2.getContainerType());
+                if (containerHierarchy.indexOf(o1Container) - containerHierarchy.indexOf(o2Container) == 0) {
+                    //those 2 data are in the same container, let's compare archived dates
+                    return (int) (o2.getArchiveDate() - o1.getArchiveDate());
+                }
+                return containerHierarchy.indexOf(o1Container) - containerHierarchy.indexOf(o2Container);
+            }
+        });
+
+        //remove duplicates
+        Set<String> alreadyUsedNames = new HashSet<String>();
+        final Iterator<SADataInstance> it = dataInstances.iterator();
+        while (it.hasNext()) {
+            SADataInstance current = it.next();
+            if (alreadyUsedNames.contains(current.getName())) {
+                it.remove();
+            } else {
+                alreadyUsedNames.add(current.getName());
+            }
+        }
+        return dataInstances;
+    }
+
     @Override
     public SADataInstance getSADataInstance(final long containerId, final String containerType,
             final ParentContainerResolver parentContainerResolver, final String dataName, final long time)
             throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getSADataInstance");
-        // try {
-        // final long dataInstanceId = getSADataInstanceDataVisibilityMapping(dataName, containerId, containerType);
-        // final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-        // final Map<String, Object> parameters = new HashMap<String, Object>(2);
-        // parameters.put("dataInstanceId", dataInstanceId);
-        // parameters.put("time", time);
-        // final SADataInstance saDataInstance = readPersistenceService.selectOne(new SelectOneDescriptor<SADataInstance>(
-        // "getSADataInstanceByDataInstanceIdAndArchiveDate", parameters, SADataInstance.class));
-        // logAfterMethod(TechnicalLogSeverity.TRACE, "getSADataInstance");
-        // return saDataInstance;
-        // } catch (final SBonitaReadException e) {
-        // logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getSADataInstance", e);
-        // throw new SDataInstanceReadException("Unable to read SADataInstance", e);
-        // }
-        return null;
+        final String queryName = "getArchivedDataInstanceWithNameOfContainers";
+        final Map<String, Object> inputParameters = new HashMap<String, Object>();
+        inputParameters.put("dataName", dataName);
+        inputParameters.put("time", time);
+        final List<SADataInstance> dataInstances = getSADatainstanceOfContainers(containerId, containerType, parentContainerResolver, queryName, inputParameters);
+        if (dataInstances.size() == 0) {
+            final StringBuilder stb = new StringBuilder("DataInstance with name not found: [name: ");
+            stb.append(dataName).append(", container type: ").append(containerType);
+            stb.append(", container id: ").append(containerId).append(']');
+            throw new SDataInstanceReadException(stb.toString());
+        } else if (dataInstances.size() > 1) {
+            //should never happen but in case...
+            final StringBuilder stb = new StringBuilder("Several data have been retrieved for: [name: ");
+            stb.append(dataName).append(", container type: ").append(containerType);
+            stb.append(", container id: ").append(containerId).append(']');
+            throw new SDataInstanceReadException(stb.toString());
+        } else {
+            return dataInstances.get(0);
+        }
     }
 
     @Override
     public SADataInstance getSADataInstance(final long sourceObjectId, final long time) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getSADataInstance");
-        try {
-            final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-            final Map<String, Object> parameters = new HashMap<String, Object>(2);
-            parameters.put("dataInstanceId", sourceObjectId);
-            parameters.put("time", time);
-            final SADataInstance saDataInstance = readPersistenceService.selectOne(new SelectOneDescriptor<SADataInstance>(
-                    "getSADataInstanceByDataInstanceIdAndArchiveDate", parameters, SADataInstance.class));
-            logAfterMethod(TechnicalLogSeverity.TRACE, "getSADataInstance");
-            return saDataInstance;
-        } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getSADataInstance", e);
-            throw new SDataInstanceReadException("Unable to read SADataInstance", e);
-        }
+        // TODO
+        return null;
     }
 
     @Override
     public SADataInstance getLastSADataInstance(final long dataInstanceId) throws SDataInstanceReadException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance");
-        try {
-            final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-            final Map<String, Object> parameters = new HashMap<String, Object>(1);
-            parameters.put("dataInstanceId", dataInstanceId);
-            final SADataInstance saDataInstance = readPersistenceService.selectOne(new SelectOneDescriptor<SADataInstance>(
-                    "getLastSADataInstanceByDataInstanceId", parameters, SADataInstance.class));
-            logAfterMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance");
-            return saDataInstance;
-        } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance", e);
-            throw new SDataInstanceReadException("Unable to read SADataInstance", e);
-        }
+        // TODO
+        return null;
     }
 
     @Override
     public SADataInstance getLastSADataInstance(final String dataName, final long containerId, final String containerType,
             final ParentContainerResolver parentContainerResolver) throws SDataInstanceException {
         logBeforeMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance");
-        final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-        final Map<String, Object> parameters = new HashMap<String, Object>(1);
-        parameters.put("dataName", dataName);
-        parameters.put("containerId", containerId);
-        parameters.put("containerType", containerType);
-        try {
-            final SADataInstance saDataInstance = readPersistenceService.selectOne(new SelectOneDescriptor<SADataInstance>("getLastSADataInstanceByContainer",
-                    parameters, SADataInstance.class));
-            if (saDataInstance == null) {
-                final SDataInstanceNotFoundException exception = new SDataInstanceNotFoundException("No archived data instance found for data:" + dataName
-                        + " in container: " + containerType + " " + containerId);
-                logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance", exception);
-                throw exception;
-            }
-            logAfterMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance");
-            return saDataInstance;
-        } catch (final SBonitaReadException e) {
-            logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getLastSADataInstance", e);
-            throw new SDataInstanceReadException("Unable to read SADataInstance", e);
+        // TODO
+        return null;
+    }
+
+    @Override
+    public List<SADataInstance> getSADataInstances(final long containerId, final String containerType,
+                                                   final ParentContainerResolver parentContainerResolver, final List<String> dataNames, final long time)
+            throws SDataInstanceReadException {
+        logBeforeMethod(TechnicalLogSeverity.TRACE, "getSADataInstancesWithNames");
+        if (dataNames.isEmpty()) {
+            return Collections.emptyList();
         }
+        final String queryName = "getDataInstancesOfContainers";
+        final Map<String, Object> inputParameters = new HashMap<String, Object>();
+        inputParameters.put("time", time);
+        inputParameters.put("dataNames", dataNames);
+        return getSADatainstanceOfContainers(containerId, containerType, parentContainerResolver, queryName, inputParameters);
     }
 
     @Override
@@ -396,47 +445,12 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         if (dataNames.isEmpty()) {
             return Collections.emptyList();
         }
-        // try {
-        // final List<Long> dataInstanceIds = getDataInstanceDataVisibilityMapping(dataNames, containerId, containerType);
-        // final ArrayList<SDataInstance> finalResult = new ArrayList<SDataInstance>(dataNames.size());
-        // finalResult.addAll(getDataInstances(dataInstanceIds));
-        // logAfterMethod(TechnicalLogSeverity.TRACE, "getDataInstances");
-        // return finalResult;
-        // } catch (final SBonitaReadException e) {
-        // logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getDataInstances", e);
-        // throw new SDataInstanceReadException("Unable to find the data in the data mapping with name = " + dataNames + ", containerId = " + containerId
-        // + ", containerType = " + containerType, e);
-        // }
         final ArrayList<SDataInstance> finalResult = new ArrayList<SDataInstance>(dataNames.size());
         for (String dataName : dataNames) {
-            finalResult.add(getDataInstance(dataName, containerId, containerType, parentContainerResolver));
+            final SDataInstance dataInstance = getDataInstance(dataName, containerId, containerType, parentContainerResolver);
+            finalResult.add(dataInstance);
         }
         return finalResult;
-    }
-
-    @Override
-    public List<SADataInstance> getSADataInstances(final long containerId, final String containerType,
-            final ParentContainerResolver parentContainerResolver, final List<String> dataNames, final long time)
-            throws SDataInstanceReadException {
-        logBeforeMethod(TechnicalLogSeverity.TRACE, "getSADataInstances");
-        if (dataNames.isEmpty()) {
-            return Collections.emptyList();
-        }
-        // try {
-        // final List<Long> dataInstanceIds = getSADataInstanceDataVisibilityMapping(dataNames, containerId, containerType);
-        // final ReadPersistenceService readPersistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
-        // final Map<String, Object> parameters = new HashMap<String, Object>(2);
-        // parameters.put("dataInstanceIds", dataInstanceIds);
-        // parameters.put("time", time);
-        // final List<SADataInstance> listSADataInstance = readPersistenceService.selectList(new SelectListDescriptor<SADataInstance>(
-        // "getSADataInstancesByDataInstanceIdAndArchiveDate", parameters, SADataInstance.class, new QueryOptions(0, dataInstanceIds.size())));
-        // logAfterMethod(TechnicalLogSeverity.TRACE, "getSADataInstances");
-        // return listSADataInstance;
-        // } catch (final SBonitaReadException e) {
-        // logOnExceptionMethod(TechnicalLogSeverity.TRACE, "getSADataInstances", e);
-        // throw new SDataInstanceReadException("Unable to read SADataInstance", e);
-        // }
-        return Collections.emptyList();
     }
 
     @Override
@@ -579,25 +593,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             return dataInstance;
         } catch (final SBonitaReadException e) {
             throw new SDataInstanceReadException("Cannot get the data instance with id " + dataInstanceId, e);
-        }
-    }
-
-    private List<SDataInstance> getDataInstances(final List<Long> dataInstanceIds) throws SDataInstanceException {
-        NullCheckingUtil.checkArgsNotNull(dataInstanceIds);
-        if (dataInstanceIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-        try {
-            final Map<String, Object> parameters = CollectionUtil.buildSimpleMap("ids", dataInstanceIds);
-            final SelectListDescriptor<SDataInstance> selectDescriptor = new SelectListDescriptor<SDataInstance>("getDataInstanceByIds", parameters,
-                    SDataInstance.class, new QueryOptions(0, dataInstanceIds.size()));
-            final List<SDataInstance> dataInstances = persistenceService.selectList(selectDescriptor);
-            if (dataInstances == null) {
-                throw new SDataInstanceNotFoundException("Cannot get the data instance with id " + dataInstanceIds);
-            }
-            return dataInstances;
-        } catch (final SBonitaReadException e) {
-            throw new SDataInstanceReadException("Cannot get the data instance with id " + dataInstanceIds, e);
         }
     }
 
