@@ -3368,7 +3368,7 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ParentContainerResolver parentContainerResolver = tenantAccessor.getParentContainerResolver();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
-        return dataInstanceService.getNumberOfDataInstances(instanceId, containerType, parentContainerResolver);
+        return dataInstanceService.getNumberOfDataInstances(instanceId, containerType.name(), parentContainerResolver);
     }
 
     @Override

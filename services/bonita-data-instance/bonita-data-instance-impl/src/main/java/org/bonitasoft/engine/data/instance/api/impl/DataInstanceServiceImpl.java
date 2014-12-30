@@ -13,7 +13,16 @@
  **/
 package org.bonitasoft.engine.data.instance.api.impl;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.bonitasoft.engine.archive.ArchiveInsertRecord;
 import org.bonitasoft.engine.archive.ArchiveService;
@@ -24,7 +33,6 @@ import org.bonitasoft.engine.commons.NullCheckingUtil;
 import org.bonitasoft.engine.commons.Pair;
 import org.bonitasoft.engine.commons.exceptions.SObjectNotFoundException;
 import org.bonitasoft.engine.commons.exceptions.SObjectReadException;
-import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SCreateDataInstanceException;
@@ -94,7 +102,8 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         archiveDataInstance(sDataInstance, System.currentTimeMillis());
     }
 
-    private void archiveDataInstance(final SDataInstance sDataInstance, final long archiveDate) throws SDataInstanceException {
+    @Override
+    public void archiveDataInstance(final SDataInstance sDataInstance, final long archiveDate) throws SDataInstanceException {
         if (!sDataInstance.isTransientData()) {
             try {
                 final SADataInstance saDataInstance = BuilderFactory.get(SADataInstanceBuilderFactory.class).createNewInstance(sDataInstance).done();
@@ -104,22 +113,6 @@ public class DataInstanceServiceImpl implements DataInstanceService {
                 logOnExceptionMethod("updateDataInstance", e);
                 throw new SDataInstanceException("Unable to create SADataInstance", e);
             }
-        }
-    }
-
-    @Override
-    public void archiveLocalDataInstancesFromProcessInstance(final long processInstanceId, final long archiveDate) throws SDataInstanceException {
-        final int archiveBatchSize = 50;
-        int currentIndex = 0;
-        List<SDataInstance> sDataInstances = getLocalDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex,
-                archiveBatchSize);
-
-        while (sDataInstances != null && sDataInstances.size() > 0) {
-            for (final SDataInstance sDataInstance : sDataInstances) {
-                archiveDataInstance(sDataInstance, archiveDate);
-            }
-            currentIndex += archiveBatchSize;
-            sDataInstances = getLocalDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex, archiveBatchSize);
         }
     }
 
@@ -374,7 +367,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         if (dataNames.isEmpty()) {
             return Collections.emptyList();
         }
-        final String queryName = "getArchivedDataInstancesWithNameOfContainers";
+        final String queryName = "getArchivedDataInstancesWithNames";
         final Map<String, Object> inputParameters = new HashMap<String, Object>();
         inputParameters.put("time", time);
         inputParameters.put("dataNames", dataNames);
@@ -401,12 +394,12 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     }
 
     @Override
-    public long getNumberOfDataInstances(final long containerId, final DataInstanceContainer containerType,
+    public long getNumberOfDataInstances(final long containerId, final String containerType,
             final ParentContainerResolver parentContainerResolver) throws SDataInstanceReadException {
         logBeforeMethod("getNumberOfDataInstances");
         final List<SDataInstance> dataInstances;
         try {
-            dataInstances = getDataInstances(containerId, containerType.name(), parentContainerResolver, 0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
+            dataInstances = getDataInstances(containerId, containerType, parentContainerResolver, 0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS);
         } catch (SDataInstanceException e) {
             throw new SDataInstanceReadException(e);
         }

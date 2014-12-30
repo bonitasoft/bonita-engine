@@ -208,7 +208,19 @@ public class ProcessArchiver {
     private static void archiveDataInstances(final SProcessDefinition processDefinition, final SProcessInstance processInstance,
             final DataInstanceService dataInstanceService, final long archiveDate) throws SArchivingException {
         try {
-            dataInstanceService.archiveLocalDataInstancesFromProcessInstance(processInstance.getId(), archiveDate);
+            long processInstanceId = processInstance.getId();
+            final int archiveBatchSize = 50;
+            int currentIndex = 0;
+            List<SDataInstance> sDataInstances = dataInstanceService.getLocalDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex,
+                    archiveBatchSize);
+
+            while (sDataInstances != null && sDataInstances.size() > 0) {
+                for (final SDataInstance sDataInstance : sDataInstances) {
+                    dataInstanceService.archiveDataInstance(sDataInstance, archiveDate);
+                }
+                currentIndex += archiveBatchSize;
+                sDataInstances = dataInstanceService.getLocalDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.toString(), currentIndex, archiveBatchSize);
+            }
         } catch (final SDataInstanceException e) {
             setExceptionContext(processDefinition, processInstance, e);
             throw new SArchivingException("Unable to archive the process instance.", e);

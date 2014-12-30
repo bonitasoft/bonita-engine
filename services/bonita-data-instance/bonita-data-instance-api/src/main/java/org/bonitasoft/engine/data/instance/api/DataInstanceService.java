@@ -136,7 +136,6 @@ public interface DataInstanceService {
      *            Type of container, e.g process instance, activity instance and so on.
      * @return a list of SDataInstance objects
      * @throws SDataInstanceException
-     * @see {@link #getLocalDataInstances(long, String)}
      */
     List<SDataInstance> getLocalDataInstances(long containerId, String containerType, int fromIndex, int numberOfResults) throws SDataInstanceException;
 
@@ -196,7 +195,7 @@ public interface DataInstanceService {
      * @return the number of dataInstances
      * @throws SDataInstanceException
      */
-    long getNumberOfDataInstances(long containerId, DataInstanceContainer containerType,
+    long getNumberOfDataInstances(long containerId, String containerType,
             final ParentContainerResolver parentContainerResolver) throws SDataInstanceException;
 
 
@@ -262,16 +261,7 @@ public interface DataInstanceService {
      */
     void deleteLocalDataInstances(long containerId, String dataInstanceContainerType, boolean dataPresent) throws SDataInstanceException;
 
-    /**
-     * Archive all data instances in database, for a specific process instance, at a specific date
-     * 
-     * @param processInstanceId
-     *            Identifier of process instance
-     * @param archiveDate
-     *            Date to archive
-     * @throws SDataInstanceException
-     * @since 6.1
-     */
-    void archiveLocalDataInstancesFromProcessInstance(long processInstanceId, long archiveDate) throws SDataInstanceException;
+    void archiveDataInstance(SDataInstance sDataInstance, long archiveDate) throws SDataInstanceException;
+
 
 }
