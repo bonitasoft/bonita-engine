@@ -140,7 +140,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             final ParentContainerResolver parentContainerResolver, final int fromIndex, final int numberOfResults)
             throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(containerType);
-        final String queryName = "getDataInstancesOfContainers";
+        final String queryName = "getDataInstances";
         final Map<String, Object> inputParameters = new HashMap<String, Object>();
         final List<SDataInstance> dataInstances = getSDatainstanceOfContainers(containerId, containerType, parentContainerResolver, queryName, inputParameters);
 
