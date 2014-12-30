@@ -6,8 +6,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessAPI;
@@ -20,7 +23,9 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.exception.ExceptionContext;
 import org.bonitasoft.engine.exception.RetrieveException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
@@ -190,6 +195,46 @@ public class ProcessDataInstanceIT extends TestWithUser {
         assertTrue(!processDataInstances.isEmpty());
         assertEquals(1, processDataInstances.size());
         assertEquals(2, processDataInstances.get(0).getValue());
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.DATA, jira = "BS-1984", keywords = { "update", "process data", "wrong type" })
+    @Test
+    public void cantUpdateProcessDataInstanceWithWrongValue() throws Exception {
+        final DesignProcessDefinition processDef = new ProcessDefinitionBuilder().createNewInstance("My_Process", "1.0").addActor(ACTOR_NAME)
+                .addDescription("Delivery all day and night long")
+                .addData("data", List.class.getName(), null)
+                .addUserTask("step1", ACTOR_NAME).getProcess();
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDef, ACTOR_NAME, user);
+
+        // test execution
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+        final long step1Id = waitForUserTask(processInstance, "step1");
+
+        // verify the retrieved data
+        try {
+            getProcessAPI().updateProcessDataInstance("data", processInstance.getId(), "wrong value");
+            fail();
+        } catch (final UpdateException e) {
+            assertEquals("USERNAME=" + USERNAME + " | DATA_NAME=data | DATA_CLASS_NAME=java.util.List | The type of new value [" + String.class.getName()
+                    + "] is not compatible with the type of the data.", e.getMessage());
+            final Map<ExceptionContext, Serializable> exceptionContext = e.getContext();
+            assertEquals(List.class.getName(), exceptionContext.get(ExceptionContext.DATA_CLASS_NAME));
+            assertEquals("data", exceptionContext.get(ExceptionContext.DATA_NAME));
+        }
+
+        // retrieve data after the update
+        final List<DataInstance> processDataInstances = getProcessAPI().getProcessDataInstances(processInstance.getId(), 0, 10);
+        assertEquals(1, processDataInstances.size());
+        assertEquals(null, processDataInstances.get(0).getValue());
+
+        // Evaluate the data
+        final List<Expression> dependencies = Collections.singletonList(new ExpressionBuilder().createDataExpression("data", List.class.getName()));
+        final Expression longExpression = new ExpressionBuilder().createGroovyScriptExpression("Script",
+                "data = new ArrayList<String>(); data.add(\"plop\"); return data;", List.class.getName(), dependencies);
+        final Map<Expression, Map<String, Serializable>> expressions = Collections.singletonMap(longExpression, Collections.<String, Serializable> emptyMap());
+        getProcessAPI().evaluateExpressionsOnActivityInstance(step1Id, expressions);
 
         disableAndDeleteProcess(processDefinition);
     }
