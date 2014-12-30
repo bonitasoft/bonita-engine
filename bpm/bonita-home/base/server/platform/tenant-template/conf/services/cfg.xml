@@ -80,6 +80,7 @@
         <constructor-arg name="identityService" ref="identityService"/>
         <constructor-arg name="breakpointService" ref="breakpointService"/>
         <constructor-arg name="refBusinessDataService" ref="refBusinessDataService"/>
+        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
     </bean>
 
     <bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">
