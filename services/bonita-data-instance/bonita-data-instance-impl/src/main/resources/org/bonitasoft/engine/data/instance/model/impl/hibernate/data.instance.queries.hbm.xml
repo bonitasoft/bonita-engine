@@ -32,44 +32,69 @@
         AND dataInstance.containerType = :containerType
 	</query>
 
-	<query name="getDataInstancesOfContainers">
+	<query name="getDataInstancesOf1Containers">
+	SELECT dataInstance
+	FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+	WHERE
+	dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
+</query>
+
+	<query name="getDataInstancesOf2Containers">
 		SELECT dataInstance
 		FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
 		WHERE
-		dataInstance.containerType = 'ACTIVITY_INSTANCE' AND dataInstance.containerId in(:activityInstanceContainerIds)
+		dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
 		OR
-		dataInstance.containerType = 'PROCESS_INSTANCE' AND dataInstance.containerId in(:processInstanceContainerIds)
-		OR
-		dataInstance.containerType = 'MESSAGE_INSTANCE' AND dataInstance.containerId in(:messageInstanceContainerIds)
+		dataInstance.containerType = :containerType2 AND dataInstance.containerId in(:containerType2Ids)
 	</query>
 
-	<query name="getDataInstanceWithNameOfContainers">
+	<query name="getDataInstancesOf3Containers">
 		SELECT dataInstance
 		FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
 		WHERE
-		dataInstance.name = :dataName
-		AND
-		(
-		dataInstance.containerType = 'ACTIVITY_INSTANCE' AND dataInstance.containerId in(:activityInstanceContainerIds)
+		dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
 		OR
-		dataInstance.containerType = 'PROCESS_INSTANCE' AND dataInstance.containerId in(:processInstanceContainerIds)
+		dataInstance.containerType = :containerType2 AND dataInstance.containerId in(:containerType2Ids)
 		OR
-		dataInstance.containerType = 'MESSAGE_INSTANCE' AND dataInstance.containerId in(:messageInstanceContainerIds)
-		)
+		dataInstance.containerType = :containerType3 AND dataInstance.containerId in(:containerType3Ids)
 	</query>
 
-	<query name="getDataInstanceWithNamesOfContainers">
+	<query name="getDataInstancesWithNamesOf1Containers">
 		SELECT dataInstance
 		FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
 		WHERE
 		dataInstance.name in (:dataNames)
 		AND
 		(
-		dataInstance.containerType = 'ACTIVITY_INSTANCE' AND dataInstance.containerId in(:activityInstanceContainerIds)
+		dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
+		)
+	</query>
+
+	<query name="getDataInstancesWithNamesOf2Containers">
+		SELECT dataInstance
+		FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+		WHERE
+		dataInstance.name in (:dataNames)
+		AND
+		(
+		dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
 		OR
-		dataInstance.containerType = 'PROCESS_INSTANCE' AND dataInstance.containerId in(:processInstanceContainerIds)
+		dataInstance.containerType = :containerType2 AND dataInstance.containerId in(:containerType2Ids)
+		)
+	</query>
+
+	<query name="getDataInstancesWithNamesOf3Containers">
+		SELECT dataInstance
+		FROM org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl AS dataInstance
+		WHERE
+		dataInstance.name in (:dataNames)
+		AND
+		(
+		dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
 		OR
-		dataInstance.containerType = 'MESSAGE_INSTANCE' AND dataInstance.containerId in(:messageInstanceContainerIds)
+		dataInstance.containerType = :containerType2 AND dataInstance.containerId in(:containerType2Ids)
+		OR
+		dataInstance.containerType = :containerType3 AND dataInstance.containerId in(:containerType3Ids)
 		)
 	</query>
 
