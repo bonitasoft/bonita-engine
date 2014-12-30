@@ -106,7 +106,7 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
         }
         Pair<Long, String> container = new Pair<Long, String>(flowNodeInstance.parentContainerId, containerType);
         containerHierarchy.add(container);
-        if (flowNodeInstance.parentActivityInstanceId > 0 && flowNodeInstance.parentContainerId == flowNodeInstance.rootContainerId) {
+        if (flowNodeInstance.parentActivityInstanceId <= 0 && flowNodeInstance.parentContainerId == flowNodeInstance.rootContainerId) {
             container = null;
         }
         return container;

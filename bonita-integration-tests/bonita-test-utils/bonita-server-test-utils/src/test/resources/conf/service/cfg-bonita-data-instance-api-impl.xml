@@ -13,4 +13,6 @@
 		<constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
 	</bean>
 
+	<bean id="parentContainerResolver" class="org.bonitasoft.engine.test.util.TestParentContainerResolver">
+	</bean>
 </beans>
