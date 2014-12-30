@@ -12,10 +12,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.TestWithUser;
+import org.bonitasoft.engine.api.ProcessAPI;
 import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
+import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.UserTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
@@ -29,6 +32,7 @@ import org.bonitasoft.engine.connector.Connector;
 import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
+import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -198,12 +202,18 @@ public class ProcessExecutionIT extends TestWithUser {
         disableAndDeleteProcess(processDefinition);
     }
 
+    @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, jira = "BS-11970", keywords = { "Archive", "Process instance", "Start event",
+            "End event" })
     @Test
     public void checkProcessIsArchived() throws Exception {
-        final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_ProcessToCheckDate",
-                "1.0", Arrays.asList("step1"), Arrays.asList(true));
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
+        builder.addActor(ACTOR_NAME);
+        builder.addStartEvent("start");
+        builder.addUserTask("step1", ACTOR_NAME);
+        builder.addEndEvent("end");
+        builder.addTransition("start", "step1").addTransition("step1", "end");
 
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final Long step1Id = waitForUserTask(processInstance, "step1");
 
@@ -213,6 +223,8 @@ public class ProcessExecutionIT extends TestWithUser {
 
         assignAndExecuteStep(step1Id, user);
         waitForProcessToFinish(processInstance);
+
+        // Verify if the process instance is archived
         final ArchivedProcessInstance archivedProcessInstance = getProcessAPI().getFinalArchivedProcessInstance(processInstance.getId());
         assertNotNull(archivedProcessInstance);
         try {
@@ -221,6 +233,21 @@ public class ProcessExecutionIT extends TestWithUser {
         } catch (final ProcessInstanceNotFoundException e) {
             // ok
         }
+
+        // Verify if the flow node instances are archived
+        final SearchOptionsBuilder optionsBuilder = new SearchOptionsBuilder(0, 20);
+        optionsBuilder.sort(ArchivedFlowNodeInstanceSearchDescriptor.NAME, Order.ASC);
+        optionsBuilder.filter(ArchivedFlowNodeInstanceSearchDescriptor.STATE_NAME, "completed");
+        final List<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(optionsBuilder.done()).getResult();
+        // To uncomment if need to fix BS-11970
+        //        assertEquals(3, archivedFlowNodeInstances.size());
+        //        assertEquals("end", archivedFlowNodeInstances.get(0).getName());
+        //        assertEquals("start", archivedFlowNodeInstances.get(1).getName());
+        //        assertEquals("step1", archivedFlowNodeInstances.get(2).getName());
+        // To remove if need to fix BS-11970
+        assertEquals(1, archivedFlowNodeInstances.size());
+        assertEquals("step1", archivedFlowNodeInstances.get(0).getName());
+
         disableAndDeleteProcess(processDefinition);
     }
 

@@ -7,6 +7,11 @@
 	SELECT COUNT(aa)
 	FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl AS aa
   </query>
+  	
+  <query name="searchSAFlowNodeInstance">
+	SELECT aa
+	FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl AS aa
+  </query>
 
   <query name="getNumberOfSAFlowNodeInstanceSupervisedBy">
 	SELECT COUNT(DISTINCT aa.id)
@@ -28,11 +33,6 @@
 			)
 		)
 	)
-  </query>
-	
-  <query name="searchSAFlowNodeInstance">
-	SELECT aa
-	FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl AS aa
   </query>
 	
   <query name="searchSAFlowNodeInstanceSupervisedBy">
