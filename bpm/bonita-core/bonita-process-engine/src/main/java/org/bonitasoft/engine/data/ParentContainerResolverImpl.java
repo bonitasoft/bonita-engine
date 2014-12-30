@@ -16,6 +16,7 @@
 package org.bonitasoft.engine.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.bonitasoft.engine.commons.Pair;
@@ -54,7 +55,11 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
 
     @Override
     public List<Pair<Long, String>> getArchivedContainerHierarchy(final Pair<Long, String> currentContainer) throws SObjectNotFoundException, SObjectReadException {
-        return getContainerHierarchy(currentContainer, true);
+        try{
+            return getContainerHierarchy(currentContainer, true);
+        } catch (SObjectNotFoundException e){
+            return Collections.singletonList(currentContainer);
+        }
     }
 
     private List<Pair<Long, String>> getContainerHierarchy(Pair<Long, String> currentContainer, boolean isArchived) throws SObjectNotFoundException, SObjectReadException {
@@ -125,9 +130,12 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
         }
     }
 
-    private ActivityContainer getSaFlowNodeInstance(long id) throws SBonitaReadException {
+    private ActivityContainer getSaFlowNodeInstance(long id) throws SBonitaReadException, SFlowNodeNotFoundException {
         SAFlowNodeInstance flowNodeInstance;
         flowNodeInstance = flowNodeInstanceService.getLastArchivedFlowNodeInstance(SAFlowNodeInstance.class, id);
+        if(flowNodeInstance == null){
+            throw new SFlowNodeNotFoundException(id);
+        }
         return new ActivityContainer(flowNodeInstance);
     }
 
@@ -147,9 +155,9 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
 
     private ActivityContainer getsFlowNodeInstance(long callerId, boolean isArchived) throws SFlowNodeReadException, SFlowNodeNotFoundException, SBonitaReadException {
         if (isArchived) {
-            return getsFlowNodeInstance(callerId);
-        } else {
             return getSaFlowNodeInstance(callerId);
+        } else {
+            return getsFlowNodeInstance(callerId);
         }
     }
 
