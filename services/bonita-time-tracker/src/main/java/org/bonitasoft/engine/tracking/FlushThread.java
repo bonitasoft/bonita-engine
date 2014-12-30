@@ -13,6 +13,8 @@ public class FlushThread extends Thread {
 
     private final TechnicalLoggerService logger;
 
+    private boolean askStop=false;
+    
     public FlushThread(final Clock clock, final long flushIntervalInMilliSeconds, final TimeTracker timeTracker, final TechnicalLoggerService logger) {
         super("TimeTracker-FlushThread");
         this.clock = clock;
@@ -26,7 +28,8 @@ public class FlushThread extends Thread {
         if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(getClass(), TechnicalLogSeverity.INFO, "Starting " + this.getName() + "...");
         }
-        while (true) {
+        askStop=false;
+        while ( ! askStop ) {
             try {
                 clock.sleep(flushIntervalInMilliSeconds);
             } catch (InterruptedException e) {
@@ -39,10 +42,24 @@ public class FlushThread extends Thread {
                     this.logger.log(getClass(), TechnicalLogSeverity.WARNING, "Exception caught while flushing: " + e.getMessage(), e);
                 }
             }
-        }
+           
+        } // end loop flush
+        
         if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
             logger.log(getClass(), TechnicalLogSeverity.INFO, this.getName() + " stopped.");
         }
+    }
+    
+    
+    /**
+     * ask the thread to stop
+     */
+    protected void askStop()
+    {
+    		askStop = true;
+    		if (this.logger.isLoggable(getClass(), TechnicalLogSeverity.INFO)) {
+    				logger.log(getClass(), TechnicalLogSeverity.INFO, this.getName() + " ASK STOP.");                  
+    		}
     }
 
 }
