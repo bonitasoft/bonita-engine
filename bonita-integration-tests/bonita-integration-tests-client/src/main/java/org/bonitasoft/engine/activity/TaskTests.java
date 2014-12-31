@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.process.task;
+package org.bonitasoft.engine.activity;
 
 import org.bonitasoft.engine.TestsInitializer;
 import org.bonitasoft.engine.filter.user.UserFilterIT;
@@ -15,7 +15,11 @@ import org.junit.runners.Suite.SuiteClasses;
         PendingTasksIT.class,
         ReceiveTasksIT.class,
         HumanTasksIT.class,
-        GetPossibleUsersOfPendingHumanTaskIT.class
+        GetPossibleUsersOfPendingHumanTaskIT.class,
+        ManualTasksIT.class,
+        CallActivityIT.class,
+        LoopIT.class,
+        MultiInstanceIT.class,
 })
 @Initializer(TestsInitializer.class)
 public class TaskTests {

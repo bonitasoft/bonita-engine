@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.external.profile.command;
+package org.bonitasoft.engine.command.web.profile;
 
 import static org.junit.Assert.assertEquals;
 
