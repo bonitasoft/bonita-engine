@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.operation.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -122,7 +123,7 @@ public class OperationServiceImpl implements OperationService {
             final SExpressionContext expressionContext) throws SOperationExecutionException {
         for (final Entry<SLeftOperand, Boolean> update : leftOperandUpdates.entrySet()) {
             final SLeftOperand leftOperand = update.getKey();
-            final LeftOperandHandler leftOperandHandler = getLeftOperandHandler(leftOperand);
+            final LeftOperandHandler leftOperandHandler = getLeftOperandHandler(leftOperand.getType());
             if (update.getValue()) {
                 leftOperandHandler.update(leftOperand, expressionContext.getInputValues(), expressionContext.getInputValues().get(leftOperand.getName()), leftOperandContainerId,
                         leftOperandContainerType);
@@ -132,10 +133,10 @@ public class OperationServiceImpl implements OperationService {
         }
     }
 
-    private LeftOperandHandler getLeftOperandHandler(final SLeftOperand leftOperand) throws SOperationExecutionException {
-        final LeftOperandHandler leftOperandHandler = leftOperandHandlersMap.get(leftOperand.getType());
+    private LeftOperandHandler getLeftOperandHandler(final String type) throws SOperationExecutionException {
+        final LeftOperandHandler leftOperandHandler = leftOperandHandlersMap.get(type);
         if (leftOperandHandler == null) {
-            throw new SOperationExecutionException("Left operand type not found: " + leftOperand.getType());
+            throw new SOperationExecutionException("Left operand type not found: " + type);
         }
         return leftOperandHandler;
     }
@@ -150,16 +151,23 @@ public class OperationServiceImpl implements OperationService {
         if(containerId == null || containerId != dataContainerId || containerType == null || !containerType.equals(dataContainerType)){
             return;
         }
+        HashMap<String, List<SLeftOperand>> leftOperandHashMap = new HashMap<String, List<SLeftOperand>>();
         for (final SOperation operation : operations) {
             // this operation will set a data, we retrieve it and put it in context
             final SLeftOperand leftOperand = operation.getLeftOperand();
-            try {
-                getLeftOperandHandler(leftOperand).loadLeftOperandInContext(leftOperand,
-                        new SExpressionContext(dataContainerId, dataContainerType, inputValues), inputValues);
-            } catch (final SBonitaReadException e) {
-                throw new SOperationExecutionException("Unable to retrieve value for operation " + operation, e);
+            if(!leftOperandHashMap.containsKey(leftOperand.getType())){
+                leftOperandHashMap.put(leftOperand.getType(), new ArrayList<SLeftOperand>());
             }
         }
+        for (Entry<String, List<SLeftOperand>> stringListEntry : leftOperandHashMap.entrySet()) {
+            try {
+                getLeftOperandHandler(stringListEntry.getKey()).loadLeftOperandInContext(stringListEntry.getValue(),
+                        new SExpressionContext(dataContainerId, dataContainerType, inputValues), inputValues);
+            } catch (final SBonitaReadException e) {
+                throw new SOperationExecutionException("Unable to retrieve value for operation ", e);
+            }
+        }
+
     }
     protected Object getOperationValue(final SOperation operation, final SExpressionContext expressionContext, final SExpression sExpression)
             throws SOperationExecutionException {

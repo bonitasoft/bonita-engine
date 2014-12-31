@@ -27,6 +27,7 @@ import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 
@@ -97,6 +98,13 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     @Override
     public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) {
         //do nothing
+    }
+
+    @Override
+    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
+        for (SLeftOperand leftOperand : sLeftOperand) {
+            loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
+        }
     }
 
     @Override

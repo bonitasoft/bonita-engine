@@ -15,6 +15,8 @@
  */
 package org.bonitasoft.engine.operation;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -109,16 +111,43 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
     @Override
     public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
         try {
-            String name = sLeftOperand.getName();
-            SDataInstance dataInstance = getDataInstance(name, expressionContext.getContainerId(), expressionContext.getContainerType());
-            contextToSet.put(DATA_INSTANCE + name, dataInstance);
-            if (!contextToSet.containsKey(name)) {
-                contextToSet.put(name, dataInstance.getValue());
+            putInContext(sLeftOperand, expressionContext, contextToSet);
+        } catch (final SDataInstanceException e) {
+            throw new SBonitaReadException("Unable to retrieve the data", e);
+        }
+    }
+
+    private void putInContext(SLeftOperand sLeftOperand, SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SDataInstanceException {
+        String name = sLeftOperand.getName();
+        SDataInstance dataInstance = getDataInstance(name, expressionContext.getContainerId(), expressionContext.getContainerType());
+        putDataInContext(contextToSet, dataInstance);
+    }
+
+    private void putDataInContext(Map<String, Object> contextToSet, SDataInstance dataInstance) {
+        String name = dataInstance.getName();
+        contextToSet.put(DATA_INSTANCE + name, dataInstance);
+        if (!contextToSet.containsKey(name)) {
+            contextToSet.put(name, dataInstance.getValue());
+        }
+    }
+
+
+    @Override
+    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
+        try {
+            ArrayList<String> names = new ArrayList<String>(sLeftOperand.size());
+            for (SLeftOperand leftOperand : sLeftOperand) {
+                names.add(leftOperand.getName());
+            }
+            List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(names, expressionContext.getContainerId(), expressionContext.getContainerType(), parentContainerResolver);
+            for (SDataInstance dataInstance : dataInstances) {
+                putDataInContext(contextToSet, dataInstance);
             }
         } catch (final SDataInstanceException e) {
             throw new SBonitaReadException("Unable to retrieve the data", e);
         }
     }
+
 
     protected SDataInstance getDataInstance(final String dataInstanceName, final long containerId, final String containerType) throws SDataInstanceException {
         return dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType, parentContainerResolver);

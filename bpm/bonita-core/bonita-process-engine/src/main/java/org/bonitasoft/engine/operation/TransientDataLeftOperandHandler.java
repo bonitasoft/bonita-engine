@@ -189,6 +189,13 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
         throw new SBonitaReadException("Transient data was not found and we were unable to reevaluate it, name=<" + name + ">", e);
     }
 
+
+    @Override
+    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
+        for (SLeftOperand leftOperand : sLeftOperand) {
+            loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
+        }
+    }
     @Override
     public boolean supportBatchUpdate() {
         return true;

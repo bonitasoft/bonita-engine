@@ -16,6 +16,7 @@
 package org.bonitasoft.engine.core.operation;
 
 import java.util.Map;
+import java.util.List;
 
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
@@ -62,4 +63,6 @@ public interface LeftOperandHandler {
      */
     // TODO batch method
     void loadLeftOperandInContext(SLeftOperand sLeftOperand, SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException;
+
+    void loadLeftOperandInContext(List<SLeftOperand> sLeftOperandList, SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException;
 }
