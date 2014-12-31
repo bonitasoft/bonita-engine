@@ -8,6 +8,7 @@
  *******************************************************************************/
 package com.bonitasoft.engine.operation;
 
+import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
@@ -24,6 +25,7 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilder;
 import com.bonitasoft.engine.core.process.instance.model.builder.SProcessInstanceUpdateBuilderFactory;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Baptiste Mesta
@@ -104,6 +106,13 @@ public class StringIndexLeftOperandHandler implements LeftOperandHandler {
         // don't retrieve it, not useful
     }
 
+
+    @Override
+    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
+        for (SLeftOperand leftOperand : sLeftOperand) {
+            loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
+        }
+    }
     @Override
     public boolean supportBatchUpdate() {
         return true;
