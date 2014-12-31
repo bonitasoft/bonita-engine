@@ -32,7 +32,7 @@ import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
-public class MultiInstanceTest extends CommonAPISPIT {
+public class MultiInstanceIT extends CommonAPISPIT {
 
     private static final String JOHN = "john";
 

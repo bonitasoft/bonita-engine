@@ -8,14 +8,14 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
+import org.bonitasoft.engine.activity.PendingTasksIT;
 import org.bonitasoft.engine.exception.BonitaException;
-import org.bonitasoft.engine.process.task.PendingTasksIT;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
-import com.bonitasoft.engine.activity.TaskOnDemandTest;
+import com.bonitasoft.engine.activity.TaskOnDemandIT;
 import com.bonitasoft.engine.business.application.ApplicationAPIITs;
 import com.bonitasoft.engine.business.data.BDRepositoryIT;
 import com.bonitasoft.engine.command.ExecuteBDMQueryCommandIT;
@@ -40,7 +40,7 @@ import com.bonitasoft.engine.tenant.TenantIT;
         NodeAPITest.class,
         LogTest.class,
         ExternalCommandsTestSP.class,
-        TaskOnDemandTest.class,
+        TaskOnDemandIT.class,
         ProcessManagementTest.class,
         PendingTasksIT.class,
         ProcessSupervisedTest.class,

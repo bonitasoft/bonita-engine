@@ -14,9 +14,9 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-        HiddenTaskTest.class,
-        ManualTasksTest.class,
-        TaskOnDemandTest.class
+        HiddenTaskIT.class,
+        ManualTasksIT.class,
+        TaskOnDemandIT.class
 })
 public class ActivityTests {
 

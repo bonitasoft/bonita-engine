@@ -33,7 +33,7 @@ import org.junit.Test;
 import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 
-public class HiddenTaskTest extends CommonAPISPIT {
+public class HiddenTaskIT extends CommonAPISPIT {
 
     private ProcessDefinition processDefinition;
 

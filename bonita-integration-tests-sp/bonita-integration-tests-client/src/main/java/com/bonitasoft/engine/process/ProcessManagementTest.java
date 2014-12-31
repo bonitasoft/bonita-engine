@@ -358,36 +358,4 @@ public class ProcessManagementTest extends CommonAPISPIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Test
-    public void executeTaskShouldAbortSubtasks() throws Exception {
-        final ProcessDefinitionBuilderExt processBuilder = new ProcessDefinitionBuilderExt().createNewInstance("testArchiveTaskShouldArchiveSubtasks", "1.0");
-        final String userTaskName = "userTask";
-        processBuilder.addActor(ACTOR_NAME).addDescription("test Archive Task Should Archive Subtasks").addUserTask(userTaskName, ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
-        final ProcessInstance processInstance = getProcessAPI().startProcess(john.getId(), processDefinition.getId());
-        final ActivityInstance parentTask = waitForUserTaskAndAssigneIt(processInstance, userTaskName, john);
-
-        // add sub task
-        final Date dueDate = new Date(System.currentTimeMillis());
-        final TaskPriority newPriority = TaskPriority.ABOVE_NORMAL;
-        ManualTaskCreator taskCreator = buildManualTaskCreator(parentTask.getId(), "newManualTask1", john.getId(), "add new manual user task 1", dueDate,
-                newPriority);
-        getProcessAPI().addManualUserTask(taskCreator);
-        taskCreator = buildManualTaskCreator(parentTask.getId(), "newManualTask2", john.getId(), "add new manual user task 2", dueDate, newPriority);
-        getProcessAPI().addManualUserTask(taskCreator);
-        assertTrue("Expecting 3 assigned task for Jack", new WaitUntil(200, 1000) {
-
-            @Override
-            protected boolean check() {
-                return getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null).size() == 3;
-            }
-        }.waitUntil());
-
-        assignAndExecuteStep(parentTask, john.getId());
-        waitForFlowNodeInState(processInstance, parentTask.getName(), TestStates.NORMAL_FINAL, true);
-        waitForFlowNodeInState(processInstance, "newManualTask1", TestStates.ABORTED, true);
-        waitForFlowNodeInState(processInstance, "newManualTask2", TestStates.ABORTED, true);
-
-        disableAndDeleteProcess(processDefinition);
-    }
 }

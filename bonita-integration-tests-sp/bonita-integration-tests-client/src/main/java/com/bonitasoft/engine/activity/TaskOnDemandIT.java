@@ -36,7 +36,7 @@ import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
-public class TaskOnDemandTest extends CommonAPISPIT {
+public class TaskOnDemandIT extends CommonAPISPIT {
 
     // FIXME add test that there is no pending task if the parent task is finished
 
