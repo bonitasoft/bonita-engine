@@ -34,7 +34,7 @@ public class ExternalDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object update(final SLeftOperand leftOperand, final Object newValue, final long containerId, final String containerType) {
+    public Object update(final SLeftOperand leftOperand, Map<String, Object> inputValues, final Object newValue, final long containerId, final String containerType) {
         // nothing to do, the value is already changed in the context
         return newValue;
     }
@@ -48,7 +48,7 @@ public class ExternalDataLeftOperandHandler implements LeftOperandHandler {
     public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) {
         String name = sLeftOperand.getName();
         if(!contextToSet.containsKey(name)) {
-            contextToSet.put(name,expressionContext.getInputValues().get(name));
+            contextToSet.put(name, expressionContext.getInputValues().get(name));
         }
     }
 

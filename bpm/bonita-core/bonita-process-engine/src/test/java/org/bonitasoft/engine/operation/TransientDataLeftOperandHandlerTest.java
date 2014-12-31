@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,7 +69,7 @@ public class TransientDataLeftOperandHandlerTest {
         final SShortTextDataInstanceImpl data = createData();
         when(transientDataService.getDataInstance("myData", 42, "ctype")).thenReturn(data);
         // when
-        transientDataLeftOperandHandler.update(createLeftOperand("myData"), "new Value", 42, "ctype");
+        transientDataLeftOperandHandler.update(createLeftOperand("myData"), Collections.<String,Object>emptyMap(), "new Value", 42, "ctype");
 
         // then
         final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();
@@ -160,7 +161,7 @@ public class TransientDataLeftOperandHandlerTest {
         doThrow(SDataInstanceNotFoundException.class).doReturn(data).when(transientDataService).getDataInstance("myData", taskId, "ctype");
 
         // when
-        transientDataLeftOperandHandler.update(createLeftOperand("myData"), "newValue", taskId, "ctype");
+        transientDataLeftOperandHandler.update(createLeftOperand("myData"), Collections.<String,Object>emptyMap(), "newValue", taskId, "ctype");
 
         // then
         verify(bpmInstancesCreator, times(1)).createDataInstances(eq(Arrays.<SDataDefinition>asList(sTextDefinitionImpl)), eq(taskId),

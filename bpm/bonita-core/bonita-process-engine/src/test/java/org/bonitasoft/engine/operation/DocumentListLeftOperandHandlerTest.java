@@ -16,6 +16,7 @@ package org.bonitasoft.engine.operation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -89,7 +90,7 @@ public class DocumentListLeftOperandHandlerTest {
     public void should_update_check_it_is_a_list() throws Exception {
         exception.expect(SOperationExecutionException.class);
         exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
-        handler.update(createLeftOperand("myDoc"), new HashMap<Object, Object>(), 45l, "container");
+        handler.update(createLeftOperand("myDoc"), Collections.<String,Object>emptyMap(), new HashMap<Object, Object>(), 45l, "container");
     }
 
     @Test

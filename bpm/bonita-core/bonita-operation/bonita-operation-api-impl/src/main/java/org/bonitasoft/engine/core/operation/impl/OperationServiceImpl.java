@@ -124,7 +124,7 @@ public class OperationServiceImpl implements OperationService {
             final SLeftOperand leftOperand = update.getKey();
             final LeftOperandHandler leftOperandHandler = getLeftOperandHandler(leftOperand);
             if (update.getValue()) {
-                leftOperandHandler.update(leftOperand, expressionContext.getInputValues().get(leftOperand.getName()), leftOperandContainerId,
+                leftOperandHandler.update(leftOperand, expressionContext.getInputValues(), expressionContext.getInputValues().get(leftOperand.getName()), leftOperandContainerId,
                         leftOperandContainerType);
             } else {
                 leftOperandHandler.delete(leftOperand, leftOperandContainerId, leftOperandContainerType);

@@ -57,7 +57,7 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
     }
 
     @Override
-    public Object update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
+    public Object update(final SLeftOperand sLeftOperand, Map<String, Object> inputValues, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         final List<DocumentValue> documentList = toCheckedList(newValue);
         final String documentName = sLeftOperand.getName();

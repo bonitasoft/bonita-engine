@@ -52,9 +52,9 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object update(final SLeftOperand leftOperand, final Object newValue, final long containerId, final String containerType)
+    public Object update(final SLeftOperand leftOperand, Map<String, Object> inputValues, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
-        updateDataInstance(leftOperand, containerId, containerType, newValue);
+        updateDataInstance(leftOperand, containerId, containerType, inputValues, newValue);
         return newValue;
     }
 
@@ -84,15 +84,18 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
         }
     }
 
-    private void updateDataInstance(final SLeftOperand leftOperand, final long containerId, final String containerType, final Object expressionResult)
+    private void updateDataInstance(final SLeftOperand leftOperand, final long containerId, final String containerType, Map<String, Object> inputValues, final Object expressionResult)
             throws SOperationExecutionException {
         final String dataInstanceName = leftOperand.getName();
-        SDataInstance sDataInstance;
+        SDataInstance dataInstance;
         try {
-            sDataInstance = getDataInstance(dataInstanceName, containerId, containerType);
+            dataInstance = (SDataInstance) inputValues.get(DATA_INSTANCE + dataInstanceName);
+            if(dataInstance == null){
+                dataInstance = getDataInstance(dataInstanceName, containerId, containerType);
+            }
             // Specific return type check for Data:
-            checkReturnType(expressionResult, sDataInstance);
-            update(sDataInstance, expressionResult);
+            checkReturnType(expressionResult, dataInstance);
+            update(dataInstance, expressionResult);
         } catch (final SDataInstanceException e) {
             throw new SOperationExecutionException(e);
         }

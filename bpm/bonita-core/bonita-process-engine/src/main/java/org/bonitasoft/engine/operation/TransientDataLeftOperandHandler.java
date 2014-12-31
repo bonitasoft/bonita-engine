@@ -77,11 +77,15 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
+    public Object update(final SLeftOperand sLeftOperand, Map<String, Object> inputValues, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         SDataInstance dataInstance;
         try {
-            dataInstance = retrieve(sLeftOperand, containerId, containerType);
+
+            dataInstance = (SDataInstance) inputValues.get(TRANSIENT_DATA + sLeftOperand.getName());
+            if(dataInstance == null){
+                dataInstance = retrieve(sLeftOperand, containerId, containerType);
+            }
             final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
             descriptor.addField("value", newValue);
             logger.log(
