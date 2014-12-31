@@ -100,9 +100,8 @@ public class StringIndexLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Map<String, Object> retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) {
+    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) {
         // don't retrieve it, not useful
-        return null;
     }
 
     @Override

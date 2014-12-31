@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.operation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -152,11 +153,12 @@ public class BusinessDataLeftOperandHandlerTest {
         final Map<String, Serializable> inputValues = new HashMap<String, Serializable>(1);
         final SExpressionContext expressionContext = new SExpressionContext(-1L, "unused", inputValues);
         final SLeftOperand leftOperand = createLeftOperand(bizDataName);
+        Map<String, Object> contextToSet = new HashMap<String, Object>();
         // when:
-        final Object retrieve = spy.retrieve(leftOperand, expressionContext);
+        spy.loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
 
         // then:
-        assertThat(retrieve).isEqualTo(myTravel);
+        assertThat(contextToSet).containsOnly(entry("myTravel", myTravel));
     }
 
     private SLeftOperand createLeftOperand(final String bizDataName) {

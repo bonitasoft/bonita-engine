@@ -45,7 +45,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
     private final BusinessDataRepository businessDataRepository;
 
     protected BusinessDataLeftOperandHandler(final BusinessDataRepository businessDataRepository, final RefBusinessDataService refBusinessDataService,
-            final FlowNodeInstanceService flowNodeInstanceService) {
+                                             final FlowNodeInstanceService flowNodeInstanceService) {
         super();
         this.businessDataRepository = businessDataRepository;
         this.refBusinessDataService = refBusinessDataService;
@@ -180,15 +180,16 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) throws SBonitaReadException {
+    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
         final Map<String, Object> inputValues = expressionContext.getInputValues();
         final String businessDataName = sLeftOperand.getName();
         final Long containerId = expressionContext.getContainerId();
         final String containerType = expressionContext.getContainerType();
         if (inputValues.get(businessDataName) == null) {
-            return getBusinessData(businessDataName, containerId, containerType);
+            if (!contextToSet.containsKey(businessDataName)) {
+                contextToSet.put(businessDataName, getBusinessData(businessDataName, containerId, containerType));
+            }
         }
-        return null;
     }
 
     @Override
