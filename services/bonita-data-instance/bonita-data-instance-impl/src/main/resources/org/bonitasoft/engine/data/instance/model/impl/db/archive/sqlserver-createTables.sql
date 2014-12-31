@@ -23,7 +23,7 @@ CREATE TABLE arch_data_instance (
 	PRIMARY KEY (tenantid, id)
 )
 GO
-CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId, containerId, sourceObjectId)
+CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId, containerId, containerType, archiveDate, name, sourceObjectId)
 GO
 CREATE INDEX idx2_arch_data_instance ON arch_data_instance (sourceObjectId, containerId, archiveDate, id, tenantId)
 GO

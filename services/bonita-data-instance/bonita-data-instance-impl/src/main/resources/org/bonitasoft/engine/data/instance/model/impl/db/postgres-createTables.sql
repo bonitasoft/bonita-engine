@@ -21,5 +21,5 @@ CREATE TABLE data_instance (
 	PRIMARY KEY (tenantid, id)
 );
 
-CREATE INDEX idx_datai_container ON data_instance (containerId, containerType, tenantId);
+CREATE INDEX idx_datai_container ON data_instance (tenantId, containerId, containerType, name);
 

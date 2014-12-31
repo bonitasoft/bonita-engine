@@ -22,5 +22,5 @@ CREATE TABLE arch_data_instance (
 	sourceObjectId NUMBER(19, 0) NOT NULL,
 	PRIMARY KEY (tenantid, id)
 );
-CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId,containerId, sourceObjectId);
+CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId, containerId, containerType, archiveDate, name, sourceObjectId);
 CREATE INDEX idx2_arch_data_instance ON arch_data_instance (sourceObjectId, containerId, archiveDate, id, tenantId);
