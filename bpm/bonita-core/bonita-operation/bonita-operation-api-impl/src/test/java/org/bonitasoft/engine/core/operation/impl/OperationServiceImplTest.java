@@ -236,7 +236,7 @@ public class OperationServiceImplTest {
         operationServiceImpl.retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(Arrays.asList(op1), 123, "containerType", expressionContext);
 
         // then
-        verify(leftOperandHandler2, times(1)).loadLeftOperandInContext(eq(op1.getLeftOperand()), any(SExpressionContext.class), anyMapOf(String.class,Object.class));
+        verify(leftOperandHandler2, times(1)).loadLeftOperandInContext(eq(Arrays.asList(op1.getLeftOperand())), any(SExpressionContext.class), anyMapOf(String.class,Object.class));
         assertThat(expressionContext.getInputValues().get("data1")).isEqualTo("originalValue");
     }
 

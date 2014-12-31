@@ -158,13 +158,14 @@ public class OperationServiceImpl implements OperationService {
             if(!leftOperandHashMap.containsKey(leftOperand.getType())){
                 leftOperandHashMap.put(leftOperand.getType(), new ArrayList<SLeftOperand>());
             }
+            leftOperandHashMap.get(leftOperand.getType()).add(leftOperand);
         }
-        for (Entry<String, List<SLeftOperand>> stringListEntry : leftOperandHashMap.entrySet()) {
+        for (Entry<String, List<SLeftOperand>> leftOperandByType : leftOperandHashMap.entrySet()) {
             try {
-                getLeftOperandHandler(stringListEntry.getKey()).loadLeftOperandInContext(stringListEntry.getValue(),
+                getLeftOperandHandler(leftOperandByType.getKey()).loadLeftOperandInContext(leftOperandByType.getValue(),
                         new SExpressionContext(dataContainerId, dataContainerType, inputValues), inputValues);
             } catch (final SBonitaReadException e) {
-                throw new SOperationExecutionException("Unable to retrieve value for operation ", e);
+                throw new SOperationExecutionException("Unable to retrieve value for operation "+leftOperandByType.getValue(), e);
             }
         }
 
