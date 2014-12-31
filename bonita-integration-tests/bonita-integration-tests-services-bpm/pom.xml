@@ -554,13 +554,13 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>generate bonita home</id>
+                        <id>generate bonita home version file</id>
                         <phase>compile</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <target name="copy-bos-home">
+                            <target name="copy-bos-home-version-file">
                                 <copy todir="${bonita.home}">
                                     <fileset dir="${basedir}/home" />
                                     <filterset>
