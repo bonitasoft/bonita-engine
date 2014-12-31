@@ -16,9 +16,9 @@ DROP TABLE process_definition
 GO
 DROP TABLE arch_document_mapping
 GO
-DROP TABLE document
-GO
 DROP TABLE document_mapping
+GO
+DROP TABLE document
 GO
 DROP TABLE arch_flownode_instance
 GO
@@ -56,11 +56,11 @@ DROP TABLE report
 GO
 DROP TABLE processsupervisor
 GO
-DROP TABLE business_app
+DROP TABLE business_app_menu
 GO
 DROP TABLE business_app_page
 GO
-DROP TABLE business_app_menu
+DROP TABLE business_app
 GO
 DROP TABLE command
 GO
@@ -104,13 +104,9 @@ DROP TABLE queriable_log
 GO
 DROP TABLE page
 GO
-DROP TABLE sequence
+DROP TABLE theme
 GO
-DROP TABLE tenant
-GO
-DROP TABLE platform
-GO
-DROP TABLE platformCommand
+DROP TABLE blob_
 GO
 DROP TABLE profilemember
 GO
@@ -124,7 +120,11 @@ DROP TABLE job_param
 GO
 DROP TABLE job_desc
 GO
-DROP TABLE theme
+DROP TABLE sequence
 GO
-DROP TABLE blob_
+DROP TABLE tenant
+GO
+DROP TABLE platform
+GO
+DROP TABLE platformCommand
 GO

@@ -1000,6 +1000,6 @@ CREATE TABLE theme (
   cssContent BLOB,
   type VARCHAR2(50) NOT NULL,
   lastUpdateDate NUMBER(19, 0) NOT NULL,
-  CONSTRAINT "UK_Theme" UNIQUE (tenantId, isDefault, type),
+  CONSTRAINT UK_Theme UNIQUE (tenantId, isDefault, type),
   PRIMARY KEY (tenantId, id)
 );

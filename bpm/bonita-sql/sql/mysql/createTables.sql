@@ -1007,6 +1007,6 @@ CREATE TABLE theme (
   cssContent LONGBLOB,
   type VARCHAR(50) NOT NULL,
   lastUpdateDate BIGINT NOT NULL,
-  CONSTRAINT "UK_Theme" UNIQUE (tenantId, isDefault, type),
+  CONSTRAINT UK_Theme UNIQUE (tenantId, isDefault, type),
   PRIMARY KEY (tenantId, id)
 ) ENGINE = INNODB;
