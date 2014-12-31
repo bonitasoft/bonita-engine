@@ -18,14 +18,6 @@
 
     <dependencies>
 
-        <dependency>
-            <groupId>org.bonitasoft.engine.test</groupId>
-            <artifactId>bonita-integration-tests-services</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-            <type>test-jar</type>
-        </dependency>
-
         <!-- Actor Mapping -->
         <dependency>
             <groupId>org.bonitasoft.engine.core.actor.mapping</groupId>
@@ -490,12 +482,6 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.6.1</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
