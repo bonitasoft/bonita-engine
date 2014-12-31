@@ -24,14 +24,18 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -172,20 +176,21 @@ public class OperationServiceImplTest {
     }
 
     @Test
+    @Ignore("logic is now in the left operand handler")
     public void should_retrieveLeftOperandsAndPutItInExpressionContextIfNotIn_call_leftOperandHandlers() throws Exception {
         // given
         final SOperation op1 = buildOperation("type3", "data1", SOperatorType.JAVA_METHOD);
         final SOperation op2 = buildOperation("type2", "data2", SOperatorType.XPATH_UPDATE_QUERY);
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", new HashMap<String, Object>());
-        doReturn("value1").when(leftOperandHandler3).retrieve(argThat(new MatchLeftOperandName("data1")), any(SExpressionContext.class));
-        doReturn("value2").when(leftOperandHandler2).retrieve(argThat(new MatchLeftOperandName("data2")), any(SExpressionContext.class));
+        doReturn("value1").when(leftOperandHandler3).loadLeftOperandInContext(argThat(new MatchLeftOperandName("data1")), any(SExpressionContext.class), anyMapOf(String.class,Object.class));
+        doReturn("value2").when(leftOperandHandler2).loadLeftOperandInContext(argThat(new MatchLeftOperandName("data2")), any(SExpressionContext.class), anyMapOf(String.class,Object.class));
 
         // when
         operationServiceImpl.retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(Arrays.asList(op1, op2), 123, "containerType", expressionContext);
 
         // then
-        verify(leftOperandHandler3, times(1)).retrieve(eq(op1.getLeftOperand()), any(SExpressionContext.class));
-        verify(leftOperandHandler2, times(1)).retrieve(eq(op2.getLeftOperand()), any(SExpressionContext.class));
+        verify(leftOperandHandler3, times(1)).loadLeftOperandInContext(eq(op1.getLeftOperand()), any(SExpressionContext.class), anyMapOf(String.class,Object.class));
+        verify(leftOperandHandler2, times(1)).loadLeftOperandInContext(eq(op2.getLeftOperand()), any(SExpressionContext.class), anyMapOf(String.class,Object.class));
         assertThat(expressionContext.getInputValues().get("data1")).isEqualTo("value1");
         assertThat(expressionContext.getInputValues().get("data2")).isEqualTo("value2");
     }
@@ -209,26 +214,12 @@ public class OperationServiceImplTest {
     }
 
     @Test
-    public void shouldNotRetrieveLeftOperandOnAssignementOperation() throws Exception {
-        // given
-        final String myDataName = "myDataName";
-        final SOperation op1 = buildOperation("type1", myDataName, SOperatorType.ASSIGNMENT);
-        final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", new HashMap<String, Object>(0));
-        // doReturn(null).when(leftOperandHandler1).retrieve(argThat(new MatchLeftOperandName(myDataName)), any(SExpressionContext.class));
-
-        // when
-        operationServiceImpl.retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(Arrays.asList(op1), 123, "containerType", expressionContext);
-
-        // then
-        verify(leftOperandHandler1, times(0)).retrieve(any(SLeftOperand.class), any(SExpressionContext.class));
-    }
-
-    @Test
+    @Ignore("logic is now in the left operand handler")
     public void shouldNotPutInContextWhenLeftOperandRetrievesNullValue() throws Exception {
         // given
         final SOperation op1 = buildOperation("type2", "data1", SOperatorType.XPATH_UPDATE_QUERY);
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", new HashMap<String, Object>());
-        doReturn(null).when(leftOperandHandler2).retrieve(argThat(new MatchLeftOperandName("data1")), any(SExpressionContext.class));
+        doReturn(null).when(leftOperandHandler2).loadLeftOperandInContext(argThat(new MatchLeftOperandName("data1")), any(SExpressionContext.class), anyMapOf(String.class, Object.class));
         // when
         operationServiceImpl.retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(Arrays.asList(op1), 123, "containerType", expressionContext);
 
@@ -242,13 +233,12 @@ public class OperationServiceImplTest {
         final SOperation op1 = buildOperation("type2", "data1", SOperatorType.XPATH_UPDATE_QUERY);
         final SExpressionContext expressionContext = new SExpressionContext(123l, "containerType", Collections.<String, Object> singletonMap("data1",
                 "originalValue"));
-        when(leftOperandHandler2.retrieve(argThat(new MatchLeftOperandName("data1")), any(SExpressionContext.class))).thenReturn("newIgnoredValue");
 
         // when
         operationServiceImpl.retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(Arrays.asList(op1), 123, "containerType", expressionContext);
 
         // then
-        verify(leftOperandHandler2, times(1)).retrieve(eq(op1.getLeftOperand()), any(SExpressionContext.class));
+        verify(leftOperandHandler2, times(1)).loadLeftOperandInContext(eq(op1.getLeftOperand()), any(SExpressionContext.class), anyMapOf(String.class,Object.class));
         assertThat(expressionContext.getInputValues().get("data1")).isEqualTo("originalValue");
     }
 

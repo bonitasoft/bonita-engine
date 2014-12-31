@@ -144,29 +144,23 @@ public class OperationServiceImpl implements OperationService {
             final SExpressionContext expressionContext) throws SOperationExecutionException {
         final Map<String, Object> inputValues = expressionContext.getInputValues();
 
+        //if the container where we execute the operation is not the same than the container of the expression (call activity data mapping) we skip the loading of left operand
+        String containerType = expressionContext.getContainerType();
+        Long containerId = expressionContext.getContainerId();
+        if(containerId == null || containerId != dataContainerId || containerType == null || !containerType.equals(dataContainerType)){
+            return;
+        }
         for (final SOperation operation : operations) {
-            // for assignments and deletion, initial retrieval is not necessary:
-            if (operation.getType() == SOperatorType.JAVA_METHOD || operation.getType() == SOperatorType.XPATH_UPDATE_QUERY) {
-                // this operation will set a data, we retrieve it and put it in context
-                final SLeftOperand leftOperand = operation.getLeftOperand();
-                try {
-                    final Object retrieve = getLeftOperandHandler(leftOperand).retrieve(leftOperand,
-                            new SExpressionContext(dataContainerId, dataContainerType, expressionContext.getInputValues()));
-                    putRetrievedValueInContextIfNotNullAndNotAlreadyIn(inputValues, leftOperand, retrieve);
-                } catch (final SBonitaReadException e) {
-                    throw new SOperationExecutionException("Unable to retrieve value for operation " + operation, e);
-                }
+            // this operation will set a data, we retrieve it and put it in context
+            final SLeftOperand leftOperand = operation.getLeftOperand();
+            try {
+                getLeftOperandHandler(leftOperand).loadLeftOperandInContext(leftOperand,
+                        new SExpressionContext(dataContainerId, dataContainerType, inputValues), inputValues);
+            } catch (final SBonitaReadException e) {
+                throw new SOperationExecutionException("Unable to retrieve value for operation " + operation, e);
             }
         }
     }
-
-    protected void putRetrievedValueInContextIfNotNullAndNotAlreadyIn(final Map<String, Object> context, final SLeftOperand leftOperand, final Object retrieve) {
-        /* some left operand don't retrieve it, e.g. document, it's heavy */
-        if (retrieve != null && !context.containsKey(leftOperand.getName())) {
-            context.put(leftOperand.getName(), retrieve);
-        }
-    }
-
     protected Object getOperationValue(final SOperation operation, final SExpressionContext expressionContext, final SExpression sExpression)
             throws SOperationExecutionException {
         if (sExpression == null) {

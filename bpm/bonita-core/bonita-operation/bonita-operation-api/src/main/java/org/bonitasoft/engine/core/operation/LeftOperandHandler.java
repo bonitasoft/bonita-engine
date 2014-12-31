@@ -15,6 +15,8 @@
  */
 package org.bonitasoft.engine.core.operation;
 
+import java.util.Map;
+
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
@@ -52,12 +54,14 @@ public interface LeftOperandHandler {
     void delete(SLeftOperand sLeftOperand, long containerId, String containerType) throws SOperationExecutionException;
 
     /**
+     *
+     * retrieve the left operand and put it in context as needed by the left operand
+     *
      * @param sLeftOperand
      * @param expressionContext
-     * @return
-     *         objects retrieved by this handler to be put in the context for further updates
+     * @param contextToSet
      * @throws SBonitaReadException
      */
     // TODO batch method
-    Object retrieve(SLeftOperand sLeftOperand, SExpressionContext expressionContext) throws SBonitaReadException;
+    void loadLeftOperandInContext(SLeftOperand sLeftOperand, SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException;
 }

@@ -15,6 +15,8 @@
  */
 package org.bonitasoft.engine.core.operation.impl;
 
+import java.util.Map;
+
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
@@ -43,8 +45,11 @@ public class ExternalDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) {
-        return expressionContext.getInputValues().get(sLeftOperand.getName());
+    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) {
+        String name = sLeftOperand.getName();
+        if(!contextToSet.containsKey(name)) {
+            contextToSet.put(name,expressionContext.getInputValues().get(name));
+        }
     }
 
     @Override

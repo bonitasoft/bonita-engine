@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.operation;
 
+import java.util.Map;
+
 import org.bonitasoft.engine.bpm.document.DocumentValue;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.document.api.DocumentService;
@@ -82,8 +84,8 @@ public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandl
     }
 
     @Override
-    public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) {
-        return null;
+    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) {
+        //do nothing
     }
 
     @Override

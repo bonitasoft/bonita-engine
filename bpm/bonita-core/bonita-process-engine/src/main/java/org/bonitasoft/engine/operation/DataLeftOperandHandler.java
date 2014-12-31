@@ -10,10 +10,12 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.2
  */
 package org.bonitasoft.engine.operation;
+
+import java.util.Map;
 
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -34,6 +36,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public class DataLeftOperandHandler implements LeftOperandHandler {
 
+    private static final String DATA_INSTANCE = "%DATA_INSTANCE%_";
     private final DataInstanceService dataInstanceService;
 
     private final ParentContainerResolver parentContainerResolver;
@@ -101,9 +104,14 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) throws SBonitaReadException {
+    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
         try {
-            return getDataInstance(sLeftOperand.getName(), expressionContext.getContainerId(), expressionContext.getContainerType()).getValue();
+            String name = sLeftOperand.getName();
+            SDataInstance dataInstance = getDataInstance(name, expressionContext.getContainerId(), expressionContext.getContainerType());
+            contextToSet.put(DATA_INSTANCE + name, dataInstance);
+            if (!contextToSet.containsKey(name)) {
+                contextToSet.put(name, dataInstance.getValue());
+            }
         } catch (final SDataInstanceException e) {
             throw new SBonitaReadException("Unable to retrieve the data", e);
         }

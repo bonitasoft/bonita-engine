@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.operation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -11,6 +12,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
@@ -85,11 +88,12 @@ public class TransientDataLeftOperandHandlerTest {
         // given
         final SShortTextDataInstanceImpl data = createData();
         when(transientDataService.getDataInstance("myData", 42, "ctype")).thenReturn(data);
+        Map<String, Object> contextToSet = new HashMap<String, Object>();
         // when
-        final Object retrieve = transientDataLeftOperandHandler.retrieve(createLeftOperand("myData"), new SExpressionContext(42l, "ctype", 12l));
+        transientDataLeftOperandHandler.loadLeftOperandInContext(createLeftOperand("myData"), new SExpressionContext(42l, "ctype", 12l), contextToSet);
 
         // then
-        assertThat(retrieve).isEqualTo(data);
+        assertThat(contextToSet).containsOnly(entry("myData", data.getValue()), entry("%TRANSIENT_DATA%_myData", data));
     }
 
     private SShortTextDataInstanceImpl createData() {
@@ -121,13 +125,14 @@ public class TransientDataLeftOperandHandlerTest {
         doReturn(sProcessDefinitionImpl).when(processDefinitionService).getProcessDefinition(processDefId);
         final SShortTextDataInstanceImpl data = createData();
         doThrow(SDataInstanceNotFoundException.class).doReturn(data).when(transientDataService).getDataInstance("myData", taskId, "ctype");
+        Map<String, Object> contextToSet = new HashMap<String, Object>();
 
         // when
-        final Object retrieve = transientDataLeftOperandHandler.retrieve(createLeftOperand("myData"), new SExpressionContext(taskId, "ctype", processDefId));
+        transientDataLeftOperandHandler.loadLeftOperandInContext(createLeftOperand("myData"), new SExpressionContext(taskId, "ctype", processDefId), contextToSet);
 
         // then
-        assertThat(retrieve).isEqualTo(data);
-        verify(bpmInstancesCreator, times(1)).createDataInstances(eq(Arrays.<SDataDefinition> asList(sTextDefinitionImpl)), eq(taskId),
+        assertThat(contextToSet).containsOnly(entry("myData", data.getValue()), entry("%TRANSIENT_DATA%_myData", data));
+        verify(bpmInstancesCreator, times(1)).createDataInstances(eq(Arrays.<SDataDefinition>asList(sTextDefinitionImpl)), eq(taskId),
                 eq(DataInstanceContainer.ACTIVITY_INSTANCE), any(SExpressionContext.class));
         verify(logger).log(eq(TransientDataLeftOperandHandler.class), eq(TechnicalLogSeverity.WARNING), anyString());
     }
@@ -158,7 +163,7 @@ public class TransientDataLeftOperandHandlerTest {
         transientDataLeftOperandHandler.update(createLeftOperand("myData"), "newValue", taskId, "ctype");
 
         // then
-        verify(bpmInstancesCreator, times(1)).createDataInstances(eq(Arrays.<SDataDefinition> asList(sTextDefinitionImpl)), eq(taskId),
+        verify(bpmInstancesCreator, times(1)).createDataInstances(eq(Arrays.<SDataDefinition>asList(sTextDefinitionImpl)), eq(taskId),
                 eq(DataInstanceContainer.ACTIVITY_INSTANCE), any(SExpressionContext.class));
         verify(logger, times(2)).log(eq(TransientDataLeftOperandHandler.class), eq(TechnicalLogSeverity.WARNING), anyString());
     }
