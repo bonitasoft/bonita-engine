@@ -27,7 +27,6 @@
 		</copy>
 
 		<!-- sql files -->
-		<delete dir="${target.dir}/server" />
     	<delete dir="${target.dir}/server/sql" />
     	<copy todir="${target.dir}/server/sql">
     		<fileset dir="${basedir}/../../../bonita-engine/bpm/bonita-sql/sql" />

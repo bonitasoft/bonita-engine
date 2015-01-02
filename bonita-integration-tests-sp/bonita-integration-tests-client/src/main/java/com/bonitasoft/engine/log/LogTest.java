@@ -52,7 +52,7 @@ public class LogTest extends CommonAPISPTest {
 
     @After
     public void afterTest() throws Exception {
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     @Before
@@ -92,19 +92,19 @@ public class LogTest extends CommonAPISPTest {
         for (int i = 1; i < 250; i++) {
             usernameLongPrefix += "a";
         }
-        final User userOld = getIdentityAPI().createUser(usernameLongPrefix+"old", "oldPassword");
+        final User userOld = getIdentityAPI().createUser(usernameLongPrefix + "old", "oldPassword");
 
         int actual = getLogAPI().getNumberOfLogs();
         assertEquals(before + 1, actual);
         logoutOnTenant();
-        loginOnDefaultTenantWith(usernameLongPrefix+"old","oldPassword");
+        loginOnDefaultTenantWith(usernameLongPrefix + "old", "oldPassword");
 
         actual = getLogAPI().getNumberOfLogs();
         assertEquals(before + 2, actual);
 
         // update user: add one log
         final UserUpdater updateDescriptor = new UserUpdater();
-        updateDescriptor.setUserName(usernameLongPrefix+"new");
+        updateDescriptor.setUserName(usernameLongPrefix + "new");
         updateDescriptor.setPassword("newPassword");
         getIdentityAPI().updateUser(userOld.getId(), updateDescriptor);
 
@@ -139,13 +139,13 @@ public class LogTest extends CommonAPISPTest {
 
     private void getPaginatedLogsByCreatedBy(final String orderByType) throws BonitaException {
         final User user3 = createUser("loguser3", PASSWORD);
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith("loguser3", PASSWORD);
         final User user2 = createUser("loguser2", PASSWORD);
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith("loguser2", PASSWORD);
         final User user1 = createUser("loguser1", PASSWORD);
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWithDefaultTechnicalUser();
         getIdentityAPI().deleteUser(user1.getId());
         getIdentityAPI().deleteUser(user2.getId());
