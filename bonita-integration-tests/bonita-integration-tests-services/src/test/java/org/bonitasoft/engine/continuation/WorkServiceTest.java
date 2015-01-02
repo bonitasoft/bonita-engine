@@ -74,7 +74,7 @@ public class WorkServiceTest extends CommonServiceTest {
             } else {
                 Thread.sleep(50);
             }
-        } while (!reached && timeout < System.currentTimeMillis());
+        } while (!reached && timeout > System.currentTimeMillis());
         assertThat(reached).isTrue();
     }
 
