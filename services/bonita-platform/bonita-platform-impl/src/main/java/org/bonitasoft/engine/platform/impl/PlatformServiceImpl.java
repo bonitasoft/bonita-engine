@@ -137,21 +137,22 @@ public class PlatformServiceImpl implements PlatformService {
 
     private final DataSource datasource;
 
-    // Get it from the constructor
-    final String statementDelimiter = ";";
+    private final String statementDelimiter;
 
     private final List<File> sqlFolders;
 
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, final Recorder recorder,
             final List<TenantPersistenceService> tenantPersistenceServices, final TechnicalLoggerService logger,
-            final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties, final DataSource datasource, final File sqlFolder) {
-        this(platformPersistenceService, recorder, tenantPersistenceServices, logger, platformCacheService, sPlatformProperties, datasource, asList(sqlFolder));
+            final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties, final DataSource datasource, final File sqlFolder,
+            final String statementDelimiter) {
+        this(platformPersistenceService, recorder, tenantPersistenceServices, logger, platformCacheService, sPlatformProperties, datasource, asList(sqlFolder),
+                statementDelimiter);
     }
 
     public PlatformServiceImpl(final PersistenceService platformPersistenceService, final Recorder recorder,
             final List<TenantPersistenceService> tenantPersistenceServices, final TechnicalLoggerService logger,
             final PlatformCacheService platformCacheService, final SPlatformProperties sPlatformProperties, final DataSource datasource,
-            final List<File> sqlFolders) {
+            final List<File> sqlFolders, final String statementDelimiter) {
         this.platformPersistenceService = platformPersistenceService;
         this.tenantPersistenceServices = tenantPersistenceServices;
         this.logger = logger;
@@ -160,6 +161,7 @@ public class PlatformServiceImpl implements PlatformService {
         this.recorder = recorder;
         this.datasource = datasource;
         this.sqlFolders = sqlFolders;
+        this.statementDelimiter = statementDelimiter;
 
         isTraced = logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE);
     }

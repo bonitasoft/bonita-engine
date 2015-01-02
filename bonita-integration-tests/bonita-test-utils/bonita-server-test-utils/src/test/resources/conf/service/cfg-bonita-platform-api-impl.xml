@@ -19,6 +19,7 @@
                 <value>target/test-classes/sql-test/sql/${db.vendor}</value>
 			</list>
         </constructor-arg>
+        <constructor-arg name="statementDelimiter" value="${sql.delimiter}" />
 	</bean>
 	
 </beans>
