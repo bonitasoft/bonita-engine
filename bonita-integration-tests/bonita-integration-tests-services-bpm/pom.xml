@@ -608,18 +608,6 @@
                                     <version>${project.version}</version>
                                     <type>zip</type>
                                 </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>${project.build.directory}/server</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy sql files test setup</id>
-                        <phase>generate-test-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
                                 <artifactItem>
                                     <groupId>org.bonitasoft.engine</groupId>
                                     <artifactId>bonita-sql</artifactId>

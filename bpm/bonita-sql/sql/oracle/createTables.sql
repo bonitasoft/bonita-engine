@@ -832,7 +832,7 @@ CREATE TABLE queriable_log (
   month SMALLINT NOT NULL,
   dayOfYear SMALLINT NOT NULL,
   weekOfYear SMALLINT NOT NULL,
-  userId VARCHAR2(50) NOT NULL,
+  userId VARCHAR2(255) NOT NULL,
   threadNumber NUMBER(19, 0) NOT NULL,
   clusterNode VARCHAR2(50),
   productVersion VARCHAR2(50) NOT NULL,

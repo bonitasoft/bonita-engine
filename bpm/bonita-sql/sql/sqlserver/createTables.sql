@@ -945,7 +945,7 @@ CREATE TABLE queriable_log (
   month TINYINT NOT NULL,
   dayOfYear SMALLINT NOT NULL,
   weekOfYear TINYINT NOT NULL,
-  userId NVARCHAR(50) NOT NULL,
+  userId NVARCHAR(255) NOT NULL,
   threadNumber NUMERIC(19, 0) NOT NULL,
   clusterNode NVARCHAR(50),
   productVersion NVARCHAR(50) NOT NULL,
