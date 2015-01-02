@@ -27,6 +27,7 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bonitasoft.engine.bpm.bar.BarResource;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
@@ -946,10 +947,14 @@ public class BDRepositoryIT extends CommonAPISPTest {
     }
 
     private String[] firstNames(final String employeeToString) {
+        String firstNames = StringUtils.substringAfter(employeeToString, "firstName=[");
+        firstNames = StringUtils.substringBefore(firstNames, "], lastName=[");
+        return StringUtils.split(firstNames, ", ");
+    }
 
     private String[] lastNames(final String employeeToString) {
-        String lastNames = substringAfter(employeeToString, "lastName=[");
-        lastNames = substringBefore(lastNames, "]]");
+        String lastNames = StringUtils.substringAfter(employeeToString, "lastName=[");
+        lastNames = StringUtils.substringBefore(lastNames, "]]");
         return StringUtils.split(lastNames, ", ");
     }
 
@@ -1167,20 +1172,18 @@ public class BDRepositoryIT extends CommonAPISPTest {
         parameters.put("entityClassName", EMPLOYEE_QUALIF_CLASSNAME);
         parameters.put("businessDataChildName", "address");
         parameters.put("businessDataURIPattern", "/businessdata/{className}/{id}/{field}");
-        final String result = (String) getCommandAPI().execute("getBusinessDataById", parameters);
+        final String lazyAddressResultWithChildName = (String) getCommandAPI().execute("getBusinessDataById", parameters);
 
-        assertThat(resultWithChildName).as("Address should have the right street and city").contains("\"street\":\"32, rue Gustave Eiffel\"")
+        assertThat(lazyAddressResultWithChildName).as("Address should have the right street and city").contains("\"street\":\"32, rue Gustave Eiffel\"")
                 .contains("\"city\":\"Grenoble\"");
-        assertThat(resultWithChildName).as("Address should have a link to country ")
+        assertThat(lazyAddressResultWithChildName).as("Address should have a link to country ")
                 .contains("\"rel\":\"country\"");
 
         parameters.remove("businessDataChildName");
 
-        final String resultWithoutChildName = (String) getCommandAPI().execute("getBusinessDataById", parameters);
-        assertThat(resultWithoutChildName).as("Address should have the right street and city").contains("\"street\":\"32, rue Gustave Eiffel\"")
-                .contains("\"city\":\"Grenoble\"");
+        final String employeeResultWithAddress = (String) getCommandAPI().execute("getBusinessDataById", parameters);
 
-        assertThat(resultWithoutChildName).as("should have a link to lazy country object").contains("\"rel\":\"country\"");
+        assertThat(employeeResultWithAddress).as("should have a link to lazy address object").contains("\"rel\":\"address\"");
 
         disableAndDeleteProcess(definition.getId());
     }

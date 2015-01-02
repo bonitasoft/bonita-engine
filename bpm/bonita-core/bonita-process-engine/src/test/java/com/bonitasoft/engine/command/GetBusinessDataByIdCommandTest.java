@@ -40,7 +40,6 @@ import com.bonitasoft.engine.business.data.BusinessDataService;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import com.bonitasoft.engine.operation.pojo.Travel;
-import com.bonitasoft.engine.pojo.Address;
 import com.bonitasoft.engine.pojo.AddressBook;
 import com.bonitasoft.engine.pojo.Command;
 import com.bonitasoft.engine.pojo.CommandLine;
@@ -342,19 +341,19 @@ public class GetBusinessDataByIdCommandTest {
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, Client.class.getName());
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
 
-        final Client client = new Client();
-        final Address address = new Address();
-        final Country country = new Country(1L, 2L, "France");
-        address.setPersistenceId(864L);
-        address.setCountry(country);
-
-        client.setAddress(address);
-
-        client.getAddresses().add(address);
-        client.getAddresses().add(address);
-        client.getAddresses().add(address);
-
-        when(bdrService.findById(Client.class, 1983L)).thenReturn(client);
+        //        final Client client = new Client();
+        //        final Address address = new Address();
+        //        final Country country = new Country(1L, 2L, "France");
+        //        address.setPersistenceId(864L);
+        //        address.setCountry(country);
+        //
+        //        client.setAddress(address);
+        //
+        //        client.getAddresses().add(address);
+        //        client.getAddresses().add(address);
+        //        client.getAddresses().add(address);
+        //
+        //        when(bdrService.findById(Client.class, 1983L)).thenReturn(client);
 
         final String json = (String) command.execute(parameters, tenantServiceAccessor);
         System.out.println(json);

@@ -86,14 +86,14 @@ public class BusinessDataServiceImpl implements BusinessDataService {
 
     private Object callJavaOperationOnEntity(final Entity businessObject, final Object valueToSetObjectWith, final String methodName, final String parameterType)
             throws SBusinessDataRepositoryException, SBusinessDataNotFoundException {
-        final Type relationType = getRelationType(businessObject, methodName);
+
         final Entity jpaEntity;
         if (businessObject.getPersistenceId() == null) {
             jpaEntity = copyForServer(businessObject);
         } else {
             jpaEntity = businessDataRepository.findById(businessObject.getClass(), businessObject.getPersistenceId());
         }
-        final Object valueToSet = loadValueToSet(valueToSetObjectWith, relationType);
+        final Object valueToSet = loadValueToSet(businessObject, valueToSetObjectWith, methodName);
         try {
             invokeJavaMethod(jpaEntity, methodName, parameterType, valueToSet);
             return copyForClient(jpaEntity);
@@ -115,13 +115,15 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     }
 
     @SuppressWarnings("unchecked")
-    private Object loadValueToSet(final Object valueToSetObjectWith, final Type relationType) throws SBusinessDataNotFoundException {
+    private Object loadValueToSet(final Entity businessObject, final Object valueToSetObjectWith, final String methodName)
+            throws SBusinessDataNotFoundException, SBusinessDataRepositoryException {
         Object valueToSet;
         if (isEntity(valueToSetObjectWith)) {
+            final Type relationType = getRelationType(businessObject, methodName);
             valueToSet = getPersistedValue((Entity) valueToSetObjectWith, relationType);
         }
         else if (isListOfEntities(valueToSetObjectWith)) {
-            valueToSet = getPersistedValues((List<Entity>) valueToSetObjectWith, relationType);
+            valueToSet = getPersistedValues((List<Entity>) valueToSetObjectWith);
         } else {
             valueToSet = valueToSetObjectWith;
         }
@@ -140,7 +142,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         return primaryKeys;
     }
 
-    private Object getPersistedValues(final List<Entity> entities, final Type relationType) throws SBusinessDataNotFoundException {
+    private Object getPersistedValues(final List<Entity> entities) throws SBusinessDataNotFoundException {
         if (entities.isEmpty()) {
             return new ArrayList<Entity>();
         }
@@ -168,7 +170,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         try {
             annotations = businessObject.getClass().getDeclaredField(fieldName).getAnnotations();
         } catch (final NoSuchFieldException e) {
-            throw new SBusinessDataRepositoryException(e);
+            return null;
         } catch (final SecurityException e) {
             throw new SBusinessDataRepositoryException(e);
         }
