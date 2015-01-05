@@ -40,7 +40,7 @@ public class SXMLObjectDataInstanceImplTest {
         final Serializable returnedValue = sxmlObjectDataInstanceImpl.getValue();
 
         //then
-        assertThat(returnedValue).as("should be not null").isNull();
+        assertThat(returnedValue).as("should be null").isNull();
     }
 
     @Test
@@ -52,6 +52,6 @@ public class SXMLObjectDataInstanceImplTest {
         final String returnedValue = sxmlObjectDataInstanceImpl.getDiscriminator();
 
         //then
-        assertThat(returnedValue).as("should be not null").isNotEmpty();
+        assertThat(returnedValue).as("should not be null").isNotEmpty();
     }
 }

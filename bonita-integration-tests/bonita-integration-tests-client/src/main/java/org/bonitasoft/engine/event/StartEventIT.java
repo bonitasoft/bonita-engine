@@ -41,15 +41,11 @@ public class StartEventIT extends TestWithUser {
                 .addTransition("startEventWithMessage", "step1WithMessage");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.getProcess(), ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
-
-        final HumanTaskInstance waitForUserTaskStep1 = waitForUserTask("step1");
+        final HumanTaskInstance step1 = waitForUserTaskAndGetIt("step1");
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10)
                 .sort(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, Order.ASC);
-
         List<HumanTaskInstance> humanTaskInstances = getProcessAPI().searchPendingTasksForUser(user.getId(), searchOptionsBuilder.done()).getResult();
-        final long rootContainerId = waitForUserTaskStep1.getRootContainerId();
-
         assertNotNull("searchPendingTasksForUser give a null result for userId:" + user.getId() + " search options:" + searchOptionsBuilder.done(),
                 humanTaskInstances);
 
@@ -58,7 +54,7 @@ public class StartEventIT extends TestWithUser {
         assertTrue(humanTaskInstances.size() > 0);
 
         for (final HumanTaskInstance humanTaskInstance : humanTaskInstances) {
-            if (humanTaskInstance.getRootContainerId() == rootContainerId) {
+            if (humanTaskInstance.getRootContainerId() == step1.getRootContainerId()) {
                 // even if step1WithTimer is fired
                 // the start event should be the first one
                 assertEquals("step1", humanTaskInstance.getName());

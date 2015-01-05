@@ -14,11 +14,11 @@
 	<query name="getSADataInstancesByDataInstanceIdAndArchiveDate">
 		SELECT saDataInstance
 		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS saDataInstance
-		WHERE saDataInstance.id IN(
+		WHERE saDataInstance.sourceObjectId IN (:dataInstanceIds)
+        AND saDataInstance.id IN(
 			SELECT max(sadi.id)
 			FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS sadi
-			WHERE sadi.sourceObjectId IN (:dataInstanceIds)
-			AND :time >= sadi.archiveDate 
+			WHERE :time >= sadi.archiveDate 
 			GROUP BY sadi.sourceObjectId
 		)
 	</query>

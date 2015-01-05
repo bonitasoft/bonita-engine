@@ -21,6 +21,7 @@ import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFac
 import org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SBooleanDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SDataInstanceImpl;
+import org.bonitasoft.engine.data.instance.model.impl.SDateDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SDoubleDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SFloatDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SIntegerDataInstanceImpl;
@@ -30,6 +31,8 @@ import org.bonitasoft.engine.data.instance.model.impl.SShortTextDataInstanceImpl
 import org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl;
 import org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl;
 import org.bonitasoft.engine.expression.model.SExpression;
+
+import java.util.Date;
 
 /**
  * @author Zhao Na
@@ -62,6 +65,8 @@ public class SDataInstanceBuilderFactoryImpl implements SDataInstanceBuilderFact
                 dataInstanceImpl = new SFloatDataInstanceImpl(dataDefinition);
             } else if (byte[].class.getName().equals(className)) {
                 dataInstanceImpl = new SBlobDataInstanceImpl(dataDefinition);
+            } else if (Date.class.getName().equals(className)) {
+                dataInstanceImpl = new SDateDataInstanceImpl(dataDefinition);
             } else {
                 dataInstanceImpl = new SXMLObjectDataInstanceImpl(dataDefinition);
             }

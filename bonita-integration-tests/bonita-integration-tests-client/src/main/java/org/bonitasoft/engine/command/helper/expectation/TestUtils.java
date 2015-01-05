@@ -32,7 +32,7 @@ public class TestUtils {
 
         public void execute(final User behalf, final String... steps) throws Exception {
             for (final String step : steps) {
-                testCase.waitForUserTaskAndExecuteIt(step, process, behalf);
+                testCase.waitForUserTaskAndExecuteIt(process, step, behalf);
             }
         }
 

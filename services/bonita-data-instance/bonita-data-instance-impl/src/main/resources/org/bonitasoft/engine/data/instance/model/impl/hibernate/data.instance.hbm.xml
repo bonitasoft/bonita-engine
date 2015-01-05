@@ -76,6 +76,8 @@
 	</subclass>
 
 	<subclass name="SDateDataInstanceImpl" abstract="false" discriminator-value="SDateDataInstanceImpl" extends="SDataInstanceImpl">
-		<property name="value" column="longValue" />
+		<property name="value" column="longValue">
+			<type name="org.bonitasoft.engine.persistence.DateStoredAsLongUserType" />
+		</property>
 	</subclass>
 </hibernate-mapping>

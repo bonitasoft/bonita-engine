@@ -48,7 +48,7 @@ public class SignalEventIT extends AbstractEventIT {
 
         // Check that the process with trigger signal on start is not started, before send signal
         final ProcessInstance processInstanceWithEndSignal = getProcessAPI().startProcess(processDefinitionWithEndSignal.getId());
-        waitForUserTask("step1", processInstanceWithEndSignal);
+        waitForUserTask(processInstanceWithEndSignal, "step1");
         checkNbOfProcessInstances(1);
 
         List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);

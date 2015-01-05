@@ -439,7 +439,7 @@ public interface DocumentAPI {
      * @param processInstanceId
      *        The identifier of the process instance that contains the list
      * @param name
-     *        The name of the document list
+     *        The name of the document
      * @param fromIndex
      *        The index of the first element to be retrieved (it starts from zero)
      * @param numberOfResult

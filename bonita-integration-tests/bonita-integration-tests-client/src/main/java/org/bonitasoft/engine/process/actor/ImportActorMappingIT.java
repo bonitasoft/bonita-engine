@@ -79,7 +79,7 @@ public class ImportActorMappingIT extends TestWithTechnicalUser {
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("userTask1", processInstance);
+        waitForUserTask(processInstance, "userTask1");
         waitForPendingTasks(john.getId(), 1);
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, null);
