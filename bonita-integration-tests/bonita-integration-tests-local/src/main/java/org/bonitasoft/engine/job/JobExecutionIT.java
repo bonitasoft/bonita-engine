@@ -61,16 +61,6 @@ public class JobExecutionIT extends CommonAPILocalIT {
     }
 
     @Test
-    public void retryAJob_should_execute_again_a_failed_job_and_clean_related_job_logs_and_jobDescriptor_if_not_recurrentLoop() throws Exception {
-        int i = 0;
-        while (true) {
-            System.out.println("---------------------------------------------- " + i);
-            retryAJob_should_execute_again_a_failed_job_and_clean_related_job_logs_and_jobDescriptor_if_not_recurrent();
-            i++;
-        }
-    }
-
-    @Test
     public void retryAJob_should_execute_again_a_failed_job_and_clean_related_job_logs_and_jobDescriptor_if_not_recurrent() throws Exception {
         //given
         getCommandAPI().register("except", "Throws Exception when scheduling a job", AddJobCommand.class.getName());
