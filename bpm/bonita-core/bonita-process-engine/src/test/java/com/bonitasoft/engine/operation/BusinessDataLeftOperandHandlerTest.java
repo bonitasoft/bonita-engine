@@ -387,10 +387,6 @@ public class BusinessDataLeftOperandHandlerTest {
         leftOperandHandler.delete(leftOperand, 45, "PROCESS_INSTANCE");
     }
 
-    @Test
-    public void handlerDoesNotSupportBatchUpdate() {
-        assertThat(leftOperandHandler.supportBatchUpdate()).isFalse();
-    }
 
     @Test
     public void should_update_attach_multi_business_data() throws Exception {
