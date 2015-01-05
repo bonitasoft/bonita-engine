@@ -196,9 +196,5 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
             loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
         }
     }
-    @Override
-    public boolean supportBatchUpdate() {
-        return true;
-    }
 
 }

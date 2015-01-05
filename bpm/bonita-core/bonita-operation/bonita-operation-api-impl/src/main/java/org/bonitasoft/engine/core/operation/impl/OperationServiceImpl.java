@@ -86,7 +86,6 @@ public class OperationServiceImpl implements OperationService {
             return;
         }
         // retrieve all left operand to set and put it in context
-        // TODO implement batch retrieve in leftOperandHandlers
         retrieveLeftOperandsAndPutItInExpressionContextIfNotIn(operations, leftOperandContainerId, leftOperandContainerType, expressionContext);
 
         // execute operation and put it in context again
@@ -163,13 +162,14 @@ public class OperationServiceImpl implements OperationService {
         for (Entry<String, List<SLeftOperand>> leftOperandByType : leftOperandHashMap.entrySet()) {
             try {
                 getLeftOperandHandler(leftOperandByType.getKey()).loadLeftOperandInContext(leftOperandByType.getValue(),
-                        new SExpressionContext(dataContainerId, dataContainerType, inputValues), inputValues);
+                        expressionContext, inputValues);
             } catch (final SBonitaReadException e) {
                 throw new SOperationExecutionException("Unable to retrieve value for operation "+leftOperandByType.getValue(), e);
             }
         }
 
     }
+
     protected Object getOperationValue(final SOperation operation, final SExpressionContext expressionContext, final SExpression sExpression)
             throws SOperationExecutionException {
         if (sExpression == null) {

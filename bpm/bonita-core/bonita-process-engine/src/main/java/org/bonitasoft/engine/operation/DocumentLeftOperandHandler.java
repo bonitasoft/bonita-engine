@@ -97,9 +97,5 @@ public class DocumentLeftOperandHandler extends AbstractDocumentLeftOperandHandl
             loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
         }
     }
-    @Override
-    public boolean supportBatchUpdate() {
-        return true;
-    }
 
 }

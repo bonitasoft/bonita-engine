@@ -120,6 +120,8 @@ public class DataInstanceServiceImpl implements DataInstanceService {
     public SDataInstance getDataInstance(final String dataName, final long containerId, final String containerType,
             final ParentContainerResolver parentContainerResolver) throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(dataName, containerType);
+        System.out.println("getDataInstance:"+dataName);
+
 
         final String queryName = "getDataInstancesWithNames";
         final Map<String, Object> inputParameters = new HashMap<String, Object>();
@@ -140,6 +142,8 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             final ParentContainerResolver parentContainerResolver, final int fromIndex, final int numberOfResults)
             throws SDataInstanceException {
         NullCheckingUtil.checkArgsNotNull(containerType);
+
+        System.out.println("getDataInstances of container:"+containerId+containerType);
         final String queryName = "getDataInstances";
         final Map<String, Object> inputParameters = new HashMap<String, Object>();
         final List<SDataInstance> dataInstances = getSDatainstanceOfContainers(containerId, containerType, parentContainerResolver, queryName, inputParameters);
@@ -412,6 +416,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             final ParentContainerResolver parentContainerResolver)
             throws SDataInstanceException {
         logBeforeMethod("getDataInstances");
+        System.out.println("getDataInstances:"+dataNames);
         NullCheckingUtil.checkArgsNotNull(dataNames, containerType);
         if (dataNames.isEmpty()) {
             return Collections.emptyList();

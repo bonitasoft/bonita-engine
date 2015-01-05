@@ -90,11 +90,6 @@ public class DocumentLeftOperandHandlerTest {
     }
 
     @Test
-    public void handlerSupportsBatchUpdate() {
-        assertThat(handler.supportBatchUpdate()).isTrue();
-    }
-
-    @Test
     public void should_update_check_the_type() throws Exception {
         exception.expect(SOperationExecutionException.class);
         exception.expectMessage("Document operation only accepts an expression returning a DocumentValue and not java.util.HashMap");

@@ -1,11 +1,8 @@
 package org.bonitasoft.engine.operation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.operation.DataLeftOperandHandler;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -32,9 +29,5 @@ public class DataLeftOperandHandlerTest {
         handler.delete(createLeftOperand("myData"), 45l, "container");
     }
 
-    @Test
-    public void handlerSupportsBatchUpdate() {
-        assertThat(handler.supportBatchUpdate()).isTrue();
-    }
 
 }

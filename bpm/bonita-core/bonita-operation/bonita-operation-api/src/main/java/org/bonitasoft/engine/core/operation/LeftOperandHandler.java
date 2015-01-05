@@ -35,13 +35,6 @@ public interface LeftOperandHandler {
     String getType();
 
     /**
-     * Checks whether the handler supports batch update after executing all operations
-     *
-     * @return true if the handler supports batch update after executing all operations; false otherwise
-     */
-    boolean supportBatchUpdate();
-
-    /**
      * @param inputValues   contains value(s) given by the strategy to update the left operand with
      * @param sLeftOperand  the left operand
      * @param newValue      the value to set the element with

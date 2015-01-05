@@ -61,9 +61,5 @@ public class ExternalDataLeftOperandHandler implements LeftOperandHandler {
             loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
         }
     }
-    @Override
-    public boolean supportBatchUpdate() {
-        return true;
-    }
 
 }

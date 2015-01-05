@@ -107,9 +107,4 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
         }
     }
 
-    @Override
-    public boolean supportBatchUpdate() {
-        return true;
-    }
-
 }

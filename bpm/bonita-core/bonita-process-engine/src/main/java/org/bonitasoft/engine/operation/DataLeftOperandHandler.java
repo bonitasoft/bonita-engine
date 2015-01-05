@@ -153,9 +153,4 @@ public class DataLeftOperandHandler implements LeftOperandHandler {
         return dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType, parentContainerResolver);
     }
 
-    @Override
-    public boolean supportBatchUpdate() {
-        return true;
-    }
-
 }
