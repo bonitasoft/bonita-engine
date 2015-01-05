@@ -317,12 +317,12 @@ public class SPPlatformTest {
     }
 
     @Test(expected = TenantNotFoundException.class)
-    public void activeNotExistTenant() throws BonitaException {
+    public void activateNotExistingTenantShouldThrowException() throws BonitaException {
         platformAPI.activateTenant(9999);
     }
 
     @Test(expected = TenantNotFoundException.class)
-    public void deactiveNotExistTenant() throws BonitaException {
+    public void deactiveNotExistingTenantShouldThrowException() throws BonitaException {
         platformAPI.deactiveTenant(9999);
     }
 
@@ -346,7 +346,7 @@ public class SPPlatformTest {
     }
 
     @Test(expected = DeletionException.class)
-    public void deleteNotExistTenant() throws BonitaException {
+    public void deleteNotExistingTenantShouldThrowException() throws BonitaException {
         platformAPI.deleteTenant(-3);
     }
 
