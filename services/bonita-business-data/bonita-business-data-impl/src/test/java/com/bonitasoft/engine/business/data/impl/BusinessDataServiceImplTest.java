@@ -7,6 +7,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -36,6 +37,7 @@ public class BusinessDataServiceImplTest {
 
     public class EntityPojo implements Entity {
 
+        private static final long serialVersionUID = 1L;
         private String name;
         private Boolean bool;
         private Date date;
@@ -46,6 +48,9 @@ public class BusinessDataServiceImplTest {
 
         @OneToOne(cascade = CascadeType.ALL)
         private Entity compositionEntity;
+
+        @OneToOne(cascade = CascadeType.ALL)
+        private Entity nullChildEntity;
 
         private List<Entity> entities;
         private final Long persistenceId;
@@ -121,6 +126,14 @@ public class BusinessDataServiceImplTest {
             this.aggregationEntity = aggregationEntity;
         }
 
+        public Entity getNullChildEntity() {
+            return null;
+        }
+
+        public void setNullChildEntity(final Entity nullChildEntity) {
+            this.nullChildEntity = nullChildEntity;
+        }
+
     }
 
     private final Entity pojo = new EntityPojo(1L);
@@ -172,8 +185,20 @@ public class BusinessDataServiceImplTest {
     }
 
     @Test(expected = SBusinessDataNotFoundException.class)
-    public void callJavaOperationShouldThrhrowExceptionWhenBusinessDataIsNull() throws Exception {
+    public void callJavaOperationShouldThrowExceptionWhenBusinessDataIsNull() throws Exception {
         businessDataService.callJavaOperation(null, new EntityPojo(1L), "someMethod", String.class.getName());
+    }
+
+    @Test
+    public void callJavaOperationShouldInvokeListMethod() throws Exception {
+        final List<Entity> entities = new ArrayList<Entity>();
+        entities.add(new EntityPojo(1L));
+        businessDataService.callJavaOperation(entities, entities, "contains", Object.class.getName());
+    }
+
+    @Test(expected = SBusinessDataRepositoryException.class)
+    public void callJavaOperationShouldThrowExceptionWhenNotAnEntity() throws Exception {
+        businessDataService.callJavaOperation("not an entity", null, "getLengh", String.class.getName());
     }
 
     @Test(expected = SBusinessDataNotFoundException.class)
@@ -222,26 +247,24 @@ public class BusinessDataServiceImplTest {
     }
 
     @Test
-    public void callJavaOperationShouldSetEntityAggregation() throws Exception {
+    public void callJavaOperationShouldSetEntityComposition() throws Exception {
         //given
-        final EntityPojo aggragationEntity = new EntityPojo(2L);
+        final EntityPojo compositionEntity = new EntityPojo(2L);
 
         doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
-        doReturn(aggragationEntity).when(businessDataRepository).findById(aggragationEntity.getClass(), aggragationEntity.getPersistenceId());
         doReturn(pojo).when(businessDataRepository).merge(pojo);
 
         //when
-        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, aggragationEntity, "setAggregationEntity",
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, compositionEntity, "setCompositionEntity",
                 Entity.class.getName());
 
-        //then
         assertThat(pojoObject).as("should return object").isNotNull();
-        assertThat(pojoObject.getAggregationEntity()).as("should have set entity").isEqualTo(aggragationEntity);
-        verify(businessDataRepository).findById(aggragationEntity.getClass(), aggragationEntity.getPersistenceId());
+        assertThat(pojoObject.getCompositionEntity()).as("should have set entity").isEqualTo(compositionEntity);
+        verify(businessDataRepository, never()).findById(compositionEntity.getClass(), compositionEntity.getPersistenceId());
     }
 
     @Test
-    public void callJavaOperationShouldSetEntityComposition() throws Exception {
+    public void callJavaOperationShouldSetEntityAggregation() throws Exception {
         //given
         final EntityPojo compositionEntity = new EntityPojo(2L);
 
@@ -404,7 +427,7 @@ public class BusinessDataServiceImplTest {
     @Test(expected = SBusinessDataRepositoryException.class)
     public void should_loadClass_throw_exception() throws Exception {
         //when
-        final Class<? extends Entity> loadClass = businessDataService.loadClass("not a class");
+        businessDataService.loadClass("not a class");
 
         //then exception
     }
@@ -430,6 +453,27 @@ public class BusinessDataServiceImplTest {
 
         //when then exception
         businessDataService.getJsonEntity(pojo.getClass().getName(), pojo.getPersistenceId(), PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+    }
+
+    @Test
+    public void should_getJsonChildEntity_return_emptyObject() throws Exception {
+        //given
+        final EntityPojo parentEntity = new EntityPojo(1562L);
+        final EntityPojo childEntity = new EntityPojo(156842L);
+        parentEntity.setAggregationEntity(childEntity);
+
+        doReturn(parentEntity).when(businessDataRepository).findById(parentEntity.getClass(), parentEntity.getPersistenceId());
+        doReturn(childEntity).when(businessDataRepository).findById(childEntity.getClass(), childEntity.getPersistenceId());
+        doReturn(childEntity).when(businessDataRepository).unwrap(childEntity);
+
+        //when
+        final Serializable jsonChildEntity = businessDataService.getJsonChildEntity(parentEntity.getClass().getName(), parentEntity.getPersistenceId(),
+                "nullChildEntity",
+                PARAMETER_BUSINESSDATA_CLASS_URI_VALUE);
+
+        //then
+        assertThat(jsonChildEntity).isEqualTo(JsonBusinessDataSerializer.EMPTY_OBJECT);
+
     }
 
     @Test

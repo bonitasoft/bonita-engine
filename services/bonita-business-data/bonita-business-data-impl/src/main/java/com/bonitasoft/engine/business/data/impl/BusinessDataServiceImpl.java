@@ -5,7 +5,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.ManyToMany;
@@ -181,36 +183,9 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             throw new SBusinessDataRepositoryException(e);
         }
         for (final Annotation annotation : annotations) {
-            //FIXME use custom annotation on methods
-            if (annotation.annotationType().equals(OneToOne.class)) {
+            final Set<Class<? extends Annotation>> annotationKeySet = getAnnotationKeySet();
+            if (annotationKeySet.contains(annotation.annotationType())) {
                 final CascadeType[] cascade = ((OneToOne) annotation).cascade();
-                if (cascade[0].equals(CascadeType.MERGE)) {
-                    return Type.AGGREGATION;
-                }
-                if (cascade[0].equals(CascadeType.ALL)) {
-                    return Type.COMPOSITION;
-                }
-            }
-            if (annotation.annotationType().equals(OneToMany.class)) {
-                final CascadeType[] cascade = ((OneToMany) annotation).cascade();
-                if (cascade[0].equals(CascadeType.MERGE)) {
-                    return Type.AGGREGATION;
-                }
-                if (cascade[0].equals(CascadeType.ALL)) {
-                    return Type.COMPOSITION;
-                }
-            }
-            if (annotation.annotationType().equals(ManyToMany.class)) {
-                final CascadeType[] cascade = ((ManyToMany) annotation).cascade();
-                if (cascade[0].equals(CascadeType.MERGE)) {
-                    return Type.AGGREGATION;
-                }
-                if (cascade[0].equals(CascadeType.ALL)) {
-                    return Type.COMPOSITION;
-                }
-            }
-            if (annotation.annotationType().equals(ManyToOne.class)) {
-                final CascadeType[] cascade = ((ManyToOne) annotation).cascade();
                 if (cascade[0].equals(CascadeType.MERGE)) {
                     return Type.AGGREGATION;
                 }
@@ -220,6 +195,16 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             }
         }
         return null;
+    }
+
+    private Set<Class<? extends Annotation>> getAnnotationKeySet() {
+        //FIXME use custom annotation on methods
+        final Set<Class<? extends Annotation>> annotationKeySet = new HashSet<Class<? extends Annotation>>();
+        annotationKeySet.add(OneToOne.class);
+        annotationKeySet.add(OneToMany.class);
+        annotationKeySet.add(ManyToMany.class);
+        annotationKeySet.add(ManyToOne.class);
+        return annotationKeySet;
     }
 
     @Override
