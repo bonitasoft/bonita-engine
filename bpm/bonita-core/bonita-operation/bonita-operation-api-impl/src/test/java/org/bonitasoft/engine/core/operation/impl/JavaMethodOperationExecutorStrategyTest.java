@@ -74,7 +74,7 @@ public class JavaMethodOperationExecutorStrategyTest {
         final SExpressionContext expressionContext = new SExpressionContext(123L, DataInstanceContainer.PROCESS_INSTANCE.name(), 1234L);
         final Map<String, Object> map = new HashMap<String, Object>();
         map.put("myData", new MyClassThatThrowException());
-        expressionContext.setInputValues(Collections.<String, Object> emptyMap());
+        expressionContext.setInputValues(map);
 
         strategy.computeNewValueForLeftOperand(operation, "Update", expressionContext);
     }
