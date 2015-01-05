@@ -3355,17 +3355,16 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             Thread.currentThread().setContextClassLoader(classLoader);
             final Map<String, Serializable> externalDataValue = new HashMap<String, Serializable>(operations.size());
-            for (final Operation operation : operations) {
-                // convert the client operation to server operation
-                final SOperation sOperation = convertOperation(operation);
-                // set input values of expression with connector result + provided input for this operation
-                final HashMap<String, Object> inputValues = new HashMap<String, Object>(operationInputValues);
-                inputValues.putAll(connectorResult.getResult());
-                expressionContext.setInputValues(inputValues);
-                // execute
-                final Long containerId = expressionContext.getContainerId();
-                operationService.execute(sOperation, containerId == null ? -1 : containerId, expressionContext.getContainerType(), expressionContext);
-                // return the value of the data if it's an external data
+            // convert the client operation to server operation
+            final List<SOperation> sOperations = convertOperations(operations);
+            // set input values of expression with connector result + provided input for this operation
+            final HashMap<String, Object> inputValues = new HashMap<String, Object>(operationInputValues);
+            inputValues.putAll(connectorResult.getResult());
+            expressionContext.setInputValues(inputValues);
+            // execute
+            operationService.execute(sOperations, expressionContext);
+            // return the value of the data if it's an external data
+            for (Operation operation : operations) {
                 final LeftOperand leftOperand = operation.getLeftOperand();
                 if (LeftOperand.TYPE_EXTERNAL_DATA.equals(leftOperand.getType())) {
                     externalDataValue.put(leftOperand.getName(), (Serializable) expressionContext.getInputValues().get(leftOperand.getName()));
