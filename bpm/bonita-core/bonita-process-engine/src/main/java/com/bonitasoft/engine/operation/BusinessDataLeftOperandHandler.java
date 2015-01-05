@@ -199,9 +199,5 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
         }
     }
 
-    @Override
-    public boolean supportBatchUpdate() {
-        return false;
-    }
 
 }
