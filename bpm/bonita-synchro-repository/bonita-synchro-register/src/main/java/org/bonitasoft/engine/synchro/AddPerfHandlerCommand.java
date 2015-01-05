@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.synchro.jms;
+package org.bonitasoft.engine.synchro;
 
 import java.io.Serializable;
 import java.util.List;

@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.synchro.jms;
+package org.bonitasoft.engine.synchro;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -24,7 +24,7 @@ import org.bonitasoft.engine.events.model.SEvent;
 /**
  * @author Baptiste Mesta
  */
-public class ProcessInstanceFinishedHandler extends AbstractUpdateHandler {
+public class ProcessInstanceFinishedHandler extends AbstractJMSUpdateHandler {
 
     private static final long serialVersionUID = 1L;
 
