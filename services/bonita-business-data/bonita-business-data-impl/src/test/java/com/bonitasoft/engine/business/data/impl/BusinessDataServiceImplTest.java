@@ -165,6 +165,12 @@ public class BusinessDataServiceImplTest {
         assertThat(businessDataService.isBusinessData(pojo)).isFalse();
     }
 
+    @Test
+    public void isBusinessDataShouldBeFalseWhenDataIsNull() throws Exception {
+        assertThat(businessDataService.isBusinessData(null)).isFalse();
+
+    }
+
     @Test(expected = SBusinessDataNotFoundException.class)
     public void callJavaOperationShouldThrhrowExceptionWhenBusinessDataIsNull() throws Exception {
         businessDataService.callJavaOperation(null, new EntityPojo(1L), "someMethod", String.class.getName());
@@ -198,6 +204,21 @@ public class BusinessDataServiceImplTest {
 
         assertThat(pojoObject).as("should return object").isNotNull();
         assertThat(pojoObject.getName()).as("should have set name").isEqualTo(NEW_NAME);
+    }
+
+    @Test
+    public void callJavaOperationSetValueToNull() throws Exception {
+        //given
+        doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
+        doReturn(pojo).when(businessDataRepository).merge(pojo);
+
+        //when
+        businessDataService.callJavaOperation(pojo, NEW_NAME, "setName", String.class.getName());
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, null, "setName", String.class.getName());
+
+        //then
+        assertThat(pojoObject).as("should return object").isNotNull();
+        assertThat(pojoObject.getName()).as("should have set name to null").isNull();
     }
 
     @Test
@@ -330,6 +351,22 @@ public class BusinessDataServiceImplTest {
         //then
         assertThat(pojoObject).as("should return object").isNotNull();
         assertThat(pojoObject.getNumbers()).as("should have set list").hasSize(2).contains(1L, 2L);
+    }
+
+    @Test
+    public void callJavaOperationShouldSetListToNull() throws Exception {
+        //given
+        final List<Long> longs = Arrays.asList(1L, 2L);
+        doReturn(pojo).when(businessDataRepository).findById(pojo.getClass(), pojo.getPersistenceId());
+        doReturn(pojo).when(businessDataRepository).merge(pojo);
+
+        //when
+        businessDataService.callJavaOperation(pojo, longs, "setNumbers", List.class.getName());
+        final EntityPojo pojoObject = (EntityPojo) businessDataService.callJavaOperation(pojo, null, "setNumbers", List.class.getName());
+
+        //then
+        assertThat(pojoObject).as("should return object").isNotNull();
+        assertThat(pojoObject.getNumbers()).as("should have set list to null").isNull();
     }
 
     @Test

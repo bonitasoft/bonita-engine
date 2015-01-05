@@ -41,6 +41,9 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     }
 
     private boolean isListOfEntities(final Object data) {
+        if (data == null) {
+            return false;
+        }
         if (!List.class.isAssignableFrom(data.getClass())) {
             return false;
         }
@@ -54,6 +57,9 @@ public class BusinessDataServiceImpl implements BusinessDataService {
     }
 
     private boolean isEntity(final Object data) {
+        if (data == null) {
+            return false;
+        }
         return Entity.class.isAssignableFrom(data.getClass());
     }
 
@@ -106,7 +112,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             throws ClassNotFoundException,
             NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         final JavaMethodInvoker methodInvoker = new JavaMethodInvoker();
-        methodInvoker.invokeJavaMethod(valueToSet.getClass().getName(), valueToSet, objectToSet, methodName, parameterType);
+        methodInvoker.invokeJavaMethod(parameterType, valueToSet, objectToSet, methodName, parameterType);
     }
 
     private Object copyForClient(final Entity jpaEntity) {
@@ -228,6 +234,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Serializable getJsonChildEntity(final String entityClassName, final Long identifier, final String childFieldName, final String businessDataURIPattern)
             throws SBusinessDataNotFoundException, SBusinessDataRepositoryException {
@@ -245,7 +252,7 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         }
 
         if (childEntity == null) {
-            return jsonBusinessDataSerializer.EMPTY_OBJECT;
+            return JsonBusinessDataSerializer.EMPTY_OBJECT;
         }
         if (childEntity instanceof Entity) {
             final Entity unwrap = businessDataRepository.unwrap((Entity) childEntity);
