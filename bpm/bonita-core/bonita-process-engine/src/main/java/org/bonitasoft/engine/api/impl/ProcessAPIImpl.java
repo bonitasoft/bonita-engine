@@ -3362,7 +3362,8 @@ public class ProcessAPIImpl implements ProcessAPI {
             inputValues.putAll(connectorResult.getResult());
             expressionContext.setInputValues(inputValues);
             // execute
-            operationService.execute(sOperations, expressionContext);
+            Long containerId = expressionContext.getContainerId();
+            operationService.execute(sOperations, containerId == null ? -1 : containerId, expressionContext.getContainerType(), expressionContext);
             // return the value of the data if it's an external data
             for (Operation operation : operations) {
                 final LeftOperand leftOperand = operation.getLeftOperand();
