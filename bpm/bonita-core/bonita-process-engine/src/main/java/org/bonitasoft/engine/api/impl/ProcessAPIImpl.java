@@ -295,7 +295,6 @@ import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
 import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.dependency.DependencyService;
@@ -2919,11 +2918,15 @@ public class ProcessAPIImpl implements ProcessAPI {
             final long parentProcessInstanceId = activityInstanceService.getFlowNodeInstance(activityInstanceId).getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            for (final Entry<String, Serializable> variable : variables.entrySet()) {
-                final SDataInstance sDataInstance = dataInstanceService.getDataInstance(variable.getKey(), activityInstanceId,
-                        DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
-                final EntityUpdateDescriptor entityUpdateDescriptor = buildEntityUpdateDescriptorForData(variable.getValue());
-                dataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
+            List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(new ArrayList<String>(variables.keySet()), activityInstanceId,
+                    DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
+            if(dataInstances.size()<variables.size()){
+                throw new UpdateException("Some data does not exists, wanted to update "+variables.keySet()+" but there is only "+dataInstances);
+            }
+            for (SDataInstance dataInstance : dataInstances) {
+                Serializable newValue = variables.get(dataInstance.getName());
+                final EntityUpdateDescriptor entityUpdateDescriptor = buildEntityUpdateDescriptorForData(newValue);
+                dataInstanceService.updateDataInstance(dataInstance, entityUpdateDescriptor);
             }
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
@@ -2938,61 +2941,21 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final OperationService operationService = tenantAccessor.getOperationService();
-        final ParentContainerResolver parentContainerResolver = tenantAccessor.getParentContainerResolver();
-
-        final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
-        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final int processDefinitionIndex = BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class).getProcessDefinitionIndex();
-        final List<String> dataNames = new ArrayList<String>(operations.size());
+        ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        for (final Operation operation : operations) {
-            dataNames.add(operation.getLeftOperand().getName());
-        }
         try {
-
             final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
-            final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(activityInstance.getProcessDefinitionId());
-            final SActivityDefinition activityDefinition = (SActivityDefinition) processDefinition.getProcessContainer().getFlowNode(
-                    activityInstance.getFlowNodeDefinitionId());
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(),
-                    activityInstance.getLogicalGroup(processDefinitionIndex));
+                    activityInstance.getProcessDefinitionId());
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            final List<SDataDefinition> sDataDefinitions = activityDefinition.getSDataDefinitions();
-            final ArrayList<String> transientDataNames = new ArrayList<String>();
-            // separate transient data and normal data
-            for (final SDataDefinition sDataDefinition : sDataDefinitions) {
-                if (sDataDefinition.isTransientData() && dataNames.contains(sDataDefinition.getName())) {
-                    transientDataNames.add(sDataDefinition.getName());
-                    dataNames.remove(sDataDefinition.getName());
-                }
-            }
-            // get transient data instances on this activity
-            final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(dataNames, activityInstanceId,
-                    DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
-            for (final Operation operation : operations) {
-                final String name = operation.getLeftOperand().getName();
-                if (transientDataNames.contains(name)) {
-                    final SOperation sOperation = convertOperation(operation);
-                    final SExpressionContext sExpressionContext = new SExpressionContext(activityInstanceId,
-                            DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
-                            activityInstance.getLogicalGroup(processDefinitionIndex));
-                    sExpressionContext.setSerializableInputValues(expressionContexts);
-                    operationService.execute(sOperation, activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.toString(), sExpressionContext);
-                } else {
-                    // same order between dataInstances and dataNames
-                    final SDataInstance dataInstance = dataInstances.get(dataNames.indexOf(name));
-                    final SOperation sOperation = convertOperation(operation);
-                    final SExpressionContext sExpressionContext = new SExpressionContext(activityInstanceId,
-                            DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
-                            activityInstance.getLogicalGroup(processDefinitionIndex));
-                    sExpressionContext.setSerializableInputValues(expressionContexts);
-                    operationService.execute(sOperation, dataInstance.getContainerId(), dataInstance.getContainerType(), sExpressionContext);
-                }
-            }
-        } catch (final SDataInstanceReadException e) {
-            throw new UpdateException(e);
+            final List<SOperation> sOperations = convertOperations(operations);
+            final SExpressionContext sExpressionContext = new SExpressionContext(activityInstanceId,
+                    DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
+                    activityInstance.getProcessDefinitionId());
+            sExpressionContext.setSerializableInputValues(expressionContexts);
+
+            operationService.execute(sOperations,sExpressionContext);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         } finally {
@@ -3002,6 +2965,9 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     protected SOperation convertOperation(final Operation operation) {
         return ModelConvertor.convertOperation(operation);
+    }
+    protected List<SOperation> convertOperations(final List<Operation> operations) {
+        return ModelConvertor.convertOperations(operations);
     }
 
     @Override

@@ -610,10 +610,10 @@ public class ProcessAPIImplTest {
         when(dataInstanceService.getDataInstances(anyListOf(String.class), anyLong(),
                 eq(DataInstanceContainer.ACTIVITY_INSTANCE.toString()), any(ParentContainerResolver.class))).thenReturn(Arrays.asList(dataInstance));
 
-        doReturn(mock(SOperation.class)).when(processAPI).convertOperation(operation);
-
         final List<Operation> operations = new ArrayList<Operation>();
         operations.add(operation);
+        doReturn(Arrays.asList(mock(SOperation.class))).when(processAPI).convertOperations(operations);
+
         processAPI.updateActivityInstanceVariables(operations, 2, null);
 
         verify(classLoaderService).getLocalClassLoader(anyString(), anyLong());
