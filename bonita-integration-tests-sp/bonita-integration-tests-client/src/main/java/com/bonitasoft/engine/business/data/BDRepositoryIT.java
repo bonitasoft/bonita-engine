@@ -327,10 +327,10 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        waitForUserTask(processInstance, "step2");
+
+        waitForUserTask(processInstance,"step2");
 
         // Let's check the updated firstName + lastName values by calling an expression:
-        final long processInstanceId = processInstance.getId();
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
         final String expressionFirstName = "retrieve_FirstName";
         expressions.put(new ExpressionBuilder().createGroovyScriptExpression(expressionFirstName, businessDataName + ".firstName", String.class.getName(),
@@ -338,13 +338,13 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final String expressionLastName = "retrieve_new_lastName";
         expressions.put(new ExpressionBuilder().createGroovyScriptExpression(expressionLastName, businessDataName + ".lastName", String.class.getName(),
                 new ExpressionBuilder().createBusinessDataExpression(businessDataName, EMPLOYEE_QUALIF_CLASSNAME)), null);
-        final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
+        final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
         final String returnedFirstName = (String) evaluatedExpressions.get(expressionFirstName);
         final String returnedLastName = (String) evaluatedExpressions.get(expressionLastName);
         assertThat(returnedFirstName).isEqualTo(newEmployeeFirstName);
         assertThat(returnedLastName).isEqualTo(newEmployeeLastName);
 
-        assertCount(processInstanceId);
+        assertCount(processInstance.getId());
         disableAndDeleteProcess(definition.getId());
     }
 
@@ -932,8 +932,9 @@ public class BDRepositoryIT extends CommonAPISPIT {
         waitForUserTaskAndExecuteIt(instance, "step1", matti);
         waitForUserTaskAndExecuteIt(instance, "step1", matti);
 
-        waitForUserTask(instance, "step2");
+        waitForUserTask(instance,"step2");
         final String employeeToString = getEmployeesToString("myEmployees", instance.getId());
+        assertThat(employeeToString).isEqualTo("Employee [firstName=[Jane, John], lastName=[Smith, Smith]]");
 
         assertThat(firstNames(employeeToString)).containsOnlyOnce("Jane", "John");
         assertThat(lastNames(employeeToString)).containsExactly("Smith", "Smith");
@@ -1169,17 +1170,18 @@ public class BDRepositoryIT extends CommonAPISPIT {
         parameters.put("entityClassName", EMPLOYEE_QUALIF_CLASSNAME);
         parameters.put("businessDataChildName", "address");
         parameters.put("businessDataURIPattern", "/businessdata/{className}/{id}/{field}");
-        final String resultWithChildName = (String) getCommandAPI().execute("getBusinessDataById", parameters);
+        final String lazyAddressResultWithChildName = (String) getCommandAPI().execute("getBusinessDataById", parameters);
 
-        assertThat(resultWithChildName).as("Address should have the right street and city").contains("\"street\":\"32, rue Gustave Eiffel\"")
+        assertThat(lazyAddressResultWithChildName).as("Address should have the right street and city").contains("\"street\":\"32, rue Gustave Eiffel\"")
                 .contains("\"city\":\"Grenoble\"");
-        assertThat(resultWithChildName).as("Address should have a link to country ")
+        assertThat(lazyAddressResultWithChildName).as("Address should have a link to country ")
                 .contains("\"rel\":\"country\"");
 
         parameters.remove("businessDataChildName");
 
-        final String resultWithoutChildName = (String) getCommandAPI().execute("getBusinessDataById", parameters);
-        assertThat(resultWithoutChildName).as("should have a link to lazy country object").contains("\"rel\":\"country\"");
+        final String employeeResultWithAddress = (String) getCommandAPI().execute("getBusinessDataById", parameters);
+
+        assertThat(employeeResultWithAddress).as("should have a link to lazy address object").contains("\"rel\":\"address\"");
 
         disableAndDeleteProcess(definition.getId());
     }
