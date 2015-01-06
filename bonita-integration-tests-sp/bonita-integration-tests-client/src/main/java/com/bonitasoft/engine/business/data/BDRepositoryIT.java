@@ -326,9 +326,9 @@ public class BDRepositoryIT extends CommonAPISPIT {
         processDefinitionBuilder.addTransition("step1", "step2");
 
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
-        final long processInstanceId = getProcessAPI().startProcess(definition.getId()).getId();
+        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
 
-        waitForUserTask("step2", processInstanceId);
+        waitForUserTask(processInstance,"step2");
 
         // Let's check the updated firstName + lastName values by calling an expression:
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(2);
@@ -338,13 +338,13 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final String expressionLastName = "retrieve_new_lastName";
         expressions.put(new ExpressionBuilder().createGroovyScriptExpression(expressionLastName, businessDataName + ".lastName", String.class.getName(),
                 new ExpressionBuilder().createBusinessDataExpression(businessDataName, EMPLOYEE_QUALIF_CLASSNAME)), null);
-        final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
+        final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstance.getId(), expressions);
         final String returnedFirstName = (String) evaluatedExpressions.get(expressionFirstName);
         final String returnedLastName = (String) evaluatedExpressions.get(expressionLastName);
         assertThat(returnedFirstName).isEqualTo(newEmployeeFirstName);
         assertThat(returnedLastName).isEqualTo(newEmployeeLastName);
 
-        assertCount(processInstanceId);
+        assertCount(processInstance.getId());
         disableAndDeleteProcess(definition.getId());
     }
 
@@ -932,7 +932,7 @@ public class BDRepositoryIT extends CommonAPISPIT {
         waitForUserTaskAndExecuteIt(instance, "step1", matti);
         waitForUserTaskAndExecuteIt(instance, "step1", matti);
 
-        waitForUserTask("step2", instance.getId());
+        waitForUserTask(instance,"step2");
         final String employeeToString = getEmployeesToString("myEmployees", instance.getId());
         assertThat(employeeToString).isEqualTo("Employee [firstName=[Jane, John], lastName=[Smith, Smith]]");
 
