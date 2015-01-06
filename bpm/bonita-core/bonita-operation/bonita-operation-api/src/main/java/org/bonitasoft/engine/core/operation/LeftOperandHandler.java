@@ -41,7 +41,6 @@ public interface LeftOperandHandler {
      * @param containerId   the container id
      * @param containerType the container type    @throws SOperationExecutionException
      */
-    // TODO batch method
     Object update(SLeftOperand sLeftOperand, Map<String, Object> inputValues, Object newValue, long containerId, String containerType) throws SOperationExecutionException;
 
     void delete(SLeftOperand sLeftOperand, long containerId, String containerType) throws SOperationExecutionException;
@@ -54,7 +53,6 @@ public interface LeftOperandHandler {
      * @param contextToSet      the context to add the value in
      * @throws SBonitaReadException
      */
-    // TODO batch method
     void loadLeftOperandInContext(SLeftOperand sLeftOperand, SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException;
 
     void loadLeftOperandInContext(List<SLeftOperand> sLeftOperandList, SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException;
