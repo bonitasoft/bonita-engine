@@ -420,8 +420,7 @@ public class ConnectorExecutionsLocalIT extends ConnectorExecutionIT {
         processBuilder.addActor(ACTOR_NAME);
         final UserTaskDefinitionBuilder userTaskDefinitionBuilder = processBuilder.addUserTask("step1", ACTOR_NAME);
         userTaskDefinitionBuilder.addConnector("myConnector", "org.bonitasoft.connector.testConnector", "1.0", ConnectorEvent.ON_FINISH).addInput(
-                TestConnector.INPUT1,
-                new ExpressionBuilder().createConstantStringExpression(valueOfInput1));
+                TestConnector.INPUT1, new ExpressionBuilder().createConstantStringExpression(valueOfInput1));
         processBuilder.addStartEvent("start");
         userTaskDefinitionBuilder.addBoundaryEvent("timer", true).addTimerEventTriggerDefinition(TimerType.DURATION,
                 new ExpressionBuilder().createConstantLongExpression(3000));
