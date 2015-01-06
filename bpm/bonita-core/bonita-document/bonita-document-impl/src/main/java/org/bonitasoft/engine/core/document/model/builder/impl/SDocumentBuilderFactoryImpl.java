@@ -1,5 +1,5 @@
-/*
- * * Copyright (C) 2014 BonitaSoft S.A.
+/**
+ * Copyright (C) 2014-2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,6 +57,10 @@ public class SDocumentBuilderFactoryImpl implements SDocumentBuilderFactory {
 
     @Override
     public SDocumentBuilder createNewProcessDocument(final String fileName, final String mimetype, final long authorId, final byte[] content) {
+        if (content == null || content.length == 0 || fileName == null || fileName.isEmpty()) {
+            throw new IllegalArgumentException("The content & fileName fields must be filled !!");
+        }
+
         final SDocumentBuilder sDocumentBuilder = createNewInstance(fileName, mimetype, authorId);
         sDocumentBuilder.setContent(content);
         sDocumentBuilder.setHasContent(true);

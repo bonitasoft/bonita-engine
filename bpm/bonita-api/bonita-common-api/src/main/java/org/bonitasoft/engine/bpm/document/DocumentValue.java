@@ -18,7 +18,7 @@ import java.io.Serializable;
 /**
  * Class that holds a content + mime type and a name OR the url if it's an external document.
  * It is used by DOCUMENT_CREATE_UPDATE operations to create or update a document stored in bonita
- * 
+ *
  * @author Baptiste Mesta
  */
 public class DocumentValue implements Serializable {
@@ -43,16 +43,20 @@ public class DocumentValue implements Serializable {
 
     /**
      * Represent the value of a document. Content, mime type and file name are given
-     * 
+     *
      * @param content
      *        content of the document
      * @param mimeType
      *        mime type of the document
      * @param fileName
      *        file name of the document
+     * @throws IllegalArgumentException
+     *         if the content or the fileName is null or empty
      */
     public DocumentValue(final byte[] content, final String mimeType, final String fileName) {
         super();
+        checkIfTheFileNameAndTheContentAreFilled(content, fileName);
+
         this.content = content;
         this.mimeType = mimeType;
         this.fileName = fileName;
@@ -91,7 +95,7 @@ public class DocumentValue implements Serializable {
     /**
      * Represent an existing document that changed with the content and metadata in parameters.
      * It is used only in operations to update document list.
-     * 
+     *
      * @param documentId
      *        the id of the existing document (mapping)
      * @param content
@@ -100,15 +104,24 @@ public class DocumentValue implements Serializable {
      *        mime type of the document
      * @param fileName
      *        file name of the document
+     * @throws IllegalArgumentException
+     *         if the content or the fileName is null or empty
      */
     public DocumentValue(final long documentId, final byte[] content, final String mimeType, final String fileName) {
         super();
+        checkIfTheFileNameAndTheContentAreFilled(content, fileName);
         this.content = content;
         this.mimeType = mimeType;
         this.fileName = fileName;
         hasContent = true;
         hasChanged = true;
         this.documentId = documentId;
+    }
+
+    private void checkIfTheFileNameAndTheContentAreFilled(final byte[] content, final String fileName) {
+        if (content == null || content.length == 0 || fileName == null || fileName.isEmpty()) {
+            throw new IllegalArgumentException("The content & fileName fields must be filled !!");
+        }
     }
 
     /**
@@ -149,23 +162,31 @@ public class DocumentValue implements Serializable {
         return hasContent;
     }
 
-    public void setContent(byte[] content) {
+    public void setContent(final byte[] content) {
+        checkIfTheFileNameIsFilled(fileName, content);
         this.content = content;
     }
 
-    public void setMimeType(String mimeType) {
+    private void checkIfTheFileNameIsFilled(final String fileName, final byte[] content) {
+        if ((fileName == null || fileName.isEmpty()) && content != null && content.length != 0) {
+            throw new IllegalArgumentException("The fileName field must be filled when the content is filled !!");
+        }
+    }
+
+    public void setMimeType(final String mimeType) {
         this.mimeType = mimeType;
     }
 
-    public void setFileName(String fileName) {
+    public void setFileName(final String fileName) {
+        checkIfTheFileNameIsFilled(fileName, content);
         this.fileName = fileName;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(final String url) {
         this.url = url;
     }
 
-    public void setHasContent(boolean hasContent) {
+    public void setHasContent(final boolean hasContent) {
         this.hasContent = hasContent;
     }
 
@@ -179,7 +200,7 @@ public class DocumentValue implements Serializable {
         return documentId;
     }
 
-    public void setDocumentId(Long documentId) {
+    public void setDocumentId(final Long documentId) {
         this.documentId = documentId;
     }
 
@@ -192,7 +213,7 @@ public class DocumentValue implements Serializable {
         return hasChanged;
     }
 
-    public void setHasChanged(boolean hasChanged) {
+    public void setHasChanged(final boolean hasChanged) {
         this.hasChanged = hasChanged;
     }
 
@@ -202,11 +223,11 @@ public class DocumentValue implements Serializable {
 
     /**
      * Index of were to put the document inside the list. Only used when using API method attach document.
-     * 
+     *
      * @param index
      *        index in the list
      */
-    public DocumentValue setIndex(int index) {
+    public DocumentValue setIndex(final int index) {
         this.index = index;
         return this;
     }
