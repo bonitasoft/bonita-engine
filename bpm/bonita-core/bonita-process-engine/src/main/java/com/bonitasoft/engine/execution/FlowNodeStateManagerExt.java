@@ -28,6 +28,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityExecu
 import org.bonitasoft.engine.core.process.instance.api.states.FlowNodeState;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeStateManagerImpl;
 import org.bonitasoft.engine.execution.event.EventsHandler;
@@ -59,13 +60,13 @@ public class FlowNodeStateManagerExt extends FlowNodeStateManagerImpl {
             final TechnicalLoggerService logger, final DocumentService documentService, final SCommentService commentService,
             final EventsHandler eventsHandler, final UserFilterService userFilterService, final ActorMappingService actorMappingService,
             final WorkService workService, final TokenService tokenService, final IdentityService identityService, final BreakpointService breakpointService,
-            final RefBusinessDataService refBusinessDataService) {
+            final RefBusinessDataService refBusinessDataService, final ParentContainerResolver parentContainerResolver) {
         super(processDefinitionService, processInstanceService, activityInstanceService, connectorInstanceService, expressionResolverService,
                 dataInstanceService, operationService, bpmInstancesCreator, containerRegistry, archiveService, logger, documentService, commentService,
                 new StateBehaviorsExt(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService,
                         connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService,
                         containerRegistry, eventInstanceService, schedulerService, commentService, identityService, logger, tokenService,
-                        refBusinessDataService));
+                        refBusinessDataService, parentContainerResolver));
         this.breakpointService = breakpointService;
     }
 
