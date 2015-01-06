@@ -23,8 +23,6 @@ public enum DataInstanceContainer {
 
     ACTIVITY_INSTANCE,
 
-    MESSAGE_INSTANCE,
-
-    WAITING_MESSAGE;
+    MESSAGE_INSTANCE;
 
 }

@@ -23,24 +23,7 @@ CREATE TABLE arch_data_instance (
 	PRIMARY KEY (tenantid, id)
 )
 GO
-CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId, containerId, sourceObjectId)
+CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId, containerId, containerType, archiveDate, name, sourceObjectId)
 GO
 CREATE INDEX idx2_arch_data_instance ON arch_data_instance (sourceObjectId, containerId, archiveDate, id, tenantId)
-GO
-
-CREATE TABLE arch_data_mapping (
-    tenantid NUMERIC(19, 0) NOT NULL,
-	id NUMERIC(19, 0) NOT NULL,
-	containerId NUMERIC(19, 0),
-	containerType NVARCHAR(60),
-	dataName NVARCHAR(50),
-	dataInstanceId NUMERIC(19, 0) NOT NULL,
-	archiveDate NUMERIC(19, 0) NOT NULL,
-	sourceObjectId NUMERIC(19, 0) NOT NULL,
-	PRIMARY KEY (tenantid, id)
-)
-GO
-CREATE INDEX idx1_arch_data_mapping ON arch_data_mapping (tenantId,containerId, dataInstanceId, sourceObjectId)
-GO
-CREATE INDEX idx2_arch_data_mapping ON arch_data_mapping (containerId, containerType, tenantid)
 GO

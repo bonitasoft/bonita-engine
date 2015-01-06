@@ -15,9 +15,6 @@ import org.junit.runners.Suite.SuiteClasses;
         UserPermissionCommandIT.class,
         ProfileImportCommandIT.class,
         ActorPermissionCommandIT.class,
-        GetUpdatedVariableValuesForProcessDefinitionIT.class,
-        GetUpdatedVariableValuesForActivityInstanceIT.class,
-        GetUpdatedVariableValuesForProcessInstanceIT.class,
         ActivityCommandIT.class,
         EntityMemberCommandsIT.class
 })

@@ -100,9 +100,9 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
 
             @Override
             public Void call() throws Exception {
-                final SADataInstance saActDataInstances = dataInstanceService.getLastSADataInstance(activityDataInstance.getId());
+                final SADataInstance saActDataInstances = dataInstanceService.getSADataInstance(activityDataInstance.getId(), System.currentTimeMillis());
                 assertNotNull(saActDataInstances);
-                final SADataInstance saProcDataInstances = dataInstanceService.getLastSADataInstance(processDataInstance.getId());
+                final SADataInstance saProcDataInstances = dataInstanceService.getSADataInstance(processDataInstance.getId(), System.currentTimeMillis());
                 assertNotNull(saProcDataInstances);
 
                 return null;
@@ -120,8 +120,8 @@ public class ProcessArchiveIT extends CommonAPILocalIT {
 
             @Override
             public Void call() throws Exception {
-                final SADataInstance saActDataInstances = dataInstanceService.getLastSADataInstance(activityDataInstance.getId());
-                final SADataInstance saProcDataInstances = dataInstanceService.getLastSADataInstance(processDataInstance.getId());
+                final SADataInstance saActDataInstances = dataInstanceService.getSADataInstance(activityDataInstance.getId(), System.currentTimeMillis());
+                final SADataInstance saProcDataInstances = dataInstanceService.getSADataInstance(processDataInstance.getId(), System.currentTimeMillis());
                 assertNull(saActDataInstances);
                 assertNull(saProcDataInstances);
                 return null;

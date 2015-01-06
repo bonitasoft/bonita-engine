@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.data.instance.api;
+package org.bonitasoft.engine.expression;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,11 +22,11 @@ import java.util.Map;
 
 import javax.lang.model.SourceVersion;
 
+import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
-import org.bonitasoft.engine.expression.ContainerState;
-import org.bonitasoft.engine.expression.NonEmptyContentExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.exception.SInvalidExpressionException;
@@ -43,8 +43,11 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
 
     private final DataInstanceService dataService;
 
-    public DataExpressionExecutorStrategy(final DataInstanceService dataService) {
+    private final ParentContainerResolver parentContainerResolver;
+
+    public DataExpressionExecutorStrategy(final DataInstanceService dataService, final ParentContainerResolver parentContainerResolver) {
         this.dataService = dataService;
+        this.parentContainerResolver = parentContainerResolver;
     }
 
     @Override
@@ -94,13 +97,13 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
             final String containerType = (String) context.get(CONTAINER_TYPE_KEY);
             final Long time = (Long) context.get(TIME);
             if (time != null) {
-                final List<SADataInstance> dataInstances = dataService.getSADataInstances(containerId, containerType, dataNames, time);
+                final List<SADataInstance> dataInstances = dataService.getSADataInstances(containerId, containerType, parentContainerResolver, dataNames, time);
                 for (final SADataInstance dataInstance : dataInstances) {
                     dataNames.remove(dataInstance.getName());
                     results.put(dataInstance.getName(), dataInstance.getValue());
                 }
             }
-            final List<SDataInstance> dataInstances = dataService.getDataInstances(dataNames, containerId, containerType);
+            final List<SDataInstance> dataInstances = dataService.getDataInstances(dataNames, containerId, containerType, parentContainerResolver);
             for (final SDataInstance dataInstance : dataInstances) {
                 dataNames.remove(dataInstance.getName());
                 results.put(dataInstance.getName(), dataInstance.getValue());

@@ -89,6 +89,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.trigger.STimerEve
 import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
@@ -341,7 +342,7 @@ public class ProcessAPIImplTest {
         doReturn("foo").when(sDataFoo).getName();
         final SDataInstance sDataBar = mock(SDataInstance.class);
         doReturn("bar").when(sDataBar).getName();
-        doReturn(asList(sDataFoo, sDataBar)).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString());
+        doReturn(asList(sDataFoo, sDataBar)).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString(), any(ParentContainerResolver.class));
 
         // Then update the data instances
         final Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
@@ -359,7 +360,7 @@ public class ProcessAPIImplTest {
     public void should_updateProcessDataInstances_call_DataInstance_on_non_existing_data_throw_UpdateException() throws Exception {
         final long processInstanceId = 42l;
         doReturn(null).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
-        doThrow(new SDataInstanceReadException("Mocked")).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString());
+        doThrow(new SDataInstanceReadException("Mocked")).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString(), any(ParentContainerResolver.class));
 
         // Then update the data instances
         final Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
@@ -607,12 +608,12 @@ public class ProcessAPIImplTest {
 
         final SDataInstance dataInstance = mock(SDataInstance.class);
         when(dataInstanceService.getDataInstances(anyListOf(String.class), anyLong(),
-                eq(DataInstanceContainer.ACTIVITY_INSTANCE.toString()))).thenReturn(Arrays.asList(dataInstance));
-
-        doReturn(mock(SOperation.class)).when(processAPI).convertOperation(operation);
+                eq(DataInstanceContainer.ACTIVITY_INSTANCE.toString()), any(ParentContainerResolver.class))).thenReturn(Arrays.asList(dataInstance));
 
         final List<Operation> operations = new ArrayList<Operation>();
         operations.add(operation);
+        doReturn(Arrays.asList(mock(SOperation.class))).when(processAPI).convertOperations(operations);
+
         processAPI.updateActivityInstanceVariables(operations, 2, null);
 
         verify(classLoaderService).getLocalClassLoader(anyString(), anyLong());
