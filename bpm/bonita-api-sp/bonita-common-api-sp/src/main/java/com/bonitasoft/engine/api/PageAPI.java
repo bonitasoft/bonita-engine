@@ -37,7 +37,7 @@ import com.bonitasoft.engine.page.PageUpdater;
  * <p>
  * Also allows to manipulate <code>Page</code>s, through creation, deletion, search.
  * </p>
- * 
+ *
  * @author Laurent Leseigneur
  * @see Page
  */
@@ -45,77 +45,77 @@ public interface PageAPI {
 
     /**
      * Retrieves a page from its ID.
-     * 
+     *
      * @param pageId
-     *            the Identifier of the page to retrieve
+     *        the Identifier of the page to retrieve
      * @return the found page
      * @throws PageNotFoundException
-     *             if no page can be found with the provided ID.
+     *         if no page can be found with the provided ID.
      */
     Page getPage(final long pageId) throws PageNotFoundException;
 
     /**
      * Retrieves a page from its name.
-     * 
+     *
      * @param name
-     *            the name of the page to retrieve
+     *        the name of the page to retrieve
      * @return the found page
      * @throws PageNotFoundException
-     *             if no page can be found with the provided ID.
+     *         if no page can be found with the provided ID.
      */
     Page getPageByName(final String name) throws PageNotFoundException;
 
     /**
      * Retrieves the binary content of a page.
-     * 
+     *
      * @param pageId
-     *            the ID of the page to extract the content for.
+     *        the ID of the page to extract the content for.
      * @return
      *         the binary content of the page.
      * @throws PageNotFoundException
-     *             if no page can be found with the provided ID.
+     *         if no page can be found with the provided ID.
      */
     byte[] getPageContent(final long pageId) throws PageNotFoundException;
 
     /**
      * Searches for pages with specific search criteria.
-     * 
+     *
      * @param searchOptions
-     *            the search options for the search. See {@link SearchOptions} for search option details.
+     *        the search options for the search. See {@link SearchOptions} for search option details.
      * @return the <code>SearchResult</code> containing
      * @throws SearchException
-     *             if a problem occurs during the search.
+     *         if a problem occurs during the search.
      */
     SearchResult<Page> searchPages(final SearchOptions searchOptions) throws SearchException;
 
     /**
      * Creates a custom page.
-     * 
+     *
      * @param pageCreator
-     *            the creator object to instantiate the new page.
+     *        the creator object to instantiate the new page.
      * @param content
-     *            the binary content of the page.
+     *        the binary content of the page.
      * @return the newly created page.
      * @throws AlreadyExistsException
-     *             if a page with this name already exists.
+     *         if a page with this name already exists.
      * @throws CreationException
-     *             if an error occurs during the creation.
+     *         if an error occurs during the creation.
      */
     Page createPage(final PageCreator pageCreator, final byte[] content) throws AlreadyExistsException, CreationException, InvalidPageTokenException,
             InvalidPageZipContentException;
 
     /**
      * Updates a custom page.
-     * 
+     *
      * @param pageId
-     *            the Identifier of the page to update
+     *        the Identifier of the page to update
      * @param pageUpdater
      *            the creator object to instantiate the new page.
      * @return the newly created page.
      * @throws UpdateException
-     *             if an error occurs during the update.
+     *         if an error occurs during the update.
      * @throws AlreadyExistsException
-     *             if a page with this name already exists.
+     *         if a page with this name already exists.
      */
     Page updatePage(final long pageId, final PageUpdater pageUpdater) throws UpdateException, AlreadyExistsException, UpdatingWithInvalidPageTokenException,
             UpdatingWithInvalidPageZipContentException;
@@ -123,53 +123,50 @@ public interface PageAPI {
     /**
      * Updates a custom page content.
      * it read the page.properties inside to update the page properties
-     * 
+     *
      * @param pageId
-     *            the Identifier of the page to update
+     *        the Identifier of the page to update
      * @param content
-     *            the binary content of the page.
+     *        the binary content of the page.
      * @throws UpdateException
-     *             if an error occurs during the update.
+     *         if an error occurs during the update.
      */
     void updatePageContent(final long pageId, final byte[] content) throws UpdateException, UpdatingWithInvalidPageTokenException,
             UpdatingWithInvalidPageZipContentException;
 
     /**
      * Deletes a page identified by its ID.
-     * 
+     *
      * @param pageId
-     *            the page identifier to delete.
+     *        the page identifier to delete.
      * @throws DeletionException
-     *             if a problem occurs during deletion.
+     *         if a problem occurs during deletion.
      */
     void deletePage(final long pageId) throws DeletionException;
 
     /**
      * Deletes a list of pages, given by their IDs.
-     * 
+     *
      * @param pageIds
-     *            a list of page identifiers to delete.
+     *        a list of page identifiers to delete.
      * @throws DeletionException
-     *             if a problem occurs during deletion.
+     *         if a problem occurs during deletion.
      */
     void deletePages(final List<Long> pageIds) throws DeletionException;
 
     /**
-     *
      * create a page using the given content
-     *
      * the content must contain a page.properties file that contains informations on the page:
-     *
      * name, displayName and description
      *
      * @param contentName
-     *            name of the zip file containing the page
+     *        name of the zip file containing the page
      * @param content
-     *            content of the zip file containing the page
+     *        content of the zip file containing the page
      * @return
      *         the created page
      * @throws AlreadyExistsException
-     *             if a page with the same name already exists
+     *         if a page with the same name already exists
      * @throws CreationException
      * @since 6.3.1
      */
@@ -177,16 +174,16 @@ public interface PageAPI {
             InvalidPageZipContentException;
 
     /**
-     *
      * Read the content of the page zip file check it is consistent and return it's properties
      *
      * @param content
-     *            content of the zip file containing the page
+     *        content of the zip file containing the page
      * @return
      *         the properties of the page
      * @since 6.4.0
      */
     Properties getPageProperties(byte[] content, boolean checkIfItAlreadyExists) throws InvalidPageTokenException,
-            AlreadyExistsException, InvalidPageZipMissingPropertiesException, InvalidPageZipMissingIndexException, InvalidPageZipInconsistentException, InvalidPageZipMissingAPropertyException;
+            AlreadyExistsException, InvalidPageZipMissingPropertiesException, InvalidPageZipMissingIndexException, InvalidPageZipInconsistentException,
+            InvalidPageZipMissingAPropertyException;
 
 }

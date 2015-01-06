@@ -15,16 +15,13 @@ import com.sap.conn.jco.ext.DestinationDataProvider;
 import com.sap.conn.jco.ext.Environment;
 
 /**
- * 
- * 
  * Used by SAP connector in order to synchronize SAP {@code com.sap.conn.jco.ext.DestinationDataProvider} used
  * 
  * 
  * Warning: Internal use only!
  * This class is subject to change without notice
- * 
+ *
  * @author Aurelien Pupier
- * 
  */
 public class SAPMonoDestinationDataProvider implements DestinationDataProvider {
 
@@ -43,7 +40,7 @@ public class SAPMonoDestinationDataProvider implements DestinationDataProvider {
 
     /**
      * BE CAREFUL: only one destinationName is possible
-     * 
+     *
      * @param destinationName
      * @return
      */
@@ -61,15 +58,15 @@ public class SAPMonoDestinationDataProvider implements DestinationDataProvider {
 
     @Override
     public Properties getDestinationProperties(final String destinationName) {
-        if (destinationName.equals(this.destinationName) && this.properties != null) {
-            return this.properties;
+        if (destinationName.equals(this.destinationName) && properties != null) {
+            return properties;
         }
         throw new RuntimeException("Destination " + destinationName + " is not available");
     }
 
     @Override
     public void setDestinationDataEventListener(final DestinationDataEventListener eventListener) {
-        this.listener = eventListener;
+        listener = eventListener;
     }
 
     @Override
@@ -79,18 +76,18 @@ public class SAPMonoDestinationDataProvider implements DestinationDataProvider {
 
     public void changeProperties(final Properties properties) {
         if (properties == null) {
-            this.listener.deleted(this.destinationName);
+            listener.deleted(destinationName);
             this.properties = null;
         } else {
             if (listener != null && !properties.equals(this.properties)) {
-                this.listener.updated(this.destinationName);
+                listener.updated(destinationName);
             }
             this.properties = properties;
         }
     }
 
     public String getDestinationName() {
-        return this.destinationName;
+        return destinationName;
     }
 
     /**

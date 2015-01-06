@@ -24,6 +24,7 @@ import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.StateCategory;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
@@ -99,7 +100,7 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         getProcessAPI().executeFlowNode(waitForGatewayToBeAborted.getId());
 
         // the target process instances that exceed the max loop must be in aborted state
-        waitForProcessToFinish(targetProcInstToBeAborted, TestStates.ABORTED);
+        waitForProcessToBeInState(targetProcInstToBeAborted, ProcessInstanceState.ABORTED);
 
         // the gateway not executed must be in aborted state
         final SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, 10);
@@ -160,7 +161,7 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         getProcessAPI().executeFlowNode(waitForFlowNodeToBeAborted.getId());
 
         // the target process instances that exceed the max loop must be in aborted state
-        waitForProcessToFinish(targetProcInstToBeAborted, TestStates.ABORTED);
+        waitForProcessToBeInState(targetProcInstToBeAborted, ProcessInstanceState.ABORTED);
 
         // the task not executed must be in aborted state
         final SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, 10);
@@ -225,7 +226,7 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         getProcessAPI().executeFlowNode(waitForFlowNodeToBeAborted.getId());
 
         // the target process instances that exceed the max loop must be in aborted state
-        waitForProcessToFinish(targetProcInstToBeAborted, TestStates.ABORTED);
+        waitForProcessToBeInState(targetProcInstToBeAborted, ProcessInstanceState.ABORTED);
 
         // the start event not executed must be in aborted state
         // FIXME: uncomment the code below when archive mechanism deals with events
@@ -285,7 +286,7 @@ public class AbortProcessInstanceTest extends InterruptProcessInstanceTest {
         getProcessAPI().executeFlowNode(waitForFlowNodeToBeAborted.getId());
 
         // the target process instances that exceed the max loop must be in aborted state
-        waitForProcessToFinish(targetProcInstToBeAborted, TestStates.ABORTED);
+        waitForProcessToBeInState(targetProcInstToBeAborted, ProcessInstanceState.ABORTED);
 
         // the event not executed must be in aborted state
         // FIXME: uncomment final the code below final when archive mechanism final deals with events

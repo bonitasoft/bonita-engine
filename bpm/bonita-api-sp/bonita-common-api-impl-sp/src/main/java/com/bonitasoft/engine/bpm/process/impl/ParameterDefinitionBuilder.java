@@ -19,7 +19,7 @@ import org.bonitasoft.engine.bpm.process.impl.internal.DesignProcessDefinitionIm
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  * @see org.bonitasoft.engine.bpm.parameter.ParameterDefinition
- * @version 6.3.5
+ * @version 6.4.1
  * @since 6.0.0
  */
 public class ParameterDefinitionBuilder extends ProcessBuilderExt implements DescriptionBuilder {
@@ -29,11 +29,13 @@ public class ParameterDefinitionBuilder extends ProcessBuilderExt implements Des
     /**
      * Default Constructor.
      * To build a new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
-     * 
+     *
      * @param processDefinitionBuilder
-     *        The {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder} to build the {@link org.bonitasoft.engine.bpm.process.DesignProcessDefinition}
+     *        The {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder} to build the
+     *        {@link org.bonitasoft.engine.bpm.process.DesignProcessDefinition}
      * @param designProcessDefinitionImpl
-     *        The {@link org.bonitasoft.engine.bpm.process.DesignProcessDefinition} where add the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
+     *        The {@link org.bonitasoft.engine.bpm.process.DesignProcessDefinition} where add the new
+     *        {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
      * @param parameterName
      *        The name of the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
      * @param type

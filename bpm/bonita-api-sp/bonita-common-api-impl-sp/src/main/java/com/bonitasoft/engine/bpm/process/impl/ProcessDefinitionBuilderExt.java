@@ -46,7 +46,7 @@ public final class ProcessDefinitionBuilderExt extends ProcessDefinitionBuilder 
 
     /**
      * Add a parameter on this process.
-     * 
+     *
      * @param parameterName
      *        The name of the new {@link org.bonitasoft.engine.bpm.parameter.ParameterDefinition}
      * @param type
@@ -59,7 +59,7 @@ public final class ProcessDefinitionBuilderExt extends ProcessDefinitionBuilder 
 
     /**
      * Set the process string index at the given position.
-     * 
+     *
      * @param index
      *        The position to be set. Valid values are between 1 and 5 (inclusive)
      * @param label
@@ -73,7 +73,7 @@ public final class ProcessDefinitionBuilderExt extends ProcessDefinitionBuilder 
 
     /**
      * Add a new {@link BusinessDataDefinition} on this process.
-     * 
+     *
      * @param name
      *        The name of the new {@link BusinessDataDefinition}
      * @param className

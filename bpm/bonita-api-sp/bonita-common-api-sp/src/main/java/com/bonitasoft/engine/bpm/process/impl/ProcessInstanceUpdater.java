@@ -14,7 +14,7 @@ import java.util.Map;
 
 /**
  * Updater object to update the string indexes.
- * 
+ *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  * @version 6.3.5
@@ -59,7 +59,7 @@ public class ProcessInstanceUpdater implements Serializable {
 
     /**
      * Set the new value for the first string index.
-     * 
+     *
      * @param stringIndex
      *        The new value for the first string index.
      */
@@ -69,7 +69,7 @@ public class ProcessInstanceUpdater implements Serializable {
 
     /**
      * Set the new value for the second string index.
-     * 
+     *
      * @param stringIndex
      *        The new value for the second string index.
      */
@@ -79,7 +79,7 @@ public class ProcessInstanceUpdater implements Serializable {
 
     /**
      * Set the new value for the third string index.
-     * 
+     *
      * @param stringIndex
      *        The new value for the third string index.
      */
@@ -89,7 +89,7 @@ public class ProcessInstanceUpdater implements Serializable {
 
     /**
      * Set the new value for the fourth string index.
-     * 
+     *
      * @param stringIndex
      *        The new value for the fourth string index.
      */
@@ -99,7 +99,7 @@ public class ProcessInstanceUpdater implements Serializable {
 
     /**
      * Set the new value for the fifth string index.
-     * 
+     *
      * @param stringIndex
      *        The new value for the fifth string index.
      */
@@ -109,7 +109,7 @@ public class ProcessInstanceUpdater implements Serializable {
 
     /**
      * Get the map of the fields to update and their new value.
-     * 
+     *
      * @return The map of the fields to update and their new value.
      */
     public Map<ProcessInstanceField, Serializable> getFields() {

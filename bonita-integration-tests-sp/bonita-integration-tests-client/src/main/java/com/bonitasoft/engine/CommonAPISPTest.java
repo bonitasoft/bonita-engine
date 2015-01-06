@@ -14,12 +14,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
-import org.bonitasoft.engine.BonitaTestRunner;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Rule;
@@ -29,11 +29,11 @@ import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.platform.Tenant;
-import org.xml.sax.SAXException;
 
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializerSP.class)
@@ -82,7 +82,7 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
 
     /**
      * FIXME: clean actors!
-     * 
+     *
      * @return
      * @throws BonitaException
      */
