@@ -11,3 +11,5 @@ CREATE TABLE arch_document_mapping (
   archiveDate BIGINT NOT NULL,
   PRIMARY KEY (tenantid, ID)
 ) ENGINE = INNODB;
+
+CREATE INDEX idx_a_doc_mp_pr_id ON arch_document_mapping (processinstanceid, tenantid);

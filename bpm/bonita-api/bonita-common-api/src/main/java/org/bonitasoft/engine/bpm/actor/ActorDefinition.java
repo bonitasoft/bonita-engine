@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
+ * Copyright (C) 2011, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -16,27 +16,36 @@ package org.bonitasoft.engine.bpm.actor;
 import java.io.Serializable;
 
 /**
- * ActorDefinition forms part of the ProcessDefinition. It is used to design an actor in the context of a process.
- * 
+ * It forms part of the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition}. It is used to design an actor in the context of a process.
+ *
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
+ * @author Celine Souchet
  * @see org.bonitasoft.engine.bpm.process.ProcessDefinition
  * @see "The BPMN specification"
+ * @since 6.0.0
+ * @version 6.4.1
  */
 public interface ActorDefinition extends Serializable {
 
     /**
-     * @return The logical name of the actor.
+     * Get the name of the actor.
+     *
+     * @return The name of the actor.
      */
     String getName();
 
     /**
-     * @return The description given to this actor.
+     * Get the description of the actor.
+     *
+     * @return The description of the actor.
      */
     String getDescription();
 
     /**
-     * @return True if this actor is the actor initiator of the process, that is, the actor that can start the process.
+     * Can this actor start the process ?
+     *
+     * @return <code>true</code>} if this actor can start the process, <code>false</code> otherwise.
      */
     boolean isInitiator();
 

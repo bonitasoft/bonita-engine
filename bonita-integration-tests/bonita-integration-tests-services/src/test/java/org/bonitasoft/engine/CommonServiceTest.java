@@ -13,11 +13,11 @@
  **/
 package org.bonitasoft.engine;
 
-import javax.naming.Context;
-
 import org.bonitasoft.engine.platform.PlatformService;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.bonitasoft.engine.test.util.TestUtil;
 import org.bonitasoft.engine.transaction.TransactionService;
 import org.bonitasoft.engine.work.WorkService;
@@ -28,15 +28,16 @@ import org.junit.Rule;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
+@RunWith(BonitaTestRunner.class)
+@Initializer(TestsInitializerService.class)
 public class CommonServiceTest {
 
     private static ServicesBuilder servicesBuilder;
@@ -52,32 +53,6 @@ public class CommonServiceTest {
     private static long defaultTenantId;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CommonServiceTest.class);
-
-    static ConfigurableApplicationContext springContext;
-
-    private static boolean contextSpringLoaded = false;
-
-    private static void setupSpringContext() {
-        setSystemPropertyIfNotSet("sysprop.bonita.db.vendor", "h2");
-
-        /** set bonita.services.folder to target/test-classes/conf as it is done in pom.xml -> no need to edit test configuration */
-        setSystemPropertyIfNotSet("bonita.services.folder", "target/conf");
-        setSystemPropertyIfNotSet("bonita.home", "target");
-
-        // Force these system properties
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.bonitasoft.engine.local.SimpleMemoryContextFactory");
-        System.setProperty(Context.URL_PKG_PREFIXES, "org.bonitasoft.engine.local");
-
-        springContext = new ClassPathXmlApplicationContext("datasource.xml", "jndi-setup.xml");
-    }
-
-    public static void closeSpringContext() {
-        springContext.close();
-    }
-
-    private static void setSystemPropertyIfNotSet(final String property, final String value) {
-        System.setProperty(property, System.getProperty(property, value));
-    }
 
     @Rule
     public TestRule testWatcher = new TestWatcher() {
@@ -101,32 +76,21 @@ public class CommonServiceTest {
     };
 
     static {
-        // Needs to be done before anything else:
-        setupSpringContextIfNeeded();
-
         servicesBuilder = new ServicesBuilder();
-        platformService = servicesBuilder.buildPlatformService();
-        txService = servicesBuilder.buildTransactionService();
-        sessionAccessor = servicesBuilder.buildSessionAccessor();
-        sessionService = servicesBuilder.buildSessionService();
-    }
-
-    public static void setupSpringContextIfNeeded() {
-        if (!CommonServiceTest.contextSpringLoaded) {
-            setupSpringContext();
-            contextSpringLoaded = true;
-        }
     }
 
     @BeforeClass
     public static void initPlatform() throws Exception {
-        setupSpringContextIfNeeded();
+        platformService = getServicesBuilder().buildPlatformService();
+        txService = getServicesBuilder().buildTransactionService();
+        sessionAccessor = getServicesBuilder().buildSessionAccessor();
+        sessionService = getServicesBuilder().buildSessionService();
+
         defaultTenantId = TestUtil.createDefaultTenant(txService, platformService, sessionAccessor, sessionService);
     }
 
     @AfterClass
     public static void cleanPlatform() throws Exception {
-        TestUtil.closeTransactionIfOpen(txService);
         TestUtil.deleteDefaultTenant(txService, platformService, sessionAccessor, sessionService);
     }
 

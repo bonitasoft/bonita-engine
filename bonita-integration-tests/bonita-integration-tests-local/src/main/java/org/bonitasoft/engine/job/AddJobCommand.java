@@ -27,7 +27,7 @@ public class AddJobCommand extends TenantCommand {
         final SchedulerService schedulerService = serviceAccessor.getSchedulerService();
         final Trigger trigger = new OneShotTrigger("OneShot", new Date());
         final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
-                .createNewInstance(ThrowsExceptionJob.class.getName(), "ThowExceptionJob").setDescription("Throw an exception when 'throwException'=true")
+                .createNewInstance(ThrowsExceptionJob.class.getName(), "ThrowsExceptionJob").setDescription("Throw an exception when 'throwException'=true")
                 .done();
         Boolean throwException = Boolean.TRUE;
         final Serializable exception = parameters.get("throwException");

@@ -24,6 +24,7 @@ import org.bonitasoft.engine.bpm.document.DocumentDefinition;
 import org.bonitasoft.engine.bpm.document.DocumentListDefinition;
 
 /**
+ * Allows to access all flow elements (activities, gateways, events and transitions) of a process or sub-process.
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */

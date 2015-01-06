@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -38,7 +38,7 @@ import org.junit.Test;
 /**
  * @author Celine Souchet
  */
-public class SearchProcessDeploymentInfosCanBeStartedByUsersManagedByIT extends CommonAPITest {
+public class SearchProcessDeploymentInfosCanBeStartedByUsersManagedByIT extends TestWithTechnicalUser {
 
     private List<ProcessDefinition> enabledProcessDefinitions;
 
@@ -52,21 +52,10 @@ public class SearchProcessDeploymentInfosCanBeStartedByUsersManagedByIT extends 
 
     private List<UserMembership> userMemberships = null;
 
-    @After
-    public void afterTest() throws BonitaException {
-        disableAndDeleteProcess(enabledProcessDefinitions);
-        deleteProcess(disabledProcessDefinitions);
-        deleteUserMemberships(userMemberships);
-        deleteUsers(users);
-        deleteGroups(groups);
-        deleteRoles(roles);
-
-        logoutOnTenant();
-    }
-
+    @Override
     @Before
-    public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+    public void before() throws Exception {
+        super.before();
         // create users
         users = new ArrayList<User>(10);
         users.add(createUser("magali", "bpm"));
@@ -101,6 +90,18 @@ public class SearchProcessDeploymentInfosCanBeStartedByUsersManagedByIT extends 
         enabledProcessDefinitions = new ArrayList<ProcessDefinition>(4);
         disabledProcessDefinitions = new ArrayList<ProcessDefinition>(1);
         createProcessesDefForSearchProcessUserCanStart();
+    }
+
+    @Override
+    @After
+    public void after() throws Exception {
+        disableAndDeleteProcess(enabledProcessDefinitions);
+        deleteProcess(disabledProcessDefinitions);
+        deleteUserMemberships(userMemberships);
+        deleteUsers(users);
+        deleteGroups(groups);
+        deleteRoles(roles);
+        super.after();
     }
 
     @Test

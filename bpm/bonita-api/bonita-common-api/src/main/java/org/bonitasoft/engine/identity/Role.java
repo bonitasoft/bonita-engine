@@ -18,7 +18,7 @@ import java.util.Date;
 import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
- * represents a Role inside the organization.
+ * Represents a role inside the organization.
  *
  * @author Yanyan Liu
  * @author Matthieu Chaffotte

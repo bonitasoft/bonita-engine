@@ -18,7 +18,7 @@ import java.util.Date;
 import org.bonitasoft.engine.bpm.BonitaObject;
 
 /**
- * represents a User inside the organization.
+ * Represents a user inside the organization.
  *
  * @author Yanyan Liu
  * @author Matthieu Chaffotte
@@ -29,75 +29,75 @@ import org.bonitasoft.engine.bpm.BonitaObject;
 public interface User extends BonitaObject {
 
     /**
-     * @return the user's id
+     * @return The identifier of the user
      */
     long getId();
 
     /**
      * deprecated since 6.3.1
      *
-     * @return the user's password
+     * @return The user's password
      */
     @Deprecated
     String getPassword();
 
     /**
-     * @return the user's firstname
+     * @return The user's firstname
      */
     String getFirstName();
 
     /**
-     * @return the user's lastname
+     * @return The user's lastname
      */
     String getLastName();
 
     /**
-     * @return the user's username
+     * @return The user's username
      */
     String getUserName();
 
     /**
-     * @return the user's icon name
+     * @return The user's icon name
      */
     String getIconName();
 
     /**
-     * @return the user's icon path
+     * @return The user's icon path
      */
     String getIconPath();
 
     /**
-     * @return the user's title
+     * @return The user's title
      */
     String getTitle();
 
     /**
-     * @return the user's job title
+     * @return The user's job title
      */
     String getJobTitle();
 
     /**
-     * @return the user's creation date
+     * @return The user's creation date
      */
     Date getCreationDate();
 
     /**
-     * @return the user's id that created the user
+     * @return The user's id that created the user
      */
     long getCreatedBy();
 
     /**
-     * @return the user's last update date
+     * @return The user's last update date
      */
     Date getLastUpdate();
 
     /**
-     * @return the user's last connection date
+     * @return The user's last connection date
      */
     Date getLastConnection();
 
     /**
-     * @return the user's manager id
+     * @return The user's manager id
      */
     long getManagerUserId();
 

@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2011 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2011, 2014 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -14,15 +14,16 @@
 package org.bonitasoft.engine.bpm;
 
 /**
- * Any element that has a name in Bonita BPM implements this interface.
+ * Interface <code>NamedElement</code> names a <code>BonitaObject</code>.
  *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
+ * @since 6.0.0
  */
 public interface NamedElement extends BonitaObject {
 
     /**
-     * Retrieves the element name
+     * Gets the element name.
      *
      * @return the element name
      */

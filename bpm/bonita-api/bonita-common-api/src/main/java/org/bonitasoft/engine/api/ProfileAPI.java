@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- ** 
+ **
  * @since 6.0
  */
 package org.bonitasoft.engine.api;
@@ -38,7 +38,7 @@ import org.bonitasoft.engine.search.SearchResult;
  * Profiles are associated to Bonita Identity / Organization notions: users, groups, roles, memberships. <code>ProfileAPI</code> gives access to some of the
  * profile administration: adding / removing members to / from a profile, retrieving / searching for profiles. <br>
  * Full control on profiles is part of <b>Subscription</b> editions of Bonita BPM suite.
- * 
+ *
  * @author Celine Souchet
  * @author Matthieu Chaffotte
  * @see SearchResult SearchResult for general knowledege on Search mechanism in Bonita BPM.
@@ -47,7 +47,7 @@ public interface ProfileAPI {
 
     /**
      * Retrieves the profile.
-     * 
+     *
      * @param id
      *        The identifier of the profile
      * @return the searched profile
@@ -63,7 +63,7 @@ public interface ProfileAPI {
 
     /**
      * Retrieves the profiles of the user.
-     * 
+     *
      * @param userId
      *        The identifier of the user
      * @return The 1000 first profiles of the user, ordered by name
@@ -75,14 +75,14 @@ public interface ProfileAPI {
      *         If the session is invalid (expired, unknown, ...)
      * @since 6.0
      * @deprecated since 6.3
-     * @see ProfileAPI#getProfilesForUser(long, int, int, org.bonitasoft.engine.profile.ProfileCriterion)
+     * @see ProfileAPI#getProfilesForUser(long, int, int, ProfileCriterion)
      */
     @Deprecated
     List<Profile> getProfilesForUser(long userId) throws UserNotFoundException;
 
     /**
      * Retrieves the profiles of the user.
-     * 
+     *
      * @param userId
      *        The identifier of the user
      * @param startIndex
@@ -102,7 +102,7 @@ public interface ProfileAPI {
 
     /**
      * Searches profiles according to the criteria containing in the options.
-     * 
+     *
      * @param options
      *        The search criteria
      * @return the search result
@@ -132,7 +132,7 @@ public interface ProfileAPI {
 
     /**
      * Searches profile members according to the criteria containing in the options.
-     * 
+     *
      * @param memberType
      *        The member type, it can be: user, role, group, roleAndGroup.
      * @param options
@@ -148,7 +148,7 @@ public interface ProfileAPI {
 
     /**
      * Searches profile entries according to the criteria containing in the options.
-     * 
+     *
      * @param options
      *        The search criteria
      * @return the search result
@@ -162,7 +162,7 @@ public interface ProfileAPI {
 
     /**
      * Returns a profile entry according to its identifier.
-     * 
+     *
      * @param id
      *        The profile entry identifier
      * @return the searched profile entry
@@ -173,7 +173,7 @@ public interface ProfileAPI {
 
     /**
      * Retrieves the profile entry.
-     * 
+     *
      * @param id
      *        The identifier of the profile entry
      * @return the searched profile entry
@@ -189,7 +189,7 @@ public interface ProfileAPI {
 
     /**
      * Creates a profile member.
-     * 
+     *
      * @param profileId
      *        The identifier of the profile
      * @param userId
@@ -229,7 +229,7 @@ public interface ProfileAPI {
 
     /**
      * Deletes the profile member.
-     * 
+     *
      * @param id
      *        The identifier of the profile member
      * @throws DeletionException

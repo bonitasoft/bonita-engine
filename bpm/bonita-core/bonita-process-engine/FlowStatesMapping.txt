@@ -18,7 +18,6 @@ ACTIVITY
 2 CompletedActivityStateImpl
 3 FailedActivityStateImpl
 4 ReadyActivityStateImpl
-7 FailedProcessInstanceStateImpl
 9 CompletingActivityStateImpl
 10 WaitingEventStateImpl
 12 SkippedFlowNodeStateImpl

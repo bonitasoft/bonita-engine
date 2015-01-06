@@ -58,9 +58,11 @@ public class SearchOptionsBuilder {
     /**
      * Filter the results to the specific value for the specific field (equality)
      *
-     * @param field The name of the field to filter on. Depending on the search perimeter, specify the field by accessing the relevant xxxSearchDescriptor classes.
-     *              For example, HumanTaskInstanceSearchDescriptor.NAME and HumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID.
-     * @param value the single value to filter on that field name
+     * @param field
+     *        The name of the field to filter on. Depending on the search parameter, specify the field by accessing the relevant xxxSearchDescriptor classes.
+     *        For example, <code>HumanTaskInstanceSearchDescriptor.NAME</code> and <code>HumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID</code>.
+     * @param value
+     *        the single value to filter on that field name
      * @return this builder itself
      * @since 6.0
      */
@@ -72,8 +74,10 @@ public class SearchOptionsBuilder {
     /**
      * Filters search results with a greaterThan comparison operation.
      *
-     * @param field the field name to compare to.
-     * @param value the value to compare.
+     * @param field
+     *        the field name to compare to.
+     * @param value
+     *        the value to compare.
      * @return this builder itself
      * @see SearchOptionsBuilder#filter(String, java.io.Serializable) for field values
      */
@@ -182,8 +186,10 @@ public class SearchOptionsBuilder {
     /**
      * Adds a sort order option to the list of sort options
      *
-     * @param field the field name to sort by
-     * @param order the order of the sort (ASCENDING, DESCENDING)
+     * @param field
+     *        the field name to sort by
+     * @param order
+     *        the order of the sort (ASCENDING, DESCENDING)
      * @return the current SearchOptionsBuilder
      */
     public SearchOptionsBuilder sort(final String field, final Order order) {

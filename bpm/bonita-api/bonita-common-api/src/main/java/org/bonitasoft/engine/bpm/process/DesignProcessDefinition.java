@@ -54,7 +54,11 @@ public interface DesignProcessDefinition extends ProcessDefinition {
     String getDisplayDescription();
 
     /**
-     * Retrieves the definition of the FlowElementContainerDefinition of the process container
+     * Retrieves the definition of the FlowElementContainerDefinition of the process container.
+     * <p>
+     *     This method is deprecated. Please, use {@link #getFlowElementContainer()} instead.
+     * </p>
+     * Th
      *
      * @return The {@link FlowElementContainerDefinition} of the process container.<br>
      *         return type FlowElementContainerDefinition in this package is deprecated. Instead use
@@ -62,6 +66,14 @@ public interface DesignProcessDefinition extends ProcessDefinition {
      */
     @Deprecated
     FlowElementContainerDefinition getProcessContainer();
+
+    /**
+     * Returns a {@link org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition} containing all flow elements of this process.
+     * @return a {@code FlowElementContainerDefinition} containing all flow elements of this process.
+     * @see org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition
+     * @since 6.4.1
+     */
+    org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition getFlowElementContainer();
 
     /**
      * Retrieves a Set of ParameterDefinition objects from a ProcessDefinition

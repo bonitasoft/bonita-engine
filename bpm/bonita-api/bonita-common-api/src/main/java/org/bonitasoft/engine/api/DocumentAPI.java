@@ -42,7 +42,7 @@ import org.bonitasoft.engine.search.SearchResult;
  * <p>
  * Multiple versions of a document can be stored. You can retrieve the latest version or the version that was current at a given milestone (for example process
  * instantiation, or activity completion).
- * 
+ *
  * @author Emmanuel Duchastenier
  * @author Baptiste Mesta
  */
@@ -66,9 +66,9 @@ public interface DocumentAPI {
      *        The URL of the document content
      * @return a document object
      * @throws ProcessInstanceNotFoundException
-     *         when the processInstanceId does not refer to an existing process instance
+     *         If the identifier does not refer to an existing process instance.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DocumentAttachmentException
      *         when an error occurs while attaching the document
      * @since 6.0
@@ -86,16 +86,16 @@ public interface DocumentAPI {
      * @param documentId
      *        The identifier of the document to update
      * @param documentValue
-     *        the value of the document
+     *        The value of the document
      * @return a document object
      * @throws ProcessInstanceNotFoundException
-     *         when the processInstanceId does not refer to an existing process instance
+     *         If the identifier does not refer to an existing process instance.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DocumentAttachmentException
      *         when an error occurs while attaching the document
      * @throws org.bonitasoft.engine.exception.AlreadyExistsException
-     *         when an error occurs while attaching the document
+     *         If the document already exists.
      * @since 6.4.0
      */
     Document updateDocument(long documentId, DocumentValue documentValue) throws ProcessInstanceNotFoundException,
@@ -120,21 +120,20 @@ public interface DocumentAPI {
      * @param description
      *        The description of the document
      * @param documentValue
-     *        the value of the document
+     *        The value of the document
      * @return a document object
      * @throws ProcessInstanceNotFoundException
-     *         when the processInstanceId does not refer to an existing process instance
+     *         If the identifier does not refer to an existing process instance.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DocumentAttachmentException
      *         when an error occurs while attaching the document
      * @throws org.bonitasoft.engine.exception.AlreadyExistsException
-     *         when an error occurs while attaching the document
+     *         If the document already exists.
      * @since 6.4.0
      */
     Document addDocument(long processInstanceId, String documentName, String description, DocumentValue documentValue)
-            throws ProcessInstanceNotFoundException,
-            DocumentAttachmentException, AlreadyExistsException;
+            throws ProcessInstanceNotFoundException, DocumentAttachmentException, AlreadyExistsException;
 
     /**
      * Attach the given document to the specified process instance.
@@ -154,9 +153,9 @@ public interface DocumentAPI {
      *        The content of the document
      * @return a document object
      * @throws ProcessInstanceNotFoundException
-     **         when the processInstanceId does not refer to an existing process instance
+     **         If the identifier does not refer to an existing process instance.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DocumentAttachmentException
      *         when an error occurs while attaching the document
      * @since 6.0
@@ -180,7 +179,7 @@ public interface DocumentAPI {
      *        The URL of the document content
      * @return a document object
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DocumentAttachmentException
      *         when an error occurs while attaching the new version of the document
      * @since 6.0
@@ -206,7 +205,7 @@ public interface DocumentAPI {
      *        The content of the document
      * @return a document object
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DocumentAttachmentException
      *         when an error occurs while attaching the new version of the document
      * @since 6.0
@@ -221,9 +220,9 @@ public interface DocumentAPI {
      *        The identifier of the document to retrieve
      * @return a document object
      * @throws DocumentNotFoundException
-     *         when the document identifier does not refer to an existing document
+     *         If the specified identifier does not refer to an existing document.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
     Document getDocument(long documentId) throws DocumentNotFoundException;
@@ -239,16 +238,16 @@ public interface DocumentAPI {
      *        The identifier of the document to retrieve
      * @return the removed document object
      * @throws DocumentNotFoundException
-     *         when the document identifier does not refer to an existing document
+     *         If the specified identifier does not refer to an existing document.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.4.0
      */
     Document removeDocument(long documentId) throws DocumentNotFoundException, DeletionException;
 
     /**
      * Get the latest version of all documents attached to the specified process instance.
-     * 
+     *
      * @param processInstanceId
      *        The identifier of the process instance
      * @param pageIndex
@@ -256,13 +255,13 @@ public interface DocumentAPI {
      * @param numberPerPage
      *        The number of documents to list per page
      * @param pagingCriterion
-     *        the sort criterion for the returned list
+     *        The sort criterion for the returned list
      * @return the matching list of documents
      *         a paginated list of the latest version of each document attached to the process instance
      * @throws ProcessInstanceNotFoundException
-     *         when the specified processInstanceId does not refer to an existing process instance
+     *         If the identifier does not refer to an existing process instance.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DocumentException
      *         when any other error occurs during document handling
      * @since 6.0
@@ -272,12 +271,12 @@ public interface DocumentAPI {
 
     /**
      * Get content of the document with the specified identifier.
-     * 
+     *
      * @param storageId
-     *        the id of the document to retrieve the content from
+     *        The identifier of the document to retrieve the content from
      * @return document content as a byte array
      * @throws DocumentNotFoundException
-     *         when the specified documentId does not refer to an existing document
+     *         If the specified identifier does not refer to an existing document.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
      *         when the session is note valid
      * @since 6.0
@@ -286,60 +285,60 @@ public interface DocumentAPI {
 
     /**
      * Get the last version of the named document for the specified process instance.
-     * 
+     *
      * @param processInstanceId
      *        The identifier of the process instance that the document is attached to
      * @param documentName
      *        The name of the document
      * @return a document object
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DocumentNotFoundException
-     *         when the specified documentName does not refer to an existing document attached to this process instance
+     *         If the specified documentName does not refer to an existing document attached to this process instance
      * @since 6.0
      */
     Document getLastDocument(long processInstanceId, String documentName) throws DocumentNotFoundException;
 
     /**
      * Get the version of the named document that was current when the specified process instance is instantiated.
-     * 
+     *
      * @param processInstanceId
      *        The identifier of the process instance
      * @param documentName
      *        The name of the document
      * @return a document object
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DocumentNotFoundException
-     *         when the specified documentName does not refer to a document attached to the specified process instance
+     *         If the specified documentName does not refer to a document attached to the specified process instance.
      * @since 6.0
      */
     Document getDocumentAtProcessInstantiation(long processInstanceId, String documentName) throws DocumentNotFoundException;
 
     /**
      * Get the version of the named document when the specified activity completed.
-     * 
+     *
      * @param activityInstanceId
      *        The identifier of the activity instance
      * @param documentName
      *        The name of the document
      * @return a document object
      * @throws DocumentNotFoundException
-     *         when the specified documentName does not refer to an existing document attached to the process instance that contains the activity
+     *         If the specified documentName does not refer to an existing document attached to the process instance that contains the activity.
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @since 6.0
      */
     Document getDocumentAtActivityInstanceCompletion(long activityInstanceId, String documentName) throws DocumentNotFoundException;
 
     /**
      * Get the number of documents attached to the specified process instance. A document with multiple versions is counted once.
-     * 
+     *
      * @param processInstanceId
      *        The process instance identifier
      * @return the number of documents in the specified process instance
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws DocumentException
      *         when an error occurs during document handling
      * @since 6.0
@@ -348,12 +347,12 @@ public interface DocumentAPI {
 
     /**
      * Search for documents that match the search options.
-     * 
+     *
      * @param searchOptions
      *        A {@link SearchOptions} object defining the search options
      * @return the matching document list and its total number
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws SearchException
      *         when an error occurs during the search
      * @since 6.0
@@ -362,14 +361,14 @@ public interface DocumentAPI {
 
     /**
      * Search for documents that match the search options and are supervised by the specified user.
-     * 
+     *
      * @param userId
      *        The identifier of the supervising user
      * @param searchOptions
      *        A {@link SearchOptions} object defining the search options
      * @return the list of matching documents and the number of such documents
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws UserNotFoundException
      *         when the specified userId does not refer to an existing user
      * @throws SearchException
@@ -380,12 +379,12 @@ public interface DocumentAPI {
 
     /**
      * Search for archived documents that meet the search options. An archived document is a document that is not the latest version.
-     * 
+     *
      * @param searchOptions
      *        A {@link SearchOptions} object defining the search options
      * @return the matching archived document list and its total number
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws SearchException
      *         when an error occurs during the search
      * @since 6.0
@@ -395,14 +394,14 @@ public interface DocumentAPI {
     /**
      * Search for archived documents that match the search options and are supervised by the specified user. An archived document is a document that is not the
      * latest version.
-     * 
+     *
      * @param userId
      *        The identifier of the supervising user
      * @param searchOptions
      *        A {@link SearchOptions} object defining the search options
      * @return the matching archived document list and its total number
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws UserNotFoundException
      *         when the specified userId does not refer to an existing user
      * @throws SearchException
@@ -413,12 +412,12 @@ public interface DocumentAPI {
 
     /**
      * Get an ArchivedDocument based on it's id.
-     * 
+     *
      * @param sourceObjectId
      *        The identifier of the document
      * @return an archived document
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws ArchivedDocumentNotFoundException
      *         when the specified identifier does not refer to an archived document
      * @since 6.0
@@ -427,14 +426,14 @@ public interface DocumentAPI {
 
     /**
      * Get the original version of the document with the specified identifier.
-     * 
+     *
      * @param sourceObjectId
      *        The identifier of the document
      * @return an archived document
      * @throws org.bonitasoft.engine.session.InvalidSessionException
-     *         when the session is not valid
+     *         Generic exception thrown if API Session is invalid, e.g session has expired.
      * @throws ArchivedDocumentNotFoundException
-     *         when the specified identifier does not refer to an archived document
+     *         If the identifier does not refer to any existing archived document.
      * @since 6.0
      */
     ArchivedDocument getArchivedVersionOfProcessDocument(long sourceObjectId) throws ArchivedDocumentNotFoundException;
@@ -443,15 +442,15 @@ public interface DocumentAPI {
      * Get a document list that have the specified name on the process
      *
      * @param processInstanceId
-     *        the id of the process instance that contains the list
+     *        The identifier of the process instance that contains the list
      * @param name
-     *        the name of the document list
+     *        The name of the document list
      * @param fromIndex
-     *        start from this number
+     *        The index of the first element to be retrieved (it starts from zero)
      * @param numberOfResult
-     *        the number of result to resturn
+     *        The max number of result to get
      * @return
-     *         the document list
+     *         The document list
      * @throws DocumentNotFoundException
      * @since 6.4.0
      */
@@ -461,11 +460,13 @@ public interface DocumentAPI {
      * Get a document list that have the specified name on the process
      *
      * @param processInstanceId
-     *        the id of the process instance that contains the list
+     *        The identifier of the process instance that contains the list
      * @param name
-     *        the name of the document list
+     *        The name of the document list
      * @param documentsValues the values to set the list with
-     * @throws DocumentException when the list cannot be set
+     * @throws DocumentException
+     *         If an error occurs
+     * @see org.bonitasoft.engine.bpm.process.ProcessInstance#getId()
      * @since 6.4.0
      */
     void setDocumentList(long processInstanceId, String name, List<DocumentValue> documentsValues) throws DocumentNotFoundException, DocumentException;
@@ -477,11 +478,14 @@ public interface DocumentAPI {
      * This method can be useful for keeping history of a document without overloading the database.
      * </p>
      *
-     * @param documentId
-     *        the id of the archived document to remove content on
+     * @param archivedDocumentId
+     *        The identifier of the archived document to remove content on
      * @throws DocumentNotFoundException
+     *         If the identifier does not refer to any existing archived document.
      * @throws DocumentException
+     *         If an error occurs
+     * @see ArchivedDocument#getId()
      * @since 6.4.0
      */
-    void deleteContentOfArchivedDocument(long documentId) throws DocumentException, DocumentNotFoundException;
+    void deleteContentOfArchivedDocument(long archivedDocumentId) throws DocumentException, DocumentNotFoundException;
 }
