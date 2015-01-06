@@ -159,7 +159,7 @@ public class ConnectorExecutionIT extends TestWithUser {
 
     public ProcessDefinition deployProcessWithActorAndTestConnector2(final ProcessDefinitionBuilder processDefinitionBuilder,
             final String actor, final User user) throws BonitaException, IOException {
-        return deployProcessWithActorAndTestConnectorAndParameter(processDefinitionBuilder, actor, user, null);
+        return deployProcessWithActorAndTestConnector2AndParameter(processDefinitionBuilder, actor, user, null);
     }
 
     public ProcessDefinition deployProcessWithActorAndTestConnector2AndParameter(final ProcessDefinitionBuilder processDefinitionBuilder,
