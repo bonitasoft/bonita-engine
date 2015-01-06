@@ -102,9 +102,7 @@ public class DocumentListLeftOperandHandler extends AbstractDocumentLeftOperandH
 
     @Override
     public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
-        for (SLeftOperand leftOperand : sLeftOperand) {
-            loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
-        }
+        //do nothing
     }
 
 }
