@@ -40,11 +40,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.BPMTestSPUtil;
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 
-public class SPProcessManagementTest extends CommonAPISPTest {
+public class SPProcessManagementTest extends CommonAPISPIT {
 
     @After
     public void afterTest() throws Exception {
@@ -127,7 +127,7 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         final String commentContent1 = "commentContent1";
         final String commentContent2 = "commentContent2";
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step1", processInstance);
+        waitForUserTask(processInstance, "step1");
         getProcessAPI().addProcessComment(processInstance.getId(), commentContent1);
         getProcessAPI().addProcessComment(processInstance.getId(), commentContent2);
         logoutOnTenant();
@@ -139,7 +139,7 @@ public class SPProcessManagementTest extends CommonAPISPTest {
         loginOnTenantWith(USERNAME, PASSWORD, tenant1);
         final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
-        waitForUserTask("step1", processInstance1);
+        waitForUserTask(processInstance1, "step1");
         final String commentContent11 = "commentContent11";
         final String commentContent12 = "commentContent12";
         getProcessAPI().addProcessComment(processInstance1.getId(), commentContent11);

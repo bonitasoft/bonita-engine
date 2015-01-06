@@ -25,7 +25,7 @@ import com.bonitasoft.engine.page.Page;
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializerSP.class)
 @SuppressWarnings("javadoc")
-public class PageAPILocalIT extends CommonAPISPTest {
+public class PageAPILocalIT extends CommonAPISPIT {
 
     @Before
     public void before() throws BonitaException {
