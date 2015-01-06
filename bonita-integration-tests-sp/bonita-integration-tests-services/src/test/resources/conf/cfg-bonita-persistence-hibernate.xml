@@ -54,6 +54,7 @@
                 <prop key="hibernate.use_sql_comments">${hibernate.journal.use_sql_comments}</prop>
                 <prop key="hibernate.generate_statistics">false</prop>
                 <prop key="hibernate.connection.shutdown">true</prop>
+                <prop key="hibernate.jdbc.batch_size">50</prop>
                 <prop key="hibernate.validator.autoregister_listeners">false</prop>
                 <prop key="hibernate.validator.apply_to_ddl">false</prop>
                 <prop key="javax.persistence.validation.mode">NONE</prop>

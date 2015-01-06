@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013 BonitaSoft S.A.
+ * Copyright (C) 2013-2014 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -22,6 +22,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 /**
  * @author Abdelhilah Boudhan
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public class NoAuthenticationServiceImpl implements GenericAuthenticationService {
 
@@ -35,22 +36,34 @@ public class NoAuthenticationServiceImpl implements GenericAuthenticationService
     }
 
     @Override
-    public String checkUserCredentials(Map<String, Serializable> credentials) {
+    public String checkUserCredentials(final Map<String, Serializable> credentials) {
         try {
-            String userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME));
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "checkUserCredentials"));
-            }
+            final String userName = String.valueOf(credentials.get(AuthenticationConstants.BASIC_USERNAME));
+            logBeforeMethod();
             identityService.getUserByUserName(userName);
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "checkUserCredentials"));
-            }
+            logAfterMethod();
             return userName;
         } catch (final SUserNotFoundException sunfe) {
-            if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
-                logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "checkUserCredentials", sunfe));
-            }
+            logOnExceptionMethod(sunfe);
             return null;
+        }
+    }
+
+    void logOnExceptionMethod(final SUserNotFoundException sunfe) {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogOnExceptionMethod(this.getClass(), "checkUserCredentials", sunfe));
+        }
+    }
+
+    void logAfterMethod() {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogAfterMethod(this.getClass(), "checkUserCredentials"));
+        }
+    }
+
+    void logBeforeMethod() {
+        if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.TRACE)) {
+            logger.log(this.getClass(), TechnicalLogSeverity.TRACE, LogUtil.getLogBeforeMethod(this.getClass(), "checkUserCredentials"));
         }
     }
 

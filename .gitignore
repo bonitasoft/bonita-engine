@@ -10,3 +10,4 @@ Temporary*.java
 engine-sp-it.exec
 *.tmp
 **/bin
+.idea
