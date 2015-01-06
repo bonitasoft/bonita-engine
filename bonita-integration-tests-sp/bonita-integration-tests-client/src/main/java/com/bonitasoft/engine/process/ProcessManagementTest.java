@@ -16,11 +16,11 @@ import java.util.Date;
 import java.util.List;
 
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.ActivityStates;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ArchivedManualTaskInstance;
+import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ManualTaskInstance;
@@ -35,7 +35,6 @@ import org.bonitasoft.engine.search.Order;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.WaitUntil;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
@@ -76,9 +75,6 @@ public class ProcessManagementTest extends CommonAPISPIT {
 
         // make userTask1 as parentTask
         final ActivityInstance parentTask = waitForUserTaskAndAssigneIt(processInstance, userTaskName, john);
-        final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null);
-        assertEquals(1, toDoTasks.size());
-        assertEquals(userTaskName, toDoTasks.get(0).getName());
         // add sub task
         final Date dueDate = new Date(System.currentTimeMillis());
         final TaskPriority newPriority = TaskPriority.ABOVE_NORMAL;
@@ -91,33 +87,15 @@ public class ProcessManagementTest extends CommonAPISPIT {
         assertEquals("add new manual user task 1", manualUserTask1.getDisplayDescription());
         assertEquals(dueDate, manualUserTask2.getExpectedEndDate());
         assertEquals(newPriority, manualUserTask2.getPriority());
-        assertTrue("Expecting 3 assigned task for Jack", new WaitUntil(20, 500) {
 
-            @Override
-            protected boolean check() {
-                return getProcessAPI().getAssignedHumanTaskInstances(john.getId(), 0, 10, null).size() == 3;
-            }
-        }.waitUntil());
-
-        final SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, 12);
-        searchBuilder.filter(HumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition.getId());
-        searchBuilder.filter(HumanTaskInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID, parentTask.getId());
-        final SearchResult<HumanTaskInstance> tasksRes = getProcessAPI().searchHumanTaskInstances(searchBuilder.done());
-        assertEquals(2, tasksRes.getCount());
+        final FlowNodeInstance newManualTask1 = waitForFlowNodeInReadyState(processInstance, "newManualTask1", true);
+        final FlowNodeInstance newManualTask2 = waitForFlowNodeInReadyState(processInstance, "newManualTask2", true);
 
         // let's archive children tasks:
-        skipTask(tasksRes.getResult().get(0).getId());
-        skipTask(tasksRes.getResult().get(1).getId());
-        assertTrue("Expected 2 skipped tasks in the archives", new WaitUntil(100, 2000) {
-
-            @Override
-            protected boolean check() throws Exception {
-                final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
-                builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition.getId());
-                builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.SKIPPED_STATE);
-                return getProcessAPI().searchArchivedHumanTasks(builder.done()).getCount() == 2;
-            }
-        }.waitUntil());
+        skipTask(newManualTask1.getId());
+        waitForFlowNodeInState(processInstance, "newManualTask1", TestStates.SKIPPED, true);
+        skipTask(newManualTask2.getId());
+        waitForFlowNodeInState(processInstance, "newManualTask2", TestStates.SKIPPED, true);
 
         // filter the sub tasks
         final SearchOptionsBuilder searchhBuilder = new SearchOptionsBuilder(0, 10);
@@ -126,11 +104,13 @@ public class ProcessManagementTest extends CommonAPISPIT {
         final SearchResult<ArchivedHumanTaskInstance> searchResult = getProcessAPI().searchArchivedHumanTasks(searchhBuilder.done());
         assertEquals(2, searchResult.getCount());
         final List<ArchivedHumanTaskInstance> subTasks = searchResult.getResult();
+
         final ArchivedHumanTaskInstance aTask1 = subTasks.get(0);
-        final ArchivedHumanTaskInstance aTask2 = subTasks.get(1);
         assertEquals("newManualTask1", aTask1.getName());
-        assertEquals("newManualTask2", aTask2.getName());
         assertTrue(aTask1 instanceof ArchivedManualTaskInstance);
+
+        final ArchivedHumanTaskInstance aTask2 = subTasks.get(1);
+        assertEquals("newManualTask2", aTask2.getName());
         assertTrue(aTask2 instanceof ArchivedManualTaskInstance);
 
         disableAndDeleteProcess(processDefinition);
@@ -156,8 +136,7 @@ public class ProcessManagementTest extends CommonAPISPIT {
                 TaskPriority.HIGHEST);
         getProcessAPI().addManualUserTask(taskCreator);
 
-        taskCreator = buildManualTaskCreator(userTask1.getId(), "newTask'2", john.getId(), "add new manual user task", dueDate,
-                TaskPriority.LOWEST);
+        taskCreator = buildManualTaskCreator(userTask1.getId(), "newTask'2", john.getId(), "add new manual user task", dueDate, TaskPriority.LOWEST);
         getProcessAPI().addManualUserTask(taskCreator);
 
         waitForUserTask(processInstance, "newTask'1");
@@ -311,10 +290,7 @@ public class ProcessManagementTest extends CommonAPISPIT {
         processBuilder.setStringIndex(2, "Label2", expressionBuilder.createGroovyScriptExpression("script", "return \"a\"+\"b\";", String.class.getName()));
         processBuilder.setStringIndex(3, "Label3", null);
         final ProcessDefinition process1 = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, john);
-        startProcessAndWaitForTask(process1.getId(), "step1");
-        final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_ASC);
-        assertEquals(1, processInstances.size());
-        final ProcessInstance processInstance = processInstances.get(0);
+        final ProcessInstance processInstance = startProcessAndWaitForTask(process1.getId(), "step1").getProcessInstance();
         assertEquals("Label1", processInstance.getStringIndexLabel(1));
         assertEquals("Label2", processInstance.getStringIndexLabel(2));
         assertEquals("Label3", processInstance.getStringIndexLabel(3));
