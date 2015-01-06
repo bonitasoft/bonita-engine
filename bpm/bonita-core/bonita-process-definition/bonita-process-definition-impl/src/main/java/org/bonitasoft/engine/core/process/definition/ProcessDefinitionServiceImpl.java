@@ -334,6 +334,16 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         }
     }
 
+    @Override
+    public SProcessDefinition getProcessDefinitionIfIsEnabled(final long processDefinitionId) throws SProcessDefinitionReadException, SProcessDefinitionException {
+        final SProcessDefinitionDeployInfo deployInfo = getProcessDeploymentInfo(processDefinitionId);
+        if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
+            throw new SProcessDefinitionException("The process definition is not enabled !!", deployInfo.getProcessId(), deployInfo.getName(),
+                    deployInfo.getVersion());
+        }
+        return getProcessDefinition(processDefinitionId);
+    }
+
     private long setIdOnProcessDefinition(final SProcessDefinition sProcessDefinition) throws SReflectException {
         final long id = generateId();
         ClassReflector.invokeSetter(sProcessDefinition, "setId", Long.class, id);

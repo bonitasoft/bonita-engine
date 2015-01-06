@@ -23,6 +23,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.core.document.api.DocumentService;
 import org.bonitasoft.engine.core.document.model.SMappedDocument;
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.persistence.OrderByType;
@@ -46,10 +47,13 @@ public class GetDocumentByNameAtProcessInstantiation implements TransactionConte
 
     private final String documentName;
 
+    private final ProcessDefinitionService processDefinitionService;
+
     public GetDocumentByNameAtProcessInstantiation(final DocumentService documentService, final ProcessInstanceService processInstanceService,
-            final SearchEntitiesDescriptor searchEntitiesDescriptor, final long processInstanceId,
+            final ProcessDefinitionService processDefinitionService, final SearchEntitiesDescriptor searchEntitiesDescriptor, final long processInstanceId,
             final String documentName) {
         this.documentService = documentService;
+        this.processDefinitionService = processDefinitionService;
         this.processInstanceId = processInstanceId;
         this.documentName = documentName;
         this.processInstanceService = processInstanceService;
@@ -59,7 +63,8 @@ public class GetDocumentByNameAtProcessInstantiation implements TransactionConte
     @Override
     public void execute() throws SBonitaException {
         final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
-                searchEntitiesDescriptor, processInstanceId, 0, 1, BuilderFactory.get(SAProcessInstanceBuilderFactory.class).getIdKey(), OrderByType.ASC);
+                processDefinitionService, searchEntitiesDescriptor, processInstanceId, 0, 1, BuilderFactory.get(SAProcessInstanceBuilderFactory.class)
+                        .getIdKey(), OrderByType.ASC);
         getArchivedProcessInstanceList.execute();
         final ArchivedProcessInstance saProcessInstance = getArchivedProcessInstanceList.getResult().get(0);
         final Date startDate = saProcessInstance.getStartDate();
