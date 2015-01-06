@@ -88,19 +88,23 @@ public abstract class CommonAPIIT extends APITestUtil {
 
         final List<String> messages = new ArrayList<String>();
         messages.addAll(checkNoCommands());
+
+        messages.addAll(checkNoFlowNodes());
+        messages.addAll(checkNoArchivedFlowNodes());
+        messages.addAll(checkNoComments());
+        messages.addAll(checkNoArchivedComments());
+        messages.addAll(checkNoWaitingEvent());
+
+        messages.addAll(checkNoProcessIntances());
+        messages.addAll(checkNoArchivedProcessIntances());
+        messages.addAll(checkNoProcessDefinitions());
+
+        messages.addAll(checkNoCategories());
+
         messages.addAll(checkNoUsers());
         messages.addAll(checkNoGroups());
         messages.addAll(checkNoRoles());
         messages.addAll(checkNoSupervisors());
-        messages.addAll(checkNoProcessDefinitions());
-        messages.addAll(checkNoProcessIntances());
-        messages.addAll(checkNoArchivedProcessIntances());
-        messages.addAll(checkNoFlowNodes());
-        messages.addAll(checkNoArchivedFlowNodes());
-        messages.addAll(checkNoCategories());
-        messages.addAll(checkNoComments());
-        messages.addAll(checkNoArchivedComments());
-        messages.addAll(checkNoWaitingEvent());
 
         logoutOnTenant();
         return messages;

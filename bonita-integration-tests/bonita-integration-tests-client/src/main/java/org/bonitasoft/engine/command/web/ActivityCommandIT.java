@@ -79,7 +79,7 @@ public class ActivityCommandIT extends TestWithUser {
         final BusinessArchive businessArchive = buildBusinessArchiveWithDataTransientAndConnector();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance, user).getId();
+        final long activityInstanceId = waitForUserTaskAndAssigneIt(processInstance, "step1", user).getId();
 
         // Execute it with operation using the command to update data instance
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
@@ -88,7 +88,7 @@ public class ActivityCommandIT extends TestWithUser {
         executeActionsAndTerminate("dataName", true, activityInstanceId, fieldValues, rightOperand);
 
         // Get value of updated data in connector
-        waitForUserTask("step2", processInstance);
+        waitForUserTask(processInstance, "step2");
         assertEquals(updatedValue + "a", getProcessAPI().getProcessDataInstance("application", processInstance.getId()).getValue());
 
         // Clean
@@ -102,7 +102,7 @@ public class ActivityCommandIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // process is deployed here with a custom jar
         // wait for first task and assign it
-        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance, user).getId();
+        final long activityInstanceId = waitForUserTaskAndAssigneIt(processInstance, "step1", user).getId();
 
         // execute it with operation using the command
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
@@ -121,7 +121,7 @@ public class ActivityCommandIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait for first task and assign it
-        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance, user).getId();
+        final long activityInstanceId = waitForUserTaskAndAssigneIt(processInstance, "step1", user).getId();
 
         // execute it with operation using the command
         final Map<String, Serializable> fieldValues = new HashMap<String, Serializable>();
@@ -130,7 +130,7 @@ public class ActivityCommandIT extends TestWithUser {
         executeActionsAndTerminate("application", false, activityInstanceId, fieldValues, rightOperand);
 
         // check we have the other task ready and the operation was executed
-        waitForUserTask("step2", processInstance);
+        waitForUserTask(processInstance, "step2");
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("application", processInstance.getId());
         Assert.assertEquals("Excel", dataInstance.getValue().toString());
 
@@ -145,7 +145,7 @@ public class ActivityCommandIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(buildBusinessArchiveWithoutConnector(), ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // wait for first task and assign it
-        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", processInstance, john).getId();
+        final long activityInstanceId = waitForUserTaskAndAssigneIt(processInstance, "step1", john).getId();
 
         try {
             // execute it with operation using the command
@@ -155,7 +155,7 @@ public class ActivityCommandIT extends TestWithUser {
             getCommandAPI().execute(COMMAND_EXECUTE_OPERATIONS_AND_TERMINATE, parameters);
 
             // check we have the other task ready and the operation was executed
-            waitForUserTask("step2", processInstance);
+            waitForUserTask(processInstance, "step2");
             final ArchivedActivityInstance archivedActivityInstance = getProcessAPI().getArchivedActivityInstance(activityInstanceId);
             Assert.assertEquals(john.getId(), archivedActivityInstance.getExecutedBy());
             Assert.assertEquals(user.getId(), archivedActivityInstance.getExecutedBySubstitute());

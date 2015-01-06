@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.synchro.jms;
+package org.bonitasoft.engine.synchro;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -37,14 +37,14 @@ public class JMSProducer {
         final String brokerURL = System.getProperty("broker.url");
 
         // Create a ConnectionFactory
-        this.topicConnectionFactory = new ActiveMQConnectionFactory(brokerURL);
-        this.topicConnection = topicConnectionFactory.createTopicConnection();
-        this.session = topicConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        this.topic = session.createTopic(TOPIC_NAME);
+        topicConnectionFactory = new ActiveMQConnectionFactory(brokerURL);
+        topicConnection = topicConnectionFactory.createTopicConnection();
+        session = topicConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        topic = session.createTopic(TOPIC_NAME);
 
         topicConnection.start();
 
-        this.producer = session.createProducer(topic);
+        producer = session.createProducer(topic);
 
         this.timeout = timeout;
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -57,8 +57,8 @@ public class JMSProducer {
                     session.close();
                     topicConnection.close();
 
-                } catch (JMSException e) {
-                    System.err.println("Cannot stop the sychro service, probably already stopped?");
+                } catch (final JMSException e) {
+                    System.err.println("Cannot stop the synchro service, probably already stopped?");
                 }
             }
         });
@@ -68,7 +68,7 @@ public class JMSProducer {
         if (jmsProducer == null) {
             try {
                 jmsProducer = new JMSProducer(messageTimeout);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }

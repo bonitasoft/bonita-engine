@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.process.task;
+package org.bonitasoft.engine.activity;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.process.task;
+package org.bonitasoft.engine.activity;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -159,7 +159,7 @@ public class SendTaskIT extends TestWithUser {
                 10, ActivityInstanceCriterion.LAST_UPDATE_DESC);
         assertTrue(archivedActivityInstances.get(0) instanceof ArchivedSendTaskInstance);
         forceMatchingOfEvents();
-        waitForUserTask("step1", receiveMessageProcessInstance);
+        waitForUserTask(receiveMessageProcessInstance, "step1");
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
         assertEquals("Doe", dataInstance.getValue());
@@ -200,7 +200,7 @@ public class SendTaskIT extends TestWithUser {
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         waitForProcessToFinish(sendMessageProcessInstance);
         forceMatchingOfEvents();
-        waitForUserTask("step1", receiveMessageProcessInstance);
+        waitForUserTask(receiveMessageProcessInstance, "step1");
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
         assertEquals("Doe", dataInstance.getValue());

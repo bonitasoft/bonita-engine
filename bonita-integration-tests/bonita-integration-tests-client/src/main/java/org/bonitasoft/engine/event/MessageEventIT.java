@@ -155,7 +155,7 @@ public class MessageEventIT extends AbstractEventIT {
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
         Thread.sleep(100);// small sleep but don't wait for the event to be waiting, it might happen that that event is already matched at this point
         forceMatchingOfEvents();
-        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
+        waitForUserTask(receiveMessageProcessInstance, CATCH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(receiveMessageProcess);
         disableAndDeleteProcess(sendMessageProcess);
@@ -200,7 +200,7 @@ public class MessageEventIT extends AbstractEventIT {
                         buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         waitForProcessToFinish(sendMessageProcessInstance1);
         forceMatchingOfEvents();
-        assertNotNull(waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1.getId()));
+        assertNotNull(waitForUserTask(receiveMessageProcessInstance1.getId(), CATCH_MESSAGE_STEP1_NAME));
         waitForEventInWaitingState(receiveMessageProcessInstance2, CATCH_EVENT_NAME);
 
         // instantiate a process containing correlations matching with receiveMessageProcessInstance2
@@ -210,7 +210,7 @@ public class MessageEventIT extends AbstractEventIT {
                         buildAssignOperation("lastName", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         waitForProcessToFinish(sendMessageProcessInstance2);
 
-        assertNotNull(waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance2.getId()));
+        assertNotNull(waitForUserTask(receiveMessageProcessInstance2.getId(), CATCH_MESSAGE_STEP1_NAME));
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
@@ -243,8 +243,7 @@ public class MessageEventIT extends AbstractEventIT {
         waitForProcessToFinish(sendMessageProcessInstance1);
         forceMatchingOfEvents();
 
-        final HumanTaskInstance waitForUserTask = waitForUserTask(CATCH_MESSAGE_STEP1_NAME);
-
+        final HumanTaskInstance waitForUserTask = waitForUserTaskAndGetIt(CATCH_MESSAGE_STEP1_NAME);
         final long processInstance = waitForUserTask.getRootContainerId();
         assertTrue(processInstance == receiveMessageProcessInstance1.getId() || processInstance == receiveMessageProcessInstance2.getId());
         assertEquals(1, getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, ActivityInstanceCriterion.DEFAULT).size());
@@ -290,7 +289,7 @@ public class MessageEventIT extends AbstractEventIT {
         waitForProcessToFinish(sendMessageProcessInstance1);
         forceMatchingOfEvents();
 
-        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
+        waitForUserTask(receiveMessageProcessInstance1, CATCH_MESSAGE_STEP1_NAME);
         // waitForStep(100, 5000, "userTask1", receiveMessageProcessInstance1);
 
         disableAndDeleteProcess(sendMessageProcess);
@@ -338,7 +337,7 @@ public class MessageEventIT extends AbstractEventIT {
                         buildAssignOperation("lastName", "Doe Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         waitForProcessToFinish(sendMessageProcessInstance2);
         forceMatchingOfEvents();
-        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
+        waitForUserTask(receiveMessageProcessInstance1, CATCH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
@@ -438,7 +437,7 @@ public class MessageEventIT extends AbstractEventIT {
         forceMatchingOfEvents();
 
         // at the first test some time the cron job time some time before executing
-        final HumanTaskInstance userTask = waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
+        final HumanTaskInstance userTask = waitForUserTaskAndGetIt(START_WITH_MESSAGE_STEP1_NAME);
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", userTask.getRootContainerId());
         assertEquals("Doe", dataInstance.getValue());
@@ -479,7 +478,7 @@ public class MessageEventIT extends AbstractEventIT {
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         waitForProcessToFinish(sendMessageProcessInstance);
         forceMatchingOfEvents();
-        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
+        waitForUserTask(receiveMessageProcessInstance, CATCH_MESSAGE_STEP1_NAME);
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
         assertEquals("Doe", dataInstance.getValue());
@@ -507,7 +506,7 @@ public class MessageEventIT extends AbstractEventIT {
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
         Thread.sleep(100);// small sleep but don't wait for the event to be waiting, it might happen that that event is already matched at this point
         forceMatchingOfEvents();
-        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
+        waitForUserTask(receiveMessageProcessInstance, CATCH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
@@ -524,11 +523,11 @@ public class MessageEventIT extends AbstractEventIT {
         final ProcessDefinition sendAndReceiveMessageProcess = deployAndEnableProcessWithIntraMessageEvent("sendAndReceiveMessageProcess", CATCH_EVENT_NAME);
         final ProcessInstance sendAndReceiveMessageProcessInstance = getProcessAPI().startProcess(sendAndReceiveMessageProcess.getId());
 
-        final ActivityInstance step2 = waitForUserTask("userTask2", sendAndReceiveMessageProcessInstance);
+        final long step2Id = waitForUserTask(sendAndReceiveMessageProcessInstance, "userTask2");
         waitForEventInWaitingState(sendAndReceiveMessageProcessInstance, CATCH_EVENT_NAME);
-        assignAndExecuteStep(step2.getId(), user.getId());
+        assignAndExecuteStep(step2Id, user);
         forceMatchingOfEvents();
-        waitForUserTask("userTask3", sendAndReceiveMessageProcessInstance);
+        waitForUserTask(sendAndReceiveMessageProcessInstance, "userTask3");
 
         disableAndDeleteProcess(sendAndReceiveMessageProcess);
     }
@@ -644,7 +643,7 @@ public class MessageEventIT extends AbstractEventIT {
         sendMessage(MESSAGE_NAME, START_WITH_MESSAGE_PROCESS_NAME, "startEvent", Collections.singletonMap(lastNameDisplay, lastNameValue));
         forceMatchingOfEvents();
         // at the first test some time the cron job time some time before executing
-        final HumanTaskInstance taskInstance = waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
+        final HumanTaskInstance taskInstance = waitForUserTaskAndGetIt(START_WITH_MESSAGE_STEP1_NAME);
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", taskInstance.getRootContainerId());
         assertEquals("Doe", dataInstance.getValue());
@@ -658,11 +657,11 @@ public class MessageEventIT extends AbstractEventIT {
         final ProcessDefinition receiveMessageProcess = deployAndEnableProcessWithStartMessageEvent(null, null);
         sendMessage(MESSAGE_NAME, START_WITH_MESSAGE_PROCESS_NAME, "startEvent", Collections.<Expression, Expression> emptyMap());
         forceMatchingOfEvents();
-        final ActivityInstance taskFirstProcInst = waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
+        final ActivityInstance taskFirstProcInst = waitForUserTaskAndGetIt(START_WITH_MESSAGE_STEP1_NAME);
 
         sendMessage(MESSAGE_NAME, START_WITH_MESSAGE_PROCESS_NAME, "startEvent", Collections.<Expression, Expression> emptyMap());
         forceMatchingOfEvents();
-        final ActivityInstance taskSecondProcInst = waitForUserTask(START_WITH_MESSAGE_STEP1_NAME);
+        final ActivityInstance taskSecondProcInst = waitForUserTaskAndGetIt(START_WITH_MESSAGE_STEP1_NAME);
         assertNotEquals(taskFirstProcInst.getId(), taskSecondProcInst.getId());
         assertNotEquals(taskFirstProcInst.getParentProcessInstanceId(), taskSecondProcInst.getParentProcessInstanceId());
 
@@ -712,7 +711,7 @@ public class MessageEventIT extends AbstractEventIT {
         // send a message having both two correlations keys matching, the process must go further
         sendMessage(MESSAGE_NAME, CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, Collections.<Expression, Expression> emptyMap(), correlations2);
         forceMatchingOfEvents();
-        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance1);
+        waitForUserTask(receiveMessageProcessInstance1, CATCH_MESSAGE_STEP1_NAME);
 
         disableAndDeleteProcess(receiveMessageProcess);
     }
@@ -739,7 +738,7 @@ public class MessageEventIT extends AbstractEventIT {
         final Expression lastNameValue = new ExpressionBuilder().createConstantStringExpression("Doe");
         sendMessage(MESSAGE_NAME, CATCH_MESSAGE_PROCESS_NAME, CATCH_EVENT_NAME, Collections.singletonMap(lastNameDisplay, lastNameValue));
         forceMatchingOfEvents();
-        waitForUserTask(CATCH_MESSAGE_STEP1_NAME, receiveMessageProcessInstance);
+        waitForUserTask(receiveMessageProcessInstance, CATCH_MESSAGE_STEP1_NAME);
 
         dataInstance = getProcessAPI().getProcessDataInstance("name", receiveMessageProcessInstance.getId());
         assertEquals("Doe", dataInstance.getValue());

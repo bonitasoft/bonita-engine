@@ -11,48 +11,47 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.synchro.jms;
+package org.bonitasoft.engine.synchro;
 
 import java.io.Serializable;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bonitasoft.engine.core.process.definition.model.SFlowNodeType;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.events.model.SEvent;
 
 /**
- * @author Elias Ricken de Medeiros
+ * @author Baptiste Mesta
  */
-public class FlowNodeReachStateHandler extends AbstractUpdateHandler {
+public class TaskReadyHandler extends AbstractJMSUpdateHandler {
 
-    private static final long serialVersionUID = 970281460560288990L;
+    private static final long serialVersionUID = 1L;
 
     private final String identifier;
 
-    private final int stateId;
-
-    public FlowNodeReachStateHandler(final long tenantId, final long messageTimeout, final int stateId) {
+    public TaskReadyHandler(final long tenantId, final long messageTimeout) {
         super(tenantId, messageTimeout);
-        this.stateId = stateId;
-        identifier = UUID.randomUUID().toString();
+        this.identifier = UUID.randomUUID().toString();
     }
 
     @Override
     protected Map<String, Serializable> getEvent(final SEvent sEvent) {
         final SFlowNodeInstance flowNodeInstance = (SFlowNodeInstance) sEvent.getObject();
-        return PerfEventUtil.getFlowNodeReachStateEvent(flowNodeInstance.getRootContainerId(), flowNodeInstance.getName(), stateId);
+        return PerfEventUtil.getReadyTaskEvent(flowNodeInstance.getRootContainerId(), flowNodeInstance.getName());
     }
 
     @Override
     public boolean isInterested(final SEvent event) {
         // the !isStateExecuting avoid having 2 times the same event in case of execution of e.g. connectors
-        if (event.getObject() instanceof SFlowNodeInstance) {
-            final SFlowNodeInstance fni = (SFlowNodeInstance) event.getObject();
-            boolean interested = !fni.isStateExecuting();
-            interested &= fni.getStateId() == stateId;
-            return interested;
-        }
-        return false;
+    	if (event.getObject() instanceof SFlowNodeInstance) {
+    		final SFlowNodeInstance fni = (SFlowNodeInstance) event.getObject();
+    		boolean interested = !fni.isStateExecuting();
+    		interested &= fni.getStateId() == 4;
+    		interested &= (fni.getType() == SFlowNodeType.USER_TASK || fni.getType() == SFlowNodeType.MANUAL_TASK);
+    		return interested;
+    	}
+    	return false;
     }
 
     @Override

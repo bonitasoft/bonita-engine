@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.process.task;
+package org.bonitasoft.engine.activity;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -55,7 +55,7 @@ public class UserTaskAssignationIT extends TestWithTechnicalUser {
 
         processDefinition = deployAndEnableSimpleProcess();
         processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        step2 = waitForUserTask("step2", processInstance);
+        step2 = waitForUserTaskAndGetIt(processInstance, "step2");
     }
 
     @Override
@@ -227,7 +227,7 @@ public class UserTaskAssignationIT extends TestWithTechnicalUser {
 
         // Release
         getProcessAPI().releaseUserTask(taskId);
-        task = waitForUserTask("step2", processInstance);
+        task = waitForUserTaskAndGetIt(processInstance, "step2");
         assertFalse("Last update date not updated during release", previousUpdateDate.equals(task.getLastUpdateDate()));
         previousUpdateDate = task.getLastUpdateDate();
 

@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.external.profile.command;
+package org.bonitasoft.engine.command.web.profile;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

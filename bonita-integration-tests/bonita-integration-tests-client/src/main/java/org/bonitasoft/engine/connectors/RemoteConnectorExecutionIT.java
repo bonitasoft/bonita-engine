@@ -155,9 +155,9 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorWithOutput(processDefinitionBuilder, ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals(defaultValue, getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue());
-        waitForUserTaskAndExecuteIt("step0", startProcess, user);
+        waitForUserTaskAndExecuteIt(startProcess, "step0", user);
 
-        waitForUserTask("step2", startProcess);
+        waitForUserTask(startProcess, "step2");
 
         assertEquals(valueOfInput1, getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue());
 
@@ -174,9 +174,9 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
                 ConnectorEvent.ON_ENTER);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("multi", processInstance);
-        waitForUserTask("multi", processInstance);
-        waitForUserTask("multi", processInstance);
+        waitForUserTask(processInstance, "multi");
+        waitForUserTask(processInstance, "multi");
+        waitForUserTask(processInstance, "multi");
 
         // Check the data value
         final DataInstance globalData = getProcessAPI().getProcessDataInstance(globalDataName, processInstance.getId());
@@ -199,20 +199,20 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
 
         // wait for the first Multi-instance and execute it: the connector must be executed
-        waitForUserTaskAndExecuteIt(multiTaskName, processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, multiTaskName, user);
 
         // wait for the second Multi-instance
-        final ActivityInstance multiInstance = waitForUserTask(multiTaskName, processInstance);
+        final long multiInstanceId = waitForUserTask(processInstance, multiTaskName);
 
         // check the data value
         DataInstance globalData = getProcessAPI().getProcessDataInstance(globalDataName, processInstance.getId());
         assertEquals(1L, globalData.getValue());
 
         // execute the second Multi-instance: the connector must be executed again
-        assignAndExecuteStep(multiInstance, userId);
+        assignAndExecuteStep(multiInstanceId, userId);
 
         // wait for user task that follows the multi task
-        waitForUserTask(userTaskName, processInstance);
+        waitForUserTask(processInstance, userTaskName);
 
         // check the data value
         globalData = getProcessAPI().getProcessDataInstance(globalDataName, processInstance.getId());
@@ -309,8 +309,8 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorWithOutput(processDefinitionBuilder, ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         assertEquals(defaultValue, getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue());
-        waitForUserTaskAndExecuteIt("step0", startProcess, user);
-        waitForUserTask("step2", startProcess);
+        waitForUserTaskAndExecuteIt(startProcess, "step0", user);
+        waitForUserTask(startProcess, "step2");
 
         final String value = (String) getProcessAPI().getProcessDataInstance(dataName, startProcess.getId()).getValue();
         assertEquals(nbOfConnectors + 1, value.length());
@@ -565,10 +565,9 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         addConnector.ignoreError();
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorThatThrowException(processDefinitionBuilder, ACTOR_NAME, user);
 
-        final long processDefinitionId = processDefinition.getId();
-        final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
-        final ActivityInstance activityInstance = waitForUserTask("step1", startProcess);
-        final SearchOptions searchOptions = getFirst100ConnectorInstanceSearchOptions(activityInstance.getId(), FLOWNODE).done();
+        final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
+        final long step1Id = waitForUserTask(startProcess, "step1");
+        final SearchOptions searchOptions = getFirst100ConnectorInstanceSearchOptions(step1Id, FLOWNODE).done();
         final SearchResult<ConnectorInstance> connectorInstances = getProcessAPI().searchConnectorInstances(searchOptions);
         assertEquals(1, connectorInstances.getCount());
         final ConnectorInstance instance = connectorInstances.getResult().get(0);
@@ -622,7 +621,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorThatThrowException(processDefinitionBuilder, ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         // the connector must trigger this exception step
-        waitForUserTaskAndExecuteIt("errorTask", startProcess, user);
+        waitForUserTaskAndExecuteIt(startProcess, "errorTask", user);
         waitForProcessToFinish(startProcess);
         // clean up
         disableAndDeleteProcess(processDefinition);
@@ -647,7 +646,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorThatThrowException(processDefinitionBuilder, ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         // the connector must trigger this exception step
-        waitForUserTaskAndExecuteIt("errorTask", startProcess, user);
+        waitForUserTaskAndExecuteIt(startProcess, "errorTask", user);
         waitForProcessToFinish(startProcess);
         // clean up
         disableAndDeleteProcess(processDefinition);
@@ -673,7 +672,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorThatThrowException(processDefinitionBuilder, ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         // the connector must trigger this exception step
-        waitForUserTaskAndExecuteIt("errorTask", startProcess, user);
+        waitForUserTaskAndExecuteIt(startProcess, "errorTask", user);
         waitForProcessToFinish(startProcess);
         // clean up
         disableAndDeleteProcess(processDefinition);
@@ -699,7 +698,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorThatThrowException(processDefinitionBuilder, ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         // the connector must trigger this exception step
-        waitForUserTaskAndExecuteIt("errorTask", startProcess, user);
+        waitForUserTaskAndExecuteIt(startProcess, "errorTask", user);
         waitForProcessToFinish(startProcess);
         // clean up
         disableAndDeleteProcess(processDefinition);
@@ -725,7 +724,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorWithOutput(processDefinitionBuilder, ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         // the connector must trigger this exception step
-        waitForUserTaskAndExecuteIt("errorTask", startProcess, user);
+        waitForUserTaskAndExecuteIt(startProcess, "errorTask", user);
         waitForProcessToFinish(startProcess);
         // clean up
         disableAndDeleteProcess(processDefinition);
@@ -746,7 +745,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorThatThrowException(processDefinitionBuilder, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // the connector must trigger this exception step
-        waitForUserTaskAndExecuteIt("step1", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step1", user);
         waitForProcessToFinish(processInstance);
         // clean up
         disableAndDeleteProcess(processDefinition);
@@ -768,7 +767,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorWithOutput(processDefinitionBuilder, ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         // the connector must trigger this exception step
-        waitForUserTaskAndExecuteIt("step1", startProcess, user);
+        waitForUserTaskAndExecuteIt(startProcess, "step1", user);
         waitForProcessToFinish(startProcess);
         // clean up
         disableAndDeleteProcess(processDefinition);
@@ -888,7 +887,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = getProcessWithConnectorThatThrowErrorOnUserTaskOnEnter("normal", FailAction.IGNORE, false);
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
-        waitForUserTask("step1", startProcess);
+        waitForUserTask(startProcess, "step1");
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -898,7 +897,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = getProcessWithConnectorThatThrowErrorOnUserTaskOnEnter("normal", FailAction.IGNORE, true);
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
-        waitForUserTask("step1", startProcess);
+        waitForUserTask(startProcess, "step1");
 
         disableAndDeleteProcess(processDefinition);
     }
@@ -908,7 +907,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = getProcessWithConnectorThatThrowErrorOnUserTaskOnEnter("normal", FailAction.ERROR_EVENT, false);
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
-        waitForUserTask("errorTask", startProcess);
+        waitForUserTask(startProcess, "errorTask");
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -917,7 +916,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = getProcessWithConnectorThatThrowErrorOnUserTaskOnEnter("normal", FailAction.ERROR_EVENT, true);
         final long processDefinitionId = processDefinition.getId();
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinitionId);
-        waitForUserTask("errorTask", startProcess);
+        waitForUserTask(startProcess, "errorTask");
         System.out.println("before delete");
         disableAndDeleteProcess(processDefinition);
     }
@@ -1008,7 +1007,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         try {
             final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
             // the connector must trigger this exception step
-            waitForUserTask("errorTask", startProcess);
+            waitForUserTask(startProcess, "errorTask");
 
             waitForFlowNodeInState(startProcess, "step1", TestStates.ABORTED, false);
         } finally {
@@ -1070,11 +1069,9 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         // start parent
         final ProcessInstance processInstance = getProcessAPI().startProcess(callingProcess.getId());
 
-        final HumanTaskInstance step1 = waitForUserTaskAndExecuteIt("step1", user);
+        final HumanTaskInstance step1 = waitForUserTaskAndExecuteAndGetIt("step1", user);
         // the connector must trigger this exception step of the calling process
-        final ActivityInstance errorTask = waitForUserTask("errorTask", processInstance);
-
-        assignAndExecuteStep(errorTask, user.getId());
+        waitForUserTaskAndExecuteIt(processInstance, "errorTask", user);
         waitForProcessToFinish(processInstance);
         waitForProcessToBeInState(step1.getParentProcessInstanceId(), ProcessInstanceState.ABORTED);
 
@@ -1094,7 +1091,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
 
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorWithOutput(processDefinitionBuilder, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step0", processInstance.getId());
+        waitForUserTask(processInstance.getId(), "step0");
         SearchOptions searchOptions = getFirst100ConnectorInstanceSearchOptions(processInstance.getId(), PROCESS).done();
         SearchResult<ConnectorInstance> connectorInstances = getProcessAPI().searchConnectorInstances(searchOptions);
         assertEquals(2, connectorInstances.getCount());
@@ -1123,7 +1120,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         processDefinitionBuilder.addTransition("step1", "step2");
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorWithOutput(processDefinitionBuilder, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step2 = waitForUserTask("step2", processInstance.getId());
+        final long step2Id = waitForUserTask(processInstance, "step2");
         // search with filter on name
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 100);
         searchOptionsBuilder.filter(ArchiveConnectorInstancesSearchDescriptor.NAME, "myConnectorOnStep");
@@ -1133,7 +1130,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         assertThat(connectorInstances.getResult(), nameAre("myConnectorOnStep"));
 
         // finish process
-        assignAndExecuteStep(step2, userId);
+        assignAndExecuteStep(step2Id, userId);
         waitForProcessToFinish(processInstance);
 
         // search for archived connector instances
@@ -1184,7 +1181,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final BusinessArchive businessArchive = builder.done();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step1", processInstance);
+        waitForUserTask(processInstance, "step1");
         disableAndDeleteProcess(processDefinition);
     }
 
@@ -1236,7 +1233,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = deployProcessWithConnectorWithConnectedResources(dataName, userTaskName);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask(userTaskName, processInstance);
+        waitForUserTask(processInstance, userTaskName);
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstance.getId());
         assertEquals(1, dataInstance.getValue());
@@ -1291,8 +1288,8 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = deployProcessWithActorAndTestConnectorEngineExecutionContextAndFilterWithAutoAssign(
                 processDefinitionBuilder, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", processInstance, jack);
-        waitForUserTask("step2", processInstance);
+        waitForUserTaskAndExecuteIt(processInstance, "step1", jack);
+        waitForUserTask(processInstance, "step2");
 
         final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstance.getId());
         assertEquals(Long.valueOf(userId), processDataInstance.getValue());
@@ -1310,8 +1307,8 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         final ProcessDefinition processDefinition = deployProcWithConnectorEngineExecContext(dataName, step1, step2);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt(step1, processInstance, user);
-        waitForUserTask(step2, processInstance);
+        waitForUserTaskAndExecuteIt(processInstance, step1, user);
+        waitForUserTask(processInstance, step2);
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstance.getId());
         assertEquals(userId, dataInstance.getValue());
@@ -1370,7 +1367,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         barBuilder.setProcessDefinition(builder.done());
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(barBuilder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step2", processInstance);
+        waitForUserTask(processInstance, "step2");
         final DataInstance numberOfUser = getProcessAPI().getProcessDataInstance("numberOfUser", processInstance.getId());
         assertEquals(2L, numberOfUser.getValue());
         final SearchResult<Document> documents = getProcessAPI().searchDocuments(

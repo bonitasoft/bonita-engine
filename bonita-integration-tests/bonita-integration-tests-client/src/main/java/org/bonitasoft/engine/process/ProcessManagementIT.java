@@ -375,9 +375,9 @@ public class ProcessManagementIT extends TestWithUser {
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
 
         // Check the size returned, and the state of each one:
-        waitForUserTask("step2", processInstance1);
-        waitForUserTask("step3", processInstance1);
-        waitForUserTask("step4", processInstance1);
+        waitForUserTask(processInstance1, "step2");
+        waitForUserTask(processInstance1, "step3");
+        waitForUserTask(processInstance1, "step4");
         List<ActivityInstance> openedActivityInstances = getProcessAPI().getOpenActivityInstances(processInstance1.getId(), 0, 3000,
                 ActivityInstanceCriterion.DEFAULT);
         for (final ActivityInstance activityInstance : openedActivityInstances) {
@@ -385,8 +385,8 @@ public class ProcessManagementIT extends TestWithUser {
             assertEquals(activityInstance.getState(), TestStates.READY.getStateName());
         }
 
-        waitForUserTask("step2", processInstance2);
-        waitForUserTask("step3", processInstance2);
+        waitForUserTask(processInstance2, "step2");
+        waitForUserTask(processInstance2, "step3");
         openedActivityInstances = getProcessAPI().getOpenActivityInstances(processInstance1.getId(), 0, 200, ActivityInstanceCriterion.DEFAULT);
         for (final ActivityInstance activityInstance : openedActivityInstances) {
             // Check that all TestStates are Open (Ready):
@@ -412,9 +412,9 @@ public class ProcessManagementIT extends TestWithUser {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         // We check the size first, to be sure to wait long enough before retrieving the list:
-        waitForUserTask("step2", processInstance);
-        waitForUserTask("step3", processInstance);
-        waitForUserTask("step4", processInstance);
+        waitForUserTask(processInstance, "step2");
+        waitForUserTask(processInstance, "step3");
+        waitForUserTask(processInstance, "step4");
 
         List<ActivityInstance> openedActivityInstances;
         openedActivityInstances = getProcessAPI().getOpenActivityInstances(processInstance.getId(), 0, 200, ActivityInstanceCriterion.LAST_UPDATE_ASC);
@@ -439,11 +439,11 @@ public class ProcessManagementIT extends TestWithUser {
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final String step2Name = "step2";
-        waitForUserTask(step2Name, processInstance);
+        waitForUserTask(processInstance, step2Name);
         final String step3Name = "step3";
-        waitForUserTask(step3Name, processInstance);
+        waitForUserTask(processInstance, step3Name);
         final String step4Name = "step4";
-        waitForUserTask(step4Name, processInstance);
+        waitForUserTask(processInstance, step4Name);
 
         List<ActivityInstance> openedActivityInstances;
         openedActivityInstances = getProcessAPI().getOpenActivityInstances(processInstance.getId(), 0, 200, ascendingCriterion);
@@ -469,9 +469,9 @@ public class ProcessManagementIT extends TestWithUser {
 
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step2", processInstance);
-        waitForUserTask("step3", processInstance);
-        waitForUserTask("step4", processInstance);
+        waitForUserTask(processInstance, "step2");
+        waitForUserTask(processInstance, "step3");
+        waitForUserTask(processInstance, "step4");
 
         assertEquals(3, getProcessAPI().getNumberOfOpenedActivityInstances(processInstance.getId()));
 
@@ -490,7 +490,7 @@ public class ProcessManagementIT extends TestWithUser {
         assertEquals(processDefinition.getId(), processDefinitionId);
 
         // Clean up
-        waitForUserTask("step1", pi0);
+        waitForUserTask(pi0, "step1");
         disableAndDeleteProcess(processDefinition);
         assertEquals(0, getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.DEFAULT).size());
     }
@@ -616,9 +616,9 @@ public class ProcessManagementIT extends TestWithUser {
         final DesignProcessDefinition designProcessDefinition = definitionBuilder.done();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("initTask1", processInstance);
-        waitForUserTask("initTask2", processInstance);
-        waitForUserTask("initTask3", processInstance);
+        waitForUserTask(processInstance, "initTask1");
+        waitForUserTask(processInstance, "initTask2");
+        waitForUserTask(processInstance, "initTask3");
 
         List<ActivityInstance> activityInstances = getProcessAPI().getActivities(processInstance.getId(), 0, 2);
         assertEquals(2, activityInstances.size());
@@ -710,9 +710,9 @@ public class ProcessManagementIT extends TestWithUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processDefinitionBuilder.getProcess(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance step1 = waitForUserTask("step1", processInstance);
+        final long step1Id = waitForUserTask(processInstance, "step1");
 
-        List<DataInstance> dataInstances = getProcessAPI().getActivityDataInstances(step1.getId(), 0, 10);
+        List<DataInstance> dataInstances = getProcessAPI().getActivityDataInstances(step1Id, 0, 10);
         assertThat(dataInstances).hasSize(6);
         final ArrayList<String> names = new ArrayList<String>(6);
         ArrayList<String> values = new ArrayList<String>(6);
@@ -727,9 +727,9 @@ public class ProcessManagementIT extends TestWithUser {
             final Operation stringOperation = BuildTestUtil.buildStringOperation(dataInstance2.getName(), dataInstance2.getValue() + "+up", false);
             operations.add(stringOperation);
         }
-        getProcessAPI().updateActivityInstanceVariables(operations, step1.getId(), null);
+        getProcessAPI().updateActivityInstanceVariables(operations, step1Id, null);
 
-        dataInstances = getProcessAPI().getActivityDataInstances(step1.getId(), 0, 10);
+        dataInstances = getProcessAPI().getActivityDataInstances(step1Id, 0, 10);
         assertThat(dataInstances).hasSize(6);
         values = new ArrayList<String>(6);
         for (final DataInstance dataInstance2 : dataInstances) {
@@ -746,7 +746,7 @@ public class ProcessManagementIT extends TestWithUser {
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        waitForUserTask("step1", processInstance);
+        waitForUserTask(processInstance, "step1");
 
         final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
         final long activityInstanceId = activityInstances.get(0).getId();
@@ -769,7 +769,7 @@ public class ProcessManagementIT extends TestWithUser {
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        waitForUserTask("step1", processInstance);
+        waitForUserTask(processInstance, "step1");
 
         final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
         final long activityInstanceId = activityInstances.get(0).getId();
@@ -792,7 +792,7 @@ public class ProcessManagementIT extends TestWithUser {
                 Arrays.asList(true));
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final long activityInstanceId = waitForUserTask("step1", processInstance).getId();
+        final long activityInstanceId = waitForUserTask(processInstance, "step1");
         assertFalse("The user " + USERNAME + " shouldn't be able to execute the task step1.", getProcessAPI().canExecuteTask(activityInstanceId, userId));
 
         getProcessAPI().assignUserTask(activityInstanceId, userId);
@@ -831,7 +831,7 @@ public class ProcessManagementIT extends TestWithUser {
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(processDefinition.getId());
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDeploymentInfo.getProcessId());
-        waitForUserTask("step1", processInstance);
+        waitForUserTask(processInstance, "step1");
 
         final List<ActivityInstance> activityInstances = new ArrayList<ActivityInstance>(getProcessAPI().getActivities(processInstance.getId(), 0, 20));
         final ActivityInstance activityInstance = activityInstances.get(activityInstances.size() - 1);
@@ -1004,7 +1004,7 @@ public class ProcessManagementIT extends TestWithUser {
         final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition1.getId());
 
-        HumanTaskInstance humanTaskInstance = waitForUserTask("step one", startProcess);
+        HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(startProcess, "step one");
         final Date reachedDate = humanTaskInstance.getReachedStateDate();
         assertNotNull(reachedDate);
         humanTaskInstance = getProcessAPI().getHumanTaskInstance(humanTaskInstance.getId());
@@ -1045,7 +1045,7 @@ public class ProcessManagementIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
 
-        final HumanTaskInstance userTaskInstance = waitForUserTask("step1", pi0);
+        final HumanTaskInstance userTaskInstance = waitForUserTaskAndGetIt(pi0, "step1");
         assertEquals(displayName, userTaskInstance.getDisplayName());
         assertEquals(displayDescription, userTaskInstance.getDisplayDescription());
         assignAndExecuteStep(userTaskInstance, user.getId());
@@ -1066,11 +1066,9 @@ public class ProcessManagementIT extends TestWithUser {
                 .addDisplayDescription(new ExpressionBuilder().createConstantStringExpression(displayDescription)).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("step1", pi0);
-        assertNotNull(step1);
+        final long step1Id = waitForUserTask(pi0, "step1");
 
-        final long activityInstanceId = step1.getId();
-        final HumanTaskInstance userTaskInstance = getProcessAPI().getHumanTaskInstance(activityInstanceId);
+        final HumanTaskInstance userTaskInstance = getProcessAPI().getHumanTaskInstance(step1Id);
         assertEquals(displayName, userTaskInstance.getDisplayName());
         assertEquals(displayDescription, userTaskInstance.getDisplayDescription());
         assignAndExecuteStep(userTaskInstance, user.getId());
@@ -1089,8 +1087,7 @@ public class ProcessManagementIT extends TestWithUser {
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask(stepName, ACTOR_NAME).addDescription(stepDescription).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-
-        final HumanTaskInstance userTaskInstance = waitForUserTask(stepName, pi0);
+        final HumanTaskInstance userTaskInstance = waitForUserTaskAndGetIt(pi0, stepName);
         assertEquals(stepName, userTaskInstance.getDisplayName());
         assertEquals(stepDescription, userTaskInstance.getDisplayDescription());
         assertEquals(stepDescription, userTaskInstance.getDescription());
@@ -1120,16 +1117,16 @@ public class ProcessManagementIT extends TestWithUser {
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, jack);
 
         final ProcessInstance startedProcess = getProcessAPI().startProcess(definition.getId());
-        final HumanTaskInstance step1 = waitForUserTask("userTask1", startedProcess);
-        final HumanTaskInstance step2 = waitForUserTask("userTask2", startedProcess);
-        waitForUserTask("userTask3", startedProcess);
+        final long step1Id = waitForUserTask(startedProcess, "userTask1");
+        final long step2Id = waitForUserTask(startedProcess, "userTask2");
+        waitForUserTask(startedProcess, "userTask3");
 
         // add lucy to actor
         getProcessAPI().addUserToActor(ACTOR_NAME, definition, lucy.getId());
 
         // assign first user task to jack, second one to john, leaving the third pending
-        getProcessAPI().assignUserTask(step1.getId(), jack.getId());
-        getProcessAPI().assignUserTask(step2.getId(), john.getId());
+        getProcessAPI().assignUserTask(step1Id, jack.getId());
+        getProcessAPI().assignUserTask(step2Id, john.getId());
 
         // check
         final List<Long> userIds = new ArrayList<Long>();
@@ -1166,16 +1163,16 @@ public class ProcessManagementIT extends TestWithUser {
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, jack);
 
         final ProcessInstance startedProcess = getProcessAPI().startProcess(definition.getId());
-        final HumanTaskInstance step1 = waitForUserTask("userTask1", startedProcess);
-        final HumanTaskInstance step2 = waitForUserTask("userTask2", startedProcess);
-        waitForUserTask("userTask3", startedProcess);
+        final long step1Id = waitForUserTask(startedProcess, "userTask1");
+        final long step2Id = waitForUserTask(startedProcess, "userTask2");
+        waitForUserTask(startedProcess, "userTask3");
 
         // add lucy to actor
         getProcessAPI().addUserToActor(ACTOR_NAME, definition, lucy.getId());
 
         // assign first user task to jack, second one to john, leaving the third pending
-        getProcessAPI().assignUserTask(step1.getId(), jack.getId());
-        getProcessAPI().assignUserTask(step2.getId(), john.getId());
+        getProcessAPI().assignUserTask(step1Id, jack.getId());
+        getProcessAPI().assignUserTask(step2Id, john.getId());
 
         // check
         final List<Long> userIds = new ArrayList<Long>();
@@ -1334,7 +1331,7 @@ public class ProcessManagementIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
 
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        final long activityInstanceId = waitForUserTaskAndAssigneIt("step1", pi0, user).getId();
+        final long activityInstanceId = waitForUserTaskAndAssigneIt(pi0, "step1", user).getId();
         getProcessAPI().setActivityStateById(activityInstanceId, 3);
 
         final HumanTaskInstance userTaskInstance = getProcessAPI().getHumanTaskInstance(activityInstanceId);

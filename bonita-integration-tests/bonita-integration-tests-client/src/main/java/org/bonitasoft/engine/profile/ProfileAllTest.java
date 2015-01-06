@@ -11,6 +11,6 @@ import org.junit.runners.Suite.SuiteClasses;
         ProfileEntryIT.class,
         ProfileMemberIT.class })
 @Initializer(TestsInitializer.class)
-public class ProfileAllITest {
+public class ProfileAllTest {
 
 }

@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.process.task;
+package org.bonitasoft.engine.activity;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -137,7 +137,7 @@ public class ReceiveTasksIT extends TestWithUser {
         final ProcessInstance sendMessageProcessInstance = getProcessAPI().startProcess(sendMessageProcess.getId());
         waitForProcessToFinish(sendMessageProcessInstance);
         forceMatchingOfEvents();
-        waitForUserTask("userTask1", receiveMessageProcessInstance);
+        waitForUserTask(receiveMessageProcessInstance, "userTask1");
 
         searchResult = (SearchResult<WaitingEvent>) getCommandAPI().execute(SEARCH_WAITING_EVENTS_COMMAND, parameters);
         assertEquals(0, searchResult.getCount());
@@ -174,7 +174,7 @@ public class ReceiveTasksIT extends TestWithUser {
 
         final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
         forceMatchingOfEvents();
-        waitForUserTask("userTask1", receiveMessageProcessInstance);
+        waitForUserTask(receiveMessageProcessInstance, "userTask1");
 
         disableAndDeleteProcess(sendMessageProcess);
         disableAndDeleteProcess(receiveMessageProcess);
@@ -207,11 +207,11 @@ public class ReceiveTasksIT extends TestWithUser {
             final ProcessInstance receiveMessageProcessInstance = getProcessAPI().startProcess(receiveMessageProcess.getId());
             waitForTaskInState(receiveMessageProcessInstance, "waitForMessage", TestStates.WAITING);
             forceMatchingOfEvents();
-            waitForUserTask("userTask1", receiveMessageProcessInstance);
+            waitForUserTask(receiveMessageProcessInstance, "userTask1");
             final ProcessInstance receiveMessageProcessInstance2 = getProcessAPI().startProcess(receiveMessageProcess.getId());
             waitForTaskInState(receiveMessageProcessInstance2, "waitForMessage", TestStates.WAITING);
             forceMatchingOfEvents();
-            waitForUserTask("userTask1", receiveMessageProcessInstance2);
+            waitForUserTask(receiveMessageProcessInstance2, "userTask1");
         } finally {
             disableAndDeleteProcess(sendMessageProcess1);
             disableAndDeleteProcess(sendMessageProcess2);
@@ -245,7 +245,7 @@ public class ReceiveTasksIT extends TestWithUser {
                 Arrays.asList(buildAssignOperation("lastName", "Doe", String.class.getName(), ExpressionType.TYPE_CONSTANT)), null);
         waitForProcessToFinish(sendMessageProcessInstance);
         forceMatchingOfEvents();
-        final HumanTaskInstance step1 = waitForUserTask("userTask1", receiveMessageProcessInstance);
+        final HumanTaskInstance step1 = waitForUserTaskAndGetIt(receiveMessageProcessInstance, "userTask1");
 
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance("name", step1.getRootContainerId());
         assertEquals("Doe", dataInstance.getValue());

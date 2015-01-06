@@ -1,4 +1,4 @@
-package org.bonitasoft.engine.process.task;
+package org.bonitasoft.engine.activity;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -36,7 +36,7 @@ public class ManualTasksIT extends TestWithUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndAssigneIt("step2", processInstance, user);
+        waitForUserTaskAndAssigneIt(processInstance, "step2", user);
         final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(1, toDoTasks.size());
         final HumanTaskInstance humanTaskInstance = toDoTasks.get(0);
@@ -60,8 +60,8 @@ public class ManualTasksIT extends TestWithUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndAssigneIt("step2", processInstance, user);
-        waitForUserTaskAndAssigneIt("step3", processInstance, user);
+        waitForUserTaskAndAssigneIt(processInstance, "step2", user);
+        waitForUserTaskAndAssigneIt(processInstance, "step3", user);
 
         final List<HumanTaskInstance> toDoTasks = getProcessAPI().getAssignedHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(2, toDoTasks.size());

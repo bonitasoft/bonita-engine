@@ -1,6 +1,6 @@
 package org.bonitasoft.engine.event;
 
-import org.bonitasoft.engine.process.task.SendTaskIT;
+import org.bonitasoft.engine.activity.SendTaskIT;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
