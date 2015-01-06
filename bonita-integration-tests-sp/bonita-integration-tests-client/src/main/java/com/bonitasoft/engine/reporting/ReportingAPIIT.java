@@ -38,13 +38,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.platform.TenantCreator;
 
 @SuppressWarnings("javadoc")
-public class ReportingAPIIT extends CommonAPISPTest {
+public class ReportingAPIIT extends CommonAPISPIT {
 
     private static String lineSeparator = "\n";
 
@@ -57,7 +57,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
     @After
     public void tearDown() throws BonitaException {
         getIdentityAPI().deleteUser("matti");
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     @Test
@@ -292,7 +292,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
 
     @Test
     public void createTenantDeploysDefaultReports() throws BonitaException {
-       logoutOnTenant();
+        logoutOnTenant();
         PlatformSession session = loginOnPlatform();
         PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
         final long tenantId = platformAPI.createTenant(new TenantCreator("newTenant", "a test tenant to check default report creation", "testIconName",
@@ -307,7 +307,7 @@ public class ReportingAPIIT extends CommonAPISPTest {
             assertEquals(4, searchReports.getCount());
         } finally {
             // cleanup:
-           logoutOnTenant();
+            logoutOnTenant();
             session = loginOnPlatform();
             platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
             platformAPI.deactiveTenant(tenantId);
@@ -428,12 +428,12 @@ public class ReportingAPIIT extends CommonAPISPTest {
         final ProcessDefinition processDefinitionWithStartSignal = deployAndEnableProcessWithActor(startSignalArchive, ACTOR_NAME, john);
         final ProcessDefinition processDefinitionWithEndSignal = deployAndEnableProcessWithActor(endSignalArchive, ACTOR_NAME, john);
 
-       logoutOnTenant();
+        logoutOnTenant();
         loginOnDefaultTenantWith("john", "bpm");
 
         // Check that the process with trigger signal on start is not started, before send signal
         final ProcessInstance processInstanceWithEndSignal = getProcessAPI().startProcess(processDefinitionWithEndSignal.getId());
-        waitForUserTask("step1", processInstanceWithEndSignal);
+        waitForUserTask(processInstanceWithEndSignal, "step1");
         checkNbOfProcessInstances(1);
 
         List<HumanTaskInstance> taskInstances = getProcessAPI().getPendingHumanTaskInstances(john.getId(), 0, 10, ActivityInstanceCriterion.NAME_ASC);

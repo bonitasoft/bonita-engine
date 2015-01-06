@@ -10,7 +10,7 @@
 package com.bonitasoft.engine.business.application;
 
 import com.bonitasoft.engine.BPMTestSPUtil;
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -20,7 +20,7 @@ import org.junit.Before;
 /**
  * @author Elias Ricken de Medeiros
  */
-public class TestWithApplication extends CommonAPISPTest {
+public class TestWithApplication extends CommonAPISPIT {
 
     private User user;
 

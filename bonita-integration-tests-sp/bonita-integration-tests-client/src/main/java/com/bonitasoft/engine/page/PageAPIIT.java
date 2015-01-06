@@ -46,12 +46,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.profile.ProfileEntryCreator;
 import com.bonitasoft.engine.profile.ProfileEntryType;
 
 @SuppressWarnings("javadoc")
-public class PageAPIIT extends CommonAPISPTest {
+public class PageAPIIT extends CommonAPISPIT {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();

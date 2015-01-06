@@ -38,9 +38,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 import com.bonitasoft.engine.operation.pojo.Travel;
+import com.bonitasoft.engine.pojo.Address;
 import com.bonitasoft.engine.pojo.AddressBook;
+import com.bonitasoft.engine.pojo.Client;
 import com.bonitasoft.engine.pojo.Command;
 import com.bonitasoft.engine.pojo.CommandLine;
+import com.bonitasoft.engine.pojo.Country;
 import com.bonitasoft.engine.pojo.NameList;
 import com.bonitasoft.engine.pojo.Product;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
@@ -50,6 +53,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GetBusinessDataByIdCommandTest {
+
+    private static final String BUSINESSDATA_CLASS_URI_VALUE = "/businessdata/{className}/{id}/{field}";
 
     private GetBusinessDataByIdCommand command;
 
@@ -70,9 +75,11 @@ public class GetBusinessDataByIdCommandTest {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 1983L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, Travel.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, BUSINESSDATA_CLASS_URI_VALUE);
         final Travel travel = new Travel();
         travel.setNbDays(45);
+        travel.setPersistenceId(1L);
+        travel.setPersistenceVersion(1L);
         when(bdrService.findById(Travel.class, 1983L)).thenReturn(travel);
 
         final String travelJson = (String) command.execute(parameters, tenantServiceAccessor);
@@ -84,7 +91,7 @@ public class GetBusinessDataByIdCommandTest {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 1983L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, "com.bonitasoft.Employee");
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, BUSINESSDATA_CLASS_URI_VALUE);
 
         command.execute(parameters, tenantServiceAccessor);
     }
@@ -94,7 +101,7 @@ public class GetBusinessDataByIdCommandTest {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 1983L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, Travel.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, BUSINESSDATA_CLASS_URI_VALUE);
         when(bdrService.findById(Travel.class, 1983L)).thenThrow(new SBusinessDataNotFoundException("not found"));
 
         try {
@@ -110,7 +117,7 @@ public class GetBusinessDataByIdCommandTest {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 1983L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, AddressBook.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, BUSINESSDATA_CLASS_URI_VALUE);
         final AddressBook addressBook = new AddressBook();
         when(bdrService.findById(AddressBook.class, 1983L)).thenReturn(addressBook);
 
@@ -125,7 +132,7 @@ public class GetBusinessDataByIdCommandTest {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 1983L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, Command.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, BUSINESSDATA_CLASS_URI_VALUE);
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "lines");
         final Product pencil = new Product(687L, 1L, "Pencil");
         final Product paper = new Product(688L, 12L, "Paper");
@@ -145,7 +152,7 @@ public class GetBusinessDataByIdCommandTest {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 864L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, CommandLine.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, BUSINESSDATA_CLASS_URI_VALUE);
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "product");
         final Product pencil = new Product(687L, 1L, "Pencil");
         final CommandLine commandLine = new CommandLine(864L, 78L, pencil, 5);
@@ -163,7 +170,7 @@ public class GetBusinessDataByIdCommandTest {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 864L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, CommandLine.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, BUSINESSDATA_CLASS_URI_VALUE);
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "");
         final Product pencil = new Product(687L, 1L, "Pencil");
         final CommandLine commandLine = new CommandLine(864L, 78L, pencil, 5);
@@ -180,7 +187,7 @@ public class GetBusinessDataByIdCommandTest {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 864L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, CommandLine.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, BUSINESSDATA_CLASS_URI_VALUE);
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "address");
         final Product pencil = new Product(687L, 1L, "Pencil");
         final CommandLine commandLine = new CommandLine(864L, 78L, pencil, 5);
@@ -194,7 +201,7 @@ public class GetBusinessDataByIdCommandTest {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 864L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, CommandLine.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, BUSINESSDATA_CLASS_URI_VALUE);
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "persistenceVersion");
         final Product pencil = new Product(687L, 1L, "Pencil");
         final CommandLine commandLine = new CommandLine(864L, 78L, pencil, 5);
@@ -211,7 +218,7 @@ public class GetBusinessDataByIdCommandTest {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 1983L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, Travel.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, BUSINESSDATA_CLASS_URI_VALUE);
         final Travel travel = new Travel();
         travel.setNbDays(45);
         when(bdrService.findById(Travel.class, 1983L)).thenReturn(travel);
@@ -228,7 +235,7 @@ public class GetBusinessDataByIdCommandTest {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 1983L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, Travel.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, BUSINESSDATA_CLASS_URI_VALUE);
         final Travel travel = new Travel();
         travel.setNbDays(45);
         when(bdrService.findById(Travel.class, 1983L)).thenReturn(travel);
@@ -242,7 +249,7 @@ public class GetBusinessDataByIdCommandTest {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 864L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, NameList.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, BUSINESSDATA_CLASS_URI_VALUE);
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "names");
         final NameList nameList = new NameList();
         nameList.setPersistenceId(864L);
@@ -251,13 +258,13 @@ public class GetBusinessDataByIdCommandTest {
 
         command.execute(parameters, tenantServiceAccessor);
     }
-    
+
     @Test
     public void should_return_empty_json_object_when_child_is_null() throws Exception {
         final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 864L);
         parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, CommandLine.class.getName());
-        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, "/businessdata/{className}/{id}/{field}");
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, BUSINESSDATA_CLASS_URI_VALUE);
         parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_CHILD_NAME, "product");
         final CommandLine commandLine = new CommandLine(864L, 78L, null, 5);
         when(bdrService.findById(CommandLine.class, 864L)).thenReturn(commandLine);
@@ -266,6 +273,34 @@ public class GetBusinessDataByIdCommandTest {
 
         assertThatJson(json).isEqualTo("{}");
     }
-    
+
+    @Test
+    public void execute_should_return_lazy_links_inside_members() throws Exception {
+
+        final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_ID, 1983L);
+        parameters.put(GetBusinessDataByIdCommand.ENTITY_CLASS_NAME, Client.class.getName());
+        parameters.put(GetBusinessDataByIdCommand.BUSINESS_DATA_URI_PATTERN, BUSINESSDATA_CLASS_URI_VALUE);
+
+        final Client client = new Client();
+        final Address address = new Address();
+        final Country country = new Country(1L, 2L, "France");
+        address.setPersistenceId(864L);
+        address.setCountry(country);
+
+        client.setAddress(address);
+
+        client.getAddresses().add(address);
+        client.getAddresses().add(address);
+        client.getAddresses().add(address);
+
+        when(bdrService.findById(Client.class, 1983L)).thenReturn(client);
+
+        final String json = (String) command.execute(parameters, tenantServiceAccessor);
+        System.out.println(json);
+
+        final String expectedJson = IOUtils.toString(GetBusinessDataByIdCommandTest.class.getResource("/rest/ClientWithLinksInChildren.json"));
+        JsonAssert.assertThatJson(json).isEqualTo(expectedJson);
+    }
 
 }

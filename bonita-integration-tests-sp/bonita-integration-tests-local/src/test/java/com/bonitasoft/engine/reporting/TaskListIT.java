@@ -29,11 +29,11 @@ import org.junit.Test;
 import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.core.reporting.ReportingService;
 import com.bonitasoft.engine.service.impl.SpringTenantServiceAccessor;
 
-public class TaskListIT extends CommonAPISPTest {
+public class TaskListIT extends CommonAPISPIT {
 
     private PersistenceService persistenceservice;
 

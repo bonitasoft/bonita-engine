@@ -23,14 +23,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.api.PlatformMonitoringAPI;
 
 /**
  * @author Elias Ricken de Medeiros
  * @author Feng Hui
  */
-public class PlatformMonitoringAPITest extends CommonAPISPTest {
+public class PlatformMonitoringAPITest extends CommonAPISPIT {
 
     @After
     public void afterTest() throws Exception {

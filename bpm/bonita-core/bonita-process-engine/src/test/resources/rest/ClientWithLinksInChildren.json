@@ -1,0 +1,60 @@
+{
+	"address": 
+	{
+		"persistenceId": 864,
+		"persistenceVersion": null,
+		"street": null,
+		"links": 
+		[
+			{
+				"rel": "country",
+				"href": "/businessdata/com.bonitasoft.engine.pojo.Address/864/country"
+			}
+		]
+	},
+
+	"addresses": 
+	[
+		{
+			"persistenceId": 864,
+			"persistenceVersion": null,
+			"street": null,
+			"links": 
+			[
+				{
+					"rel": "country",
+					"href": "/businessdata/com.bonitasoft.engine.pojo.Address/864/country"
+				}
+			]
+		},
+
+		{
+			"persistenceId": 864,
+			"persistenceVersion": null,
+			"street": null,
+			"links": 
+			[
+				{
+					"rel": "country",
+					"href": "/businessdata/com.bonitasoft.engine.pojo.Address/864/country"
+				}
+			]
+		},
+
+		{
+			"persistenceId": 864,
+			"persistenceVersion": null,
+			"street": null,
+			"links": 
+			[
+				{
+					"rel": "country",
+					"href": "/businessdata/com.bonitasoft.engine.pojo.Address/864/country"
+				}
+			]
+		}
+	],
+
+	"persistenceVersion": 148,
+	"persistenceId": 753
+}
