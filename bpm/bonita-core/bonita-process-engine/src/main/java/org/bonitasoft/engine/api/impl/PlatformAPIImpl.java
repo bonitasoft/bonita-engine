@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
@@ -24,6 +25,8 @@ import java.util.concurrent.Callable;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.api.PlatformAPI;
+import org.bonitasoft.engine.api.impl.scheduler.PlatformJobListenerManager;
+import org.bonitasoft.engine.api.impl.scheduler.TenantJobListenerManager;
 import org.bonitasoft.engine.api.impl.transaction.CustomTransactions;
 import org.bonitasoft.engine.api.impl.transaction.GetTenantsCallable;
 import org.bonitasoft.engine.api.impl.transaction.SetServiceState;
@@ -87,7 +90,6 @@ import org.bonitasoft.engine.profile.ImportPolicy;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.ProfilesImporter;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
-import org.bonitasoft.engine.scheduler.AbstractBonitaPlatformJobListener;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
@@ -367,34 +369,37 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
     }
 
-    private void startScheduler(final PlatformServiceAccessor platformAccessor, final List<STenant> tenants) throws SSchedulerException, SBonitaException,
+    private void startScheduler(final PlatformServiceAccessor platformAccessor, final List<STenant> tenants) throws SBonitaException,
             BonitaHomeNotSetException, BonitaHomeConfigurationException, IOException, NoSuchMethodException, InstantiationException, IllegalAccessException,
             InvocationTargetException {
         final NodeConfiguration platformConfiguration = platformAccessor.getPlatformConfiguration();
         final SchedulerService schedulerService = platformAccessor.getSchedulerService();
         if (platformConfiguration.shouldStartScheduler() && !schedulerService.isStarted()) {
             schedulerService.initializeScheduler();
-            addPlatformJobListener(schedulerService, platformAccessor.getPlatformConfiguration());
-            for (final STenant sTenant : tenants) {
-                addTenantJobListener(schedulerService, sTenant.getId());
-            }
+            addPlatformJobListeners(platformAccessor, schedulerService);
+            addTenantJobListeners(tenants, schedulerService);
             schedulerService.start();
         }
     }
 
-    private void addPlatformJobListener(final SchedulerService schedulerService, final NodeConfiguration platformConfiguration) throws SSchedulerException {
-        final List<AbstractBonitaPlatformJobListener> jobListeners = platformConfiguration.getJobListeners();
-        if (!jobListeners.isEmpty()) {
-            schedulerService.addJobListener(jobListeners);
+    private void addTenantJobListeners(final List<STenant> tenants, final SchedulerService schedulerService) throws SBonitaException,
+            BonitaHomeNotSetException, IOException, BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException,
+            InvocationTargetException {
+        for (STenant tenant : tenants) {
+            addTenantJobListener(schedulerService, tenant.getId());
         }
     }
 
     private void addTenantJobListener(final SchedulerService schedulerService, final long tenantId) throws SBonitaException, BonitaHomeNotSetException,
             IOException, BonitaHomeConfigurationException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         final List<AbstractBonitaTenantJobListener> jobListeners = getTenantServiceAccessor(tenantId).getTenantConfiguration().getJobListeners();
-        if (!jobListeners.isEmpty()) {
-            schedulerService.addJobListener(jobListeners, String.valueOf(tenantId));
-        }
+        TenantJobListenerManager tenantJobListenerManager = new TenantJobListenerManager(schedulerService);
+        tenantJobListenerManager.registerListeners(jobListeners, tenantId);
+    }
+
+    private void addPlatformJobListeners(final PlatformServiceAccessor platformAccessor, final SchedulerService schedulerService) throws SSchedulerException {
+        PlatformJobListenerManager platformJobListenerManager = new PlatformJobListenerManager(schedulerService);
+        platformJobListenerManager.registerListener(platformAccessor.getPlatformConfiguration().getJobListeners());
     }
 
     void startServicesOfTenants(final PlatformServiceAccessor platformAccessor,
@@ -807,7 +812,8 @@ public class PlatformAPIImpl implements PlatformAPI {
         try {
             platformAccessor = getPlatformAccessor();
             sessionAccessor = createSessionAccessor();
-            final long tenantId = getDefaultTenant().getId();
+            STenant defaultTenant = getDefaultTenant();
+            final long tenantId = defaultTenant.getId();
             final PlatformService platformService = platformAccessor.getPlatformService();
             final SchedulerService schedulerService = platformAccessor.getSchedulerService();
             final SessionService sessionService = platformAccessor.getSessionService();
@@ -815,8 +821,7 @@ public class PlatformAPIImpl implements PlatformAPI {
 
             // here the scheduler is started only to be able to store global jobs. Once theses jobs are stored the scheduler is stopped and it will started
             // definitively in startNode method
-            schedulerService.initializeScheduler();
-            schedulerService.start();
+            startScheduler(platformAccessor, Arrays.asList(defaultTenant));
             // FIXME: commented out for the tests to not restart the scheduler all the time. Will need to be refactored. (It should be the responsibility of
             // startNode() method to start the scheduler, not ActivateTenant)
             // schedulerStarted = true;

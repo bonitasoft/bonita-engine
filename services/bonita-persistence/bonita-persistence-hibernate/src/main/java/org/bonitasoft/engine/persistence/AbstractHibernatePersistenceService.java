@@ -891,6 +891,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                     final Statement stmt = connection.createStatement();
                     try {
                         stmt.execute(command);
+                    } catch (final SQLException e) {
+                        logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Following SQL command failed: " + command);
+                        throw e;
                     } finally {
                         stmt.close();
                     }

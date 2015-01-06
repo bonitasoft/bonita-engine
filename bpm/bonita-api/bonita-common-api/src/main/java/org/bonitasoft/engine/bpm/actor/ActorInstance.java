@@ -17,27 +17,36 @@ import org.bonitasoft.engine.bpm.BaseElement;
 import org.bonitasoft.engine.bpm.DescriptionElement;
 
 /**
- * Once a process is deployed, the associated actors are instances of class <code>ActorInstance</code>.
- * 
+ * Once the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition} is deployed, the associated {@link ActorDefinition}s are instantiated.
+ * This object represents this instance of {@link ActorDefinition}.
+ *
  * @author Matthieu Chaffotte
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
- * @see ActorDefinition
+ * @since 6.0.0
+ * @version 6.4.1
  */
 public interface ActorInstance extends DescriptionElement, BaseElement {
 
     /**
+     * Get the identifier of the process definition where this actor is defined.
+     *
      * @return The identifier of the process definition where this actor is defined.
      */
     long getProcessDefinitionId();
 
     /**
-     * @return The display name of the actor, as designed is {@link ActorDefinition}
+     * The display name of the actor defined in {@link ActorDefinition#getName()}.
+     *
+     * @return The display name of the actor.
      */
     String getDisplayName();
 
     /**
-     * @return True if this actor is the actor initiator of the process, that is, the actor that can start the process.
+     * Can this actor start the process ?
+     * Defined in {@link ActorDefinition#isInitiator()}.
+     *
+     * @return <code>true</code>} if this actor can start the process, <code>false</code> otherwise.
      */
     boolean isInitiator();
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -52,6 +52,8 @@ public class SExpressionContext implements Serializable {
     private long time;
 
     private Long processDefinitionId;
+
+    private Long parentProcessDefinitionId;
 
     private SProcessDefinition processDefinition;
 
@@ -206,6 +208,14 @@ public class SExpressionContext implements Serializable {
         return "context [containerId=" + containerId + ", containerType=" + containerType + ", processDefinitionId="
                 + processDefinitionId
                 + (processDefinition != null ? ", processDefinition=" + processDefinition.getName() + " -- " + processDefinition.getVersion() : "") + "]";
+    }
+
+    public Long getParentProcessDefinitionId() {
+        return parentProcessDefinitionId;
+    }
+
+    public void setParentProcessDefinitionId(final Long parentProcessDefinitionId) {
+        this.parentProcessDefinitionId = parentProcessDefinitionId;
     }
 
 }

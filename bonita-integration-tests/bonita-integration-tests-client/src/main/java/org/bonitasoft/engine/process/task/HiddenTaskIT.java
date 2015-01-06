@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.actor.ActorMember;
@@ -31,7 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SuppressWarnings("javadoc")
-public class HiddenTaskIT extends CommonAPITest {
+public class HiddenTaskIT extends TestWithTechnicalUser {
 
     private ProcessDefinition processDefinition;
 
@@ -43,9 +43,10 @@ public class HiddenTaskIT extends CommonAPITest {
 
     private User user2;
 
+    @Override
     @Before
-    public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+    public void before() throws Exception {
+        super.before();
 
         final DesignProcessDefinition designProcessDefinition = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(
                 "ProcessContainingTasksToHide", "1.01beta", Arrays.asList("humanTask_1", "humanTask_2"), Arrays.asList(true, true), "actor", true, true);
@@ -61,11 +62,12 @@ public class HiddenTaskIT extends CommonAPITest {
                 new SearchOptionsBuilder(0, 100).done());
     }
 
+    @Override
     @After
-    public void afterTest() throws BonitaException {
+    public void after() throws Exception {
         disableAndDeleteProcess(processDefinition);
         deleteUsers(user, user2);
-        logoutOnTenant();
+        super.after();
     }
 
     @Test

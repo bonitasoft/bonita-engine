@@ -52,7 +52,7 @@ public class ProcessDefinitionBuilderTest {
         final String taskWithBoundary = "step1";
         processDefinitionBuilder.addStartEvent("start");
         processDefinitionBuilder.addUserTask(taskWithBoundary, "actor").addBoundaryEvent("b1", true)
-        .addTimerEventTriggerDefinition(TimerType.DURATION, timerExpr);
+                .addTimerEventTriggerDefinition(TimerType.DURATION, timerExpr);
         processDefinitionBuilder.addAutomaticTask("auto2");
         processDefinitionBuilder.addEndEvent("end");
         processDefinitionBuilder.addTransition("start", taskWithBoundary);
@@ -141,7 +141,7 @@ public class ProcessDefinitionBuilderTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("invalid", "1.0");
         processDefinitionBuilder.addStartEvent("start");
         processDefinitionBuilder.addAutomaticTask(taskWithBoundary).addBoundaryEvent("b1")
-        .addTimerEventTriggerDefinition(TimerType.DURATION, new ExpressionBuilder().createConstantLongExpression(1000));
+                .addTimerEventTriggerDefinition(TimerType.DURATION, new ExpressionBuilder().createConstantLongExpression(1000));
         processDefinitionBuilder.addAutomaticTask("auto2");
         processDefinitionBuilder.addEndEvent("end");
         processDefinitionBuilder.addTransition("start", taskWithBoundary);
@@ -184,7 +184,7 @@ public class ProcessDefinitionBuilderTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("invalid", "1.0");
         processDefinitionBuilder.addStartEvent("start");
         processDefinitionBuilder.addReceiveTask(taskWithBoundary, "m1").addBoundaryEvent("b1")
-        .addTimerEventTriggerDefinition(TimerType.DURATION, new ExpressionBuilder().createConstantLongExpression(1000));
+                .addTimerEventTriggerDefinition(TimerType.DURATION, new ExpressionBuilder().createConstantLongExpression(1000));
         processDefinitionBuilder.addAutomaticTask("auto2");
         processDefinitionBuilder.addEndEvent("end");
         processDefinitionBuilder.addTransition("start", taskWithBoundary);
@@ -227,7 +227,7 @@ public class ProcessDefinitionBuilderTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("invalid", "1.0");
         processDefinitionBuilder.addStartEvent("start");
         processDefinitionBuilder.addSendTask(taskWithBoundary, "m1", new ExpressionBuilder().createConstantStringExpression("p1")).addBoundaryEvent("b1")
-        .addTimerEventTriggerDefinition(TimerType.DURATION, new ExpressionBuilder().createConstantLongExpression(1000));
+                .addTimerEventTriggerDefinition(TimerType.DURATION, new ExpressionBuilder().createConstantLongExpression(1000));
         processDefinitionBuilder.addAutomaticTask("auto2");
         processDefinitionBuilder.addEndEvent("end");
         processDefinitionBuilder.addTransition("start", taskWithBoundary);
@@ -242,7 +242,7 @@ public class ProcessDefinitionBuilderTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("invalid", "1.0");
         processDefinitionBuilder.addStartEvent("start");
         processDefinitionBuilder.addSendTask(taskWithBoundary, "m1", new ExpressionBuilder().createConstantStringExpression("p1")).addBoundaryEvent("b1")
-        .addSignalEventTrigger("go");
+                .addSignalEventTrigger("go");
         processDefinitionBuilder.addAutomaticTask("auto2");
         processDefinitionBuilder.addEndEvent("end");
         processDefinitionBuilder.addTransition("start", taskWithBoundary);
@@ -257,7 +257,7 @@ public class ProcessDefinitionBuilderTest {
         final ProcessDefinitionBuilder processDefinitionBuilder = new ProcessDefinitionBuilder().createNewInstance("invalid", "1.0");
         processDefinitionBuilder.addStartEvent("start");
         processDefinitionBuilder.addSendTask(taskWithBoundary, "m1", new ExpressionBuilder().createConstantStringExpression("p1")).addBoundaryEvent("b1")
-        .addMessageEventTrigger("m1");
+                .addMessageEventTrigger("m1");
         processDefinitionBuilder.addAutomaticTask("auto2");
         processDefinitionBuilder.addEndEvent("end");
         processDefinitionBuilder.addTransition("start", taskWithBoundary);
@@ -376,8 +376,8 @@ public class ProcessDefinitionBuilderTest {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
         builder.addActor("mainActor");
         builder.addUserTask("step1", "mainActor")
-        .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.ASSIGNMENT, null, null, expression)
-        .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.DELETION, null, null, null);
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.ASSIGNMENT, null, null, expression)
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.DELETION, null, null, null);
         builder.done();
     }
 
@@ -388,8 +388,8 @@ public class ProcessDefinitionBuilderTest {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
         builder.addActor("mainActor");
         builder.addUserTask("step1", "mainActor")
-        .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress1"), OperatorType.ASSIGNMENT, null, null, expression)
-        .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.DELETION, null, null, null);
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress1"), OperatorType.ASSIGNMENT, null, null, expression)
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.DELETION, null, null, null);
         builder.done();
     }
 
@@ -400,8 +400,15 @@ public class ProcessDefinitionBuilderTest {
         final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("ProcessWithEventSubProcess", "1.0");
         builder.addActor("mainActor");
         builder.addUserTask("step1", "mainActor")
-        .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress1"), OperatorType.ASSIGNMENT, null, null, expression)
-        .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.JAVA_METHOD, null, null, expression);
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress1"), OperatorType.ASSIGNMENT, null, null, expression)
+                .addOperation(new LeftOperandBuilder().createBusinessDataLeftOperand("myAddress"), OperatorType.JAVA_METHOD, null, null, expression);
+        builder.done();
+    }
+
+    @Test(expected = InvalidProcessDefinitionException.class)
+    public void cant_create_process_definition_with_actor_initiator_without_actor() throws Exception {
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("Double-hyphen -- test", "any");
+        builder.setActorInitiator("toto");
         builder.done();
     }
 

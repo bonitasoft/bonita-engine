@@ -17,15 +17,39 @@ import org.bonitasoft.engine.bpm.DescriptionElement;
 import org.bonitasoft.engine.expression.Expression;
 
 /**
+ * It forms part of the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition}. It is used to define a date in the context of a
+ * {@link org.bonitasoft.engine.bpm.process.ProcessDefinition} or a {@link org.bonitasoft.engine.bpm.flownode.FlowNodeDefinition}.
+ *
  * @author Matthieu Chaffotte
  * @author Feng Hui
+ * @author Celine Souchet
+ * @since 6.0.0
+ * @version 6.4.1
  */
 public interface DataDefinition extends DescriptionElement {
 
+    /**
+     * Get the class name of the type of the data.
+     *
+     * @return The class name of the type of the data.
+     * @since 6.0.0
+     */
     String getClassName();
 
+    /**
+     * Is it transient?
+     *
+     * @return <code>true</code> if the data is transient, <code>false</code> otherwise.
+     * @since 6.0.0
+     */
     boolean isTransientData();
 
+    /**
+     * Get the expression representing the default value of the data.
+     *
+     * @return The default value of the data.
+     * @since 6.0.0
+     */
     Expression getDefaultValueExpression();
 
 }

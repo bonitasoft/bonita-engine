@@ -17,7 +17,7 @@
 
 package org.bonitasoft.engine.command.helper.expectation;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 
 /**
@@ -25,11 +25,11 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
  */
 public class ProcessExpectation {
 
-    private CommonAPITest testCase;
+    private CommonAPIIT testCase;
 
     private ProcessInstance process;
 
-    public ProcessExpectation(CommonAPITest testCase, ProcessInstance process) {
+    public ProcessExpectation(CommonAPIIT testCase, ProcessInstance process) {
         this.testCase = testCase;
         this.process = process;
     }

@@ -39,7 +39,6 @@ import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogCreationException
 import org.bonitasoft.engine.scheduler.exception.jobLog.SJobLogUpdatingException;
 import org.bonitasoft.engine.scheduler.model.SJobDescriptor;
 import org.bonitasoft.engine.scheduler.model.SJobLog;
-import org.bonitasoft.engine.scheduler.model.impl.SJobLogImpl;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
 import org.bonitasoft.engine.transaction.TransactionService;
@@ -59,6 +58,8 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
 
     private final TechnicalLoggerService logger;
 
+    private final JobLogCreator jobLogCreator;
+
     private final SchedulerService schedulerService;
 
     private final SchedulerExecutor schedulerExecutor;
@@ -69,7 +70,7 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
 
     public JDBCJobListener(final SchedulerService schedulerService, final JobService jobService, final SchedulerExecutor schedulerExecutor,
             final SessionAccessor sessionAccessor, final TransactionService transactionService, final IncidentService incidentService,
-            final TechnicalLoggerService logger) {
+            final TechnicalLoggerService logger, final JobLogCreator jobLogCreator) {
         super();
         this.schedulerService = schedulerService;
         this.jobService = jobService;
@@ -78,6 +79,7 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
         this.transactionService = transactionService;
         this.incidentService = incidentService;
         this.logger = logger;
+        this.jobLogCreator = jobLogCreator;
     }
 
     @Override
@@ -89,13 +91,12 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
     public void jobToBeExecuted(final Map<String, Serializable> context) {
         final Long jobDescriptorId = (Long) context.get(JOB_DESCRIPTOR_ID);
         final Long tenantId = (Long) context.get(TENANT_ID);
-        if (isNotNullOrEmpty(jobDescriptorId) && isNotNullOrEmpty(tenantId)) {
-            jobToBeExecutedInSession(context, jobDescriptorId, tenantId);
+        if (isSessionRelated(jobDescriptorId, tenantId)) {
+            deleteRelatedJob(context, jobDescriptorId, tenantId);
         }
-        return;
     }
 
-    private void jobToBeExecutedInSession(final Map<String, Serializable> context, final Long jobDescriptorId, final Long tenantId) {
+    private void deleteRelatedJob(final Map<String, Serializable> context, final Long jobDescriptorId, final Long tenantId) {
         try {
             // Set the tenant id, because the jobService is a tenant service and need a session to use the tenant persistence service. But, a job listener runs not in a session.
             sessionAccessor.setTenantId(tenantId);
@@ -140,14 +141,18 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
 
         final Long jobDescriptorId = (Long) context.get(JOB_DESCRIPTOR_ID);
         final Long tenantId = (Long) context.get(TENANT_ID);
-        if (isNotNullOrEmpty(jobDescriptorId) && isNotNullOrEmpty(tenantId)) {
-            jobWasExecutedInSession(jobException, jobDescriptorId, tenantId);
+        if (isSessionRelated(jobDescriptorId, tenantId)) {
+            performPostExecutionActions(jobException, jobDescriptorId, tenantId);
         } else {
             logWarningWhenExceptionOccurs("job execution.", jobException);
         }
     }
 
-    private void jobWasExecutedInSession(final Exception jobException, final Long jobDescriptorId, final Long tenantId) {
+    private boolean isSessionRelated(final Long jobDescriptorId, final Long tenantId) {
+        return isNotNullOrEmpty(jobDescriptorId) && isNotNullOrEmpty(tenantId);
+    }
+
+    private void performPostExecutionActions(final Exception jobException, final Long jobDescriptorId, final Long tenantId) {
         // Set the tenant id, because the jobService is a tenant service and need a session to use the tenant persistence service. But, a job listener runs not in a session.
         sessionAccessor.setTenantId(tenantId);
         try {
@@ -167,12 +172,12 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
     }
 
     private void setJobLog(final Exception jobException, final Long jobDescriptorId) throws SBonitaReadException, SJobLogUpdatingException,
-            SJobLogCreationException {
+            SJobLogCreationException, SJobDescriptorReadException {
         final List<SJobLog> jobLogs = jobService.getJobLogs(jobDescriptorId, 0, 1);
         if (!jobLogs.isEmpty()) {
             updateJobLog(jobException, jobLogs);
         } else {
-            createJobLog(jobException, jobDescriptorId);
+            jobLogCreator.createJobLog(jobException, jobDescriptorId);
         }
     }
 
@@ -190,14 +195,6 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
         }
     }
 
-    private void createJobLog(final Exception jobException, final Long jobDescriptorId) throws SJobLogCreationException {
-        final SJobLogImpl jobLog = new SJobLogImpl(jobDescriptorId);
-        jobLog.setLastMessage(getStackTrace(jobException));
-        jobLog.setRetryNumber(Long.valueOf(0));
-        jobLog.setLastUpdateDate(System.currentTimeMillis());
-        jobService.createJobLog(jobLog);
-    }
-
     private void updateJobLog(final Exception jobException, final List<SJobLog> jobLogs) throws SJobLogUpdatingException {
         final SJobLog jobLog = jobLogs.get(0);
         final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
@@ -207,7 +204,7 @@ public class JDBCJobListener extends AbstractBonitaPlatformJobListener {
         jobService.updateJobLog(jobLog, descriptor);
     }
 
-    private void deleteJobIfNotScheduledAnyMore(final Long jobDescriptorId) throws SJobDescriptorReadException, SSchedulerException {
+    private void deleteJobIfNotScheduledAnyMore(final Long jobDescriptorId) throws SSchedulerException {
         final SJobDescriptor jobDescriptor = jobService.getJobDescriptor(jobDescriptorId);
         if (jobDescriptor != null && !schedulerService.isStillScheduled(jobDescriptor)) {
             schedulerService.delete(jobDescriptor.getJobName());

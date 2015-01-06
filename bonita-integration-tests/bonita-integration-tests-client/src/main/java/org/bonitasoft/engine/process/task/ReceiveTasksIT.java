@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.actor.ActorCriterion;
 import org.bonitasoft.engine.bpm.actor.ActorInstance;
 import org.bonitasoft.engine.bpm.bar.BusinessArchive;
@@ -45,6 +45,7 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
+import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ReceiveTaskDefinitionBuilder;
 import org.bonitasoft.engine.bpm.process.impl.ThrowMessageEventTriggerBuilder;
@@ -64,34 +65,16 @@ import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author Julien Molinaro
  */
-public class ReceiveTasksIT extends CommonAPITest {
+public class ReceiveTasksIT extends TestWithUser {
 
     private static final String SEARCH_WAITING_EVENTS_COMMAND = "searchWaitingEventsCommand";
 
     private static final String SEARCH_OPTIONS_KEY = "searchOptions";
-
-    private User user = null;
-
-    @Before
-    public void setUp() throws Exception {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
-        user = getIdentityAPI().createUser("john", "bpm");
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        if (user != null) {
-            getIdentityAPI().deleteUser(user.getId());
-        }
-        logoutOnTenant();
-    }
 
     /*
      * 1 receiveProcess, no message sent
@@ -296,7 +279,7 @@ public class ReceiveTasksIT extends CommonAPITest {
         assertEquals(1, searchResult.getCount());
 
         getProcessAPI().cancelProcessInstance(receiveMessageProcessInstance.getId());
-        waitForProcessToFinish(receiveMessageProcessInstance, TestStates.CANCELLED);
+        waitForProcessToBeInState(receiveMessageProcessInstance, ProcessInstanceState.CANCELLED);
 
         searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(ArchivedActivityInstanceSearchDescriptor.ROOT_PROCESS_INSTANCE_ID, receiveMessageProcessInstance.getId());

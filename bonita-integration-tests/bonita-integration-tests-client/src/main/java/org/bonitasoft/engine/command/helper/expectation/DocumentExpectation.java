@@ -15,7 +15,7 @@ package org.bonitasoft.engine.command.helper.expectation;
 
 import static org.junit.Assert.assertEquals;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.bpm.document.Document;
 import org.bonitasoft.engine.bpm.document.DocumentNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -27,13 +27,13 @@ import org.bonitasoft.engine.bpm.process.ProcessInstance;
  */
 public class DocumentExpectation {
 
-    private CommonAPITest testCase;
+    private CommonAPIIT testCase;
 
     private ProcessInstance process;
 
     private String name;
 
-    public DocumentExpectation(CommonAPITest testCase, ProcessInstance process, String name) {
+    public DocumentExpectation(CommonAPIIT testCase, ProcessInstance process, String name) {
         this.testCase = testCase;
         this.process = process;
         this.name = name;

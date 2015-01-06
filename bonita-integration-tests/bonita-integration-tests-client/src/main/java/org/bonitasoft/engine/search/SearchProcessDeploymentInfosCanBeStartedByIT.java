@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.TestWithTechnicalUser;
 import org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder;
 import org.bonitasoft.engine.bpm.category.Category;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
@@ -39,7 +39,7 @@ import org.junit.Test;
 /**
  * @author Celine Souchet
  */
-public class SearchProcessDeploymentInfosCanBeStartedByIT extends CommonAPITest {
+public class SearchProcessDeploymentInfosCanBeStartedByIT extends TestWithTechnicalUser {
 
     private List<ProcessDefinition> enabledProcessDefinitions;
 
@@ -55,22 +55,11 @@ public class SearchProcessDeploymentInfosCanBeStartedByIT extends CommonAPITest 
 
     private List<UserMembership> userMemberships = null;
 
-    @After
-    public void afterTest() throws BonitaException {
-        disableAndDeleteProcess(enabledProcessDefinitions);
-        deleteProcess(disabledProcessDefinitions);
-        deleteCategories(categories);
-        deleteUserMemberships(userMemberships);
-        deleteUsers(users);
-        deleteGroups(groups);
-        deleteRoles(roles);
-
-        logoutOnTenant();
-    }
-
+    @Override
     @Before
-    public void beforeTest() throws BonitaException {
-        loginOnDefaultTenantWithDefaultTechnicalUser();
+    public void before() throws Exception {
+        super.before();
+
         // create users
         users = new ArrayList<User>(2);
         users.add(createUser("chicobento", "bpm"));
@@ -109,6 +98,19 @@ public class SearchProcessDeploymentInfosCanBeStartedByIT extends CommonAPITest 
         getProcessAPI().addProcessDefinitionToCategory(categories.get(1).getId(), enabledProcessDefinitions.get(2).getId());
         getProcessAPI().addProcessDefinitionToCategory(categories.get(1).getId(), enabledProcessDefinitions.get(1).getId());
         getProcessAPI().addProcessDefinitionToCategory(categories.get(2).getId(), enabledProcessDefinitions.get(3).getId());
+    }
+
+    @Override
+    @After
+    public void after() throws Exception {
+        disableAndDeleteProcess(enabledProcessDefinitions);
+        deleteProcess(disabledProcessDefinitions);
+        deleteCategories(categories);
+        deleteUserMemberships(userMemberships);
+        deleteUsers(users);
+        deleteGroups(groups);
+        deleteRoles(roles);
+        super.after();
     }
 
     @Test
