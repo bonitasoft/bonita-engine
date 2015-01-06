@@ -45,10 +45,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
-public class LogTest extends CommonAPISPTest {
+public class LogTest extends CommonAPISPIT {
 
     @After
     public void afterTest() throws Exception {

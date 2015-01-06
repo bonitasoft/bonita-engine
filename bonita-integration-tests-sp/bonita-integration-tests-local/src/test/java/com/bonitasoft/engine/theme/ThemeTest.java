@@ -23,7 +23,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.api.ThemeAPI;
 import com.bonitasoft.engine.theme.exception.RestoreThemeException;
 import com.bonitasoft.engine.theme.exception.SetThemeException;
@@ -31,7 +31,7 @@ import com.bonitasoft.engine.theme.exception.SetThemeException;
 /**
  * @author Celine Souchet
  */
-public class ThemeTest extends CommonAPISPTest {
+public class ThemeTest extends CommonAPISPIT {
 
     @After
     public void afterTest() throws BonitaException {

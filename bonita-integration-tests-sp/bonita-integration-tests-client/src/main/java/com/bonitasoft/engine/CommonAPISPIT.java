@@ -37,9 +37,9 @@ import com.bonitasoft.engine.platform.Tenant;
 
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializerSP.class)
-public abstract class CommonAPISPTest extends APITestSPUtil {
+public abstract class CommonAPISPIT extends APITestSPUtil {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommonAPISPTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonAPISPIT.class);
 
     @Rule
     public TestRule testWatcher = new TestWatcher() {
@@ -100,17 +100,24 @@ public abstract class CommonAPISPTest extends APITestSPUtil {
                 getTenantManagementAPI().resume();
             }
             messages.addAll(checkNoCommands());
+
+            messages.addAll(checkNoFlowNodes());
+            messages.addAll(checkNoArchivedFlowNodes());
+            messages.addAll(checkNoComments());
+            messages.addAll(checkNoArchivedComments());
+            messages.addAll(checkNoWaitingEvent());
+
+            messages.addAll(checkNoProcessIntances());
+            messages.addAll(checkNoArchivedProcessIntances());
+            messages.addAll(checkNoProcessDefinitions());
+
+            messages.addAll(checkNoCategories());
+
             messages.addAll(checkNoUsers());
             messages.addAll(checkNoGroups());
             messages.addAll(checkNoRoles());
-            messages.addAll(checkNoProcessDefinitions());
-            messages.addAll(checkNoProcessIntances());
-            messages.addAll(checkNoArchivedProcessIntances());
-            messages.addAll(checkNoFlowNodes());
-            messages.addAll(checkNoArchivedFlowNodes());
-            messages.addAll(checkNoCategories());
-            messages.addAll(checkNoComments());
-            messages.addAll(checkNoArchivedComments());
+            messages.addAll(checkNoSupervisors());
+
             messages.addAll(checkNoBreakpoints());
             messages.addAll(checkNoReports());
 

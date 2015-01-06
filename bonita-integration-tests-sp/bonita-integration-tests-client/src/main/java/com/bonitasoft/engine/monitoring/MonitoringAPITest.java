@@ -17,13 +17,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.api.MonitoringAPI;
 
 /**
  * @author Elias Ricken de Medeiros
  */
-public class MonitoringAPITest extends CommonAPISPTest {
+public class MonitoringAPITest extends CommonAPISPIT {
 
     @After
     public void afterTest() throws Exception {

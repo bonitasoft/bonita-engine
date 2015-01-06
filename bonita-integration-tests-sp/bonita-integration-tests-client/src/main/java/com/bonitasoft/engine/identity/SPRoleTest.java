@@ -19,10 +19,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.bonitasoft.engine.BPMTestSPUtil;
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
 
-public class SPRoleTest extends CommonAPISPTest {
+public class SPRoleTest extends CommonAPISPIT {
 
     private static APISession session;
 

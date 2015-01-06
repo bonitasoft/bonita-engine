@@ -28,11 +28,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
-public class MultiInstanceTest extends CommonAPISPTest {
+public class MultiInstanceIT extends CommonAPISPIT {
 
     private static final String JOHN = "john";
 
@@ -91,7 +91,7 @@ public class MultiInstanceTest extends CommonAPISPTest {
         }
 
         for (int i = 0; i < numberOfTaskToCompleteMI; i++) {
-            executeFlowNodeUntilEnd(pendingTasks.get(i).getId());
+            getProcessAPI().executeFlowNode(pendingTasks.get(i).getId());
         }
         Thread.sleep(200);
         checkNbPendingTaskOf(0, john);
