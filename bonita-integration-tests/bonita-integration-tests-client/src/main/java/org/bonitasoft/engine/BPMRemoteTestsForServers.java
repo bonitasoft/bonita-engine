@@ -1,6 +1,7 @@
 package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.accessors.TenantAccessorTest;
+import org.bonitasoft.engine.activity.PendingTasksIT;
 import org.bonitasoft.engine.command.AdvancedStartProcessCommandIT;
 import org.bonitasoft.engine.command.CommandIT;
 import org.bonitasoft.engine.command.web.ExternalCommandsTests;
@@ -11,7 +12,6 @@ import org.bonitasoft.engine.login.PlatformLoginAPIIT;
 import org.bonitasoft.engine.operation.OperationIT;
 import org.bonitasoft.engine.platform.command.PlatformCommandIT;
 import org.bonitasoft.engine.process.ProcessManagementIT;
-import org.bonitasoft.engine.process.task.PendingTasksIT;
 import org.bonitasoft.engine.profile.ProfileIT;
 import org.bonitasoft.engine.search.SearchProcessInstanceIT;
 import org.bonitasoft.engine.supervisor.ProcessSupervisedIT;

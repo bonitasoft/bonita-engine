@@ -14,7 +14,6 @@ import org.bonitasoft.engine.bpm.comment.ArchivedCommentsSearchDescriptor;
 import org.bonitasoft.engine.bpm.comment.Comment;
 import org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -40,10 +39,10 @@ public class SearchCommentIT extends TestWithUser {
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("userTask1", ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance activityInstance = waitForUserTask("userTask1", processInstance);
+        final long userTask1Id = waitForUserTask(processInstance, "userTask1");
         final String commentContent1 = "commentContent1";
         getProcessAPI().addProcessComment(processInstance.getId(), commentContent1);
-        assignAndExecuteStep(activityInstance, user.getId());
+        assignAndExecuteStep(userTask1Id, user);
         waitForProcessToFinish(processInstance);
         final SearchOptionsBuilder builder2 = new SearchOptionsBuilder(0, 10);
         builder2.filter(ArchivedCommentsSearchDescriptor.PROCESS_INSTANCE_ID, processInstance.getId());
@@ -77,7 +76,7 @@ public class SearchCommentIT extends TestWithUser {
 
         // create a ProcessInstance
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask(activityName, processInstance);
+        waitForUserTask(processInstance, activityName);
 
         // add an comment to ProcessInstance
         getProcessAPI().addProcessComment(processInstance.getId(), commentContent);
@@ -202,8 +201,8 @@ public class SearchCommentIT extends TestWithUser {
         // create a ProcessInstance
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("userTask1", processInstance);
-        waitForUserTask("userTask1", processInstance2);
+        waitForUserTask(processInstance, "userTask1");
+        waitForUserTask(processInstance2, "userTask1");
 
         // add an comment to ProcessInstance
         final String commentContent1 = "commentContent1";
@@ -273,8 +272,8 @@ public class SearchCommentIT extends TestWithUser {
 
         final ProcessInstance instance1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance instance2 = getProcessAPI().startProcess(john.getId(), processDefinition.getId());
-        waitForUserTaskAndAssigneIt("userTask1", instance1, jack);
-        waitForUserTaskAndAssigneIt("userTask2", instance1, jack);
+        waitForUserTaskAndAssigneIt(instance1, "userTask1", jack);
+        waitForUserTaskAndAssigneIt(instance1, "userTask2", jack);
 
         logoutOnTenant();
         loginOnDefaultTenantWith(jackUserName, PASSWORD);
@@ -330,8 +329,8 @@ public class SearchCommentIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, john);
 
         final ProcessInstance pi1 = getProcessAPI().startProcess(steven.getId(), processDefinition.getId());
-        waitForUserTaskAndAssigneIt("userTask1", pi1, john);
-        waitForUserTaskAndAssigneIt("userTask2", pi1, john);
+        waitForUserTaskAndAssigneIt(pi1, "userTask1", john);
+        waitForUserTaskAndAssigneIt(pi1, "userTask2", john);
 
         getProcessAPI().addProcessComment(pi1.getId(), "John's comment Content1");
         getProcessAPI().addProcessComment(pi1.getId(), "John's comment Content2");
@@ -348,7 +347,7 @@ public class SearchCommentIT extends TestWithUser {
         loginOnDefaultTenantWith(stevenUserName, PASSWORD);
 
         final ProcessInstance pi3 = getProcessAPI().startProcess(steven.getId(), processDefinition.getId());
-        waitForUserTaskAndAssigneIt("userTask1", pi3, john);
+        waitForUserTaskAndAssigneIt(pi3, "userTask1", john);
         final String commentContent5 = "Steven's comment Content5";
         getProcessAPI().addProcessComment(pi3.getId(), commentContent5);
 

@@ -25,7 +25,6 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoSearchDescriptor;
-import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -43,12 +42,9 @@ public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksIT exten
 
     private List<User> users = null;
 
-    private ProcessSupervisor supervisor;
-
     @Override
     @After
     public void after() throws Exception {
-        deleteSupervisor(supervisor);
         disableAndDeleteProcess(enabledProcessDefinitions);
         deleteUsers(users);
         super.after();
@@ -66,8 +62,6 @@ public class SearchProcessDeploymentInfosWithAssignedOrPendingHumanTasksIT exten
         // create processes
         enabledProcessDefinitions = new ArrayList<ProcessDefinition>(4);
         createProcessesDefinitions();
-
-        supervisor = getProcessAPI().createProcessSupervisorForUser(enabledProcessDefinitions.get(0).getId(), users.get(0).getId());
     }
 
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.PROCESS, keywords = { "Supervisor", "Assignee", "Pending", "Task", "Process definition" }, jira = "BS-1635")

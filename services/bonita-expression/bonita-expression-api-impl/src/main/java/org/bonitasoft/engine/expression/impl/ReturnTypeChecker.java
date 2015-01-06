@@ -39,7 +39,7 @@ public class ReturnTypeChecker {
      *        the evaluated expression
      * @param result
      *        the expression result to check
-     * @throws SInvalidExpressionException
+     * @throws SExpressionEvaluationException
      *         if the condition is not fulfilled, does nothing otherwise
      */
     public void checkReturnType(final SExpression expression, final Object result, final Map<String, Object> context) throws SExpressionEvaluationException {

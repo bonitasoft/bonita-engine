@@ -76,7 +76,7 @@ public class SearchProcessDefinitionIT extends TestWithUser {
                 Arrays.asList(true, true));
         enabledProcessDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition1, ACTOR_NAME, user));
         final ProcessInstance pi1 = getProcessAPI().startProcess(userId, enabledProcessDefinitions.get(0).getId());
-        waitForUserTask("step1", pi1);
+        waitForUserTask(pi1, "step1");
 
         // create process2
         final DesignProcessDefinition designProcessDefinition2 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps("My_Process2",
@@ -84,7 +84,7 @@ public class SearchProcessDefinitionIT extends TestWithUser {
                 Arrays.asList("step1", "step2"), Arrays.asList(true, true));
         enabledProcessDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition2, ACTOR_NAME, user));
         final ProcessInstance pi2 = getProcessAPI().startProcess(userId, enabledProcessDefinitions.get(1).getId());
-        waitForUserTask("step1", pi2);
+        waitForUserTask(pi2, "step1");
 
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 5);
         builder.sort(ProcessDeploymentInfoSearchDescriptor.ID, Order.ASC);

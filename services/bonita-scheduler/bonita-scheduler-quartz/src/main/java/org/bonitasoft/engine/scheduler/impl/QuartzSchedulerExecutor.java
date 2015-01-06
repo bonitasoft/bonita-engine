@@ -289,18 +289,8 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
         try {
             checkSchedulerState();
             final JobKey jobKey = jobKey(jobName, groupName);
+            scheduler.pauseJob(jobKey);
             return scheduler.deleteJob(jobKey);
-        } catch (final SchedulerException e) {
-            throw new SSchedulerException(e);
-        }
-    }
-
-    @Override
-    public boolean isExistingJob(final String jobName, final String groupName) throws SSchedulerException {
-        try {
-            checkSchedulerState();
-            final JobKey jobKey = jobKey(jobName, groupName);
-            return scheduler.getJobDetail(jobKey) != null;
         } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         }
@@ -312,8 +302,20 @@ public class QuartzSchedulerExecutor implements SchedulerExecutor {
             checkSchedulerState();
             final Set<JobKey> jobNames = scheduler.getJobKeys(jobGroupEquals(groupName));
             for (final JobKey jobKey : jobNames) {
+                scheduler.pauseJob(jobKey);
                 scheduler.deleteJob(jobKey);
             }
+        } catch (final SchedulerException e) {
+            throw new SSchedulerException(e);
+        }
+    }
+
+    @Override
+    public boolean isExistingJob(final String jobName, final String groupName) throws SSchedulerException {
+        try {
+            checkSchedulerState();
+            final JobKey jobKey = jobKey(jobName, groupName);
+            return scheduler.getJobDetail(jobKey) != null;
         } catch (final SchedulerException e) {
             throw new SSchedulerException(e);
         }

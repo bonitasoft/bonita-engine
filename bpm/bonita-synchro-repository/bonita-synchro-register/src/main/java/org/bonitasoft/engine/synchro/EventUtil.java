@@ -18,11 +18,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 
 /**
  * Utility methods to get maps that match process as wanted
- * 
+ *
  * @author Baptiste Mesta
  */
 public class EventUtil {
@@ -48,7 +49,7 @@ public class EventUtil {
     private static final String STATE = "state";
 
     public static Map<String, Serializable> getEventForProcess(final SProcessInstance instance) {
-        final HashMap<String, Serializable> map = new HashMap<String, Serializable>(4);
+        final Map<String, Serializable> map = new HashMap<String, Serializable>(4);
         map.put(TYPE, PROCESS);
         map.put(ID, instance.getId());
         map.put(STATE_ID, instance.getStateId());
@@ -58,7 +59,7 @@ public class EventUtil {
     }
 
     public static Map<String, Serializable> getEventForFlowNode(final SFlowNodeInstance flowNodeInstance) {
-        final HashMap<String, Serializable> map = new HashMap<String, Serializable>(5);
+        final Map<String, Serializable> map = new HashMap<String, Serializable>(5);
         map.put(TYPE, FLOW_NODE);
         map.put(ID, flowNodeInstance.getId());
         map.put(ROOT_CONTAINER_ID, flowNodeInstance.getRootContainerId());
