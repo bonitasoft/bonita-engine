@@ -28,13 +28,13 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.junit.After;
 import org.junit.Before;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 
 /**
  * @author Baptiste Mesta
  * @author Celine Souchet
  */
-public abstract class ConnectorExecutionTest extends CommonAPISPTest {
+public abstract class ConnectorExecutionTest extends CommonAPISPIT {
 
     public static final String DEFAULT_EXTERNAL_CONNECTOR_ID = "org.bonitasoft.connector.testExternalConnector";
 

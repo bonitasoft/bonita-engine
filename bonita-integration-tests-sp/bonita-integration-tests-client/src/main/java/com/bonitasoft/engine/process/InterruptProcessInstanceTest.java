@@ -18,9 +18,9 @@ import org.bonitasoft.engine.identity.User;
 import org.junit.After;
 import org.junit.Before;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 
-public class InterruptProcessInstanceTest extends CommonAPISPTest {
+public class InterruptProcessInstanceTest extends CommonAPISPIT {
 
     protected User pedro;
 

@@ -14,11 +14,9 @@ import static org.junit.Assert.assertNotNull;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.EventInstance;
@@ -27,7 +25,6 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
 import org.bonitasoft.engine.test.TestStates;
-import org.bonitasoft.engine.test.check.CheckNbOfActivities;
 import org.bonitasoft.engine.test.wait.WaitForEvent;
 import org.junit.Test;
 
@@ -58,11 +55,8 @@ public class CancelProcessInstanceTest extends InterruptProcessInstanceTest {
         final Long breakpointId2 = (Long) getCommandAPI().execute("addBreakpoint", parameters2);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final CheckNbOfActivities checkNbOfInterrupted = checkNbOfActivitiesInInterruptingState(processInstance, 2);
-
-        final Iterator<ActivityInstance> iterator = checkNbOfInterrupted.getResult().iterator();
-        final ActivityInstance task1 = iterator.next();
-        final ActivityInstance task2 = iterator.next();
+        final FlowNodeInstance task1 = waitForFlowNodeInInterruptingState(processInstance, taskName1, true);
+        final FlowNodeInstance task2 = waitForFlowNodeInInterruptingState(processInstance, taskName2, true);
 
         getProcessAPI().cancelProcessInstance(processInstance.getId());
 

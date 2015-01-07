@@ -22,9 +22,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 
-public class SupervisorTest extends CommonAPISPTest {
+public class SupervisorTest extends CommonAPISPIT {
 
     @Before
     public void before() throws Exception {

@@ -8,9 +8,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
@@ -28,8 +25,6 @@ import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class JPABusinessDataRepositoryImplTest {
-
-    private static final long PRIMARY_KEY_2 = 20L;
 
     private static final long PRIMARY_KEY_1 = 1L;
 
@@ -76,21 +71,6 @@ public class JPABusinessDataRepositoryImplTest {
         repository.findById(Address.class, null);
     }
 
-    @Test
-    public void findByIds_should_not_detach_entities() throws Exception {
-        final List<Address> addresses = new ArrayList<Address>();
-        final Address address1 = new Address(PRIMARY_KEY_1);
-        final Address address2 = new Address(PRIMARY_KEY_2);
-        addresses.add(address1);
-        addresses.add(address2);
-        when(manager.find(Address.class, PRIMARY_KEY_1)).thenReturn(address1);
-        when(manager.find(Address.class, PRIMARY_KEY_2)).thenReturn(address2);
-
-        final List<Address> results = repository.findByIds(Address.class, Arrays.asList(PRIMARY_KEY_1, PRIMARY_KEY_2, 3L));
-
-        assertThat(results).isEqualTo(addresses);
-        verify(manager, never()).detach(any(Address.class));
-    }
 
     class Address implements Entity {
 
