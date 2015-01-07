@@ -8,30 +8,15 @@
  *******************************************************************************/
 package com.bonitasoft.engine.command;
 
-import static net.javacrumbs.jsonunit.assertj.JsonAssert.assertThatJson;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.io.Writer;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.bonitasoft.engine.business.data.BusinessDataService;
-import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
-import com.bonitasoft.engine.pojo.Address;
-import com.bonitasoft.engine.pojo.Client;
-import com.bonitasoft.engine.pojo.Country;
-import net.javacrumbs.jsonunit.assertj.JsonAssert;
-
-import org.apache.commons.io.IOUtils;
-import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.command.SCommandExecutionException;
-import org.bonitasoft.engine.command.SCommandParameterizationException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,17 +24,11 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
+import com.bonitasoft.engine.business.data.BusinessDataService;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
+import com.bonitasoft.engine.business.data.SBusinessDataRepositoryException;
 import com.bonitasoft.engine.operation.pojo.Travel;
-import com.bonitasoft.engine.pojo.AddressBook;
-import com.bonitasoft.engine.pojo.Command;
-import com.bonitasoft.engine.pojo.CommandLine;
-import com.bonitasoft.engine.pojo.NameList;
-import com.bonitasoft.engine.pojo.Product;
 import com.bonitasoft.engine.service.TenantServiceAccessor;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GetBusinessDataByIdCommandTest {
