@@ -97,6 +97,9 @@ public class ProcessManagementTest extends CommonAPISPIT {
         skipTask(newManualTask2.getId());
         waitForFlowNodeInState(processInstance, "newManualTask2", TestStates.SKIPPED, true);
 
+        getProcessAPI().executeFlowNode(parentTask.getId());
+        waitForProcessToFinish(processInstance);
+
         // filter the sub tasks
         final SearchOptionsBuilder searchhBuilder = new SearchOptionsBuilder(0, 10);
         searchhBuilder.filter(ArchivedHumanTaskInstanceSearchDescriptor.PARENT_ACTIVITY_INSTANCE_ID, parentTask.getId());
