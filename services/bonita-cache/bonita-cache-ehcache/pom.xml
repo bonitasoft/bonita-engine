@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-cache</artifactId>
 		<groupId>org.bonitasoft.engine.cache</groupId>
-		<version>6.4.1-SNAPSHOT</version>
+		<version>6.4.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-cache-ehcache</artifactId>
