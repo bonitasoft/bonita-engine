@@ -934,8 +934,6 @@ public class BDRepositoryIT extends CommonAPISPIT {
 
         waitForUserTask(instance,"step2");
         final String employeeToString = getEmployeesToString("myEmployees", instance.getId());
-        assertThat(employeeToString).isEqualTo("Employee [firstName=[Jane, John], lastName=[Smith, Smith]]");
-
         assertThat(firstNames(employeeToString)).containsOnlyOnce("Jane", "John");
         assertThat(lastNames(employeeToString)).containsExactly("Smith", "Smith");
 
