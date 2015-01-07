@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeoutException;
 
 import org.bonitasoft.engine.api.CommandAPI;
 import org.bonitasoft.engine.api.IdentityAPI;
@@ -58,13 +59,11 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.ArchivedHumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.FlowNodeExecutionException;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.WaitingEvent;
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
@@ -115,10 +114,8 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.InvalidSessionException;
-import org.bonitasoft.engine.test.check.CheckNbOfActivities;
 import org.bonitasoft.engine.test.check.CheckNbOfArchivedActivities;
 import org.bonitasoft.engine.test.check.CheckNbOfArchivedActivityInstances;
-import org.bonitasoft.engine.test.check.CheckNbOfHumanTasks;
 import org.bonitasoft.engine.test.check.CheckNbOfOpenActivities;
 import org.bonitasoft.engine.test.check.CheckNbOfProcessInstances;
 import org.bonitasoft.engine.test.check.CheckNbPendingTaskOf;
@@ -129,7 +126,6 @@ import org.bonitasoft.engine.test.wait.WaitForDataValue;
 import org.bonitasoft.engine.test.wait.WaitForEvent;
 import org.bonitasoft.engine.test.wait.WaitForFinalArchivedActivity;
 import org.bonitasoft.engine.test.wait.WaitForPendingTasks;
-import org.bonitasoft.engine.test.wait.WaitProcessToFinishAndBeArchived;
 import org.junit.After;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -716,44 +712,93 @@ public class APITestUtil extends PlatformTestUtil {
         assignAndExecuteStep(activityInstance.getId(), user.getId());
     }
 
+    public void assignAndExecuteStep(final long activityInstanceId, final User user) throws BonitaException {
+        assignAndExecuteStep(activityInstanceId, user.getId());
+    }
+
     public void assignAndExecuteStep(final long activityInstanceId, final long userId) throws BonitaException {
         getProcessAPI().assignUserTask(activityInstanceId, userId);
-        executeFlowNodeUntilEnd(activityInstanceId);
+        getProcessAPI().executeFlowNode(activityInstanceId);
     }
 
-    public void executeFlowNodeUntilEnd(final long flowNodeId) throws FlowNodeExecutionException {
-        getProcessAPI().executeFlowNode(flowNodeId);
+    public HumanTaskInstance waitForUserTaskAndExecuteAndGetIt(final String taskName, final User user) throws Exception {
+        final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(taskName);
+        assignAndExecuteStep(humanTaskInstance, user);
+        return humanTaskInstance;
     }
 
-    public HumanTaskInstance waitForUserTask(final String taskName, final ProcessInstance processInstance) throws Exception {
-        return waitForUserTask(taskName, processInstance.getId(), DEFAULT_TIMEOUT);
+    public long waitForUserTaskAndExecuteIt(final String taskName, final User user) throws Exception {
+        final long humanTaskInstanceId = waitForUserTask(taskName);
+        assignAndExecuteStep(humanTaskInstanceId, user);
+        return humanTaskInstanceId;
     }
 
-    public HumanTaskInstance waitForUserTask(final String taskName, final long processInstanceId) throws Exception {
-        return waitForUserTask(taskName, processInstanceId, DEFAULT_TIMEOUT);
+    public HumanTaskInstance waitForUserTaskAndExecuteAndGetIt(final ProcessInstance processInstance, final String taskName, final User user) throws Exception {
+        final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(processInstance.getId(), taskName, DEFAULT_TIMEOUT);
+        assignAndExecuteStep(humanTaskInstance, user);
+        return humanTaskInstance;
     }
 
-    private HumanTaskInstance waitForUserTask(final String taskName, final long processInstanceId, final int timeout) throws Exception {
+    public long waitForUserTaskAndExecuteIt(final ProcessInstance processInstance, final String taskName, final User user) throws Exception {
+        final long humanTaskInstanceId = waitForUserTask(processInstance.getId(), taskName, DEFAULT_TIMEOUT);
+        assignAndExecuteStep(humanTaskInstanceId, user);
+        return humanTaskInstanceId;
+    }
+
+    public HumanTaskInstance waitForUserTaskAndAssigneIt(final String taskName, final User user) throws Exception,
+            UpdateException {
+        final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(taskName);
+        getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
+        return humanTaskInstance;
+    }
+
+    public HumanTaskInstance waitForUserTaskAndAssigneIt(final ProcessInstance processInstance, final String taskName, final User user) throws Exception,
+            UpdateException {
+        final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(processInstance.getId(), taskName);
+        getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
+        return humanTaskInstance;
+    }
+
+    public HumanTaskInstance waitForUserTaskAndGetIt(final ProcessInstance processInstance, final String taskName) throws Exception {
+        return waitForUserTaskAndGetIt(processInstance.getId(), taskName, DEFAULT_TIMEOUT);
+    }
+
+    public HumanTaskInstance waitForUserTaskAndGetIt(final long processInstanceId, final String taskName) throws Exception {
+        return waitForUserTaskAndGetIt(processInstanceId, taskName, DEFAULT_TIMEOUT);
+    }
+
+    public HumanTaskInstance waitForUserTaskAndGetIt(final String taskName) throws Exception {
+        return waitForUserTaskAndGetIt(-1, taskName, DEFAULT_TIMEOUT);
+    }
+
+    public long waitForUserTask(final ProcessInstance processInstance, final String taskName) throws Exception {
+        return waitForUserTask(processInstance.getId(), taskName, DEFAULT_TIMEOUT);
+    }
+
+    public long waitForUserTask(final long processInstanceId, final String taskName) throws Exception {
+        return waitForUserTask(processInstanceId, taskName, DEFAULT_TIMEOUT);
+    }
+
+    public long waitForUserTask(final String taskName) throws Exception {
+        return waitForUserTask(-1, taskName, DEFAULT_TIMEOUT);
+    }
+
+    private HumanTaskInstance waitForUserTaskAndGetIt(final long processInstanceId, final String taskName, final int timeout) throws Exception {
+        final long activityInstanceId = waitForUserTask(processInstanceId, taskName, timeout);
+        final HumanTaskInstance getHumanTaskInstance = getHumanTaskInstance(activityInstanceId);
+        assertNotNull(getHumanTaskInstance);
+        return getHumanTaskInstance;
+    }
+
+    private long waitForUserTask(final long processInstanceId, final String taskName, final int timeout) throws CommandNotFoundException,
+            CommandParameterizationException, CommandExecutionException, TimeoutException {
         final Map<String, Serializable> readyTaskEvent;
         if (processInstanceId > 0) {
             readyTaskEvent = ClientEventUtil.getReadyFlowNodeEvent(processInstanceId, taskName);
         } else {
             readyTaskEvent = ClientEventUtil.getReadyFlowNodeEvent(taskName);
         }
-        final Long activityInstanceId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(), readyTaskEvent, timeout);
-        final HumanTaskInstance getHumanTaskInstance = getHumanTaskInstance(activityInstanceId);
-        assertNotNull(getHumanTaskInstance);
-        return getHumanTaskInstance;
-    }
-
-    public HumanTaskInstance waitForUserTask(final String taskName) throws Exception {
-        return waitForUserTask(taskName, -1, DEFAULT_TIMEOUT);
-    }
-
-    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final User user) throws Exception {
-        final HumanTaskInstance humanTaskInstance = waitForUserTask(taskName);
-        assignAndExecuteStep(humanTaskInstance, user.getId());
-        return humanTaskInstance;
+        return ClientEventUtil.executeWaitServerCommand(getCommandAPI(), readyTaskEvent, timeout);
     }
 
     private HumanTaskInstance getHumanTaskInstance(final Long id) throws ActivityInstanceNotFoundException, RetrieveException {
@@ -800,7 +845,7 @@ public class APITestUtil extends PlatformTestUtil {
 
     public StartProcessUntilStep startProcessAndWaitForTask(final long processDefinitionId, final String taskName) throws Exception {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinitionId);
-        final ActivityInstance task = waitForUserTask(taskName, processInstance.getId());
+        final ActivityInstance task = waitForUserTaskAndGetIt(processInstance.getId(), taskName);
         return new StartProcessUntilStep(processInstance, task);
     }
 
@@ -821,14 +866,6 @@ public class APITestUtil extends PlatformTestUtil {
         final ArchivedHumanTaskInstance saUserTaskInstance = waitUntil.getArchivedTask();
         assertEquals(displayName, saUserTaskInstance.getDisplayName());
         assertEquals(displayDescription, saUserTaskInstance.getDisplayDescription());
-    }
-
-    @Deprecated
-    private void waitForProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance, final TestStates state)
-            throws Exception {
-        final WaitProcessToFinishAndBeArchived waitProcessToFinishAndBeArchived = new WaitProcessToFinishAndBeArchived(repeatEach, timeout, false,
-                processInstance, getProcessAPI(), state);
-        assertTrue(waitProcessToFinishAndBeArchived.waitUntil());
     }
 
     public void waitForProcessToFinish(final ProcessInstance processInstance) throws Exception {
@@ -857,17 +894,6 @@ public class APITestUtil extends PlatformTestUtil {
                 DEFAULT_TIMEOUT);
     }
 
-    @Deprecated
-    private boolean waitProcessToFinishAndBeArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance) throws Exception {
-        final boolean waitUntil = new WaitProcessToFinishAndBeArchived(repeatEach, timeout, processInstance, processAPI).waitUntil();
-        if (!waitUntil) {
-            printFlowNodes(processInstance);
-            printArchivedFlowNodes(processInstance);
-        }
-        assertTrue("Process was not finished", waitUntil);
-        return waitUntil;
-    }
-
     protected void printArchivedFlowNodes(final ProcessInstance processInstance) throws SearchException {
         System.err.println("Archived flownodes: ");
         final List<ArchivedFlowNodeInstance> archivedFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(
@@ -882,11 +908,6 @@ public class APITestUtil extends PlatformTestUtil {
                 new SearchOptionsBuilder(0, 100).filter(FlowNodeInstanceSearchDescriptor.PARENT_PROCESS_INSTANCE_ID, processInstance.getId()).done())
                 .getResult();
         System.err.println(flownodes);
-    }
-
-    @Deprecated
-    public boolean waitForProcessToFinishAndBeArchived(final ProcessInstance processInstance) throws Exception {
-        return waitProcessToFinishAndBeArchived(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance);
     }
 
     private Long waitForFlowNode(final long processInstanceId, final TestStates state, final String flowNodeName, final boolean useRootProcessInstance,
@@ -971,19 +992,6 @@ public class APITestUtil extends PlatformTestUtil {
         return getFlowNodeInstance(flowNodeInstanceId);
     }
 
-    public HumanTaskInstance waitForUserTaskAndExecuteIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception {
-        final HumanTaskInstance humanTaskInstance = waitForUserTask(taskName, processInstance.getId(), DEFAULT_TIMEOUT);
-        assignAndExecuteStep(humanTaskInstance, user.getId());
-        return humanTaskInstance;
-    }
-
-    public HumanTaskInstance waitForUserTaskAndAssigneIt(final String taskName, final ProcessInstance processInstance, final User user) throws Exception,
-            UpdateException {
-        final HumanTaskInstance humanTaskInstance = waitForUserTask(taskName, processInstance.getId());
-        getProcessAPI().assignUserTask(humanTaskInstance.getId(), user.getId());
-        return humanTaskInstance;
-    }
-
     public GatewayInstance waitForGateway(final ProcessInstance processInstance, final String name) throws Exception {
         final Map<String, Serializable> readyTaskEvent = ClientEventUtil.getFlowNode(processInstance.getId(), name);
         final Long activityInstanceId = ClientEventUtil.executeWaitServerCommand(getCommandAPI(), readyTaskEvent, DEFAULT_REPEAT_EACH * DEFAULT_TIMEOUT);
@@ -1016,16 +1024,6 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     @Deprecated
-    public WaitForEvent waitForEventInWaitingState(final long processInstanceId, final String eventName) throws Exception {
-        return waitForEvent(processInstanceId, eventName, TestStates.WAITING);
-    }
-
-    @Deprecated
-    public WaitForEvent waitForEvent(final long processInstanceId, final String eventName, final TestStates state) throws Exception {
-        return waitForEvent(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstanceId, eventName, state);
-    }
-
-    @Deprecated
     public WaitForEvent waitForEvent(final ProcessInstance processInstance, final String eventName, final TestStates state) throws Exception {
         return waitForEvent(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance.getId(), eventName, state);
     }
@@ -1036,18 +1034,6 @@ public class APITestUtil extends PlatformTestUtil {
         final WaitForEvent waitForEvent = new WaitForEvent(repeatEach, timeout, eventName, processInstanceId, state, getProcessAPI());
         assertTrue("Expected 1 activities in " + state + " state", waitForEvent.waitUntil());
         return waitForEvent;
-    }
-
-    public List<ProcessDefinition> createNbProcessDefinitionWithHumanAndAutomaticAndDeployWithActor(final int nbProcess, final User user,
-            final List<String> stepNames, final List<Boolean> isHuman) throws InvalidProcessDefinitionException, BonitaException {
-        final List<ProcessDefinition> processDefinitions = new ArrayList<ProcessDefinition>();
-        final List<DesignProcessDefinition> designProcessDefinitions = BuildTestUtil.buildNbProcessDefinitionWithHumanAndAutomatic(nbProcess, stepNames,
-                isHuman);
-
-        for (final DesignProcessDefinition designProcessDefinition : designProcessDefinitions) {
-            processDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition, BuildTestUtil.ACTOR_NAME, user));
-        }
-        return processDefinitions;
     }
 
     @Deprecated
@@ -1095,25 +1081,6 @@ public class APITestUtil extends PlatformTestUtil {
     }
 
     @Deprecated
-    public CheckNbOfActivities checkNbOfActivitiesInReadyState(final ProcessInstance processInstance, final int nbActivities) throws Exception {
-        return checkNbOfActivitiesInInterruptingState(processInstance, nbActivities, TestStates.READY);
-    }
-
-    @Deprecated
-    public CheckNbOfActivities checkNbOfActivitiesInInterruptingState(final ProcessInstance processInstance, final int nbActivities) throws Exception {
-        return checkNbOfActivitiesInInterruptingState(processInstance, nbActivities, TestStates.INTERRUPTED);
-    }
-
-    @Deprecated
-    public CheckNbOfActivities checkNbOfActivitiesInInterruptingState(final ProcessInstance processInstance, final int nbActivities, final TestStates state)
-            throws Exception {
-        final CheckNbOfActivities checkNbOfActivities = new CheckNbOfActivities(getProcessAPI(), DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, false, processInstance,
-                nbActivities, state);
-        assertTrue("Expected " + nbActivities + " activities in " + state + " state", checkNbOfActivities.waitUntil());
-        return checkNbOfActivities;
-    }
-
-    @Deprecated
     public void checkProcessInstanceIsArchived(final ProcessInstance processInstance) throws Exception {
         checkProcessInstanceIsArchived(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance);
     }
@@ -1121,21 +1088,6 @@ public class APITestUtil extends PlatformTestUtil {
     @Deprecated
     private void checkProcessInstanceIsArchived(final int repeatEach, final int timeout, final ProcessInstance processInstance) throws Exception {
         assertTrue(new CheckProcessInstanceIsArchived(repeatEach, timeout, processInstance.getId(), getProcessAPI()).waitUntil());
-    }
-
-    @Deprecated
-    public CheckNbOfHumanTasks checkNbOfHumanTasks(final int nbHumanTaks) throws Exception {
-        return checkNbOfHumanTasks(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, nbHumanTaks);
-    }
-
-    @Deprecated
-    private CheckNbOfHumanTasks checkNbOfHumanTasks(final int repeatEach, final int timeout, final int nbHumanTaks) throws Exception {
-        final CheckNbOfHumanTasks checkNbOfHumanTasks = new CheckNbOfHumanTasks(repeatEach, timeout, false, nbHumanTaks, new SearchOptionsBuilder(0, 15)
-                .filter(HumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.READY_STATE).sort(HumanTaskInstanceSearchDescriptor.NAME, Order.DESC)
-                .done(), getProcessAPI());
-        final boolean waitUntil = checkNbOfHumanTasks.waitUntil();
-        assertTrue("Expected " + nbHumanTaks + " Human tasks in ready state, but found " + checkNbOfHumanTasks.getHumanTaskInstances().getCount(), waitUntil);
-        return checkNbOfHumanTasks;
     }
 
     @Deprecated
@@ -1306,7 +1258,7 @@ public class APITestUtil extends PlatformTestUtil {
                 if (ActivationState.ENABLED.equals(processDeploymentInfo.getActivationState())) {
                     getProcessAPI().disableProcess(processDeploymentInfo.getProcessId());
                 }
-                getProcessAPI().deleteProcess(processDeploymentInfo.getProcessId());
+                getProcessAPI().deleteProcessDefinition(processDeploymentInfo.getProcessId());
             }
             messages.add(processBuilder.toString());
         }
@@ -1550,6 +1502,18 @@ public class APITestUtil extends PlatformTestUtil {
         }
         assertNotNull(archivedDataInstance);
         return archivedDataInstance;
+    }
+
+    public List<ProcessDefinition> createNbProcessDefinitionWithHumanAndAutomaticAndDeployWithActor(final int nbProcess, final User user,
+            final List<String> stepNames, final List<Boolean> isHuman) throws InvalidProcessDefinitionException, BonitaException {
+        final List<ProcessDefinition> processDefinitions = new ArrayList<ProcessDefinition>();
+        final List<DesignProcessDefinition> designProcessDefinitions = BuildTestUtil.buildNbProcessDefinitionWithHumanAndAutomatic(nbProcess, stepNames,
+                isHuman);
+
+        for (final DesignProcessDefinition designProcessDefinition : designProcessDefinitions) {
+            processDefinitions.add(deployAndEnableProcessWithActor(designProcessDefinition, BuildTestUtil.ACTOR_NAME, user));
+        }
+        return processDefinitions;
     }
 
 }

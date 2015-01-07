@@ -25,7 +25,6 @@ import org.bonitasoft.engine.api.ProcessManagementAPI;
 import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.data.DataNotFoundException;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceState;
@@ -49,20 +48,19 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
     public void evaluateExpressionsOnLoopUserTaskInSupProcess() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithSignalEventSubProcess(false, true);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance);
+        waitForUserTask(processInstance, PARENT_PROCESS_USER_TASK_NAME);
         checkNumberOfWaitingEvents(SUB_PROCESS_START_NAME, 1);
 
         // send signal to start event sub process
         getProcessAPI().sendSignal(SIGNAL_NAME);
 
         waitForFlowNodeInExecutingState(processInstance, SUB_PROCESS_NAME, false);
-        final ActivityInstance subStep = waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance);
+        final long subStepId = waitForUserTask(processInstance, SUB_PROCESS_USER_TASK_NAME);
 
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>();
-        final String dataName = "content";
-        expressions.put(new ExpressionBuilder().createDataExpression(dataName, String.class.getName()), new HashMap<String, Serializable>(0));
-        final Map<String, Serializable> expressionResults = getProcessAPI().evaluateExpressionsOnActivityInstance(subStep.getId(), expressions);
-        assertEquals("childActivityVar", expressionResults.get(dataName));
+        expressions.put(new ExpressionBuilder().createDataExpression(SHORT_DATA_NAME, String.class.getName()), new HashMap<String, Serializable>(0));
+        final Map<String, Serializable> expressionResults = getProcessAPI().evaluateExpressionsOnActivityInstance(subStepId, expressions);
+        assertEquals("childActivityVar", expressionResults.get(SHORT_DATA_NAME));
 
         disableAndDeleteProcess(process);
     }
@@ -75,7 +73,7 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
 
         // when
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        final HumanTaskInstance step1 = waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance);
+        final long step1Id = waitForUserTask(processInstance, PARENT_PROCESS_USER_TASK_NAME);
 
         // then
         List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
@@ -84,8 +82,8 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
 
         // when
         getProcessAPI().sendSignal(SIGNAL_NAME);
-        waitForArchivedActivity(step1.getId(), TestStates.ABORTED);
-        final ActivityInstance subStep = waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance);
+        waitForArchivedActivity(step1Id, TestStates.ABORTED);
+        final ActivityInstance subStep = waitForUserTaskAndGetIt(processInstance, SUB_PROCESS_USER_TASK_NAME);
 
         // then
         checkNumberOfWaitingEvents(SUB_PROCESS_START_NAME, 0);
@@ -113,12 +111,12 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
     public void signalEventSubProcessTriggeredWithIntermediateThrowEvent() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithSignalEventSubProcess(true, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        final ActivityInstance step1 = waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance);
+        final long step1Id = waitForUserTask(processInstance, PARENT_PROCESS_USER_TASK_NAME);
         checkNumberOfWaitingEvents(SUB_PROCESS_START_NAME, 1);
 
-        assignAndExecuteStep(step1.getId(), user.getId());
+        assignAndExecuteStep(step1Id, user);
 
-        waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance);
+        waitForUserTask(processInstance, SUB_PROCESS_USER_TASK_NAME);
 
         disableAndDeleteProcess(process);
     }
@@ -128,14 +126,14 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
     public void signalEventSubProcessNotTriggered() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithSignalEventSubProcess(false, false);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        final ActivityInstance step1 = waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance);
+        final long step1Id = waitForUserTask(processInstance, PARENT_PROCESS_USER_TASK_NAME);
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
         assertEquals(1, activities.size());
         checkNumberOfWaitingEvents(SUB_PROCESS_START_NAME, 1);
 
-        assignAndExecuteStep(step1, user.getId());
+        assignAndExecuteStep(step1Id, user);
 
-        waitForArchivedActivity(step1.getId(), TestStates.NORMAL_FINAL);
+        waitForArchivedActivity(step1Id, TestStates.NORMAL_FINAL);
         waitForProcessToFinish(processInstance);
 
         // the parent process instance has completed, so no more waiting events are expected
@@ -151,14 +149,14 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(process.getId());
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(process.getId());
 
-        waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance1);
-        waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance2);
+        waitForUserTask(processInstance1, PARENT_PROCESS_USER_TASK_NAME);
+        waitForUserTask(processInstance2, PARENT_PROCESS_USER_TASK_NAME);
 
         // send signal to start event sub processes: one signal must start the event sub-processes in the two process instances
         getProcessAPI().sendSignal(SIGNAL_NAME);
 
-        waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance1);
-        waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance2);
+        waitForUserTask(processInstance1, SUB_PROCESS_USER_TASK_NAME);
+        waitForUserTask(processInstance2, SUB_PROCESS_USER_TASK_NAME);
         Thread.sleep(50);
 
         disableAndDeleteProcess(process);
@@ -169,17 +167,17 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
     public void subProcessCanAccessParentData() throws Exception {
         final ProcessDefinition process = deployAndEnableProcessWithSignalEventSubProcess(false, true);
         final ProcessInstance processInstance = getProcessAPI().startProcess(process.getId());
-        waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance);
+        waitForUserTask(processInstance, PARENT_PROCESS_USER_TASK_NAME);
 
         getProcessAPI().sendSignal(SIGNAL_NAME);
 
-        final ActivityInstance subStep = waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance);
+        final ActivityInstance subStep = waitForUserTaskAndGetIt(processInstance, SUB_PROCESS_USER_TASK_NAME);
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
         checkProcessDataInstance("count", subProcInst.getId(), 1);
-        checkProcessDataInstance("content", subProcInst.getId(), "childVar");
+        checkProcessDataInstance(SHORT_DATA_NAME, subProcInst.getId(), "childVar");
         checkProcessDataInstance("value", subProcInst.getId(), 10.0);
-        checkProcessDataInstance("content", processInstance.getId(), "parentVar");
-        checkActivityDataInstance("content", subStep.getId(), "childActivityVar");
+        checkProcessDataInstance(SHORT_DATA_NAME, processInstance.getId(), "parentVar");
+        checkActivityDataInstance(SHORT_DATA_NAME, subStep.getId(), "childActivityVar");
 
         assignAndExecuteStep(subStep, user);
         waitForProcessToFinish(subProcInst);
@@ -206,11 +204,11 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         final ProcessDefinition targetProcess = deployAndEnableProcessWithSignalEventSubProcess(false, false);
         final ProcessDefinition callerProcess = deployAndEnableProcessWithCallActivity(targetProcess.getName(), targetProcess.getVersion());
         final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcess.getId());
-        final ActivityInstance step1 = waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance);
+        final ActivityInstance step1 = waitForUserTaskAndGetIt(processInstance, PARENT_PROCESS_USER_TASK_NAME);
 
         getProcessAPI().sendSignal(SIGNAL_NAME);
 
-        final ActivityInstance subStep = waitForUserTask(SUB_PROCESS_USER_TASK_NAME, processInstance);
+        final ActivityInstance subStep = waitForUserTaskAndGetIt(processInstance, SUB_PROCESS_USER_TASK_NAME);
         final ProcessInstance calledProcInst = getProcessAPI().getProcessInstance(step1.getParentProcessInstanceId());
         final ProcessInstance subProcInst = getProcessAPI().getProcessInstance(subStep.getParentProcessInstanceId());
 
@@ -219,7 +217,7 @@ public class SignalEventSubProcessIT extends AbstractWaitingEventIT {
         waitForProcessToFinish(subProcInst);
         waitForProcessToBeInState(calledProcInst, ProcessInstanceState.ABORTED);
 
-        waitForUserTaskAndExecuteIt("step2", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step2", user);
         waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(callerProcess.getId());
