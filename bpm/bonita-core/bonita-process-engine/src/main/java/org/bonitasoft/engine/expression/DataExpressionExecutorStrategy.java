@@ -118,7 +118,7 @@ public class DataExpressionExecutorStrategy extends NonEmptyContentExpressionExe
     }
 
     private List<Object> buildExpressionResultSameOrderAsInputList(final List<SExpression> expressions, final Map<String, Serializable> results) {
-        final ArrayList<Object> list = new ArrayList<Object>(expressions.size());
+        final List<Object> list = new ArrayList<Object>(expressions.size());
         for (final SExpression expression : expressions) {
             list.add(results.get(expression.getContent()));
         }

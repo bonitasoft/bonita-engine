@@ -1,73 +1,73 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+                                   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="false">
 
-    <query name="getSADataInstanceByDataInstanceIdAndArchiveDate">
-        SELECT saDataInstance
-        FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS saDataInstance
-        WHERE saDataInstance.sourceObjectId = :dataInstanceId
-        AND :time >= saDataInstance.archiveDate
-        ORDER BY archiveDate DESC
-    </query>
+	<query name="getSADataInstanceByDataInstanceIdAndArchiveDate">
+		SELECT saDataInstance
+		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS saDataInstance
+		WHERE saDataInstance.sourceObjectId = :dataInstanceId
+		AND :time >= saDataInstance.archiveDate  
+		ORDER BY archiveDate DESC
+	</query>
 
-    <query name="getSADataInstancesByDataInstanceIdAndArchiveDate">
-        SELECT saDataInstance
-        FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS saDataInstance
-        WHERE saDataInstance.id IN(
-        SELECT max(sadi.id)
-        FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS sadi
-        WHERE sadi.sourceObjectId IN (:dataInstanceIds)
-        AND :time >= sadi.archiveDate
-        GROUP BY sadi.sourceObjectId
-        )
-    </query>
+	<query name="getSADataInstancesByDataInstanceIdAndArchiveDate">
+		SELECT saDataInstance
+		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS saDataInstance
+		WHERE saDataInstance.sourceObjectId IN (:dataInstanceIds)
+        AND saDataInstance.id IN(
+			SELECT max(sadi.id)
+			FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS sadi
+			WHERE :time >= sadi.archiveDate 
+			GROUP BY sadi.sourceObjectId
+		)
+	</query>
 
-    <query name="getSADataInstanceByDataInstanceId">
-        SELECT saDataInstance
-        FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS saDataInstance
-        WHERE saDataInstance.sourceObjectId = :dataInstanceId
-    </query>
+	<query name="getSADataInstanceByDataInstanceId">
+		SELECT saDataInstance
+		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS saDataInstance
+		WHERE saDataInstance.sourceObjectId = :dataInstanceId
+	</query>
 
-    <query name="getLastSADataInstanceByDataInstanceId">
-        SELECT sa
-        FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS sa
-        WHERE sa.sourceObjectId = :dataInstanceId
-        ORDER BY sa.archiveDate DESC
-    </query>
+	<query name="getLastSADataInstanceByDataInstanceId">
+		SELECT sa
+		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS sa
+		WHERE sa.sourceObjectId = :dataInstanceId
+		ORDER BY sa.archiveDate DESC
+	</query>
 
-    <query name="getLastSADataInstanceByContainer">
-        SELECT sa
-        FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS sa
-        WHERE sa.name = :dataName
-        AND sa.containerId = :containerId
-        AND sa.containerType = :containerType
-        ORDER BY sa.archiveDate DESC
-    </query>
+	<query name="getLastSADataInstanceByContainer">
+		SELECT sa
+		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS sa
+		WHERE sa.name = :dataName 
+		AND sa.containerId = :containerId
+		AND sa.containerType = :containerType
+		ORDER BY sa.archiveDate DESC
+	</query>
 
-    <query name="getLocalSADataInstances">
-        SELECT sa
-        FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS sa
-        WHERE sa.containerId = :containerId
-        AND sa.containerType = :containerType
-        ORDER BY sa.tenantId, sa.id
-    </query>
+	<query name="getLocalSADataInstances">
+		SELECT sa
+		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS sa
+		WHERE sa.containerId = :containerId
+		AND sa.containerType = :containerType
+		ORDER BY sa.tenantId, sa.id
+	</query>
 
-    <query name="getLastLocalSADataInstances">
-        SELECT sa
-        FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS sa
-        WHERE sa.containerId = :containerId
-        AND sa.containerType = :containerType
-        AND sa.archiveDate IN (
-        SELECT MAX(archiveDate)
-        FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl
-        WHERE containerId = :containerId
-        AND containerType = :containerType
-        AND name = sa.name
-        GROUP BY name
-        )
-        ORDER BY sa.archiveDate DESC
-    </query>
+	<query name="getLastLocalSADataInstances">
+		SELECT sa
+		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS sa
+		WHERE sa.containerId = :containerId
+		AND sa.containerType = :containerType
+		AND sa.archiveDate IN (
+			SELECT MAX(archiveDate)
+			FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl
+			WHERE containerId = :containerId
+			AND containerType = :containerType
+			AND name = sa.name
+			GROUP BY name
+		)
+		ORDER BY sa.archiveDate DESC
+	</query>
 
     <query name="getArchivedDataInstancesWithNamesOf1Containers">
         SELECT dataInstance

@@ -8,7 +8,6 @@ import org.bonitasoft.engine.process.data.ProcessDataDefinitionIT;
 import org.bonitasoft.engine.process.data.ProcessDataInstanceIT;
 import org.bonitasoft.engine.process.document.DocumentIT;
 import org.bonitasoft.engine.process.instance.ProcessInstanceTests;
-import org.bonitasoft.engine.process.task.TaskTests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -28,7 +27,6 @@ import org.junit.runners.Suite.SuiteClasses;
         StartProcessWithOperationsIT.class,
         ProcessDeletionIT.class,
         EvaluateExpressionIT.class,
-        TaskTests.class,
         CommentIT.class,
         DocumentIT.class,
         ActorTests.class,

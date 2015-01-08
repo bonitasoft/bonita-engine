@@ -15,7 +15,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class TestsInitializer {
 
-    private static final String BONITA_HOME_DEFAULT_PATH = "../../bpm/bonita-home/target/home";
+    private static final String BONITA_HOME_DEFAULT_PATH = "target/home";
 
     private static final String BONITA_HOME_PROPERTY = "bonita.home";
 

@@ -22,7 +22,6 @@ import org.bonitasoft.engine.bpm.flownode.BoundaryEventDefinition;
 import org.bonitasoft.engine.bpm.flownode.CallActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ErrorEventTriggerDefinition;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.flownode.MultiInstanceActivityInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -60,14 +59,14 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcDef.getId());
         final FlowNodeInstance callActivity = waitForFlowNodeInExecutingState(processInstance, "callStep", false);
-        final ActivityInstance calledStep1 = waitForUserTask("calledStep1", processInstance);
-        final ActivityInstance calledStep2 = waitForUserTask("calledStep2", processInstance);
+        final ActivityInstance calledStep1 = waitForUserTaskAndGetIt(processInstance, "calledStep1");
+        final long calledStep2Id = waitForUserTask(processInstance, "calledStep2");
         final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep1.getParentProcessInstanceId());
         assignAndExecuteStep(calledStep1, user);
 
         waitForProcessToFinish(calledProcessInstance);
         try {
-            waitForArchivedActivity(calledStep2.getId(), TestStates.ABORTED);
+            waitForArchivedActivity(calledStep2Id, TestStates.ABORTED);
         } catch (final Exception e) {
             final List<ArchivedActivityInstance> archivedActivityInstances = getProcessAPI().getArchivedActivityInstances(processInstance.getId(), 0, 100,
                     ActivityInstanceCriterion.DEFAULT);
@@ -78,7 +77,7 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
             }
             throw new Exception(archivedActivityInstances.toString(), e);
         }
-        waitForUserTaskAndExecuteIt(EXCEPTION_STEP, processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, EXCEPTION_STEP, user);
 
         waitForProcessToFinish(processInstance);
         waitForArchivedActivity(callActivity.getId(), TestStates.ABORTED);
@@ -97,14 +96,13 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
 
         try {
             final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcDef.getId());
-            final ActivityInstance calledStep1 = waitForUserTask("calledStep1", processInstance.getId());
-            final ActivityInstance calledStep2 = waitForUserTask("calledStep2", processInstance.getId());
+            final ActivityInstance calledStep1 = waitForUserTaskAndGetIt(processInstance, "calledStep1");
             final ProcessInstance calledProcessInstance = getProcessAPI().getProcessInstance(calledStep1.getParentProcessInstanceId());
-            assignAndExecuteStep(calledStep2, user);
+            waitForUserTaskAndExecuteIt(processInstance, "calledStep2", user);
             waitForFlowNodeInState(processInstance, "calledStep1", TestStates.ABORTED, true);
             waitForProcessToFinish(calledProcessInstance);
 
-            waitForUserTaskAndExecuteIt("step2", processInstance, user);
+            waitForUserTaskAndExecuteIt(processInstance, "step2", user);
             waitForProcessToFinish(processInstance);
             checkWasntExecuted(processInstance, EXCEPTION_STEP);
         } finally {
@@ -123,12 +121,12 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(callerProcDef.getId());
         waitForFlowNodeInExecutingState(processInstance, "callStep", false);
-        final ActivityInstance calledStep2 = waitForUserTask("calledStep2", processInstance.getId());
-        waitForUserTaskAndExecuteIt("calledStep1", processInstance, user);
+        final long calledStep2Id = waitForUserTask(processInstance, "calledStep2");
+        waitForUserTaskAndExecuteIt(processInstance, "calledStep1", user);
 
-        waitForArchivedActivity(calledStep2.getId(), TestStates.ABORTED);
+        waitForArchivedActivity(calledStep2Id, TestStates.ABORTED);
         // if there are no catch error able to handle the thrown error, the throw error event has the same behavior as a terminate event.
-        waitForUserTaskAndExecuteIt("step2", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step2", user);
 
         waitForProcessToFinish(processInstance);
 
@@ -150,13 +148,13 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(procDefLevel2.getId());
         final FlowNodeInstance callActivityL2 = waitForFlowNodeInExecutingState(processInstance, "callStepL2", false);
         final FlowNodeInstance callActivityL1 = waitForFlowNodeInExecutingState(processInstance, "callStepL1", true);
-        final HumanTaskInstance calledStep2 = waitForUserTask("calledStep2", processInstance);
-        final ActivityInstance calledStep1 = waitForUserTaskAndExecuteIt("calledStep1", processInstance, user);
+        final long calledStep2Id = waitForUserTask(processInstance, "calledStep2");
+        final ActivityInstance calledStep1 = waitForUserTaskAndExecuteAndGetIt(processInstance, "calledStep1", user);
 
         final ProcessInstance calledProcessInstanceL0 = getProcessAPI().getProcessInstance(calledStep1.getParentProcessInstanceId());
         final ProcessInstance calledProcessInstanceL1 = getProcessAPI().getProcessInstance(callActivityL1.getParentProcessInstanceId());
 
-        waitForArchivedActivity(calledStep2.getId(), TestStates.ABORTED);
+        waitForArchivedActivity(calledStep2Id, TestStates.ABORTED);
         final FlowNodeInstance executionStep = waitForFlowNodeInReadyState(processInstance, EXCEPTION_STEP, false);
         waitForProcessToFinish(calledProcessInstanceL0);
         waitForProcessToBeInState(calledProcessInstanceL1, ProcessInstanceState.ABORTED);
@@ -183,20 +181,20 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
         final ProcessInstance processInstance = getProcessAPI().startProcess(procDefLevel2.getId());
         final FlowNodeInstance callActivityL2 = waitForFlowNodeInExecutingState(processInstance, "callStepL2", false);
         final FlowNodeInstance callActivityL1 = waitForFlowNodeInExecutingState(processInstance, "callStepL1", true);
-        final ActivityInstance calledStep1 = waitForUserTask("calledStep1", processInstance);
-        final ActivityInstance calledStep2 = waitForUserTask("calledStep2", processInstance);
+        final ActivityInstance calledStep1 = waitForUserTaskAndGetIt(processInstance, "calledStep1");
+        final long calledStep2Id = waitForUserTask(processInstance, "calledStep2");
         final ProcessInstance calledProcessInstanceL0 = getProcessAPI().getProcessInstance(calledStep1.getParentProcessInstanceId());
         final ProcessInstance calledProcessInstanceL1 = getProcessAPI().getProcessInstance(callActivityL1.getParentProcessInstanceId());
         assignAndExecuteStep(calledStep1, user.getId());
 
-        waitForArchivedActivity(calledStep2.getId(), TestStates.ABORTED);
+        waitForArchivedActivity(calledStep2Id, TestStates.ABORTED);
         final FlowNodeInstance executionStep = waitForFlowNodeInReadyState(calledProcessInstanceL1, EXCEPTION_STEP, false);
         waitForProcessToFinish(calledProcessInstanceL0);
 
         assignAndExecuteStep(executionStep.getId(), user.getId());
         waitForProcessToFinish(calledProcessInstanceL1);
 
-        waitForUserTaskAndExecuteIt("step2", processInstance, user);
+        waitForUserTaskAndExecuteIt(processInstance, "step2", user);
         waitForProcessToFinish(processInstance);
 
         waitForArchivedActivity(callActivityL1.getId(), TestStates.ABORTED);
@@ -229,10 +227,8 @@ public class ErrorBoundaryEventIT extends AbstractEventIT {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnectorThatThrowException(processDefinitionBuilder);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTaskAndExecuteIt("step1", user);
-        final ActivityInstance errorStep = waitForUserTask("errorFlow");
-        assignAndExecuteStep(errorStep, user.getId());
-
+        waitForUserTaskAndExecuteIt(processInstance, "step1", user);
+        waitForUserTaskAndExecuteIt(processInstance, "errorFlow", user);
         waitForProcessToFinish(processInstance);
 
         disableAndDeleteProcess(processDefinition.getId());

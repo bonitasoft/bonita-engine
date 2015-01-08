@@ -278,6 +278,7 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SAutomaticTaskInstanceBuilderFactory;
@@ -2544,23 +2545,57 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public void updateProcessDataInstances(final long processInstanceId, final Map<String, Serializable> dataNameValues) throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         final ParentContainerResolver parentContainerResolver = tenantAccessor.getParentContainerResolver();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             final ClassLoader processClassLoader = getProcessInstanceClassloader(tenantAccessor, processInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            final List<SDataInstance> sDataInstances = dataInstanceService.getDataInstances(new ArrayList<String>(dataNameValues.keySet()), processInstanceId,
+            final List<String> dataNames = new ArrayList<String>(dataNameValues.keySet());
+            final List<SDataInstance> sDataInstances = dataInstanceService.getDataInstances(dataNames, processInstanceId,
                     DataInstanceContainer.PROCESS_INSTANCE.toString(), parentContainerResolver);
-            for (final SDataInstance sDataInstance : sDataInstances) {
-                final EntityUpdateDescriptor entityUpdateDescriptor = buildEntityUpdateDescriptorForData(dataNameValues.get(sDataInstance.getName()));
-                dataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
-            }
+            updateDataInstances(sDataInstances, dataNameValues);
         } catch (final SBonitaException e) {
+            throw new UpdateException(e);
+        } catch (final ClassNotFoundException e) {
             throw new UpdateException(e);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
+    }
+
+    private void updateDataInstances(final List<SDataInstance> sDataInstances, final Map<String, Serializable> dataNameValues) throws ClassNotFoundException,
+            UpdateException, SDataInstanceException {
+        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
+        for (final SDataInstance sDataInstance : sDataInstances) {
+            final Serializable dataValue = dataNameValues.get(sDataInstance.getName());
+            updateDataInstance(dataInstanceService, sDataInstance, dataValue);
+        }
+    }
+
+    private void updateDataInstance(final DataInstanceService dataInstanceService, final SDataInstance sDataInstance, final Serializable dataNewValue)
+            throws UpdateException, SDataInstanceException {
+        verifyTypeOfNewDataValue(sDataInstance, dataNewValue);
+
+        final EntityUpdateDescriptor entityUpdateDescriptor = buildEntityUpdateDescriptorForData(dataNewValue);
+        dataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
+    }
+
+    private void verifyTypeOfNewDataValue(final SDataInstance sDataInstance, final Serializable dataValue) throws UpdateException {
+        final String dataClassName = sDataInstance.getClassName();
+        Class<?> dataClass;
+        try {
+            dataClass = Class.forName(dataClassName);
+        } catch (final ClassNotFoundException e) {
+            throw new UpdateException(e);
+        }
+        if (!dataClass.isInstance(dataValue)) {
+            final UpdateException e = new UpdateException("The type of new value [" + dataValue.getClass().getName()
+                    + "] is not compatible with the type of the data.");
+            e.setDataName(sDataInstance.getName());
+            e.setDataClassName(dataClassName);
+            throw e;
         }
     }
 
@@ -2650,20 +2685,14 @@ public class ProcessAPIImpl implements ProcessAPI {
             final long parentProcessInstanceId = flowNodeInstance.getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            updateData(dataName, activityInstanceId, dataValue, dataInstanceService, parentContainerResolver);
+            final SDataInstance sDataInstance = dataInstanceService.getDataInstance(dataName, activityInstanceId,
+                    DataInstanceContainer.ACTIVITY_INSTANCE.toString());
+            updateDataInstance(dataInstanceService, sDataInstance, dataValue);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
-    }
-
-    private void updateData(final String dataName, final long activityInstanceId, final Serializable dataValue, final DataInstanceService dataInstanceService, final ParentContainerResolver parentContainerResolver)
-            throws SDataInstanceException {
-        final SDataInstance sDataInstance = dataInstanceService.getDataInstance(dataName, activityInstanceId,
-                DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
-        final EntityUpdateDescriptor entityUpdateDescriptor = buildEntityUpdateDescriptorForData(dataValue);
-        dataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
     }
 
     @Override
@@ -2751,10 +2780,10 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     protected void updateTransientData(final String dataName, final long activityInstanceId, final Serializable dataValue,
-            final TransientDataService transientDataInstanceService)
-            throws SDataInstanceException {
+            final TransientDataService transientDataInstanceService) throws SDataInstanceException, UpdateException {
         final SDataInstance sDataInstance = transientDataInstanceService.getDataInstance(dataName, activityInstanceId,
                 DataInstanceContainer.ACTIVITY_INSTANCE.toString());
+        verifyTypeOfNewDataValue(sDataInstance, dataValue);
         final EntityUpdateDescriptor entityUpdateDescriptor = buildEntityUpdateDescriptorForData(dataValue);
         transientDataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
     }
@@ -2794,7 +2823,31 @@ public class ProcessAPIImpl implements ProcessAPI {
     public boolean isInvolvedInProcessInstance(final long userId, final long processInstanceId) throws ProcessInstanceNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+
         try {
+            final ProcessInstance processInstance = getProcessInstance(processInstanceId);
+            if (isUserProcessInstanceInitiator(userId, processInstance)) {
+                return true;
+            }
+            if (isUserManagerOfProcessInstanceInitiator(userId, processInstance.getStartedBy())) {
+                return true;
+            }
+
+            final List<OrderByOption> archivedOrderByOptions = Arrays.asList(new OrderByOption(SAHumanTaskInstance.class, "id", OrderByType.ASC));
+            final List<FilterOption> archivedFilterOptions = Arrays.asList(new FilterOption(SAHumanTaskInstance.class, "logicalGroup4", processInstanceId));
+            QueryOptions archivedQueryOptions = new QueryOptions(0, BATCH_SIZE, archivedOrderByOptions, archivedFilterOptions, null);
+
+            List<SAHumanTaskInstance> sArchivedHumanTasks = activityInstanceService.searchArchivedTasks(archivedQueryOptions);
+            while (!sArchivedHumanTasks.isEmpty()) {
+                for (final SAHumanTaskInstance sArchivedHumanTask : sArchivedHumanTasks) {
+                    if (userId == sArchivedHumanTask.getAssigneeId()) {
+                        return true;
+                    }
+                }
+                archivedQueryOptions = QueryOptions.getNextPage(archivedQueryOptions);
+                sArchivedHumanTasks = activityInstanceService.searchArchivedTasks(archivedQueryOptions);
+            }
+
             final List<OrderByOption> orderByOptions = Arrays.asList(new OrderByOption(SHumanTaskInstance.class, "id", OrderByType.ASC));
             final List<FilterOption> filterOptions = Arrays.asList(new FilterOption(SHumanTaskInstance.class, "logicalGroup4", processInstanceId));
             QueryOptions queryOptions = new QueryOptions(0, BATCH_SIZE, orderByOptions, filterOptions, null);
@@ -2805,9 +2858,8 @@ public class ProcessAPIImpl implements ProcessAPI {
                     if (userId == sHumanTaskInstance.getAssigneeId()) {
                         return true;
                     }
-                    final boolean isActorMemberOrManagerOfActorMember = checkIfUserIsActorMemberOrManagerOfActorMember(userId,
-                            sHumanTaskInstance.getActorId());
-                    if (isActorMemberOrManagerOfActorMember) {
+                    if (checkIfUserIsActorMemberOrManagerOfActorMember(userId,
+                            sHumanTaskInstance.getActorId())) {
                         return true;
                     }
                 }
@@ -2815,12 +2867,32 @@ public class ProcessAPIImpl implements ProcessAPI {
                 sHumanTaskInstances = activityInstanceService.searchHumanTasks(queryOptions);
             }
 
+            //search in archived human tasks
+
             checkIfProcessInstanceExistsWhenNoHumanTask(processInstanceId);
             return false;
         } catch (final SBonitaException e) {
             // no rollback, read only method
             throw new BonitaRuntimeException(e);// TODO refactor Exceptions!!!!!!!!!!!!!!!!!!!
         }
+    }
+
+    private boolean isUserManagerOfProcessInstanceInitiator(final long userId, final long startedByUserId) {
+        final IdentityService identityService = getTenantAccessor().getIdentityService();
+        SUser sUser;
+        try {
+            sUser = identityService.getUser(startedByUserId);
+        } catch (final SUserNotFoundException e) {
+            return false;
+        }
+        if (userId == sUser.getManagerUserId()) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isUserProcessInstanceInitiator(final long userId, final ProcessInstance processInstance) {
+        return userId == processInstance.getStartedBy();
     }
 
     private void checkIfProcessInstanceExistsWhenNoHumanTask(final long processInstanceId) throws SBonitaReadException, SProcessInstanceReadException,

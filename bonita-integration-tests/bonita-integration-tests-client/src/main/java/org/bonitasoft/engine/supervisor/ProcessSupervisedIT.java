@@ -141,9 +141,9 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         processInstances.add(getProcessAPI().startProcess(definition.getId()));
         processInstances.add(getProcessAPI().startProcess(definition.getId()));
         processInstances.add(getProcessAPI().startProcess(definition.getId()));
-        waitForUserTaskAndAssigneIt("step1", processInstances.get(0), john);
-        waitForUserTaskAndAssigneIt("step1", processInstances.get(1), john);
-        waitForUserTask("step1", processInstances.get(2));
+        waitForUserTaskAndAssigneIt(processInstances.get(0), "step1", john);
+        waitForUserTaskAndAssigneIt(processInstances.get(1), "step1", john);
+        waitForUserTask(processInstances.get(2), "step1");
     }
 
     @Override
@@ -338,7 +338,7 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         buildAndAttachDocument(processInstance);
 
         skipTasks(processInstance);
-        waitForProcessToFinishAndBeArchived(processInstance);
+        waitForProcessToFinish(processInstance);
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
         searchOptionsBuilder.filter(ArchivedDocumentsSearchDescriptor.PROCESSINSTANCE_ID, processInstance.getId());
@@ -436,7 +436,7 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         // assign pending task to jack
         final ProcessInstance processInstance = getProcessAPI().startProcess(john.getId(), processDefinitionId);
         processInstances.add(processInstance);
-        final HumanTaskInstance pendingTask = waitForUserTask("step1", processInstance);
+        final long step1Id = waitForUserTask(processInstance, "step1");
 
         logoutOnTenant();
         loginOnDefaultTenantWith("john", PASSWORD);
@@ -448,10 +448,10 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
         assertEquals(john.getId(), result.getResult().get(0).getStartedBy());
         assertEquals(matti.getId(), result.getResult().get(0).getStartedBySubstitute());
 
-        getProcessAPI().assignUserTask(pendingTask.getId(), john.getId());
-        getProcessAPI().executeFlowNode(matti.getId(), pendingTask.getId());
+        getProcessAPI().assignUserTask(step1Id, john.getId());
+        getProcessAPI().executeFlowNode(matti.getId(), step1Id);
 
-        waitForProcessToFinishAndBeArchived(processInstance);
+        waitForProcessToFinish(processInstance);
         result = getProcessAPI().searchOpenProcessInstancesInvolvingUser(john.getId(), searchOptions.done());
         assertNotNull(result);
         assertEquals(0, result.getCount());
@@ -473,7 +473,7 @@ public class ProcessSupervisedIT extends TestWithTechnicalUser {
             skipTask(activityInstanceId);
         }
 
-        waitForProcessToFinishAndBeArchived(processInstance);
+        waitForProcessToFinish(processInstance);
 
         // test supervisor
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);

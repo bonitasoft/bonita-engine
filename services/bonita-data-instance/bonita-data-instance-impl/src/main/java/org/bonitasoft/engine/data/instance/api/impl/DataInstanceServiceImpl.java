@@ -70,7 +70,7 @@ import org.bonitasoft.engine.recorder.model.UpdateRecord;
 /**
  * General mechanism for lookup is to look in specific flow node to search a data instance. When referring to "local" data instance, it means the lookup is
  * performed only on the specific element, and not on inherited data for parent containers.
- * 
+ *
  * @author Zhao Na
  * @author Elias Ricken de Medeiros
  * @author Feng Hui
@@ -133,7 +133,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             throw new SDataInstanceReadException("Several data have been retrieved for: [name: " + dataName + ", container type: " + containerType + ", container id: " + containerId + ']');
         } else {
             return dataInstances.get(0);
-        }
+            }
     }
 
     @Override
@@ -151,7 +151,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         final int toIndex = Math.min(dataInstances.size(), fromIndex + numberOfResults);
 
         return dataInstances.subList(startIndex, toIndex);
-    }
+        }
 
     private Map<String, List<Long>> buildContainersMap(final List<Pair<Long, String>> containerHierarchy, final Map<String, Object> inputParameters) {
         final Map<String, List<Long>> containers = new HashMap<String, List<Long>>();
@@ -161,7 +161,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
                 containers.put(containerTypeKey, new ArrayList<Long>());
                 inputParameters.put("containerType" + containers.size(), containerTypeKey);
                 inputParameters.put("containerType" + containers.size() + "Ids", containers.get(containerTypeKey));
-            }
+    }
             containers.get(containerTypeKey).add(container.getLeft());
         }
         return containers;
@@ -176,7 +176,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             throw new SDataInstanceNotFoundException(e);
         } catch (SObjectReadException e) {
             throw new SDataInstanceNotFoundException(e);
-        }
+    }
 
         final Map<String, List<Long>> containers = buildContainersMap(containerHierarchy, inputParameters);
 
@@ -186,11 +186,11 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             dataInstances = persistenceService.selectList(new SelectListDescriptor<SDataInstance>(getDynamicContainersQueryName(queryName, containers.size()), inputParameters, SDataInstance.class, new QueryOptions(0, QueryOptions.UNLIMITED_NUMBER_OF_RESULTS)));
         } catch (final SBonitaReadException e) {
             throw new SDataInstanceReadException("Unable to check if a data instance already exists: " + e.getMessage(), e);
-        }
+    }
 
         //order the retrieved list by container level
         Collections.sort(dataInstances, new Comparator<SDataInstance>() {
-            @Override
+    @Override
             public int compare(SDataInstance o1, SDataInstance o2) {
                 final Pair<Long, String> o1Container = new Pair<Long, String>(o1.getContainerId(), o1.getContainerType());
                 final Pair<Long, String> o2Container = new Pair<Long, String>(o2.getContainerId(), o2.getContainerType());
@@ -207,8 +207,8 @@ public class DataInstanceServiceImpl implements DataInstanceService {
                 it.remove();
             } else {
                 alreadyUsedNames.add(current.getName());
-            }
         }
+    }
         return dataInstances;
     }
 
@@ -266,7 +266,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             throw new SDataInstanceReadException(e);
         } catch (SObjectReadException e) {
             throw new SDataInstanceReadException(e);
-        }
+            }
         final Map<String, List<Long>> containers = buildContainersMap(containerHierarchy, inputParameters);
 
         //get all data of any of th possible containers
@@ -279,16 +279,16 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
         //order the retrieved list by container level and by archive date
         Collections.sort(dataInstances, new Comparator<SADataInstance>() {
-            @Override
+    @Override
             public int compare(SADataInstance o1, SADataInstance o2) {
                 final Pair<Long, String> o1Container = new Pair<Long, String>(o1.getContainerId(), o1.getContainerType());
                 final Pair<Long, String> o2Container = new Pair<Long, String>(o2.getContainerId(), o2.getContainerType());
                 if (containerHierarchy.indexOf(o1Container) - containerHierarchy.indexOf(o2Container) == 0) {
                     //those 2 data are in the same container, let's compare archived dates
                     return (int) (o2.getArchiveDate() - o1.getArchiveDate());
-                }
+        }
                 return containerHierarchy.indexOf(o1Container) - containerHierarchy.indexOf(o2Container);
-            }
+    }
         });
 
         //remove duplicates
@@ -307,7 +307,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
 
     private String getDynamicContainersQueryName(String queryName, long nbOfContainers) {
         return queryName + "Of" + nbOfContainers + "Containers";
-    }
+        }
 
     @Override
     public SADataInstance getSADataInstance(final long containerId, final String containerType,
@@ -354,11 +354,11 @@ public class DataInstanceServiceImpl implements DataInstanceService {
             final ParentContainerResolver parentContainerResolver) throws SDataInstanceException {
         logBeforeMethod("getLastSADataInstance");
         SADataInstance saDataInstance = getSADataInstance(containerId, containerType, parentContainerResolver, dataName, System.currentTimeMillis());
-        if (saDataInstance == null) {
+            if (saDataInstance == null) {
             throw new SDataInstanceNotFoundException("No archived data instance found for data:" + dataName
-                    + " in container: " + containerType + " " + containerId);
-        }
-        return saDataInstance;
+                        + " in container: " + containerType + " " + containerId);
+            }
+            return saDataInstance;
     }
 
     @Override
@@ -423,7 +423,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
         final Map<String, Object> inputParameters = new HashMap<String, Object>();
         inputParameters.put("dataNames", dataNames);
         return getSDatainstanceOfContainers(containerId, containerType, parentContainerResolver, queryName, inputParameters);
-    }
+        }
 
     @Override
     public List<SADataInstance> getLocalSADataInstances(final long containerId, final String containerType, final int fromIndex, final int numberOfResults)
@@ -465,7 +465,7 @@ public class DataInstanceServiceImpl implements DataInstanceService {
                 deleteSADataInstance(sDataInstance);
             }
         } while (!sDataInstances.isEmpty());
-    }
+        }
 
     @Override
     public void deleteLocalDataInstances(final long containerId, final String dataInstanceContainerType, final boolean dataPresent)

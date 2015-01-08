@@ -172,8 +172,6 @@ public class FlowNodeExecutorImpl implements FlowNodeExecutor {
             throw e;
         } catch (final SFlowNodeExecutionException e) {
             throw e;
-        } catch (final SWorkRegisterException e) {
-            throw new SFlowNodeExecutionException(e);
         } catch (final SBonitaException e) {
             throw new SFlowNodeExecutionException(e);
         } finally {

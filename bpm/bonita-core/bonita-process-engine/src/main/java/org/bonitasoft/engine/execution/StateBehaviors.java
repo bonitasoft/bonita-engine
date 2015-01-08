@@ -88,7 +88,6 @@ import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAAutomaticTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SMultiInstanceActivityInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SPendingActivityMappingBuilderFactory;
-import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.SBoundaryEventInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.event.handling.SWaitingEventKeyProviderBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.event.SBoundaryEventInstance;
@@ -674,15 +673,9 @@ public class StateBehaviors {
     }
 
     public void interruptSubActivities(final long parentActivityInstanceId, final SStateCategory stateCategory) throws SBonitaException {
-        final int numberOfResults = 100;
+        QueryOptions queryOptions = activityInstanceService.buildQueryOptionsForSubActivitiesInNormalStateAndNotTerminal(parentActivityInstanceId,
+                MAX_NUMBER_OF_RESULTS);
         List<SActivityInstance> childrenToEnd;
-        final SUserTaskInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
-        final List<FilterOption> filters = new ArrayList<FilterOption>(3);
-        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getParentActivityInstanceKey(), parentActivityInstanceId));
-        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getTerminalKey(), false));
-        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
-        final OrderByOption orderByOption = new OrderByOption(SActivityInstance.class, flowNodeKeyProvider.getNameKey(), OrderByType.ASC);
-        QueryOptions queryOptions = new QueryOptions(0, numberOfResults, Collections.singletonList(orderByOption), filters, null);
         do {
             childrenToEnd = activityInstanceService.searchActivityInstances(SActivityInstance.class, queryOptions);
             for (final SActivityInstance child : childrenToEnd) {
@@ -694,7 +687,7 @@ public class StateBehaviors {
                 }
             }
             queryOptions = QueryOptions.getNextPage(queryOptions);
-        } while (childrenToEnd.size() == numberOfResults);
+        } while (!childrenToEnd.isEmpty());
     }
 
     public void executeConnectorInWork(final Long processDefinitionId, final long processInstanceId, final long flowNodeDefinitionId,
