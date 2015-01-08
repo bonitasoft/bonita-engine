@@ -174,6 +174,8 @@ public class ProcessAPIImplTest {
 
     @Mock
     private DataInstanceService dataInstanceService;
+    @Mock
+    private ParentContainerResolver parentContainerResolver;
 
     @Mock
     private ProcessDefinitionService processDefinitionService;
@@ -240,6 +242,7 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getSearchEntitiesDescriptor()).thenReturn(searchEntitiesDescriptor);
         when(tenantAccessor.getEventInstanceService()).thenReturn(eventInstanceService);
         when(tenantAccessor.getFlowNodeStateManager()).thenReturn(flowNodeStateManager);
+        when(tenantAccessor.getParentContainerResolver()).thenReturn(parentContainerResolver);
     }
 
     @Test
@@ -346,7 +349,7 @@ public class ProcessAPIImplTest {
         processAPI.updateProcessDataInstance("foo", PROCESS_INSTANCE_ID, "go");
 
         // Then
-        verify(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), eq(Collections.<String, Serializable> singletonMap("foo", "go")));
+        verify(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), eq(Collections.<String, Serializable>singletonMap("foo", "go")));
     }
 
     @Test(expected = UpdateException.class)
@@ -398,7 +401,7 @@ public class ProcessAPIImplTest {
         dataInstance.setClassName(List.class.getName());
         dataInstance.setName(dataName);
         doReturn(Collections.singletonList(dataInstance)).when(dataInstanceService).getDataInstances(Collections.singletonList(dataName),
-                PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.toString());
+                PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.toString(), parentContainerResolver);
 
         // When
         try {
@@ -562,7 +565,7 @@ public class ProcessAPIImplTest {
         final SBlobDataInstanceImpl dataInstance = new SBlobDataInstanceImpl();
         dataInstance.setClassName(List.class.getName());
         dataInstance.setName(dataName);
-        doReturn(dataInstance).when(dataInstanceService).getDataInstance(dataName, FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.toString());
+        doReturn(dataInstance).when(dataInstanceService).getDataInstance(dataName, FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
 
         // When
         try {
