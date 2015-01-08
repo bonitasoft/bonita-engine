@@ -279,7 +279,7 @@
 				<entry key="getDataSourceParameterByNameAndDataSourceId" value="true" />
 				<entry key="getDataSourceParametersByDataSourceId" value="true" />
 				<entry key="getDataSources" value="true" />
-<!-- 				<entry key="getPlatform" value="true" /> -->
+				<entry key="getPlatform" value="true" />
 				<entry key="getDeployInfoByProcessDefId" value="true" />
 				<entry key="getCommandByName" value="true" />
 			</map>

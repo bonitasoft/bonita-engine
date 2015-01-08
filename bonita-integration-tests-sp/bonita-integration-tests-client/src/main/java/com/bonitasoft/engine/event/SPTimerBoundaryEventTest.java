@@ -32,6 +32,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.bonitasoft.engine.BPMTestSPUtil;
 import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bpm.flownode.ManualTaskCreator;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
@@ -43,6 +44,7 @@ public class SPTimerBoundaryEventTest extends CommonAPISPTest {
 
     @Before
     public void beforeTest() throws BonitaException {
+        BPMTestSPUtil.refreshDefaultTenantId();
         loginOnDefaultTenantWithDefaultTechnicalUser();
         donaBenta = createUser("donabenta", "bpm");
         logoutOnTenant();

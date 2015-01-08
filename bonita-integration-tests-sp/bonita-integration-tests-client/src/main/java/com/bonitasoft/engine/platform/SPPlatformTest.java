@@ -84,6 +84,7 @@ public class SPPlatformTest {
         platformAPI.deleteTenant(tenantId1);
         platformAPI.deleteTenant(tenantId2);
         platformAPI.deleteTenant(tenantId3);
+        BPMTestSPUtil.setDefaultTenantId(platformAPI.getDefaultTenant().getId());
         apiTestSpUtil.logoutOnPlatform(session);
     }
 
@@ -679,7 +680,7 @@ public class SPPlatformTest {
     public void cleanAndDeletePlaftorm_should_deactive_tenants_before_deletion() throws Exception {
         platformAPI.activateTenant(tenantId1);
         platformAPI.stopNode();
-        platformAPI.cleanAndDeletePlaftorm();
+        platformAPI.cleanAndDeletePlatform();
 
         platformAPI.createPlatform();
         apiTestSpUtil.initializeAndStartPlatformWithDefaultTenant(platformAPI, true);
