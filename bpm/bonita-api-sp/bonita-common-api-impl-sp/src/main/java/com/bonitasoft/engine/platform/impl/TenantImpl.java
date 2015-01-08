@@ -124,4 +124,10 @@ public class TenantImpl implements Tenant {
         this.defaultTenant = defaultTenant;
     }
 
+    @Override
+    public String toString() {
+        return String.format("TenantImpl [tenantId=%s, name=%s, description=%s, iconName=%s, iconPath=%s, state=%s, creationDate=%s, defaultTenant=%s]",
+                tenantId, name, description, iconName, iconPath, state, creationDate, defaultTenant);
+    }
+
 }
