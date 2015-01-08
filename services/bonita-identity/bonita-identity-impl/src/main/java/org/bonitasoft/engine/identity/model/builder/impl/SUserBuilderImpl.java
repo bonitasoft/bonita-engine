@@ -107,12 +107,6 @@ public class SUserBuilderImpl implements SUserBuilder {
     }
 
     @Override
-    public SUserBuilder setLastConnection(final Long lastConnection) {
-        ((SUserLoginImpl)entity.getSUserLogin()).setLastConnection(lastConnection);
-        return this;
-    }
-
-    @Override
     public SUserBuilder setCreatedBy(final long createdBy) {
         entity.setCreatedBy(createdBy);
         return this;

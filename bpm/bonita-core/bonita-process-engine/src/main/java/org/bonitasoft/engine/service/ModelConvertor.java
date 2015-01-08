@@ -1382,7 +1382,6 @@ public class ModelConvertor {
         }
         userBuilder.setCreationDate(now);
         userBuilder.setLastUpdate(now);
-        userBuilder.setLastConnection(null);
         return userBuilder.done();
     }
 

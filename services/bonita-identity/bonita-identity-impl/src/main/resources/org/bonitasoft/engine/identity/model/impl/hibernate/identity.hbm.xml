@@ -62,11 +62,7 @@
 		<property name="createdBy" type="long" column="createdBy" />
 		<property name="creationDate" type="long" column="creationDate" />
 		<property name="lastUpdate" type="long" column="lastUpdate" />
-		<!--<property name="loginId" type="long" column="login_id"/>-->
-		<many-to-one name="sUserLogin" class="SUserLoginImpl">
-			<column name="tenantid"/>
-			<column name="login_id"/>
-		</many-to-one>
+		<one-to-one name="sUserLogin" class="SUserLoginImpl" cascade="all"/>
 		<filter name="tenantFilter" />
 	</class>
 
@@ -76,8 +72,10 @@
 			<key-property name="id" column="ID" type="long" />
 		</composite-id>
 		<property name="lastConnection" type="long" column="lastConnection" />
+		<one-to-one name="sUser" class="SUserImpl" constrained="true"/>
 		<filter name="tenantFilter" />
 	</class>
+
 
 	<class name="SContactInfoImpl" table="user_contactinfo">
 		<composite-id class="org.bonitasoft.engine.persistence.PersistentObjectId" mapped="true">

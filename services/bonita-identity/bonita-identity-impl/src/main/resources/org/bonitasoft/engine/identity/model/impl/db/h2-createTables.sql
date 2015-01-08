@@ -48,7 +48,6 @@ CREATE TABLE user_ (
   createdBy BIGINT,
   creationDate BIGINT,
   lastUpdate BIGINT,
-  login_id BIGINT,
   UNIQUE (tenantid, userName),
   PRIMARY KEY (tenantid, id)
 );

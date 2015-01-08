@@ -103,12 +103,6 @@ public class SUserUpdateBuilderImpl implements SUserUpdateBuilder {
     }
 
     @Override
-    public SUserUpdateBuilder updateLastConnection(final long lastConnection) {
-        descriptor.addField(SUserBuilderFactoryImpl.LAST_CONNECTION, lastConnection);
-        return this;
-    }
-
-    @Override
     public SUserUpdateBuilder updateEnabled(boolean enabled) {
         descriptor.addField(SUserBuilderFactoryImpl.ENABLED, enabled);
         return this;

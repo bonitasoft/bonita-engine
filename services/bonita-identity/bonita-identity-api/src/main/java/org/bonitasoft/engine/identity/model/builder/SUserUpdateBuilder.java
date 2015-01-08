@@ -44,8 +44,6 @@ public interface SUserUpdateBuilder extends SIdentityUpdateBuilder {
 
     SUserUpdateBuilder updateLastUpdate(final long lastUpdate);
 
-    SUserUpdateBuilder updateLastConnection(final long lastConnection);
-
     SUserUpdateBuilder updateEnabled(final boolean enabled);
 
 }

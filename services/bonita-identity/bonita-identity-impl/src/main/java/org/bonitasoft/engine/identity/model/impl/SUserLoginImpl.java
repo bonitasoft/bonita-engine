@@ -15,6 +15,7 @@
 
 package org.bonitasoft.engine.identity.model.impl;
 
+import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.identity.model.SUserLogin;
 
 /**
@@ -28,6 +29,8 @@ public class SUserLoginImpl extends SPersistentObjectImpl implements SUserLogin 
 
     private Long lastConnection;
 
+    private SUser sUser;
+
 
     public SUserLoginImpl() {
         super();
@@ -35,6 +38,14 @@ public class SUserLoginImpl extends SPersistentObjectImpl implements SUserLogin 
 
     public SUserLoginImpl(Long lastConnection) {
         this.lastConnection = lastConnection;
+    }
+
+    public SUser getsUser() {
+        return sUser;
+    }
+
+    public void setsUser(SUser sUser) {
+        this.sUser = sUser;
     }
 
     @Override

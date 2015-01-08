@@ -71,6 +71,7 @@ import org.bonitasoft.engine.identity.model.builder.SUserLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilder;
 import org.bonitasoft.engine.identity.model.builder.SUserMembershipLogBuilderFactory;
 import org.bonitasoft.engine.identity.model.impl.SUserImpl;
+import org.bonitasoft.engine.identity.model.impl.SUserLoginImpl;
 import org.bonitasoft.engine.identity.recorder.SelectDescriptorBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -264,8 +265,13 @@ public class IdentityServiceImpl implements IdentityService {
             //no insert event for user login objects
             final InsertRecord insertRecord = new InsertRecord(hashedUser);
             final SInsertEvent insertEvent = getInsertEvent(hashedUser, USER);
-            recorder.recordInsert(new InsertRecord(hashedUser.getSUserLogin()),null);
-            ((SUserImpl)hashedUser).setLoginId(hashedUser.getSUserLogin().getId());
+            SUserLogin sUserLogin = hashedUser.getSUserLogin();
+            if(sUserLogin == null){
+                sUserLogin = new SUserLoginImpl();
+            }
+            ((SUserImpl)hashedUser).setsUserLogin(sUserLogin);
+            ((SUserLoginImpl)sUserLogin).setsUser(hashedUser);
+            recorder.recordInsert(new InsertRecord(sUserLogin), null);
             recorder.recordInsert(insertRecord, insertEvent);
             initiateLogBuilder(hashedUser.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
@@ -529,7 +535,6 @@ public class IdentityServiceImpl implements IdentityService {
             final DeleteRecord deleteRecord = new DeleteRecord(user);
             final SDeleteEvent deleteEvent = getDeleteEvent(user, USER);
             recorder.recordDelete(deleteRecord, deleteEvent);
-            recorder.recordDelete(new DeleteRecord(user.getSUserLogin()), null);
             initiateLogBuilder(user.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
         } catch (final SRecorderException re) {
@@ -1815,4 +1820,8 @@ public class IdentityServiceImpl implements IdentityService {
         return result;
     }
 
+    @Override
+    public void updateLastConnection(SUser sUser, long lastConnectionDate) {
+        sUser.getSUserLogin().setLastConnection(lastConnectionDate);
+    }
 }

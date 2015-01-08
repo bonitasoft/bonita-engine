@@ -23,4 +23,6 @@ import org.bonitasoft.engine.persistence.PersistentObject;
 public interface SUserLogin extends PersistentObject {
 
     Long getLastConnection();
+
+    void setLastConnection(Long lastConnection);
 }

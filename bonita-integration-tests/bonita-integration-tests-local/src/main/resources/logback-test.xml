@@ -29,6 +29,7 @@
 	<!--<logger name="org.bonitasoft.engine.execution.FlowNodeExecutorImpl" level="DEBUG" />-->
 	<!--<logger name="org.bonitasoft.engine.core.process.instance.impl.ActivityInstanceServiceImpl" level="DEBUG" /> -->
 	<!--<logger name="org.hibernate.engine.jdbc.internal.JdbcCoordinatorImpl" level="ERROR"/>-->
+	<logger name="org.hibernate.type" level="DEBUG"/>
 
 
 	<!-- Quartz log for job lifecycle -->

@@ -216,6 +216,10 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
         this.enabled = enabled;
     }
 
+    public void setsUserLogin(SUserLogin sUserLogin) {
+        this.sUserLogin = sUserLogin;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
