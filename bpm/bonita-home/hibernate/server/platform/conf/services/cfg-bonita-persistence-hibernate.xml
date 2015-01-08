@@ -281,6 +281,8 @@
 				<entry key="getPlatform" value="true" />
 				<entry key="getDeployInfoByProcessDefId" value="true" />
 				<entry key="getCommandByName" value="true" />
+				<entry key="getUserByUserName" value="true" />
+				<entry key="getRoleByName" value="true" />
 			</map>
 		</constructor-arg>
 	</bean>

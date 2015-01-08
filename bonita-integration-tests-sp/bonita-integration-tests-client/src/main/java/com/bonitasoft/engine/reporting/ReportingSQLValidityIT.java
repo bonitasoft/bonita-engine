@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 
 /**
  * Validate sql used in reports. Check only if there is no errors in sql, according to each supported databases
@@ -20,7 +20,7 @@ import com.bonitasoft.engine.CommonAPISPTest;
  * Run all sql files located in same package than this class and postfixed by '_test.sql' (see in resources folder)
  */
 @RunWith(Parameterized.class)
-public class ReportingSQLValidityIT extends CommonAPISPTest {
+public class ReportingSQLValidityIT extends CommonAPISPIT {
 
     @Parameters(name = "{0}")
     public static Collection<Object[]> params() {
