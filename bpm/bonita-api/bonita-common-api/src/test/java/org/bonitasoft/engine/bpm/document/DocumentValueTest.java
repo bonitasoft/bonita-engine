@@ -43,16 +43,16 @@ public class DocumentValueTest {
     /**
      * Test method for {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(byte[], java.lang.String, java.lang.String)}.
      */
-    @Test(expected = IllegalArgumentException.class)
-    public final void cant_construct_DocumentValue_without_content_with_mimeType_and_file_name() {
+    @Test
+    public final void should_be_able_to_construct_DocumentValue_without_content_but_with_mimeType_and_file_name() {
         new DocumentValue(null, "mimeType", "filename");
     }
 
     /**
      * Test method for {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(byte[], java.lang.String, java.lang.String)}.
      */
-    @Test(expected = IllegalArgumentException.class)
-    public final void cant_construct_DocumentValue_with_empty_content_with_mimeType_and_file_name() {
+    @Test
+    public final void should_be_able_to_construct_DocumentValue_with_empty_content_with_mimeType_and_file_name() {
         new DocumentValue("".getBytes(), "mimeType", "filename");
     }
 
@@ -83,16 +83,16 @@ public class DocumentValueTest {
     /**
      * Test method for {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(long, byte[], java.lang.String, java.lang.String)}.
      */
-    @Test(expected = IllegalArgumentException.class)
-    public final void cant_construct_DocumentValue_without_content_with_documentId_and_mimeType_and_file_name() {
+    @Test
+    public final void should_be_able_to_construct_DocumentValue_without_content_with_documentId_and_mimeType_and_file_name() {
         new DocumentValue(1, null, "mimeType", "filename");
     }
 
     /**
      * Test method for {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(long, byte[], java.lang.String, java.lang.String)}.
      */
-    @Test(expected = IllegalArgumentException.class)
-    public final void cant_construct_DocumentValue_with_empty_content_with_documentId_and_mimeType_and_file_name() {
+    @Test
+    public final void should_be_able_to_construct_DocumentValue_with_empty_content_with_documentId_and_mimeType_and_file_name() {
         new DocumentValue(1, "".getBytes(), "mimeType", "filename");
     }
 

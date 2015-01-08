@@ -13,6 +13,9 @@
  **/
 package org.bonitasoft.engine.core.document.model.builder.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.bonitasoft.engine.core.document.model.builder.SDocumentBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -61,11 +64,8 @@ public class SDocumentBuilderFactoryImplTest {
         sDocumentBuilderFactoryImpl.createNewProcessDocument(fileName, mimeType, authorId, content);
     }
 
-    /**
-     * Test method for {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(byte[], java.lang.String, java.lang.String)}.
-     */
-    @Test(expected = IllegalArgumentException.class)
-    public final void createNewProcessDocument_should_throw_exception_if_no_content() {
+    @Test
+    public final void createNewProcessDocument_should_be_valid_if_no_content_but_with_filename() {
         // Given
         final String fileName = "filename";
         final String mimeType = "mimeType";
@@ -73,14 +73,17 @@ public class SDocumentBuilderFactoryImplTest {
         final byte[] content = null;
 
         // When
-        sDocumentBuilderFactoryImpl.createNewProcessDocument(fileName, mimeType, authorId, content);
+        final SDocumentBuilder newProcessDocument = sDocumentBuilderFactoryImpl.createNewProcessDocument(fileName, mimeType, authorId, content);
+
+        // then
+        assertThat(newProcessDocument).isNotNull();
     }
 
     /**
      * Test method for {@link org.bonitasoft.engine.bpm.document.DocumentValue#DocumentValue(byte[], java.lang.String, java.lang.String)}.
      */
-    @Test(expected = IllegalArgumentException.class)
-    public final void createNewProcessDocument_should_throw_exception_if_empty_content() {
+    @Test
+    public final void createNewProcessDocument_should_be_valid_if_empty_content_but_with_filename() {
         // Given
         final String fileName = "filename";
         final String mimeType = "mimeType";
@@ -88,7 +91,10 @@ public class SDocumentBuilderFactoryImplTest {
         final byte[] content = "".getBytes();
 
         // When
-        sDocumentBuilderFactoryImpl.createNewProcessDocument(fileName, mimeType, authorId, content);
+        final SDocumentBuilder newProcessDocument = sDocumentBuilderFactoryImpl.createNewProcessDocument(fileName, mimeType, authorId, content);
+
+        // then
+        assertThat(newProcessDocument).isNotNull();
     }
 
 }

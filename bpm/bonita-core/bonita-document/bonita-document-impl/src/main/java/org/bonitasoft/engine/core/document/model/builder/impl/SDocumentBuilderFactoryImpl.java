@@ -57,8 +57,8 @@ public class SDocumentBuilderFactoryImpl implements SDocumentBuilderFactory {
 
     @Override
     public SDocumentBuilder createNewProcessDocument(final String fileName, final String mimetype, final long authorId, final byte[] content) {
-        if (content == null || content.length == 0 || fileName == null || fileName.isEmpty()) {
-            throw new IllegalArgumentException("The content & fileName fields must be filled !!");
+        if (fileName == null || fileName.isEmpty()) {
+            throw new IllegalArgumentException("The fileName must be filled for a document with content");
         }
 
         final SDocumentBuilder sDocumentBuilder = createNewInstance(fileName, mimetype, authorId);

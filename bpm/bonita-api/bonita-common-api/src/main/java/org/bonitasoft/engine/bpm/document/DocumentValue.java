@@ -55,7 +55,6 @@ public class DocumentValue implements Serializable {
      */
     public DocumentValue(final byte[] content, final String mimeType, final String fileName) {
         super();
-        checkIfTheFileNameAndTheContentAreFilled(content, fileName);
 
         this.content = content;
         this.mimeType = mimeType;
@@ -63,6 +62,8 @@ public class DocumentValue implements Serializable {
         hasContent = true;
         hasChanged = false;
         documentId = null;
+
+        checkIfTheFileNameIsFilledForADocumentWithContent();
     }
 
     /**
@@ -109,19 +110,13 @@ public class DocumentValue implements Serializable {
      */
     public DocumentValue(final long documentId, final byte[] content, final String mimeType, final String fileName) {
         super();
-        checkIfTheFileNameAndTheContentAreFilled(content, fileName);
+        hasContent = true;
         this.content = content;
         this.mimeType = mimeType;
         this.fileName = fileName;
-        hasContent = true;
         hasChanged = true;
         this.documentId = documentId;
-    }
-
-    private void checkIfTheFileNameAndTheContentAreFilled(final byte[] content, final String fileName) {
-        if (content == null || content.length == 0 || fileName == null || fileName.isEmpty()) {
-            throw new IllegalArgumentException("The content & fileName fields must be filled !!");
-        }
+        checkIfTheFileNameIsFilledForADocumentWithContent();
     }
 
     /**
@@ -163,12 +158,13 @@ public class DocumentValue implements Serializable {
     }
 
     public void setContent(final byte[] content) {
-        checkIfTheFileNameIsFilled(fileName, content);
+        hasContent = true;
         this.content = content;
+        checkIfTheFileNameIsFilledForADocumentWithContent();
     }
 
-    private void checkIfTheFileNameIsFilled(final String fileName, final byte[] content) {
-        if ((fileName == null || fileName.isEmpty()) && content != null && content.length != 0) {
+    private void checkIfTheFileNameIsFilledForADocumentWithContent() {
+        if (hasContent && (fileName == null || fileName.isEmpty())) {
             throw new IllegalArgumentException("The fileName field must be filled when the content is filled !!");
         }
     }
@@ -178,12 +174,13 @@ public class DocumentValue implements Serializable {
     }
 
     public void setFileName(final String fileName) {
-        checkIfTheFileNameIsFilled(fileName, content);
         this.fileName = fileName;
+        checkIfTheFileNameIsFilledForADocumentWithContent();
     }
 
     public void setUrl(final String url) {
         this.url = url;
+        hasContent = false;
     }
 
     public void setHasContent(final boolean hasContent) {
