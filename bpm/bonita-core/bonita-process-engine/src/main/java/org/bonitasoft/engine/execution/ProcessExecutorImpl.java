@@ -405,8 +405,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         flowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, false, 0, stateCategory, -1, tokenRefId);
     }
 
-    protected void executeOperations(final List<SOperation> operations, final Map<String, Object> context, final SExpressionContext expressionContext,
-            final SProcessInstance sProcessInstance) throws SBonitaException {
+    protected void executeOperations(final List<SOperation> operations, final Map<String, Object> context, final SExpressionContext expressionContext) throws SBonitaException {
         if (operations != null && !operations.isEmpty()) {
             expressionContext.setInputValues(context);
             operationService.execute(operations, expressionContext);
@@ -428,7 +427,9 @@ public class ProcessExecutorImpl implements ProcessExecutor {
         if (expressionContext == null) {
             expressionContext = new SExpressionContext();
         }
-        executeOperations(operations, context, expressionContext, sProcessInstance);
+        expressionContext.setContainerId(sProcessInstance.getId());
+        expressionContext.setContainerType(DataInstanceContainer.PROCESS_INSTANCE.name());
+        executeOperations(operations, context, expressionContext);
 
         // Create connectors
         bpmInstancesCreator.createConnectorInstances(sProcessInstance, processContainer.getConnectors(), SConnectorInstance.PROCESS_TYPE);

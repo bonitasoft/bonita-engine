@@ -25,6 +25,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ProcessCategoryIT.class,
         ProcessInstanceTests.class,
         ProcessWithExpressionIT.class,
+        StartProcessWithOperationsIT.class,
         ProcessDeletionIT.class,
         EvaluateExpressionIT.class,
         TaskTests.class,

@@ -91,7 +91,6 @@ public class OperationServiceImpl implements OperationService {
         // execute operation and put it in context again
         final Map<SLeftOperand, Boolean> leftOperandUpdates = executeOperators(operations, expressionContext);
         // update data
-        // TODO implement batch update in leftOperandHandlers
         updateLeftOperands(leftOperandUpdates, leftOperandContainerId, leftOperandContainerType, expressionContext);
     }
 
