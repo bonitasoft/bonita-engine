@@ -409,7 +409,7 @@ public class ProcessExecutorImpl implements ProcessExecutor {
             final SProcessInstance sProcessInstance) throws SBonitaException {
         if (operations != null && !operations.isEmpty()) {
             expressionContext.setInputValues(context);
-            operationService.execute(operations, sProcessInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(), expressionContext);
+            operationService.execute(operations, expressionContext);
         }
     }
 
