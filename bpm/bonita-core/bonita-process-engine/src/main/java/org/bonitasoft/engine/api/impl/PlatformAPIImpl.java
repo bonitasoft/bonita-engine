@@ -66,6 +66,7 @@ import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.io.PropertiesManager;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.platform.Platform;
 import org.bonitasoft.engine.platform.PlatformNotFoundException;
 import org.bonitasoft.engine.platform.PlatformService;
@@ -562,7 +563,6 @@ public class PlatformAPIImpl implements PlatformAPI {
     @CustomTransactions
     @AvailableOnStoppedNode
     public void deletePlatform() throws DeletionException {
-        // TODO : Reduce number of transactions
         PlatformServiceAccessor platformAccessor;
         try {
             platformAccessor = getPlatformAccessor();
@@ -577,11 +577,19 @@ public class PlatformAPIImpl implements PlatformAPI {
 
                     @Override
                     public Void call() throws Exception {
+                        final List<STenant> tenants = platformService.getTenants(new QueryOptions(0, Integer.MAX_VALUE));
+                        for (final STenant sTenant : tenants) {
+                            if (sTenant.isActivated()) {
+                                throw new DeletionException("Cannot delete platform with some active tenants.");
+                            }
+                        }
                         platformService.deletePlatform();
                         return null;
                     }
                 });
             }
+        } catch (final DeletionException e) {
+            throw e;
         } catch (final Exception e) {
             // ignore not existing platform
         }
