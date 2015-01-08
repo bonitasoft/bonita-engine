@@ -110,8 +110,6 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
         if (expressionContext == null) {
             expressionContext = new SExpressionContext();
         }
-        expressionContext.setContainerId(sInstance.getId());
-        expressionContext.setContainerType(DataInstanceContainer.PROCESS_INSTANCE.name());
         expressionContext.setProcessDefinitionId(sDefinition.getId());
         try {
             // Create SDataInstances
@@ -157,7 +155,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             if (connectors != null) {
                 executeConnectors(sDefinition, sInstance, connectors);
             }
-            executeOperations(operations, context, expressionContext);
+            executeOperations(operations, context, expressionContext, sInstance);
 
             // Create connectors
             bpmInstancesCreator.createConnectorInstances(sInstance, processContainer.getConnectors(), SConnectorInstance.PROCESS_TYPE);
