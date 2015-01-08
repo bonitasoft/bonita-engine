@@ -2686,7 +2686,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
             final SDataInstance sDataInstance = dataInstanceService.getDataInstance(dataName, activityInstanceId,
-                    DataInstanceContainer.ACTIVITY_INSTANCE.toString());
+                    DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
             updateDataInstance(dataInstanceService, sDataInstance, dataValue);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
