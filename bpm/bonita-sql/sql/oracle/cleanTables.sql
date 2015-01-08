@@ -90,4 +90,5 @@ DELETE FROM theme;
 DELETE FROM tenant;
 
 DELETE FROM platformCommand;
-DELETE FROM platform;
+
+ 

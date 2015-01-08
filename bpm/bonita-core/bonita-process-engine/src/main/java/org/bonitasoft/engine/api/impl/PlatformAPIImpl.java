@@ -571,6 +571,21 @@ public class PlatformAPIImpl implements PlatformAPI {
         }
         final PlatformService platformService = platformAccessor.getPlatformService();
         try {
+            if (isPlatformCreated()) {
+                // to ensure Hibernate cache is up-to-date before we drop tables with its content:
+                platformAccessor.getTransactionService().executeInTransaction(new Callable<Void>() {
+
+                    @Override
+                    public Void call() throws Exception {
+                        platformService.deletePlatform();
+                        return null;
+                    }
+                });
+            }
+        } catch (final Exception e) {
+            // ignore not existing platform
+        }
+        try {
             platformService.deleteTables();
         } catch (final SBonitaException e) {
             throw new DeletionException(e);
@@ -580,7 +595,15 @@ public class PlatformAPIImpl implements PlatformAPI {
     @Override
     @CustomTransactions
     @AvailableOnStoppedNode
+    @Deprecated
     public void cleanAndDeletePlaftorm() throws DeletionException {
+        cleanAndDeletePlatform();
+    }
+
+    @Override
+    @CustomTransactions
+    @AvailableOnStoppedNode
+    public void cleanAndDeletePlatform() throws DeletionException {
         cleanPlatform();
         deletePlatform();
     }

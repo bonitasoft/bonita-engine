@@ -151,5 +151,6 @@ GO
 
 DELETE FROM platformCommand
 GO
-DELETE FROM platform
-GO
+
+-- do NOT clear directly PLATFORM table, Hibernate needs to update its cache to know the platform has been deleted
+ 

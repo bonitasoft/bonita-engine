@@ -38,15 +38,19 @@ public class PlatformTest extends CommonAPITest {
 
     private static PlatformSession session;
 
+    private static PlatformTestUtil platformTestUtil = new PlatformTestUtil();
+
     @BeforeClass
     public static void beforeClass() throws BonitaException {
-        session = new PlatformTestUtil().loginOnPlatform();
+        session = platformTestUtil.loginOnPlatform();
         platformAPI = PlatformAPIAccessor.getPlatformAPI(session);
     }
 
     @AfterClass
     public static void afterClass() throws BonitaException {
-        new PlatformTestUtil().logoutOnPlatform(session);
+        platformTestUtil.logoutOnPlatform(session);
+        // Restore initial state:
+        platformTestUtil.deployCommandsOnDefaultTenant();
     }
 
     @Before
@@ -96,11 +100,11 @@ public class PlatformTest extends CommonAPITest {
     @Test
     public void deletePlatform() throws BonitaException {
         platformAPI.stopNode();
-        platformAPI.cleanAndDeletePlaftorm();
+        platformAPI.cleanAndDeletePlatform();
         assertFalse(platformAPI.isPlatformCreated());
     }
 
-    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "State" }, story = "Try to get platfom state.", jira = "")
+    @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "State" }, story = "Try to get platform state.", jira = "")
     @Test
     public void getPlatformState() throws Exception {
         // test started state
@@ -111,7 +115,7 @@ public class PlatformTest extends CommonAPITest {
         state = platformAPI.getPlatformState();
         assertEquals(PlatformState.STOPPED, state);
         // test exception:PlatformNotFoundException
-        platformAPI.cleanAndDeletePlaftorm();
+        platformAPI.cleanAndDeletePlatform();
         // when platform does not exists it return STOPPED now
         assertEquals(PlatformState.STOPPED, platformAPI.getPlatformState());
     }
@@ -120,7 +124,7 @@ public class PlatformTest extends CommonAPITest {
     @Test(expected = StartNodeException.class)
     public void unableToStartANodeIfTheNodeIsNotCreated() throws Exception {
         platformAPI.stopNode();
-        platformAPI.cleanAndDeletePlaftorm();
+        platformAPI.cleanAndDeletePlatform();
         assertFalse(platformAPI.isPlatformCreated());
         platformAPI.startNode();
     }
@@ -130,7 +134,7 @@ public class PlatformTest extends CommonAPITest {
     public void callStopNodeTwice() throws Exception {
         platformAPI.stopNode();
         platformAPI.stopNode();
-        platformAPI.cleanAndDeletePlaftorm();
+        platformAPI.cleanAndDeletePlatform();
     }
 
     @Cover(classes = PlatformAPI.class, concept = BPMNConcept.NONE, keywords = { "Platform", "Node" }, story = "stop node then start it with same session.", jira = "")
