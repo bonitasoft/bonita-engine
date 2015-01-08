@@ -157,7 +157,7 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
             if (connectors != null) {
                 executeConnectors(sDefinition, sInstance, connectors);
             }
-            executeOperations(operations, context, expressionContext, sInstance);
+            executeOperations(operations, context, expressionContext);
 
             // Create connectors
             bpmInstancesCreator.createConnectorInstances(sInstance, processContainer.getConnectors(), SConnectorInstance.PROCESS_TYPE);
