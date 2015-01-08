@@ -110,6 +110,8 @@ public class ProcessExecutorExt extends ProcessExecutorImpl {
         if (expressionContext == null) {
             expressionContext = new SExpressionContext();
         }
+        expressionContext.setContainerId(sInstance.getId());
+        expressionContext.setContainerType(DataInstanceContainer.PROCESS_INSTANCE.name());
         expressionContext.setProcessDefinitionId(sDefinition.getId());
         try {
             // Create SDataInstances
