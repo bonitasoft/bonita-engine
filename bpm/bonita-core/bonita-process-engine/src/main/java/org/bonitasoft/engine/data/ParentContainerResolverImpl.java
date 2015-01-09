@@ -145,7 +145,7 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
         return new ActivityContainer(flowNodeInstance);
     }
 
-    private long getCallerId(long id, boolean isArchived) throws SProcessInstanceNotFoundException, SProcessInstanceReadException {
+    private long getCallerId(long id, boolean isArchived) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SBonitaReadException {
         if (isArchived) {
             return getArchivedCallerId(id);
         } else {
@@ -166,8 +166,8 @@ public class ParentContainerResolverImpl implements ParentContainerResolver {
         return processInstance.getCallerId();
     }
 
-    private long getArchivedCallerId(Long processInstanceId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException {
-        SAProcessInstance processInstance = processInstanceService.getArchivedProcessInstance(processInstanceId);
+    private long getArchivedCallerId(Long processInstanceId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SBonitaReadException {
+        SAProcessInstance processInstance = processInstanceService.getLastArchivedProcessInstance(processInstanceId);
         if (processInstance == null) {
             throw new SProcessInstanceNotFoundException(processInstanceId);
         }

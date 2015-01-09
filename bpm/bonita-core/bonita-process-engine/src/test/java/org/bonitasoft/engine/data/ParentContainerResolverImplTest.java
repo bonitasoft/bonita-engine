@@ -210,10 +210,10 @@ public class ParentContainerResolverImplTest {
         activity.setRootContainerId(rootContainerId);
     }
 
-    private void archivedProcessWithCaller(long processInstanceId, long callerId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException {
+    private void archivedProcessWithCaller(long processInstanceId, long callerId) throws SProcessInstanceNotFoundException, SProcessInstanceReadException, SBonitaReadException {
         SAProcessInstanceImpl processInstance = new SAProcessInstanceImpl();
         processInstance.setCallerId(callerId);
-        doReturn(processInstance).when(processInstanceService).getArchivedProcessInstance(processInstanceId);
+        doReturn(processInstance).when(processInstanceService).getLastArchivedProcessInstance(processInstanceId);
     }
 
     @Test
