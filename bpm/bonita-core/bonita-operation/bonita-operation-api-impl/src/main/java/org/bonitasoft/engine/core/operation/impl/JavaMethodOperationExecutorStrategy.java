@@ -34,23 +34,40 @@ public class JavaMethodOperationExecutorStrategy implements OperationExecutorStr
     @Override
     public Object computeNewValueForLeftOperand(final SOperation operation, final Object valueToSetObjectWith, final SExpressionContext expressionContext)
             throws SOperationExecutionException {
-        final String dataToSet = operation.getLeftOperand().getName();
-        final Object objectToInvokeJavaMethodOn = expressionContext.getInputValues().get(dataToSet);
-        if (objectToInvokeJavaMethodOn == null) {
-            throw new SOperationExecutionException("data " + dataToSet + " does not exist");
-        }
-        final String[] split = operation.getOperator().split(":", 2);
-        final String operator = split[0];
-        String className = null;
-        if (split.length > 1) {
-            className = split[1];
-        }
+        final Object objectToInvokeJavaMethodOn;
+        objectToInvokeJavaMethodOn = extractObjectToInvokeFromContext(operation, expressionContext);
+        final String methodName = extractMethodName(operation);
+        final String operatorType = extractParameterType(operation);
         try {
             return new JavaMethodInvoker().invokeJavaMethod(operation.getRightOperand().getReturnType(), valueToSetObjectWith, objectToInvokeJavaMethodOn,
-                    operator, className);
+                    methodName, operatorType);
         } catch (final Exception e) {
             throw new SOperationExecutionException("Unable to evaluate operation " + operation, e);
         }
+    }
+
+    protected String extractParameterType(final SOperation operation) {
+        final String[] split = operation.getOperator().split(":", 2);
+        if (split.length > 1) {
+            return split[1];
+        }
+        return null;
+    }
+
+    protected String extractMethodName(final SOperation operation) {
+        final String[] split = operation.getOperator().split(":", 2);
+        return split[0];
+    }
+
+    protected Object extractObjectToInvokeFromContext(final SOperation operation, final SExpressionContext expressionContext)
+            throws SOperationExecutionException {
+        final Object objectToInvokeJavaMethodOn;
+        final String dataToSet = operation.getLeftOperand().getName();
+        objectToInvokeJavaMethodOn = expressionContext.getInputValues().get(dataToSet);
+        if (objectToInvokeJavaMethodOn == null) {
+            throw new SOperationExecutionException("data " + dataToSet + " does not exist");
+        }
+        return objectToInvokeJavaMethodOn;
     }
 
     @Override

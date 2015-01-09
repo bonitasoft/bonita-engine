@@ -80,7 +80,9 @@
 	</subclass>
 
 	<subclass name="SADateDataInstanceImpl" abstract="false" discriminator-value="SADateDataInstanceImpl" extends="SADataInstanceImpl">
-		<property name="value" column="longValue" />
+		<property name="value" column="longValue">
+			<type name="org.bonitasoft.engine.persistence.DateStoredAsLongUserType" />
+		</property>
 	</subclass>
 
 </hibernate-mapping>

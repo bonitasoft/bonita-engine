@@ -30,7 +30,7 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
  * <p>
  * Usage example:
  * <p> {@code BusinessArchive businessArchive = BusinessArchiveBuilder().createNewBusinessArchive().setProcessDefinition(processDefinition).done();}
- * 
+ *
  * @author Baptiste Mesta
  * @author Matthieu Chaffotte
  * @author Celine Souchet
@@ -49,7 +49,7 @@ public class BusinessArchiveBuilder {
     /**
      * Set the process definition of the {@link BusinessArchive} that is currently build
      * <p> {@link DesignProcessDefinition} can be constructed using {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder}
-     * 
+     *
      * @see ProcessDefinitionBuilder
      * @param processDefinition
      * @return
@@ -66,7 +66,7 @@ public class BusinessArchiveBuilder {
      * Parameters must also be defined in the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition} using
      * {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder} <p> {@link DesignProcessDefinition} can be
      * constructed using {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder}
-     * 
+     *
      * @see ProcessDefinitionBuilder
      * @param processDefinition
      * @return
@@ -84,7 +84,7 @@ public class BusinessArchiveBuilder {
      * <p>
      * <p>
      * e.g. if you add a connector in your process add here dependencies the process need to execute it
-     * 
+     *
      * @param resource
      *        the {@link BarResource} the represent a JAR file
      * @return
@@ -101,13 +101,13 @@ public class BusinessArchiveBuilder {
      * This resource must be a connector implementation descriptor file (.impl) and must be compliant to the connector-implementation-descriptor.xsd
      * <p>
      * A connector definition should also be added in the {@link org.bonitasoft.engine.bpm.process.ProcessDefinition} using
-     * {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder#addConnector(String, String, String, org.bonitasoft.engine.bpm.model.ConnectorEvent)}
+     * {@link org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder#addConnector(String, String, String, org.bonitasoft.engine.bpm.connector.ConnectorEvent)}
      * or
-     * {@link org.bonitasoft.engine.bpm.process.impl.ActivityDefinitionBuilder#addConnector(String, String, String, org.bonitasoft.engine.bpm.model.ConnectorEvent)}
+     * {@link org.bonitasoft.engine.bpm.process.impl.ActivityDefinitionBuilder#addConnector(String, String, String, org.bonitasoft.engine.bpm.connector.ConnectorEvent)}
      * <p>
      * <p>
      * e.g. if you add a connector in your process add here dependencies the process need to execute it
-     * 
+     *
      * @param resource
      *        the {@link BarResource} the represent a connector implementation descriptor file
      * @return
@@ -120,7 +120,7 @@ public class BusinessArchiveBuilder {
 
     /**
      * same as {@link #addConnectorImplementation(BarResource)} but for {@link org.bonitasoft.engine.filter.UserFilter}
-     * 
+     *
      * @see #addConnectorImplementation(BarResource)
      * @param resource
      * @return
@@ -133,14 +133,14 @@ public class BusinessArchiveBuilder {
 
     /**
      * Set the actor mapping for this {@link BusinessArchive} <p>
-     * The file must be compliant with the xsd actorMapping.xsd The actor mapping specify for each {@link ActorDefinition actor} of the process who it is in the
-     * organization.
+     * The file must be compliant with the xsd actorMapping.xsd The actor mapping specify for each {@link org.bonitasoft.engine.bpm.actor.ActorDefinition} of
+     * the process who it is in the organization.
      * <p>
      * It is not mandatory to set it in the {@link BusinessArchive}, it can be set after the process was deployed using
      * {@link org.bonitasoft.engine.api.ProcessAPI#addUserToActor(long, long)}, {@link org.bonitasoft.engine.api.ProcessAPI#addGroupToActor(long, long)},
      * {@link org.bonitasoft.engine.api.ProcessAPI#addRoleToActor(long, long)} or
      * {@link org.bonitasoft.engine.api.ProcessAPI#addRoleAndGroupToActor(long, long, long)}
-     * 
+     *
      * @param xmlContent
      *        the xml file content that describe the actor mapping
      * @return
@@ -153,7 +153,7 @@ public class BusinessArchiveBuilder {
 
     /**
      * Add resource in the {@link BusinessArchive} used by extensions
-     * 
+     *
      * @param resource
      *        the resource to be added in the business archive
      * @return
@@ -166,7 +166,7 @@ public class BusinessArchiveBuilder {
 
     /**
      * Add document contents in the {@link BusinessArchive}
-     * 
+     *
      * @see org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder#addDocumentDefinition(String)
      * @param resource
      * @return

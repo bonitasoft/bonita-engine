@@ -5,6 +5,8 @@
 		<constructor-arg name="sessionProvider" ref="sessionProvider" />
 		<constructor-arg name="applicationName" value="BPM" />
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <!-- set Engine session duration (in ms) : -->
+        <property name="sessionDuration" value="3600000" />
 	</bean>
 
 </beans>

@@ -1,43 +1,44 @@
 package org.bonitasoft.engine;
 
-import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.accessors.TenantAccessorTest;
+import org.bonitasoft.engine.activity.PendingTasksIT;
 import org.bonitasoft.engine.command.AdvancedStartProcessCommandIT;
-import org.bonitasoft.engine.command.CommandTest;
-import org.bonitasoft.engine.command.web.ExternalCommandsTest;
-import org.bonitasoft.engine.event.SignalEventTest;
-import org.bonitasoft.engine.identity.UserTest;
-import org.bonitasoft.engine.login.LoginAPITest;
-import org.bonitasoft.engine.login.PlatformLoginAPITest;
-import org.bonitasoft.engine.operation.OperationTest;
-import org.bonitasoft.engine.platform.command.PlatformCommandTest;
+import org.bonitasoft.engine.command.CommandIT;
+import org.bonitasoft.engine.command.web.ExternalCommandsTests;
+import org.bonitasoft.engine.event.SignalEventIT;
+import org.bonitasoft.engine.identity.UserIT;
+import org.bonitasoft.engine.login.LoginAPIIT;
+import org.bonitasoft.engine.login.PlatformLoginAPIIT;
+import org.bonitasoft.engine.operation.OperationIT;
+import org.bonitasoft.engine.platform.command.PlatformCommandIT;
 import org.bonitasoft.engine.process.ProcessManagementIT;
-import org.bonitasoft.engine.process.task.PendingTasksIT;
-import org.bonitasoft.engine.profile.ProfileITest;
-import org.bonitasoft.engine.search.SearchProcessInstanceTest;
-import org.bonitasoft.engine.supervisor.ProcessSupervisedTest;
+import org.bonitasoft.engine.profile.ProfileIT;
+import org.bonitasoft.engine.search.SearchProcessInstanceIT;
+import org.bonitasoft.engine.supervisor.ProcessSupervisedIT;
 import org.bonitasoft.engine.test.APITestUtil;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-        RemoteEngineTests.class,// this class is only in remote (we test that server stack trace are reported in client side)
-        PlatformCommandTest.class,
+        RemoteEngineIT.class,// this class is only in remote (we test that server stack trace are reported in client side)
+        PlatformCommandIT.class,
         ProcessManagementIT.class,
-        ProfileITest.class,
-        SearchProcessInstanceTest.class,
+        ProfileIT.class,
+        SearchProcessInstanceIT.class,
         PendingTasksIT.class,
-        SignalEventTest.class,
-        UserTest.class,
-        LoginAPITest.class,
-        PlatformLoginAPITest.class,
-        CommandTest.class,
-        ExternalCommandsTest.class,
-        ProcessSupervisedTest.class,
-        OperationTest.class,
+        SignalEventIT.class,
+        UserIT.class,
+        LoginAPIIT.class,
+        PlatformLoginAPIIT.class,
+        CommandIT.class,
+        ExternalCommandsTests.class,
+        ProcessSupervisedIT.class,
+        OperationIT.class,
         TenantAccessorTest.class,
-        MultiThreadCallsTest.class,
+        MultiThreadCallsIT.class,
         AdvancedStartProcessCommandIT.class })
 @Initializer(BPMRemoteTestsForServers.class)
 public class BPMRemoteTestsForServers {

@@ -46,6 +46,15 @@
         ORDER BY f.id ASC
 	</query>
 
+	<query name="getNumberOfFlowNodesInAllStates">
+		SELECT new org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter(name AS name, stateName AS statename, count(f) AS numberof)
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl AS f
+		WHERE logicalGroup4 = :parentProcessInstanceId
+		AND deleted = FALSE
+		GROUP BY name, stateName
+		ORDER BY name ASC, stateName ASC
+	</query>
+
 	<query name="getOpenActivitiesFromProcessInstance">
 		SELECT a
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
@@ -669,6 +678,22 @@
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a
 		WHERE a.deleted = FALSE
 	</query>
+	
+	<query name="getNumberOfSHumanTaskInstancewithSProcessSupervisor">
+		SELECT COUNT(a)
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		WHERE a.deleted = FALSE
+		AND a.logicalGroup1 =  processsupervisor.processDefId
+	</query>
+
+	<query name="searchSHumanTaskInstancewithSProcessSupervisor">
+		SELECT a
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SHumanTaskInstanceImpl AS a,
+			 org.bonitasoft.engine.supervisor.mapping.model.impl.SProcessSupervisorImpl AS processsupervisor
+		WHERE a.deleted = FALSE
+		AND a.logicalGroup1 =  processsupervisor.processDefId
+	</query>
 
 	<query name="getNumberOfSHumanTaskInstanceSupervisedBy">
 		SELECT COUNT(a)
@@ -1224,6 +1249,20 @@
 	<query name="searchSProcessInstance">
 		SELECT DISTINCT p
 		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p
+	</query>
+	
+	<query name="getNumberOfSProcessInstancewithSUserTaskInstance">
+		SELECT COUNT(DISTINCT p)
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+			 org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
+		WHERE p.id = a.logicalGroup4
+	</query>
+	
+	<query name="searchSProcessInstancewithSUserTaskInstance">
+		SELECT DISTINCT p
+		FROM org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl AS p,
+			 org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
+		WHERE p.id = a.logicalGroup4
 	</query>
 	
 	<query name="getNumberOfSProcessInstanceFailed">

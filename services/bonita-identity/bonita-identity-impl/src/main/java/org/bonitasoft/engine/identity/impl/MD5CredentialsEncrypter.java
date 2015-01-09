@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2013, 2014 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -29,8 +29,7 @@ public class MD5CredentialsEncrypter implements CredentialsEncrypter {
 
     @Override
     public boolean check(final String password, final String hashPassword) {
-        final byte[] hash = DigestUtils.md5(password);
-        final String hashedPassword = Base64.encodeBase64String(hash);
+        final String hashedPassword = hash(password);
         return hashedPassword.equals(hashPassword);
     }
 

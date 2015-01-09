@@ -1,6 +1,6 @@
 package org.bonitasoft.engine.command.helper.expectation;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.bpm.flownode.SendEventException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.identity.User;
@@ -12,9 +12,9 @@ import org.bonitasoft.engine.identity.User;
  */
 public class TestUtils {
 
-    private final CommonAPITest testCase;
+    private final CommonAPIIT testCase;
 
-    public TestUtils(final CommonAPITest testCase) {
+    public TestUtils(final CommonAPIIT testCase) {
         this.testCase = testCase;
     }
 
@@ -32,7 +32,7 @@ public class TestUtils {
 
         public void execute(final User behalf, final String... steps) throws Exception {
             for (final String step : steps) {
-                testCase.waitForUserTaskAndExecuteIt(step, process, behalf);
+                testCase.waitForUserTaskAndExecuteIt(process, step, behalf);
             }
         }
 

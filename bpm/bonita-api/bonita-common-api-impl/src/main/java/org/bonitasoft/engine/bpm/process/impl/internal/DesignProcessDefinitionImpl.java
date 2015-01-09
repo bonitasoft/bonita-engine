@@ -139,6 +139,11 @@ public class DesignProcessDefinitionImpl extends ProcessDefinitionImpl implement
     }
 
     @Override
+    public org.bonitasoft.engine.bpm.flownode.FlowElementContainerDefinition getFlowElementContainer() {
+        return flowElementContainer;
+    }
+
+    @Override
     public String getStringIndexLabel(final int index) {
         switch (index) {
             case 1:

@@ -6,9 +6,9 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ 
-    ProcessActorTest.class,
-    ImportActorMappingTest.class,
-    ExportActorMappingTest.class
+    ProcessActorIT.class,
+    ImportActorMappingIT.class,
+    ExportActorMappingIT.class
 })
 public class ActorTests {
 

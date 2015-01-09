@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2012, 2014 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -14,17 +14,19 @@
 package org.bonitasoft.engine.bpm;
 
 /**
- * Every <code>BaseElement</code> object has an identifier that can be accessed through the {@link #getId()} method.
- * 
+ * Interface <code>BaseElement</code> identifies a <code>BonitaObject</code>.
+ *
  * @author Baptiste Mesta
  * @author Emmanuel Duchastenier
+ * @author Matthieu Chaffotte
+ * @since 6.0.0
  */
 public interface BaseElement extends BonitaObject {
 
     /**
-     * Gets this unique Object Identifier.
-     * 
-     * @return this unique Object Identifier
+     * Gets the unique object identifier.
+     *
+     * @return the unique object identifier
      */
     long getId();
 

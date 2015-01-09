@@ -14,10 +14,12 @@
 package org.bonitasoft.engine.bpm.actor;
 
 /**
- * Criterion to sort actors
- * 
+ * Criterion to sort {@link ActorInstance}.
+ *
  * @author Matthieu Chaffotte
  * @author Celine Souchet
+ * @since 6.0.0
+ * @version 6.4.1
  */
 public enum ActorCriterion {
 

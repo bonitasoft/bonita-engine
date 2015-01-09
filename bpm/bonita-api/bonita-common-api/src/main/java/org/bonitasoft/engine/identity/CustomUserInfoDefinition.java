@@ -25,19 +25,19 @@ import org.bonitasoft.engine.bpm.BonitaObject;
 public interface CustomUserInfoDefinition extends BonitaObject {
 
     /**
-     * @return the custom user info definition identifier
+     * @return the {@code CustomUserInfoDefinition} identifier
      * @since 6.3
      */
     long getId();
 
     /**
-     * @return the custom user info name
+     * @return the {@code CustomUserInfoDefinition} name
      * @since 6.3
      */
     String getName();
 
     /**
-     * @return the custom user info description
+     * @return the {@code CustomUserInfoDefinition} description
      * @since 6.3
      */
     String getDescription();

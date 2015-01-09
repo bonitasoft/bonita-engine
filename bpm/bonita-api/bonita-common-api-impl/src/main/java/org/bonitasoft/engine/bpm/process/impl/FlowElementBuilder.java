@@ -27,7 +27,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a integer data on this element
-     * 
+     *
      * @param name
      *        The data name
      * @param defaultValue
@@ -38,7 +38,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a long data on this element
-     * 
+     *
      * @param name
      *        The data name
      * @param defaultValue
@@ -49,7 +49,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a short text data (up to 255 characters) on this element
-     * 
+     *
      * @param name
      *        The data name
      * @param defaultValue
@@ -60,7 +60,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a long text data (more than 255 characters) on this element
-     * 
+     *
      * @param name
      *        The data name
      * @param defaultValue
@@ -71,7 +71,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a double data on this element
-     * 
+     *
      * @param name
      *        The data name
      * @param defaultValue
@@ -82,7 +82,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a float data on this element
-     * 
+     *
      * @param name
      *        The data name
      * @param defaultValue
@@ -93,7 +93,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a date data on this element
-     * 
+     *
      * @param name
      *        The data name
      * @param defaultValue
@@ -104,7 +104,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a XML data on this element
-     * 
+     *
      * @param name
      *        The data name
      * @param defaultValue
@@ -115,7 +115,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a blob data on this element
-     * 
+     *
      * @param name
      *        The data name
      * @param defaultValue
@@ -126,7 +126,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a boolean data on this element
-     * 
+     *
      * @param name
      *        The data name
      * @param defaultValue
@@ -137,7 +137,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a data on this element
-     * 
+     *
      * @param name
      *        The data name
      * @param className
@@ -153,9 +153,9 @@ public interface FlowElementBuilder {
      * <p>
      * Must also add connector dependencies and connector implementation descriptor
      * <p>
-     * 
-     * @see BusinessArchiveBuilder#addClasspathResource(org.bonitasoft.engine.bpm.bar.BarResource)
-     * @see BusinessArchiveBuilder#addConnectorImplementation(org.bonitasoft.engine.bpm.bar.BarResource)
+     *
+     * @see org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder#addClasspathResource(org.bonitasoft.engine.bpm.bar.BarResource)
+     * @see org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder#addConnectorImplementation(org.bonitasoft.engine.bpm.bar.BarResource)
      * @param name
      *        The name the connector instance will use
      * @param connectorId
@@ -171,7 +171,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds an {@link org.bonitasoft.engine.bpm.flownode.UserTaskDefinition} on this element
-     * 
+     *
      * @param taskName
      *        The task name
      * @param actorName
@@ -182,7 +182,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds {@link org.bonitasoft.engine.bpm.flownode.AutomaticTaskDefinition}
-     * 
+     *
      * @param taskName
      *        The task name
      * @return
@@ -191,7 +191,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a {@link org.bonitasoft.engine.bpm.flownode.ReceiveTaskDefinition} on this element
-     * 
+     *
      * @param taskName
      *        The task name
      * @param messageName
@@ -202,7 +202,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a {@link org.bonitasoft.engine.bpm.flownode.SendTaskDefinition} on this element
-     * 
+     *
      * @param taskName
      *        The task name
      * @param messageName
@@ -215,7 +215,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a {@link org.bonitasoft.engine.bpm.flownode.ManualTaskDefinition} on this element
-     * 
+     *
      * @param name
      *        The task name
      * @param actorName
@@ -226,7 +226,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a transition on this element. Source and target elements must be previously added
-     * 
+     *
      * @param source
      *        The source element name
      * @param target
@@ -237,7 +237,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a conditional transition on this element. Source and target elements must be previously added
-     * 
+     *
      * @param source
      *        The source element name
      * @param target
@@ -250,7 +250,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a {@link org.bonitasoft.engine.bpm.flownode.GatewayDefinition} on this element
-     * 
+     *
      * @param name
      *        The gateway name
      * @param gatewayType
@@ -261,7 +261,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a {@link org.bonitasoft.engine.bpm.flownode.StartEventDefinition} on this element
-     * 
+     *
      * @param name
      *        The start event name
      * @return
@@ -270,7 +270,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds an {@link org.bonitasoft.engine.bpm.flownode.EndEventDefinition} on this element
-     * 
+     *
      * @param name
      *        The end event name
      * @return
@@ -279,7 +279,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds an {@link org.bonitasoft.engine.bpm.flownode.IntermediateCatchEventDefinition} on this element
-     * 
+     *
      * @param name
      *        The intermediate catch event name
      * @return
@@ -288,7 +288,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds an {@link org.bonitasoft.engine.bpm.flownode.IntermediateThrowEventDefinition} on this element
-     * 
+     *
      * @param name
      *        The intermediate throw event name
      * @return
@@ -297,7 +297,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a {@link org.bonitasoft.engine.bpm.flownode.CallActivityDefinition} on this element
-     * 
+     *
      * @param name
      *        The call activity name
      * @param callableElement
@@ -310,7 +310,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a {@link org.bonitasoft.engine.bpm.process.SubProcessDefinition} on this element
-     * 
+     *
      * @param name
      *        The sub process name
      * @param triggeredByEvent
@@ -321,7 +321,7 @@ public interface FlowElementBuilder {
 
     /**
      * Adds a default transition on this element
-     * 
+     *
      * @param source
      *        The source element name
      * @param target

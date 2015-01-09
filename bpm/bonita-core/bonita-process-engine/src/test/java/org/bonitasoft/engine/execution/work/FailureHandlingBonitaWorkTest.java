@@ -261,7 +261,7 @@ public class FailureHandlingBonitaWorkTest {
 
         txBonitawork.work(context);
 
-        verify(loggerService).log(any(Class.class), eq(TechnicalLogSeverity.ERROR), eq(seee.getClass().getName() + " : \"message\""));
+        verify(loggerService).log(any(Class.class), eq(TechnicalLogSeverity.ERROR), eq(seee.getClass().getName() + " : \"message\""), eq(seee));
     }
 
     @Test
@@ -270,13 +270,13 @@ public class FailureHandlingBonitaWorkTest {
         final SExpressionEvaluationException seee = new SExpressionEvaluationException("message", "expressionName");
         doThrow(seee).when(wrappedWork).work(context);
         // Yes for all log level, in order to simulate a TRACE configuration
+        // Since latest change, exception stack trace is logged in the ERROR level message. DEBUG level have no impact
         when(loggerService.isLoggable(any(Class.class), eq(TechnicalLogSeverity.DEBUG))).thenReturn(true);
         when(loggerService.isLoggable(any(Class.class), eq(TechnicalLogSeverity.ERROR))).thenReturn(true);
 
         txBonitawork.handleFailure(seee, context);
 
-        verify(loggerService, times(2)).log(any(Class.class), eq(TechnicalLogSeverity.ERROR), anyString());
-        verify(loggerService, times(1)).log(any(Class.class), eq(TechnicalLogSeverity.DEBUG), anyString(), any(Throwable.class));
+        verify(loggerService, times(1)).log(any(Class.class), eq(TechnicalLogSeverity.ERROR), anyString(), any(Throwable.class));
     }
 
 }

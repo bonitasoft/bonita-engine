@@ -474,8 +474,8 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public void deleteContentOfArchivedDocument(final long documentId) throws SObjectNotFoundException, SBonitaReadException, SRecorderException {
-        final SAMappedDocument archivedDocument = getArchivedDocument(documentId);
+    public void deleteContentOfArchivedDocument(final long archivedDocumentId) throws SObjectNotFoundException, SBonitaReadException, SRecorderException {
+        final SAMappedDocument archivedDocument = getArchivedDocument(archivedDocumentId);
         final SDocument document = getDocumentWithContent(archivedDocument.getDocumentId());
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(document, Collections.singletonMap("content", null));
         SUpdateEvent updateEvent = null;

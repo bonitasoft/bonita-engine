@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>bonita-expression-resolver</artifactId>
 		<groupId>org.bonitasoft.engine.core</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.5.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-expression-resolver-api-impl</artifactId>
@@ -47,6 +47,19 @@
             <groupId>org.bonitasoft.engine.api</groupId>
             <artifactId>bonita-common-api</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+         <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
         </dependency>
 	</dependencies>
 </project>

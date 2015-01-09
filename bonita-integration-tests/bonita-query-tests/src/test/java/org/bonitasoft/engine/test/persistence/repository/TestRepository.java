@@ -8,6 +8,8 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefiniti
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
@@ -19,6 +21,8 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceI
 import org.bonitasoft.engine.core.process.instance.model.impl.SHiddenTaskInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SPendingActivityMappingImpl;
 import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceImpl;
+import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
+import org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoDefinition;
 import org.bonitasoft.engine.identity.model.SCustomUserInfoValue;
 import org.bonitasoft.engine.identity.model.SGroup;
@@ -60,7 +64,7 @@ public class TestRepository {
     }
 
     protected Session getSessionWithTenantFilter() {
-        Session session = getSession();
+        final Session session = getSession();
         session.enableFilter("tenantFilter").setParameter("tenantId", PersistentObjectBuilder.DEFAULT_TENANT_ID);
         return session;
     }
@@ -153,6 +157,11 @@ public class TestRepository {
         return (SFlowNodeInstance) getSession().get(sFlowNode.getClass(), new PersistentObjectId(sFlowNode.getId(), sFlowNode.getTenantId()));
     }
 
+    public SAFlowNodeInstance add(final SAFlowNodeInstanceImpl saFlowNode) {
+        getSession().save(saFlowNode);
+        return (SAFlowNodeInstance) getSession().get(saFlowNode.getClass(), new PersistentObjectId(saFlowNode.getId(), saFlowNode.getTenantId()));
+    }
+
     public SHiddenTaskInstanceImpl add(final SHiddenTaskInstanceImpl sHiddenTaskInstanceImpl) {
         getSession().save(sHiddenTaskInstanceImpl);
         return (SHiddenTaskInstanceImpl) getSession().get(sHiddenTaskInstanceImpl.getClass(),
@@ -183,6 +192,11 @@ public class TestRepository {
     public SJobDescriptor addJobDescriptor(final SJobDescriptorImpl jobDescriptor) {
         getSession().save(jobDescriptor);
         return (SJobDescriptor) getSession().get(jobDescriptor.getClass(), new PersistentObjectId(jobDescriptor.getId(), jobDescriptor.getTenantId()));
+    }
+
+    public SADataInstance add(final SADataInstanceImpl dataInstance) {
+        getSession().save(dataInstance);
+        return (SADataInstance) getSession().get(dataInstance.getClass(), new PersistentObjectId(dataInstance.getId(), dataInstance.getTenantId()));
     }
 
 }

@@ -4,9 +4,9 @@
 	<parent>
 		<groupId>org.bonitasoft.engine.test</groupId>
 		<artifactId>bonita-test-utils</artifactId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.5.0-SNAPSHOT</version>
 	</parent>
-	
+
 	<artifactId>bonita-server-test-utils</artifactId>
 
 	<dependencies>
@@ -23,7 +23,13 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>compile</scope>
+		</dependency>
+
 		<!-- jdbc connectors -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -45,7 +51,7 @@
 			<groupId>com.microsoft.jdbc</groupId>
 			<artifactId>sqlserver</artifactId>
 		</dependency>
-		
+
 		<!-- Transaction -->
 		<dependency>
 			<groupId>org.codehaus.btm</groupId>
@@ -62,7 +68,7 @@
 			<version>0.7.1.RELEASE</version>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 			<plugin>
