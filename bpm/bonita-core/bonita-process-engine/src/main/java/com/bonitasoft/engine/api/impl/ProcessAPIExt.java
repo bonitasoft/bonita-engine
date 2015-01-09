@@ -583,7 +583,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public void replayActivity(final long activityInstanceId, final Map<Long, ConnectorStateReset> connectorsToReset) throws ActivityExecutionException,
-    ActivityInstanceNotFoundException {
+            ActivityInstanceNotFoundException {
         LicenseChecker.getInstance().checkLicenseAndFeature(Features.REPLAY_ACTIVITY);
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ConnectorInstanceService connectorInstanceService = tenantAccessor.getConnectorInstanceService();
@@ -703,7 +703,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorAtProcessInstantiation(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-                    throws ConnectorExecutionException {
+            throws ConnectorExecutionException {
         return executeConnectorAtProcessInstantiationWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processInstanceId);
     }
@@ -727,7 +727,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         try {
             final GetArchivedProcessInstanceList getArchivedProcessInstanceList = new GetArchivedProcessInstanceList(processInstanceService,
-                    tenantAccessor.getSearchEntitiesDescriptor(), processInstanceId, 0, 1,
+                    tenantAccessor.getProcessDefinitionService(), tenantAccessor.getSearchEntitiesDescriptor(), processInstanceId, 0, 1,
                     BuilderFactory.get(SAProcessInstanceBuilderFactory.class).getIdKey(), OrderByType.ASC);
             getArchivedProcessInstanceList.execute();
             final ArchivedProcessInstance saprocessInstance = getArchivedProcessInstanceList.getResult().get(0);
@@ -760,7 +760,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
-                    throws ConnectorExecutionException {
+            throws ConnectorExecutionException {
         return executeConnectorOnActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, activityInstanceId);
     }
@@ -820,7 +820,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedActivityInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long activityInstanceId)
-                    throws ConnectorExecutionException {
+            throws ConnectorExecutionException {
         return executeConnectorOnCompletedActivityInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, activityInstanceId);
     }
@@ -848,7 +848,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final SAActivityInstance aactivityInstance = activityInstanceService.getMostRecentArchivedActivityInstance(activityInstanceId);
 
             final GetLastArchivedProcessInstance getLastArchivedProcessInstance = new GetLastArchivedProcessInstance(processInstanceService,
-                    aactivityInstance.getRootContainerId(), tenantAccessor.getSearchEntitiesDescriptor());
+                    tenantAccessor.getProcessDefinitionService(), aactivityInstance.getRootContainerId(), tenantAccessor.getSearchEntitiesDescriptor());
             getLastArchivedProcessInstance.execute();
 
             final long processDefinitionId = getLastArchivedProcessInstance.getResult().getProcessDefinitionId();
@@ -878,7 +878,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnCompletedProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-                    throws ConnectorExecutionException {
+            throws ConnectorExecutionException {
         return executeConnectorOnCompletedProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processInstanceId);
     }
@@ -902,8 +902,8 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
 
         try {
-            final GetLastArchivedProcessInstance getLastArchivedProcessInstance = new GetLastArchivedProcessInstance(processInstanceService, processInstanceId,
-                    tenantAccessor.getSearchEntitiesDescriptor());
+            final GetLastArchivedProcessInstance getLastArchivedProcessInstance = new GetLastArchivedProcessInstance(processInstanceService,
+                    tenantAccessor.getProcessDefinitionService(), processInstanceId, tenantAccessor.getSearchEntitiesDescriptor());
             getLastArchivedProcessInstance.execute();
             final ArchivedProcessInstance saprocessInstance = getLastArchivedProcessInstance.getResult();
             final long processDefinitionId = saprocessInstance.getProcessDefinitionId();
@@ -933,7 +933,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
     @Override
     public Map<String, Serializable> executeConnectorOnProcessInstance(final String connectorDefinitionId, final String connectorDefinitionVersion,
             final Map<String, Expression> connectorInputParameters, final Map<String, Map<String, Serializable>> inputValues, final long processInstanceId)
-                    throws ConnectorExecutionException {
+            throws ConnectorExecutionException {
         return executeConnectorOnProcessInstanceWithOrWithoutOperations(connectorDefinitionId, connectorDefinitionVersion, connectorInputParameters,
                 inputValues, null, null, processInstanceId);
     }
@@ -1022,7 +1022,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public ProcessInstance updateProcessInstance(final long processInstanceId, final ProcessInstanceUpdater updater) throws ProcessInstanceNotFoundException,
-    UpdateException {
+            UpdateException {
         if (updater == null || updater.getFields().isEmpty()) {
             throw new UpdateException("The update descriptor does not contain field updates");
         }
@@ -1204,7 +1204,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService) {
         return new EvaluateExpressionsDefinitionLevelExt(expressionsAndTheirPartialContext, processDefinitionId, expressionResolverService,
                 processDefinitionService, getTenantAccessor()
-                .getBusinessDataRepository());
+                        .getBusinessDataRepository());
     }
 
     @Override
@@ -1214,7 +1214,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final ExpressionResolverService expressionService) {
         return new EvaluateExpressionsInstanceLevelAndArchivedExt(expressions, containerId, containerType, processDefinitionId, time, expressionService,
                 getTenantAccessor()
-                .getBusinessDataRepository());
+                        .getBusinessDataRepository());
     }
 
     @Override

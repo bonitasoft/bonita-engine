@@ -10,11 +10,11 @@ package com.bonitasoft.engine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
-import org.bonitasoft.engine.BonitaTestRunner;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +25,7 @@ import com.bonitasoft.engine.page.Page;
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializerSP.class)
 @SuppressWarnings("javadoc")
-public class PageAPILocalIT extends CommonAPISPTest {
+public class PageAPILocalIT extends CommonAPISPIT {
 
     @Before
     public void before() throws BonitaException {
@@ -40,7 +40,7 @@ public class PageAPILocalIT extends CommonAPISPTest {
                 getPageAPI().deletePage(page.getId());
             }
         }
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     /*

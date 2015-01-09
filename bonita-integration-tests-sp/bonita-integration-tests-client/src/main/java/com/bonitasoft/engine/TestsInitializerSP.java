@@ -11,10 +11,10 @@ package com.bonitasoft.engine;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bonitasoft.engine.BonitaSuiteRunner;
 import org.bonitasoft.engine.TestsInitializer;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -47,7 +47,7 @@ public class TestsInitializerSP extends TestsInitializer {
 
     @Override
     protected List<String> getSpringConfigLocations() {
-        List<String> springConfigLocations = new ArrayList<String>(super.getSpringConfigLocations());
+        final List<String> springConfigLocations = new ArrayList<String>(super.getSpringConfigLocations());
         springConfigLocations.add("datasource-sp.xml");
         springConfigLocations.add("jndi-setup-sp.xml");
         return springConfigLocations;
@@ -63,8 +63,8 @@ public class TestsInitializerSP extends TestsInitializer {
     protected void initPlatformAndTenant() throws Exception {
         try {
             testUtil.createPlatformStructure();
-        } catch (Exception e) {
-            Logger logger = LoggerFactory.getLogger(BonitaSuiteRunner.class);
+        } catch (final Exception e) {
+            final Logger logger = LoggerFactory.getLogger(BonitaSuiteRunner.class);
             logger.error("unable to create platform", e);
             final PlatformSession session = testUtil.loginOnPlatform();
             final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(session);

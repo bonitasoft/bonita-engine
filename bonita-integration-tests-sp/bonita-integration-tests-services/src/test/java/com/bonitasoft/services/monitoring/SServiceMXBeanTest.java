@@ -104,7 +104,7 @@ public class SServiceMXBeanTest extends CommonServiceSPTest {
     /**
      * Assure that no Bonitasoft MBeans are registered in the MBServer before
      * each test.
-     * 
+     *
      * @throws MBeanRegistrationException
      * @throws InstanceNotFoundException
      */
@@ -119,7 +119,6 @@ public class SServiceMXBeanTest extends CommonServiceSPTest {
 
     @Test
     public void getActiveTransactionTest() throws Exception {
-
         // start the ServiceMXBean
         final SServiceMXBean svcMB = getServiceMXBean();
         svcMB.start();
@@ -174,36 +173,31 @@ public class SServiceMXBeanTest extends CommonServiceSPTest {
         final Trigger trigger = new OneShotTrigger("events", now, 10);
         schedulerService.schedule(jobDescriptor, parameters, trigger);
         getTransactionService().complete();
-        final WaitFor waitForJobExecuting = new WaitFor(50, 6000) {
-
-            @Override
-            boolean check() throws AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException {
-                // return svcMB.getExecutingJobsNb() == (startNbOfExecutingJobs
-                // + 1);
-                return (Long) mbserver.getAttribute(serviceMB, numberOfExecutingJobs) == startNbOfExecutingJobs + 1;
-            }
-        };
 
         // check the number of executing job has incremented
-        assertTrue(waitForJobExecuting.waitFor());
+        waitForJobExecuting(numberOfExecutingJobs, startNbOfExecutingJobs + 1);
 
         // set the storage variable to 1 to finish the Job execution
         storage.setVariable(theResponse, 1);
+
         // wait while the job finish its execution
-        final WaitFor waitforJobCompleted = new WaitFor(50, 5000) {
+        // check the number of executing jobs is 0
+        waitForJobExecuting(numberOfExecutingJobs, startNbOfExecutingJobs);
+
+        svcMB.stop();
+    }
+
+    private void waitForJobExecuting(final String numberOfExecutingJobs, final long startNbOfExecutingJobs) throws InterruptedException,
+            AttributeNotFoundException,
+            InstanceNotFoundException, MBeanException, ReflectionException {
+        final WaitFor waitForJobExecuting = new WaitFor(50, 10000) {
 
             @Override
             boolean check() throws AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException {
-                // return (svcMB.getExecutingJobsNb() ==
-                // startNbOfExecutingJobs);
-                return (Long) mbserver.getAttribute(serviceMB, "NumberOfExecutingJobs") == startNbOfExecutingJobs;
+                return (Long) mbserver.getAttribute(serviceMB, numberOfExecutingJobs) == startNbOfExecutingJobs;
             }
-
         };
-
-        // check the number of executing jobs is 0
-        assertTrue(waitforJobCompleted.waitFor());
-        svcMB.stop();
+        assertTrue(waitForJobExecuting.waitFor());
     }
 
     private class CreateTransactionThread implements Runnable {

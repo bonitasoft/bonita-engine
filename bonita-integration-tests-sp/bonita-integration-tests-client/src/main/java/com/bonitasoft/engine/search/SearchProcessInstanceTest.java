@@ -33,7 +33,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.api.ProcessAPI;
 import com.bonitasoft.engine.bpm.flownode.ArchivedProcessInstancesSearchDescriptor;
 import com.bonitasoft.engine.bpm.process.Index;
@@ -45,7 +45,7 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessInstanceUpdater;
  * @author Matthieu Chaffotte
  * @author Celine Souchet
  */
-public class SearchProcessInstanceTest extends CommonAPISPTest {
+public class SearchProcessInstanceTest extends CommonAPISPIT {
 
     private User user;
 
@@ -72,7 +72,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step2", processInstance1);
+        waitForUserTask(processInstance1, "step2");
         getProcessAPI().startProcess(processDefinition.getId());
 
         final ProcessInstanceUpdater updateDescriptor = new ProcessInstanceUpdater();
@@ -102,7 +102,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
         addUserToFirstActorOfProcess(1, processDefinition);
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step2", processInstance1);
+        waitForUserTask(processInstance1, "step2");
         getProcessAPI().startProcess(processDefinition.getId());
 
         final ProcessInstanceUpdater updateDescriptor = new ProcessInstanceUpdater();
@@ -135,7 +135,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step2", processInstance1);
+        waitForUserTask(processInstance1, "step2");
         getProcessAPI().startProcess(processDefinition.getId());
 
         final ProcessInstanceUpdater updateDescriptor = new ProcessInstanceUpdater();
@@ -168,7 +168,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step2", processInstance1);
+        waitForUserTask(processInstance1, "step2");
         getProcessAPI().startProcess(processDefinition.getId());
 
         final ProcessInstanceUpdater updateDescriptor = new ProcessInstanceUpdater();
@@ -201,7 +201,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
 
         getProcessAPI().enableProcess(processDefinition.getId());
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step2", processInstance1);
+        waitForUserTask(processInstance1, "step2");
         getProcessAPI().startProcess(processDefinition.getId());
 
         final ProcessInstanceUpdater updateDescriptor = new ProcessInstanceUpdater();
@@ -236,7 +236,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
                 .done();
         final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(designProcessDefinition1, ACTOR_NAME, user1);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
-        waitForUserTask("step1", processInstance1.getId());
+        waitForUserTask(processInstance1, "step1");
         logoutOnTenant();
 
         loginOnDefaultTenantWith("john1", "bpm");
@@ -244,7 +244,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
                 .done();
         final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(designProcessDefinition2, ACTOR_NAME, user2);
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
-        waitForUserTask("step1", processInstance2.getId());
+        waitForUserTask(processInstance2, "step1");
         logoutOnTenant();
 
         loginOnDefaultTenantWith("john3", "bpm");
@@ -252,7 +252,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
                 .done();
         final ProcessDefinition processDefinition3 = deployAndEnableProcessWithActor(designProcessDefinition3, ACTOR_NAME, user3);
         final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefinition3.getId());
-        waitForUserTask("step1", processInstance3.getId());
+        waitForUserTask(processInstance3, "step1");
         logoutOnTenant();
 
         loginOnDefaultTenantWith("john2", "bpm");
@@ -260,7 +260,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
                 .done();
         final ProcessDefinition processDefinition4 = deployAndEnableProcessWithActor(designProcessDefinition4, ACTOR_NAME, user4);
         final ProcessInstance processInstance4 = getProcessAPI().startProcess(processDefinition4.getId());
-        waitForUserTask("step1", processInstance4.getId());
+        waitForUserTask(processInstance4, "step1");
         logoutOnTenant();
 
         loginOnDefaultTenantWith("john4", "bpm");
@@ -268,7 +268,7 @@ public class SearchProcessInstanceTest extends CommonAPISPTest {
                 .done();
         final ProcessDefinition processDefinition5 = deployAndEnableProcessWithActor(designProcessDefinition5, ACTOR_NAME, user1);
         final ProcessInstance processInstance5 = getProcessAPI().startProcess(processDefinition5.getId());
-        waitForUserTask("step1", processInstance5.getId());
+        waitForUserTask(processInstance5, "step1");
 
         // Search term for STRING_INDEX
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);

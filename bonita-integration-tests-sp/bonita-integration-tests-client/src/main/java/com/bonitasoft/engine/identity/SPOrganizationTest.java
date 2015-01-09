@@ -15,13 +15,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.api.IdentityAPI;
 
 /**
  * @author Celine Souchet
  */
-public class SPOrganizationTest extends CommonAPISPTest {
+public class SPOrganizationTest extends CommonAPISPIT {
 
     @After
     public void afterTest() throws Exception {

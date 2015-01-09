@@ -33,12 +33,12 @@ import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.junit.After;
 import org.junit.Before;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 
 /**
  * @author Baptiste Mesta
  */
-public abstract class AbstractProfileSPTest extends CommonAPISPTest {
+public abstract class AbstractProfileSPTest extends CommonAPISPIT {
 
     protected static final String IMPORT_PROFILES_CMD = "importProfilesCommand";
 

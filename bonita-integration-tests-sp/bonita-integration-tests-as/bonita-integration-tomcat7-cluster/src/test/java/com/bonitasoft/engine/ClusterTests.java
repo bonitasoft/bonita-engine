@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bonitasoft.engine.api.ProcessAPI;
 import org.apache.commons.io.IOUtils;
 import org.bonitasoft.engine.BPMRemoteTests;
 import org.bonitasoft.engine.api.ApiAccessType;
@@ -41,6 +42,7 @@ import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.io.IOUtil;
 import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.engine.test.wait.WaitProcessToFinishAndBeArchived;
 import org.bonitasoft.engine.util.APITypeManager;
 import org.junit.After;
 import org.junit.Before;
@@ -56,7 +58,7 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 /**
  * @author Baptiste Mesta
  */
-public class ClusterTests extends CommonAPISPTest {
+public class ClusterTests extends CommonAPISPIT {
 
     static Logger LOGGER = LoggerFactory.getLogger(ClusterTests.class);
 
@@ -241,7 +243,7 @@ public class ClusterTests extends CommonAPISPTest {
         loginOnDefaultTenantWith(USERNAME, PASSWORD);
         try {
             // then: node2 should finish the work
-            waitForProcessToFinishAndBeArchived(pi);
+            waitProcessToFinishAndBeArchived(pi, getProcessAPI());
         } finally {
             // cleanup
             disableAndDeleteProcess(pd);
@@ -250,6 +252,15 @@ public class ClusterTests extends CommonAPISPTest {
             startPlatform();
             loginOnDefaultTenantWith(USERNAME, PASSWORD);
         }
+    }
+
+    public void waitProcessToFinishAndBeArchived(final ProcessInstance processInstance, ProcessAPI processAPI) throws Exception {
+        final boolean waitUntil = new WaitProcessToFinishAndBeArchived(DEFAULT_REPEAT_EACH, DEFAULT_TIMEOUT, processInstance, processAPI).waitUntil();
+        if (!waitUntil) {
+            printFlowNodes(processInstance);
+            printArchivedFlowNodes(processInstance);
+        }
+        assertTrue("Process was not finished", waitUntil);
     }
 
 }

@@ -20,6 +20,9 @@
 		<copy todir="${target.dir}/home" overwrite="true">
 			<fileset dir="${bonita.home}/hibernate" />
 		</copy>
+		<copy todir="${basedir}/target/home" overwrite="true">
+			<fileset dir="${bonita.home}/target/common/home" excludes="**/.svn" />
+		</copy>
 		<echo>Copy specific "SP Performance edition" configuration files</echo>
 		<copy todir="${target.dir}/home" overwrite="true">
 			<fileset dir="${bonita.home}/editions/performance" />

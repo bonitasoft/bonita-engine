@@ -8,8 +8,8 @@
  *******************************************************************************/
 package com.bonitasoft.engine;
 
-import org.bonitasoft.engine.BonitaSuiteRunner;
-import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 
@@ -35,26 +35,26 @@ import com.bonitasoft.engine.tenant.TenantIT;
 
 @RunWith(BonitaSuiteRunner.class)
 @SuiteClasses({
-    PageAPIIT.class,
-    ApplicationAPIITs.class,
-    TenantIT.class,
-    NodeAPITest.class,
-    LogTest.class,
-    ExternalCommandsTestSP.class,
-    ActivityTests.class,
-    ProcessTests.class,
-    SupervisedTests.class,
-    ProfileAllSPITest.class,
-    RemoteConnectorExecutionTestSP.class,
-    MonitoringAPITest.class,
-    SearchEntitiesTests.class,
-    ReportingAPIIT.class,
-    ReportingSQLValidityIT.class,
-    PlatformMonitoringAPITest.class,
-    TenantIT.class,
-    OperationTest.class,
-    BDRepositoryIT.class,
-    ExecuteBDMQueryCommandIT.class
+        PageAPIIT.class,
+        ApplicationAPIITs.class,
+        TenantIT.class,
+        NodeAPITest.class,
+        LogTest.class,
+        ExternalCommandsTestSP.class,
+        ActivityTests.class,
+        ProcessTests.class,
+        SupervisedTests.class,
+        ProfileAllSPITest.class,
+        RemoteConnectorExecutionTestSP.class,
+        MonitoringAPITest.class,
+        SearchEntitiesTests.class,
+        ReportingAPIIT.class,
+        ReportingSQLValidityIT.class,
+        PlatformMonitoringAPITest.class,
+        TenantIT.class,
+        OperationTest.class,
+        BDRepositoryIT.class,
+        ExecuteBDMQueryCommandIT.class
 })
 @Initializer(TestsInitializerSP.class)
 public class BPMRemoteSPTests {

@@ -26,7 +26,7 @@ import org.bonitasoft.engine.session.PlatformSession;
 import org.junit.Test;
 
 import com.bonitasoft.engine.BPMTestSPUtil;
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.api.LoginAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.api.TenantAPIAccessor;
@@ -36,7 +36,7 @@ import com.bonitasoft.engine.platform.TenantCriterion;
 /**
  * @author Matthieu Chaffotte
  */
-public class SPUserTest extends CommonAPISPTest {
+public class SPUserTest extends CommonAPISPIT {
 
     @Test(expected = LoginException.class)
     public void loginFailsUsingWrongTenant() throws LoginException, BonitaException {

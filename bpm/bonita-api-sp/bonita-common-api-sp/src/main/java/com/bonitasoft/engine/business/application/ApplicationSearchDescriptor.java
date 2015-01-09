@@ -8,18 +8,14 @@
  *******************************************************************************/
 package com.bonitasoft.engine.business.application;
 
-import org.bonitasoft.engine.search.SearchOptions;
-
-import com.bonitasoft.engine.api.ApplicationAPI;
-
 /**
- * Defines the fields that can be used in the {@link SearchOptions} when searching for {@link Application}s
+ * Defines the fields that can be used in the {@link org.bonitasoft.engine.search.SearchOptions} when searching for {@link Application}s
  *
  * @author Elias Ricken de Medeiros
  * @since 6.4
- * @see SearchOptions
+ * @see org.bonitasoft.engine.search.SearchOptions
  * @see Application
- * @see ApplicationAPI#searchApplications(SearchOptions)
+ * @see com.bonitasoft.engine.api.ApplicationAPI#searchApplications(SearchOptions)
  */
 public class ApplicationSearchDescriptor {
 
@@ -70,15 +66,15 @@ public class ApplicationSearchDescriptor {
 
     /**
      * Used to filter or order by the <code>Application</code> state. The possible values are {@link ApplicationState#ACTIVATED#name()} and
-     * {@link ApplicationState#DEACTIVATED
-     * #name()}
+     * {@link ApplicationState#DEACTIVATED#name()}
      *
      * @see ApplicationState
      */
     public static final String STATE = "state";
 
     /**
-     * Used to filter or order by the identifier of {@link org.bonitasoft.engine.profile.Profile} associated to the {@link com.bonitasoft.engine.business.application.Application}.
+     * Used to filter or order by the identifier of {@link org.bonitasoft.engine.profile.Profile} associated to the
+     * {@link com.bonitasoft.engine.business.application.Application}.
      *
      * @see org.bonitasoft.engine.profile.Profile
      * @see com.bonitasoft.engine.business.application.Application

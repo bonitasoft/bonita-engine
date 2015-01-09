@@ -39,6 +39,24 @@ public class ProxyfierTest {
     private Proxyfier proxyfier;
 
     @Test
+    public void should_return_null_when_entity_is_null() throws Exception {
+        TestEntity entity = null;
+        
+        TestEntity proxy = proxyfier.proxify(entity);
+        
+        assertThat(proxy).isNull();
+    }
+    
+    @Test
+    public void should_return_null_when_list_of_entities_is_null() throws Exception {
+        List<TestEntity> entities = null;
+        
+        List<TestEntity> proxies = proxyfier.proxify(entities);
+        
+        assertThat(proxies).isNull();
+    }
+    
+    @Test
     public void should_proxify_an_entity() {
         final TestEntity entity = new TestEntity();
 

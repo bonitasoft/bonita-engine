@@ -46,4 +46,11 @@
 			</map>
 		</constructor-arg>
 	</bean>
+    
+    <bean id="jsonBusinessDataSerializer" class="com.bonitasoft.engine.business.data.impl.JsonBusinessDataSerializerImpl"/>
+       
+    <bean id="businessDataService" class="com.bonitasoft.engine.business.data.impl.BusinessDataServiceImpl">
+        <constructor-arg name="businessDataRepository" ref="businessDataRepository" />
+        <constructor-arg name="jsonBusinessDataSerializer" ref="jsonBusinessDataSerializer" />
+    </bean>
 </beans>
