@@ -39,7 +39,6 @@ DROP TABLE dependencymapping;
 DROP TABLE dependency;
 DROP TABLE pdependencymapping;
 DROP TABLE pdependency;
-DROP TABLE document_content;
 DROP TABLE external_identity_mapping;
 DROP TABLE user_membership;
 DROP TABLE custom_usr_inf_val;
