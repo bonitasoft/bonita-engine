@@ -658,8 +658,20 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Process Version" }, jira = "")
     @Test
-    public void callActivityUsingInexistingVersion() throws Exception {
+    public void callActivityUsingUndeployedVersion() throws Exception {
         final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", "unexisting_version_4.0");
+        final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
+
+        final ActivityInstance failedTask = waitForTaskToFail(callingProcessInstance);
+        assertThat(failedTask.getName()).isEqualTo("callActivity");
+
+        disableAndDeleteProcess(callingProcessDef);
+    }
+
+    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Undeployed target" }, jira = "BS-10502")
+    @Test
+    public void callActivityUsingUndeployedProcess() throws Exception {
+        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", null);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
 
         final ActivityInstance failedTask = waitForTaskToFail(callingProcessInstance);
