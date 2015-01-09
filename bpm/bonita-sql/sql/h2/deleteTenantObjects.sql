@@ -37,7 +37,6 @@ DELETE FROM data_mapping WHERE tenantid = ${tenantid};
 DELETE FROM data_instance WHERE tenantid = ${tenantid};
 DELETE FROM dependencymapping WHERE tenantid = ${tenantid};
 DELETE FROM dependency WHERE tenantid = ${tenantid};
-DELETE FROM document_content WHERE tenantid = ${tenantid};
 DELETE FROM external_identity_mapping WHERE tenantid = ${tenantid};
 DELETE FROM user_membership WHERE tenantid = ${tenantid};
 DELETE FROM custom_usr_inf_val WHERE tenantid = ${tenantid};

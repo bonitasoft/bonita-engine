@@ -55,7 +55,6 @@ DELETE FROM data_instance;
 DELETE FROM dependencymapping;
 
 DELETE FROM dependency;
-DELETE FROM document_content;
 DELETE FROM external_identity_mapping;
 DELETE FROM user_membership;
 
