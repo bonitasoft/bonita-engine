@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012, 2014 BonitaSoft S.A.
+ * Copyright (C) 2012, 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -39,6 +39,16 @@ public interface SDocumentBuilderFactory {
 
     SDocumentBuilder createNewInstance(String fileName, String mimetype, long authorId);
 
+    /**
+     * @param fileName
+     * @param mimetype
+     * @param authorId
+     * @param content
+     * @return
+     * @throws IllegalArgumentException
+     *         if the content or the fileName is null or empty
+     * @since 6.4.0
+     */
     SDocumentBuilder createNewProcessDocument(String fileName, String mimetype, long authorId, byte[] content);
 
     SDocumentBuilder createNewExternalProcessDocumentReference(String fileName, String mimetype, long authorId, final String url);

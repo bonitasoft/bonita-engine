@@ -24,25 +24,16 @@ public class SIllegalStateTransition extends SActivityExecutionException {
     
     private static final long serialVersionUID = 6940283544247417112L;
     
-    private final boolean fromTerminalState;
-    
-    public SIllegalStateTransition(String message, Throwable cause, boolean terminalState) {
+    public SIllegalStateTransition(String message, Throwable cause) {
         super(message, cause);
-        this.fromTerminalState = terminalState;
     }
 
-    public SIllegalStateTransition(String message, boolean fromTerminalState) {
+    public SIllegalStateTransition(String message) {
         super(message);
-        this.fromTerminalState = fromTerminalState;
     }
 
-    public SIllegalStateTransition(Throwable cause, boolean terminalState) {
+    public SIllegalStateTransition(Throwable cause) {
         super(cause);
-        this.fromTerminalState = terminalState;
     }
     
-    public boolean isTransitionFromTerminalState() {
-        return fromTerminalState;
-    }
-
 }

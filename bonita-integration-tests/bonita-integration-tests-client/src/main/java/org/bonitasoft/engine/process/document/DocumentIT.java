@@ -111,11 +111,9 @@ public class DocumentIT extends TestWithUser {
     @Test
     public void removeADocument() throws BonitaException {
         final ProcessInstance pi = deployAndEnableWithActorAndStartIt(user);
-        Document attachment;
         try {
             //given
-            final Document doc = buildReferenceToExternalDocument();
-            attachment = getProcessAPI().attachDocument(pi.getId(), doc.getName(), doc.getContentFileName(), doc.getContentMimeType(), new byte[] { 1, 2, 3 });
+            final Document attachment = getProcessAPI().attachDocument(pi.getId(), "Name", "FileName", "MimeType", new byte[] { 1, 2, 3 });
 
             //when
             final Document document = getProcessAPI().removeDocument(attachment.getId());
@@ -133,7 +131,6 @@ public class DocumentIT extends TestWithUser {
             assertThat(archivedDocumentSearchResult.getResult()).hasSize(1);
             assertThat(archivedDocumentSearchResult.getResult().get(0).getContentStorageId()).isEqualTo(document.getContentStorageId());
             assertThat(getProcessAPI().getDocumentContent(document.getContentStorageId())).isEqualTo(new byte[] { 1, 2, 3 });
-
         } finally {
             disableAndDeleteProcess(pi.getProcessDefinitionId());
         }
@@ -932,13 +929,11 @@ public class DocumentIT extends TestWithUser {
     @Test
     public void startProcessAndSetDocumentValueWithOperations() throws Exception {
         final ProcessDefinitionBuilder designProcessDefinition = new ProcessDefinitionBuilder().createNewInstance("LivingDay", "1.0");
-        final String ACTOR_NAME = "documentalist";
         final String docRefName = "invoiceReference";
         designProcessDefinition.addData(docRefName, DocumentValue.class.getName(), null);
         final String docName = "invoiceLetter";
         designProcessDefinition.addData(docName, DocumentValue.class.getName(), null);
         designProcessDefinition.addActor(ACTOR_NAME);
-        // ...
         designProcessDefinition.addUserTask("step1", ACTOR_NAME);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
 
@@ -956,6 +951,7 @@ public class DocumentIT extends TestWithUser {
         final ProcessInstance myCase = getProcessAPI()
                 .startProcess(processDefinition.getId(), Arrays.asList(docContentOperation, docRefOperation), expressionContext);
         waitForUserTask(myCase, "step1");
+
         SearchResult<Document> searchDocuments = getProcessAPI().searchDocuments(
                 new SearchOptionsBuilder(0, 5).filter(DocumentsSearchDescriptor.DOCUMENT_NAME, docRefName).done());
         assertEquals(docUrl, searchDocuments.getResult().get(0).getUrl());
