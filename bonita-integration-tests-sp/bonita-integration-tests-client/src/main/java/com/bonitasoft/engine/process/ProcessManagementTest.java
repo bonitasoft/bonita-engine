@@ -39,6 +39,7 @@ import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bonitasoft.engine.BuildTestUtilSP;
@@ -308,6 +309,7 @@ public class ProcessManagementTest extends CommonAPISPIT {
         disableAndDeleteProcess(process1);
     }
 
+    @Ignore("wait for fix BS-9946")
     @Cover(classes = { ProcessAPI.class }, concept = BPMNConcept.SUB_TASK, jira = "BS-2735", keywords = { "Sub-task", "Human task", "Skipped" })
     @Test
     public void skipHumanTaskShouldAbortSubtasks() throws Exception {
