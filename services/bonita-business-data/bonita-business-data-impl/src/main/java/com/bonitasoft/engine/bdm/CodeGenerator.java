@@ -148,8 +148,8 @@ public class CodeGenerator {
     public JClass toJavaClass(final Field field) {
         if (field instanceof SimpleField) {
             final Class<?> fieldClass = ((SimpleField) field).getType().getClazz();
-            return getModel().ref(fieldClass);
-        }
+                return getModel().ref(fieldClass);
+            }
         final String qualifiedName = ((RelationField) field).getReference().getQualifiedName();
         return getModel().ref(qualifiedName);
     }
@@ -207,13 +207,11 @@ public class CodeGenerator {
         final JClass fieldClass = toJavaClass(field);
         final StringBuilder builder = new StringBuilder(parameterName);
         builder.append(WordUtils.capitalize(field.getName()));
-
         final JMethod method = definedClass.method(JMod.PUBLIC, void.class, builder.toString());
         final JVar adderParam = method.param(fieldClass, parameterName);
-        final JMethod getterMethod = definedClass.getMethod(getGetterName(field), new JType[0]);
         final JBlock body = method.body();
-        final JVar decl = body.decl(getModel().ref(List.class), field.getName(), JExpr.invoke(getterMethod));
-        method.body().add(decl.invoke(listMethodName).arg(adderParam));
+        final JVar decl = body.decl(getModel().ref(List.class), field.getName(), JExpr.invoke(getGetterName(field)));
+        body.add(decl.invoke(listMethodName).arg(adderParam));
         return method;
     }
 
@@ -236,7 +234,7 @@ public class CodeGenerator {
     }
 
     public String getGetterName(final Field field) {
-        final boolean bool = field instanceof SimpleField && FieldType.BOOLEAN.equals(((SimpleField) field).getType());
+        final boolean bool = field instanceof SimpleField && FieldType.BOOLEAN.equals(((SimpleField) field).getType()) && !field.isCollection();
         return getGetterName(bool, field.getName());
     }
 
