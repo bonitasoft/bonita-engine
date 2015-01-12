@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.execution.state;
 
-import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.expression.control.api.ExpressionResolverService;
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
@@ -42,16 +41,13 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
 
     private final ExpressionResolverService expressionResolverService;
 
-    private final BPMInstancesCreator bpmInstancesCreator;
-
     private final ActivityInstanceService activityInstanceService;
 
     private final StateBehaviors stateBehaviors;
 
-    public InitializingMultiInstanceActivityStateImpl(final ExpressionResolverService expressionResolverService, final BPMInstancesCreator bpmInstancesCreator,
+    public InitializingMultiInstanceActivityStateImpl(final ExpressionResolverService expressionResolverService,
             final ActivityInstanceService activityInstanceService, final StateBehaviors stateBehaviors) {
         this.expressionResolverService = expressionResolverService;
-        this.bpmInstancesCreator = bpmInstancesCreator;
         this.activityInstanceService = activityInstanceService;
         this.stateBehaviors = stateBehaviors;
     }
@@ -64,7 +60,6 @@ public class InitializingMultiInstanceActivityStateImpl implements FlowNodeState
             final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
             final SActivityDefinition activity = (SActivityDefinition) processContainer.getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
             final SLoopCharacteristics loopCharacteristics = activity.getLoopCharacteristics();
-            bpmInstancesCreator.addChildDataContainer(multiInstanceActivityInstance);
             if (loopCharacteristics instanceof SMultiInstanceLoopCharacteristics) {
                 final SMultiInstanceLoopCharacteristics miLoop = (SMultiInstanceLoopCharacteristics) loopCharacteristics;
                 final SExpression loopCardinality = miLoop.getLoopCardinality();

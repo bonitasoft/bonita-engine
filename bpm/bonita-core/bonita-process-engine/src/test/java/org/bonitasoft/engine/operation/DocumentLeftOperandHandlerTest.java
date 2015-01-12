@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.operation;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
@@ -25,6 +24,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.HashMap;
 
 import org.bonitasoft.engine.bpm.document.DocumentValue;
@@ -89,20 +89,15 @@ public class DocumentLeftOperandHandlerTest {
     }
 
     @Test
-    public void handlerSupportsBatchUpdate() {
-        assertThat(handler.supportBatchUpdate()).isTrue();
-    }
-
-    @Test
     public void should_update_check_the_type() throws Exception {
         exception.expect(SOperationExecutionException.class);
         exception.expectMessage("Document operation only accepts an expression returning a DocumentValue and not java.util.HashMap");
-        handler.update(new SLeftOperandImpl(), new HashMap<Object, Object>(), 45l, "container");
+        handler.update(new SLeftOperandImpl(), Collections.<String,Object>emptyMap(), new HashMap<Object, Object>(), 45l, "container");
     }
 
     @Test
     public void should_update_delete_if_type_is_null() throws Exception {
-        handler.update(createLeftOperand("myDoc"), null, 45l, "PROCESS_INSTANCE");
+        handler.update(createLeftOperand("myDoc"), Collections.<String,Object>emptyMap(), null, 45l, "PROCESS_INSTANCE");
         verify(documentService).removeCurrentVersion(45l, "myDoc");
     }
 
@@ -111,7 +106,7 @@ public class DocumentLeftOperandHandlerTest {
         //given
         doThrow(new SObjectNotFoundException("myDoc")).when(documentService).getMappedDocument(45l, "myDoc");
         //when
-        handler.update(createLeftOperand("myDoc"), new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 45l, "PROCESS_INSTANCE");
+        handler.update(createLeftOperand("myDoc"), Collections.<String,Object>emptyMap(), new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 45l, "PROCESS_INSTANCE");
         //then
         verify(documentService).attachDocumentToProcessInstance(any(SDocument.class), eq(45l), eq("myDoc"), isNull(String.class));
     }
@@ -122,7 +117,7 @@ public class DocumentLeftOperandHandlerTest {
         final SMappedDocument sMappedDocument = mock(SMappedDocument.class);
         doReturn(sMappedDocument).when(documentService).getMappedDocument(45l, "myDoc");
         //when
-        handler.update(createLeftOperand("myDoc"), new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 45l, "PROCESS_INSTANCE");
+        handler.update(createLeftOperand("myDoc"), Collections.<String,Object>emptyMap(), new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 45l, "PROCESS_INSTANCE");
         //then
         verify(documentService).updateDocument(eq(sMappedDocument), any(SDocument.class));
     }
@@ -135,7 +130,7 @@ public class DocumentLeftOperandHandlerTest {
         final SMappedDocument sMappedDocument = mock(SMappedDocument.class);
         doReturn(sMappedDocument).when(documentService).getMappedDocument(45l, "myDoc");
         //when
-        handler.update(createLeftOperand("myDoc"), new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 12l, "notProcess");
+        handler.update(createLeftOperand("myDoc"), Collections.<String,Object>emptyMap(), new DocumentValue("content".getBytes(), "plain/text", "file.txt"), 12l, "notProcess");
         //then
         verify(documentService).updateDocument(eq(sMappedDocument), any(SDocument.class));
 
@@ -146,7 +141,7 @@ public class DocumentLeftOperandHandlerTest {
         //given
         doReturn(mock(SMappedDocument.class)).when(documentService).getMappedDocument(45l, "myDoc");
         //when
-        handler.update(createLeftOperand("myDoc"), new DocumentValue(123l), 45l, "PROCESS_INSTANCE");
+        handler.update(createLeftOperand("myDoc"), Collections.<String,Object>emptyMap(), new DocumentValue(123l), 45l, "PROCESS_INSTANCE");
         //then
         verify(documentService, times(0)).updateDocument(any(SMappedDocument.class), any(SDocument.class));
     }

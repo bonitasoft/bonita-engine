@@ -97,6 +97,7 @@ import org.bonitasoft.engine.core.process.instance.model.event.SThrowEventInstan
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingEvent;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilderFactory;
@@ -184,13 +185,16 @@ public class StateBehaviors {
 
     private final TokenService tokenService;
 
+    protected final ParentContainerResolver parentContainerResolver;
+
     public StateBehaviors(final BPMInstancesCreator bpmInstancesCreator, final EventsHandler eventsHandler,
             final ActivityInstanceService activityInstanceService, final UserFilterService userFilterService, final ClassLoaderService classLoaderService,
             final ActorMappingService actorMappingService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService, final ProcessDefinitionService processDefinitionService,
             final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
             final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceService, final SchedulerService schedulerService,
-            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final TokenService tokenService) {
+            final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final TokenService tokenService,
+            final ParentContainerResolver parentContainerResolver) {
         super();
         this.bpmInstancesCreator = bpmInstancesCreator;
         this.eventsHandler = eventsHandler;
@@ -211,6 +215,7 @@ public class StateBehaviors {
         this.identityService = identityService;
         this.logger = logger;
         this.tokenService = tokenService;
+        this.parentContainerResolver = parentContainerResolver;
     }
 
     public void setProcessExecutor(final ProcessExecutor processExecutor) {
@@ -254,9 +259,9 @@ public class StateBehaviors {
     public void mapDataOutputOfMultiInstance(final SFlowNodeInstance flowNodeInstance, final SMultiInstanceLoopCharacteristics miLoop)
             throws SActivityExecutionException, SBonitaException {
         final SDataInstance outputData = dataInstanceService.getDataInstance(miLoop.getDataOutputItemRef(), flowNodeInstance.getId(),
-                DataInstanceContainer.ACTIVITY_INSTANCE.name());
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
         final SDataInstance loopData = dataInstanceService.getDataInstance(miLoop.getLoopDataOutputRef(), flowNodeInstance.getId(),
-                DataInstanceContainer.ACTIVITY_INSTANCE.name());
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
         if (outputData != null && loopData != null) {
             final Serializable value = loopData.getValue();
             final int index = flowNodeInstance.getLoopCounter();
@@ -374,15 +379,15 @@ public class StateBehaviors {
 
     /**
      * Return the phases and connectors to execute, as a couple of (phase, couple of (connector instance, connector definition))
-     *
+     * 
      * @param processDefinition
-     *        the process where the connectors are defined.
+     *            the process where the connectors are defined.
      * @param flowNodeInstance
-     *        the instance of the flow node to execute possible connectors on.
+     *            the instance of the flow node to execute possible connectors on.
      * @param executeConnectorsOnEnter
-     *        do we want to consider the connectors ON_ENTER or ignore them?
+     *            do we want to consider the connectors ON_ENTER or ignore them?
      * @param executeConnectorsOnFinish
-     *        do we want to consider the connectors ON_FINISH or ignore them?
+     *            do we want to consider the connectors ON_FINISH or ignore them?
      * @return the phases and connectors to execute
      * @throws SActivityStateExecutionException
      */
@@ -496,29 +501,12 @@ public class StateBehaviors {
     }
 
     public void createData(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
-        boolean childHaveData = false;
         if (flowNodeInstance instanceof SActivityInstance) {
             final String containerType = getParentContainerType(flowNodeInstance).name();
             final SExpressionContext sExpressionContext = new SExpressionContext(flowNodeInstance.getParentContainerId(), containerType,
                     processDefinition.getId());
-            childHaveData = bpmInstancesCreator.createDataInstances(processDefinition, flowNodeInstance, sExpressionContext);
+            bpmInstancesCreator.createDataInstances(processDefinition, flowNodeInstance, sExpressionContext);
         }
-        final SFlowNodeDefinition flowNodeDefinition = processDefinition.getProcessContainer().getFlowNode(flowNodeInstance.getFlowNodeDefinitionId());
-        if (hasLocalOrInheritedData(processDefinition, childHaveData, flowNodeDefinition)) {
-            bpmInstancesCreator.addChildDataContainer(flowNodeInstance);
-        }
-    }
-
-    private boolean hasLocalOrInheritedData(final SProcessDefinition processDefinition, final boolean childHaveData,
-            final SFlowNodeDefinition flowNodeDefinition) {
-        // processDefinition.getProcessContainer() is different of flowNodeDefinition.getParentContainer() in the case of a sub process
-        boolean hasLocalOrInheritedData = childHaveData || !processDefinition.getProcessContainer().getDataDefinitions().isEmpty();
-
-        // can be null if the task has been added at runtime (sub tasks)
-        if (flowNodeDefinition != null) {
-            hasLocalOrInheritedData = hasLocalOrInheritedData || !flowNodeDefinition.getParentContainer().getDataDefinitions().isEmpty();
-        }
-        return hasLocalOrInheritedData;
     }
 
     public void handleCallActivity(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance)
@@ -929,7 +917,7 @@ public class StateBehaviors {
     public int getNumberOfInstancesToCreateFromInputRef(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
             final SMultiInstanceLoopCharacteristics miLoop, final int numberOfInstanceMax) throws SDataInstanceException, SActivityStateExecutionException {
         final SDataInstance loopDataInput = dataInstanceService.getDataInstance(miLoop.getLoopDataInputRef(), flowNodeInstance.getId(),
-                DataInstanceContainer.ACTIVITY_INSTANCE.name());
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
         if (loopDataInput != null) {
             final Serializable value = loopDataInput.getValue();
             if (value instanceof List) {
@@ -948,7 +936,7 @@ public class StateBehaviors {
             return miActivityInstance.getLoopCardinality() > numberOfInstances;
         }
         final SDataInstance dataInstance = dataInstanceService.getDataInstance(loopCharacteristics.getLoopDataInputRef(), miActivityInstance.getId(),
-                DataInstanceContainer.ACTIVITY_INSTANCE.name());
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
         if (dataInstance != null) {
             final List<?> loopDataInputCollection = (List<?>) dataInstance.getValue();
             return numberOfInstances < loopDataInputCollection.size();
@@ -961,7 +949,7 @@ public class StateBehaviors {
         final String loopDataOutputRef = miLoop.getLoopDataOutputRef();
         if (loopDataOutputRef != null) {
             final SDataInstance loopDataOutput = dataInstanceService.getDataInstance(loopDataOutputRef, flowNodeInstance.getId(),
-                    DataInstanceContainer.ACTIVITY_INSTANCE.name());
+                    DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
             if (loopDataOutput != null) {
                 final Serializable outValue = loopDataOutput.getValue();
                 if (outValue instanceof List) {

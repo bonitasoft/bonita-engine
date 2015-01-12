@@ -91,6 +91,7 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceIm
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
@@ -173,6 +174,8 @@ public class ProcessAPIImplTest {
 
     @Mock
     private DataInstanceService dataInstanceService;
+    @Mock
+    private ParentContainerResolver parentContainerResolver;
 
     @Mock
     private ProcessDefinitionService processDefinitionService;
@@ -239,6 +242,7 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getSearchEntitiesDescriptor()).thenReturn(searchEntitiesDescriptor);
         when(tenantAccessor.getEventInstanceService()).thenReturn(eventInstanceService);
         when(tenantAccessor.getFlowNodeStateManager()).thenReturn(flowNodeStateManager);
+        when(tenantAccessor.getParentContainerResolver()).thenReturn(parentContainerResolver);
     }
 
     @Test
@@ -345,7 +349,7 @@ public class ProcessAPIImplTest {
         processAPI.updateProcessDataInstance("foo", PROCESS_INSTANCE_ID, "go");
 
         // Then
-        verify(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), eq(Collections.<String, Serializable> singletonMap("foo", "go")));
+        verify(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), eq(Collections.<String, Serializable>singletonMap("foo", "go")));
     }
 
     @Test(expected = UpdateException.class)
@@ -370,7 +374,7 @@ public class ProcessAPIImplTest {
         sDataBar.setClassName(String.class.getName());
         sDataBar.setName("bar");
 
-        doReturn(asList(sDataFoo, sDataBar)).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString());
+        doReturn(asList(sDataFoo, sDataBar)).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString(), any(ParentContainerResolver.class));
 
         // Then update the data instances
         final Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
@@ -397,7 +401,7 @@ public class ProcessAPIImplTest {
         dataInstance.setClassName(List.class.getName());
         dataInstance.setName(dataName);
         doReturn(Collections.singletonList(dataInstance)).when(dataInstanceService).getDataInstances(Collections.singletonList(dataName),
-                PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.toString());
+                PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.toString(), parentContainerResolver);
 
         // When
         try {
@@ -417,7 +421,7 @@ public class ProcessAPIImplTest {
     public void should_updateProcessDataInstances_call_DataInstance_on_non_existing_data_throw_UpdateException() throws Exception {
         final long processInstanceId = 42l;
         doReturn(null).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
-        doThrow(new SDataInstanceReadException("Mocked")).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString());
+        doThrow(new SDataInstanceReadException("Mocked")).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString(), any(ParentContainerResolver.class));
 
         // Then update the data instances
         final Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
@@ -561,7 +565,7 @@ public class ProcessAPIImplTest {
         final SBlobDataInstanceImpl dataInstance = new SBlobDataInstanceImpl();
         dataInstance.setClassName(List.class.getName());
         dataInstance.setName(dataName);
-        doReturn(dataInstance).when(dataInstanceService).getDataInstance(dataName, FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.toString());
+        doReturn(dataInstance).when(dataInstanceService).getDataInstance(dataName, FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
 
         // When
         try {
@@ -712,12 +716,12 @@ public class ProcessAPIImplTest {
 
         final SDataInstance dataInstance = mock(SDataInstance.class);
         when(dataInstanceService.getDataInstances(anyListOf(String.class), anyLong(),
-                eq(DataInstanceContainer.ACTIVITY_INSTANCE.toString()))).thenReturn(Arrays.asList(dataInstance));
-
-        doReturn(mock(SOperation.class)).when(processAPI).convertOperation(operation);
+                eq(DataInstanceContainer.ACTIVITY_INSTANCE.toString()), any(ParentContainerResolver.class))).thenReturn(Arrays.asList(dataInstance));
 
         final List<Operation> operations = new ArrayList<Operation>();
         operations.add(operation);
+        doReturn(Arrays.asList(mock(SOperation.class))).when(processAPI).convertOperations(operations);
+
         processAPI.updateActivityInstanceVariables(operations, 2, null);
 
         verify(classLoaderService).getLocalClassLoader(anyString(), anyLong());

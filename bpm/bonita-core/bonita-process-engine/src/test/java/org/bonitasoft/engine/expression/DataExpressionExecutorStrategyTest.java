@@ -11,8 +11,9 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.engine.data.instance.api.test;
+package org.bonitasoft.engine.expression;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -22,11 +23,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.bonitasoft.engine.data.instance.api.DataExpressionExecutorStrategy;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.expression.ContainerState;
+import org.bonitasoft.engine.expression.DataExpressionExecutorStrategy;
 import org.bonitasoft.engine.expression.exception.SExpressionDependencyMissingException;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.expression.model.SExpression;
@@ -53,6 +55,9 @@ public class DataExpressionExecutorStrategyTest {
     private SExpression expression;
 
     @Mock
+    private ParentContainerResolver parentContainerResolver;
+
+    @Mock
     private Iterator<SExpression> exprIterator;
 
     @InjectMocks
@@ -67,7 +72,7 @@ public class DataExpressionExecutorStrategyTest {
         // when(exprIterator.next()).thenReturn(expression);
         // when(expressionList.get(anyInt())).thenReturn(expression);
         // when(expression.getContent()).thenReturn("nonExistingData");
-        when(dataService.getDataInstances(anyListOf(String.class), anyLong(), anyString())).thenThrow(new SDataInstanceReadException("test"));
+        when(dataService.getDataInstances(anyListOf(String.class), anyLong(), anyString(), any(ParentContainerResolver.class))).thenThrow(new SDataInstanceReadException("test"));
         final HashMap<String, Object> dependencyValues = new HashMap<String, Object>(2);
         dependencyValues.put("containerId", 17L);
         dependencyValues.put("containerType", "process");
