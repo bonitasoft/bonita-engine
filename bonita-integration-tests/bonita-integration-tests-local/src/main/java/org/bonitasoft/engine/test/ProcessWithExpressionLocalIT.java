@@ -130,7 +130,7 @@ public class ProcessWithExpressionLocalIT extends TestWithUser {
                 .addData("tData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("The default value")).isTransient();
         processDefinition = deployAndEnableProcessWithActor(builder.done(), "actor", user);
         getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance step1 = waitForUserTask("step1");
+        final HumanTaskInstance step1 = waitForUserTaskAndGetIt("step1");
 
         // evaluate the expression of the transient data, it should return the default value
         assertThat(evaluateTransientDataWithExpression(step1).get("tData")).isEqualTo("The default value");

@@ -16,7 +16,7 @@ package org.bonitasoft.engine.exception;
 
 /**
  * To define the context of an exception in the message.
- * 
+ *
  * @author Celine Souchet
  */
 public enum ExceptionContext {
@@ -103,6 +103,14 @@ public enum ExceptionContext {
     /**
      * Corresponding to the identifier of the document
      */
-    DOCUMENT_ID;
+    DOCUMENT_ID,
+    /**
+     * Corresponding to the name of the data
+     */
+    DATA_NAME,
+    /**
+     * Corresponding to the class name of the data
+     */
+    DATA_CLASS_NAME;
 
 }

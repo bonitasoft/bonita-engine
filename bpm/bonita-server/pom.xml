@@ -433,11 +433,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bonitasoft.engine.synchro</groupId>
-			<artifactId>bonita-synchro-jms</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.synchro</groupId>
 			<artifactId>bonita-synchro-register</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -692,7 +687,6 @@
 									<include>org.bonitasoft.engine.synchro:bonita-synchro-service</include>
 									<include>org.bonitasoft.engine.synchro:bonita-synchro-service-impl</include>
 									<include>org.bonitasoft.engine.synchro:bonita-synchro-register</include>
-									<include>org.bonitasoft.engine.synchro:bonita-synchro-jms</include>
 									<!-- Transaction -->
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-api</include>
 									<include>org.bonitasoft.engine.transaction:bonita-transaction-impl</include>

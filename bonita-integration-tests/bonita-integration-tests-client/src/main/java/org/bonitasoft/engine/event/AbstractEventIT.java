@@ -53,7 +53,6 @@ import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
-import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.operation.Operation;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
@@ -74,7 +73,7 @@ public abstract class AbstractEventIT extends TestWithUser {
 
     public static final String INT_DATA_NAME = "count";
 
-    public static final String SHORT_DATA_NAME = "content";
+    public static final String SHORT_DATA_NAME = "short_data_name";
 
     public static final String SUB_PROCESS_START_NAME = "subProcessStart";
 
@@ -217,7 +216,7 @@ public abstract class AbstractEventIT extends TestWithUser {
         processDefinitionBuilder.addTransition("Boundary timer", EXCEPTION_STEP);
         processDefinitionBuilder.addTransition(EXCEPTION_STEP, "end");
 
-        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, getUser());
+        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
     }
 
     /**
@@ -254,7 +253,7 @@ public abstract class AbstractEventIT extends TestWithUser {
                 .addTransition("start", "callActivity").addTransition("callActivity", PARENT_PROCESS_USER_TASK_NAME)
                 .addTransition(PARENT_PROCESS_USER_TASK_NAME, "end").addTransition("timer", EXCEPTION_STEP);
 
-        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, getUser());
+        return deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, user);
     }
 
     /**
@@ -280,8 +279,8 @@ public abstract class AbstractEventIT extends TestWithUser {
      * @since 6.0
      */
     public ProcessDefinition deployAndEnableProcessMultiInstanceWithBoundaryEvent(final long timerValue, final boolean interrupting,
-            final String multiTaskName,
-            final int loopCardinality, final boolean isSequential, final String normalFlowTaskName, final String exceptionFlowTaskName) throws BonitaException {
+            final String multiTaskName, final int loopCardinality, final boolean isSequential, final String normalFlowTaskName,
+            final String exceptionFlowTaskName) throws BonitaException {
         final Expression timerExpr = new ExpressionBuilder().createConstantLongExpression(timerValue);
 
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance("processWithMultiInstanceAndBoundaryEvent", "1.0");
@@ -297,7 +296,7 @@ public abstract class AbstractEventIT extends TestWithUser {
         processBuilder.addTransition(normalFlowTaskName, "end");
         processBuilder.addTransition("timer", exceptionFlowTaskName);
 
-        return deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, getUser());
+        return deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
     }
 
     /**
@@ -336,13 +335,13 @@ public abstract class AbstractEventIT extends TestWithUser {
                 .addTransition("start", loopActivityName).addTransition(loopActivityName, normalFlowStepName).addTransition(normalFlowStepName, "end")
                 .addTransition("timer", exceptionFlowStepName);
 
-        return deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, getUser());
+        return deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
     }
 
-    protected void executeRemainingSequencialMultiInstancesOrLoop(final String taskName, final ProcessInstance processInstance, final int nbOfRemainingInstances)
+    protected void waitForUserTasksAndExecuteIt(final String taskName, final ProcessInstance processInstance, final int nbOfRemainingInstances)
             throws Exception {
         for (int i = 0; i < nbOfRemainingInstances; i++) {
-            waitForUserTaskAndExecuteIt(taskName, processInstance, getUser());
+            waitForUserTaskAndExecuteIt(processInstance, taskName, user);
         }
     }
 
@@ -355,12 +354,8 @@ public abstract class AbstractEventIT extends TestWithUser {
         final SearchResult<ActivityInstance> searchResult = getProcessAPI().searchActivities(builder.done());
         assertEquals(nbOfRemainingInstances, searchResult.getCount());
         for (final ActivityInstance activity : searchResult.getResult()) {
-            assignAndExecuteStep(activity, getUser().getId());
+            assignAndExecuteStep(activity, user.getId());
         }
-    }
-
-    protected User getUser() {
-        return user;
     }
 
     public ProcessDefinition deployAndEnableProcessWithInterruptingAndNonInterruptingTimer(final long interruptTimer, final long nonInterruptingTimer,

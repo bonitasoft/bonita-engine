@@ -17,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.bpm.data.DataInstance;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -45,8 +44,8 @@ public class ProcessDescriptionIT extends TestWithUser {
         final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance("booleanProcessData", processInstance.getId());
         assertEquals("descBooleanProcessData", processDataInstance.getDescription());
 
-        final ActivityInstance userTask = waitForUserTask("userTask", processInstance);
-        final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("booleanUserTaskData", userTask.getId());
+        final long userTaskId = waitForUserTask(processInstance, "userTask");
+        final DataInstance activityDataInstance = getProcessAPI().getActivityDataInstance("booleanUserTaskData", userTaskId);
         assertEquals("descBooleanUserTaskData", activityDataInstance.getDescription());
 
         disableAndDeleteProcess(processDefinition);

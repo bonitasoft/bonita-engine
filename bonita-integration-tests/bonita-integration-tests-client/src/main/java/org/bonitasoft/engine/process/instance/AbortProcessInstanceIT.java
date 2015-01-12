@@ -76,9 +76,9 @@ public class AbortProcessInstanceIT extends AbstractProcessInstanceIT {
         waitForProcessToBeInState(procInstToAbort, ProcessInstanceState.ABORTED);
 
         // task1 not executed must be in aborted state
-        waitForArchivedActivity(humanTaskInst1ToAbort.getId(), TestStates.ABORTED);
+        waitForFlowNodeInState(parentProcessInstance, humanTaskInst1ToAbort.getName(), TestStates.ABORTED, true);
         // task2 not executed must be in aborted state
-        waitForArchivedActivity(humanTaskInst2ToAbort.getId(), TestStates.ABORTED);
+        waitForFlowNodeInState(parentProcessInstance, humanTaskInst2ToAbort.getName(), TestStates.ABORTED, true);
 
         // check the automatic task in the aborted process instance was not created
         checkWasntExecuted(procInstToAbort, autoTaskName);

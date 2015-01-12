@@ -19,9 +19,9 @@ public class AddHandlerCommand extends TenantCommand {
 
     private static final String PROCESSINSTANCE_STATE_UPDATED = "PROCESSINSTANCE_STATE_UPDATED";
 
-    private static final String ACTIVITYINSTANCE_STATE_UPDATED = "ACTIVITYINSTANCE_STATE_UPDATED";
-
     private static final String ACTIVITYINSTANCE_CREATED = "ACTIVITYINSTANCE_CREATED";
+
+    private static final String ACTIVITYINSTANCE_STATE_UPDATED = "ACTIVITYINSTANCE_STATE_UPDATED";
 
     private static final String EVENT_INSTANCE_CREATED = "EVENT_INSTANCE_CREATED";
 
@@ -34,7 +34,7 @@ public class AddHandlerCommand extends TenantCommand {
             throws SCommandExecutionException {
         final EventService eventService = serviceAccessor.getEventService();
         try {
-            long tenantId = serviceAccessor.getTenantId();
+            final long tenantId = serviceAccessor.getTenantId();
             if (!containsHandler(eventService, PROCESSINSTANCE_STATE_UPDATED, ProcessInstanceHandler.class)) {
                 eventService.addHandler(PROCESSINSTANCE_STATE_UPDATED, new ProcessInstanceHandler(tenantId));
             }
@@ -45,8 +45,6 @@ public class AddHandlerCommand extends TenantCommand {
             }
             if (!containsHandler(eventService, GATEWAYINSTANCE_CREATED, GatewayHandler.class)) {
                 eventService.addHandler(GATEWAYINSTANCE_CREATED, new GatewayHandler(tenantId));
-            }
-            if (!containsHandler(eventService, GATEWAYINSTANCE_STATE_UPDATED, GatewayHandler.class)) {
                 eventService.addHandler(GATEWAYINSTANCE_STATE_UPDATED, new GatewayHandler(tenantId));
             }
             final EntityUpdateDescriptor entityUpdateDescriptor = new EntityUpdateDescriptor();

@@ -97,7 +97,7 @@ public class ProcessWithExpressionIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition.done(), ACTOR_NAME, user);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step2", processInstance);
+        waitForUserTask(processInstance, "step2");
 
         final DataInstance processDataInstance = getProcessAPI().getProcessDataInstance("data1", processInstance.getId());
         final Serializable value = processDataInstance.getValue();
@@ -125,8 +125,7 @@ public class ProcessWithExpressionIT extends TestWithUser {
 
         try {
             final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-            final ActivityInstance task;
-            task = waitForUserTask("step1", processInstance);
+            final ActivityInstance task = waitForUserTaskAndGetIt(processInstance, "step1");
             assertEquals("stringFromPublicMethod", task.getDisplayName());
         } finally {
             disableAndDeleteProcess(processDefinition);
@@ -146,14 +145,14 @@ public class ProcessWithExpressionIT extends TestWithUser {
             final ProcessInstance pi11 = getProcessAPI().startProcess(p11.getId());
             final ProcessInstance pi22 = getProcessAPI().startProcess(p22.getId());
             final ProcessInstance pi12 = getProcessAPI().startProcess(p12.getId());
-            final ActivityInstance task1 = waitForUserTask("step1", pi11);
+            final ActivityInstance task1 = waitForUserTaskAndGetIt(pi11, "step1");
             assertEquals("stringFromPublicMethod", task1.getDisplayName());
-            final ActivityInstance task2 = waitForUserTask("step1", pi22);
+            final ActivityInstance task2 = waitForUserTaskAndGetIt(pi22, "step1");
             assertEquals("stringFromPublicMethod2", task2.getDisplayName());
             final ActivityInstance task3 = waitForTaskToFail(pi12);
             assertEquals("step1", task3.getName());
             final ProcessInstance pi11bis = getProcessAPI().startProcess(p11.getId());
-            final ActivityInstance task1bis = waitForUserTask("step1", pi11bis);
+            final ActivityInstance task1bis = waitForUserTaskAndGetIt(pi11bis, "step1");
             assertEquals("stringFromPublicMethod", task1bis.getDisplayName());
         } finally {
             disableAndDeleteProcess(p11);
@@ -545,7 +544,7 @@ public class ProcessWithExpressionIT extends TestWithUser {
         processBuilder.addActor(ACTOR_NAME);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("aTask", processInstance);
+        waitForUserTask(processInstance, "aTask");
         waitForTaskToFail(processInstance);
         disableAndDeleteProcess(processDefinition);
     }
@@ -560,7 +559,7 @@ public class ProcessWithExpressionIT extends TestWithUser {
         processBuilder.addActor(ACTOR_NAME);
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("aDummyTask", processInstance);
+        waitForUserTask(processInstance, "aDummyTask");
 
         assertEquals("Alexander Corvinus", getProcessAPI().getProcessDataInstance("data", processInstance.getId()).getValue());
         disableAndDeleteProcess(processDefinition);
@@ -627,7 +626,7 @@ public class ProcessWithExpressionIT extends TestWithUser {
         builder.setProcessDefinition(designProcessDefinition.done());
         final ProcessDefinition processDefinition1 = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance1 = getProcessAPI().startProcess(processDefinition1.getId());
-        final ActivityInstance userTask = waitForUserTask("step1", processInstance1);
+        final ActivityInstance userTask = waitForUserTaskAndGetIt(processInstance1, "step1");
         assertEquals("name1", userTask.getDisplayName());
 
         // do the same thing a second time
@@ -646,11 +645,11 @@ public class ProcessWithExpressionIT extends TestWithUser {
         builder2.setProcessDefinition(designProcessDefinition2.done());
         final ProcessDefinition processDefinition2 = deployAndEnableProcessWithActor(builder2.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance2 = getProcessAPI().startProcess(processDefinition2.getId());
-        final ActivityInstance userTask2 = waitForUserTask("step1", processInstance2);
+        final ActivityInstance userTask2 = waitForUserTaskAndGetIt(processInstance2, "step1");
         assertEquals("name1", userTask2.getDisplayName());
 
         final ProcessInstance processInstance3 = getProcessAPI().startProcess(processDefinition1.getId());
-        final ActivityInstance userTask3 = waitForUserTask("step1", processInstance3);
+        final ActivityInstance userTask3 = waitForUserTaskAndGetIt(processInstance3, "step1");
         assertEquals("name1", userTask3.getDisplayName());
 
         disableAndDeleteProcess(processDefinition1);

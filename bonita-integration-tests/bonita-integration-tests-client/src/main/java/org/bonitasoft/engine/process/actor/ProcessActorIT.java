@@ -130,7 +130,7 @@ public class ProcessActorIT extends TestWithUser {
         assertEquals(ACTOR_NAME, actor.getName());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("deliver", processInstance);
+        waitForUserTask(processInstance, "deliver");
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
@@ -209,9 +209,9 @@ public class ProcessActorIT extends TestWithUser {
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinition, ACTOR_NAME, user);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        waitForUserTask("userTask1", processInstance);
-        waitForUserTask("userTask2", processInstance);
-        waitForUserTask("userTask3", processInstance);
+        waitForUserTask(processInstance, "userTask1");
+        waitForUserTask(processInstance, "userTask2");
+        waitForUserTask(processInstance, "userTask3");
 
         final List<ActivityInstance> activities = getProcessAPI().getActivities(processInstance.getId(), 0, 10);
         // assign first 2 user tasks to user:
@@ -738,7 +738,7 @@ public class ProcessActorIT extends TestWithUser {
         getProcessAPI().addRoleToActor(actor.getId(), role.getId());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        waitForUserTask("deliver", processInstance);
+        waitForUserTask(processInstance, "deliver");
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
@@ -760,7 +760,7 @@ public class ProcessActorIT extends TestWithUser {
         getProcessAPI().addRoleAndGroupToActor(actor.getId(), role.getId(), group.getId());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        waitForUserTask("deliver", processInstance);
+        waitForUserTask(processInstance, "deliver");
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(1, tasks.size());
@@ -800,7 +800,7 @@ public class ProcessActorIT extends TestWithUser {
         assertEquals(ActivationState.ENABLED, processDeploymentInfo.getActivationState());
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
-        waitForUserTask("deliver", processInstance);
+        waitForUserTask(processInstance, "deliver");
 
         final List<HumanTaskInstance> tasks = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, null);
         assertEquals(0, tasks.size());
@@ -837,9 +837,9 @@ public class ProcessActorIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
         nbOfActors = getProcessAPI().getNumberOfActors(processDefinition.getId());
         assertEquals(3, nbOfActors);
-        waitForUserTask("step2", processInstance);
-        waitForUserTask("step3", processInstance);
-        waitForUserTask("step4", processInstance);
+        waitForUserTask(processInstance, "step2");
+        waitForUserTask(processInstance, "step3");
+        waitForUserTask(processInstance, "step4");
 
         nbOfActors = getProcessAPI().getNumberOfActors(processDefinition.getId());
         assertEquals(3, nbOfActors);

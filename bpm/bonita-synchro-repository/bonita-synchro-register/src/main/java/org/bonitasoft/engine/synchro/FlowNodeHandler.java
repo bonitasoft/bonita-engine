@@ -30,7 +30,7 @@ public class FlowNodeHandler extends AbstractUpdateHandler {
 
     public FlowNodeHandler(final long tenantId) {
         super(tenantId);
-        this.identifier = UUID.randomUUID().toString();
+        identifier = UUID.randomUUID().toString();
     }
 
     @Override
@@ -41,7 +41,7 @@ public class FlowNodeHandler extends AbstractUpdateHandler {
 
     @Override
     public boolean isInterested(final SEvent event) {
-        // the !isStateExecuting avoid having 2 times the same event in case of execution of e.g. connectors
+        // the !isStateExecuting avoids having 2 times the same event in case of execution of e.g. connectors
         return event.getObject() instanceof SFlowNodeInstance && !((SFlowNodeInstance) event.getObject()).isStateExecuting();
     }
 
