@@ -27,6 +27,7 @@ import org.bonitasoft.engine.core.process.instance.api.GatewayInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.expression.exception.SExpressionException;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
@@ -49,9 +50,9 @@ public class BPMInstancesCreatorExt extends BPMInstancesCreator {
     public BPMInstancesCreatorExt(final ActivityInstanceService activityInstanceService, final ActorMappingService actorMappingService,
             final GatewayInstanceService gatewayInstanceService, final EventInstanceService eventInstanceService, final ConnectorInstanceService connectorInstanceService,
             final ExpressionResolverService expressionResolverService, final DataInstanceService dataInstanceService, final TechnicalLoggerService logger,
-            final TransientDataService transientDataService, final RefBusinessDataService refBusinessDataService, final ArchiveService archiveService) {
+            final TransientDataService transientDataService, final RefBusinessDataService refBusinessDataService, final ArchiveService archiveService, final ParentContainerResolver parentContainerResolver) {
         super(activityInstanceService, actorMappingService, gatewayInstanceService, eventInstanceService, connectorInstanceService, expressionResolverService,
-                dataInstanceService, logger, transientDataService, archiveService);
+                dataInstanceService, logger, transientDataService, archiveService, parentContainerResolver);
         this.refBusinessDataService = refBusinessDataService;
     }
 
