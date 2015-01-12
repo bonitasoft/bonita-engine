@@ -727,7 +727,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 processDefinitionService.getProcessDefinitionId(designProcessDefinition.getName(), designProcessDefinition.getVersion());
                 throw new AlreadyExistsException("The process " + designProcessDefinition.getName() + " in version " + designProcessDefinition.getVersion()
                         + " already exists.");
-            } catch (final SProcessDefinitionReadException e) {
+            } catch (final SProcessDefinitionNotFoundException e) {
                 // ok
             }
             processDefinitionService.store(sProcessDefinition, designProcessDefinition.getDisplayName(), designProcessDefinition.getDisplayDescription());
