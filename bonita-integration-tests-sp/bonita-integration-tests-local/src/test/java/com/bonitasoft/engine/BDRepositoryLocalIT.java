@@ -20,6 +20,7 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
+import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
@@ -32,7 +33,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
 import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
 import com.bonitasoft.engine.bdm.model.BusinessObjectModel;
@@ -45,7 +45,7 @@ import com.bonitasoft.engine.bdm.model.field.SimpleField;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 import com.bonitasoft.engine.business.data.ClassloaderRefresher;
 
-public class BDRepositoryLocalIT extends CommonAPISPTest {
+public class BDRepositoryLocalIT extends CommonAPISPIT {
 
     private static final String FIND_BY_FIRST_NAME_AND_LAST_NAME_NEW_ORDER = "findByFirstNameAndLastNameNewOrder";
 
@@ -162,8 +162,8 @@ public class BDRepositoryLocalIT extends CommonAPISPTest {
         processDefinitionBuilder.addTransition(TASK_TO_CALL_JAVA_METHOD_OPERATION, TASK_HUMAN_TASK);
 
         final ProcessDefinition definition = deployAndEnableProcessWithActor(processDefinitionBuilder.done(), ACTOR_NAME, matti);
-        final long processInstanceId = getProcessAPI().startProcess(definition.getId()).getId();
-        final HumanTaskInstance humanTaskInstance = waitForUserTask(TASK_HUMAN_TASK, processInstanceId);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(definition.getId());
+        final HumanTaskInstance humanTaskInstance = waitForUserTaskAndGetIt(processInstance, TASK_HUMAN_TASK);
 
         //then
         verifyLazyAddressesCount(humanTaskInstance, 2);

@@ -30,11 +30,11 @@ import org.junit.Test;
 
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
-public class LocalLogTest extends CommonAPISPTest {
+public class LocalLogTest extends CommonAPISPIT {
 
     @After
     public void afterTest() throws Exception {
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     @Before
@@ -106,8 +106,8 @@ public class LocalLogTest extends CommonAPISPTest {
         final ProcessInstance startProcess = getProcessAPI().startProcess(processDefinition.getId());
         final long procInstanceId = startProcess.getId();
         assertEquals(0l, getProcessAPI().getProcessDataInstance(dataName, procInstanceId).getValue());
-        waitForUserTaskAndExecuteIt("step0", startProcess, user);
-        waitForUserTask("step2", startProcess);
+        waitForUserTaskAndExecuteIt(startProcess, "step0", user);
+        waitForUserTask(startProcess, "step2");
 
         final long numberOfUsers = getIdentityAPI().getNumberOfUsers();
         assertEquals(numberOfUsers, getProcessAPI().getProcessDataInstance(dataName, procInstanceId).getValue());

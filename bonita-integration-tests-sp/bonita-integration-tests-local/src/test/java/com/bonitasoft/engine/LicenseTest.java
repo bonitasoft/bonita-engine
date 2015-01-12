@@ -17,7 +17,7 @@ import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.PlatformAPIAccessor;
 import com.bonitasoft.engine.platform.TenantCreator;
 
-public class LicenseTest extends CommonAPISPTest {
+public class LicenseTest extends CommonAPISPIT {
 
     @Test
     public void invalidLicense() throws BonitaException {

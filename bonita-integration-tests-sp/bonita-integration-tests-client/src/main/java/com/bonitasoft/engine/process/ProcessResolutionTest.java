@@ -40,10 +40,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
-public class ProcessResolutionTest extends CommonAPISPTest {
+public class ProcessResolutionTest extends CommonAPISPIT {
 
     @After
     public void afterTest() throws BonitaException {
