@@ -81,7 +81,7 @@
 				<entry key="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoDefinitionImpl" value="24" />
 				<entry key="org.bonitasoft.engine.identity.model.impl.SCustomUserInfoValueImpl" value="25" />
 				<entry key="org.bonitasoft.engine.identity.model.impl.SContactInfoImpl" value="26" />
-				<entry key="org.bonitasoft.engine.identity.model.impl.SUserImpl" value="27" />
+				<entry key="org.bonitasoft.engine.identity.model.impl.SUserLoginImpl" value="27" />
 				<entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogImpl" value="30" />
 				<entry key="org.bonitasoft.engine.queriablelogger.model.impl.SQueriableLogParameterImpl" value="31" />
 				<entry key="org.bonitasoft.engine.scheduler.model.impl.SJobDescriptorImpl" value="70" />
