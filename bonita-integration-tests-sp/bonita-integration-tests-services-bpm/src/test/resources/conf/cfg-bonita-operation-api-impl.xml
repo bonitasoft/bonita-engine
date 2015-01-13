@@ -27,8 +27,9 @@
     <bean id="assignmentOperationExecutorStrategy"
           class="org.bonitasoft.engine.core.operation.impl.AssignmentOperationExecutorStrategy"/>
 
-    <bean id="dataLeftOperandHandler" class="org.bonitasoft.engine.core.operation.impl.DataLeftOperandHandler">
+    <bean id="dataLeftOperandHandler" class="org.bonitasoft.engine.operation.DataLeftOperandHandler">
         <constructor-arg name="dataInstanceService" ref="dataInstanceService"/>
+        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
     </bean>
 
     <bean id="externalDataLeftOperandHandler"
