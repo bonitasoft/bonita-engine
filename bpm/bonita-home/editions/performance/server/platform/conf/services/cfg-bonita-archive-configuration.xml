@@ -20,7 +20,6 @@
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SSendTaskInstance" value="true" />
                 <entry key="org.bonitasoft.engine.core.process.instance.model.SReceiveTaskInstance" value="true" />
         		<entry key="org.bonitasoft.engine.data.instance.model.SDataInstance" value="true" />
-        		<entry key="org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping" value="true" />
         		<!-- archived version because there is no not archived one -->
         		<entry key="org.bonitasoft.engine.core.process.instance.model.archive.SATransitionInstance" value="true" />
 			</map>
