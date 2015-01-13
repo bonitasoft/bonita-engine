@@ -405,10 +405,13 @@ public class ProcessExecutorImpl implements ProcessExecutor {
                         flowNodeDefinition, rootProcessInstanceId, parentProcessInstanceId, false, 0, stateCategory, -1, tokenRefId);
     }
 
-    protected void executeOperations(final List<SOperation> operations, final Map<String, Object> context, final SExpressionContext expressionContext,
-            final SProcessInstance sProcessInstance) throws SBonitaException {
+    protected void executeOperations(final List<SOperation> operations, final Map<String, Object> context, final SExpressionContext expressionContext, SProcessInstance sProcessInstance) throws SBonitaException {
         if (operations != null && !operations.isEmpty()) {
             expressionContext.setInputValues(context);
+            if(expressionContext.getContainerId() == null){
+                expressionContext.setContainerId(sProcessInstance.getId());
+                expressionContext.setContainerType(DataInstanceContainer.PROCESS_INSTANCE.name());
+            }
             operationService.execute(operations, sProcessInstance.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(), expressionContext);
         }
     }

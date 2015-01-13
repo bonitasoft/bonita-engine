@@ -56,6 +56,7 @@ import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -356,6 +357,11 @@ public class BPMServicesBuilder implements PlatformServiceAccessor, TenantServic
     @Override
     public long getTenantId() {
         return 0;
+    }
+
+    @Override
+    public ParentContainerResolver getParentContainerResolver() {
+        return getInstanceOf(ParentContainerResolver.class);
     }
 
     @Override

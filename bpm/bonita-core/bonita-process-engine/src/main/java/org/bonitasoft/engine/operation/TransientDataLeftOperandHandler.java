@@ -17,6 +17,7 @@ package org.bonitasoft.engine.operation;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator;
 import org.bonitasoft.engine.core.data.instance.TransientDataService;
@@ -50,6 +51,7 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
  */
 public class TransientDataLeftOperandHandler implements LeftOperandHandler {
 
+    private static final String TRANSIENT_DATA = "%TRANSIENT_DATA%_";
     private final TransientDataService transientDataService;
 
     private final FlowNodeInstanceService flownodeInstanceService;
@@ -75,11 +77,15 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
+    public Object update(final SLeftOperand sLeftOperand, Map<String, Object> inputValues, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         SDataInstance dataInstance;
         try {
-            dataInstance = retrieve(sLeftOperand, containerId, containerType);
+
+            dataInstance = (SDataInstance) inputValues.get(TRANSIENT_DATA + sLeftOperand.getName());
+            if(dataInstance == null){
+                dataInstance = retrieve(sLeftOperand, containerId, containerType);
+            }
             final EntityUpdateDescriptor descriptor = new EntityUpdateDescriptor();
             descriptor.addField("value", newValue);
             logger.log(
@@ -108,10 +114,15 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) throws SBonitaReadException {
+    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
         final Long containerId = expressionContext.getContainerId();
         final String containerType = expressionContext.getContainerType();
-        return retrieve(sLeftOperand, containerId, containerType);
+        String name = sLeftOperand.getName();
+        SDataInstance dataInstance = retrieve(sLeftOperand, containerId, containerType);
+        contextToSet.put(TRANSIENT_DATA + name, dataInstance);
+        if (!contextToSet.containsKey(name)) {
+            contextToSet.put(name, dataInstance.getValue());
+        }
     }
 
     private SDataInstance retrieve(final SLeftOperand sLeftOperand, final Long containerId, final String containerType) throws SBonitaReadException {
@@ -134,11 +145,11 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     public static void reevaluateTransientData(final String name, final long containerId, final String containerType,
-            final FlowNodeInstanceService flowbodeInstanceService, final ProcessDefinitionService processDefinitionService,
+            final FlowNodeInstanceService flowNodeInstanceService, final ProcessDefinitionService processDefinitionService,
             final BPMInstancesCreator bpmInstancesCreator) throws SBonitaReadException {
 
         try {
-            final SFlowNodeInstance flowNodeInstance = flowbodeInstanceService.getFlowNodeInstance(containerId);
+            final SFlowNodeInstance flowNodeInstance = flowNodeInstanceService.getFlowNodeInstance(containerId);
             final long flowNodeDefinitionId = flowNodeInstance.getFlowNodeDefinitionId();
             final long processDefinitionId = flowNodeInstance.getProcessDefinitionId();
             final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
@@ -178,9 +189,12 @@ public class TransientDataLeftOperandHandler implements LeftOperandHandler {
         throw new SBonitaReadException("Transient data was not found and we were unable to reevaluate it, name=<" + name + ">", e);
     }
 
+
     @Override
-    public boolean supportBatchUpdate() {
-        return true;
+    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
+        for (SLeftOperand leftOperand : sLeftOperand) {
+            loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
+        }
     }
 
 }

@@ -98,6 +98,11 @@
         <constructor-arg name="workService" ref="workService"/>
     </bean>
 
+    <bean id="parentContainerResolver" class="org.bonitasoft.engine.data.ParentContainerResolverImpl">
+        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService"/>
+        <constructor-arg name="processInstanceService" ref="processInstanceService"/>
+    </bean>
+
     <bean id="bpmInstancesCreator" class="org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator">
         <constructor-arg name="activityInstanceService" ref="activityInstanceService"/>
         <constructor-arg name="actorMappingService" ref="actorMappingService"/>
@@ -109,6 +114,7 @@
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService"/>
         <constructor-arg name="transientDataService" ref="transientDataService"/>
         <constructor-arg name="archiveService" ref="archiveService"/>
+        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
     </bean>
 
     <bean id="flowNodeStateManager" class="org.bonitasoft.engine.execution.FlowNodeStateManagerImpl">
@@ -134,6 +140,7 @@
         <constructor-arg name="workService" ref="workService"/>
         <constructor-arg name="tokenService" ref="tokenService"/>
         <constructor-arg name="identityService" ref="identityService"/>
+        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
     </bean>
 
     <bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">
