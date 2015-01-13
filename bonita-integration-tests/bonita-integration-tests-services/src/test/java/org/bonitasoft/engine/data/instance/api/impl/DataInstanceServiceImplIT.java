@@ -16,11 +16,8 @@ package org.bonitasoft.engine.data.instance.api.impl;
 import org.bonitasoft.engine.archive.ArchiveService;
 import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
-import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
-import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.data.instance.DataInstanceServiceTest;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
-import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.TenantHibernatePersistenceService;
 import org.bonitasoft.engine.recorder.Recorder;
@@ -32,8 +29,6 @@ import org.junit.BeforeClass;
 public class DataInstanceServiceImplIT extends DataInstanceServiceTest {
 
     private static DataInstanceServiceImpl dataInstanceServiceImpl;
-
-    private static ParentContainerResolver parentContainerResolver;
 
     @BeforeClass
     public static void setupImplementation() {
