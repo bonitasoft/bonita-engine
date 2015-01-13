@@ -836,9 +836,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             final Map<String, Object> parameters = Collections.singletonMap("id", (Object) archivedProcessInstanceId);
-            final SAProcessInstance saProcessInstance = persistenceService.selectOne(new SelectOneDescriptor<SAProcessInstance>("getArchivedProcessInstance",
+            return persistenceService.selectOne(new SelectOneDescriptor<SAProcessInstance>("getArchivedProcessInstance",
                     parameters, SAProcessInstance.class));
-            return saProcessInstance;
         } catch (final SBonitaReadException e) {
             throw new SProcessInstanceReadException(e);
         }

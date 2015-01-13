@@ -293,8 +293,8 @@ import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilde
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
-import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.archive.SADataInstance;
 import org.bonitasoft.engine.dependency.DependencyService;
@@ -2498,12 +2498,13 @@ public class ProcessAPIImpl implements ProcessAPI {
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final ParentContainerResolver parentContainerResolver = tenantAccessor.getParentContainerResolver();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             final long processDefinitionId = processInstanceService.getProcessInstance(processInstanceId).getProcessDefinitionId();
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name(),
+            final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name(), parentContainerResolver,
                     startIndex, maxResults);
             return convertModelToDataInstances(dataInstances);
         } catch (final SBonitaException e) {
@@ -2520,13 +2521,14 @@ public class ProcessAPIImpl implements ProcessAPI {
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
+        final ParentContainerResolver parentContainerResolver = tenantAccessor.getParentContainerResolver();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             final long processDefinitionId = processInstanceService.getProcessInstance(processInstanceId).getProcessDefinitionId();
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), processDefinitionId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
             final SDataInstance sDataInstance = dataInstanceService.getDataInstance(dataName, processInstanceId,
-                    DataInstanceContainer.PROCESS_INSTANCE.toString());
+                    DataInstanceContainer.PROCESS_INSTANCE.toString(), parentContainerResolver);
             return convertModeltoDataInstance(sDataInstance);
         } catch (final SBonitaException e) {
             throw new DataNotFoundException(e);
@@ -2544,13 +2546,14 @@ public class ProcessAPIImpl implements ProcessAPI {
     public void updateProcessDataInstances(final long processInstanceId, final Map<String, Serializable> dataNameValues) throws UpdateException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
+        final ParentContainerResolver parentContainerResolver = tenantAccessor.getParentContainerResolver();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             final ClassLoader processClassLoader = getProcessInstanceClassloader(tenantAccessor, processInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
             final List<String> dataNames = new ArrayList<String>(dataNameValues.keySet());
             final List<SDataInstance> sDataInstances = dataInstanceService.getDataInstances(dataNames, processInstanceId,
-                    DataInstanceContainer.PROCESS_INSTANCE.toString());
+                    DataInstanceContainer.PROCESS_INSTANCE.toString(), parentContainerResolver);
             updateDataInstances(sDataInstances, dataNameValues);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
@@ -2624,6 +2627,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final ParentContainerResolver parentContainerResolver = tenantAccessor.getParentContainerResolver();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final int processDefinitionIndex = BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class).getProcessDefinitionIndex();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -2631,7 +2635,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final long parentProcessInstanceId = activityInstanceService.getFlowNodeInstance(activityInstanceId).getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(),
+            final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver,
                     startIndex, maxResults);
             return convertModelToDataInstances(dataInstances);
         } catch (final SBonitaException e) {
@@ -2647,6 +2651,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final ParentContainerResolver parentContainerResolver = tenantAccessor.getParentContainerResolver();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final int processDefinitionIndex = BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class).getProcessDefinitionIndex();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -2656,7 +2661,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final long parentProcessInstanceId = flowNodeInstance.getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            data = dataInstanceService.getDataInstance(dataName, activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.toString());
+            data = dataInstanceService.getDataInstance(dataName, activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
             return convertModeltoDataInstance(data);
         } catch (final SBonitaException e) {
             throw new DataNotFoundException(e);
@@ -2671,6 +2676,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final ParentContainerResolver parentContainerResolver = tenantAccessor.getParentContainerResolver();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final int processDefinitionIndex = BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class).getProcessDefinitionIndex();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -2680,7 +2686,7 @@ public class ProcessAPIImpl implements ProcessAPI {
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
             final SDataInstance sDataInstance = dataInstanceService.getDataInstance(dataName, activityInstanceId,
-                    DataInstanceContainer.ACTIVITY_INSTANCE.toString());
+                    DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
             updateDataInstance(dataInstanceService, sDataInstance, dataValue);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
@@ -2981,6 +2987,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final ParentContainerResolver parentContainerResolver = tenantAccessor.getParentContainerResolver();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
         final int processDefinitionIndex = BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class).getProcessDefinitionIndex();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -2988,11 +2995,15 @@ public class ProcessAPIImpl implements ProcessAPI {
             final long parentProcessInstanceId = activityInstanceService.getFlowNodeInstance(activityInstanceId).getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            for (final Entry<String, Serializable> variable : variables.entrySet()) {
-                final SDataInstance sDataInstance = dataInstanceService.getDataInstance(variable.getKey(), activityInstanceId,
-                        DataInstanceContainer.ACTIVITY_INSTANCE.toString());
-                final EntityUpdateDescriptor entityUpdateDescriptor = buildEntityUpdateDescriptorForData(variable.getValue());
-                dataInstanceService.updateDataInstance(sDataInstance, entityUpdateDescriptor);
+            List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(new ArrayList<String>(variables.keySet()), activityInstanceId,
+                    DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
+            if(dataInstances.size()<variables.size()){
+                throw new UpdateException("Some data does not exists, wanted to update "+variables.keySet()+" but there is only "+dataInstances);
+            }
+            for (SDataInstance dataInstance : dataInstances) {
+                Serializable newValue = variables.get(dataInstance.getName());
+                final EntityUpdateDescriptor entityUpdateDescriptor = buildEntityUpdateDescriptorForData(newValue);
+                dataInstanceService.updateDataInstance(dataInstance, entityUpdateDescriptor);
             }
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
@@ -3007,59 +3018,21 @@ public class ProcessAPIImpl implements ProcessAPI {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
 
         final OperationService operationService = tenantAccessor.getOperationService();
-        final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
-        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-        final int processDefinitionIndex = BuilderFactory.get(SAutomaticTaskInstanceBuilderFactory.class).getProcessDefinitionIndex();
-        final List<String> dataNames = new ArrayList<String>(operations.size());
+        ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        for (final Operation operation : operations) {
-            dataNames.add(operation.getLeftOperand().getName());
-        }
         try {
-
             final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
-            final SProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(activityInstance.getProcessDefinitionId());
-            final SActivityDefinition activityDefinition = (SActivityDefinition) processDefinition.getProcessContainer().getFlowNode(
-                    activityInstance.getFlowNodeDefinitionId());
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(),
-                    activityInstance.getLogicalGroup(processDefinitionIndex));
+                    activityInstance.getProcessDefinitionId());
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            final List<SDataDefinition> sDataDefinitions = activityDefinition.getSDataDefinitions();
-            final ArrayList<String> transientDataNames = new ArrayList<String>();
-            // separate transient data and normal data
-            for (final SDataDefinition sDataDefinition : sDataDefinitions) {
-                if (sDataDefinition.isTransientData() && dataNames.contains(sDataDefinition.getName())) {
-                    transientDataNames.add(sDataDefinition.getName());
-                    dataNames.remove(sDataDefinition.getName());
-                }
-            }
-            // get transient data instances on this activity
-            final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(dataNames, activityInstanceId,
-                    DataInstanceContainer.ACTIVITY_INSTANCE.toString());
-            for (final Operation operation : operations) {
-                final String name = operation.getLeftOperand().getName();
-                if (transientDataNames.contains(name)) {
-                    final SOperation sOperation = convertOperation(operation);
-                    final SExpressionContext sExpressionContext = new SExpressionContext(activityInstanceId,
-                            DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
-                            activityInstance.getLogicalGroup(processDefinitionIndex));
-                    sExpressionContext.setSerializableInputValues(expressionContexts);
-                    operationService.execute(sOperation, activityInstanceId, DataInstanceContainer.ACTIVITY_INSTANCE.toString(), sExpressionContext);
-                } else {
-                    // same order between dataInstances and dataNames
-                    final SDataInstance dataInstance = dataInstances.get(dataNames.indexOf(name));
-                    final SOperation sOperation = convertOperation(operation);
-                    final SExpressionContext sExpressionContext = new SExpressionContext(activityInstanceId,
-                            DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
-                            activityInstance.getLogicalGroup(processDefinitionIndex));
-                    sExpressionContext.setSerializableInputValues(expressionContexts);
-                    operationService.execute(sOperation, dataInstance.getContainerId(), dataInstance.getContainerType(), sExpressionContext);
-                }
-            }
-        } catch (final SDataInstanceReadException e) {
-            throw new UpdateException(e);
+            final List<SOperation> sOperations = convertOperations(operations);
+            final SExpressionContext sExpressionContext = new SExpressionContext(activityInstanceId,
+                    DataInstanceContainer.ACTIVITY_INSTANCE.toString(),
+                    activityInstance.getProcessDefinitionId());
+            sExpressionContext.setSerializableInputValues(expressionContexts);
+
+            operationService.execute(sOperations,sExpressionContext);
         } catch (final SBonitaException e) {
             throw new UpdateException(e);
         } finally {
@@ -3069,6 +3042,9 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     protected SOperation convertOperation(final Operation operation) {
         return ModelConvertor.convertOperation(operation);
+    }
+    protected List<SOperation> convertOperations(final List<Operation> operations) {
+        return ModelConvertor.convertOperations(operations);
     }
 
     @Override
@@ -3433,8 +3409,9 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     private long getNumberOfDataInstancesOfContainer(final long instanceId, final DataInstanceContainer containerType) throws SBonitaException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ParentContainerResolver parentContainerResolver = tenantAccessor.getParentContainerResolver();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
-        return dataInstanceService.getNumberOfDataInstances(instanceId, containerType);
+        return dataInstanceService.getNumberOfDataInstances(instanceId, containerType.name(), parentContainerResolver);
     }
 
     @Override
@@ -3455,17 +3432,17 @@ public class ProcessAPIImpl implements ProcessAPI {
         try {
             Thread.currentThread().setContextClassLoader(classLoader);
             final Map<String, Serializable> externalDataValue = new HashMap<String, Serializable>(operations.size());
-            for (final Operation operation : operations) {
-                // convert the client operation to server operation
-                final SOperation sOperation = convertOperation(operation);
-                // set input values of expression with connector result + provided input for this operation
-                final HashMap<String, Object> inputValues = new HashMap<String, Object>(operationInputValues);
-                inputValues.putAll(connectorResult.getResult());
-                expressionContext.setInputValues(inputValues);
-                // execute
-                final Long containerId = expressionContext.getContainerId();
-                operationService.execute(sOperation, containerId == null ? -1 : containerId, expressionContext.getContainerType(), expressionContext);
-                // return the value of the data if it's an external data
+            // convert the client operation to server operation
+            final List<SOperation> sOperations = convertOperations(operations);
+            // set input values of expression with connector result + provided input for this operation
+            final HashMap<String, Object> inputValues = new HashMap<String, Object>(operationInputValues);
+            inputValues.putAll(connectorResult.getResult());
+            expressionContext.setInputValues(inputValues);
+            // execute
+            Long containerId = expressionContext.getContainerId();
+            operationService.execute(sOperations, containerId == null ? -1 : containerId, expressionContext.getContainerType(), expressionContext);
+            // return the value of the data if it's an external data
+            for (Operation operation : operations) {
                 final LeftOperand leftOperand = operation.getLeftOperand();
                 if (LeftOperand.TYPE_EXTERNAL_DATA.equals(leftOperand.getType())) {
                     externalDataValue.put(leftOperand.getName(), (Serializable) expressionContext.getInputValues().get(leftOperand.getName()));
@@ -3578,7 +3555,7 @@ public class ProcessAPIImpl implements ProcessAPI {
                 tenantAccessor.getProcessDefinitionService(), tenantAccessor.getDataInstanceService(), tenantAccessor.getOperationService(),
                 tenantAccessor.getWorkService(), tenantAccessor.getContainerRegistry(), tenantAccessor.getEventInstanceService(),
                 tenantAccessor.getSchedulerService(), tenantAccessor.getCommentService(), tenantAccessor.getIdentityService(),
-                tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getTokenService());
+                tenantAccessor.getTechnicalLoggerService(), tenantAccessor.getTokenService(), tenantAccessor.getParentContainerResolver());
         try {
             final SActivityInstance sActivityInstance = getSActivityInstance(activityInstanceId);
             if (sActivityInstance instanceof SHumanTaskInstance) {
@@ -5856,10 +5833,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ArchivedDataInstance getArchivedProcessDataInstance(final String dataName, final long processInstanceId) throws ArchivedDataNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ParentContainerResolver parentContainerResolver = tenantAccessor.getParentContainerResolver();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         try {
             final SADataInstance dataInstance = dataInstanceService.getLastSADataInstance(dataName, processInstanceId,
-                    DataInstanceContainer.PROCESS_INSTANCE.toString());
+                    DataInstanceContainer.PROCESS_INSTANCE.toString(), parentContainerResolver);
             return ModelConvertor.toArchivedDataInstance(dataInstance);
         } catch (final SDataInstanceException sdie) {
             throw new ArchivedDataNotFoundException(sdie);
@@ -5869,10 +5847,11 @@ public class ProcessAPIImpl implements ProcessAPI {
     @Override
     public ArchivedDataInstance getArchivedActivityDataInstance(final String dataName, final long activityInstanceId) throws ArchivedDataNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
+        final ParentContainerResolver parentContainerResolver = tenantAccessor.getParentContainerResolver();
         final DataInstanceService dataInstanceService = tenantAccessor.getDataInstanceService();
         try {
             final SADataInstance dataInstance = dataInstanceService.getLastSADataInstance(dataName, activityInstanceId,
-                    DataInstanceContainer.ACTIVITY_INSTANCE.toString());
+                    DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
             return ModelConvertor.toArchivedDataInstance(dataInstance);
         } catch (final SDataInstanceException sdie) {
             throw new ArchivedDataNotFoundException(sdie);

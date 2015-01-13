@@ -80,6 +80,7 @@ public class EvaluateExpressionIT extends TestWithUser {
         processDefinitionBuilder.addData("booleanData", Boolean.class.getName(), new ExpressionBuilder().createConstantBooleanExpression(true));
         processDefinitionBuilder.addData("floatData", Float.class.getName(), new ExpressionBuilder().createConstantFloatExpression(100F));
         processDefinitionBuilder.addData("integerData", Integer.class.getName(), new ExpressionBuilder().createConstantIntegerExpression(4));
+        processDefinitionBuilder.addData("processData", String.class.getName(), new ExpressionBuilder().createConstantStringExpression("processData"));
         processDefinitionBuilder.addActor(ACTOR_NAME);
         processDefinitionBuilder.addUserTask(STEP1_NAME, ACTOR_NAME);
         processDefinitionBuilder.addUserTask(STEP2_NAME, ACTOR_NAME);
@@ -134,6 +135,7 @@ public class EvaluateExpressionIT extends TestWithUser {
         expressions.put(floatExpression, new HashMap<String, Serializable>());
         expressions.put(integerExpression, new HashMap<String, Serializable>());
         expressions.put(constantStringExpression, new HashMap<String, Serializable>());
+        expressions.put(new ExpressionBuilder().createDataExpression("processData",String.class.getName()), new HashMap<String, Serializable>());
     }
 
     @Override
@@ -230,6 +232,47 @@ public class EvaluateExpressionIT extends TestWithUser {
         assertEquals(false, result.get("BooleanScript"));
         assertEquals("100.0plop", result.get("FloatScript"));
         assertEquals("4plop", result.get("IntegerScript"));
+        assertEquals("processData", result.get("processData"));
+    }
+
+
+    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Completed activity" }, story = "Evaluate an expression on completed activity instance.", jira = "")
+    @Test
+    public void evaluateExpressionsOnCompletedActivityInstanceWithArchivedProcess() throws Exception {
+        final long step1Id = waitForUserTaskAndExecuteIt(processInstance, STEP1_NAME, user);
+        waitForUserTaskAndExecuteIt(processInstance, STEP2_NAME, user);
+        waitForProcessToFinish(processInstance);
+        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnCompletedActivityInstance(step1Id, expressions);
+        assertEquals("Word-Excel", result.get("StringScript"));
+        assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
+        assertEquals("1plop", result.get("LongScript"));
+        assertEquals("2.0plop", result.get("DoubleScript"));
+        assertEquals(false, result.get("BooleanScript"));
+        assertEquals("100.0plop", result.get("FloatScript"));
+        assertEquals("4plop", result.get("IntegerScript"));
+        assertEquals("processData", result.get("processData"));
+    }
+    @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Completed activity" }, story = "Evaluate an expression on completed activity instance.", jira = "")
+    @Test
+    public void evaluateExpressionsOnCompletedActivityInstanceInSubProcess() throws Exception {
+        ProcessDefinitionBuilder caller = new ProcessDefinitionBuilder().createNewInstance("Caller", "1");
+        caller.addCallActivity("callActivity",new ExpressionBuilder().createConstantStringExpression(PROCESS_NAME),new ExpressionBuilder().createConstantStringExpression(PROCESS_VERSION));
+        ProcessDefinition callerProcess = deployAndEnableProcess(caller.done());
+        ProcessInstance callerInstance = getProcessAPI().startProcess(callerProcess.getId());
+
+        final long step1Id = waitForUserTaskAndExecuteIt(callerInstance, STEP1_NAME, user);
+        waitForUserTaskAndExecuteIt(callerInstance, STEP2_NAME, user);
+        waitForProcessToFinish(callerInstance);
+        final Map<String, Serializable> result = getProcessAPI().evaluateExpressionsOnCompletedActivityInstance(step1Id, expressions);
+        assertEquals("Word-Excel", result.get("StringScript"));
+        assertEquals("Thu Jul 18 14:49:26 CEST 2013plop", result.get("DateScript"));
+        assertEquals("1plop", result.get("LongScript"));
+        assertEquals("2.0plop", result.get("DoubleScript"));
+        assertEquals(false, result.get("BooleanScript"));
+        assertEquals("100.0plop", result.get("FloatScript"));
+        assertEquals("4plop", result.get("IntegerScript"));
+        assertEquals("processData", result.get("processData"));
+        disableAndDeleteProcess(callerProcess);
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Evaluate", "Wrong activity instance id" }, story = "Execute form expression command with wrong activity instance id", jira = "ENGINE-1160")
@@ -253,6 +296,7 @@ public class EvaluateExpressionIT extends TestWithUser {
         assertEquals(false, result.get("BooleanScript"));
         assertEquals("100.0plop", result.get("FloatScript"));
         assertEquals("4plop", result.get("IntegerScript"));
+        assertEquals("processData", result.get("processData"));
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Completed process instance", "Updated data" }, story = "Evaluate an expression on completed process instance with variable update.", jira = "ENGINE-1160")
@@ -273,6 +317,7 @@ public class EvaluateExpressionIT extends TestWithUser {
         assertEquals(false, result.get("BooleanScript"));
         assertEquals("100.0plop", result.get("FloatScript"));
         assertEquals("4plop", result.get("IntegerScript"));
+        assertEquals("processData", result.get("processData"));
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Activity instance" }, story = "Evaluate expression on activity instance.", jira = "ENGINE-1160")
@@ -288,6 +333,7 @@ public class EvaluateExpressionIT extends TestWithUser {
         assertEquals("100.0plop", result.get("FloatScript"));
         assertEquals("4plop", result.get("IntegerScript"));
         assertEquals("", result.get("Word"));
+        assertEquals("processData", result.get("processData"));
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Wrong activity instance id" }, story = "Execute form expression command with wrong activity instance id", jira = "ENGINE-1160")
@@ -327,6 +373,7 @@ public class EvaluateExpressionIT extends TestWithUser {
         assertEquals(false, result.get("BooleanScript"));
         assertEquals("100.0plop", result.get("FloatScript"));
         assertEquals("4plop", result.get("IntegerScript"));
+        assertEquals("processData", result.get("processData"));
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Process instance", "Current value" }, story = "Evalute an expression on process intance with current values.", jira = "ENGINE-1160")
@@ -343,6 +390,7 @@ public class EvaluateExpressionIT extends TestWithUser {
         assertEquals(false, result.get("BooleanScript"));
         assertEquals("100.0plop", result.get("FloatScript"));
         assertEquals("4plop", result.get("IntegerScript"));
+        assertEquals("processData", result.get("processData"));
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Evaluate", "Wrong process instance id" }, jira = "ENGINE-1160")
@@ -369,6 +417,7 @@ public class EvaluateExpressionIT extends TestWithUser {
         assertEquals(false, result.get("BooleanScript"));
         assertEquals("100.0plop", result.get("FloatScript"));
         assertEquals("4plop", result.get("IntegerScript"));
+        assertEquals("processData", result.get("processData"));
     }
 
     @Cover(classes = ProcessAPI.class, concept = BPMNConcept.EXPRESSIONS, keywords = { "Expression", "Wrong process definition id" }, jira = "ENGINE-1160")

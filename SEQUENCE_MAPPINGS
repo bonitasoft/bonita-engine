@@ -80,7 +80,6 @@ BlobDataInstance -> 10020
 DATEDataInstance -> 10020
 LongTextDataInstance -> 10020
 XMLDataInstance -> 10020
-DataInstanceVisibilityMapping -> 10021
 
 Category
 category -> 10030
@@ -129,7 +128,6 @@ SADateDataInstance --> 20050
 SALongTextDataInstance --> 20050
 SAXMLDataInstance --> 20050
 SABlobDataInstance --> 20050
-SADataInstanceVisibilityMapping -> 20051
 
 
 =TESTS=
