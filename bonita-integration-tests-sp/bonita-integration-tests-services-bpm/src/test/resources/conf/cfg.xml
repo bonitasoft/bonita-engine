@@ -91,11 +91,6 @@
         <constructor-arg name="workService" ref="workService"/>
 	</bean>
 
-    <bean id="parentContainerResolver" class="org.bonitasoft.engine.data.ParentContainerResolverImpl">
-        <constructor-arg name="flowNodeInstanceService" ref="activityInstanceService"/>
-        <constructor-arg name="processInstanceService" ref="processInstanceService"/>
-    </bean>
-
 	<bean id="bpmInstancesCreator" class="org.bonitasoft.engine.bpm.model.impl.BPMInstancesCreator">
         <constructor-arg name="activityInstanceService" ref="activityInstanceService"/>
         <constructor-arg name="actorMappingService" ref="actorMappingService"/>
