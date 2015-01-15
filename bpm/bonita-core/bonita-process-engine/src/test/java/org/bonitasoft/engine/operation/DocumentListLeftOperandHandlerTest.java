@@ -14,8 +14,17 @@
 package org.bonitasoft.engine.operation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.anyByte;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -29,6 +38,9 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
+import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeReadException;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.session.SessionService;
 import org.bonitasoft.engine.sessionaccessor.SessionAccessor;
@@ -44,6 +56,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class DocumentListLeftOperandHandlerTest {
 
+    private static final long LOGGED_USER_ID = 125;
+    public static final long CONTAINER_ID = 45l;
+    public static final String CONTAINER_TYPE = "container";
+    public static final long PROCESS_INSTANCE_ID = 45l;
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
@@ -71,12 +87,16 @@ public class DocumentListLeftOperandHandlerTest {
     @Mock
     private DocumentHelper documentHelper;
 
-    @InjectMocks
     private DocumentListLeftOperandHandler handler;
 
     @Before
-    public void setUp() {
+    public void setUp() throws SFlowNodeReadException, SFlowNodeNotFoundException {
+        handler = new DocumentListLeftOperandHandler(activityInstanceService, sessionAccessor, sessionService, documentService, documentHelper);
+        doReturn(LOGGED_USER_ID).when(sessionService).getLoggedUserFromSession(sessionAccessor);
 
+        SFlowNodeInstance flowNodeInstance = mock(SFlowNodeInstance.class);
+        doReturn(flowNodeInstance).when(activityInstanceService).getFlowNodeInstance(CONTAINER_ID);
+        doReturn(PROCESS_INSTANCE_ID).when(flowNodeInstance).getParentProcessInstanceId();
     }
 
     private SLeftOperandImpl createLeftOperand(final String name) {
@@ -89,7 +109,19 @@ public class DocumentListLeftOperandHandlerTest {
     public void should_update_check_it_is_a_list() throws Exception {
         exception.expect(SOperationExecutionException.class);
         exception.expectMessage("Document operation only accepts an expression returning a list of DocumentValue");
-        handler.update(createLeftOperand("myDoc"), new HashMap<Object, Object>(), 45l, "container");
+        handler.update(createLeftOperand("myDoc"), Collections.<String, Object>emptyMap(), new HashMap<Object, Object>(), 45l, "container");
+    }
+
+    @Test
+    public void should_update_setDocumentList() throws Exception {
+        doNothing().when(documentHelper).setDocumentList(anyList(), anyString(), anyLong(), anyLong());
+        List<DocumentValue> newValue = Arrays.asList(documentValue("doc1"), documentValue("doc2"));
+        handler.update(createLeftOperand("myDoc"), Collections.<String, Object>emptyMap(), newValue, CONTAINER_ID, CONTAINER_TYPE);
+        verify(documentHelper).setDocumentList(newValue, "myDoc", PROCESS_INSTANCE_ID, LOGGED_USER_ID);
+    }
+
+    private DocumentValue documentValue(String name) {
+        return new DocumentValue(name);
     }
 
     @Test

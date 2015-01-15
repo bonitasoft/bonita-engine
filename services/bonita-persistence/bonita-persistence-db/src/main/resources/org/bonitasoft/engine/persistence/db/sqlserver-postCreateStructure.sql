@@ -17,8 +17,6 @@ ALTER TABLE connector_instance ADD CONSTRAINT fk_connector_instance_tenantId FOR
 GO
 ALTER TABLE data_instance ADD CONSTRAINT fk_data_instance_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
 GO
-ALTER TABLE data_mapping ADD CONSTRAINT fk_data_mapping_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
-GO
 ALTER TABLE dependency ADD CONSTRAINT fk_dependency_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
 GO
 ALTER TABLE dependencymapping ADD CONSTRAINT fk_dependencymapping_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
@@ -130,6 +128,4 @@ GO
 ALTER TABLE arch_transition_instance ADD CONSTRAINT fk_arch_transition_instance_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
 GO
 ALTER TABLE arch_data_instance ADD CONSTRAINT fk_arch_data_instance_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
-GO
-ALTER TABLE arch_data_mapping ADD CONSTRAINT fk_arch_data_mapping_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id)
 GO

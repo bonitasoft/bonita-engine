@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilde
 import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SXMLDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceNotFoundException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.SXMLDataInstance;
@@ -55,10 +57,13 @@ public abstract class DataInstanceServiceTest extends CommonServiceTest {
 
     protected DataInstanceService dataInstanceService;
 
+    protected static ParentContainerResolver parentContainerResolver;
+
     protected abstract DataInstanceService getDataInstanceServiceImplementation();
 
     static {
         expressionService = getServicesBuilder().buildExpressionService();
+        parentContainerResolver = getServicesBuilder().buildParentContainerResolver();
     }
 
     @Before
@@ -112,6 +117,32 @@ public abstract class DataInstanceServiceTest extends CommonServiceTest {
         evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
         return dataInstanceBuilder.done();
     }
+
+    @Test
+    public void testCreateAndRetrieveDateDataInstance() throws Exception {
+        final long time = System.currentTimeMillis();
+        verifyCreateAndRetrieveDataInstance("createDate", Date.class.getName(), "creates new Date", "new java.util.Date(" + time + ")", 9L, "process", false,
+                new Date(time));
+    }
+
+    @Test
+    public void createAndRetrieveNullDateDataInstanceShouldBeSupported() throws Exception {
+        verifyCreateAndRetrieveDataInstance("createNullDate", Date.class.getName(), "creates a null Date", "null", 9L, "process", false, null);
+    }
+
+    //    private SDataInstance buildDateDataInstance(final String instanceName, final String description, final String content, final long containerId,
+    //            final String containerType, final Boolean isTransient) throws SBonitaException {
+    //        // create definition
+    //        final SDataDefinitionBuilder dataDefinitionBuilder = BuilderFactory.get(SDataDefinitionBuilderFactory.class).createNewInstance(instanceName, Date.class.getName());
+    //
+    //        initializeBuilder(dataDefinitionBuilder, description, content, Date.class.getName(), isTransient);
+    //        final SDataDefinition dataDefinition = dataDefinitionBuilder.done();
+    //        final SDataInstanceBuilder dataInstanceBuilder = BuilderFactory.get(SDataInstanceBuilderFactory.class).createNewInstance(dataDefinition)
+    //                .setContainerId(containerId).setContainerType(containerType);
+    //        // create data instance
+    //        evaluateDefaultValueOf(dataDefinition, dataInstanceBuilder);
+    //        return dataInstanceBuilder.done();
+    //    }
 
     private SDataInstance buildXMLDataInstance(final String instanceName, final String description, final String namespace, final String xmlElement,
             final String content, final long containerId, final String containerType) throws SBonitaException {
@@ -302,14 +333,13 @@ public abstract class DataInstanceServiceTest extends CommonServiceTest {
                 true);
         insertDataInstance(data2Instance);
         getTransactionService().begin();
-        dataInstanceService.createDataContainer(containerId, containerType, true);
         getTransactionService().complete();
 
         final List<String> dataNames = new ArrayList<String>(2);
         dataNames.add(instance1Name);
         dataNames.add(instance2Name);
         getTransactionService().begin();
-        final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(dataNames, containerId, containerType);
+        final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(dataNames, containerId, containerType, parentContainerResolver);
         getTransactionService().complete();
         assertEquals(2, dataInstances.size());
         assertThat("Not all data instances have been found", Arrays.asList(dataInstances.get(0), dataInstances.get(1)),
@@ -319,7 +349,7 @@ public abstract class DataInstanceServiceTest extends CommonServiceTest {
     @Test
     public void getSADataInstancesWithEmptyList() throws Exception {
         getTransactionService().begin();
-        final List<SADataInstance> dataInstances = dataInstanceService.getSADataInstances(13544L, "dummyContainerType", Arrays.<String> asList(), 1111111L);
+        final List<SADataInstance> dataInstances = dataInstanceService.getSADataInstances(13544L, "dummyContainerType", parentContainerResolver, Arrays.<String> asList(), 1111111L);
         getTransactionService().complete();
         assertEquals(0, dataInstances.size());
     }

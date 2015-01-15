@@ -52,8 +52,8 @@ public class EventTriggerIT extends AbstractEventIT {
         final ProcessInstance processInstance4 = getProcessAPI().startProcess(process4.getId());
 
         waitForFlowNodeInState(processInstance2, "timer", TestStates.WAITING, true);
-        waitForUserTask(PARENT_PROCESS_USER_TASK_NAME, processInstance3);
-        waitForUserTask("step1", processInstance4);
+        waitForUserTask(processInstance3, PARENT_PROCESS_USER_TASK_NAME);
+        waitForUserTask(processInstance4, "step1");
 
         // Return only timer event trigger
         SearchOptions options = new SearchOptionsBuilder(0, 10).done();
@@ -93,7 +93,7 @@ public class EventTriggerIT extends AbstractEventIT {
             final Date newDate = getProcessAPI().updateExecutionDateOfTimerEventTriggerInstance(result.get(0).getId(), date);
             assertTrue(newDate.equals(date) || newDate.after(date));
 
-            waitForUserTask(EXCEPTION_STEP, processInstance2);
+            waitForUserTask(processInstance2, EXCEPTION_STEP);
         } finally {
             disableAndDeleteProcess(process2, process1);
         }

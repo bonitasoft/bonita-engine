@@ -15,10 +15,6 @@ package org.bonitasoft.engine.execution.work;
 
 import java.util.Map;
 
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
-import org.bonitasoft.engine.execution.SIllegalStateTransition;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
@@ -71,7 +67,6 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
         } catch (final SExpressionEvaluationException e) {
             // To do before log, because we want to set the context of the exception.
             handleFailureWrappedWork(loggerService, e, context);
-            logException(loggerService, e);
         } catch (final Exception e) {
             handleFailure(e, context);
         } finally {
@@ -83,20 +78,12 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
     public void handleFailure(final Exception e, final Map<String, Object> context) {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
-        final Throwable cause = e.getCause();
-        if (mustNotPutInFailedState(e)) {
-            logFailureCause(loggerService, e);
-        } else if (mustNotPutInFailedState(cause)) {
-            logFailureCause(loggerService, cause);
-        } else {
-            // final Edge case we cannot manage
-            if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
-                loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "The work [" + getDescription() + "] failed. The failure will be handled.");
-            }
-            // To do before log, because we want to set the context of the exception.
-            handleFailureWrappedWork(loggerService, e, context);
-            logException(loggerService, e);
+        // final Edge case we cannot manage
+        if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.ERROR)) {
+            loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "The work [" + getDescription() + "] failed. The failure will be handled.");
         }
+        // To do before log, because we want to set the context of the exception.
+        handleFailureWrappedWork(loggerService, e, context);
     }
 
     private void logException(final TechnicalLoggerService loggerService, final Throwable e) {
@@ -117,32 +104,12 @@ public class FailureHandlingBonitaWork extends WrappingBonitaWork {
     private void handleFailureWrappedWork(final TechnicalLoggerService loggerService, final Exception e, final Map<String, Object> context) {
         try {
             getWrappedWork().handleFailure(e, context);
+            logException(loggerService, e);
         } catch (final Exception e1) {
             loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unexpected error while executing work [" + getDescription() + "]"
                     + ". You may consider restarting the system. This will restart all works.", e);
             loggerService.log(getClass(), TechnicalLogSeverity.ERROR, "Unable to handle the failure. ", e1);
             logIncident(e, e1);
-        }
-    }
-
-    private boolean mustNotPutInFailedState(final Throwable cause) {
-        return cause instanceof SFlowNodeNotFoundException
-                || cause instanceof SProcessInstanceNotFoundException
-                || cause instanceof SProcessDefinitionNotFoundException
-                || isTransitionFromTerminalState(cause);
-    }
-
-    boolean isTransitionFromTerminalState(final Throwable cause) {
-        if (!(cause instanceof SIllegalStateTransition)) {
-            return false;
-        }
-        final SIllegalStateTransition e = (SIllegalStateTransition) cause;
-        return e.isTransitionFromTerminalState();
-    }
-
-    protected void logFailureCause(final TechnicalLoggerService loggerService, final Throwable cause) {
-        if (loggerService.isLoggable(getClass(), TechnicalLogSeverity.DEBUG)) {
-            loggerService.log(getClass(), TechnicalLogSeverity.DEBUG, "The work [" + getDescription() + "] failed to execute due to : ", cause);
         }
     }
 

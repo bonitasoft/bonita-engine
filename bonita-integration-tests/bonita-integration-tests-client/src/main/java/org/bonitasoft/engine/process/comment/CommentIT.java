@@ -74,7 +74,7 @@ public class CommentIT extends TestWithUser {
         for (int i = 0; i < 21; i++) {
             getProcessAPI().addProcessComment(pi.getId(), "myComment_" + i);
         }
-        waitForUserTaskAndExecuteIt(activityName, pi, user);
+        waitForUserTaskAndExecuteIt(pi, activityName, user);
         waitForProcessToFinish(pi);
         final SearchResult<ArchivedComment> searchArchivedComments = getProcessAPI().searchArchivedComments(
                 new SearchOptionsBuilder(0, 30).filter(ArchivedCommentsSearchDescriptor.PROCESS_INSTANCE_ID, pi.getId()).done());

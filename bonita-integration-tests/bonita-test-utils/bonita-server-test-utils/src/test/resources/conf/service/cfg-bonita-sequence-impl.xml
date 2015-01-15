@@ -9,9 +9,7 @@
 				<entry key="30" value="10000" /><!-- queriable log -->
 				<entry key="31" value="200000" /><!-- queriable log parameter -->
 				<entry key="10020" value="5000" /><!-- data -->
-				<entry key="10021" value="5000" /><!-- DataInstanceVisibilityMapping -->
 				<entry key="20050" value="25000" /><!-- archived data --><!-- 5 change by data -->
-				<entry key="20051" value="25000" /><!-- SADataInstanceVisibilityMapping -->
 
 				<!-- less used objects -->
 				<entry key="10012" value="100" /><!-- ProcessDefinition -->
@@ -88,7 +86,6 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" value="10020" />
 				<entry key="org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl" value="10020" />
-				<entry key="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" value="10021" />
 				<entry key="org.bonitasoft.engine.external.identity.mapping.model.impl.SExternalIdentityMappingImpl" value="10070" />
 				<entry key="org.bonitasoft.engine.core.document.model.impl.SDocumentMappingImpl" value="10090" />
 				<!-- archived objects -->
@@ -104,7 +101,6 @@
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLDataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" value="20050" />
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl" value="20050" />
-				<entry key="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" value="20051" />
 			</map>
 		</constructor-arg>
 		<constructor-arg name="datasource" ref="bonitaSequenceManagerDSJNDI" />

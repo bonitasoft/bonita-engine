@@ -343,7 +343,7 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
 
     @Override
     public String toString() {
-        return "SUserImpl (" + getId() + ") [firstName=" + firstName + ", lastName=" + lastName + ", password=" + password + ", userName=" + userName
+        return "SUserImpl (" + getId() + ") [firstName=" + firstName + ", lastName=" + lastName + ", userName=" + userName
                 + ", iconName=" + iconName + ", iconPath=" + iconPath + ", managerUserId=" + managerUserId + ", delegeeUserName=" + delegeeUserName
                 + ", title=" + title + ", jobTitle=" + jobTitle + ", creationDate=" + creationDate + ", createdBy=" + createdBy + ", lastUpdate=" + lastUpdate
                 + ", lastConnection=" + lastConnection + ", enabled=" + enabled + "]";

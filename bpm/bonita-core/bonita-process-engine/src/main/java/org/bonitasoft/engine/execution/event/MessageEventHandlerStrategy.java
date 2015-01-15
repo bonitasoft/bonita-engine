@@ -210,7 +210,6 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         if (!messageTrigger.getDataDefinitions().isEmpty()) {
             bpmInstancesCreator.createDataInstances(messageTrigger.getDataDefinitions(), messageInstance.getId(), DataInstanceContainer.MESSAGE_INSTANCE,
                     expressionContext);
-            dataInstanceService.createDataContainer(messageInstance.getId(), DataInstanceContainer.MESSAGE_INSTANCE.name(), false);
             final TechnicalLoggerService logger = bpmInstancesCreator.getLogger();
             if (logger.isLoggable(this.getClass(), TechnicalLogSeverity.DEBUG)) {
                 logger.log(
@@ -227,9 +226,8 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
     private void fillCorrelation(final SCorrelationContainerBuilder builder, final List<SCorrelationDefinition> correlations,
             final SExpressionContext expressionContext) throws SExpressionTypeUnknownException, SExpressionEvaluationException,
             SExpressionDependencyMissingException, SInvalidExpressionException {
-        int size = correlations.size();
-        size = Math.min(5, size);
-        final ArrayList<SExpression> toEval = new ArrayList<SExpression>(size * 2);
+        final int size = Math.min(5, correlations.size());
+        final List<SExpression> toEval = new ArrayList<SExpression>(size * 2);
         if (size > 0) {
             for (int i = 0; i < size; i++) {
                 final SCorrelationDefinition sCorrelationDefinition = correlations.get(i);
@@ -238,13 +236,13 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
             }
             final List<Object> res = expressionResolverService.evaluate(toEval, expressionContext);
 
-            final ArrayList<String> keys = new ArrayList<String>(size);
-            final ArrayList<String> values = new ArrayList<String>(size);
+            final List<String> keys = new ArrayList<String>(size);
+            final List<String> values = new ArrayList<String>(size);
             for (int i = 0; i < size; i++) {
                 keys.add(String.valueOf(res.get(i * 2)));
                 values.add(String.valueOf(res.get(i * 2 + 1)));
             }
-            final ArrayList<String> sortedKeys = new ArrayList<String>(keys);
+            final List<String> sortedKeys = new ArrayList<String>(keys);
             Collections.sort(sortedKeys);
             for (int i = 0; i < size; i++) {
                 final String key = sortedKeys.get(i);

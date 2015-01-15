@@ -15,10 +15,14 @@
  */
 package org.bonitasoft.engine.core.operation.impl;
 
+import java.util.List;
+import java.util.Map;
+
 import org.bonitasoft.engine.core.expression.control.model.SExpressionContext;
 import org.bonitasoft.engine.core.operation.LeftOperandHandler;
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.SLeftOperand;
+import org.bonitasoft.engine.persistence.SBonitaReadException;
 
 /**
  * @author Baptiste Mesta
@@ -32,7 +36,7 @@ public class ExternalDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object update(final SLeftOperand leftOperand, final Object newValue, final long containerId, final String containerType) {
+    public Object update(final SLeftOperand leftOperand, Map<String, Object> inputValues, final Object newValue, final long containerId, final String containerType) {
         // nothing to do, the value is already changed in the context
         return newValue;
     }
@@ -43,13 +47,19 @@ public class ExternalDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) {
-        return expressionContext.getInputValues().get(sLeftOperand.getName());
+    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) {
+        String name = sLeftOperand.getName();
+        if(!contextToSet.containsKey(name)) {
+            contextToSet.put(name, expressionContext.getInputValues().get(name));
+        }
     }
 
+
     @Override
-    public boolean supportBatchUpdate() {
-        return true;
+    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
+        for (SLeftOperand leftOperand : sLeftOperand) {
+            loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
+        }
     }
 
 }

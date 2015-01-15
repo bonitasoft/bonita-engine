@@ -38,9 +38,14 @@ import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.supervisor.ProcessSupervisor;
 import org.bonitasoft.engine.connectors.TestConnectorLongToExecute;
 import org.bonitasoft.engine.exception.BonitaException;
+import org.bonitasoft.engine.exception.SearchException;
+import org.bonitasoft.engine.exception.UpdateException;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
+import org.bonitasoft.engine.identity.Group;
+import org.bonitasoft.engine.identity.Role;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.test.BuildTestUtil;
 import org.bonitasoft.engine.test.annotation.Cover;
@@ -75,8 +80,8 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessInstance processInstance = getProcessAPI().startProcess(user.getId(), processDefinition.getId());
 
         // Wait for 2 activities in READY state:
-        waitForUserTask("userTask", processInstance);
-        waitForUserTask("secondTask", processInstance);
+        waitForUserTask(processInstance, "userTask");
+        waitForUserTask(processInstance, "secondTask");
 
         // Check that no tasks are archived yet:
         SearchOptionsBuilder searchBuilder = new SearchOptionsBuilder(0, 12);
@@ -125,17 +130,12 @@ public class SearchActivityInstanceIT extends TestWithUser {
                 .addUserTask("userTask6", ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, jack);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        final long stepId1 = waitForUserTask("userTask1", pi0).getId();
-        final long stepId2 = waitForUserTask("userTask2", pi0).getId();
-        final long stepId3 = waitForUserTask("userTask3", pi0).getId();
-        final long stepId4 = waitForUserTask("task4", pi0).getId();
-        final long stepId5 = waitForUserTask("userTask5", pi0).getId();
-        final long stepId6 = waitForUserTask("userTask6", pi0).getId();
-        getProcessAPI().assignUserTask(stepId1, john.getId());
-        getProcessAPI().assignUserTask(stepId2, john.getId());
-        getProcessAPI().assignUserTask(stepId3, jack.getId());
-        getProcessAPI().assignUserTask(stepId4, john.getId());
-        getProcessAPI().assignUserTask(stepId5, jules.getId());
+        final long stepId1 = waitForUserTaskAndAssigneIt(pi0, "userTask1", john).getId();
+        final long stepId2 = waitForUserTaskAndAssigneIt(pi0, "userTask2", john).getId();
+        final long stepId3 = waitForUserTaskAndAssigneIt(pi0, "userTask3", jack).getId();
+        final long stepId4 = waitForUserTaskAndAssigneIt(pi0, "task4", john).getId();
+        final long stepId5 = waitForUserTaskAndAssigneIt(pi0, "userTask5", jules).getId();
+        final long stepId6 = waitForUserTask(pi0, "userTask6");
         // don't assign userTask6 to anyone.
         skipTask(stepId1);
         skipTask(stepId2);
@@ -209,14 +209,10 @@ public class SearchActivityInstanceIT extends TestWithUser {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, john);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final long stepId1 = waitForUserTask("userTask1", processInstance).getId();
-        final long stepId2 = waitForUserTask("userTask2", processInstance).getId();
-        final long stepId3 = waitForUserTask("userTask3", processInstance).getId();
-        final long stepId4 = waitForUserTask("task4", processInstance).getId();
-        getProcessAPI().assignUserTask(stepId1, john.getId());
-        getProcessAPI().assignUserTask(stepId2, john.getId());
-        getProcessAPI().assignUserTask(stepId3, jack.getId());
-        getProcessAPI().assignUserTask(stepId4, john.getId());
+        waitForUserTaskAndAssigneIt(processInstance, "userTask1", john).getId();
+        waitForUserTaskAndAssigneIt(processInstance, "userTask2", john).getId();
+        waitForUserTaskAndAssigneIt(processInstance, "userTask3", jack).getId();
+        waitForUserTaskAndAssigneIt(processInstance, "task4", john).getId();
 
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(HumanTaskInstanceSearchDescriptor.NAME, "userTask1");
@@ -255,98 +251,192 @@ public class SearchActivityInstanceIT extends TestWithUser {
 
     @Test
     public void searchHumanTaskInstances() throws Exception {
+        final Group group = createGroup("groupName");
+        final Role role = createRole("roleName");
+
         // First process def with 2 instances:
         final DesignProcessDefinition designProcessDef1 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(Arrays.asList("initTask1"),
                 Arrays.asList(true));
         final ProcessDefinition processDef1 = deployAndEnableProcessWithActor(designProcessDef1, ACTOR_NAME, user);
-        // final ProcessInstance processInstance =
         final ProcessInstance pi1 = getProcessAPI().startProcess(processDef1.getId());
+        final long step1Id = waitForUserTask(pi1, "initTask1");
         final ProcessInstance pi2 = getProcessAPI().startProcess(processDef1.getId());
+        waitForUserTask(pi2, "initTask1");
 
-        final ProcessDefinitionBuilder definitionBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME + 2, PROCESS_VERSION);
-        definitionBuilder.addStartEvent("start");
-        definitionBuilder.addActor(ACTOR_NAME);
-        definitionBuilder.addUserTask("initTask2", ACTOR_NAME);
-        definitionBuilder.addEndEvent("end");
-        definitionBuilder.addTransition("start", "initTask2");
-        definitionBuilder.addTransition("initTask2", "end");
-        final ProcessDefinition processDef2 = deployAndEnableProcessWithActor(definitionBuilder.done(), ACTOR_NAME, user);
+        final DesignProcessDefinition designProcessDef2 = BuildTestUtil.buildProcessDefinitionWithHumanAndAutomaticSteps(PROCESS_NAME + 2, PROCESS_VERSION,
+                Arrays.asList("initTask2"), Arrays.asList(true));
+        final ProcessDefinition processDef2 = deployAndEnableProcessWithActor(designProcessDef2, ACTOR_NAME, user);
         final ProcessInstance pi3 = getProcessAPI().startProcess(processDef2.getId());
+        waitForUserTask(pi3, "initTask2");
         final ProcessInstance pi4 = getProcessAPI().startProcess(processDef2.getId());
+        waitForUserTask(pi4, "initTask2");
         final ProcessInstance pi5 = getProcessAPI().startProcess(processDef2.getId());
-        waitForUserTask("initTask1", pi1);
-        waitForUserTask("initTask1", pi2);
-        waitForUserTask("initTask2", pi3);
-        waitForUserTask("initTask2", pi4);
-        waitForUserTask("initTask2", pi5);
+        waitForUserTask(pi5, "initTask2");
 
-        SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
-        SearchResult<HumanTaskInstance> humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        searchOptionsBuilder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        final SearchResult<HumanTaskInstance> humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
         assertEquals(5, humanTasksSearch.getCount());
 
-        // There should be 1 task which priority is above_normal:
-        final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(pi2.getId(), 0, 10);
-        getProcessAPI().setTaskPriority(activityInstances.get(0).getId(), TaskPriority.ABOVE_NORMAL);
-        searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
-        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.PRIORITY, TaskPriority.ABOVE_NORMAL);
-        humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
-        assertEquals(1, humanTasksSearch.getCount());
-        assertEquals(TaskPriority.ABOVE_NORMAL, humanTasksSearch.getResult().get(0).getPriority());
+        searchHumanTaskInstancesFilteredByPriority(pi2);
+        searchHumanTaskInstancesFilteredByAssigneeId();
+        searchHumanTaskInstancesFilteredByProcessInstance(pi2);
+        searchHumanTaskInstancesFilteredByProcessDefinition(processDef2);
+        searchHumanTaskInstancesFilteredByState(step1Id);
+        searchHumanTaskInstancesFilteredByUser(user.getId(), processDef1.getId());
+        searchHumanTaskInstancesFilteredByGroup(group.getId(), processDef2.getId());
+        searchHumanTaskInstancesFilteredByRole(role.getId(), processDef1.getId());
+        searchHumanTaskInstancesFilteredByMembership(group.getId(), role.getId(), processDef2.getId());
+        searchHumanTaskInstancesByTerm();
 
-        // There should be no assigned tasks to 'user':
-        searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
-        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.ASSIGNEE_ID, user.getId());
-        humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
-        assertEquals(0, humanTasksSearch.getCount());
+        disableAndDeleteProcess(processDef1, processDef2);
+        deleteGroups(group);
+        deleteRoles(role);
+    }
 
-        // There should be 5 non-assigned tasks:
-        searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
-        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.ASSIGNEE_ID, 0L);
-        humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
-        assertEquals(5, humanTasksSearch.getCount());
+    private void searchHumanTaskInstancesFilteredByUser(final long userId, final long processDefinitionId) throws Exception {
+        final ProcessSupervisor supervisor = getProcessAPI().createProcessSupervisorForUser(processDefinitionId, userId);
 
-        searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
-        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, pi2.getId());
-        humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
-        assertEquals(1, humanTasksSearch.getCount());
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        searchOptionsBuilder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.USER_ID, userId);
+        final SearchResult<HumanTaskInstance> humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
+        assertEquals(2, humanTasksSearch.getCount());
+        for (final HumanTaskInstance task : humanTasksSearch.getResult()) {
+            assertEquals("initTask1", task.getName());
+        }
 
-        searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
-        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDef2.getId());
-        humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
+        getProcessAPI().deleteSupervisor(supervisor.getSupervisorId());
+    }
+
+    private void searchHumanTaskInstancesFilteredByGroup(final long groupId, final long processDefinitionId) throws Exception {
+        final ProcessSupervisor supervisor = getProcessAPI().createProcessSupervisorForGroup(processDefinitionId, groupId);
+
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        searchOptionsBuilder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.GROUP_ID, groupId);
+        final SearchResult<HumanTaskInstance> humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
         assertEquals(3, humanTasksSearch.getCount());
+        for (final HumanTaskInstance task : humanTasksSearch.getResult()) {
+            assertEquals("initTask2", task.getName());
+        }
 
-        searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        getProcessAPI().deleteSupervisor(supervisor.getSupervisorId());
+    }
+
+    private void searchHumanTaskInstancesFilteredByRole(final long roleId, final long processDefinitionId) throws Exception {
+        final ProcessSupervisor supervisor = getProcessAPI().createProcessSupervisorForRole(processDefinitionId, roleId);
+
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        searchOptionsBuilder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.ROLE_ID, roleId);
+        final SearchResult<HumanTaskInstance> humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
+        assertEquals(2, humanTasksSearch.getCount());
+        for (final HumanTaskInstance task : humanTasksSearch.getResult()) {
+            assertEquals("initTask1", task.getName());
+        }
+
+        getProcessAPI().deleteSupervisor(supervisor.getSupervisorId());
+    }
+
+    private void searchHumanTaskInstancesFilteredByMembership(final long groupId, final long roleId, final long processDefinitionId) throws Exception {
+        final ProcessSupervisor supervisor = getProcessAPI().createProcessSupervisorForMembership(processDefinitionId, groupId, roleId);
+
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        searchOptionsBuilder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.ROLE_ID, roleId);
+        final SearchResult<HumanTaskInstance> humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
+        assertEquals(3, humanTasksSearch.getCount());
+        for (final HumanTaskInstance task : humanTasksSearch.getResult()) {
+            assertEquals("initTask2", task.getName());
+        }
+
+        final SearchOptionsBuilder searchOptionsBuilder2 = new SearchOptionsBuilder(0, 45);
+        searchOptionsBuilder2.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        searchOptionsBuilder2.filter(HumanTaskInstanceSearchDescriptor.GROUP_ID, groupId);
+        final SearchResult<HumanTaskInstance> humanTasksSearch2 = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder2.done());
+        assertEquals(humanTasksSearch, humanTasksSearch2);
+
+        getProcessAPI().deleteSupervisor(supervisor.getSupervisorId());
+    }
+
+    private void searchHumanTaskInstancesFilteredByState(final long step1Id) throws UpdateException, SearchException {
+        getProcessAPI().assignUserTask(step1Id, user.getId());
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        searchOptionsBuilder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.READY_STATE);
+        final SearchResult<HumanTaskInstance> humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
+        assertEquals(5, humanTasksSearch.getCount());
+        for (final HumanTaskInstance task : humanTasksSearch.getResult()) {
+            assertEquals(ActivityStates.READY_STATE, task.getState());
+        }
+    }
+
+    private void searchHumanTaskInstancesByTerm() throws SearchException {
+        SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        searchOptionsBuilder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
         searchOptionsBuilder.searchTerm("initTask2");
-        humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
+        SearchResult<HumanTaskInstance> humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
         assertEquals(3, humanTasksSearch.getCount());
         for (final HumanTaskInstance task : humanTasksSearch.getResult()) {
             assertEquals("initTask2", task.getName());
         }
 
         searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        searchOptionsBuilder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
         searchOptionsBuilder.searchTerm("initTask");
         humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
         assertEquals(5, humanTasksSearch.getCount());
         for (final HumanTaskInstance task : humanTasksSearch.getResult()) {
             assertTrue("keyword search sould return only tasks with name containing 'initTask'", task.getName().contains("initTask"));
         }
+    }
 
-        final long taskId = humanTasksSearch.getResult().get(0).getId();
-        getProcessAPI().assignUserTask(taskId, user.getId());
+    private void searchHumanTaskInstancesFilteredByProcessDefinition(final ProcessDefinition processDef2) throws SearchException {
+        SearchOptionsBuilder searchOptionsBuilder;
+        SearchResult<HumanTaskInstance> humanTasksSearch;
         searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
-        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.STATE_NAME, ActivityStates.READY_STATE);
+        searchOptionsBuilder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDef2.getId());
         humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
-        assertEquals(5, humanTasksSearch.getCount());
-        for (final HumanTaskInstance task : humanTasksSearch.getResult()) {
-            assertEquals(ActivityStates.READY_STATE, task.getState());
-        }
+        assertEquals(3, humanTasksSearch.getCount());
+    }
 
+    private void searchHumanTaskInstancesFilteredByProcessInstance(final ProcessInstance pi2) throws SearchException {
+        SearchOptionsBuilder searchOptionsBuilder;
+        SearchResult<HumanTaskInstance> humanTasksSearch;
         searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
-        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.ASSIGNEE_ID, user.getId());
+        searchOptionsBuilder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, pi2.getId());
         humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
         assertEquals(1, humanTasksSearch.getCount());
+    }
 
-        disableAndDeleteProcess(processDef1, processDef2);
+    private void searchHumanTaskInstancesFilteredByAssigneeId() throws SearchException {
+        // There should be no assigned tasks to 'user':
+        SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        searchOptionsBuilder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.ASSIGNEE_ID, user.getId());
+        SearchResult<HumanTaskInstance> humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
+        assertEquals(0, humanTasksSearch.getCount());
+
+        // There should be 5 non-assigned tasks:
+        searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        searchOptionsBuilder.sort(HumanTaskInstanceSearchDescriptor.NAME, Order.ASC);
+        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.ASSIGNEE_ID, 0L);
+        humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
+        assertEquals(5, humanTasksSearch.getCount());
+    }
+
+    private void searchHumanTaskInstancesFilteredByPriority(final ProcessInstance pi2) throws UpdateException, SearchException {
+        // There should be 1 task which priority is above_normal:
+        final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(pi2.getId(), 0, 10);
+        getProcessAPI().setTaskPriority(activityInstances.get(0).getId(), TaskPriority.ABOVE_NORMAL);
+        final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 45);
+        searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.PRIORITY, TaskPriority.ABOVE_NORMAL);
+        final SearchResult<HumanTaskInstance> humanTasksSearch = getProcessAPI().searchHumanTaskInstances(searchOptionsBuilder.done());
+        assertEquals(1, humanTasksSearch.getCount());
+        assertEquals(TaskPriority.ABOVE_NORMAL, humanTasksSearch.getResult().get(0).getPriority());
     }
 
     @Test
@@ -455,7 +545,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, actorName, user);
         // -------- start process and wait for tasks
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask(taskName, processInstance);
+        waitForUserTask(processInstance, taskName);
 
         // -------- test pending task search methods
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -480,13 +570,13 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi1 = getProcessAPI().startProcess(processDefinition.getId());
         final ProcessInstance pi2 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("userTask1", pi1);
-        waitForUserTaskAndAssigneIt("userTask2", pi1, user);
-        waitForUserTask("manualTask", pi1);
+        waitForUserTask(pi1, "userTask1");
+        waitForUserTaskAndAssigneIt(pi1, "userTask2", user);
+        waitForUserTask(pi1, "manualTask");
 
-        waitForUserTask("userTask1", pi2);
-        waitForUserTask("userTask2", pi2);
-        waitForUserTask("manualTask", pi2);
+        waitForUserTask(pi2, "userTask1");
+        waitForUserTask(pi2, "userTask2");
+        waitForUserTask(pi2, "manualTask");
 
         // finish the tasks
         final List<ActivityInstance> openedActivityInstances1 = getProcessAPI().getOpenActivityInstances(pi1.getId(), 0, 20, ActivityInstanceCriterion.DEFAULT);
@@ -597,23 +687,17 @@ public class SearchActivityInstanceIT extends TestWithUser {
                 .getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("userTask1", pi0);
-        Thread.sleep(1000);
+        final long step1Id = waitForUserTask(pi0, "userTask1");
+        final long step2Id = waitForUserTaskAndAssigneIt(pi0, "userTask2", user).getId();
 
-        final ActivityInstance step2 = waitForUserTask("userTask2", pi0);
-
-        SearchResult<ArchivedHumanTaskInstance> taskInstanceSearchResult;
-        SearchOptionsBuilder builder;
-
-        getProcessAPI().assignUserTask(step2.getId(), user.getId());
-
-        getProcessAPI().setActivityStateById(step1.getId(), 12);
-        getProcessAPI().setActivityStateById(step2.getId(), 12);
+        getProcessAPI().setActivityStateById(step1Id, 12);
+        getProcessAPI().setActivityStateById(step2Id, 12);
         waitForProcessToFinish(pi0);
-        builder = new SearchOptionsBuilder(0, 10);
+
+        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
         builder.filter(ArchivedHumanTaskInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDefinition.getId());
         builder.sort(ArchivedHumanTaskInstanceSearchDescriptor.NAME, Order.DESC);
-        taskInstanceSearchResult = getProcessAPI().searchArchivedHumanTasks(builder.done());
+        SearchResult<ArchivedHumanTaskInstance> taskInstanceSearchResult = getProcessAPI().searchArchivedHumanTasks(builder.done());
         assertEquals(2, taskInstanceSearchResult.getCount());
         List<ArchivedHumanTaskInstance> archivedTasks = taskInstanceSearchResult.getResult();
         final ArchivedHumanTaskInstance aut1 = archivedTasks.get(0);
@@ -647,21 +731,18 @@ public class SearchActivityInstanceIT extends TestWithUser {
     }
 
     @Test
-    public void testSearchArchivedActivitiesInTerminalState() throws Exception {
+    public void searchArchivedActivitiesInTerminalState() throws Exception {
         final ProcessDefinitionBuilder processBuilder = new ProcessDefinitionBuilder().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
         processBuilder.addActor(ACTOR_NAME);
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask("userTask1", ACTOR_NAME).addUserTask("userTask2", ACTOR_NAME)
-                .addUserTask("userTask3", ACTOR_NAME).addTransition("userTask2", "userTask3")
-                .getProcess();
+                .addUserTask("userTask3", ACTOR_NAME).addTransition("userTask2", "userTask3").getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("userTask1", pi0);
-        getProcessAPI().assignUserTask(step1.getId(), user.getId());
-        final ActivityInstance step2 = waitForUserTask("userTask2", pi0);
-        assignAndExecuteStep(step2, user.getId());
-        waitForUserTask("userTask3", pi0);
-        SearchOptionsBuilder builder;
-        builder = new SearchOptionsBuilder(0, 10).filter(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL, true);
+        waitForUserTaskAndAssigneIt(pi0, "userTask1", user);
+        waitForUserTaskAndExecuteIt(pi0, "userTask2", user);
+        waitForUserTask(pi0, "userTask3");
+
+        SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10).filter(ArchivedFlowNodeInstanceSearchDescriptor.TERMINAL, true);
         SearchResult<ArchivedFlowNodeInstance> searchFlowNodeInstances = getProcessAPI().searchArchivedFlowNodeInstances(builder.done());
         assertEquals(1, searchFlowNodeInstances.getResult().size());
         assertEquals("userTask2", searchFlowNodeInstances.getResult().get(0).getName());
@@ -682,7 +763,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final DesignProcessDefinition designProcessDefinition = processBuilder.addUserTask(taskName, ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask(taskName, pi0);
+        waitForUserTask(pi0, taskName);
 
         final List<ActivityInstance> activityInstances = getProcessAPI().getActivities(pi0.getId(), 0, 10);
         assertEquals(1, activityInstances.size());
@@ -732,8 +813,8 @@ public class SearchActivityInstanceIT extends TestWithUser {
         processBuilder.addTransition("Request2", "Approval2");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(processBuilder.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("Request", processInstance);
-        waitForUserTask("Request2", processInstance);
+        waitForUserTask(processInstance, "Request");
+        waitForUserTask(processInstance, "Request2");
 
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 20);
         searchOptionsBuilder.filter(HumanTaskInstanceSearchDescriptor.NAME, "Request2");
@@ -741,7 +822,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         assertEquals(1, humanTasksSearch.getCount());
         final HumanTaskInstance userTaskId = humanTasksSearch.getResult().get(0);
         assignAndExecuteStep(userTaskId, user.getId());
-        waitForUserTask("Approval2", processInstance);
+        waitForUserTask(processInstance, "Approval2");
 
         final List<HumanTaskInstance> userTaskInstances = getProcessAPI().getPendingHumanTaskInstances(user.getId(), 0, 10, activityInstanceCriterion);
         assertNotNull(userTaskInstances);
@@ -788,11 +869,11 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         // -------- start process and wait for tasks
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("userTask1", pi0);
-        waitForUserTaskAndAssigneIt("userTask2", pi0, user);
-        waitForUserTaskAndAssigneIt("userTask3", pi0, user);
-        waitForUserTask("task4", pi0);
-        waitForUserTask("userTask5", pi0);
+        waitForUserTask(pi0, "userTask1");
+        waitForUserTaskAndAssigneIt(pi0, "userTask2", user);
+        waitForUserTaskAndAssigneIt(pi0, "userTask3", user);
+        waitForUserTask(pi0, "task4");
+        waitForUserTask(pi0, "userTask5");
 
         // -------- test pending task search methods
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -834,11 +915,11 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, Arrays.asList(user, john));
         // -------- start process and wait for tasks
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("userTask1", pi0);
-        waitForUserTaskAndAssigneIt("userTask2", pi0, user);
-        waitForUserTaskAndAssigneIt("userTask3", pi0, user);
-        waitForUserTaskAndAssigneIt("task4", pi0, john);
-        waitForUserTask("userTask5", pi0);
+        waitForUserTask(pi0, "userTask1");
+        waitForUserTaskAndAssigneIt(pi0, "userTask2", user);
+        waitForUserTaskAndAssigneIt(pi0, "userTask3", user);
+        waitForUserTaskAndAssigneIt(pi0, "task4", john);
+        waitForUserTask(pi0, "userTask5");
 
         // -------- test assigned & pending task search methods
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -876,11 +957,11 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, Arrays.asList(user, john));
         // -------- start process and wait for tasks
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("userTask1", pi0);
-        waitForUserTaskAndAssigneIt("userTask2", pi0, user);
-        waitForUserTaskAndAssigneIt("userTask3", pi0, user);
-        waitForUserTaskAndAssigneIt("task4", pi0, john);
-        waitForUserTask("userTask5", pi0);
+        waitForUserTask(pi0, "userTask1");
+        waitForUserTaskAndAssigneIt(pi0, "userTask2", user);
+        waitForUserTaskAndAssigneIt(pi0, "userTask3", user);
+        waitForUserTaskAndAssigneIt(pi0, "task4", john);
+        waitForUserTask(pi0, "userTask5");
 
         // -------- test pending task search methods
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -921,12 +1002,12 @@ public class SearchActivityInstanceIT extends TestWithUser {
                 .addUserTask("userTask6", ACTOR_NAME).getProcess();
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, john);
         final ProcessInstance pi0 = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("userTask1", pi0);
-        waitForUserTask("userTask2", pi0);
-        waitForUserTask("userTask3", pi0);
-        waitForUserTask("task4", pi0);
-        waitForUserTask("userTask5", pi0);
-        waitForUserTask("userTask6", pi0);
+        waitForUserTask(pi0, "userTask1");
+        waitForUserTask(pi0, "userTask2");
+        waitForUserTask(pi0, "userTask3");
+        waitForUserTask(pi0, "task4");
+        waitForUserTask(pi0, "userTask5");
+        waitForUserTask(pi0, "userTask6");
 
         // filter all *userTask*, managedBy jack:
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -983,10 +1064,10 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         // -------- start process and wait for tasks
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("userTask", processInstance);
-        waitForUserTask("step1", processInstance);
-        waitForUserTask("etape1", processInstance);
-        waitForUserTask("tache", processInstance);
+        waitForUserTask(processInstance, "userTask");
+        waitForUserTask(processInstance, "step1");
+        waitForUserTask(processInstance, "etape1");
+        waitForUserTask(processInstance, "tache");
 
         // -------- test pending task search methods
         final SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -1011,15 +1092,15 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDef = deployAndEnableProcessWithActor(designProcessDef, ACTOR_NAME, user);
         // start twice and get 2 processInstances for processDef
         final ProcessInstance pi1 = getProcessAPI().startProcess(processDef.getId());
-        waitForUserTask(taskName, pi1);
+        waitForUserTask(pi1, taskName);
         Thread.sleep(5);
         final long afterCreationTask1 = System.currentTimeMillis();
         final ProcessInstance pi2 = getProcessAPI().startProcess(processDef.getId());
-        waitForUserTask(taskName, pi2);
+        waitForUserTask(pi2, taskName);
         final long afterCreationTask2 = System.currentTimeMillis();
         Thread.sleep(5);
         final ProcessInstance pi3 = getProcessAPI().startProcess(processDef.getId());
-        waitForUserTask(taskName, pi3);
+        waitForUserTask(pi3, taskName);
 
         SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
         searchOptionsBuilder.filter(ActivityInstanceSearchDescriptor.PROCESS_DEFINITION_ID, processDef.getId());
@@ -1079,7 +1160,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
                 Arrays.asList(true));
         final ProcessDefinition processDef = deployAndEnableProcessWithActor(designProcessDef, ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDef.getId());
-        waitForUserTask(taskName, processInstance);
+        waitForUserTask(processInstance, taskName);
 
         // Search apostrophe
         final SearchOptionsBuilder searchOptionsBuilder = new SearchOptionsBuilder(0, 10);
@@ -1101,12 +1182,12 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, user);
         // -------- start process and wait for tasks
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask("step#1a", processInstance);
-        waitForUserTask("step#1_b", processInstance);
-        waitForUserTask("step#1_c", processInstance);
-        waitForUserTask("%step#2", processInstance);
-        waitForUserTask("mystep3", processInstance);
-        waitForUserTask("%step#4_a", processInstance);
+        waitForUserTask(processInstance, "step#1a");
+        waitForUserTask(processInstance, "step#1_b");
+        waitForUserTask(processInstance, "step#1_c");
+        waitForUserTask(processInstance, "%step#2");
+        waitForUserTask(processInstance, "mystep3");
+        waitForUserTask(processInstance, "%step#4_a");
 
         // -------- test pending task search methods
         SearchOptionsBuilder builder = new SearchOptionsBuilder(0, 10);
@@ -1160,7 +1241,7 @@ public class SearchActivityInstanceIT extends TestWithUser {
         final List<ActivityInstance> activities = searchActivities.getResult();
         final ActivityInstance activity = activities.get(0);
         assertEquals("sendTask", activity.getName());
-        waitForUserTask("userTask", processInstance);
+        waitForUserTask(processInstance, "userTask");
 
         disableAndDeleteProcess(processDefinition);
     }
