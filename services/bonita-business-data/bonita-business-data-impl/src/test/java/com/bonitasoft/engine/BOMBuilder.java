@@ -30,6 +30,21 @@ public class BOMBuilder {
         return bom;
     }
 
+    public BusinessObjectModel buildModelWithMultipleBoolean() {
+        final SimpleField booleans = new SimpleField();
+        booleans.setName("booleanList");
+        booleans.setType(FieldType.BOOLEAN);
+        booleans.setCollection(true);
+
+        final BusinessObject booleansBO = new BusinessObject();
+        booleansBO.setQualifiedName("com.company.Demo");
+        booleansBO.addField(booleans);
+
+        final BusinessObjectModel bom = new BusinessObjectModel();
+        bom.addBusinessObject(booleansBO);
+        return bom;
+    }
+
     public BusinessObjectModel buildModelWithAllSupportedTypes() {
         final BusinessObject invoice = new BusinessObject();
         invoice.setQualifiedName("com.company.pojo.ComplexInvoice");
