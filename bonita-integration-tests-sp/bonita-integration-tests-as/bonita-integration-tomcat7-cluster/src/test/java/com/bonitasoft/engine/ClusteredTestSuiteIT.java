@@ -13,7 +13,9 @@ import java.util.Map;
 
 import org.bonitasoft.engine.api.ApiAccessType;
 import org.bonitasoft.engine.api.PlatformLoginAPI;
+import org.bonitasoft.engine.session.APISession;
 import org.bonitasoft.engine.session.PlatformSession;
+import org.bonitasoft.engine.test.ClientEventUtil;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner;
 import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
 import org.bonitasoft.engine.util.APITypeManager;
@@ -36,11 +38,17 @@ public class ClusteredTestSuiteIT {
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);
         BPMTestSPUtil.setDefaultTenantId(platformAPI.getDefaultTenant().getId());
         platformLoginAPI.logout(platformSession);
+        final APISession loginDefaultTenant = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
+        ClientEventUtil.deployCommand(loginDefaultTenant);
+        BPMTestSPUtil.logoutOnTenant(loginDefaultTenant);
         changeToNode1();
     }
 
     public static void afterAll() throws Exception {
         changeToNode2();
+        final APISession loginDefaultTenant = BPMTestSPUtil.loginOnDefaultTenantWithDefaultTechnicalUser();
+        ClientEventUtil.undeployCommand(loginDefaultTenant);
+        BPMTestSPUtil.logoutOnTenant(loginDefaultTenant);
         final PlatformLoginAPI platformLoginAPI = PlatformAPIAccessor.getPlatformLoginAPI();
         final PlatformSession platformSession = platformLoginAPI.login("platformAdmin", "platform");
         final PlatformAPI platformAPI = PlatformAPIAccessor.getPlatformAPI(platformSession);

@@ -35,9 +35,11 @@ import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JCodeModel;
+import com.sun.codemodel.JConditional;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
+import com.sun.codemodel.JFieldRef;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
@@ -146,8 +148,8 @@ public class CodeGenerator {
     public JClass toJavaClass(final Field field) {
         if (field instanceof SimpleField) {
             final Class<?> fieldClass = ((SimpleField) field).getType().getClazz();
-            return getModel().ref(fieldClass);
-        }
+                return getModel().ref(fieldClass);
+            }
         final String qualifiedName = ((RelationField) field).getReference().getQualifiedName();
         return getModel().ref(qualifiedName);
     }
@@ -164,6 +166,21 @@ public class CodeGenerator {
         final JMethod method = definedClass.method(JMod.PUBLIC, Void.TYPE, getSetterName(field));
         method.param(field.type(), field.name());
         method.body().assign(JExpr._this().ref(field.name()), JExpr.ref(field.name()));
+        return method;
+    }
+
+    public JMethod addListSetter(final JDefinedClass definedClass, final JFieldVar field) {
+        final JMethod method = definedClass.method(JMod.PUBLIC, Void.TYPE, getSetterName(field));
+        method.param(field.type(), field.name());
+        final JFieldRef thisField = JExpr._this().ref(field.name());
+        final JConditional ifListIsNull = method.body()._if(thisField.eq(JExpr._null()));
+
+        ifListIsNull._then().assign(JExpr._this().ref(field.name()), JExpr.ref(field.name()));
+
+        final JBlock elseBlock = ifListIsNull._else();
+        elseBlock.invoke(JExpr._this().ref(field.name()), "clear");
+        elseBlock.invoke(JExpr._this().ref(field.name()), "addAll").arg(field);
+
         return method;
     }
 
@@ -190,13 +207,11 @@ public class CodeGenerator {
         final JClass fieldClass = toJavaClass(field);
         final StringBuilder builder = new StringBuilder(parameterName);
         builder.append(WordUtils.capitalize(field.getName()));
-
         final JMethod method = definedClass.method(JMod.PUBLIC, void.class, builder.toString());
         final JVar adderParam = method.param(fieldClass, parameterName);
-        final JMethod getterMethod = definedClass.getMethod(getGetterName(field), new JType[0]);
         final JBlock body = method.body();
-        final JVar decl = body.decl(getModel().ref(List.class), field.getName(), JExpr.invoke(getterMethod));
-        method.body().add(decl.invoke(listMethodName).arg(adderParam));
+        final JVar decl = body.decl(getModel().ref(List.class), field.getName(), JExpr.invoke(getGetterName(field)));
+        body.add(decl.invoke(listMethodName).arg(adderParam));
         return method;
     }
 
@@ -219,7 +234,7 @@ public class CodeGenerator {
     }
 
     public String getGetterName(final Field field) {
-        final boolean bool = field instanceof SimpleField && FieldType.BOOLEAN.equals(((SimpleField) field).getType());
+        final boolean bool = field instanceof SimpleField && FieldType.BOOLEAN.equals(((SimpleField) field).getType()) && !field.isCollection();
         return getGetterName(bool, field.getName());
     }
 
