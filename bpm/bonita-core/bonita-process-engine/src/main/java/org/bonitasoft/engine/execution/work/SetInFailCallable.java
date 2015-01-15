@@ -15,38 +15,23 @@ package org.bonitasoft.engine.execution.work;
 
 import java.util.concurrent.Callable;
 
-import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
-import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
-import org.bonitasoft.engine.execution.FlowNodeExecutor;
-import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
-
 /**
  * @author Baptiste Mesta
  */
 public class SetInFailCallable implements Callable<Void> {
 
-    private final FlowNodeExecutor flowNodeExecutor;
-
-    private final ActivityInstanceService activityInstanceService;
-
-    private final FlowNodeStateManager flowNodeStateManager;
-
+    private final FailedStateSetter failedStateSetter;
     private final long flowNodeInstanceId;
 
-    SetInFailCallable(final FlowNodeExecutor flowNodeExecutor, final ActivityInstanceService activityInstanceService,
-            final FlowNodeStateManager flowNodeStateManager, final long flowNodeInstanceId) {
-        this.flowNodeExecutor = flowNodeExecutor;
-        this.activityInstanceService = activityInstanceService;
-        this.flowNodeStateManager = flowNodeStateManager;
+    SetInFailCallable(FailedStateSetter failedStateSetter, final long flowNodeInstanceId) {
+        this.failedStateSetter = failedStateSetter;
         this.flowNodeInstanceId = flowNodeInstanceId;
     }
 
     @Override
     public Void call() throws Exception {
-        final SFlowNodeInstance flowNodeInstance = activityInstanceService.getFlowNodeInstance(flowNodeInstanceId);
-        final long processDefinitionId = flowNodeInstance.getProcessDefinitionId();
-        flowNodeExecutor.archiveFlowNodeInstance(flowNodeInstance, false, processDefinitionId);
-        activityInstanceService.setState(flowNodeInstance, flowNodeStateManager.getFailedState());
+        failedStateSetter.setAsFailed(flowNodeInstanceId);
         return null;
     }
+
 }
