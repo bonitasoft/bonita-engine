@@ -129,7 +129,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         return targetProcessDefinition;
     }
 
-    private ProcessDefinition getProcessWithCallActivity(final String ACTOR_NAME, final boolean addInputOperations, final boolean addOutputOperations,
+    private ProcessDefinition buildProcessWithCallActivity(final boolean addInputOperations, final boolean addOutputOperations,
             final String processName, final String targetProcessName, final int loopNb, final String strTargetVersion) throws BonitaException {
 
         final Expression targetProcessNameExpr = new ExpressionBuilder().createConstantStringExpression(targetProcessName);
@@ -160,6 +160,16 @@ public class CallActivityIT extends TestWithTechnicalUser {
         processDefBuilder.addTransition("step1", "end");
 
         return deployAndEnableProcessWithActor(processDefBuilder.done(), ACTOR_NAME, cascao);
+    }
+
+    private ProcessDefinition buildProcessWithCallActivity(final String processName, final String targetProcessName, final String strTargetVersion)
+            throws BonitaException {
+        return buildProcessWithCallActivity(false, false, processName, targetProcessName, 0, strTargetVersion);
+    }
+
+    private ProcessDefinition buildProcessWithCallActivity(final String processName, final String targetProcessName, int loopNb, final String strTargetVersion)
+            throws BonitaException {
+        return buildProcessWithCallActivity(false, false, processName, targetProcessName, loopNb, strTargetVersion);
     }
 
     private void addDataOutputOperationIfNeed(final boolean addOutputOperations, final CallActivityBuilder callActivityBuilder)
@@ -432,7 +442,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         final ProcessDefinition targetProcessDef3 = getSimpleProcess(ACTOR_NAME, "targetProcess", "3.0", terminateEnd);
         final ProcessDefinition targetProcessDef2 = getSimpleProcess(ACTOR_NAME, "targetProcess", "2.0", terminateEnd);
 
-        final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, addInputOperations, addOutputOperations, "callingProcess",
+        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity(addInputOperations, addOutputOperations, "callingProcess",
                 "targetProcess", 0, strTargetVersion);
 
         assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
@@ -518,7 +528,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
         final ProcessDefinition[] processDefLevels = new ProcessDefinition[nbLevel];
 
         for (int i = 0; i < nbLevel - 1; i++) {
-            processDefLevels[i] = getProcessWithCallActivity(ACTOR_NAME, false, false, "processLevel" + i, "processLevel" + (i + 1), 0, PROCESS_VERSION);
+            processDefLevels[i] = buildProcessWithCallActivity("processLevel" + i, "processLevel" + (i + 1), PROCESS_VERSION);
         }
         processDefLevels[nbLevel - 1] = getSimpleProcess(ACTOR_NAME, "processLevel" + (nbLevel - 1), PROCESS_VERSION, false);
 
@@ -559,7 +569,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
     @Test
     public void callUndeployedProcess() throws Exception {
 
-        final ProcessDefinition processDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "unDeployedProcess", 0, PROCESS_VERSION);
+        final ProcessDefinition processDef = buildProcessWithCallActivity("callingProcess", "unDeployedProcess", PROCESS_VERSION);
         assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDef.getId());
         final List<ProcessInstance> processInstances = getProcessAPI().getProcessInstances(0, 10, ProcessInstanceCriterion.NAME_DESC);
@@ -572,7 +582,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
     private void callActivityInALoop(final int nbLoop) throws Exception {
         final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
-        final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "targetProcess", nbLoop,
+        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", nbLoop,
                 PROCESS_VERSION);
 
         assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0);
@@ -618,7 +628,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
     @Test
     public void getArchivedCallActivityInstance() throws Exception {
         final ProcessDefinition targetProcessDef = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
-        final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "targetProcess", 0, PROCESS_VERSION);
+        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", PROCESS_VERSION);
 
         assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
@@ -642,15 +652,26 @@ public class CallActivityIT extends TestWithTechnicalUser {
 
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Process Version" }, jira = "")
     @Test
-    public void callActivityUsingLatestVersion() throws Exception {
+    public void callActivityUsingLastestVersion() throws Exception {
         executeCallAtivityUntilEndOfProcess(false, false, null, false);
     }
 
     @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Process Version" }, jira = "")
     @Test
-    public void callActivityUsingInexistingVersion() throws Exception {
-        final ProcessDefinition callingProcessDef = getProcessWithCallActivity("delivery", false, false, "callingProcess", "targetProcess", 0,
-                "unexisting_version_4.0");
+    public void callActivityUsingUndeployedVersion() throws Exception {
+        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", "unexisting_version_4.0");
+        final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
+
+        final ActivityInstance failedTask = waitForTaskToFail(callingProcessInstance);
+        assertThat(failedTask.getName()).isEqualTo("callActivity");
+
+        disableAndDeleteProcess(callingProcessDef);
+    }
+
+    @Cover(classes = { CallActivityDefinition.class }, concept = BPMNConcept.CALL_ACTIVITY, keywords = { "Call Activity", "Undeployed target" }, jira = "BS-10502")
+    @Test
+    public void callActivityUsingUndeployedProcess() throws Exception {
+        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", null);
         final ProcessInstance callingProcessInstance = getProcessAPI().startProcess(callingProcessDef.getId());
 
         final ActivityInstance failedTask = waitForTaskToFail(callingProcessInstance);
@@ -663,7 +684,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
     @Test
     public void deleteProcessInstanceThatIsCalledByCallActivity() throws Exception {
         final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
-        final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "targetProcess", 0, PROCESS_VERSION);
+        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", PROCESS_VERSION);
 
         assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
 
@@ -692,7 +713,7 @@ public class CallActivityIT extends TestWithTechnicalUser {
     @Test(expected = DeletionException.class)
     public void deleteProcessDefinitionWithProcessInstanceThatIsCalledByCallActivity() throws Exception {
         final ProcessDefinition targetProcessDef1 = getSimpleProcess(ACTOR_NAME, "targetProcess", PROCESS_VERSION, false);
-        final ProcessDefinition callingProcessDef = getProcessWithCallActivity(ACTOR_NAME, false, false, "callingProcess", "targetProcess", 0, PROCESS_VERSION);
+        final ProcessDefinition callingProcessDef = buildProcessWithCallActivity("callingProcess", "targetProcess", PROCESS_VERSION);
 
         assertThat(getProcessAPI().getNumberOfProcessInstances()).isEqualTo(0L);
 

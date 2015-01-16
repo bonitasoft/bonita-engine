@@ -13,7 +13,6 @@
  **/
 package org.bonitasoft.engine.archive.impl;
 
-
 /**
  * @author Celine Souchet
  */
@@ -27,7 +26,6 @@ public class DefaultArchivingStrategyForTest extends AbstractArchivingStrategy {
         archives.put("org.bonitasoft.engine.archive.model.Laptop", true);
         archives.put("org.bonitasoft.engine.archive.model.Project", true);
         archives.put("org.bonitasoft.engine.data.instance.model.SDataInstance", true);
-        archives.put("org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping", true);
     }
 
 }

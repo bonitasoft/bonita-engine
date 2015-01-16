@@ -22,6 +22,7 @@ import org.bonitasoft.engine.data.definition.model.SDataDefinition;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilder;
 import org.bonitasoft.engine.data.definition.model.builder.SDataDefinitionBuilderFactory;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.data.instance.model.builder.SDataInstanceBuilder;
@@ -50,17 +51,20 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
 
     private static DataInstanceService dataInstanceService;
 
+    private static ParentContainerResolver parentContainerResolver;
+
     public OperationServiceIntegrationTest() {
         servicesBuilder = getServicesBuilder();
         transactionService = servicesBuilder.getTransactionService();
         dataInstanceService = servicesBuilder.getDataInstanceService();
         operationService = servicesBuilder.getOperationService();
+        parentContainerResolver = servicesBuilder.getParentContainerResolver();
     }
 
     /**
      * Assign a new value to a String Variable. Using an expression which is a constant.
      * variableName = "afterUpdate"
-     *
+     * 
      * @throws Exception
      */
     @Test
@@ -89,7 +93,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     /**
      * Assign a new value to a List Variable. Using an expression which is a constant.
      * variableName.add("afterUpdate");
-     *
+     * 
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
@@ -158,7 +162,7 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
 
     private SDataInstance getDataInstance(final String dataInstanceName, final long containerId, final String containerType) throws SBonitaException {
         transactionService.begin();
-        final SDataInstance dataInstance = dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType);
+        final SDataInstance dataInstance = dataInstanceService.getDataInstance(dataInstanceName, containerId, containerType, parentContainerResolver);
         transactionService.complete();
         return dataInstance;
     }
@@ -185,7 +189,6 @@ public class OperationServiceIntegrationTest extends CommonBPMServicesTest {
     private void insertDataInstance(final SDataInstance dataInstance) throws SBonitaException {
         transactionService.begin();
         dataInstanceService.createDataInstance(dataInstance);
-        dataInstanceService.createDataContainer(dataInstance.getContainerId(), dataInstance.getContainerType(), true);
         transactionService.complete();
     }
 
