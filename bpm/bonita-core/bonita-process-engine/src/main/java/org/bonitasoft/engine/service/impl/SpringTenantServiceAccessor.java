@@ -54,6 +54,7 @@ import org.bonitasoft.engine.core.process.instance.api.TokenService;
 import org.bonitasoft.engine.core.process.instance.api.TransitionService;
 import org.bonitasoft.engine.core.process.instance.api.event.EventInstanceService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -229,6 +230,15 @@ public class SpringTenantServiceAccessor implements TenantServiceAccessor {
 
     private TimeTracker timeTracker;
     private PermissionService permissionService;
+
+    private ParentContainerResolver parentContainerResolver;
+
+    public ParentContainerResolver getParentContainerResolver() {
+        if (parentContainerResolver == null) {
+            parentContainerResolver = beanAccessor.getService(ParentContainerResolver.class);
+        }
+        return this.parentContainerResolver;
+    }
 
     public SpringTenantServiceAccessor(final Long tenantId) {
         beanAccessor = new SpringTenantFileSystemBeanAccessor(tenantId);

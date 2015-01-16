@@ -581,20 +581,20 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public long getProcessDefinitionId(final String name, final String version) throws SProcessDefinitionReadException {
+    public long getProcessDefinitionId(final String name, final String version) throws SProcessDefinitionReadException, SProcessDefinitionNotFoundException {
         try {
             final Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put("name", name);
             parameters.put("version", version);
             final Long processDefId = persistenceService.selectOne(new SelectOneDescriptor<Long>("getProcessDefinitionIdByNameAndVersion", parameters,
                     SProcessDefinitionDeployInfo.class, Long.class));
-            if (processDefId != null) {
-                return processDefId;
+            if (processDefId == null) {
+                final SProcessDefinitionNotFoundException exception = new SProcessDefinitionNotFoundException("Process definition id not found.");
+                exception.setProcessDefinitionNameOnContext(name);
+                exception.setProcessDefinitionVersionOnContext(version);
+                throw exception;
             }
-            final SProcessDefinitionReadException exception = new SProcessDefinitionReadException("Process definition id not found.");
-            exception.setProcessDefinitionNameOnContext(name);
-            exception.setProcessDefinitionVersionOnContext(version);
-            throw exception;
+            return processDefId;
         } catch (final SBonitaReadException e) {
             throw new SProcessDefinitionReadException(e);
         }

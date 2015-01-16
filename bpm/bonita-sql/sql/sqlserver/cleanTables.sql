@@ -79,12 +79,8 @@ DELETE FROM business_app
 GO
 DELETE FROM command
 GO
-DELETE FROM arch_data_mapping
-GO
 
 DELETE FROM arch_data_instance
-GO
-DELETE FROM data_mapping
 GO
 
 DELETE FROM data_instance
@@ -93,8 +89,6 @@ DELETE FROM dependencymapping
 GO
 
 DELETE FROM dependency
-GO
-DELETE FROM document_content
 GO
 DELETE FROM external_identity_mapping
 GO

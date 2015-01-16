@@ -26,7 +26,7 @@ public class SUserTaskInstanceImpl extends SHumanTaskInstanceImpl implements SUs
 
     private static final long serialVersionUID = -3537435744421627183L;
 
-    protected SUserTaskInstanceImpl() {
+    public SUserTaskInstanceImpl() {
     }
 
     public SUserTaskInstanceImpl(final String name, final long flowNodeDefinitionId, final long rootContainerId, final long parenteContainerId,

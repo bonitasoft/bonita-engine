@@ -11,7 +11,6 @@
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.data.instance.model.SDataInstance" value="dataInstance" />
-				<entry key="org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping" value="sDataInstanceVisibilityMapping" />
 			</map>
 		</property>
 	</bean>
@@ -26,7 +25,6 @@
 		<property name="classAliasMappings">
 			<map>
 				<entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstance" value="saDataInstance" />
-				<entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstanceVisibilityMapping" value="saDataInstanceVisibilityMapping" />
 			</map>
 		</property>
 	</bean>

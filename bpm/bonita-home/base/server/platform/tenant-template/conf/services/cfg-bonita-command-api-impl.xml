@@ -26,9 +26,6 @@
 				<ref bean="isAllowedToSeeInstanciationForm" />
 				<ref bean="searchAssignedTasksSupervisedBy" />
 				<ref bean="searchArchivedTasksSupervisedBy" />
-				<ref bean="getUpdatedVariableValuesForProcessDefinition" />
-				<ref bean="getUpdatedVariableValuesForActivityInstance" />
-				<ref bean="getUpdatedVariableValuesForProcessInstance" />
 				<ref bean="searchProcessDefinitionsSupervisedBy" />
 				<ref bean="searchSCommentSupervisedBy" />
 				<ref bean="isAllowedToStartProcesses" />
@@ -209,45 +206,6 @@
 		</constructor-arg>
 		<constructor-arg name="implementation">
 			<value>org.bonitasoft.engine.external.task.supervisor.SearchArchivedTasksSupervisedBy</value>
-		</constructor-arg>
-	</bean>
-
-	<bean id="getUpdatedVariableValuesForProcessDefinition" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
-		<constructor-arg name="name">
-			<value>getUpdatedVariableValuesForProcessDefinition</value>
-		</constructor-arg>
-		<constructor-arg name="description">
-			<value>Returns the map of updatedVariable after executing operations. Use parameter keys OPERATIONS_WITH_CONTEXT_MAP_KEY, CURRENT_VARIABLE_VALUES_MAP_KEY,
-				PROCESS_DEFINITION_ID_KEY</value>
-		</constructor-arg>
-		<constructor-arg name="implementation">
-			<value>org.bonitasoft.engine.external.process.GetUpdatedVariableValuesForProcessDefinition</value>
-		</constructor-arg>
-	</bean>
-
-	<bean id="getUpdatedVariableValuesForActivityInstance" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
-		<constructor-arg name="name">
-			<value>getUpdatedVariableValuesForActivityInstance</value>
-		</constructor-arg>
-		<constructor-arg name="description">
-			<value>Returns the map of updatedVariable after executing operations. Use parameter keys OPERATIONS_WITH_CONTEXT_MAP_KEY, CURRENT_VARIABLE_VALUES_MAP_KEY,
-				ACTIVITY_INSTANCE_ID_KEY</value>
-		</constructor-arg>
-		<constructor-arg name="implementation">
-			<value>org.bonitasoft.engine.external.process.GetUpdatedVariableValuesForActivityInstance</value>
-		</constructor-arg>
-	</bean>
-
-	<bean id="getUpdatedVariableValuesForProcessInstance" class="org.bonitasoft.engine.command.CommandDescriptorImpl">
-		<constructor-arg name="name">
-			<value>getUpdatedVariableValuesForProcessInstance</value>
-		</constructor-arg>
-		<constructor-arg name="description">
-			<value>Returns the map of updatedVariable after executing operations. Use parameter keys OPERATIONS_WITH_CONTEXT_MAP_KEY, CURRENT_VARIABLE_VALUES_MAP_KEY,
-				PROCESS_INSTANCE_ID_KEY</value>
-		</constructor-arg>
-		<constructor-arg name="implementation">
-			<value>org.bonitasoft.engine.external.process.GetUpdatedVariableValuesForProcessInstance</value>
 		</constructor-arg>
 	</bean>
 

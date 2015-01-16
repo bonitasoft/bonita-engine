@@ -6,6 +6,7 @@ import org.bonitasoft.engine.cache.CacheService;
 import org.bonitasoft.engine.classloader.ClassLoaderService;
 import org.bonitasoft.engine.command.CommandService;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.events.EventService;
 import org.bonitasoft.engine.expression.ExpressionService;
@@ -120,6 +121,10 @@ public class ServicesBuilder implements ServicesResolver {
 
     public ExpressionService buildExpressionService() {
         return getAccessor().getInstanceOf(ExpressionService.class);
+    }
+
+    public ParentContainerResolver buildParentContainerResolver() {
+        return getAccessor().getInstanceOf(ParentContainerResolver.class);
     }
 
     public DataInstanceService buildDataInstanceService() {

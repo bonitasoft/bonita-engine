@@ -164,28 +164,6 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
         disableAndDeleteProcess(processDefinition);
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On enter", "Multi-instance" }, story = "Test connector on enter of an Multi-instance activity.", jira = "BS-2483")
-    @Test
-    @Ignore("To fix with the bug BS-2483")
-    public void executeConnectorOnEnterOfMultiInstancedActivity() throws Exception {
-        // deploy the process
-        final String globalDataName = "globalData";
-        final ProcessDefinition processDefinition = deployProcessWithConnectorOnMutiInstance(globalDataName, "step2", "multi", false, 3,
-                ConnectorEvent.ON_ENTER);
-
-        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask(processInstance, "multi");
-        waitForUserTask(processInstance, "multi");
-        waitForUserTask(processInstance, "multi");
-
-        // Check the data value
-        final DataInstance globalData = getProcessAPI().getProcessDataInstance(globalDataName, processInstance.getId());
-        assertEquals(3L, globalData.getValue());
-
-        // delete process
-        disableAndDeleteProcess(processDefinition);
-    }
-
     @Cover(classes = Connector.class, concept = BPMNConcept.CONNECTOR, keywords = { "Connector", "On finish", "Multi-instance", "activitity data" }, story = "Test connector on finish of an Multi-instance activity with local data expression.", jira = "")
     @Test
     public void executeConnectorOnFinishOfMultiInstancedActivity() throws Exception {
@@ -1423,7 +1401,7 @@ public class RemoteConnectorExecutionIT extends ConnectorExecutionIT {
     }
 
     public ProcessDefinition deployAndEnableProcessWithActorAndTestConnectorThatThrowException(final ProcessDefinitionBuilder processDefinitionBuilder,
-            final String actor, final User user) throws BonitaException, IOException {
+                                                                                               final String actor, final User user) throws BonitaException, IOException {
         return deployAndEnableProcessWithActorAndConnectorAndParameter(processDefinitionBuilder, actor, user, null,
                 "TestConnectorThatThrowException.impl", TestConnectorThatThrowException.class, "TestConnectorThatThrowException.jar");
     }

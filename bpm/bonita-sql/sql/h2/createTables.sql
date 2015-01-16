@@ -605,23 +605,9 @@ CREATE TABLE arch_data_instance (
 	PRIMARY KEY (tenantid, id)
 );
 
-CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId,containerId, sourceObjectId);
+CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId, containerId, containerType, archiveDate, name, sourceObjectId);
 CREATE INDEX idx2_arch_data_instance ON arch_data_instance (sourceObjectId, containerId, archiveDate, id, tenantId);
 
-CREATE TABLE arch_data_mapping (
-    tenantid BIGINT NOT NULL,
-	id BIGINT NOT NULL,
-	containerId BIGINT,
-	containerType VARCHAR(60),
-	dataName VARCHAR(50),
-	dataInstanceId BIGINT NOT NULL,
-	archiveDate BIGINT NOT NULL,
-	sourceObjectId BIGINT NOT NULL,
-	PRIMARY KEY (tenantid, id)
-);
-
-CREATE INDEX idx1_arch_data_mapping ON arch_data_mapping (tenantId,containerId, dataInstanceId, sourceObjectId);
-CREATE INDEX idx2_arch_data_mapping ON arch_data_mapping (containerId, containerType, tenantid);
 CREATE TABLE data_instance (
     tenantId BIGINT NOT NULL,
 	id BIGINT NOT NULL,
@@ -644,19 +630,8 @@ CREATE TABLE data_instance (
 	discriminant VARCHAR(50) NOT NULL,
 	PRIMARY KEY (tenantid, id)
 );
-CREATE INDEX idx_datai_container ON data_instance (containerId, containerType, tenantId);
+CREATE INDEX idx_datai_container ON data_instance (tenantId, containerId, containerType, name);
 
-CREATE TABLE data_mapping (
-    tenantid BIGINT NOT NULL,
-	id BIGINT NOT NULL,
-	containerId BIGINT,
-	containerType VARCHAR(60),
-	dataName VARCHAR(50),
-	dataInstanceId BIGINT NOT NULL,
-	UNIQUE (tenantId, containerId, containerType, dataName),
-	PRIMARY KEY (tenantid, id)
-);
-CREATE INDEX idx_datamapp_container ON data_mapping (containerId, containerType, tenantId);
 CREATE TABLE dependency (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,

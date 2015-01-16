@@ -46,10 +46,8 @@ DELETE FROM business_app_menu;
 DELETE FROM business_app_page;
 DELETE FROM business_app;
 DELETE FROM command;
-DELETE FROM arch_data_mapping;
 
 DELETE FROM arch_data_instance;
-DELETE FROM data_mapping;
 
 DELETE FROM data_instance;
 DELETE FROM dependencymapping;

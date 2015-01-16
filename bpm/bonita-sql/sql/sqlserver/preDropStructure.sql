@@ -19,8 +19,6 @@ ALTER TABLE connector_instance DROP CONSTRAINT fk_connector_instance_tenantId
 GO
 ALTER TABLE data_instance DROP CONSTRAINT fk_data_instance_tenantId
 GO
-ALTER TABLE data_mapping DROP CONSTRAINT fk_data_mapping_tenantId
-GO
 ALTER TABLE dependency DROP CONSTRAINT fk_dependency_tenantId
 GO
 ALTER TABLE dependencymapping DROP CONSTRAINT fk_dependencymapping_tenantId
@@ -131,6 +129,4 @@ GO
 ALTER TABLE arch_transition_instance DROP CONSTRAINT fk_arch_transition_instance_tenantId
 GO
 ALTER TABLE arch_data_instance DROP CONSTRAINT fk_arch_data_instance_tenantId
-GO
-ALTER TABLE arch_data_mapping DROP CONSTRAINT fk_arch_data_mapping_tenantId
 GO

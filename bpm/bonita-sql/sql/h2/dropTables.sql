@@ -32,8 +32,6 @@ DROP TABLE business_app_page;
 DROP TABLE business_app;
 DROP TABLE command;
 DROP TABLE arch_data_instance;
-DROP TABLE arch_data_mapping;
-DROP TABLE data_mapping;
 DROP TABLE data_instance;
 DROP TABLE dependencymapping;
 DROP TABLE dependency;

@@ -9,7 +9,6 @@ ALTER TABLE category DROP FOREIGN KEY fk_category_tenantId;
 ALTER TABLE command DROP FOREIGN KEY fk_command_tenantId;
 ALTER TABLE connector_instance DROP FOREIGN KEY fk_connector_instance_tenantId;
 ALTER TABLE data_instance DROP FOREIGN KEY fk_data_instance_tenantId;
-ALTER TABLE data_mapping DROP FOREIGN KEY fk_data_mapping_tenantId;
 ALTER TABLE dependency DROP FOREIGN KEY fk_dependency_tenantId;
 ALTER TABLE dependencymapping DROP FOREIGN KEY fk_dependencymapping_tenantId;
 ALTER TABLE document DROP FOREIGN KEY fk_document_tenantId;
@@ -69,4 +68,3 @@ ALTER TABLE arch_process_comment DROP FOREIGN KEY fk_arch_process_comment_tenant
 ALTER TABLE arch_process_instance DROP FOREIGN KEY fk_arch_process_instance_tenantId;
 ALTER TABLE arch_transition_instance DROP FOREIGN KEY fk_arch_transition_instance_tenantId;
 ALTER TABLE arch_data_instance DROP FOREIGN KEY fk_arch_data_instance_tenantId;
-ALTER TABLE arch_data_mapping DROP FOREIGN KEY fk_arch_data_mapping_tenantId;

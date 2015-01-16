@@ -74,7 +74,7 @@ GO
 
 CREATE INDEX idx1_arch_process_comment on arch_process_comment (tenantid, sourceobjectid)
 GO
-CREATE INDEX idx2_arch_process_comment on arch_process_comment (tenantid, processinstanceid, archivedate)
+CREATE INDEX idx2_arch_process_comment on arch_process_comment (processInstanceId, archivedate, tenantid)
 GO
 CREATE TABLE process_comment (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -121,6 +121,8 @@ CREATE TABLE arch_document_mapping (
   archiveDate NUMERIC(19, 0) NOT NULL,
   PRIMARY KEY (tenantid, id)
 )
+GO
+CREATE INDEX idx_a_doc_mp_pr_id ON arch_document_mapping (processinstanceid, tenantid)
 GO
 CREATE TABLE document (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -377,6 +379,8 @@ GO
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId)
 GO
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4)
+GO
+CREATE INDEX idx_fn_lg2_state_tenant_del ON flownode_instance (logicalGroup2, stateName, tenantid, deleted)
 GO
 
 CREATE TABLE connector_instance (
@@ -637,7 +641,6 @@ CREATE INDEX idx_app_menu_page ON business_app_menu (applicationPageId, tenantid
 GO
 CREATE INDEX idx_app_menu_parent ON business_app_menu (parentId, tenantid)
 GO
--- foreign keys are create in bonita-persistence-db/postCreateStructure.sql
 
 CREATE TABLE command (
   tenantid NUMERIC(19, 0) NOT NULL,
@@ -676,26 +679,11 @@ CREATE TABLE arch_data_instance (
 )
 GO
 
-CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId,containerId, sourceObjectId)
+CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId, containerId, containerType, archiveDate, name, sourceObjectId)
+GO
+CREATE INDEX idx2_arch_data_instance ON arch_data_instance (sourceObjectId, containerId, archiveDate, id, tenantId)
 GO
 
-CREATE TABLE arch_data_mapping (
-    tenantid NUMERIC(19, 0) NOT NULL,
-	id NUMERIC(19, 0) NOT NULL,
-	containerId NUMERIC(19, 0),
-	containerType NVARCHAR(60),
-	dataName NVARCHAR(50),
-	dataInstanceId NUMERIC(19, 0) NOT NULL,
-	archiveDate NUMERIC(19, 0) NOT NULL,
-	sourceObjectId NUMERIC(19, 0) NOT NULL,
-	PRIMARY KEY (tenantid, id)
-)
-GO
-
-CREATE INDEX idx1_arch_data_mapping ON arch_data_mapping (tenantId,containerId, dataInstanceId, sourceObjectId)
-GO
-CREATE INDEX idx2_arch_data_mapping ON arch_data_mapping (tenantid, containerId, containerType)
-GO
 CREATE TABLE data_instance (
     tenantId NUMERIC(19, 0) NOT NULL,
 	id NUMERIC(19, 0) NOT NULL,
@@ -719,22 +707,9 @@ CREATE TABLE data_instance (
 	PRIMARY KEY (tenantid, id)
 )
 GO
-CREATE INDEX idx_datai_container ON data_instance (containerId, containerType, tenantId)
+CREATE INDEX idx_datai_container ON data_instance (tenantId, containerId, containerType, name)
 GO
 
-CREATE TABLE data_mapping (
-    tenantid NUMERIC(19, 0) NOT NULL,
-	id NUMERIC(19, 0) NOT NULL,
-	containerId NUMERIC(19, 0),
-	containerType NVARCHAR(60),
-	dataName NVARCHAR(50),
-	dataInstanceId NUMERIC(19, 0) NOT NULL,
-	UNIQUE (tenantId, containerId, containerType, dataName),
-	PRIMARY KEY (tenantid, id)
-)
-GO
-CREATE INDEX idx_datamapp_container ON data_mapping (containerId, containerType, tenantId)
-GO
 CREATE TABLE dependency (
   tenantid NUMERIC(19, 0) NOT NULL,
   id NUMERIC(19, 0) NOT NULL,
@@ -787,14 +762,6 @@ GO
 CREATE INDEX idx_pdependencymapping_depid ON pdependencymapping (dependencyid)
 GO
 ALTER TABLE pdependencymapping ADD CONSTRAINT fk_pdepmapping_depid FOREIGN KEY (dependencyid) REFERENCES pdependency(id) ON DELETE CASCADE
-GO
-CREATE TABLE document_content (
-  tenantid NUMERIC(19, 0) NOT NULL,
-  id NUMERIC(19, 0) NOT NULL,
-  documentId NVARCHAR(50) NOT NULL,
-  content VARBINARY(MAX) NOT NULL,
-  PRIMARY KEY (tenantid, id)
-)
 GO
 CREATE TABLE external_identity_mapping (
   tenantid NUMERIC(19, 0) NOT NULL,

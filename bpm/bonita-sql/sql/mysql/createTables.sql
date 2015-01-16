@@ -66,7 +66,7 @@ CREATE TABLE arch_process_comment(
 ) ENGINE = INNODB;
 
 CREATE INDEX idx1_arch_process_comment on arch_process_comment (tenantid, sourceobjectid);
-CREATE INDEX idx2_arch_process_comment on arch_process_comment (tenantid, processinstanceid, archivedate);
+CREATE INDEX idx2_arch_process_comment on arch_process_comment (processInstanceId, archivedate, tenantid);
 CREATE TABLE process_comment (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -110,6 +110,7 @@ CREATE TABLE arch_document_mapping (
   archiveDate BIGINT NOT NULL,
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
+CREATE INDEX idx_a_doc_mp_pr_id ON arch_document_mapping (processinstanceid, tenantid);
 CREATE TABLE document (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -346,6 +347,7 @@ CREATE TABLE flownode_instance (
 ) ENGINE = INNODB;
 CREATE INDEX idx_fni_rootcontid ON flownode_instance (rootContainerId);
 CREATE INDEX idx_fni_loggroup4 ON flownode_instance (logicalGroup4);
+CREATE INDEX idx_fn_lg2_state_tenant_del ON flownode_instance (logicalGroup2, stateName, tenantid, deleted);
 
 CREATE TABLE connector_instance (
   tenantid BIGINT NOT NULL,
@@ -567,7 +569,6 @@ ALTER TABLE business_app_menu ADD CONSTRAINT pk_business_app_menu PRIMARY KEY (t
 CREATE INDEX idx_app_menu_app ON business_app_menu (applicationId, tenantid);
 CREATE INDEX idx_app_menu_page ON business_app_menu (applicationPageId, tenantid);
 CREATE INDEX idx_app_menu_parent ON business_app_menu (parentId, tenantid);
--- foreign keys are create in bonita-persistence-db/postCreateStructure.sql
 
 CREATE TABLE command (
   tenantid BIGINT NOT NULL,
@@ -604,22 +605,9 @@ CREATE TABLE arch_data_instance (
 	PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 
-CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId,containerId, sourceObjectId);
+CREATE INDEX idx1_arch_data_instance ON arch_data_instance (tenantId, containerId, containerType, archiveDate, name, sourceObjectId);
+CREATE INDEX idx2_arch_data_instance ON arch_data_instance (sourceObjectId, containerId, archiveDate, id, tenantId);
 
-CREATE TABLE arch_data_mapping (
-    tenantid BIGINT NOT NULL,
-	id BIGINT NOT NULL,
-	containerId BIGINT,
-	containerType VARCHAR(60),
-	dataName VARCHAR(50),
-	dataInstanceId BIGINT NOT NULL,
-	archiveDate BIGINT NOT NULL,
-	sourceObjectId BIGINT NOT NULL,
-	PRIMARY KEY (tenantid, id)
-) ENGINE = INNODB;
-
-CREATE INDEX idx1_arch_data_mapping ON arch_data_mapping (tenantId,containerId, dataInstanceId, sourceObjectId);
-CREATE INDEX idx2_arch_data_mapping ON arch_data_mapping (tenantid, containerId, containerType);
 CREATE TABLE data_instance (
     tenantId BIGINT NOT NULL,
 	id BIGINT NOT NULL,
@@ -642,19 +630,8 @@ CREATE TABLE data_instance (
 	discriminant VARCHAR(50) NOT NULL,
 	PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
-CREATE INDEX idx_datai_container ON data_instance (containerId, containerType, tenantId);
+CREATE INDEX idx_datai_container ON data_instance (tenantId, containerId, containerType, name);
 
-CREATE TABLE data_mapping (
-    tenantid BIGINT NOT NULL,
-	id BIGINT NOT NULL,
-	containerId BIGINT,
-	containerType VARCHAR(60),
-	dataName VARCHAR(50),
-	dataInstanceId BIGINT NOT NULL,
-	UNIQUE (tenantId, containerId, containerType, dataName),
-	PRIMARY KEY (tenantid, id)
-) ENGINE = INNODB;
-CREATE INDEX idx_datamapp_container ON data_mapping (containerId, containerType, tenantId);
 CREATE TABLE dependency (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
@@ -698,13 +675,6 @@ CREATE TABLE pdependencymapping (
 ) ENGINE = INNODB;
 CREATE INDEX idx_pdependencymapping_depid ON pdependencymapping (dependencyid);
 ALTER TABLE pdependencymapping ADD CONSTRAINT fk_pdepmapping_depid FOREIGN KEY (dependencyid) REFERENCES pdependency(id) ON DELETE CASCADE;
-CREATE TABLE document_content (
-  tenantid BIGINT NOT NULL,
-  id BIGINT NOT NULL,
-  documentId VARCHAR(50) NOT NULL,
-  content LONGBLOB NOT NULL,
-  PRIMARY KEY (tenantid, id)
-) ENGINE = INNODB;
 CREATE TABLE external_identity_mapping (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,

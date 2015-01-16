@@ -64,19 +64,13 @@ DELETE FROM business_app_menu WHERE tenantid = ${tenantid}
 GO
 DELETE FROM command WHERE tenantid = ${tenantid}
 GO
-DELETE FROM arch_data_mapping WHERE tenantid = ${tenantid}
-GO
 DELETE FROM arch_data_instance WHERE tenantid = ${tenantid}
-GO
-DELETE FROM data_mapping WHERE tenantid = ${tenantid}
 GO
 DELETE FROM data_instance WHERE tenantid = ${tenantid}
 GO
 DELETE FROM dependencymapping WHERE tenantid = ${tenantid}
 GO
 DELETE FROM dependency WHERE tenantid = ${tenantid}
-GO
-DELETE FROM document_content WHERE tenantid = ${tenantid}
 GO
 DELETE FROM external_identity_mapping WHERE tenantid = ${tenantid}
 GO

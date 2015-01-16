@@ -21,6 +21,8 @@ import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.execution.ContainerRegistry;
 import org.bonitasoft.engine.execution.FlowNodeExecutor;
 import org.bonitasoft.engine.execution.state.FlowNodeStateManager;
+import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.transaction.UserTransactionService;
 
 /**
@@ -73,11 +75,14 @@ public class NotifyChildFinishedWork extends TenantAwareBonitaWork {
 
     @Override
     public void handleFailure(final Exception e, final Map<String, Object> context) throws Exception {
-        final ActivityInstanceService activityInstanceService = getTenantAccessor(context).getActivityInstanceService();
-        final FlowNodeStateManager flowNodeStateManager = getTenantAccessor(context).getFlowNodeStateManager();
-        final FlowNodeExecutor flowNodeExecutor = getTenantAccessor(context).getFlowNodeExecutor();
-        final UserTransactionService userTransactionService = getTenantAccessor(context).getUserTransactionService();
-        userTransactionService.executeInTransaction(new SetInFailCallable(flowNodeExecutor, activityInstanceService, flowNodeStateManager, flowNodeInstanceId));
+        TenantServiceAccessor tenantAccessor = getTenantAccessor(context);
+        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
+        final FlowNodeStateManager flowNodeStateManager = tenantAccessor.getFlowNodeStateManager();
+        final FlowNodeExecutor flowNodeExecutor = tenantAccessor.getFlowNodeExecutor();
+        final UserTransactionService userTransactionService = tenantAccessor.getUserTransactionService();
+        TechnicalLoggerService loggerService = tenantAccessor.getTechnicalLoggerService();
+        FailedStateSetter failedStateSetter = new FailedStateSetter(flowNodeExecutor, activityInstanceService, flowNodeStateManager, loggerService);
+        userTransactionService.executeInTransaction(new SetInFailCallable(failedStateSetter, flowNodeInstanceId));
     }
 
     @Override

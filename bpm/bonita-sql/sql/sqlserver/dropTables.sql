@@ -66,10 +66,6 @@ DROP TABLE command
 GO
 DROP TABLE arch_data_instance
 GO
-DROP TABLE arch_data_mapping
-GO
-DROP TABLE data_mapping
-GO
 DROP TABLE data_instance
 GO
 DROP TABLE dependencymapping
@@ -79,8 +75,6 @@ GO
 DROP TABLE pdependencymapping
 GO
 DROP TABLE pdependency
-GO
-DROP TABLE document_content
 GO
 DROP TABLE external_identity_mapping
 GO
