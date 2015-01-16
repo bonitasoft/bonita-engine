@@ -97,6 +97,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInsta
 import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAProcessInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SConnectorInstanceBuilderFactory;
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
+import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
@@ -737,7 +738,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(processInstanceId);
-            expcontext.setContainerType("PROCESS_INSTANCE");
+            expcontext.setContainerType(DataInstanceContainer.PROCESS_INSTANCE.name());
             expcontext.setContainerState(ContainerState.ACTIVE);
             expcontext.setProcessDefinitionId(processDefinitionId);
             expcontext.setTime(saprocessInstance.getArchiveDate().getTime());
@@ -800,7 +801,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(activityInstanceId);
-            expcontext.setContainerType("ACTIVITY_INSTANCE");
+            expcontext.setContainerType(DataInstanceContainer.ACTIVITY_INSTANCE.name());
             expcontext.setContainerState(ContainerState.ACTIVE);
             expcontext.setProcessDefinitionId(processDefinitionId);
             final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
@@ -857,7 +858,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(activityInstanceId);
-            expcontext.setContainerType("ACTIVITY_INSTANCE");
+            expcontext.setContainerType(DataInstanceContainer.ACTIVITY_INSTANCE.name());
             expcontext.setContainerState(ContainerState.ARCHIVED);
             expcontext.setProcessDefinitionId(processDefinitionId);
             expcontext.setTime(aactivityInstance.getArchiveDate() + 500);
@@ -912,7 +913,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(processInstanceId);
-            expcontext.setContainerType("PROCESS_INSTANCE");
+            expcontext.setContainerType(DataInstanceContainer.PROCESS_INSTANCE.name());
             expcontext.setContainerState(ContainerState.ARCHIVED);
             expcontext.setProcessDefinitionId(processDefinitionId);
             expcontext.setTime(saprocessInstance.getArchiveDate().getTime() + 500);
@@ -970,7 +971,7 @@ public class ProcessAPIExt extends ProcessAPIImpl implements ProcessAPI {
             final Map<String, SExpression> connectorsExps = ModelConvertor.constructExpressions(connectorInputParameters);
             final SExpressionContext expcontext = new SExpressionContext();
             expcontext.setContainerId(processInstanceId);
-            expcontext.setContainerType("PROCESS_INSTANCE");
+            expcontext.setContainerType(DataInstanceContainer.PROCESS_INSTANCE.name());
             expcontext.setContainerState(ContainerState.ACTIVE);
             expcontext.setProcessDefinitionId(processDefinitionId);
             final ConnectorResult connectorResult = connectorService.executeMutipleEvaluation(processDefinitionId, connectorDefinitionId,
