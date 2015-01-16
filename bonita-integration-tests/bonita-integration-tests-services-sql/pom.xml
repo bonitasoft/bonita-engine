@@ -12,7 +12,7 @@
 	<artifactId>bonita-integration-tests-services-sql</artifactId>
 	<packaging>pom</packaging>
 
-	<name>Bonita SQL scripts</name>
+	<name>Bonita service-tests SQL scripts</name>
 	<build>
 		<plugins>
 			<plugin>

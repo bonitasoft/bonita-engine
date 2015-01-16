@@ -21,7 +21,7 @@
 				<module>bonita-common</module>
 				<module>bonita-client</module>
 				<module>bonita-server</module>
-				<module>bonita-sql</module>
+<!-- 				<module>bonita-sql</module> -->
 				<module>bonita-home</module>
 			</modules>
 		</profile>

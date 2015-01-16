@@ -503,6 +503,13 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-sql</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+			<scope>test</scope>
+        </dependency>
 	</dependencies>
 
 	<build>

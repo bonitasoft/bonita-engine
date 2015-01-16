@@ -46,14 +46,20 @@
             <artifactId>dom4j</artifactId>
             <version>1.6.1</version>
         </dependency>
-        
+
         <!-- Just for the conf of the datasource -->
-		<dependency>
-			<groupId>org.bonitasoft.engine.test</groupId>
-			<artifactId>bonita-server-test-utils</artifactId>
-			<version>${project.version}</version>
-			<scope>compile</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.test</groupId>
+            <artifactId>bonita-server-test-utils</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine</groupId>
+            <artifactId>bonita-sql</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+        </dependency>
     </dependencies>
 
     <build>
