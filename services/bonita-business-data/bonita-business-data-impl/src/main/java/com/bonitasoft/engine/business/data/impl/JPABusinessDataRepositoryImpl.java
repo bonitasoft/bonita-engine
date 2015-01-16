@@ -23,6 +23,9 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.EntityType;
 
 import org.bonitasoft.engine.transaction.STransactionNotFoundException;
@@ -31,6 +34,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 
 import com.bonitasoft.engine.bdm.Entity;
+import com.bonitasoft.engine.bdm.model.field.Field;
 import com.bonitasoft.engine.business.data.BusinessDataModelRepository;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
@@ -135,16 +139,15 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
 
     @Override
     public <T extends Entity> List<T> findByIds(final Class<T> entityClass, final List<Long> primaryKeys) {
-        final List<T> entities = new ArrayList<T>();
-        final EntityManager em = getEntityManager();
-        for (final Long primaryKey : primaryKeys) {
-            final T entity = em.find(entityClass, primaryKey);
-            if (entity != null) {
-                em.detach(entity);
-                entities.add(entity);
-            }
+        if (primaryKeys == null || primaryKeys.isEmpty()) {
+            return new ArrayList<T>();
         }
-        return entities;
+        final EntityManager em = getEntityManager();
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<T> criteriaQuery = cb.createQuery(entityClass);
+        Root<T> row = criteriaQuery.from(entityClass);
+        criteriaQuery.select(row).where(row.get(Field.PERSISTENCE_ID).in(primaryKeys));
+        return em.createQuery(criteriaQuery).getResultList();
     }
 
     protected <T extends Serializable> T find(final Class<T> resultClass, final TypedQuery<T> query, final Map<String, Serializable> parameters)
@@ -177,7 +180,7 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
     public <T extends Serializable> List<T> findList(final Class<T> resultClass, final String jpqlQuery, final Map<String, Serializable> parameters,
             final int startIndex, final int maxResults) {
         final TypedQuery<T> typedQuery = createTypedQuery(jpqlQuery, resultClass);
-        return findList(resultClass, typedQuery, parameters, startIndex, maxResults);
+        return findList(typedQuery, parameters, startIndex, maxResults);
     }
 
     @Override
@@ -193,15 +196,15 @@ public class JPABusinessDataRepositoryImpl implements BusinessDataRepository {
             final Map<String, Serializable> parameters, final int startIndex, final int maxResults) {
         final EntityManager em = getEntityManager();
         final TypedQuery<T> query = em.createNamedQuery(queryName, resultClass);
-        return findList(resultClass, query, parameters, startIndex, maxResults);
+        return findList(query, parameters, startIndex, maxResults);
     }
 
-    private <T extends Serializable> TypedQuery<T> createTypedQuery(final String jpqlQuery, final Class<T> resultClass) {
+    private <T> TypedQuery<T> createTypedQuery(final String jpqlQuery, final Class<T> resultClass) {
         return getEntityManager().createQuery(jpqlQuery, resultClass);
     }
 
-    protected <T extends Serializable> List<T> findList(final Class<T> resultClass, final TypedQuery<T> query, final Map<String, Serializable> parameters,
-            final int startIndex, final int maxResults) {
+    protected <T extends Serializable> List<T> findList(final TypedQuery<T> query, final Map<String, Serializable> parameters, final int startIndex,
+            final int maxResults) {
         if (query == null) {
             throw new IllegalArgumentException("query is null");
         }

@@ -84,44 +84,4 @@ public class ConnectorExecutionTimeOutTest extends ConnectorExecutionTest {
         }
     }
 
-    @Cover(classes = Connector.class, concept = BPMNConcept.OTHERS, keywords = { "Connector", "Classpath" }, jira = "ENGINE-865")
-    @Test
-    public void executeConnectorWithCustomOutputTypeWithCommands() throws Exception {
-        final ProcessDefinitionBuilderExt designProcessDefinition = new ProcessDefinitionBuilderExt().createNewInstance(PROCESS_NAME, PROCESS_VERSION);
-        designProcessDefinition.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
-        designProcessDefinition.addShortTextData("value", null);
-        designProcessDefinition.addUserTask("step1", ACTOR_NAME);
-        final ProcessDefinition processDefinition = deployAndEnableProcessWithActorAndTestConnectorWithCustomType(designProcessDefinition, ACTOR_NAME, user);
-        final ProcessInstance process = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = this.waitForUserTask("step1", process);
-        final Map<String, Expression> params = Collections.emptyMap();
-        final Map<String, Map<String, Serializable>> input = Collections.emptyMap();
-        final Map<String, Serializable> results = getProcessAPI().executeConnectorOnActivityInstance("connectorWithCustomType", "1.0.0", params, input,
-                step1.getId());
-
-        // execute command:
-        final String commandName = "getUpdatedVariableValuesForActivityInstance";
-        final ArrayList<Operation> operations = new ArrayList<Operation>(1);
-        operations.add(new OperationBuilder()
-                .createNewInstance()
-                .setLeftOperand("value", true)
-                .setType(OperatorType.ASSIGNMENT)
-                .setRightOperand(
-                        new ExpressionBuilder().createGroovyScriptExpression("script", "output.getValue()", String.class.getName(),
-                                new ExpressionBuilder().createInputExpression("output", "org.connector.custom.CustomType"))).done());
-        final HashMap<String, Serializable> commandParameters = new HashMap<String, Serializable>();
-        commandParameters.put("OPERATIONS_LIST_KEY", operations);
-        commandParameters.put("OPERATIONS_INPUT_KEY", (Serializable) results);
-        final HashMap<String, Serializable> currentvalues = new HashMap<String, Serializable>();
-        currentvalues.put("value", "test");
-        commandParameters.put("CURRENT_VARIABLE_VALUES_MAP_KEY", currentvalues);
-        commandParameters.put("ACTIVITY_INSTANCE_ID_KEY", step1.getId());
-        @SuppressWarnings("unchecked")
-        final Map<String, Serializable> updatedVariable = (Map<String, Serializable>) getCommandAPI().execute(commandName, commandParameters);
-        assertEquals("value", updatedVariable.get("value"));
-        designProcessDefinition.addUserTask("step1", ACTOR_NAME);
-
-        disableAndDeleteProcess(processDefinition);
-    }
-
 }

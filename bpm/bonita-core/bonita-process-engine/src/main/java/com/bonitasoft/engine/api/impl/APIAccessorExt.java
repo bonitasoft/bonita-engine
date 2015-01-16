@@ -35,10 +35,6 @@ public class APIAccessorExt extends APIAccessorImpl implements APIAccessor {
 
     private static final long serialVersionUID = 6745423337035389065L;
 
-    public APIAccessorExt(final SessionAccessor sessionAccessor, final SessionService sessionService) {
-        super(sessionAccessor, sessionService);
-    }
-
     @Override
     public IdentityAPI getIdentityAPI() {
         return new IdentityAPIExt();

@@ -4,7 +4,7 @@
   <parent>
     <artifactId>bpm</artifactId>
     <groupId>com.bonitasoft.engine</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.5.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>bonita-server-sp</artifactId>
@@ -591,11 +591,6 @@
       <artifactId>bonita-synchro-register</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.bonitasoft.engine.synchro</groupId>
-      <artifactId>bonita-synchro-jms</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     
     <!-- Time Tracker -->
         <dependency>
@@ -914,7 +909,6 @@
                   <include>org.bonitasoft.engine.synchro:bonita-synchro-service-impl</include>
                   <include>com.bonitasoft.engine.synchro:bonita-synchro-service-clustered</include>
                   <include>org.bonitasoft.engine.synchro:bonita-synchro-register</include>
-                  <include>org.bonitasoft.engine.synchro:bonita-synchro-jms</include>
                   <!-- Transaction -->
                   <include>org.bonitasoft.engine.transaction:bonita-transaction-api</include>
                   <include>org.bonitasoft.engine.transaction:bonita-transaction-impl</include>

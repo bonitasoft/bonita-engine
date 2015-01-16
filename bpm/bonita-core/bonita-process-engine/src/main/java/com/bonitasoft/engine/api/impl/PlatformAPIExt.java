@@ -36,6 +36,7 @@ import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
 import org.bonitasoft.engine.commons.transaction.TransactionContentWithResult;
 import org.bonitasoft.engine.commons.transaction.TransactionExecutor;
+import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
 import org.bonitasoft.engine.exception.BonitaHomeConfigurationException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
@@ -67,6 +68,7 @@ import org.bonitasoft.engine.profile.ImportPolicy;
 import org.bonitasoft.engine.profile.ProfileService;
 import org.bonitasoft.engine.profile.impl.ExportedProfile;
 import org.bonitasoft.engine.scheduler.SchedulerService;
+import org.bonitasoft.engine.scheduler.exception.SSchedulerException;
 import org.bonitasoft.engine.search.SearchOptions;
 import org.bonitasoft.engine.search.SearchResult;
 import org.bonitasoft.engine.session.SessionService;
@@ -79,6 +81,7 @@ import com.bonitasoft.engine.api.PlatformAPI;
 import com.bonitasoft.engine.api.impl.transaction.GetNumberOfTenants;
 import com.bonitasoft.engine.api.impl.transaction.GetTenantsWithOrder;
 import com.bonitasoft.engine.api.impl.transaction.NotifyNodeStoppedTask;
+import com.bonitasoft.engine.api.impl.transaction.RegisterTenantJobListeners;
 import com.bonitasoft.engine.page.PageService;
 import com.bonitasoft.engine.platform.Tenant;
 import com.bonitasoft.engine.platform.TenantActivationException;
@@ -174,6 +177,7 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         }
         super.createPlatform();
     }
+
     private long create(final TenantCreator creator) throws CreationException {
         final Map<com.bonitasoft.engine.platform.TenantCreator.TenantField, Serializable> tenantFields = creator.getFields();
         try {
@@ -251,6 +255,8 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
                         // Create default themes
                         getDelegate().createDefaultThemes(tenantServiceAccessor);
 
+                        registerTenantJobListeners(platformAccessor, tenantId);
+
                         sessionService.deleteSession(session.getId());
                         return tenantId;
                     } finally {
@@ -263,6 +269,12 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
         } catch (final Exception e) {
             throw new CreationException("Unable to create tenant " + tenantFields.get(com.bonitasoft.engine.platform.TenantCreator.TenantField.NAME), e);
         }
+    }
+
+    private void registerTenantJobListeners(final PlatformServiceAccessor platformServiceAccessor, final Long tenantId) throws SSchedulerException {
+        BroadcastService broadcastService = platformServiceAccessor.getBroadcastService();
+        RegisterTenantJobListeners registerTenantJobListeners = new RegisterTenantJobListeners(tenantId);
+        broadcastService.execute(registerTenantJobListeners, tenantId);
     }
 
     @Override
@@ -363,9 +375,11 @@ public class PlatformAPIExt extends PlatformAPIImpl implements PlatformAPI {
             final TenantServiceAccessor tenantServiceAccessor = getTenantServiceAccessor(tenantId);
 
             final WorkService workService = tenantServiceAccessor.getWorkService();
+            final ConnectorExecutor connectorExecutor = tenantServiceAccessor.getConnectorExecutor();
 
             final TransactionContent transactionContent = new ActivateTenant(tenantId, platformService, schedulerService,
-                    platformAccessor.getTechnicalLoggerService(), workService, nodeConfiguration, tenantServiceAccessor.getTenantConfiguration());
+                    platformAccessor.getTechnicalLoggerService(), workService, connectorExecutor, nodeConfiguration,
+                    tenantServiceAccessor.getTenantConfiguration());
             transactionContent.execute();
             //TODO remove me when bug that does not start services on tenant creation is fixed
             tenantServiceAccessor.getReportingService().start();

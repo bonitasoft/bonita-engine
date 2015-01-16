@@ -9,6 +9,7 @@
 package com.bonitasoft.engine.operation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +86,7 @@ public class BusinessDataLeftOperandHandlerTest {
         final Peticion bizData = new Peticion(bizDataId);
         doReturn(bizData).when(repository).merge(eq(bizData));
 
-        spy.update(createLeftOperand("myBizData"), bizData, 9L, "some container");
+        spy.update(createLeftOperand("myBizData"), Collections.<String,Object>emptyMap(), bizData, 9L, "some container");
 
         verify(refBusinessDataService).updateRefBusinessDataInstance(refBiz, bizDataId);
     }
@@ -133,7 +135,7 @@ public class BusinessDataLeftOperandHandlerTest {
 
         }).when(refBusinessDataService).updateRefBusinessDataInstance(refBizDataInstance, dataId);
 
-        leftOperandHandler.update(leftOperand, employee, processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name());
+        leftOperandHandler.update(leftOperand, Collections.<String,Object>emptyMap(), employee, processInstanceId, DataInstanceContainer.PROCESS_INSTANCE.name());
 
         verify(repository).merge(employee);
         verify(refBusinessDataService).getRefBusinessDataInstance("unused", processInstanceId);
@@ -151,11 +153,12 @@ public class BusinessDataLeftOperandHandlerTest {
         final Map<String, Object> inputValues = new HashMap<String, Object>(1);
         final SExpressionContext expressionContext = new SExpressionContext(-1L, "unused", inputValues);
         final SLeftOperand leftOperand = createLeftOperand(bizDataName);
+        Map<String, Object> contextToSet = new HashMap<String, Object>();
         // when:
-        final Object retrieve = spy.retrieve(leftOperand, expressionContext);
+        spy.loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
 
         // then:
-        assertThat(retrieve).isEqualTo(myTravel);
+        assertThat(contextToSet).containsOnly(entry("myTravel", myTravel));
     }
 
     private SLeftOperand createLeftOperand(final String bizDataName) {
@@ -175,7 +178,7 @@ public class BusinessDataLeftOperandHandlerTest {
         final SLeftOperand leftOp = mock(SLeftOperand.class);
         when(leftOp.getName()).thenReturn("bizData");
 
-        spy.update(leftOp, new Object(), 1L, "");
+        spy.update(leftOp, Collections.<String,Object>emptyMap(), new Object(), 1L, "");
     }
 
     @Test
@@ -229,7 +232,7 @@ public class BusinessDataLeftOperandHandlerTest {
         expectedException.expect(SOperationExecutionException.class);
         expectedException.expectMessage("Unable to insert/update a null business data");
         // when
-        leftOperandHandler.update(createLeftOperand("bizData"), null, 1, "cont");
+        leftOperandHandler.update(createLeftOperand("bizData"), Collections.<String,Object>emptyMap(), null, 1, "cont");
     }
 
     @Test
@@ -242,7 +245,7 @@ public class BusinessDataLeftOperandHandlerTest {
         doReturn(bizData).when(repository).merge(bizData);
 
         // when
-        leftOperandHandler.update(leftOperand, bizData, 1, "PROCESS_INSTANCE");
+        leftOperandHandler.update(leftOperand, Collections.<String,Object>emptyMap(), bizData, 1, "PROCESS_INSTANCE");
 
         // then
         verify(repository).merge(bizData);
@@ -266,7 +269,7 @@ public class BusinessDataLeftOperandHandlerTest {
         doReturn(mergedBizData).when(repository).merge(bizData);
 
         // when
-        leftOperandHandler.update(leftOperand, bizData, 1, "PROCESS_INSTANCE");
+        leftOperandHandler.update(leftOperand, Collections.<String,Object>emptyMap(), bizData, 1, "PROCESS_INSTANCE");
 
         // then
         verify(repository, times(1)).merge(bizData);
@@ -283,7 +286,7 @@ public class BusinessDataLeftOperandHandlerTest {
         doReturn(bizData).when(repository).merge(bizData);
 
         // when
-        leftOperandHandler.update(leftOperand, bizData, 1, "PROCESS_INSTANCE");
+        leftOperandHandler.update(leftOperand, Collections.<String,Object>emptyMap(), bizData, 1, "PROCESS_INSTANCE");
 
         // then
         verify(repository, times(1)).merge(bizData);
@@ -301,7 +304,7 @@ public class BusinessDataLeftOperandHandlerTest {
         doReturn(mergedBizData).when(repository).merge(bizData);
 
         // when
-        leftOperandHandler.update(leftOperand, bizData, 1, "PROCESS_INSTANCE");
+        leftOperandHandler.update(leftOperand, Collections.<String,Object>emptyMap(), bizData, 1, "PROCESS_INSTANCE");
 
         // then
         verify(repository).merge(bizData);
@@ -318,7 +321,7 @@ public class BusinessDataLeftOperandHandlerTest {
         doReturn(bizData).when(repository).merge(bizData);
 
         // when
-        leftOperandHandler.update(leftOperand, bizData, 1, "PROCESS_INSTANCE");
+        leftOperandHandler.update(leftOperand, Collections.<String,Object>emptyMap(), bizData, 1, "PROCESS_INSTANCE");
 
         // then
         verify(repository).merge(bizData);
@@ -336,7 +339,7 @@ public class BusinessDataLeftOperandHandlerTest {
         doReturn(mergedBizData).when(repository).merge(bizData);
 
         // when
-        leftOperandHandler.update(leftOperand, bizData, 1, "PROCESS_INSTANCE");
+        leftOperandHandler.update(leftOperand, Collections.<String,Object>emptyMap(), bizData, 1, "PROCESS_INSTANCE");
 
         // then
         verify(repository).merge(bizData);
@@ -353,7 +356,7 @@ public class BusinessDataLeftOperandHandlerTest {
         doReturn(bizData).when(repository).merge(bizData);
 
         // when
-        leftOperandHandler.update(leftOperand, bizData, 1, "PROCESS_INSTANCE");
+        leftOperandHandler.update(leftOperand, Collections.<String,Object>emptyMap(), bizData, 1, "PROCESS_INSTANCE");
 
         // then
         verify(repository).merge(bizData);
@@ -383,10 +386,6 @@ public class BusinessDataLeftOperandHandlerTest {
         leftOperandHandler.delete(leftOperand, 45, "PROCESS_INSTANCE");
     }
 
-    @Test
-    public void handlerDoesNotSupportBatchUpdate() {
-        assertThat(leftOperandHandler.supportBatchUpdate()).isFalse();
-    }
 
     @Test
     public void should_update_attach_multi_business_data() throws Exception {
@@ -399,7 +398,7 @@ public class BusinessDataLeftOperandHandlerTest {
         doReturn(bizData).when(repository).merge(bizData);
 
         // when
-        leftOperandHandler.update(leftOperand, peticions, 1, "PROCESS_INSTANCE");
+        leftOperandHandler.update(leftOperand, Collections.<String,Object>emptyMap(), peticions, 1, "PROCESS_INSTANCE");
 
         // then
         verify(repository).merge(bizData);
@@ -447,12 +446,7 @@ public class BusinessDataLeftOperandHandlerTest {
         when(refInstance.getDataClassName()).thenReturn(Employee.class.getName());
 
         final List<Employee> employees = (List<Employee>) leftOperandHandler.getBusinessData(bizDataName, processInstanceId, "PROCESS_INSTANCE");
-        assertThat(employees).hasSize(1);
-        final Employee employee = employees.get(0);
-        assertThat(employee).isNotNull();
-        assertThat(employee.getPersistenceId()).isNull();
-        assertThat(employee.getFirstName()).isNull();
-        assertThat(employee.getLastName()).isNull();
+        assertThat(employees).isEmpty();
     }
 
 }

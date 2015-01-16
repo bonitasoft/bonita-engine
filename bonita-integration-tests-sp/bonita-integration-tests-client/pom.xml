@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.bonitasoft.engine.test</groupId>
         <artifactId>bonita-integration-tests-sp</artifactId>
-        <version>6.4.0-SNAPSHOT</version>
+        <version>6.5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>bonita-integration-tests-client-sp</artifactId>
@@ -44,8 +44,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.bonitasoft.engine.test</groupId>
-            <artifactId>bonita-server-test-utils</artifactId>
+            <groupId>com.bonitasoft.engine.test</groupId>
+            <artifactId>bonita-server-test-utils-sp</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

@@ -11,7 +11,6 @@
 package com.bonitasoft.engine.operation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +22,7 @@ import org.bonitasoft.engine.core.operation.model.SLeftOperand;
 import org.bonitasoft.engine.core.process.instance.api.FlowNodeInstanceService;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
 
+import com.bonitasoft.engine.api.impl.transaction.expression.bdm.ServerProxyfier;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.business.data.BusinessDataRepository;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
@@ -45,7 +45,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
     private final BusinessDataRepository businessDataRepository;
 
     protected BusinessDataLeftOperandHandler(final BusinessDataRepository businessDataRepository, final RefBusinessDataService refBusinessDataService,
-            final FlowNodeInstanceService flowNodeInstanceService) {
+                                             final FlowNodeInstanceService flowNodeInstanceService) {
         super();
         this.businessDataRepository = businessDataRepository;
         this.refBusinessDataService = refBusinessDataService;
@@ -58,7 +58,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object update(final SLeftOperand sLeftOperand, final Object newValue, final long containerId, final String containerType)
+    public Object update(final SLeftOperand sLeftOperand, Map<String, Object> inputValues, final Object newValue, final long containerId, final String containerType)
             throws SOperationExecutionException {
         try {
             final SRefBusinessDataInstance reference = getRefBusinessDataInstance(sLeftOperand.getName(), containerId, containerType);
@@ -66,7 +66,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
             if (newValue instanceof Entity) {
                 final Entity newBusinessDataValue = (Entity) newValue;
                 final SSimpleRefBusinessDataInstance simpleRef = (SSimpleRefBusinessDataInstance) reference;
-                final Entity businessData = businessDataRepository.merge(newBusinessDataValue);
+                final Entity businessData = mergeToBusinessDataRepository(newBusinessDataValue);
                 if (!businessData.getPersistenceId().equals(simpleRef.getDataId())) {
                     refBusinessDataService.updateRefBusinessDataInstance(simpleRef, businessData.getPersistenceId());
                 }
@@ -77,7 +77,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
             final List<Long> businessDataIds = new ArrayList<Long>();
             final List<Entity> updated = new ArrayList<Entity>();
             for (final Entity entity : newBusinessDataValue) {
-                final Entity businessData = businessDataRepository.merge(entity);
+                final Entity businessData = mergeToBusinessDataRepository(entity);
                 businessDataIds.add(businessData.getPersistenceId());
                 updated.add(businessData);
             }
@@ -89,6 +89,10 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
         } catch (final SBonitaException e) {
             throw new SOperationExecutionException(e);
         }
+    }
+
+    private Entity mergeToBusinessDataRepository(final Entity newBusinessDataValue) {
+        return businessDataRepository.merge(ServerProxyfier.unProxyfyIfNeeded(newBusinessDataValue));
     }
 
     private void checkIsValidBusinessData(final SRefBusinessDataInstance reference, final Object newValue) throws SOperationExecutionException {
@@ -121,7 +125,7 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
             if (!dataIds.isEmpty()) {
                 return businessDataRepository.findByIds(dataClass, dataIds);
             }
-            return Arrays.asList(dataClass.newInstance());
+            return new ArrayList<Entity>();
         } catch (final Exception e) {
             throw new SBonitaReadException(e);
         }
@@ -176,20 +180,24 @@ public class BusinessDataLeftOperandHandler implements LeftOperandHandler {
     }
 
     @Override
-    public Object retrieve(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext) throws SBonitaReadException {
+    public void loadLeftOperandInContext(final SLeftOperand sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
         final Map<String, Object> inputValues = expressionContext.getInputValues();
         final String businessDataName = sLeftOperand.getName();
         final Long containerId = expressionContext.getContainerId();
         final String containerType = expressionContext.getContainerType();
         if (inputValues.get(businessDataName) == null) {
-            return getBusinessData(businessDataName, containerId, containerType);
+            if (!contextToSet.containsKey(businessDataName)) {
+                contextToSet.put(businessDataName, getBusinessData(businessDataName, containerId, containerType));
+            }
         }
-        return null;
     }
 
     @Override
-    public boolean supportBatchUpdate() {
-        return false;
+    public void loadLeftOperandInContext(final List<SLeftOperand> sLeftOperand, final SExpressionContext expressionContext, Map<String, Object> contextToSet) throws SBonitaReadException {
+        for (SLeftOperand leftOperand : sLeftOperand) {
+            loadLeftOperandInContext(leftOperand, expressionContext, contextToSet);
+        }
     }
+
 
 }

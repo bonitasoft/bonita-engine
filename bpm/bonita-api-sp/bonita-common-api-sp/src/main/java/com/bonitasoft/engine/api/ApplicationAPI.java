@@ -27,15 +27,11 @@ import com.bonitasoft.engine.business.application.ApplicationImportPolicy;
 import com.bonitasoft.engine.business.application.ApplicationMenu;
 import com.bonitasoft.engine.business.application.ApplicationMenuCreator;
 import com.bonitasoft.engine.business.application.ApplicationMenuNotFoundException;
-import com.bonitasoft.engine.business.application.ApplicationMenuSearchDescriptor;
 import com.bonitasoft.engine.business.application.ApplicationMenuUpdater;
 import com.bonitasoft.engine.business.application.ApplicationNotFoundException;
 import com.bonitasoft.engine.business.application.ApplicationPage;
 import com.bonitasoft.engine.business.application.ApplicationPageNotFoundException;
-import com.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor;
-import com.bonitasoft.engine.business.application.ApplicationSearchDescriptor;
 import com.bonitasoft.engine.business.application.ApplicationUpdater;
-import com.bonitasoft.engine.page.Page;
 
 /**
  * This API allows to list and manage Bonita Living Applications ({@link Application}).
@@ -95,13 +91,14 @@ public interface ApplicationAPI {
     Application updateApplication(long applicationId, ApplicationUpdater updater) throws ApplicationNotFoundException, UpdateException, AlreadyExistsException;
 
     /**
-     * Searches for {@link Application}s with specific search criteria. Use {@link ApplicationSearchDescriptor} to know the available filters.
+     * Searches for {@link Application}s with specific search criteria. Use {@link com.bonitasoft.engine.business.application.ApplicationSearchDescriptor} to
+     * know the available filters.
      *
      * @param searchOptions the search criteria. See {@link SearchOptions} for details.
      * @return a {@link SearchResult} containing the number and the list of applications matching the search criteria.
      * @throws SearchException if an error occurs during search
      * @see Application
-     * @see ApplicationSearchDescriptor
+     * @see com.bonitasoft.engine.business.application.ApplicationSearchDescriptor
      * @see SearchOptions
      * @see SearchResult
      */
@@ -121,7 +118,7 @@ public interface ApplicationAPI {
      * @throws ApplicationNotFoundException if the referenced application does not exist.
      * @see ApplicationPage
      * @see Application
-     * @see Page
+     * @see com.bonitasoft.engine.page.Page
      */
     ApplicationPage createApplicationPage(long applicationId, long pageId, String token) throws AlreadyExistsException, CreationException,
             ApplicationNotFoundException;
@@ -162,12 +159,14 @@ public interface ApplicationAPI {
     /**
      * Searches for {@link ApplicationPage}s with specific search criteria.
      *
-     * @param searchOptions the search criteria. See {@link SearchOptions} for details. Use {@link ApplicationPageSearchDescriptor} to know the available
+     * @param searchOptions the search criteria. See {@link SearchOptions} for details. Use
+     *        {@link com.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor} to know the available
      *        filters.
-     * @return a {@link SearchResult} containing the number and the list of {@code ApplicationPageSearchDescriptor}s matching the search criteria.
+     * @return a {@link SearchResult} containing the number and the list of {@code com.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor}s
+     *         matching the search criteria.
      * @throws SearchException if an error occurs during the search execution
      * @see ApplicationPage
-     * @see ApplicationPageSearchDescriptor
+     * @see com.bonitasoft.engine.business.application.ApplicationPageSearchDescriptor
      * @see SearchOptions
      * @see SearchResult
      */
@@ -253,13 +252,14 @@ public interface ApplicationAPI {
     /**
      * Searches for {@link ApplicationMenu}s with specific search criteria.
      *
-     * @param searchOptions the search criteria. See {@link SearchOptions} for details. Use {@link ApplicationMenuSearchDescriptor} to know the available
+     * @param searchOptions the search criteria. See {@link SearchOptions} for details. Use
+     *        {@link com.bonitasoft.engine.business.application.ApplicationMenuSearchDescriptor} to know the available
      *        filters
      * @return a {@link SearchResult} containing the number and the list of {@code ApplicationMenu}s matching the search criteria.
      * @throws SearchException if an error occurs during search
      * @see ApplicationMenu
      * @see SearchOptions
-     * @see ApplicationMenuSearchDescriptor
+     * @see com.bonitasoft.engine.business.application.ApplicationMenuSearchDescriptor
      * @see SearchResult
      */
     SearchResult<ApplicationMenu> searchApplicationMenus(final SearchOptions searchOptions) throws SearchException;
@@ -311,10 +311,10 @@ public interface ApplicationAPI {
      * @see com.bonitasoft.engine.business.application.ApplicationImportPolicy
      * @see org.bonitasoft.engine.api.ImportStatus
      * @see org.bonitasoft.engine.api.ImportError
-     * @See com.bonitasoft.engine.business.application.ApplicationPage
+     * @see com.bonitasoft.engine.business.application.ApplicationPage
      * @see com.bonitasoft.engine.business.application.ApplicationMenu
      * @see org.bonitasoft.engine.profile.Profile
-     * @See com.bonitasoft.engine.page.Page
+     * @see com.bonitasoft.engine.page.Page
      */
     List<ImportStatus> importApplications(final byte[] xmlContent, final ApplicationImportPolicy policy) throws ImportException, AlreadyExistsException;
 

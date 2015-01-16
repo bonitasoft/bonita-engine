@@ -4,7 +4,7 @@ import javax.transaction.UserTransaction;
 
 import bitronix.tm.TransactionManagerServices;
 
-import com.bonitasoft.pojo.Employee;
+import com.company.pojo.Employee;
 
 public class AddNewEmployeeThread extends Thread {
 

@@ -8,8 +8,6 @@
  *******************************************************************************/
 package com.bonitasoft.engine.operation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.bonitasoft.engine.core.operation.exception.SOperationExecutionException;
 import org.bonitasoft.engine.core.operation.model.impl.SLeftOperandImpl;
 import org.bonitasoft.engine.core.process.instance.api.ActivityInstanceService;
@@ -43,9 +41,5 @@ public class StringIndexLeftOperandHandlerTest {
         handler.delete(createLeftOperand("myData"), 45l, "container");
     }
 
-    @Test
-    public void handlerSupportsBatchUpdate() {
-        assertThat(handler.supportBatchUpdate()).isTrue();
-    }
 
 }

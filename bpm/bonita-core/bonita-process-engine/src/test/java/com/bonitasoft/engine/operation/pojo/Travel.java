@@ -8,6 +8,10 @@ public class Travel implements Entity {
 
     private int nbDays;
 
+    private Long persistenceId;
+
+    private Long persistenceVersion;
+
     public int getNbDays() {
         return nbDays;
     }
@@ -17,12 +21,21 @@ public class Travel implements Entity {
     }
 
     @Override
-    public Long getPersistenceId() {
-        return 1L;
+    public Long getPersistenceVersion() {
+        return persistenceVersion;
     }
 
     @Override
-    public Long getPersistenceVersion() {
-        return 1L;
+    public Long getPersistenceId() {
+        return persistenceId;
     }
+
+    public void setPersistenceId(final Long id) {
+        persistenceId = id;
+    }
+
+    public void setPersistenceVersion(Long persistenceVersion) {
+        this.persistenceVersion = persistenceVersion;
+    }
+
 }

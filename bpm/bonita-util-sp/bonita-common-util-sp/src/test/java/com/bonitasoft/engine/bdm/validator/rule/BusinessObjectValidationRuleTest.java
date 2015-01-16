@@ -61,18 +61,52 @@ public class BusinessObjectValidationRuleTest {
     }
 
     @Test
+    public void should_validate_that_qualified_name_is_not_starting_by_org_bonitasoft() throws Exception {
+        checkQualifiedNameValidationStatus("com.bonitasoft.Forbidden", false);
+
+
+        checkQualifiedNameValidationStatus("com.bonitasoftextended", true);
+        checkQualifiedNameValidationStatus("org.com.bonitasoft.modem", true);
+        checkQualifiedNameValidationStatus("org.bonitasoft", true);
+    }
+
+    private void checkQualifiedNameValidationStatus(final String qualifiedName, final boolean expectedValidation) {
+        //given
+        final BusinessObject bo = aValidBusinesObject();
+        bo.setQualifiedName(qualifiedName);
+
+        //when
+        final ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
+
+        //then
+        if (expectedValidation) {
+            assertThat(validationStatus).isOk();
+        } else {
+            assertThat(validationStatus).isNotOk();
+        }
+    }
+
+    @Test
     public void shoudCheckRule_returns_valid_status() {
-        final BusinessObject bo = new BusinessObject();
-        bo.setQualifiedName("org.bonita.Bo");
-        final SimpleField field = new SimpleField();
-        field.setName("firstName");
-        bo.addField(field);
+        final BusinessObject bo = aValidBusinesObject();
+
         ValidationStatus validationStatus = businessObjectValidationRule.validate(bo);
         assertThat(validationStatus).isOk();
 
         bo.addUniqueConstraint("_UC_1", "firstName");
         validationStatus = businessObjectValidationRule.validate(bo);
         assertThat(validationStatus).isOk();
+    }
+
+    private BusinessObject aValidBusinesObject() {
+        final BusinessObject bo = new BusinessObject();
+        bo.setQualifiedName("org.bonita.Bo");
+
+        final SimpleField field = new SimpleField();
+        field.setName("firstName");
+
+        bo.addField(field);
+        return bo;
     }
 
     @Test

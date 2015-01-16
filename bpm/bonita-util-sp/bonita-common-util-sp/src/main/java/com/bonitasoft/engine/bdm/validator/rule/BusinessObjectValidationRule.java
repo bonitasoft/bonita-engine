@@ -27,6 +27,8 @@ import com.bonitasoft.engine.bdm.validator.ValidationStatus;
  */
 public class BusinessObjectValidationRule extends ValidationRule<BusinessObject> {
 
+    private static final String RESERVED_PACKAGE_PREFIX = "com.bonitasoft.";
+
     private static final int MAX_TABLENAME_LENGTH = 30;
 
     private final SQLNameValidator sqlNameValidator;
@@ -44,20 +46,25 @@ public class BusinessObjectValidationRule extends ValidationRule<BusinessObject>
             status.addError("A Business Object must have a qualified name");
             return status;
         }
-        String simpleName = bo.getSimpleName();
+
+        if (qualifiedName.startsWith(RESERVED_PACKAGE_PREFIX)) {
+            status.addError("Package com.bonitasoft is reserved. Please choose another package name");
+        }
+
+        final String simpleName = bo.getSimpleName();
         if (!SourceVersion.isName(qualifiedName) || !sqlNameValidator.isValid(simpleName)) {
             status.addError(qualifiedName + " is not a valid Java qualified name");
             return status;
         }
-        
+
         if (simpleName.contains("_")) {
             status.addError("_ is a forbidden character in business object's name");
         }
-        
+
         if (bo.getFields().isEmpty()) {
             status.addError(qualifiedName + " must have at least one field declared");
         }
-        
+
         validateConstraints(bo, status);
         validateQueries(bo, status);
         return status;

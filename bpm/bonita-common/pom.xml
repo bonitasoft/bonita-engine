@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>bpm</artifactId>
 		<groupId>com.bonitasoft.engine</groupId>
-		<version>6.4.0-SNAPSHOT</version>
+		<version>6.5.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>bonita-common-sp</artifactId>
@@ -20,11 +20,6 @@
 		<dependency>
 			<groupId>org.bonitasoft.engine.api</groupId>
 			<artifactId>bonita-common-api-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.api</groupId>
-			<artifactId>bonita-common-api-ejb2</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -60,7 +55,6 @@
 								<includes>
 									<include>org.bonitasoft.engine.api:bonita-common-api</include>
 									<include>org.bonitasoft.engine.api:bonita-common-api-impl</include>
-									<include>org.bonitasoft.engine.api:bonita-common-api-ejb2</include>
 									<include>com.bonitasoft.engine.api:bonita-common-api-sp</include>
 									<include>com.bonitasoft.engine.api:bonita-common-api-impl-sp</include>
 									<include>com.bonitasoft.engine.util:bonita-common-util-sp</include>

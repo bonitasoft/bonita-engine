@@ -38,16 +38,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 
 /**
  * @author Baptiste Mesta
  */
-public class SearchActivityInstanceTest extends CommonAPISPTest {
+public class SearchActivityInstanceTest extends CommonAPISPIT {
 
     @After
     public void afterTest() throws BonitaException {
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     @Before
@@ -188,7 +188,7 @@ public class SearchActivityInstanceTest extends CommonAPISPTest {
             assertTrue("keyword search sould return only tasks with name containing 'userTask'", activity.getName().contains("userTask"));
         }
 
-        deleteUser(user.getId());
+        deleteUser(user);
         getCommandAPI().execute("removeBreakpoint", Collections.singletonMap("breakpointId", (Serializable) breakpointId));
         disableAndDeleteProcess(processDef1, processDef2);
     }

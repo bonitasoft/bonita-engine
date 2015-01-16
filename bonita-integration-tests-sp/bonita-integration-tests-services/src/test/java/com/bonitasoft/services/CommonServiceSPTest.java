@@ -9,18 +9,21 @@
 package com.bonitasoft.services;
 
 import org.bonitasoft.engine.CommonServiceTest;
+import org.bonitasoft.engine.TestsInitializerService;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
+import org.junit.runner.RunWith;
 
 /**
  * @author Baptiste Mesta
  */
+@RunWith(BonitaTestRunner.class)
+@Initializer(TestsInitializerService.class)
 public class CommonServiceSPTest extends CommonServiceTest {
 
     private static ServicesBuilder servicesBuilder;
 
     static {
-        // Needs to be done before anything else:
-        setupSpringContextIfNeeded();
-
         servicesBuilder = new ServicesBuilder();
     }
 

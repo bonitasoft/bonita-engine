@@ -15,9 +15,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
-import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
-import org.bonitasoft.engine.BonitaTestRunner;
-import org.bonitasoft.engine.bpm.flownode.ActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.TimerType;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
@@ -37,6 +34,8 @@ import org.bonitasoft.engine.operation.OperationBuilder;
 import org.bonitasoft.engine.operation.OperatorType;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bonitasoft.engine.BPMTestSPUtil;
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.TestsInitializerSP;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
@@ -55,7 +54,7 @@ import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
  */
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializerSP.class)
-public class TenantMaintenanceIT extends CommonAPISPTest {
+public class TenantMaintenanceIT extends CommonAPISPIT {
 
     private static final String CRON_EXPRESSION_EACH_SECOND = "*/1 * * * * ?";
 
@@ -159,12 +158,12 @@ public class TenantMaintenanceIT extends CommonAPISPTest {
 
         // Start a process instance. The connector should work.
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final ActivityInstance step1 = waitForUserTask("step1", processInstance);
+        final long step1Id = waitForUserTask(processInstance, "step1");
 
         final Map<String, Serializable> res = getProcessAPI().executeConnectorOnActivityInstance(
                 "org.bonitasoft.connector.testConnectorEngineExecutionContext", "1.0", Collections.<String, Expression> emptyMap(),
                 Collections.<String, Map<String, Serializable>> emptyMap(), Collections.singletonList(operation),
-                Collections.<String, Serializable> emptyMap(), step1.getId());
+                Collections.<String, Serializable> emptyMap(), step1Id);
 
         assertEquals(processDefinition.getId(), res.get("externalData"));
 
@@ -190,9 +189,9 @@ public class TenantMaintenanceIT extends CommonAPISPTest {
 
     private void logNumberOfProcess(final long tenantId, final String tenantName) throws Exception {
         loginOnTenantWithTechnicalLogger(tenantId);
-        long numberOfProcessInstances = getProcessAPI()
+        final long numberOfProcessInstances = getProcessAPI()
                 .getNumberOfProcessInstances();
-        long numberOfArchivedProcessInstances = getProcessAPI()
+        final long numberOfArchivedProcessInstances = getProcessAPI()
                 .getNumberOfArchivedProcessInstances();
 
         LOGGER.info(String.format(
@@ -207,7 +206,7 @@ public class TenantMaintenanceIT extends CommonAPISPTest {
 
     private ProcessDefinition createProcessOnTenant(final long tenantId) throws Exception {
         loginOnTenantWith(USERNAME, PASSWORD, tenantId);
-        String processName = new StringBuilder().append(PROCESS_NAME).append(tenantId).toString();
+        final String processName = new StringBuilder().append(PROCESS_NAME).append(tenantId).toString();
         final DesignProcessDefinition designProcessDefinition = new ProcessDefinitionBuilder()
                 .createNewInstance(processName,
                         PROCESS_VERSION)

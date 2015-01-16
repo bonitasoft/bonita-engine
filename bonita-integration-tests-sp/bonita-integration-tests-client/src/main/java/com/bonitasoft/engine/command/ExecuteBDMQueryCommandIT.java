@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
@@ -41,7 +40,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.bdm.BusinessObjectModelConverter;
 import com.bonitasoft.engine.bdm.Entity;
 import com.bonitasoft.engine.bdm.model.BusinessObject;
@@ -56,7 +55,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Romain Bioteau
  */
-public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
+public class ExecuteBDMQueryCommandIT extends CommonAPISPIT {
 
     private static final String EXECUTE_BDM_QUERY_COMMAND = "executeBDMQuery";
 
@@ -162,7 +161,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
             getTenantManagementAPI().cleanAndUninstallBusinessDataModel();
             getTenantManagementAPI().resume();
         }
-        deleteUser(businessUser.getId());
+        deleteUser(businessUser);
         logoutOnTenant();
     }
 
@@ -261,10 +260,7 @@ public class ExecuteBDMQueryCommandIT extends CommonAPISPTest {
         final DesignProcessDefinition designProcessDefinition = processDefinitionBuilder.done();
         final ProcessDefinition definition = deployAndEnableProcessWithActor(designProcessDefinition, ACTOR_NAME, businessUser);
         final ProcessInstance instance = getProcessAPI().startProcess(definition.getId());
-
-        final HumanTaskInstance userTask = waitForUserTask("step1", instance.getId());
-        getProcessAPI().assignUserTask(userTask.getId(), businessUser.getId());
-        getProcessAPI().executeFlowNode(userTask.getId());
+        waitForUserTaskAndExecuteIt(instance, "step1", businessUser);
 
         disableAndDeleteProcess(definition.getId());
     }

@@ -1,6 +1,6 @@
 package com.bonitasoft.engine.business.data.impl;
 
-import static com.bonitasoft.pojo.EmployeeBuilder.anEmployee;
+import static com.company.pojo.EmployeeBuilder.anEmployee;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Matchers.any;
@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -42,8 +43,8 @@ import bitronix.tm.TransactionManagerServices;
 
 import com.bonitasoft.engine.business.data.NonUniqueResultException;
 import com.bonitasoft.engine.business.data.SBusinessDataNotFoundException;
-import com.bonitasoft.pojo.Employee;
-import com.bonitasoft.pojo.Person;
+import com.company.pojo.Employee;
+import com.company.pojo.Person;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/testContext.xml" })
@@ -186,6 +187,28 @@ public class JPABusinessDataRepositoryImplITest {
         businessDataRepository.find(Employee.class, "FROM Employee e WHERE e.lastName = :lastName", parameters);
     }
 
+    @Test
+    public void should_get_employees_by_id() throws Exception {
+        final String lastName = "Kangaroo";
+        Employee emp1 = addEmployeeToRepository(anEmployee().withLastName(lastName).build());
+        Employee emp2 = addEmployeeToRepository(anEmployee().withLastName(lastName).build());
+        Employee emp3 = addEmployeeToRepository(anEmployee().withLastName(lastName).build());
+        
+        List<Employee> emps = businessDataRepository.findByIds(Employee.class, Arrays.asList(emp1.getPersistenceId(), emp2.getPersistenceId()));
+        
+        assertThat(emps).contains(emp1, emp2);
+        assertThat(emps).doesNotContain(emp3);
+    }
+    
+    @Test
+    public void should_return_an_empty_list_when_getting_entities_with_empty_ids_list() throws Exception {
+       ArrayList<Long> emptyIdsList = new ArrayList<Long>();
+        
+        List<Employee> emps = businessDataRepository.findByIds(Employee.class, emptyIdsList);
+        
+        assertThat(emps).isEmpty();
+    }
+    
     @Test
     public void returnNullnWhenFindingAnUnknownEmployee() throws Exception {
         final Map<String, Serializable> parameters = Collections.singletonMap("lastName", (Serializable) "Unknown_lastName");

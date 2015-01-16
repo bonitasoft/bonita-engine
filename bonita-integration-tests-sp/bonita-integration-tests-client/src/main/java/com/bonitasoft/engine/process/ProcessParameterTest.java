@@ -52,14 +52,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.bpm.bar.BusinessArchiveFactory;
 import com.bonitasoft.engine.bpm.parameter.ParameterCriterion;
 import com.bonitasoft.engine.bpm.parameter.ParameterInstance;
 import com.bonitasoft.engine.bpm.parameter.ParameterNotFoundException;
 import com.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilderExt;
 
-public class ProcessParameterTest extends CommonAPISPTest {
+public class ProcessParameterTest extends CommonAPISPIT {
 
     private static final String PROCESS_VERSION = "1.0";
 
@@ -202,13 +202,12 @@ public class ProcessParameterTest extends CommonAPISPTest {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(businessArchive.done(), ACTOR_NAME, user);
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        waitForUserTask(aTask, processInstance.getId());
+        waitForUserTask(processInstance, aTask);
         final DataInstance dataInstance = getProcessAPI().getProcessDataInstance(dataName, processInstance.getId());
         assertEquals(paramValue, dataInstance.getValue());
 
         disableAndDeleteProcess(processDefinition);
-
-        deleteUser(user.getId());
+        deleteUser(user);
     }
 
     @Test
@@ -654,7 +653,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
                 user, paraMap);
         final long proDefId = processDefinition.getId();
         ProcessInstance processInstance = getProcessAPI().startProcess(proDefId);
-        assertNotNull(waitForUserTask("step2", processInstance.getId()));
+        waitForUserTask(processInstance, "step2");
 
         final ProcessDeploymentInfo processDeploymentInfo = getProcessAPI().getProcessDeploymentInfo(proDefId);
         assertNotNull(processDeploymentInfo);
@@ -689,7 +688,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         final long processDefinitionId = processDef.getId();
         getProcessAPI().enableProcess(processDefinitionId);
         processInstance = getProcessAPI().startProcess(processDefinitionId);
-        waitForUserTask("step2", processInstance.getId());
+        waitForUserTask(processInstance, "step2");
 
         assertEquals("bcd", getProcessAPI().getParameterInstance(processDefinitionId, paraName).getValue());
         final ConnectorImplementationDescriptor connectorRedeploy = getProcessAPI().getConnectorImplementation(processDefinitionId, connectorId,
@@ -699,7 +698,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         assertEquals(ConfigurationState.RESOLVED, getProcessAPI().getProcessDeploymentInfo(processDefinitionId).getConfigurationState());
 
         disableAndDeleteProcess(processDef);
-        deleteUser(user.getId());
+        deleteUser(user);
     }
 
     private ProcessDefinitionBuilderExt buildProcessWithOutputConnectorAndParameter(final String delivery, final String inputName, final String connectorId,
@@ -752,7 +751,7 @@ public class ProcessParameterTest extends CommonAPISPTest {
         assertThat((Boolean) getProcessAPI().evaluateExpressionOnProcessDefinition(isDoubleValueDouble, inputValues, processDefinition.getId()), is(true));
 
         disableAndDeleteProcess(processDefinition);
-        deleteUser(jack.getId());
+        deleteUser(jack);
     }
 
     // TODO move these methods to an util class

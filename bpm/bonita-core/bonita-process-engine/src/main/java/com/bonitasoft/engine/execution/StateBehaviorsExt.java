@@ -37,6 +37,7 @@ import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
 import org.bonitasoft.engine.execution.ContainerRegistry;
@@ -67,10 +68,10 @@ public class StateBehaviorsExt extends StateBehaviors {
             final DataInstanceService dataInstanceService, final OperationService operationService, final WorkService workService,
             final ContainerRegistry containerRegistry, final EventInstanceService eventInstanceSevice, final SchedulerService schedulerService,
             final SCommentService commentService, final IdentityService identityService, final TechnicalLoggerService logger, final TokenService tokenService,
-            final RefBusinessDataService refBusinessDataService) {
+            final RefBusinessDataService refBusinessDataService, final ParentContainerResolver parentContainerResolver) {
         super(bpmInstancesCreator, eventsHandler, activityInstanceService, userFilterService, classLoaderService, actorMappingService,
                 connectorInstanceService, expressionResolverService, processDefinitionService, dataInstanceService, operationService, workService,
-                containerRegistry, eventInstanceSevice, schedulerService, commentService, identityService, logger, tokenService);
+                containerRegistry, eventInstanceSevice, schedulerService, commentService, identityService, logger, tokenService, parentContainerResolver);
         this.refBusinessDataService = refBusinessDataService;
     }
 
@@ -113,7 +114,7 @@ public class StateBehaviorsExt extends StateBehaviors {
             possibleValues = multiRef.getDataIds();
         } catch (final SBonitaException sbe) {
             final SDataInstance dataInstance = getDataInstanceService().getDataInstance(loopCharacteristics.getLoopDataInputRef(),
-                    miActivityInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name());
+                    miActivityInstance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), parentContainerResolver);
             possibleValues = (List<?>) dataInstance.getValue();
         }
         if (possibleValues != null) {

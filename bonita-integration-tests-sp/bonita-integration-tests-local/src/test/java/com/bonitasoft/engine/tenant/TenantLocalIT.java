@@ -10,17 +10,17 @@ package com.bonitasoft.engine.tenant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
-import org.bonitasoft.engine.BonitaTestRunner;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.search.SearchResult;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.bonitasoft.engine.BPMTestSPUtil;
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.TestsInitializerSP;
 import com.bonitasoft.engine.page.Page;
 
@@ -30,7 +30,7 @@ import com.bonitasoft.engine.page.Page;
  */
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializerSP.class)
-public class TenantLocalIT extends CommonAPISPTest {
+public class TenantLocalIT extends CommonAPISPIT {
 
     private static final int EXPECTED_PAGE_SEARCH_RESULT_COUNT = 1;
 
@@ -67,7 +67,7 @@ public class TenantLocalIT extends CommonAPISPTest {
                 EXPECTED_PAGE_SEARCH_RESULT_COUNT);
 
         // clean up
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
 }

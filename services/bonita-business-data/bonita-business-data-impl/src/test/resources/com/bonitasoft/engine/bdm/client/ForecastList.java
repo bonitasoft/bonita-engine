@@ -54,7 +54,12 @@ public class Forecast
     }
 
     public void setTemperatures(List<Double> temperatures) {
-        this.temperatures = temperatures;
+        if (this.temperatures == null) {
+            this.temperatures = temperatures;
+        } else {
+            this.temperatures.clear();
+            this.temperatures.addAll(temperatures);
+        }
     }
 
     public List<Double> getTemperatures() {

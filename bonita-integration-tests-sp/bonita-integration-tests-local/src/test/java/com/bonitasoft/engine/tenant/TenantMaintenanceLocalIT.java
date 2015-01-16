@@ -11,8 +11,6 @@ package com.bonitasoft.engine.tenant;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.bonitasoft.engine.BonitaSuiteRunner.Initializer;
-import org.bonitasoft.engine.BonitaTestRunner;
 import org.bonitasoft.engine.bpm.process.DesignProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
@@ -20,12 +18,14 @@ import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.identity.User;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceSingleton;
+import org.bonitasoft.engine.test.runner.BonitaSuiteRunner.Initializer;
+import org.bonitasoft.engine.test.runner.BonitaTestRunner;
 import org.bonitasoft.engine.work.WorkService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.bonitasoft.engine.CommonAPISPTest;
+import com.bonitasoft.engine.CommonAPISPIT;
 import com.bonitasoft.engine.TestsInitializerSP;
 
 /**
@@ -34,16 +34,16 @@ import com.bonitasoft.engine.TestsInitializerSP;
  */
 @RunWith(BonitaTestRunner.class)
 @Initializer(TestsInitializerSP.class)
-public class TenantMaintenanceLocalIT extends CommonAPISPTest {
+public class TenantMaintenanceLocalIT extends CommonAPISPIT {
 
     protected User USER;
-    
+
     @Before
     public void before() throws Exception {
         loginOnDefaultTenantWithDefaultTechnicalUser();
         USER = createUser(USERNAME, PASSWORD);
     }
-    
+
     @Test
     public void should_pause_tenant_then_stop_start_node_dont_restart_elements() throws Exception {
         // given: 1 tenant that is paused
@@ -55,18 +55,18 @@ public class TenantMaintenanceLocalIT extends CommonAPISPTest {
 
         logoutThenloginAs(USERNAME, PASSWORD);
 
-        ProcessDefinitionBuilder pdb = new ProcessDefinitionBuilder().createNewInstance("loop process def", "1.0");
+        final ProcessDefinitionBuilder pdb = new ProcessDefinitionBuilder().createNewInstance("loop process def", "1.0");
         pdb.addAutomaticTask("step1").addMultiInstance(false, new ExpressionBuilder().createConstantIntegerExpression(100));
-        DesignProcessDefinition dpd = pdb.done();
-        ProcessDefinition pd = deployAndEnableProcess(dpd);
+        final DesignProcessDefinition dpd = pdb.done();
+        final ProcessDefinition pd = deployAndEnableProcess(dpd);
         getProcessAPI().startProcess(pd.getId());
         logoutOnTenant();
 
         loginOnTenantWithTechnicalLogger(tenantId);
-        
+
         getTenantManagementAPI().pause();
         assertTrue(workService.isStopped());
-       logoutOnTenant();
+        logoutOnTenant();
 
         // when: we stop and start the node
         stopAndStartPlatform();
@@ -81,7 +81,7 @@ public class TenantMaintenanceLocalIT extends CommonAPISPTest {
         logoutThenloginAs(USERNAME, PASSWORD);
         disableAndDeleteProcess(pd);
         deleteUser(USER);
-       logoutOnTenant();
+        logoutOnTenant();
     }
 
     protected TenantServiceAccessor getTenantAccessor(final long tenantId) {
