@@ -1,27 +1,27 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<artifactId>bonita-core</artifactId>
-		<groupId>com.bonitasoft.engine.core</groupId>
-		<version>6.5.0-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <artifactId>bonita-core</artifactId>
+        <groupId>com.bonitasoft.engine.core</groupId>
+        <version>6.5.0-SNAPSHOT</version>
+    </parent>
 
-	<artifactId>bonita-process-engine</artifactId>
+    <artifactId>bonita-process-engine</artifactId>
 
-	<name>Bonita Process Engine</name>
+    <name>Bonita Process Engine</name>
 
-	<properties>
-		<bonita.home>${project.build.directory}/home</bonita.home>
-	</properties>
+    <properties>
+        <bonita.home>${project.build.directory}/home</bonita.home>
+    </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.bonitasoft.manager</groupId>
-			<artifactId>manager</artifactId>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>com.bonitasoft.manager</groupId>
+            <artifactId>manager</artifactId>
+        </dependency>
 
-		<dependency>
+        <dependency>
             <artifactId>bonita-operation-api-impl</artifactId>
             <groupId>org.bonitasoft.engine.core.operation</groupId>
             <version>${project.version}</version>
@@ -30,85 +30,85 @@
 
 
         <dependency>
-			<groupId>com.bonitasoft.engine</groupId>
-			<artifactId>bonita-common-sp</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.core.parameter</groupId>
-			<artifactId>bonita-parameter-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-api-sp</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.core.reporting</groupId>
-			<artifactId>bonita-reporting-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.monitoring</groupId>
-			<artifactId>bonita-monitoring-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core</groupId>
-			<artifactId>bonita-process-engine</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.page</groupId>
-			<artifactId>bonita-page-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
+            <groupId>com.bonitasoft.engine</groupId>
+            <artifactId>bonita-common-sp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bonitasoft.engine.core.parameter</groupId>
+            <artifactId>bonita-parameter-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bonitasoft.engine.core.process.instance</groupId>
+            <artifactId>bonita-process-instance-api-sp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bonitasoft.engine.core.reporting</groupId>
+            <artifactId>bonita-reporting-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bonitasoft.engine.monitoring</groupId>
+            <artifactId>bonita-monitoring-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.core</groupId>
+            <artifactId>bonita-process-engine</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bonitasoft.engine.page</groupId>
+            <artifactId>bonita-page-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
             <version>3.18.1-GA</version>
         </dependency>
         <dependency>
-			<groupId>com.bonitasoft.engine.data</groupId>
-			<artifactId>bonita-business-data-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-         <dependency>
+            <groupId>com.bonitasoft.engine.data</groupId>
+            <artifactId>bonita-business-data-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.bonitasoft.engine.application</groupId>
             <artifactId>bonita-business-application-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.0.1</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>net.javacrumbs.json-unit</groupId>
             <artifactId>json-unit-assertj</artifactId>
         </dependency>
         <dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-junit4</artifactId>
             <scope>test</scope>
@@ -118,96 +118,96 @@
             <artifactId>powermock-api-mockito</artifactId>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.platform</groupId>
-			<artifactId>bonita-platform-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.expression</groupId>
-			<artifactId>bonita-expression-api-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.operation</groupId>
-			<artifactId>bonita-operation-model-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bonitasoft.engine.core.process.definition</groupId>
-			<artifactId>bonita-process-definition-impl</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.bonitasoft.engine.core.process.instance</groupId>
-			<artifactId>bonita-process-instance-impl-sp</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.platform</groupId>
+            <artifactId>bonita-platform-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.expression</groupId>
+            <artifactId>bonita-expression-api-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.operation</groupId>
+            <artifactId>bonita-operation-model-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bonitasoft.engine.core.process.definition</groupId>
+            <artifactId>bonita-process-definition-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.bonitasoft.engine.core.process.instance</groupId>
+            <artifactId>bonita-process-instance-impl-sp</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>com.bonitasoft.engine.application</groupId>
             <artifactId>bonita-business-application-impl</artifactId>
             <version>${project.version}</version>
-			<scope>test</scope>
+            <scope>test</scope>
         </dependency>
-	</dependencies>
+    </dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>install license</id>
-						<phase>process-test-resources</phase>
-						<configuration>
-							<target>
-								<copy todir="${bonita.home}/server/licenses" failonerror="true">
-									<fileset dir="${user.home}/lic" includes="*.lic" />
-								</copy>
-							</target>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-		<pluginManagement>
-			<plugins>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>install license</id>
+                        <phase>process-test-resources</phase>
+                        <configuration>
+                            <target>
+                                <copy todir="${bonita.home}/server/licenses" failonerror="true">
+                                    <fileset dir="${user.home}/lic" includes="*.lic" />
+                                </copy>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.apache.maven.plugins</groupId>
-										<artifactId>maven-antrun-plugin</artifactId>
-										<versionRange>[1.7,)</versionRange>
-										<goals>
-											<goal>run</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-antrun-plugin</artifactId>
+                                        <versionRange>[1.7,)</versionRange>
+                                        <goals>
+                                            <goal>run</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>

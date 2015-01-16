@@ -97,7 +97,6 @@
                 <entry key="org.bonitasoft.engine.data.instance.model.SXMLDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl" />
                 <entry key="org.bonitasoft.engine.data.instance.model.SBlobDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" />
                 <entry key="org.bonitasoft.engine.data.instance.model.SXMLObjectDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl" />
-                <entry key="org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping" value="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" />
                 <entry key="org.bonitasoft.engine.profile.model.SProfile" value="org.bonitasoft.engine.profile.model.impl.SProfileImpl" />
                 <entry key="org.bonitasoft.engine.profile.model.SProfileEntry" value="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" />
                 <entry key="org.bonitasoft.engine.profile.model.SProfileMember" value="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" />
@@ -115,7 +114,6 @@
                 <entry key="org.bonitasoft.engine.data.instance.model.archive.SABlobDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" />
                 <entry key="org.bonitasoft.engine.data.instance.model.archive.SAXMLObjectDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl" />
                 <entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl" />
-                <entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstanceVisibilityMapping" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" />
             </map>
         </constructor-arg>
         <constructor-arg name="mappingExclusions">
