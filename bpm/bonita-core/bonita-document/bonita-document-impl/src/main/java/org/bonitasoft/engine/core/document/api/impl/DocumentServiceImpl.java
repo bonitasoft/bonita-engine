@@ -455,8 +455,7 @@ public class DocumentServiceImpl implements DocumentService {
     public void archive(final SDocumentMapping docMapping, final long archiveDate) throws SObjectModificationException {
         if (archiveService.isArchivable(SDocumentMapping.class)) {
             final SADocumentMappingImpl saDocumentMapping = new SADocumentMappingImpl(docMapping.getDocumentId(), docMapping.getProcessInstanceId(),
-                    archiveDate,
-                    docMapping.getId(), docMapping.getName(), docMapping.getDescription(), docMapping.getVersion());
+                    archiveDate, docMapping.getId(), docMapping.getName(), docMapping.getDescription(), docMapping.getVersion());
             saDocumentMapping.setIndex(docMapping.getIndex());
             final ArchiveInsertRecord insertRecord = new ArchiveInsertRecord(saDocumentMapping);
             try {
@@ -475,8 +474,8 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public void deleteContentOfArchivedDocument(final long documentId) throws SObjectNotFoundException, SBonitaReadException, SRecorderException {
-        final SAMappedDocument archivedDocument = getArchivedDocument(documentId);
+    public void deleteContentOfArchivedDocument(final long archivedDocumentId) throws SObjectNotFoundException, SBonitaReadException, SRecorderException {
+        final SAMappedDocument archivedDocument = getArchivedDocument(archivedDocumentId);
         final SDocument document = getDocumentWithContent(archivedDocument.getDocumentId());
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(document, Collections.singletonMap("content", null));
         SUpdateEvent updateEvent = null;

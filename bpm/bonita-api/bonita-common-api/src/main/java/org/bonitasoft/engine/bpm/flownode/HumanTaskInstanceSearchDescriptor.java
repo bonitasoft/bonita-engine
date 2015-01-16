@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,6 +17,7 @@ package org.bonitasoft.engine.bpm.flownode;
  * @author Julien Mege
  * @author Elias Ricken de Medeiros
  * @author Matthieu Chaffotte
+ * @author Celine Souchet
  */
 public final class HumanTaskInstanceSearchDescriptor {
 
@@ -30,10 +31,19 @@ public final class HumanTaskInstanceSearchDescriptor {
 
     public static final String SUPERVISOR_ID = "supervisorId";
 
+    /**
+     * User who supervises the process definition
+     */
     public static final String USER_ID = "userId";
 
+    /**
+     * Group who supervises the process definition
+     */
     public static final String GROUP_ID = "groupId";
 
+    /**
+     * Role who supervises the process definition
+     */
     public static final String ROLE_ID = "roleId";
 
     public static final String PROCESS_DEFINITION_ID = "processDefinitionId";

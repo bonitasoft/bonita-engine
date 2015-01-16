@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012, 2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,14 +13,30 @@
  **/
 package org.bonitasoft.engine.bpm.data;
 
-
 /**
+ * Represents a {@link DataDefinition} of XML type.
+ *
  * @author Feng Hui
+ * @author Celine Souchet
+ * @since 6.0.0
+ * @version 6.4.1
  */
 public interface XMLDataDefinition extends DataDefinition {
 
+    /**
+     * Get the namespace for the XML format of the data
+     *
+     * @return The namespace for the XML format of the data.
+     * @since 6.0.0
+     */
     String getNamespace();
 
+    /**
+     * Get the element for the XML format of the data
+     *
+     * @return The element for the XML format of the data.
+     * @since 6.0.0
+     */
     String getElement();
 
 }

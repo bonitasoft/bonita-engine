@@ -82,7 +82,7 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
         try {
             return evaluateExpressionsFlatten(Collections.singletonList(expression), evaluationContext).get(0);
         } finally {
-            if (this.timeTracker.isTrackable(TimeTrackerRecords.EVALUATE_EXPRESSION_INCLUDING_CONTEXT)) {
+            if (timeTracker.isTrackable(TimeTrackerRecords.EVALUATE_EXPRESSION_INCLUDING_CONTEXT)) {
                 final long endTime = System.currentTimeMillis();
                 final StringBuilder desc = new StringBuilder();
                 desc.append("Expression: ");
@@ -90,7 +90,7 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
                 desc.append(" - ");
                 desc.append("evaluationContext: ");
                 desc.append(evaluationContext);
-                this.timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSION_INCLUDING_CONTEXT, desc.toString(), (endTime - startTime));
+                timeTracker.track(TimeTrackerRecords.EVALUATE_EXPRESSION_INCLUDING_CONTEXT, desc.toString(), endTime - startTime);
             }
         }
     }
@@ -105,10 +105,8 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
                 newEvaluationContext = evaluationContext;
                 fillContext(newEvaluationContext, dependencyValues);
             }
-            final Long processDefinitionId = newEvaluationContext.getProcessDefinitionId();
-            if (processDefinitionId != null) {
-                Thread.currentThread().setContextClassLoader(classLoaderService.getLocalClassLoader("PROCESS", processDefinitionId));
-            }
+
+            loadProcessClassLoader(newEvaluationContext);
 
             final Map<SExpression, SExpression> dataReplacement = new HashMap<SExpression, SExpression>();
             // We incrementally build the Map of already resolved expressions:
@@ -123,16 +121,16 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
                             newEvaluationContext.getContainerState()));
                 }
             }
-            final ArrayList<Object> results = new ArrayList<Object>(expressions.size());
+            final List<Object> results = new ArrayList<Object>(expressions.size());
             for (final SExpression sExpression : expressions) {
-                if(sExpression != null){
+                if (sExpression != null) {
                     final int key = sExpression.getDiscriminant();
                     final Object res = resolvedExpressions.get(key);
                     if (res == null && !resolvedExpressions.containsKey(key)) {
                         throw new SExpressionEvaluationException("No result found for the expression " + sExpression, sExpression.getName());
                     }
                     results.add(res);
-                }else{
+                } else {
                     results.add(null);
                 }
             }
@@ -145,6 +143,18 @@ public class ExpressionResolverServiceImpl implements ExpressionResolverService 
             throw new SExpressionEvaluationException(e, null);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
+    }
+
+    private void loadProcessClassLoader(final SExpressionContext evaluationContext) throws SClassLoaderException {
+        Long processId;
+        if (evaluationContext.getParentProcessDefinitionId() != null) {
+            processId = evaluationContext.getParentProcessDefinitionId();
+        } else {
+            processId = evaluationContext.getProcessDefinitionId();
+        }
+        if (processId != null) {
+            Thread.currentThread().setContextClassLoader(classLoaderService.getLocalClassLoader("PROCESS", processId));
         }
     }
 

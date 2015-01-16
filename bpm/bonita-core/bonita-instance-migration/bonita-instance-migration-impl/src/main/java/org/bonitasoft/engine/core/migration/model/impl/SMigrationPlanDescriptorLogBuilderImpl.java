@@ -23,7 +23,7 @@ import org.bonitasoft.engine.queriablelogger.model.builder.impl.MissingMandatory
  */
 public class SMigrationPlanDescriptorLogBuilderImpl extends CRUDELogBuilder implements SPersistenceLogBuilder {
 
-    private final int ID_INDEX = 0;
+    private static final int ID_INDEX = 0;
 
     @Override
     public SPersistenceLogBuilder objectId(final long objectId) {

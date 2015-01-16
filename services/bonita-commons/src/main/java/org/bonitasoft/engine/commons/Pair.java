@@ -38,8 +38,7 @@ public class Pair<L, R> implements Serializable, Map.Entry<L, R> {
         return new Pair<L, R>(left, right);
     }
 
-    public static <L, R> Pair<L, R> pair(final L left, final R right)
-    {
+    public static <L, R> Pair<L, R> pair(final L left, final R right) {
         return of(left, right);
     }
 

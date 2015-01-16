@@ -470,7 +470,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             for (final SFlowNodeInstance activityInstance : activityInstances) {
                 deleteFlowNodeInstance(activityInstance, processDefinition);
             }
-        } while (!activityInstances.isEmpty());
+        } while (activityInstances.size() == BATCH_SIZE);
     }
 
     @Override
@@ -548,9 +548,11 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     private void setExceptionContext(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance,
             final SBonitaException e) {
-        e.setProcessDefinitionIdOnContext(processDefinition.getId());
-        e.setProcessDefinitionNameOnContext(processDefinition.getName());
-        e.setProcessDefinitionVersionOnContext(processDefinition.getVersion());
+        if (processDefinition != null) {
+            e.setProcessDefinitionIdOnContext(processDefinition.getId());
+            e.setProcessDefinitionNameOnContext(processDefinition.getName());
+            e.setProcessDefinitionVersionOnContext(processDefinition.getVersion());
+        }
         setExceptionContext(flowNodeInstance, e);
     }
 
@@ -834,9 +836,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         final ReadPersistenceService persistenceService = archiveService.getDefinitiveArchiveReadPersistenceService();
         try {
             final Map<String, Object> parameters = Collections.singletonMap("id", (Object) archivedProcessInstanceId);
-            final SAProcessInstance saProcessInstance = persistenceService.selectOne(new SelectOneDescriptor<SAProcessInstance>("getArchivedProcessInstance",
+            return persistenceService.selectOne(new SelectOneDescriptor<SAProcessInstance>("getArchivedProcessInstance",
                     parameters, SAProcessInstance.class));
-            return saProcessInstance;
         } catch (final SBonitaReadException e) {
             throw new SProcessInstanceReadException(e);
         }

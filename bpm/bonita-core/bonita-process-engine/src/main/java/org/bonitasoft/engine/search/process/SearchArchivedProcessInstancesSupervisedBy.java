@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2014 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -15,6 +15,7 @@ package org.bonitasoft.engine.search.process;
 
 import java.util.List;
 
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -34,8 +35,8 @@ public class SearchArchivedProcessInstancesSupervisedBy extends AbstractArchived
     private final ProcessInstanceService processInstanceService;
 
     public SearchArchivedProcessInstancesSupervisedBy(final long userId, final ProcessInstanceService processInstanceService,
-            final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
-        super(searchDescriptor, options);
+            final ProcessDefinitionService processDefinitionService, final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
+        super(searchDescriptor, options, processDefinitionService);
         this.userId = userId;
         this.processInstanceService = processInstanceService;
 

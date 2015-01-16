@@ -14,20 +14,34 @@
 package org.bonitasoft.engine.identity;
 
 /**
- * holds constants about {@link CustomUserInfoValue} search filters.
+ * Defines the fields that can be used as filters and soring by
+ * {@link org.bonitasoft.engine.api.CustomUserInfoAPI#searchCustomUserInfoValues(org.bonitasoft.engine.search.SearchOptions)}.
  *
  * @author Vincent Elcrin
  * @since 6.3.1
+ * @see org.bonitasoft.engine.api.CustomUserInfoAPI#searchCustomUserInfoValues(org.bonitasoft.engine.search.SearchOptions)
  */
 public final class CustomUserInfoValueSearchDescriptor {
 
-	/** filter search on Custom user info's user id*/
+    /**
+     * Refers to {@link org.bonitasoft.engine.identity.CustomUserInfoValue#getUserId()}
+     * 
+     * @see CustomUserInfoValue#getUserId()
+     */
     public static final String USER_ID = "userId";
 
-	/** filter search on Custom user info's definition id*/
+    /**
+     * Refers to {@link org.bonitasoft.engine.identity.CustomUserInfoValue#getDefinitionId()}
+     * 
+     * @see CustomUserInfoValue#getDefinitionId()
+     */
     public static final String DEFINITION_ID = "definitionId";
 
-    /** filter search on Custom user info's value*/
+    /**
+     * Refers to {@link org.bonitasoft.engine.identity.CustomUserInfoValue#getValue()}
+     * 
+     * @see CustomUserInfoValue#getValue()
+     */
     public static final String VALUE = "value";
 
 }

@@ -53,10 +53,9 @@ import org.bonitasoft.engine.xml.SValidationException;
 import org.bonitasoft.engine.xml.SXMLParseException;
 
 /**
- * 
+ *
  * Import profiles with mapping and entries using Policy
- * 
- * 
+ *
  * @author Baptiste Mesta
  */
 public class ProfilesImporter {
@@ -69,12 +68,6 @@ public class ProfilesImporter {
 
     private final ProfileImportStategy importStrategy;
 
-    /**
-     * @param profileService
-     * @param identityService
-     * @param profiles
-     * @param policy
-     */
     public ProfilesImporter(final ProfileService profileService, final IdentityService identityService, final List<ExportedProfile> exportedProfiles,
             final ImportPolicy policy) {
         this(profileService, identityService, exportedProfiles, getStrategy(profileService, policy));
@@ -242,14 +235,10 @@ public class ProfilesImporter {
         final SProfile newProfile;
         if (existingProfile != null) {
             newProfile = importStrategy.whenProfileExists(importerId, exportedProfile, existingProfile);
-        } else {
-            // create profile
-            if (importStrategy.canCreateProfileIfNotExists(exportedProfile)) {
+        } else if (importStrategy.canCreateProfileIfNotExists(exportedProfile)) {
                 newProfile = profileService.createProfile(createSProfile(exportedProfile, importerId));
-            }
-            else {
-                newProfile = null;
-            }
+        } else {
+            newProfile = null;
         }
         return newProfile;
     }
@@ -259,19 +248,18 @@ public class ProfilesImporter {
         final long creationDate = System.currentTimeMillis();
         return BuilderFactory.get(SProfileBuilderFactory.class).createNewInstance(exportedProfile.getName(),
                 isDefault, creationDate, importerId, creationDate, importerId).setDescription(exportedProfile.getDescription()).done();
-
     }
 
     protected SProfileEntry createProfileEntry(final ExportedParentProfileEntry parentEntry, final long profileId, final long parentId) {
         return BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(parentEntry.getName(), profileId)
                 .setDescription(parentEntry.getDescription()).setIndex(parentEntry.getIndex()).setPage(parentEntry.getPage())
-                .setParentId(parentId).setType(parentEntry.getType()).setCustom(new Boolean(parentEntry.isCustom())).done();
+                .setParentId(parentId).setType(parentEntry.getType()).setCustom(Boolean.valueOf(parentEntry.isCustom())).done();
     }
 
     protected SProfileEntry createProfileEntry(final ExportedProfileEntry childEntry, final long profileId, final long parentId) {
         return BuilderFactory.get(SProfileEntryBuilderFactory.class).createNewInstance(childEntry.getName(), profileId)
                 .setDescription(childEntry.getDescription()).setIndex(childEntry.getIndex()).setPage(childEntry.getPage())
-                .setParentId(parentId).setType(childEntry.getType()).setCustom(new Boolean(childEntry.isCustom())).done();
+                .setParentId(parentId).setType(childEntry.getType()).setCustom(Boolean.valueOf(childEntry.isCustom())).done();
     }
 
     public static List<String> toWarnings(final List<ImportStatus> importProfiles) {

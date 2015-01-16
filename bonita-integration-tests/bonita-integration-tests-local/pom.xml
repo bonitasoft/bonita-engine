@@ -5,7 +5,7 @@
     <parent>
         <artifactId>bonita-integration-tests</artifactId>
         <groupId>org.bonitasoft.engine.test</groupId>
-        <version>6.4.0-SNAPSHOT</version>
+        <version>6.5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>bonita-integration-tests-local</artifactId>
@@ -52,7 +52,7 @@
 			<groupId>org.bonitasoft.engine.test</groupId>
 			<artifactId>bonita-server-test-utils</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
+			<scope>compile</scope>
 		</dependency>
     </dependencies>
 
@@ -145,6 +145,7 @@
                     <systemPropertyVariables>
                         <sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
                         <bonita.home>${bonita.home}</bonita.home>
+                        <sysprop.bonita.orderby.checking.mode>NONE</sysprop.bonita.orderby.checking.mode>
                     </systemPropertyVariables>
                     <includes>
                         <include>org/bonitasoft/engine/LocalIntegrationTests.java</include>
@@ -182,6 +183,7 @@
                                 <bonita.version>${project.version}</bonita.version>
                                 <sysprop.bonita.db.vendor>h2</sysprop.bonita.db.vendor>
                                 <bonita.home>${bonita.home}</bonita.home>
+                                <sysprop.bonita.orderby.checking.mode>NONE</sysprop.bonita.orderby.checking.mode>
                             </systemPropertyVariables>
                             <includes>
                                 <include>org/bonitasoft/engine/SlowExecutionLocalIntegrationTests.java</include>

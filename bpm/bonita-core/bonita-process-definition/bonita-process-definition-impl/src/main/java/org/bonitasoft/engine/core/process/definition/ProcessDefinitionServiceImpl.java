@@ -84,11 +84,8 @@ import org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor;
 import org.bonitasoft.engine.recorder.model.InsertRecord;
 import org.bonitasoft.engine.recorder.model.UpdateRecord;
 import org.bonitasoft.engine.services.QueriableLoggerService;
-import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionService;
-import org.bonitasoft.engine.session.model.SSession;
 import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
-import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.bonitasoft.engine.xml.ElementBindingsFactory;
 import org.bonitasoft.engine.xml.Parser;
 import org.bonitasoft.engine.xml.ParserFactory;
@@ -316,8 +313,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     public SProcessDefinition getProcessDefinition(final long processId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException {
         try {
             final long tenantId = sessionAccessor.getTenantId();
-            SProcessDefinition sProcessDefinition = null;
-            sProcessDefinition = (SProcessDefinition) cacheService.get(PROCESS_CACHE_NAME, processId);
+            SProcessDefinition sProcessDefinition = (SProcessDefinition) cacheService.get(PROCESS_CACHE_NAME, processId);
             if (sProcessDefinition == null) {
                 getProcessDeploymentInfo(processId);
                 final String processesFolder = BonitaHomeServer.getInstance().getProcessesFolder(tenantId);
@@ -336,6 +332,16 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         } catch (final Exception e) {
             throw new SProcessDefinitionReadException(e);
         }
+    }
+
+    @Override
+    public SProcessDefinition getProcessDefinitionIfIsEnabled(final long processDefinitionId) throws SProcessDefinitionReadException, SProcessDefinitionException {
+        final SProcessDefinitionDeployInfo deployInfo = getProcessDeploymentInfo(processDefinitionId);
+        if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
+            throw new SProcessDefinitionException("The process definition is not enabled !!", deployInfo.getProcessId(), deployInfo.getName(),
+                    deployInfo.getVersion());
+        }
+        return getProcessDefinition(processDefinitionId);
     }
 
     private long setIdOnProcessDefinition(final SProcessDefinition sProcessDefinition) throws SReflectException {
@@ -378,7 +384,6 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         NullCheckingUtil.checkArgsNotNull(definition);
         final SProcessDefinitionLogBuilder logBuilder = getQueriableLog(ActionType.CREATED, "Creating a new Process definition");
         try {
-            final SSession session = getSession();
             final long tenantId = sessionAccessor.getTenantId();
             final long processId = setIdOnProcessDefinition(definition);
             // storeProcessDefinition(processId, tenantId, definition);// FIXME remove that to check the read of processes
@@ -404,7 +409,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             }
             final SProcessDefinitionDeployInfo definitionDeployInfo = BuilderFactory.get(SProcessDefinitionDeployInfoBuilderFactory.class)
                     .createNewInstance(definition.getName(), definition.getVersion()).setProcessId(processId).setDescription(definition.getDescription())
-                    .setDeployedBy(session.getUserId()).setDeploymentDate(System.currentTimeMillis()).setActivationState(ActivationState.DISABLED.name())
+                    .setDeployedBy(getUserId()).setDeploymentDate(System.currentTimeMillis()).setActivationState(ActivationState.DISABLED.name())
                     .setConfigurationState(ConfigurationState.UNRESOLVED.name()).setDisplayName(displayName).setDisplayDescription(displayDescription).done();
 
             final InsertRecord record = new InsertRecord(definitionDeployInfo);
@@ -425,15 +430,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         return definition;
     }
 
-    private SSession getSession() throws SSessionNotFoundException {
-        long sessionId;
-        try {
-            sessionId = sessionAccessor.getSessionId();
-        } catch (final SessionIdNotSetException e) {
-            // system
-            return null;
-        }
-        return sessionService.getSession(sessionId);
+    private long getUserId() {
+        return sessionService.getLoggedUserFromSession(sessionAccessor);
     }
 
     private <T extends HasCRUDEAction> void updateLog(final ActionType actionType, final T logBuilder) {
@@ -583,20 +581,20 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public long getProcessDefinitionId(final String name, final String version) throws SProcessDefinitionReadException {
+    public long getProcessDefinitionId(final String name, final String version) throws SProcessDefinitionReadException, SProcessDefinitionNotFoundException {
         try {
             final Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put("name", name);
             parameters.put("version", version);
             final Long processDefId = persistenceService.selectOne(new SelectOneDescriptor<Long>("getProcessDefinitionIdByNameAndVersion", parameters,
                     SProcessDefinitionDeployInfo.class, Long.class));
-            if (processDefId != null) {
-                return processDefId;
+            if (processDefId == null) {
+                final SProcessDefinitionNotFoundException exception = new SProcessDefinitionNotFoundException("Process definition id not found.");
+                exception.setProcessDefinitionNameOnContext(name);
+                exception.setProcessDefinitionVersionOnContext(version);
+                throw exception;
             }
-            final SProcessDefinitionReadException exception = new SProcessDefinitionReadException("Process definition id not found.");
-            exception.setProcessDefinitionNameOnContext(name);
-            exception.setProcessDefinitionVersionOnContext(version);
-            throw exception;
+            return processDefId;
         } catch (final SBonitaReadException e) {
             throw new SProcessDefinitionReadException(e);
         }

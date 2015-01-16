@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.jobs;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
 import org.bonitasoft.engine.persistence.OrderByOption;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.StatelessJob;
@@ -71,7 +73,7 @@ public class TimerEventTriggerJobListener extends AbstractBonitaTenantJobListene
     @Override
     public void jobWasExecuted(final Map<String, Serializable> context, final Exception jobException) {
         final StatelessJob bosJob = (StatelessJob) context.get(BOS_JOB);
-        if (bosJob == null) {
+        if (bosJob == null || !isTimerEventJob(context)) {
             return;
         }
 
@@ -86,10 +88,15 @@ public class TimerEventTriggerJobListener extends AbstractBonitaTenantJobListene
         }
     }
 
+    private boolean isTimerEventJob(final Map<String, Serializable> context) {
+        return context.get(JOB_TYPE).equals(TriggerTimerEventJob.class.getName());
+    }
+
     void deleteTimerEventTrigger(final String triggerName) throws SBonitaException {
         final List<FilterOption> filters = Collections.singletonList(new FilterOption(STimerEventTriggerInstance.class, "jobTriggerName", triggerName));
+        final List<OrderByOption> orders = Arrays.asList(new OrderByOption(STimerEventTriggerInstance.class, "id", OrderByType.ASC));
 
-        final QueryOptions queryOptions = new QueryOptions(0, 1, Collections.<OrderByOption> emptyList(), filters, null);
+        final QueryOptions queryOptions = new QueryOptions(0, 1, orders, filters, null);
         final List<STimerEventTriggerInstance> timerEventTriggerInstances = eventInstanceService.searchEventTriggerInstances(STimerEventTriggerInstance.class,
                 queryOptions);
         if (!timerEventTriggerInstances.isEmpty()) {

@@ -38,11 +38,11 @@ public class SearchFilter implements Serializable {
 
     /**
      * @param field
-     *            the field to filter on
+     *        the field to filter on
      * @param operation
-     *            the operation to filter on
+     *        the operation to filter on
      * @param value
-     *            the value of the field to filter on
+     *        the value of the field to filter on
      * @see SearchFilterOperation
      */
     public SearchFilter(final String field, final SearchFilterOperation operation, final Serializable value) {
@@ -62,7 +62,7 @@ public class SearchFilter implements Serializable {
         this.operation = operation;
         if (!isUndefinedFieldNameAuthorized()) {
             throw new IncorrectParameterException(
-                    "search operator can only be AND, OR, L_PARENTHESIS, R_PARENTHESIS and  on the one-parameter SearchFilter constructor");
+                    "search operator can only be AND, OR, L_PARENTHESIS, R_PARENTHESIS on the one-parameter SearchFilter constructor");
         }
     }
 
@@ -88,7 +88,7 @@ public class SearchFilter implements Serializable {
 
     /**
      * @param field
-     *            the field name to set
+     *        the field name to set
      */
     public void setField(final String field) {
         this.field = field;
@@ -103,7 +103,7 @@ public class SearchFilter implements Serializable {
 
     /**
      * @param operation
-     *            the operation to set
+     *        the operation to set
      */
     public void setOperation(final SearchFilterOperation operation) {
         this.operation = operation;
@@ -118,7 +118,7 @@ public class SearchFilter implements Serializable {
 
     /**
      * @param value
-     *            the value to set
+     *        the value to set
      */
     public void setValue(final Serializable value) {
         this.value = value;

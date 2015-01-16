@@ -110,6 +110,7 @@
         <constructor-arg name="logger" ref="tenantTechnicalLoggerService"/>
         <constructor-arg name="transientDataService" ref="transientDataService"/>
         <constructor-arg name="archiveService" ref="archiveService"/>
+        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
     </bean>
 
     <bean id="flowNodeStateManager" class="org.bonitasoft.engine.execution.FlowNodeStateManagerImpl">
@@ -135,6 +136,7 @@
         <constructor-arg name="workService" ref="workService"/>
         <constructor-arg name="tokenService" ref="tokenService"/>
         <constructor-arg name="identityService" ref="identityService"/>
+        <constructor-arg name="parentContainerResolver" ref="parentContainerResolver"/>
     </bean>
 
     <bean id="eventsHandler" class="org.bonitasoft.engine.execution.event.EventsHandler">
@@ -205,8 +207,13 @@
 			</list>
 		</property>
 	</bean>
-	
-	<bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
+
+    <bean id="jobLogCreator" class="org.bonitasoft.engine.scheduler.impl.JobLogCreator">
+        <constructor-arg name="jobService" ref="jobService" />
+        <constructor-arg name="logger" ref="platformTechnicalLoggerService"/>
+    </bean>
+
+    <bean id="jdbcJobListener" class="org.bonitasoft.engine.scheduler.impl.JDBCJobListener">
 		<constructor-arg name="schedulerService" ref="scheduler" />
 		<constructor-arg name="schedulerExecutor" ref="schedulerExecutor" />
 		<constructor-arg name="jobService" ref="jobService" />
@@ -214,6 +221,7 @@
 		<constructor-arg name="transactionService" ref="transactionService" />
 		<constructor-arg name="incidentService" ref="incidentService" />
 		<constructor-arg name="logger" ref="platformTechnicalLoggerService" />
+        <constructor-arg name="jobLogCreator" ref="jobLogCreator"/>
 	</bean>
 
 	<bean id="loggerJobListener" class="org.bonitasoft.engine.scheduler.impl.TechnicalLoggerJobListener">

@@ -138,7 +138,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
     }
 
     protected APIAccessor getApiAccessor() {
-        return new APIAccessorImpl(sessionAccessor, sessionService);
+        return new APIAccessorImpl();
     }
 
     protected APIAccessor getConnectorApiAccessor() throws STenantIdNotSetException {
@@ -147,11 +147,7 @@ public class EngineConstantExpressionExecutorStrategy implements ExpressionExecu
     }
 
     private long getLoggedUserFromSession() throws SSessionNotFoundException {
-        try {
-            return sessionService.getSession(sessionAccessor.getSessionId()).getUserId();
-        } catch (final SessionIdNotSetException e) {
-            return -1;
-        }
+        return sessionService.getLoggedUserFromSession(sessionAccessor);
     }
 
     private Serializable getFromContextOrEngineExecutionContext(final ExpressionConstants expressionConstant, final Map<String, Object> context,

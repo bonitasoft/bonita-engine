@@ -23,7 +23,7 @@ public interface ContainerBuilder extends FlowElementBuilder {
      * Add a document definition in this container.
      * <p>
      * Must add also the content if the document is not external. This can be done using
-     * {@link BusinessArchiveBuilder#addDocumentResource(org.bonitasoft.engine.bpm.bar.BarResource)}
+     * {@link org.bonitasoft.engine.bpm.bar.BusinessArchiveBuilder#addDocumentResource(org.bonitasoft.engine.bpm.bar.BarResource)}
      *
      * @param name
      * @return
@@ -35,9 +35,9 @@ public interface ContainerBuilder extends FlowElementBuilder {
      * <p>
      *
      * @param name
-     *      the name of the list
+     *        the name of the list
      * @return
-     *      the builder to add the optional description and initial value expression
+     *         the builder to add the optional description and initial value expression
      */
     DocumentListDefinitionBuilder addDocumentListDefinition(final String name);
 

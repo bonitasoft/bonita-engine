@@ -16,15 +16,12 @@ public class TestFilterThatThrowNoClassDef extends AbstractUserFilter {
 
     @Override
     public List<Long> filter(final String actorName) throws UserFilterException {
-        if (getInputParameter("exception").equals("runtime")) {
-            throw new RuntimeException("unexpected");
-        }
-        throw new UserFilterException("unexpected");
+        // no need for real implementation as the constructor throws Exception:
+        return null;
     }
 
     @Override
     public void validateInputParameters() {
-
     }
 
     @Override

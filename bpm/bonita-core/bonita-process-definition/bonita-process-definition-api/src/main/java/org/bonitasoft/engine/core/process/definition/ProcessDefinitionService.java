@@ -103,6 +103,18 @@ public interface ProcessDefinitionService {
     SProcessDefinition getProcessDefinition(long processDefinitionId) throws SProcessDefinitionNotFoundException, SProcessDefinitionReadException;
 
     /**
+     * Get processDefinition by its id, if it's enabled.
+     *
+     * @param processDefinitionId
+     *        The identifier of processDefinition
+     * @return The processDefinition corresponding to the parameter processId
+     * @throws SProcessDefinitionReadException
+     * @throws SProcessDefinitionException
+     * @since 6.4.0
+     */
+    SProcessDefinition getProcessDefinitionIfIsEnabled(long processDefinitionId) throws SProcessDefinitionReadException, SProcessDefinitionException;
+
+    /**
      * Get deployment info of the process definition having the id given in parameter
      * 
      * @param processId
@@ -275,8 +287,9 @@ public interface ProcessDefinitionService {
      *            version or process definition
      * @return identifier of process definition
      * @throws SProcessDefinitionReadException
+     * @throws SProcessDefinitionNotFoundException
      */
-    long getProcessDefinitionId(String name, String version) throws SProcessDefinitionReadException;
+    long getProcessDefinitionId(String name, String version) throws SProcessDefinitionReadException, SProcessDefinitionNotFoundException;
 
     /**
      * Update deployment info of the process definition having the id given in parameter
@@ -374,7 +387,7 @@ public interface ProcessDefinitionService {
      * 
      * @param categoryId
      *            Identifier of the category
-     * @param searchOptions
+     * @param queryOptions
      *            a QueryOptions object containing query criteria
      * @return a list of SProcessDefinitionDeployInfo objects
      * @throws SBonitaReadException
@@ -552,7 +565,7 @@ public interface ProcessDefinitionService {
     /**
      * List all processes that contain at least one task which actor is mapped only to the specified group.
      * 
-     * @param userId
+     * @param groupId
      *            the Id of the group from which to retrieve the processes with tasks only it can do.
      * @param queryOptions
      *            object containing query criteria
@@ -566,7 +579,7 @@ public interface ProcessDefinitionService {
     /**
      * List all processes that contain at least one task which actor is mapped only to the specified groups.
      * 
-     * @param userId
+     * @param groupIds
      *            the Ids of the groups from which to retrieve the processes with tasks only they can do.
      * @param queryOptions
      *            object containing query criteria
@@ -580,7 +593,7 @@ public interface ProcessDefinitionService {
     /**
      * List all processes that contain at least one task which actor is mapped only to the specified role.
      * 
-     * @param userId
+     * @param roleId
      *            the Id of the role from which to retrieve the processes with tasks only it can do.
      * @param queryOptions
      *            object containing query criteria
@@ -594,7 +607,7 @@ public interface ProcessDefinitionService {
     /**
      * List all processes that contain at least one task which actor is mapped only to the specified roles.
      * 
-     * @param userId
+     * @param roleIds
      *            the Ids of the roles from which to retrieve the processes with tasks only they can do.
      * @param queryOptions
      *            object containing query criteria
@@ -622,7 +635,7 @@ public interface ProcessDefinitionService {
     /**
      * List all processes that contain at least one task which actor is mapped only to the specified users.
      * 
-     * @param userId
+     * @param userIds
      *            the Ids of the users from which to retrieve the processes with tasks only they can do.
      * @param queryOptions
      *            object containing query criteria
@@ -638,7 +651,7 @@ public interface ProcessDefinitionService {
      * 
      * @param processDefinitionId
      *            Identifier of the process definition
-     * @param searchOptions
+     * @param queryOptions
      *            The QueryOptions object containing some query conditions
      * @return
      * @throws SBonitaReadException
@@ -663,7 +676,7 @@ public interface ProcessDefinitionService {
      * 
      * @param userId
      *            The identifier of the user.
-     * @param searchOptions
+     * @param queryOptions
      *            The QueryOptions object containing some query conditions
      * @return The number of the process definition
      * @throws SBonitaReadException

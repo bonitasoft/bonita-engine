@@ -25,12 +25,12 @@ import org.bonitasoft.engine.api.impl.TenantConfiguration;
 import org.bonitasoft.engine.builder.BuilderFactory;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.commons.transaction.TransactionContent;
+import org.bonitasoft.engine.connector.ConnectorExecutor;
 import org.bonitasoft.engine.jobs.BPMEventHandlingJob;
 import org.bonitasoft.engine.jobs.CleanInvalidSessionsJob;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
-import org.bonitasoft.engine.scheduler.AbstractBonitaTenantJobListener;
 import org.bonitasoft.engine.scheduler.JobRegister;
 import org.bonitasoft.engine.scheduler.SchedulerService;
 import org.bonitasoft.engine.scheduler.builder.SJobDescriptorBuilderFactory;
@@ -63,19 +63,23 @@ public final class ActivateTenant implements TransactionContent {
 
     private final WorkService workService;
 
+    private final ConnectorExecutor connectorExecutor;
+
     private final TenantConfiguration tenantConfiguration;
 
     private final NodeConfiguration nodeConfiguration;
 
     public ActivateTenant(final long tenantId, final PlatformService platformService, final SchedulerService schedulerService,
-            final TechnicalLoggerService logger, final WorkService workService, final NodeConfiguration plaformConfiguration,
+            final TechnicalLoggerService logger, final WorkService workService, final ConnectorExecutor connectorExecutor,
+            final NodeConfiguration plaformConfiguration,
             final TenantConfiguration tenantConfiguration) {
         this.tenantId = tenantId;
         this.platformService = platformService;
         this.schedulerService = schedulerService;
         this.logger = logger;
         this.workService = workService;
-        this.nodeConfiguration = plaformConfiguration;
+        this.connectorExecutor = connectorExecutor;
+        nodeConfiguration = plaformConfiguration;
         this.tenantConfiguration = tenantConfiguration;
     }
 
@@ -85,21 +89,12 @@ public final class ActivateTenant implements TransactionContent {
         // we execute that only if the tenant was not already activated
         if (tenantWasActivated) {
             workService.start();
-            addTenantJobListener();
+            connectorExecutor.start();
             startEventHandling();
             startCleanInvalidSessionsJob();
             final List<JobRegister> jobsToRegister = tenantConfiguration.getJobsToRegister();
             for (final JobRegister jobRegister : jobsToRegister) {
                 registerJob(jobRegister);
-            }
-        }
-    }
-
-    private void addTenantJobListener() throws SBonitaException {
-        if (!schedulerService.isStarted()) {
-            final List<AbstractBonitaTenantJobListener> jobListeners = tenantConfiguration.getJobListeners();
-            if (!jobListeners.isEmpty()) {
-                schedulerService.addJobListener(jobListeners, String.valueOf(tenantId));
             }
         }
     }
@@ -114,7 +109,7 @@ public final class ActivateTenant implements TransactionContent {
                 final SJobDescriptor jobDescriptor = BuilderFactory.get(SJobDescriptorBuilderFactory.class)
                         .createNewInstance(jobRegister.getJobClass().getName(), jobRegister.getJobName(), true).done();
                 final ArrayList<SJobParameter> jobParameters = new ArrayList<SJobParameter>();
-                for (Entry<String, Serializable> entry : jobRegister.getJobParameters().entrySet()) {
+                for (final Entry<String, Serializable> entry : jobRegister.getJobParameters().entrySet()) {
                     jobParameters.add(BuilderFactory.get(SJobParameterBuilderFactory.class).createNewInstance(entry.getKey(), entry.getValue()).done());
                 }
                 final Trigger trigger = jobRegister.getTrigger();

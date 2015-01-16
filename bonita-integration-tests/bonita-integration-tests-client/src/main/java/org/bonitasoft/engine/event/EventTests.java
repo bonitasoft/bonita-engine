@@ -1,6 +1,6 @@
 package org.bonitasoft.engine.event;
 
-import org.bonitasoft.engine.process.task.SendTaskTest;
+import org.bonitasoft.engine.activity.SendTaskIT;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -9,15 +9,15 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-        StartEventTest.class,
-        EndEventTest.class,
-        SignalEventTest.class,
-        SendTaskTest.class,
-        SignalBoundaryEventTest.class,
-        ErrorBoundaryEventTest.class,
-        SignalEventSubProcessTest.class,
-        ErrorEventSubProcessTest.class,
-        EventTriggerTest.class
+        StartEventIT.class,
+        EndEventIT.class,
+        SignalEventIT.class,
+        SendTaskIT.class,
+        SignalBoundaryEventIT.class,
+        ErrorBoundaryEventIT.class,
+        SignalEventSubProcessIT.class,
+        ErrorEventSubProcessIT.class,
+        EventTriggerIT.class
 })
 public class EventTests {
 

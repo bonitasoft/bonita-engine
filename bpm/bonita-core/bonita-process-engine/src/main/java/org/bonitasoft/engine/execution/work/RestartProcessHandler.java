@@ -33,6 +33,7 @@ import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.execution.ProcessExecutor;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
+import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.service.PlatformServiceAccessor;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
@@ -115,16 +116,15 @@ public class RestartProcessHandler implements TenantRestartHandler {
     @Override
     public void beforeServicesStart(final PlatformServiceAccessor platformServiceAccessor, final TenantServiceAccessor tenantServiceAccessor)
             throws RestartException {
-        QueryOptions queryOptions = null;
-        List<SProcessInstance> processInstances;
         final ProcessInstanceService processInstanceService = tenantServiceAccessor.getProcessInstanceService();
         final TechnicalLoggerService logger = tenantServiceAccessor.getTechnicalLoggerService();
         final long tenantId = tenantServiceAccessor.getTenantId();
 
         final List<Long> ids = new ArrayList<Long>();
         processInstancesByTenant.put(tenantId, ids);
-        queryOptions = new QueryOptions(0, 1000);
+        QueryOptions queryOptions = new QueryOptions(0, 1000, SProcessInstance.class, "id", OrderByType.ASC);
         try {
+            List<SProcessInstance> processInstances;
             do {
                 processInstances = processInstanceService.getProcessInstancesInStates(queryOptions, ProcessInstanceState.INITIALIZING,
                         ProcessInstanceState.COMPLETING, ProcessInstanceState.COMPLETED,
@@ -135,7 +135,6 @@ public class RestartProcessHandler implements TenantRestartHandler {
                 }
             } while (processInstances.size() == queryOptions.getNumberOfResults());
             logInfo(logger, "Found " + ids.size() + " process to restart on tenant " + tenantId);
-
         } catch (final SProcessInstanceReadException e) {
             handleException(e, "Unable to restart process: can't read process instances");
         }

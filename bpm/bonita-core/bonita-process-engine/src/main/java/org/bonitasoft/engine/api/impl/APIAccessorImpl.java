@@ -35,18 +35,6 @@ public class APIAccessorImpl implements APIAccessor {
 
     private static final long serialVersionUID = -3602975597536895697L;
 
-    public APIAccessorImpl(final SessionAccessor sessionAccessor, final SessionService sessionService) {
-        try {
-            final long tenantId = sessionAccessor.getTenantId();
-            final SSession session = sessionService.createSession(tenantId, this.getClass().getSimpleName());
-            sessionAccessor.setSessionInfo(session.getId(), tenantId);
-        } catch (final SBonitaRuntimeException sbre) {
-            throw sbre;
-        } catch (final SBonitaException sbe) {
-            throw new SBonitaRuntimeException(sbe);
-        }
-    }
-
     @Override
     public IdentityAPI getIdentityAPI() {
         return new IdentityAPIImpl();

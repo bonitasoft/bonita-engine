@@ -47,8 +47,6 @@ public class APITypeManager {
                 apiAccessType = ApiAccessType.LOCAL;
             } else if (ApiAccessType.EJB3.name().equalsIgnoreCase(apiType)) {
                 apiAccessType = ApiAccessType.EJB3;
-            } else if (ApiAccessType.EJB2.name().equalsIgnoreCase(apiType)) {
-                apiAccessType = ApiAccessType.EJB2;
             } else if (apiType.equalsIgnoreCase(ApiAccessType.HTTP.name())) {
                 apiAccessType = ApiAccessType.HTTP;
             } else if (apiType.equalsIgnoreCase(ApiAccessType.TCP.name())) {

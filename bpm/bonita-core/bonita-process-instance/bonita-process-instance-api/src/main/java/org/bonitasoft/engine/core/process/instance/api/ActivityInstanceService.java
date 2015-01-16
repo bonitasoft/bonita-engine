@@ -247,7 +247,7 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
             throws SActivityReadException;
 
     /**
-     * Get all child instances for the specific parent activity instance.
+     * Get all child instances for the specific parent activity instance, order by id ascending.
      *
      * @param parentActivityInstanceId
      *        identifier of parent activity instance
@@ -948,6 +948,14 @@ public interface ActivityInstanceService extends FlowNodeInstanceService {
      * @since 6.4.0
      */
     void deleteArchivedFlowNodeInstances(long processInstanceId) throws SFlowNodeDeletionException;
+
+    /**
+     * @param parentActivityInstanceId
+     * @param maxNumberOfResults
+     * @return
+     * @since 6.4.0
+     */
+    QueryOptions buildQueryOptionsForSubActivitiesInNormalStateAndNotTerminal(long parentActivityInstanceId, int numberOfResults);
 
 
 

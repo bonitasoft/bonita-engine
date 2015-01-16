@@ -1097,7 +1097,7 @@ public interface ProcessManagementAPI {
      *         If an exception occurs when getting the processes.
      * @since 6.0
      * @deprecated since 6.3.3
-     * @see {@link ProcessManagementAPI#searchProcessDeploymentInfosCanBeStartedBy(long, SearchOptions)}
+     * @see ProcessManagementAPI#searchProcessDeploymentInfosCanBeStartedBy(long, SearchOptions)
      */
     @Deprecated
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfos(long userId, SearchOptions searchOptions) throws SearchException;

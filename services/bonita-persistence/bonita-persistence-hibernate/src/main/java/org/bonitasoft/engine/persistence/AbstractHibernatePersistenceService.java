@@ -70,6 +70,8 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     private final SessionFactory sessionFactory;
 
+    private final OrderByCheckingMode orderByCheckingMode;
+
     private final Map<String, String> classAliasMappings;
 
     protected final Map<String, String> cacheQueries;
@@ -88,16 +90,25 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     // ----
 
+    /**
+     * @param sessionFactory
+     * @param classMapping
+     * @param classAliasMappings
+     * @param enableWordSearch
+     * @param wordSearchExclusionMappings
+     * @param logger
+     * @throws ClassNotFoundException
+     */
     protected AbstractHibernatePersistenceService(final SessionFactory sessionFactory, final List<Class<? extends PersistentObject>> classMapping,
-            final Map<String, String> classAliasMappings, final boolean enableWordSearch, final Set<String> wordSearchExclusionMappings,
-            final TechnicalLoggerService logger) throws ClassNotFoundException {
+            final Map<String, String> classAliasMappings, final boolean enableWordSearch,
+            final Set<String> wordSearchExclusionMappings, final TechnicalLoggerService logger) throws ClassNotFoundException {
         super("TEST", ";", "#", enableWordSearch, wordSearchExclusionMappings, logger);
         this.sessionFactory = sessionFactory;
-        statistics = sessionFactory.getStatistics();
-
         this.classAliasMappings = classAliasMappings;
-        cacheQueries = Collections.emptyMap();
         this.classMapping = classMapping;
+        orderByCheckingMode = getOrderByCheckingMode();
+        statistics = sessionFactory.getStatistics();
+        cacheQueries = Collections.emptyMap();
         interfaceToClassMapping = Collections.emptyMap();
         mappingExclusions = Collections.emptyList();
     }
@@ -106,12 +117,27 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
 
     // ----
 
+    /**
+     * @param name
+     * @param hbmConfigurationProvider
+     * @param tenantConfigurationsProvider
+     * @param statementDelimiter
+     * @param likeEscapeCharacter
+     * @param logger
+     * @param sequenceManager
+     * @param datasource
+     * @param enableWordSearch
+     * @param wordSearchExclusionMappings
+     * @throws SPersistenceException
+     * @throws ClassNotFoundException
+     */
     public AbstractHibernatePersistenceService(final String name, final HibernateConfigurationProvider hbmConfigurationProvider,
             final DBConfigurationsProvider tenantConfigurationsProvider, final String statementDelimiter, final String likeEscapeCharacter,
             final TechnicalLoggerService logger, final SequenceManager sequenceManager, final DataSource datasource, final boolean enableWordSearch,
             final Set<String> wordSearchExclusionMappings) throws SPersistenceException, ClassNotFoundException {
         super(name, tenantConfigurationsProvider, statementDelimiter, likeEscapeCharacter, sequenceManager, datasource, enableWordSearch,
                 wordSearchExclusionMappings, logger);
+        orderByCheckingMode = getOrderByCheckingMode();
         Configuration configuration;
         try {
             configuration = hbmConfigurationProvider.getConfiguration();
@@ -157,6 +183,11 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
         mappingExclusions = hbmConfigurationProvider.getMappingExclusions();
 
         cacheQueries = hbmConfigurationProvider.getCacheQueries();
+    }
+
+    private OrderByCheckingMode getOrderByCheckingMode() {
+        final String property = System.getProperty("sysprop.bonita.orderby.checking.mode");
+        return property != null && !property.isEmpty() ? OrderByCheckingMode.valueOf(property) : OrderByCheckingMode.NONE;
     }
 
     /**
@@ -739,8 +770,7 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             query.setFirstResult(selectDescriptor.getStartIndex());
             query.setMaxResults(selectDescriptor.getPageSize());
 
-            // TODO: add a parameter to enable NONE,WARNING or STRICT mode "order by" checking
-            // checkOrderByClause(selectDescriptor, query);
+            checkOrderByClause(query);
 
             @SuppressWarnings("unchecked")
             final List<T> list = query.list();
@@ -758,6 +788,27 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
             throw new SBonitaReadException(e, selectDescriptor);
         } catch (final SPersistenceException e) {
             throw new SBonitaReadException(e, selectDescriptor);
+        }
+    }
+
+    private void checkOrderByClause(final Query query) {
+        if (!query.getQueryString().toLowerCase().contains("order by")) {
+            switch (orderByCheckingMode) {
+                case NONE:
+                    break;
+                case WARNING:
+                    logger.log(
+                            AbstractHibernatePersistenceService.class,
+                            TechnicalLogSeverity.WARNING,
+                            "Query '"
+                                    + query.getQueryString()
+                                    + "' does not contain 'ORDER BY' clause. It's better to modify your query to order the result, especially if you use the pagination.");
+                    break;
+                case STRICT:
+                default:
+                    throw new IllegalArgumentException("Query " + query.getQueryString()
+                            + " does not contain 'ORDER BY' clause hence is not allowed. Please specify ordering before re-sending the query");
+            }
         }
     }
 
@@ -840,6 +891,9 @@ public abstract class AbstractHibernatePersistenceService extends AbstractDBPers
                     final Statement stmt = connection.createStatement();
                     try {
                         stmt.execute(command);
+                    } catch (final SQLException e) {
+                        logger.log(this.getClass(), TechnicalLogSeverity.ERROR, "Following SQL command failed: " + command);
+                        throw e;
                     } finally {
                         stmt.close();
                     }

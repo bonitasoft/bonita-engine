@@ -544,24 +544,32 @@ public class ModelConvertor {
     public static List<ProcessInstance> toProcessInstances(final List<SProcessInstance> sProcessInstances,
             final ProcessDefinitionService processDefinitionService) {
         final List<ProcessInstance> clientProcessInstances = new ArrayList<ProcessInstance>();
-        final Map<Long, SProcessDefinition> processDefinitions = new HashMap<Long, SProcessDefinition>();
         if (sProcessInstances != null) {
+            final Map<Long, SProcessDefinition> processDefinitions = new HashMap<Long, SProcessDefinition>();
+
             for (final SProcessInstance sProcessInstance : sProcessInstances) {
-                SProcessDefinition sProcessDefinition = processDefinitions.get(sProcessInstance.getProcessDefinitionId());
-                if (sProcessDefinition == null) {
-                    try {
-                        sProcessDefinition = processDefinitionService.getProcessDefinition(sProcessInstance.getProcessDefinitionId());
-                        processDefinitions.put(sProcessDefinition.getId(), sProcessDefinition);
-                    } catch (final SProcessDefinitionNotFoundException e) {
-                        // ignore...
-                    } catch (final SProcessDefinitionReadException e) {
-                        // ignore...
-                    }
-                }
+                final SProcessDefinition sProcessDefinition = getProcessDefinition(processDefinitionService, processDefinitions,
+                        sProcessInstance.getProcessDefinitionId());
                 clientProcessInstances.add(toProcessInstance(sProcessDefinition, sProcessInstance));
             }
         }
         return Collections.unmodifiableList(clientProcessInstances);
+    }
+
+    private static SProcessDefinition getProcessDefinition(final ProcessDefinitionService processDefinitionService,
+            final Map<Long, SProcessDefinition> processDefinitions, final long processDefinitionId) {
+        SProcessDefinition sProcessDefinition = processDefinitions.get(processDefinitionId);
+        if (sProcessDefinition == null) {
+            try {
+                sProcessDefinition = processDefinitionService.getProcessDefinition(processDefinitionId);
+                processDefinitions.put(sProcessDefinition.getId(), sProcessDefinition);
+            } catch (final SProcessDefinitionNotFoundException e) {
+                // ignore...
+            } catch (final SProcessDefinitionReadException e) {
+                // ignore...
+            }
+        }
+        return sProcessDefinition;
     }
 
     public static ProcessInstance toProcessInstance(final SProcessDefinition definition, final SProcessInstance sInstance) {
@@ -842,15 +850,32 @@ public class ModelConvertor {
         return archivedActivityInstances;
     }
 
-    public static List<ArchivedProcessInstance> toArchivedProcessInstances(final List<SAProcessInstance> sProcessInstances) {
+    public static List<ArchivedProcessInstance> toArchivedProcessInstances(final List<SAProcessInstance> saProcessInstances,
+            final ProcessDefinitionService processDefinitionService) {
+        if (saProcessInstances != null) {
+            final List<ArchivedProcessInstance> clientProcessInstances = new ArrayList<ArchivedProcessInstance>(saProcessInstances.size());
+            final Map<Long, SProcessDefinition> processDefinitions = new HashMap<Long, SProcessDefinition>(saProcessInstances.size());
+
+            for (final SAProcessInstance saProcessInstance : saProcessInstances) {
+                final SProcessDefinition sProcessDefinition = getProcessDefinition(processDefinitionService, processDefinitions,
+                        saProcessInstance.getProcessDefinitionId());
+                clientProcessInstances.add(toArchivedProcessInstance(saProcessInstance, sProcessDefinition));
+            }
+            return Collections.unmodifiableList(clientProcessInstances);
+        }
+        return Collections.unmodifiableList(new ArrayList<ArchivedProcessInstance>(1));
+    }
+
+    public static List<ArchivedProcessInstance> toArchivedProcessInstances(final List<SAProcessInstance> sProcessInstances,
+            final SProcessDefinition sProcessDefinition) {
         final List<ArchivedProcessInstance> clientProcessInstances = new ArrayList<ArchivedProcessInstance>(sProcessInstances.size());
         for (final SAProcessInstance sProcessInstance : sProcessInstances) {
-            clientProcessInstances.add(toArchivedProcessInstance(sProcessInstance));
+            clientProcessInstances.add(toArchivedProcessInstance(sProcessInstance, sProcessDefinition));
         }
         return Collections.unmodifiableList(clientProcessInstances);
     }
 
-    public static ArchivedProcessInstance toArchivedProcessInstance(final SAProcessInstance sInstance) {
+    public static ArchivedProcessInstance toArchivedProcessInstance(final SAProcessInstance sInstance, final SProcessDefinition sProcessDefinition) {
         final ArchivedProcessInstanceImpl archivedInstance = new ArchivedProcessInstanceImpl(sInstance.getName());
         archivedInstance.setId(sInstance.getId());
         final int stateId = sInstance.getStateId();
@@ -875,6 +900,17 @@ public class ModelConvertor {
         archivedInstance.setSourceObjectId(sInstance.getSourceObjectId());
         archivedInstance.setRootProcessInstanceId(sInstance.getRootProcessInstanceId());
         archivedInstance.setCallerId(sInstance.getCallerId());
+
+        if (sProcessDefinition != null) {
+            for (int i = 1; i <= 5; i++) {
+                archivedInstance.setStringIndexLabel(i, sProcessDefinition.getStringIndexLabel(i));
+            }
+        }
+        archivedInstance.setStringIndexValue(1, sInstance.getStringIndex1());
+        archivedInstance.setStringIndexValue(2, sInstance.getStringIndex2());
+        archivedInstance.setStringIndexValue(3, sInstance.getStringIndex3());
+        archivedInstance.setStringIndexValue(4, sInstance.getStringIndex4());
+        archivedInstance.setStringIndexValue(5, sInstance.getStringIndex5());
         return archivedInstance;
     }
 
@@ -1729,7 +1765,7 @@ public class ModelConvertor {
                 .setRightOperand(ModelConvertor.constructSExpression(operation.getRightOperand()))
                 .setLeftOperand(
                         BuilderFactory.get(SLeftOperandBuilderFactory.class).createNewInstance().setName(operation.getLeftOperand().getName())
-                        .setType(operation.getLeftOperand().getType()).done()).done();
+                                .setType(operation.getLeftOperand().getType()).done()).done();
     }
 
     public static List<SOperation> convertOperations(final List<Operation> operations) {

@@ -36,7 +36,7 @@ public class NormalStateTransitionsManager {
     public FlowNodeState getNextState(final FlowNodeState currentState) throws SIllegalStateTransition {
         FlowNodeState nextState = getNextStateFromMap(currentState);
         if (nextState == null) {
-            throw new SIllegalStateTransition(getMessage(currentState), currentState.isTerminal());
+            throw new SIllegalStateTransition(getMessage(currentState));
         }
         return nextState;
     }

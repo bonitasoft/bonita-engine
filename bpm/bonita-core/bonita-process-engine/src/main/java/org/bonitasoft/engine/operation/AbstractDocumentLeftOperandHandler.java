@@ -63,15 +63,8 @@ public abstract class AbstractDocumentLeftOperandHandler implements LeftOperandH
         return (DocumentValue) newValue;
     }
 
-    protected long getAuthorId() throws SSessionNotFoundException {
-        long authorId;
-        try {
-            final long sessionId = sessionAccessor.getSessionId();
-            authorId = sessionService.getSession(sessionId).getUserId();
-        } catch (final SessionIdNotSetException e) {
-            authorId = -1;
-        }
-        return authorId;
+    protected long getAuthorId() {
+        return sessionService.getLoggedUserFromSession(sessionAccessor);
     }
 
 }

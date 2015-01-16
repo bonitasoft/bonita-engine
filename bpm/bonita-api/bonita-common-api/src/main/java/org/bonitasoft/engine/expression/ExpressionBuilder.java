@@ -209,7 +209,6 @@ public class ExpressionBuilder {
      * @return the newly built {@link Expression}
      * @throws InvalidExpressionException
      *         is name or returnType is not set or set to an empty String.
-     * @author Emmanuel Duchastenier
      * @since 6.0
      */
     public Expression done() throws InvalidExpressionException {

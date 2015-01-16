@@ -1,6 +1,6 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
- * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
+ * Copyright (C) 2012, 2014 Bonitasoft S.A.
+ * Bonitasoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
  * version 2.1 of the License.
@@ -27,7 +27,6 @@ import org.bonitasoft.engine.core.process.definition.model.SFlowElementContainer
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SActivityStateExecutionException;
-import org.bonitasoft.engine.core.process.instance.api.states.StateCode;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
@@ -90,14 +89,12 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
             throws SActivityStateExecutionException {
         final SFlowElementContainerDefinition processContainer = processDefinition.getProcessContainer();
         final SCallActivityDefinition callActivityDef = (SCallActivityDefinition) processContainer.getFlowNode(instance.getFlowNodeDefinitionId());
-
         try {
             final SProcessInstance childProcInst = processInstanceService.getChildOfActivity(instance.getId());
             final SExpressionContext expressionContext = new SExpressionContext(childProcInst.getId(), DataInstanceContainer.PROCESS_INSTANCE.name(),
                     childProcInst.getProcessDefinitionId());
-            for (final SOperation operation : callActivityDef.getDataOutputOperations()) {
-                operationService.execute(operation, instance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), expressionContext);
-            }
+            expressionContext.setParentProcessDefinitionId(instance.getProcessDefinitionId());
+            operationService.execute(callActivityDef.getDataOutputOperations(), instance.getId(), DataInstanceContainer.ACTIVITY_INSTANCE.name(), expressionContext);
             // archive child process instance
             ProcessArchiver.archiveProcessInstance(childProcInst, archiveService, processInstanceService, dataInstanceService, documentService, logger,
                     commentService, processDefinitionService, connectorInstanceService);
@@ -109,11 +106,6 @@ public class CompletingCallActivityStateImpl extends CompletingActivityStateImpl
     @Override
     public int getId() {
         return 30;
-    }
-
-    @Override
-    public StateCode execute(final SProcessDefinition processDefinition, final SFlowNodeInstance flowNodeInstance) throws SActivityStateExecutionException {
-        return super.execute(processDefinition, flowNodeInstance);
     }
 
 }

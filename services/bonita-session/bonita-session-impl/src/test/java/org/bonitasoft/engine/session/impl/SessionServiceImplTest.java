@@ -13,13 +13,20 @@
  **/
 package org.bonitasoft.engine.session.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.platform.PlatformService;
+import org.bonitasoft.engine.session.SSessionNotFoundException;
 import org.bonitasoft.engine.session.SessionProvider;
+import org.bonitasoft.engine.session.model.impl.SSessionImpl;
+import org.bonitasoft.engine.sessionaccessor.ReadSessionAccessor;
+import org.bonitasoft.engine.sessionaccessor.SessionIdNotSetException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -31,6 +38,16 @@ import org.mockito.MockitoAnnotations;
  */
 public class SessionServiceImplTest {
 
+    public static final long SESSION_ID = 1258l;
+
+    public static final long TENANT_ID = 2l;
+
+    public static final String USER_NAME = "john";
+
+    public static final String APPLICATION_NAME = "bonita";
+
+    public static final long USER_ID = 58l;
+
     @Mock
     private PlatformService platformService;
 
@@ -40,12 +57,17 @@ public class SessionServiceImplTest {
     @Mock
     private SessionProvider sessionProvider;
 
+    @Mock
+    private ReadSessionAccessor sessionAccessor;
+
     @InjectMocks
     private SessionServiceImpl sessionServiceImpl;
+    private SSessionImpl sSession;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        sSession = new SSessionImpl(SESSION_ID, TENANT_ID, USER_NAME, APPLICATION_NAME, USER_ID);
     }
 
     /**
@@ -92,5 +114,40 @@ public class SessionServiceImplTest {
     public final void deleteSessionsOfTenantExceptTechnicalUser() {
         sessionServiceImpl.deleteSessionsOfTenantExceptTechnicalUser(12l);
         verify(sessionProvider, times(1)).deleteSessionsOfTenant(12l, true);
+    }
+
+    @Test
+    public final void should_getLoggedUserFromSession_return_user_id_when_there_is_a_session() throws Exception {
+        //given
+        doReturn(SESSION_ID).when(sessionAccessor).getSessionId();
+        doReturn(sSession).when(sessionProvider).getSession(SESSION_ID);
+        //when
+        final long loggedUserFromSession = sessionServiceImpl.getLoggedUserFromSession(sessionAccessor);
+        //when
+        assertThat(loggedUserFromSession).isEqualTo(USER_ID);
+    }
+
+    @Test
+    public final void should_getLoggedUserFromSession_return_minus_1_when_there_is_no_session() throws SessionIdNotSetException, SSessionNotFoundException {
+        //given
+        doThrow(SessionIdNotSetException.class).when(sessionAccessor).getSessionId();
+        doReturn(sSession).when(sessionProvider).getSession(SESSION_ID);
+        //when
+        final long loggedUserFromSession = sessionServiceImpl.getLoggedUserFromSession(sessionAccessor);
+        //when
+        assertThat(loggedUserFromSession).isEqualTo(-1);
+
+    }
+
+    @Test
+    public final void should_getLoggedUserFromSession_return_minus_1_when_the_session_is_not_found() throws SessionIdNotSetException, SSessionNotFoundException {
+        //given
+        doReturn(SESSION_ID).when(sessionAccessor).getSessionId();
+        doThrow(SSessionNotFoundException.class).when(sessionProvider).getSession(SESSION_ID);
+        //when
+        final long loggedUserFromSession = sessionServiceImpl.getLoggedUserFromSession(sessionAccessor);
+        //when
+        assertThat(loggedUserFromSession).isEqualTo(-1);
+
     }
 }

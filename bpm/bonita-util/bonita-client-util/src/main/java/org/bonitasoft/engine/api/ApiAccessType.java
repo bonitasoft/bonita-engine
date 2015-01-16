@@ -17,5 +17,5 @@ package org.bonitasoft.engine.api;
  * @author Elias Ricken de Medeiros
  */
 public enum ApiAccessType {
-    LOCAL, EJB2, EJB3, HTTP, TCP
+    LOCAL, EJB3, HTTP, TCP
 }

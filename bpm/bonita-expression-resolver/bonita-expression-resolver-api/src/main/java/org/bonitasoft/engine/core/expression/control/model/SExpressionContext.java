@@ -53,6 +53,8 @@ public class SExpressionContext implements Serializable {
 
     private Long processDefinitionId;
 
+    private Long parentProcessDefinitionId;
+
     private SProcessDefinition processDefinition;
 
     private Map<String, Object> inputValues;
@@ -189,6 +191,14 @@ public class SExpressionContext implements Serializable {
         return "context [containerId=" + containerId + ", containerType=" + containerType + ", processDefinitionId="
                 + processDefinitionId
                 + (processDefinition != null ? ", processDefinition=" + processDefinition.getName() + " -- " + processDefinition.getVersion() : "") + "]";
+    }
+
+    public Long getParentProcessDefinitionId() {
+        return parentProcessDefinitionId;
+    }
+
+    public void setParentProcessDefinitionId(final Long parentProcessDefinitionId) {
+        this.parentProcessDefinitionId = parentProcessDefinitionId;
     }
 
 

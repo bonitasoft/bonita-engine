@@ -274,13 +274,12 @@ public class DocumentAPIImpl implements DocumentAPI {
     public Document getDocumentAtProcessInstantiation(final long processInstanceId, final String documentName) throws DocumentNotFoundException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final DocumentService documentService = tenantAccessor.getDocumentService();
-
         final ProcessInstanceService processInstanceService = tenantAccessor.getProcessInstanceService();
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
 
         try {
             final GetDocumentByNameAtProcessInstantiation transactionContent = new GetDocumentByNameAtProcessInstantiation(documentService,
-                    processInstanceService, searchEntitiesDescriptor, processInstanceId, documentName);
+                    processInstanceService, tenantAccessor.getProcessDefinitionService(), searchEntitiesDescriptor, processInstanceId, documentName);
             transactionContent.execute();
             final SMappedDocument attachment = transactionContent.getResult();
             return ModelConvertor.toDocument(attachment, documentService);
@@ -454,15 +453,15 @@ public class DocumentAPIImpl implements DocumentAPI {
     }
 
     @Override
-    public void deleteContentOfArchivedDocument(final long documentId) throws DocumentException, DocumentNotFoundException {
+    public void deleteContentOfArchivedDocument(final long archivedDocumentId) throws DocumentException, DocumentNotFoundException {
         final TenantServiceAccessor tenantAccessor = APIUtils.getTenantAccessor();
         final DocumentService documentService = tenantAccessor.getDocumentService();
         try {
-            documentService.deleteContentOfArchivedDocument(documentId);
+            documentService.deleteContentOfArchivedDocument(archivedDocumentId);
         } catch (final SObjectNotFoundException e) {
-            throw new DocumentNotFoundException("The document with id " + documentId + " could not be found", e);
+            throw new DocumentNotFoundException("The document with id " + archivedDocumentId + " could not be found", e);
         } catch (final SBonitaException e) {
-            throw new DocumentException("Unable to delete content of all version of the document " + documentId, e);
+            throw new DocumentException("Unable to delete content of all version of the document " + archivedDocumentId, e);
         }
     }
 

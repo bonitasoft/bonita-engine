@@ -1240,7 +1240,6 @@ public class IdentityServiceTest extends CommonServiceTest {
 
     @Test
     public void testRemoveMembershipFromUser() throws Exception {
-
         getTransactionService().begin();
         deleteGroups();
         final List<SGroup> groups = createGroups(1, "testRemoveMembershipFromUser_name", "testRemoveMembershipFromUser_label", null);
@@ -1286,7 +1285,7 @@ public class IdentityServiceTest extends CommonServiceTest {
                 .setLastName("lastname2").setPassword("mlbxcvjmsdkljf").done());
         getTransactionService().complete();
 
-        Map<Class<? extends PersistentObject>, Set<String>> userAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>();
+        final Map<Class<? extends PersistentObject>, Set<String>> userAllFields = new HashMap<Class<? extends PersistentObject>, Set<String>>();
         final Set<String> fields = new HashSet<String>(4);
         fields.add("userName");
         fields.add("firstName");

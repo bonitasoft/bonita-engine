@@ -13,6 +13,7 @@
  **/
 package org.bonitasoft.engine.core.process.instance.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,6 +47,7 @@ import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
 import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
+import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
@@ -71,6 +73,7 @@ import org.bonitasoft.engine.identity.model.SUser;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.persistence.FilterOption;
+import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.PersistentObject;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -119,7 +122,7 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
 
     private static final String PENDING_OR_ASSIGNED = "PendingOrAssigned";
 
-    private static final String ACTIVITYINSTANCE_ASSIGNEE = "ACTIVITYINSTANCE_ASSIGNEE";
+    private static final String HUMAN_TASK_INSTANCE_ASSIGNEE = "HUMAN_TASK_INSTANCE_ASSIGNEE";
 
     private static final String WHOCANSTART_PENDING_TASK_SUFFIX = "WhoCanStartPendingTask";
 
@@ -207,7 +210,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         try {
             List<SPendingActivityMapping> mappings = null;
             final boolean createEvents = getEventService().hasHandlers(PENDINGACTIVITYMAPPING, EventActionType.DELETED);
-            while ((mappings = getPendingMappings(humanTaskInstanceId, new QueryOptions(0, BATCH_SIZE))).size() > 0) {
+            final QueryOptions queryOptions = new QueryOptions(0, BATCH_SIZE, SPendingActivityMapping.class, "id", OrderByType.ASC);
+            while (!(mappings = getPendingMappings(humanTaskInstanceId, queryOptions)).isEmpty()) {
                 deletePendingMappings(mappings, createEvents);
             }
         } catch (final SBonitaException e) {
@@ -418,8 +422,8 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
             final UpdateRecord updateRecord = UpdateRecord.buildSetFields(flowNodeInstance, descriptor);
 
             SUpdateEvent updateEvent = null;
-            if (getEventService().hasHandlers(ACTIVITYINSTANCE_ASSIGNEE, EventActionType.UPDATED)) {
-                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(ACTIVITYINSTANCE_ASSIGNEE)
+            if (getEventService().hasHandlers(HUMAN_TASK_INSTANCE_ASSIGNEE, EventActionType.UPDATED)) {
+                updateEvent = (SUpdateEvent) BuilderFactory.get(SEventBuilderFactory.class).createUpdateEvent(HUMAN_TASK_INSTANCE_ASSIGNEE)
                         .setObject(flowNodeInstance).done();
             }
             try {
@@ -632,13 +636,10 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
             throws SActivityReadException {
         final HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("parentActivityInstanceId", parentActivityInstanceId);
+        final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfResults, SFlowNodeInstance.class, "id", OrderByType.ASC);
         final SelectListDescriptor<SActivityInstance> descriptor = new SelectListDescriptor<SActivityInstance>("getChildrenOfAnActivity", parameters,
-                SActivityInstance.class, new QueryOptions(fromIndex, numberOfResults));
-        try {
-            return getPersistenceService().selectList(descriptor);
-        } catch (final SBonitaReadException e) {
-            throw new SActivityReadException(e);
-        }
+                SActivityInstance.class, queryOptions);
+        return getPersistenceService().selectList(descriptor);
     }
 
     @Override
@@ -1088,6 +1089,20 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         if (SFlowNodeType.USER_TASK.equals(saActivityInstance.getType()) || SFlowNodeType.MANUAL_TASK.equals(saActivityInstance.getType())) {
             deleteArchivedPendingMappings(saActivityInstance.getSourceObjectId());
         }
+    }
+
+    @Override
+    public QueryOptions buildQueryOptionsForSubActivitiesInNormalStateAndNotTerminal(final long parentActivityInstanceId, final int numberOfResults) {
+        final SUserTaskInstanceBuilderFactory flowNodeKeyProvider = BuilderFactory.get(SUserTaskInstanceBuilderFactory.class);
+
+        final List<FilterOption> filters = new ArrayList<FilterOption>(3);
+        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getParentActivityInstanceKey(), parentActivityInstanceId));
+        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getTerminalKey(), false));
+        filters.add(new FilterOption(SActivityInstance.class, flowNodeKeyProvider.getStateCategoryKey(), SStateCategory.NORMAL.name()));
+
+        final OrderByOption orderByOption = new OrderByOption(SActivityInstance.class, flowNodeKeyProvider.getNameKey(), OrderByType.ASC);
+
+        return new QueryOptions(0, numberOfResults, Collections.singletonList(orderByOption), filters, null);
     }
 
     @Override

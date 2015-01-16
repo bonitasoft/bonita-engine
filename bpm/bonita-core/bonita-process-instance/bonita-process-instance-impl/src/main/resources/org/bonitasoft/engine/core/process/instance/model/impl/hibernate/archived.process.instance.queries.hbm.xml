@@ -7,6 +7,11 @@
 	SELECT COUNT(aa)
 	FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl AS aa
   </query>
+  	
+  <query name="searchSAFlowNodeInstance">
+	SELECT aa
+	FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl AS aa
+  </query>
 
   <query name="getNumberOfSAFlowNodeInstanceSupervisedBy">
 	SELECT COUNT(DISTINCT aa.id)
@@ -28,11 +33,6 @@
 			)
 		)
 	)
-  </query>
-	
-  <query name="searchSAFlowNodeInstance">
-	SELECT aa
-	FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl AS aa
   </query>
 	
   <query name="searchSAFlowNodeInstanceSupervisedBy">
@@ -245,32 +245,32 @@
 	<query name="getNumberOfSAProcessInstancewithSUserTaskInstance">
 		select COUNT(DISTINCT ap)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
-		org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS usertask
+		org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
 		WHERE ap.archiveDate = (
 			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa2
 			WHERE aa2.sourceObjectId = ap.sourceObjectId
 		)
 		AND ap.stateId != 8
 		AND (ap.startedBy = :userId
-			OR (usertask.rootContainerId = ap.sourceObjectId
-				AND usertask.stable = TRUE
-				AND usertask.assigneeId = :userId) 
+			OR (a.rootContainerId = ap.sourceObjectId
+				AND a.stable = TRUE
+				AND a.assigneeId = :userId) 
 		)
   	</query>
   
   	<query name="searchSAProcessInstancewithSUserTaskInstance">
 		select DISTINCT ap
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl AS ap,
-		org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS usertask
+		org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl AS a
 		WHERE ap.archiveDate = (
 			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAUserTaskInstanceImpl AS aa2
 			WHERE aa2.sourceObjectId = ap.sourceObjectId
 		)
 		AND ap.stateId != 8
 		AND (ap.startedBy = :userId
-			OR (usertask.rootContainerId = ap.sourceObjectId
-				AND usertask.stable = TRUE
-				AND usertask.assigneeId = :userId) 
+			OR (a.rootContainerId = ap.sourceObjectId
+				AND a.stable = TRUE
+				AND a.assigneeId = :userId) 
 		)
 	</query>
 
@@ -312,7 +312,7 @@
 			SELECT MAX(aa2.archiveDate) FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAManualTaskInstanceImpl AS aa2
 			WHERE aa2.sourceObjectId = aa.sourceObjectId
 		)
-	</query>  
+	</query>
 	
 	<query name="searchSAManualTaskInstancewithSAActivityInstance">
 		SELECT aa
@@ -480,8 +480,16 @@
 		WHERE aa.rootContainerId = :rootContainerId
         ORDER BY aa.id
 	</query>
-	
-	
+
+	<query name="getNumberOfArchivedFlowNodesInAllStates">
+		SELECT new org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter(name AS name, stateName AS statename, count(aa) AS numberof)
+		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl AS aa
+		WHERE logicalGroup4 = :parentProcessInstanceId
+		AND terminal = TRUE
+		GROUP BY name, stateName
+		ORDER BY name ASC, stateName ASC
+	</query>
+
 	<query name="getNumberOfSATransitionInstance">
 		SELECT COUNT(at)
 		FROM org.bonitasoft.engine.core.process.instance.model.archive.impl.SATransitionInstanceImpl AS at

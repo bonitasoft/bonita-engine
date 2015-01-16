@@ -211,7 +211,7 @@ public class IOUtil {
     }
 
     public static File createTempDirectoryInDefaultTempDirectory(final String directoryName) {
-        final File tmpDir = new File(TMP_DIRECTORY, directoryName + "_" + JVM_NAME + "_" + String.valueOf(System.currentTimeMillis()));
+        final File tmpDir = new File(TMP_DIRECTORY, directoryName + "_" + JVM_NAME + "_" + System.currentTimeMillis());
         createTempDirectory(tmpDir);
         return tmpDir;
     }

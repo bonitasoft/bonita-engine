@@ -78,7 +78,7 @@ public class ServerAPIImpl implements ServerAPI {
 
     private TechnicalLoggerService technicalLogger;
 
-    private enum SessionType {
+    protected enum SessionType {
         PLATFORM, API;
     }
 
@@ -189,16 +189,6 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
-    private static final class ServerAPIRuntimeException extends RuntimeException {
-
-        private static final long serialVersionUID = -5675131531953146131L;
-
-        ServerAPIRuntimeException(final Throwable cause) {
-            super(cause);
-
-        }
-    }
-
     SessionAccessor beforeInvokeMethod(final Session session, final String apiInterfaceName) throws BonitaHomeNotSetException,
             InstantiationException, IllegalAccessException, ClassNotFoundException, BonitaHomeConfigurationException, IOException, NoSuchMethodException,
             InvocationTargetException, SBonitaException {
@@ -261,7 +251,7 @@ public class ServerAPIImpl implements ServerAPI {
         return serverClassLoader;
     }
 
-    private SessionType getSessionType(final Session session) {
+    protected SessionType getSessionType(final Session session) {
         SessionType sessionType = null;
         if (session instanceof PlatformSession) {
             sessionType = SessionType.PLATFORM;
@@ -277,15 +267,20 @@ public class ServerAPIImpl implements ServerAPI {
 
         final Object apiImpl = accessResolver.getAPIImplementation(apiInterfaceName);
         final Method method = ClassReflector.getMethod(apiImpl.getClass(), methodName, parameterTypes);
-        checkMethodAccessibility(apiImpl, apiInterfaceName, method, session);
         // No session required means that there is no transaction
         if (method.isAnnotationPresent(CustomTransactions.class) || method.isAnnotationPresent(NoSessionRequired.class)) {
-            return invokeAPI(parametersValues, apiImpl, method);
+            return invokeAPIOutsideTransaction(parametersValues, apiImpl, method, apiInterfaceName, session);
+        }else{
+            return invokeAPIInTransaction(parametersValues, apiImpl, method, session, apiInterfaceName);
         }
-        return invokeAPIInTransaction(parametersValues, apiImpl, method, session);
     }
 
-    protected void checkMethodAccessibility(final Object apiImpl, final String apiInterfaceName, final Method method, final Session session) {
+    protected Object invokeAPIOutsideTransaction(Object[] parametersValues, Object apiImpl, Method method, String apiInterfaceName, Session session) throws Throwable {
+        checkMethodAccessibility(apiImpl, apiInterfaceName, method, session, /* Not in transaction */false);
+        return invokeAPI(parametersValues, apiImpl, method);
+    }
+
+    protected void checkMethodAccessibility(final Object apiImpl, final String apiInterfaceName, final Method method, final Session session, boolean isInTransaction) {
         if (!isNodeInAValidStateFor(method)) {
             logNodeNotStartedMessage(apiInterfaceName, method.getName());
             throw new NodeNotStartedException();
@@ -322,7 +317,7 @@ public class ServerAPIImpl implements ServerAPI {
         }
     }
 
-    protected Object invokeAPIInTransaction(final Object[] parametersValues, final Object apiImpl, final Method method, final Session session) throws Throwable {
+    protected Object invokeAPIInTransaction(final Object[] parametersValues, final Object apiImpl, final Method method, final Session session, final String apiInterfaceName) throws Throwable {
         if (session == null) {
             throw new BonitaRuntimeException("session is null");
         }
@@ -333,6 +328,7 @@ public class ServerAPIImpl implements ServerAPI {
             @Override
             public Object call() throws Exception {
                 try {
+                    checkMethodAccessibility(apiImpl, apiInterfaceName, method, session, /* Not in transaction */true);
                     return invokeAPI(parametersValues, apiImpl, method);
                 } catch (final Throwable cause) {
                     throw new ServerAPIRuntimeException(cause);

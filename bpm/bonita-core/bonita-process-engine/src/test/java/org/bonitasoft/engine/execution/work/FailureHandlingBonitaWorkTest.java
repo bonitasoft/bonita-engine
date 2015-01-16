@@ -19,7 +19,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -31,11 +30,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
 import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
-import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SFlowNodeNotFoundException;
-import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceNotFoundException;
-import org.bonitasoft.engine.execution.SIllegalStateTransition;
 import org.bonitasoft.engine.expression.exception.SExpressionEvaluationException;
 import org.bonitasoft.engine.incident.Incident;
 import org.bonitasoft.engine.incident.IncidentService;
@@ -53,7 +48,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * @author Celine Souchet
- *
  */
 @SuppressWarnings("javadoc")
 @RunWith(MockitoJUnitRunner.class)
@@ -181,69 +175,6 @@ public class FailureHandlingBonitaWorkTest {
     }
 
     @Test
-    public void doNotHandleFailureWhenGettingASFlowNodeNotFoundException() throws Throwable {
-        final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SFlowNodeNotFoundException(83));
-        doThrow(e).when(wrappedWork).work(context);
-        txBonitawork.work(context);
-        verify(wrappedWork, never()).handleFailure(e, context);
-        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
-        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
-    }
-
-    @Test
-    public void doNotHandleFailureWhenGettingASFlowNodeNotFoundExceptionAsMainCause() throws Exception {
-        final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception flownodeNotFound = new SFlowNodeNotFoundException(11547L);
-        doThrow(flownodeNotFound).when(wrappedWork).work(context);
-        txBonitawork.work(context);
-        verify(wrappedWork, never()).handleFailure(flownodeNotFound, context);
-        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
-        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
-    }
-
-    @Test
-    public void doNotHandleFailureWhenGettingASProcessInstanceNotFoundException() throws Throwable {
-        final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SProcessInstanceNotFoundException(83));
-        doThrow(e).when(wrappedWork).work(context);
-        when(wrappedWork.getDescription()).thenReturn("");
-        txBonitawork.work(context);
-        verify(wrappedWork, never()).handleFailure(e, context);
-        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
-        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
-    }
-
-    @Test
-    public void doNotHandleFailureWhenGettingASProcessDefinitionNotFoundException() throws Throwable {
-        final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SProcessDefinitionNotFoundException("message", 2));
-        doThrow(e).when(wrappedWork).work(context);
-        txBonitawork.work(context);
-        verify(wrappedWork, never()).handleFailure(e, context);
-        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.TRACE);
-        verify(loggerService).isLoggable(txBonitawork.getClass(), TechnicalLogSeverity.DEBUG);
-    }
-
-    public void doNotHandleFailureWhenIsIllegalTransitionFromTerminalState() throws Exception {
-        final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SIllegalStateTransition("message", true));
-        doThrow(e).when(wrappedWork).work(context);
-        txBonitawork.work(context);
-        verify(wrappedWork, never()).handleFailure(e, context);
-        verify(loggerService).isLoggable(FailureHandlingBonitaWork.class, TechnicalLogSeverity.DEBUG);
-    }
-
-    @Test
-    public void handleFailureWhenIsIllegalTransitionFromNonTerminalState() throws Exception {
-        final Map<String, Object> context = new HashMap<String, Object>();
-        final Exception e = new Exception(new SIllegalStateTransition("message", false));
-        doThrow(e).when(wrappedWork).work(context);
-        txBonitawork.work(context);
-        verify(wrappedWork, times(1)).handleFailure(e, context);
-    }
-
-    @Test
     public void handleFailureForAllOtherExceptions() throws Throwable {
         final Map<String, Object> context = new HashMap<String, Object>();
         final Exception e = new Exception();
@@ -261,7 +192,7 @@ public class FailureHandlingBonitaWorkTest {
 
         txBonitawork.work(context);
 
-        verify(loggerService).log(any(Class.class), eq(TechnicalLogSeverity.ERROR), eq(seee.getClass().getName() + " : \"message\""));
+        verify(loggerService).log(any(Class.class), eq(TechnicalLogSeverity.ERROR), eq(seee.getClass().getName() + " : \"message\""), eq(seee));
     }
 
     @Test
@@ -269,11 +200,14 @@ public class FailureHandlingBonitaWorkTest {
         final Map<String, Object> context = new HashMap<String, Object>();
         final SExpressionEvaluationException seee = new SExpressionEvaluationException("message", "expressionName");
         doThrow(seee).when(wrappedWork).work(context);
+        // Yes for all log level, in order to simulate a TRACE configuration
+        // Since latest change, exception stack trace is logged in the ERROR level message. DEBUG level have no impact
+        when(loggerService.isLoggable(any(Class.class), eq(TechnicalLogSeverity.DEBUG))).thenReturn(true);
         when(loggerService.isLoggable(any(Class.class), eq(TechnicalLogSeverity.ERROR))).thenReturn(true);
 
         txBonitawork.handleFailure(seee, context);
 
-        verify(loggerService, times(2)).log(any(Class.class), eq(TechnicalLogSeverity.ERROR), anyString());
+        verify(loggerService, times(1)).log(any(Class.class), eq(TechnicalLogSeverity.ERROR), anyString(), any(Throwable.class));
     }
 
 }
