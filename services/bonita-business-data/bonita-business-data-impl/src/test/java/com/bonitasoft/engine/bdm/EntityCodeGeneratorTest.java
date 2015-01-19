@@ -43,13 +43,13 @@ public class EntityCodeGeneratorTest {
     private EntityCodeGenerator entityCodeGenerator;
 
     private CodeGenerator codeGenerator;
-    
+
     private BusinessObjectModel bom = new BusinessObjectModel();
 
     @Before
     public void setUp() {
         codeGenerator = new CodeGenerator();
-        entityCodeGenerator = new EntityCodeGenerator(codeGenerator,bom);
+        entityCodeGenerator = new EntityCodeGenerator(codeGenerator, bom);
     }
 
     @Test
@@ -135,6 +135,7 @@ public class EntityCodeGeneratorTest {
         final JMethod getter = (JMethod) definedClass.methods().toArray()[1];
         assertThat(getter.name()).isEqualTo("getName");
     }
+
 
     @Test
     public void shouldAddBasicField_AddAFieldWithTemporalAnnotation_InDefinedClass() throws Exception {

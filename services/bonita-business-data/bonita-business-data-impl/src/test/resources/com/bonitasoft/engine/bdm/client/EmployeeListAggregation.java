@@ -72,7 +72,12 @@ public class Employee
     }
 
     public void setAddresses(List<Address> addresses) {
-        this.addresses = addresses;
+        if (this.addresses == null) {
+            this.addresses = addresses;
+        } else {
+            this.addresses.clear();
+            this.addresses.addAll(addresses);
+        }
     }
 
     public List<Address> getAddresses() {

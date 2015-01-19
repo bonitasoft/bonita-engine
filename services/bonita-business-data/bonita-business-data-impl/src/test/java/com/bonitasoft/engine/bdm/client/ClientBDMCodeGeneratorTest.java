@@ -69,7 +69,7 @@ public class ClientBDMCodeGeneratorTest extends CompilableCode {
 
     @After
     public void tearDown() throws Exception {
-        FileUtils.deleteDirectory(destDir);
+       // FileUtils.deleteDirectory(destDir);
     }
 
     @Test

@@ -226,7 +226,12 @@ public class EntityCodeGenerator {
     }
 
     public void addAccessors(final JDefinedClass entityClass, final JFieldVar fieldVar, final Field field) {
-        codeGenerator.addSetter(entityClass, fieldVar);
+        if (isCollectionField(field)) {
+            codeGenerator.addListSetter(entityClass, fieldVar);
+        }
+        else {
+            codeGenerator.addSetter(entityClass, fieldVar);
+        }
         final JMethod getter = codeGenerator.addGetter(entityClass, fieldVar);
         if (field instanceof RelationField && ((RelationField) field).isLazy()) {
             getter.annotate(LazyLoaded.class);
@@ -234,11 +239,18 @@ public class EntityCodeGenerator {
     }
 
     protected void addModifiers(final JDefinedClass entityClass, final Field field) {
-        final Boolean collection = field.isCollection();
-        if (collection != null && collection) {
+        if (isCollectionField(field)) {
             codeGenerator.addAddMethod(entityClass, field);
             codeGenerator.addRemoveMethod(entityClass, field);
         }
+    }
+
+    private boolean isCollectionField(Field field) {
+        if (field==null){
+            return false;
+        }
+        final Boolean collection = field.isCollection();
+        return collection != null && collection;
     }
 
 }

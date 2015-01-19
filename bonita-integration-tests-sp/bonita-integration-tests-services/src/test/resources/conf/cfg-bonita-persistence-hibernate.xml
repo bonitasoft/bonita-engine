@@ -54,6 +54,7 @@
                 <prop key="hibernate.use_sql_comments">${hibernate.journal.use_sql_comments}</prop>
                 <prop key="hibernate.generate_statistics">false</prop>
                 <prop key="hibernate.connection.shutdown">true</prop>
+                <prop key="hibernate.jdbc.batch_size">50</prop>
                 <prop key="hibernate.validator.autoregister_listeners">false</prop>
                 <prop key="hibernate.validator.apply_to_ddl">false</prop>
                 <prop key="javax.persistence.validation.mode">NONE</prop>
@@ -97,7 +98,6 @@
                 <entry key="org.bonitasoft.engine.data.instance.model.SXMLDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SXMLDataInstanceImpl" />
                 <entry key="org.bonitasoft.engine.data.instance.model.SBlobDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SBlobDataInstanceImpl" />
                 <entry key="org.bonitasoft.engine.data.instance.model.SXMLObjectDataInstance" value="org.bonitasoft.engine.data.instance.model.impl.SXMLObjectDataInstanceImpl" />
-                <entry key="org.bonitasoft.engine.data.instance.model.SDataInstanceVisibilityMapping" value="org.bonitasoft.engine.data.instance.model.impl.SDataInstanceVisibilityMappingImpl" />
                 <entry key="org.bonitasoft.engine.profile.model.SProfile" value="org.bonitasoft.engine.profile.model.impl.SProfileImpl" />
                 <entry key="org.bonitasoft.engine.profile.model.SProfileEntry" value="org.bonitasoft.engine.profile.model.impl.SProfileEntryImpl" />
                 <entry key="org.bonitasoft.engine.profile.model.SProfileMember" value="org.bonitasoft.engine.profile.model.impl.SProfileMemberImpl" />
@@ -115,7 +115,6 @@
                 <entry key="org.bonitasoft.engine.data.instance.model.archive.SABlobDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SABlobDataInstanceImpl" />
                 <entry key="org.bonitasoft.engine.data.instance.model.archive.SAXMLObjectDataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SAXMLObjectDataInstanceImpl" />
                 <entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstance" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl" />
-                <entry key="org.bonitasoft.engine.data.instance.model.archive.SADataInstanceVisibilityMapping" value="org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl" />
             </map>
         </constructor-arg>
         <constructor-arg name="mappingExclusions">

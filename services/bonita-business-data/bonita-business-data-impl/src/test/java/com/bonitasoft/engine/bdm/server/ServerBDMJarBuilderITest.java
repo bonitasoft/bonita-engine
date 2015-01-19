@@ -31,8 +31,15 @@ public class ServerBDMJarBuilderITest {
     public void jar_builder_should_go_well_without_errors_with_queries2() throws Exception {
         final JDTCompiler compiler = new JDTCompiler();
         final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler, null);
+        bdmJarBuilder.build(aBOM().buildPerson(), TrueFileFilter.TRUE);
+    }
+
+    @Test
+    public void jar_builder_should_go_well_with_multipleBoolean() throws Exception {
+        final JDTCompiler compiler = new JDTCompiler();
+        final AbstractBDMJarBuilder bdmJarBuilder = new ServerBDMJarBuilder(compiler, null);
         final BOMBuilder builder = new BOMBuilder();
-        bdmJarBuilder.build(builder.buildPerson(), TrueFileFilter.TRUE);
+        bdmJarBuilder.build(builder.buildModelWithMultipleBoolean(), TrueFileFilter.TRUE);
     }
 
 }

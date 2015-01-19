@@ -1,4 +1,4 @@
-package com.bonitasoft.engine.command;
+package com.bonitasoft.engine.business.data.impl;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.bonitasoft.engine.api.rest.Link;
 import com.bonitasoft.engine.bdm.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonGenerationException;

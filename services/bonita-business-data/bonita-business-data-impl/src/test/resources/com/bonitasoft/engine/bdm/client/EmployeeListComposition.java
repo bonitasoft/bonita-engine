@@ -74,7 +74,12 @@ public class Employee
     }
 
     public void setAddresses(List<Address> addresses) {
-        this.addresses = addresses;
+        if (this.addresses == null) {
+            this.addresses = addresses;
+        } else {
+            this.addresses.clear();
+            this.addresses.addAll(addresses);
+        }
     }
 
     public List<Address> getAddresses() {
@@ -92,7 +97,12 @@ public class Employee
     }
 
     public void setSkills(List<Skill> skills) {
-        this.skills = skills;
+        if (this.skills == null) {
+            this.skills = skills;
+        } else {
+            this.skills.clear();
+            this.skills.addAll(skills);
+        }
     }
 
     @LazyLoaded
