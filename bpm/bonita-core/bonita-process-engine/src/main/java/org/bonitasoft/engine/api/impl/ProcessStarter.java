@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bonitasoft.engine.bpm.connector.ConnectorDefinitionWithInputValues;
-import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ProcessActivationException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinitionNotFoundException;
 import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
@@ -34,7 +33,6 @@ import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitio
 import org.bonitasoft.engine.core.process.definition.exception.SProcessDefinitionReadException;
 import org.bonitasoft.engine.core.process.definition.model.SFlowNodeDefinition;
 import org.bonitasoft.engine.core.process.definition.model.SProcessDefinition;
-import org.bonitasoft.engine.core.process.definition.model.SProcessDefinitionDeployInfo;
 import org.bonitasoft.engine.core.process.instance.api.exceptions.SProcessInstanceCreationException;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
@@ -109,8 +107,9 @@ public class ProcessStarter {
             SProcessDefinitionReadException, SProcessDefinitionException {
         final TenantServiceAccessor tenantAccessor = getTenantAccessor();
         final ProcessExecutor processExecutor = tenantAccessor.getProcessExecutor();
+        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
 
-        final SProcessDefinition sProcessDefinition = getProcessDefinition();
+        final SProcessDefinition sProcessDefinition = processDefinitionService.getProcessDefinitionIfIsEnabled(processDefinitionId);
         final Map<String, Object> operationContext = getContext();
         final long starterSubstituteUserId = SessionInfos.getUserIdFromSession();
         final long starterUserId = getStarterUserId(starterSubstituteUserId);
@@ -151,17 +150,6 @@ public class ProcessStarter {
         }
         return Collections.emptyMap();
     }
-
-    private SProcessDefinition getProcessDefinition() throws SProcessDefinitionReadException, SProcessDefinitionException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ProcessDefinitionService processDefinitionService = tenantAccessor.getProcessDefinitionService();
-            final SProcessDefinitionDeployInfo deployInfo = processDefinitionService.getProcessDeploymentInfo(processDefinitionId);
-            if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
-            throw new SProcessDefinitionException("The process definition is not enabled !!", deployInfo.getProcessId(), deployInfo.getName(),
-                    deployInfo.getVersion());
-            }
-        return processDefinitionService.getProcessDefinition(processDefinitionId);
-        }
 
     private void logProcessInstanceStartedAndAddComment(final SProcessDefinition sProcessDefinition, final long starterId, final long starterSubstituteId,
             final SProcessInstance sProcessInstance) {

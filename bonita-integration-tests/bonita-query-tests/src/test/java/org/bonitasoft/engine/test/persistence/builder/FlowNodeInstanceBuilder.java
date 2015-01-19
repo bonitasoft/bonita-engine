@@ -3,9 +3,7 @@ package org.bonitasoft.engine.test.persistence.builder;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.impl.SFlowNodeInstanceImpl;
 
-
-public abstract class FlowNodeInstanceBuilder<T extends SFlowNodeInstanceImpl, B extends FlowNodeInstanceBuilder<T, B>>
-        extends PersistentObjectBuilder<T, B> {
+public abstract class FlowNodeInstanceBuilder<T extends SFlowNodeInstanceImpl, B extends FlowNodeInstanceBuilder<T, B>> extends PersistentObjectBuilder<T, B> {
 
     protected int stateId;
 
@@ -66,6 +64,7 @@ public abstract class FlowNodeInstanceBuilder<T extends SFlowNodeInstanceImpl, B
         persistent.setStateCategory(stateCategory);
         persistent.setStateExecuting(stateExecuting);
         persistent.setStateId(stateId);
+        persistent.setStateName(stateName);
         persistent.setTerminal(terminal);
         persistent.setTokenRefId(tokenRefId);
         persistent.setLogicalGroup(0, logicalGroup1);

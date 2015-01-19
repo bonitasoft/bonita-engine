@@ -27,14 +27,7 @@ import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.Serializable;
@@ -88,6 +81,7 @@ import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.
 import org.bonitasoft.engine.core.process.instance.api.exceptions.event.trigger.SEventTriggerInstanceReadException;
 import org.bonitasoft.engine.core.process.instance.model.SActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowElementsContainerType;
+import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstanceStateCounter;
 import org.bonitasoft.engine.core.process.instance.model.SProcessInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
 import org.bonitasoft.engine.core.process.instance.model.STaskPriority;
@@ -97,6 +91,7 @@ import org.bonitasoft.engine.core.process.instance.model.impl.SProcessInstanceIm
 import org.bonitasoft.engine.core.process.instance.model.impl.SUserTaskInstanceImpl;
 import org.bonitasoft.engine.data.instance.api.DataInstanceContainer;
 import org.bonitasoft.engine.data.instance.api.DataInstanceService;
+import org.bonitasoft.engine.data.instance.api.ParentContainerResolver;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceException;
 import org.bonitasoft.engine.data.instance.exception.SDataInstanceReadException;
 import org.bonitasoft.engine.data.instance.model.SDataInstance;
@@ -179,6 +174,8 @@ public class ProcessAPIImplTest {
 
     @Mock
     private DataInstanceService dataInstanceService;
+    @Mock
+    private ParentContainerResolver parentContainerResolver;
 
     @Mock
     private ProcessDefinitionService processDefinitionService;
@@ -245,6 +242,39 @@ public class ProcessAPIImplTest {
         when(tenantAccessor.getSearchEntitiesDescriptor()).thenReturn(searchEntitiesDescriptor);
         when(tenantAccessor.getEventInstanceService()).thenReturn(eventInstanceService);
         when(tenantAccessor.getFlowNodeStateManager()).thenReturn(flowNodeStateManager);
+        when(tenantAccessor.getParentContainerResolver()).thenReturn(parentContainerResolver);
+    }
+
+    @Test
+    public void getFlownodeStateCounters_should_build_proper_journal_and_archived_counters() throws Exception {
+        final long processInstanceId = 9811L;
+        List<SFlowNodeInstanceStateCounter> flownodes = new ArrayList<SFlowNodeInstanceStateCounter>(4);
+        flownodes.add(new SFlowNodeInstanceStateCounter("step1", "completed", 2L));
+        flownodes.add(new SFlowNodeInstanceStateCounter("step2", "completed", 4L));
+        flownodes.add(new SFlowNodeInstanceStateCounter("step1", "ready", 1L));
+        flownodes.add(new SFlowNodeInstanceStateCounter("step3", "failed", 8L));
+        when(activityInstanceService.getNumberOfFlownodesInAllStates(processInstanceId)).thenReturn(flownodes);
+
+        List<SFlowNodeInstanceStateCounter> archivedFlownodes = new ArrayList<SFlowNodeInstanceStateCounter>(1);
+        archivedFlownodes.add(new SFlowNodeInstanceStateCounter("step2", "aborted", 3L));
+        when(activityInstanceService.getNumberOfArchivedFlownodesInAllStates(processInstanceId)).thenReturn(archivedFlownodes);
+
+        Map<String, Map<String, Long>> flownodeStateCounters = processAPI.getFlownodeStateCounters(processInstanceId);
+        assertThat(flownodeStateCounters.size()).isEqualTo(3);
+
+        Map<String, Long> step1 = flownodeStateCounters.get("step1");
+        assertThat(step1.size()).isEqualTo(2);
+        assertThat(step1.get("completed")).isEqualTo(2L);
+        assertThat(step1.get("ready")).isEqualTo(1L);
+
+        Map<String, Long> step2 = flownodeStateCounters.get("step2");
+        assertThat(step2.size()).isEqualTo(2);
+        assertThat(step2.get("aborted")).isEqualTo(3L);
+        assertThat(step2.get("completed")).isEqualTo(4L);
+
+        Map<String, Long> step3 = flownodeStateCounters.get("step3");
+        assertThat(step3.size()).isEqualTo(1);
+        assertThat(step3.get("failed")).isEqualTo(8L);
     }
 
     @Test
@@ -319,7 +349,7 @@ public class ProcessAPIImplTest {
         processAPI.updateProcessDataInstance("foo", PROCESS_INSTANCE_ID, "go");
 
         // Then
-        verify(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), eq(Collections.<String, Serializable> singletonMap("foo", "go")));
+        verify(processAPI).updateProcessDataInstances(eq(PROCESS_INSTANCE_ID), eq(Collections.<String, Serializable>singletonMap("foo", "go")));
     }
 
     @Test(expected = UpdateException.class)
@@ -344,7 +374,7 @@ public class ProcessAPIImplTest {
         sDataBar.setClassName(String.class.getName());
         sDataBar.setName("bar");
 
-        doReturn(asList(sDataFoo, sDataBar)).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString());
+        doReturn(asList(sDataFoo, sDataBar)).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString(), any(ParentContainerResolver.class));
 
         // Then update the data instances
         final Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
@@ -371,7 +401,7 @@ public class ProcessAPIImplTest {
         dataInstance.setClassName(List.class.getName());
         dataInstance.setName(dataName);
         doReturn(Collections.singletonList(dataInstance)).when(dataInstanceService).getDataInstances(Collections.singletonList(dataName),
-                PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.toString());
+                PROCESS_INSTANCE_ID, DataInstanceContainer.PROCESS_INSTANCE.toString(), parentContainerResolver);
 
         // When
         try {
@@ -391,7 +421,7 @@ public class ProcessAPIImplTest {
     public void should_updateProcessDataInstances_call_DataInstance_on_non_existing_data_throw_UpdateException() throws Exception {
         final long processInstanceId = 42l;
         doReturn(null).when(processAPI).getProcessInstanceClassloader(any(TenantServiceAccessor.class), anyLong());
-        doThrow(new SDataInstanceReadException("Mocked")).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString());
+        doThrow(new SDataInstanceReadException("Mocked")).when(dataInstanceService).getDataInstances(eq(asList("foo", "bar")), anyLong(), anyString(), any(ParentContainerResolver.class));
 
         // Then update the data instances
         final Map<String, Serializable> dataNameValues = new HashMap<String, Serializable>();
@@ -535,7 +565,7 @@ public class ProcessAPIImplTest {
         final SBlobDataInstanceImpl dataInstance = new SBlobDataInstanceImpl();
         dataInstance.setClassName(List.class.getName());
         dataInstance.setName(dataName);
-        doReturn(dataInstance).when(dataInstanceService).getDataInstance(dataName, FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.toString());
+        doReturn(dataInstance).when(dataInstanceService).getDataInstance(dataName, FLOW_NODE_INSTANCE_ID, DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
 
         // When
         try {
@@ -686,12 +716,12 @@ public class ProcessAPIImplTest {
 
         final SDataInstance dataInstance = mock(SDataInstance.class);
         when(dataInstanceService.getDataInstances(anyListOf(String.class), anyLong(),
-                eq(DataInstanceContainer.ACTIVITY_INSTANCE.toString()))).thenReturn(Arrays.asList(dataInstance));
-
-        doReturn(mock(SOperation.class)).when(processAPI).convertOperation(operation);
+                eq(DataInstanceContainer.ACTIVITY_INSTANCE.toString()), any(ParentContainerResolver.class))).thenReturn(Arrays.asList(dataInstance));
 
         final List<Operation> operations = new ArrayList<Operation>();
         operations.add(operation);
+        doReturn(Arrays.asList(mock(SOperation.class))).when(processAPI).convertOperations(operations);
+
         processAPI.updateActivityInstanceVariables(operations, 2, null);
 
         verify(classLoaderService).getLocalClassLoader(anyString(), anyLong());

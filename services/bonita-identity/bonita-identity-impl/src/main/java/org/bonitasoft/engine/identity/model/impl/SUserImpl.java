@@ -249,8 +249,8 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
         if (title != null ? !title.equals(sUser.title) : sUser.title != null) return false;
         if (userName != null ? !userName.equals(sUser.userName) : sUser.userName != null) return false;
 
-        return true;
-    }
+            return true;
+        }
 
     @Override
     public int hashCode() {
@@ -271,7 +271,7 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
         result = 31 * result + (enabled ? 1 : 0);
         result = 31 * result + (sUserLogin != null ? sUserLogin.hashCode() : 0);
         return result;
-    }
+        }
 
     @Override
     public String toString() {

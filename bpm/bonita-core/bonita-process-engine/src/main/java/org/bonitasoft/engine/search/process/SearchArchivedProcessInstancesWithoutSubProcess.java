@@ -15,6 +15,7 @@ package org.bonitasoft.engine.search.process;
 
 import java.util.List;
 
+import org.bonitasoft.engine.core.process.definition.ProcessDefinitionService;
 import org.bonitasoft.engine.core.process.instance.api.ProcessInstanceService;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAProcessInstance;
 import org.bonitasoft.engine.persistence.QueryOptions;
@@ -32,9 +33,9 @@ public class SearchArchivedProcessInstancesWithoutSubProcess extends AbstractArc
 
     private final ProcessInstanceService processInstanceService;
 
-    public SearchArchivedProcessInstancesWithoutSubProcess(final ProcessInstanceService processInstanceService, final SearchEntityDescriptor searchDescriptor,
-            final SearchOptions options) {
-        super(searchDescriptor, options);
+    public SearchArchivedProcessInstancesWithoutSubProcess(final ProcessInstanceService processInstanceService,
+            final ProcessDefinitionService processDefinitionService, final SearchEntityDescriptor searchDescriptor, final SearchOptions options) {
+        super(searchDescriptor, options, processDefinitionService);
         this.processInstanceService = processInstanceService;
     }
 

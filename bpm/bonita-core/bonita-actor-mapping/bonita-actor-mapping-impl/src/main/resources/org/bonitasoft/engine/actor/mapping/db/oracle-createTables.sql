@@ -2,11 +2,11 @@ CREATE TABLE actor (
   tenantid NUMBER(19, 0) NOT NULL,
   id NUMBER(19, 0) NOT NULL,
   scopeId NUMBER(19, 0) NOT NULL,
-  name VARCHAR2(50) NOT NULL,
-  displayName VARCHAR2(75),
-  description VARCHAR2(1024),
-  initiator NUMBER(1) ,
-  UNIQUE (tenantid, id, scopeId, name),
+  name VARCHAR2(50 CHAR) NOT NULL,
+  displayName VARCHAR2(75 CHAR),
+  description VARCHAR2(1024 CHAR),
+  initiator NUMBER(1),
+  CONSTRAINT UK_Actor UNIQUE (tenantid, id, scopeId, name),
   PRIMARY KEY (tenantid, id)
 );
 

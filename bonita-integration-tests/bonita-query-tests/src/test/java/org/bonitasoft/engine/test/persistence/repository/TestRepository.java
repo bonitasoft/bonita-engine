@@ -8,6 +8,8 @@ import org.bonitasoft.engine.core.process.definition.model.impl.SProcessDefiniti
 import org.bonitasoft.engine.core.process.instance.model.SConnectorInstance;
 import org.bonitasoft.engine.core.process.instance.model.SFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
+import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
+import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAFlowNodeInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.archive.impl.SAProcessInstanceImpl;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SMessageInstance;
 import org.bonitasoft.engine.core.process.instance.model.event.handling.SWaitingMessageEvent;
@@ -153,6 +155,11 @@ public class TestRepository {
     public SFlowNodeInstance add(final SFlowNodeInstanceImpl sFlowNode) {
         getSession().save(sFlowNode);
         return (SFlowNodeInstance) getSession().get(sFlowNode.getClass(), new PersistentObjectId(sFlowNode.getId(), sFlowNode.getTenantId()));
+    }
+
+    public SAFlowNodeInstance add(final SAFlowNodeInstanceImpl saFlowNode) {
+        getSession().save(saFlowNode);
+        return (SAFlowNodeInstance) getSession().get(saFlowNode.getClass(), new PersistentObjectId(saFlowNode.getId(), saFlowNode.getTenantId()));
     }
 
     public SHiddenTaskInstanceImpl add(final SHiddenTaskInstanceImpl sHiddenTaskInstanceImpl) {

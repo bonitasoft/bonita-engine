@@ -1,25 +1,24 @@
 s/IMAGE/BLOB/g
 s/BIGINT/NUMBER(19, 0)/g
 s/INTEGER/NUMBER(10, 0)/g
-s/LONGVARCHAR/VARCHAR2(1024)/g
-s/VARCHAR/VARCHAR2/g
-s/TEXT/VARCHAR2(1024)/g
+s/LONGVARCHAR/VARCHAR2(1024 CHAR)/g
+s/VARCHAR(\(.*\))/VARCHAR2(\1 CHAR)/g
+s/TEXT/VARCHAR2(1024 CHAR)/g
 s/TINYINT/SMALLINT/g
 s/LONGVARBINARY/BLOB/g
 s/\(\s*\)\(.*\)\sBOOLEAN\(.*NULL\)*\(\s\)*/\1\2 NUMBER(1)\3\4/g
 s/MEDIUMBLOB/BLOB/g
 s/LONGBLOB/BLOB/g
-s/CLOB2/VARCHAR2(1024)/g
+s/CLOB2/VARCHAR2(1024 CHAR)/g
 s/FALSE/0/g
 s/ IF EXISTS//g
-s/previousVersion VARCHAR2(50) NOT NULL,/previousVersion VARCHAR2(50),/g
+s/previousVersion VARCHAR2(50) NOT NULL,/previousVersion VARCHAR2(50 CHAR),/g
 s/DROP TABLE \(.*\);/DROP TABLE \1 cascade constraints purge;/g
 
 #unnessessary keys
 /fk_business_log_tenantId/d
 /fk_businesslog_p_tenantId/d
 /fk_data_instance_tenantId/d
-/fk_data_mapping_tenantId/d
 /fk_datasource_tenantId/d
 /fk_dependency_tenantId/d
 /fk_dependencymapping_tenantId/d
@@ -35,11 +34,9 @@ s/DROP TABLE \(.*\);/DROP TABLE \1 cascade constraints purge;/g
 /ALTER TABLE datasourceparameter ADD CONSTRAINT fk_datasrcparam_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);/d
 /ALTER TABLE arch_process_comment ADD CONSTRAINT fk_Aproc_com_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);/d
 /ALTER TABLE arch_data_instance ADD CONSTRAINT fk_Adata_inst_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);/d
-/ALTER TABLE arch_data_mapping ADD CONSTRAINT fk_Adata_map_tenantId FOREIGN KEY (tenantid) REFERENCES tenant(id);/d
 s/fk_event_trigger_instance_flownode_instanceId_idx/fk_evtTrig_fln_Id_idx/g
 s/fk_process_definition_categoryId_idx/fk_procDef_catId_idx/g
 s/fk_arch_flownode_instance_actorId_idx/fk_Afln_actId_idx/g
-s/fk_data_mapping_data_instanceId_idx/fk_dataMap_dataInstId_idx/g
 s/fk_datasourceparameter_tenantId_idx/fk_DSParam_tenId_idx/g
 s/fk_dependencymapping_tenantId_idx/fk_depMap_tenId_idx/g
 s/fk_document_content_tenantId_idx/fk_docCont_tenId_idx/g
@@ -87,7 +84,6 @@ s/fk_arch_process_comment_user_Id_idx/fk_AprocCom_usrId_idx/g
 s/fk_arch_process_comment_arch_process_instanceId_idx/fk_AProcCom_AProc_idx/g
 s/fk_arch_process_comment_tenantId_idx/fk_AProcCom_tenId_idx/g
 s/fk_arch_data_instance_tenantId_idx/fk_AData_tenId_idx/g
-s/fk_arch_data_mapping_tenantId_idx/fk_ADataMap_tenId_idx/g
 s/fk_datasourceparameter_tenantId/fk_DSParam_tenId/g
 s/fk_event_trigger_instance_tenantId/fk_EvtTrig_tenId/g
 s/fk_external_identity_mapping_tenantId/fk_extIdMap_tenId/g
@@ -138,7 +134,6 @@ s/fk_arch_transition_instance_tenantId/fk_ATrans_tenId/g
 /fk_profileentry_profileId/d
 /fk_profilemember_profileId/d
 /fk_arch_data_instance_tenantId/d
-/fk_arch_data_mapping_tenantId/d
 
 /idx_pdependencymapping_depid/d
 /idx_pdependency_name/d

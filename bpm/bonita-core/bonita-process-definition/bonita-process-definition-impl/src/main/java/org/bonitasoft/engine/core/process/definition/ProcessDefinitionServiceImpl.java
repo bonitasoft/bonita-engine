@@ -334,6 +334,16 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         }
     }
 
+    @Override
+    public SProcessDefinition getProcessDefinitionIfIsEnabled(final long processDefinitionId) throws SProcessDefinitionReadException, SProcessDefinitionException {
+        final SProcessDefinitionDeployInfo deployInfo = getProcessDeploymentInfo(processDefinitionId);
+        if (ActivationState.DISABLED.name().equals(deployInfo.getActivationState())) {
+            throw new SProcessDefinitionException("The process definition is not enabled !!", deployInfo.getProcessId(), deployInfo.getName(),
+                    deployInfo.getVersion());
+        }
+        return getProcessDefinition(processDefinitionId);
+    }
+
     private long setIdOnProcessDefinition(final SProcessDefinition sProcessDefinition) throws SReflectException {
         final long id = generateId();
         ClassReflector.invokeSetter(sProcessDefinition, "setId", Long.class, id);
@@ -571,20 +581,20 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     }
 
     @Override
-    public long getProcessDefinitionId(final String name, final String version) throws SProcessDefinitionReadException {
+    public long getProcessDefinitionId(final String name, final String version) throws SProcessDefinitionReadException, SProcessDefinitionNotFoundException {
         try {
             final Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put("name", name);
             parameters.put("version", version);
             final Long processDefId = persistenceService.selectOne(new SelectOneDescriptor<Long>("getProcessDefinitionIdByNameAndVersion", parameters,
                     SProcessDefinitionDeployInfo.class, Long.class));
-            if (processDefId != null) {
-                return processDefId;
+            if (processDefId == null) {
+                final SProcessDefinitionNotFoundException exception = new SProcessDefinitionNotFoundException("Process definition id not found.");
+                exception.setProcessDefinitionNameOnContext(name);
+                exception.setProcessDefinitionVersionOnContext(version);
+                throw exception;
             }
-            final SProcessDefinitionReadException exception = new SProcessDefinitionReadException("Process definition id not found.");
-            exception.setProcessDefinitionNameOnContext(name);
-            exception.setProcessDefinitionVersionOnContext(version);
-            throw exception;
+            return processDefId;
         } catch (final SBonitaReadException e) {
             throw new SProcessDefinitionReadException(e);
         }

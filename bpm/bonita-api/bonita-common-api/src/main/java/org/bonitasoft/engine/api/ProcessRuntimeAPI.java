@@ -358,7 +358,7 @@ public interface ProcessRuntimeAPI {
      * Delete all archived process instance (different states) of the source identifier list.
      * Passing {@link Integer#MAX_VALUE} identifiers is discouraged as the amount of operations may be large and may thus result in timeout operation.
      *
-     * @param processInstanceIds
+     * @param sourceProcessInstanceIds
      *        Identifiers corresponding to {@link ArchivedProcessInstance#getSourceObjectId()}.
      * @return The number of {@link ArchivedProcessInstance}s that have been deleted in any state. For example, process instance can be archived is several
      *         states: Cancelled, Aborted, Completed, Failed
@@ -372,7 +372,7 @@ public interface ProcessRuntimeAPI {
      * Delete all archived process instance (different states) corresponding to the source identifier.
      * Passing {@link Integer#MAX_VALUE} identifiers is discouraged as the amount of operations may be large and may thus result in timeout operation.
      *
-     * @param processInstanceId
+     * @param sourceProcessInstanceId
      *        Identifier corresponding to {@link ArchivedProcessInstance#getSourceObjectId()}.
      * @return The number of {@link ArchivedProcessInstance}s that have been deleted in any state. For example, process instance can be archived is several
      *         states: Cancelled, Aborted, Completed, Failed
@@ -1721,7 +1721,7 @@ public interface ProcessRuntimeAPI {
      * Search for comments related to the specified process instance.
      *
      * @param searchOptions
-     *        The options used to search for comments. See {@link org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptorr} for valid fields for searching
+     *        The options used to search for comments. See {@link org.bonitasoft.engine.bpm.comment.SearchCommentsDescriptor} for valid fields for searching
      *        and sorting.
      * @return The matching comments.
      * @throws InvalidSessionException
@@ -2383,6 +2383,18 @@ public interface ProcessRuntimeAPI {
      * @since 6.3.3
      */
     SearchResult<ProcessDeploymentInfo> searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(SearchOptions searchOptions) throws SearchException;
+
+    /**
+     * Retrieve, for a given process instance, the current counters on flownodes. Please note: this method does not count the flownodes of sub-process instances
+     * of the given process instance.
+     * 
+     * @param processInstanceId ID of the process instance of which to retrieve the current indicators.
+     * @return A map of counters: the key is the name of the flownode, as defined at design-time. the value is the current counters for this flownode, that is,
+     *         a map of &lt;state name, number of current flownode in that state&gt;
+     *         If no results, returns an empty Map.
+     * @since 6.5.0
+     */
+    Map<String, Map<String, Long>> getFlownodeStateCounters(long processInstanceId);
 
     /**
      * Search the {@link TimerEventTriggerInstance} on the specific {@link ProcessInstance}.

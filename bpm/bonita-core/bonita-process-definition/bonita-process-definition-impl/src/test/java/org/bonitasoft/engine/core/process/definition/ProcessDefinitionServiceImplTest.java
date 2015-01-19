@@ -25,7 +25,9 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bonitasoft.engine.bpm.process.ActivationState;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfoCriterion;
@@ -298,23 +300,50 @@ public class ProcessDefinitionServiceImplTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl#getProcessDefinitionId(java.lang.String, java.lang.String)}.
+     * {@link ProcessDefinitionService#getProcessDefinitionId(String, String)}.
      */
     @Test
-    public void getProcessDefinitionId() throws Exception {
+    public void getProcessDefinitionId_should_return_id_of_process_definition_with_given_name_and_version() throws Exception {
         // Given
-        final long numberOfProcessDeploymentInfos = 9;
-        doReturn(numberOfProcessDeploymentInfos).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<Long>> any());
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        String name = "proc";
+        String version = "1.0";
+        parameters.put("name", name);
+        parameters.put("version", version);
+        SelectOneDescriptor<Long> selectOneDescriptor = new SelectOneDescriptor<Long>("getProcessDefinitionIdByNameAndVersion", parameters,
+                SProcessDefinitionDeployInfo.class, Long.class);
+
+        final long processId = 9;
+        doReturn(processId).when(persistenceService).selectOne(selectOneDescriptor);
 
         // When
-        final long result = processDefinitionServiceImpl.getProcessDefinitionId("name", "version");
+        final long result = processDefinitionServiceImpl.getProcessDefinitionId(name, version);
 
         // Then
-        assertEquals(numberOfProcessDeploymentInfos, result);
+        assertEquals(processId, result);
+    }
+
+    @Test(expected = SProcessDefinitionNotFoundException.class)
+    public void getProcessDefinitionId_should_return_throw_SProcessDefinitionNotFoundException_when_persistenceSservice_returns_null() throws Exception {
+        // Given
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        String name = "proc";
+        String version = "1.0";
+        parameters.put("name", name);
+        parameters.put("version", version);
+        SelectOneDescriptor<Long> selectOneDescriptor = new SelectOneDescriptor<Long>("getProcessDefinitionIdByNameAndVersion", parameters,
+                SProcessDefinitionDeployInfo.class, Long.class);
+
+        doReturn(null).when(persistenceService).selectOne(selectOneDescriptor);
+
+        // When
+        processDefinitionServiceImpl.getProcessDefinitionId("name", "version");
+
+        // Then exception
     }
 
     @Test(expected = SProcessDefinitionReadException.class)
-    public void getProcessDefinitionIdThrowException() throws Exception {
+    public void getProcessDefinitionId_should_throw_SProcessDefinitionReadException_when_persistenceSservice_throws_exception() throws Exception {
         // Given
         doThrow(new SBonitaReadException("plop")).when(persistenceService).selectOne(Matchers.<SelectOneDescriptor<Long>> any());
 
@@ -1370,7 +1399,7 @@ public class ProcessDefinitionServiceImplTest {
 
     /**
      * Test method for
-     * {@link org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl#searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(long, org.bonitasoft.engine.persistence.QueryOptions)}
+     * {@link org.bonitasoft.engine.core.process.definition.ProcessDefinitionServiceImpl#searchProcessDeploymentInfosWithAssignedOrPendingHumanTasks(org.bonitasoft.engine.persistence.QueryOptions)}
      * .
      */
     @Test

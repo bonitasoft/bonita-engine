@@ -45,29 +45,6 @@
 		ORDER BY sa.archiveDate DESC
 	</query>
 
-	<query name="getSADataInstanceIdFromMapping">
-		SELECT saDataInstanceVisibilityMapping.dataInstanceId
-		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl AS saDataInstanceVisibilityMapping
-		WHERE saDataInstanceVisibilityMapping.dataName = :dataName
-		AND saDataInstanceVisibilityMapping.containerId = :containerId
-		AND saDataInstanceVisibilityMapping.containerType = :containerType
-	</query>
-
-	<query name="getSADataInstanceIdsFromMapping">
-		SELECT saDataInstanceVisibilityMapping.dataInstanceId
-		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl AS saDataInstanceVisibilityMapping
-		WHERE saDataInstanceVisibilityMapping.dataName IN (:dataNames)
-		AND saDataInstanceVisibilityMapping.containerId = :containerId
-		AND saDataInstanceVisibilityMapping.containerType = :containerType
-	</query>
-
-	<query name="getSADataInstanceVisibilityMappings">
-		SELECT saDataInstanceVisibilityMapping
-		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceVisibilityMappingImpl AS saDataInstanceVisibilityMapping
-		WHERE saDataInstanceVisibilityMapping.containerId = :containerId
-		AND saDataInstanceVisibilityMapping.containerType = :containerType
-	</query>
-
 	<query name="getLocalSADataInstances">
 		SELECT sa
 		FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS sa
@@ -91,5 +68,50 @@
 		)
 		ORDER BY sa.archiveDate DESC
 	</query>
+
+    <query name="getArchivedDataInstancesWithNamesOf1Containers">
+        SELECT dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS dataInstance
+        WHERE
+        dataInstance.name in (:dataNames)
+        AND
+        dataInstance.archiveDate &lt;= :time
+        AND
+        (
+        dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
+        )
+    </query>
+
+    <query name="getArchivedDataInstancesWithNamesOf2Containers">
+        SELECT dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS dataInstance
+        WHERE
+        dataInstance.name in (:dataNames)
+        AND
+        dataInstance.archiveDate &lt;= :time
+        AND
+        (
+        dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
+        OR
+        dataInstance.containerType = :containerType2 AND dataInstance.containerId in(:containerType2Ids)
+        )
+    </query>
+
+    <query name="getArchivedDataInstancesWithNamesOf3Containers">
+        SELECT dataInstance
+        FROM org.bonitasoft.engine.data.instance.model.archive.impl.SADataInstanceImpl AS dataInstance
+        WHERE
+        dataInstance.name in (:dataNames)
+        AND
+        dataInstance.archiveDate &lt;= :time
+        AND
+        (
+        dataInstance.containerType = :containerType1 AND dataInstance.containerId in(:containerType1Ids)
+        OR
+        dataInstance.containerType = :containerType2 AND dataInstance.containerId in(:containerType2Ids)
+        OR
+        dataInstance.containerType = :containerType3 AND dataInstance.containerId in(:containerType3Ids)
+        )
+    </query>
 
 </hibernate-mapping>
