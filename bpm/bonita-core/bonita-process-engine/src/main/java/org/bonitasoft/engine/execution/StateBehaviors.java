@@ -259,9 +259,9 @@ public class StateBehaviors {
     public void mapDataOutputOfMultiInstance(final SFlowNodeInstance flowNodeInstance, final SMultiInstanceLoopCharacteristics miLoop)
             throws SActivityExecutionException, SBonitaException {
         final SDataInstance outputData = dataInstanceService.getDataInstance(miLoop.getDataOutputItemRef(), flowNodeInstance.getId(),
-                DataInstanceContainer.ACTIVITY_INSTANCE.name());
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(),parentContainerResolver);
         final SDataInstance loopData = dataInstanceService.getDataInstance(miLoop.getLoopDataOutputRef(), flowNodeInstance.getId(),
-                DataInstanceContainer.ACTIVITY_INSTANCE.name());
+                DataInstanceContainer.ACTIVITY_INSTANCE.name(),parentContainerResolver);
         if (outputData != null && loopData != null) {
             final Serializable value = loopData.getValue();
             final int index = flowNodeInstance.getLoopCounter();

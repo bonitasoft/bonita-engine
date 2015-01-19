@@ -46,8 +46,8 @@ import org.bonitasoft.engine.core.process.instance.model.SHumanTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SLoopActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SMultiInstanceActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.SPendingActivityMapping;
-import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.SStateCategory;
+import org.bonitasoft.engine.core.process.instance.model.SUserTaskInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAActivityInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAFlowNodeInstance;
 import org.bonitasoft.engine.core.process.instance.model.archive.SAHumanTaskInstance;
@@ -639,7 +639,11 @@ public class ActivityInstanceServiceImpl extends FlowNodeInstancesServiceImpl im
         final QueryOptions queryOptions = new QueryOptions(fromIndex, numberOfResults, SFlowNodeInstance.class, "id", OrderByType.ASC);
         final SelectListDescriptor<SActivityInstance> descriptor = new SelectListDescriptor<SActivityInstance>("getChildrenOfAnActivity", parameters,
                 SActivityInstance.class, queryOptions);
-        return getPersistenceService().selectList(descriptor);
+        try {
+            return getPersistenceService().selectList(descriptor);
+        } catch (final SBonitaReadException e) {
+            throw new SActivityReadException(e);
+        }
     }
 
     @Override

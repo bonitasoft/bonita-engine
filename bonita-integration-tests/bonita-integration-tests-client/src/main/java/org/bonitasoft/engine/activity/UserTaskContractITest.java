@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bonitasoft.engine.CommonAPITest;
+import org.bonitasoft.engine.CommonAPIIT;
 import org.bonitasoft.engine.bpm.bar.InvalidBusinessArchiveFormatException;
 import org.bonitasoft.engine.bpm.connector.ConnectorEvent;
 import org.bonitasoft.engine.bpm.contract.ComplexInputDefinition;
@@ -43,7 +43,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class UserTaskContractITest extends CommonAPITest {
+public class UserTaskContractITest extends CommonAPIIT {
 
     private static final String TASK2 = "task2";
     private static final String TASK1 = "task1";
@@ -73,7 +73,7 @@ public class UserTaskContractITest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask(TASK1);
+        final HumanTaskInstance userTask = waitForUserTaskAndGetIt(TASK1);
 
         //when
         final ContractDefinition contract = getProcessAPI().getUserTaskContract(userTask.getId());
@@ -109,7 +109,7 @@ public class UserTaskContractITest extends CommonAPITest {
         //when
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask(TASK1);
+        final HumanTaskInstance userTask = waitForUserTaskAndGetIt(TASK1);
 
         //then
         final ContractDefinition contract = getProcessAPI().getUserTaskContract(userTask.getId());
@@ -146,7 +146,7 @@ public class UserTaskContractITest extends CommonAPITest {
         getProcessAPI().startProcess(processDefinition.getId());
 
         //when
-        final HumanTaskInstance task = waitForUserTask(TASK1);
+        final HumanTaskInstance task = waitForUserTaskAndGetIt(TASK1);
         getProcessAPI().assignUserTask(task.getId(), matti.getId());
 
         //then no exceptions
@@ -170,7 +170,7 @@ public class UserTaskContractITest extends CommonAPITest {
         //when
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance task = waitForUserTask(TASK1);
+        final HumanTaskInstance task = waitForUserTaskAndGetIt(TASK1);
         getProcessAPI().assignUserTask(task.getId(), matti.getId());
 
         //then
@@ -190,7 +190,7 @@ public class UserTaskContractITest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask(TASK1);
+        final HumanTaskInstance userTask = waitForUserTaskAndGetIt(TASK1);
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
 
         try {
@@ -240,7 +240,7 @@ public class UserTaskContractITest extends CommonAPITest {
         getProcessAPI().startProcess(processDefinition.getId());
 
         //when
-        final HumanTaskInstance userTask = waitForUserTask(TASK1);
+        final HumanTaskInstance userTask = waitForUserTaskAndGetIt(TASK1);
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
 
         final List<Map<String, Object>> expenseReport = new ArrayList<Map<String, Object>>();
@@ -258,7 +258,7 @@ public class UserTaskContractITest extends CommonAPITest {
         }
 
         //then
-        waitForUserTask(TASK2);
+        waitForUserTaskAndGetIt(TASK2);
         assertThat((List<Map<String, Object>>) getProcessAPI().getArchivedActivityDataInstance("expenseData", userTask.getId()).getValue()).as(
                 "should have my expense report data").hasSize(3);
 
@@ -295,7 +295,7 @@ public class UserTaskContractITest extends CommonAPITest {
         getProcessAPI().startProcess(processDefinition.getId());
 
         //when
-        final HumanTaskInstance userTask = waitForUserTask(TASK1);
+        final HumanTaskInstance userTask = waitForUserTaskAndGetIt(TASK1);
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
 
         final Map<String, Object> taskInputs = new HashMap<String, Object>();
@@ -313,7 +313,7 @@ public class UserTaskContractITest extends CommonAPITest {
         }
 
         //then
-        waitForUserTask(TASK2);
+        waitForUserTaskAndGetIt(TASK2);
 
         final ArchivedDataInstance archivedResult = getProcessAPI().getArchivedActivityDataInstance("inputListData", userTask.getId());
         assertThat((List<String>) archivedResult.getValue()).as("should have a list of simple input").hasSameSizeAs(inputList);
@@ -336,7 +336,7 @@ public class UserTaskContractITest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask(TASK1);
+        final HumanTaskInstance userTask = waitForUserTaskAndGetIt(TASK1);
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
 
         final long expectedValue = 8l;
@@ -348,7 +348,7 @@ public class UserTaskContractITest extends CommonAPITest {
         } catch (final ContractViolationException e) {
             System.err.println(e.getExplanations());
         }
-        waitForUserTask(TASK2);
+        waitForUserTaskAndGetIt(TASK2);
 
         final ArchivedDataInstance archivedResult = getProcessAPI().getArchivedActivityDataInstance("result", userTask.getId());
         assertThat(archivedResult.getValue()).isEqualTo(expectedValue);
@@ -365,7 +365,7 @@ public class UserTaskContractITest extends CommonAPITest {
                 .addConstraint("mandatory", "numberOfDays != null", "numberOfDays must be set", "numberOfDays");
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask(TASK1);
+        final HumanTaskInstance userTask = waitForUserTaskAndGetIt(TASK1);
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
 
         try {
@@ -391,7 +391,7 @@ public class UserTaskContractITest extends CommonAPITest {
 
         final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, matti);
         getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask(TASK1);
+        final HumanTaskInstance userTask = waitForUserTaskAndGetIt(TASK1);
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
 
         try {
@@ -426,7 +426,7 @@ public class UserTaskContractITest extends CommonAPITest {
         final ProcessDefinition processDefinition = deployAndEnableProcessWithTestConnectorWithAPICall(designProcessDefinition);
 
         final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
-        final HumanTaskInstance userTask = waitForUserTask("task3");
+        final HumanTaskInstance userTask = waitForUserTaskAndGetIt("task3");
 
         getProcessAPI().assignUserTask(userTask.getId(), matti.getId());
         try {
@@ -462,7 +462,7 @@ public class UserTaskContractITest extends CommonAPITest {
         getProcessAPI().startProcess(processDefinition.getId());
 
         //when
-        final HumanTaskInstance task = waitForUserTask(TASK1);
+        final HumanTaskInstance task = waitForUserTaskAndGetIt(TASK1);
         final Map<String, Object> inputs = new HashMap<String, Object>();
         inputs.put("numberOfDays", inputValue);
         try {

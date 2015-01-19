@@ -349,6 +349,7 @@ import org.bonitasoft.engine.job.FailedJob;
 import org.bonitasoft.engine.lock.BonitaLock;
 import org.bonitasoft.engine.lock.LockService;
 import org.bonitasoft.engine.lock.SLockException;
+import org.bonitasoft.engine.log.LogMessageBuilder;
 import org.bonitasoft.engine.log.technical.TechnicalLogSeverity;
 import org.bonitasoft.engine.log.technical.TechnicalLoggerService;
 import org.bonitasoft.engine.operation.LeftOperand;
@@ -2993,13 +2994,13 @@ public class ProcessAPIImpl implements ProcessAPI {
             final long parentProcessInstanceId = activityInstanceService.getFlowNodeInstance(activityInstanceId).getLogicalGroup(processDefinitionIndex);
             final ClassLoader processClassLoader = classLoaderService.getLocalClassLoader(ScopeType.PROCESS.name(), parentProcessInstanceId);
             Thread.currentThread().setContextClassLoader(processClassLoader);
-            List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(new ArrayList<String>(variables.keySet()), activityInstanceId,
+            final List<SDataInstance> dataInstances = dataInstanceService.getDataInstances(new ArrayList<String>(variables.keySet()), activityInstanceId,
                     DataInstanceContainer.ACTIVITY_INSTANCE.toString(), parentContainerResolver);
             if(dataInstances.size()<variables.size()){
                 throw new UpdateException("Some data does not exists, wanted to update "+variables.keySet()+" but there is only "+dataInstances);
             }
-            for (SDataInstance dataInstance : dataInstances) {
-                Serializable newValue = variables.get(dataInstance.getName());
+            for (final SDataInstance dataInstance : dataInstances) {
+                final Serializable newValue = variables.get(dataInstance.getName());
                 final EntityUpdateDescriptor entityUpdateDescriptor = buildEntityUpdateDescriptorForData(newValue);
                 dataInstanceService.updateDataInstance(dataInstance, entityUpdateDescriptor);
             }
@@ -3017,7 +3018,7 @@ public class ProcessAPIImpl implements ProcessAPI {
 
         final OperationService operationService = tenantAccessor.getOperationService();
         final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
+        final ClassLoaderService classLoaderService = tenantAccessor.getClassLoaderService();
         final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             final SActivityInstance activityInstance = activityInstanceService.getActivityInstance(activityInstanceId);
@@ -3437,10 +3438,10 @@ public class ProcessAPIImpl implements ProcessAPI {
             inputValues.putAll(connectorResult.getResult());
             expressionContext.setInputValues(inputValues);
             // execute
-            Long containerId = expressionContext.getContainerId();
+            final Long containerId = expressionContext.getContainerId();
             operationService.execute(sOperations, containerId == null ? -1 : containerId, expressionContext.getContainerType(), expressionContext);
             // return the value of the data if it's an external data
-            for (Operation operation : operations) {
+            for (final Operation operation : operations) {
                 final LeftOperand leftOperand = operation.getLeftOperand();
                 if (LeftOperand.TYPE_EXTERNAL_DATA.equals(leftOperand.getType())) {
                     externalDataValue.put(leftOperand.getName(), (Serializable) expressionContext.getInputValues().get(leftOperand.getName()));
@@ -4094,35 +4095,35 @@ public class ProcessAPIImpl implements ProcessAPI {
     }
 
     @Override
-    public Map<String, Map<String, Long>> getFlownodeStateCounters(long processInstanceId) {
+    public Map<String, Map<String, Long>> getFlownodeStateCounters(final long processInstanceId) {
         final TenantServiceAccessor serviceAccessor = getTenantAccessor();
         final HashMap<String, Map<String, Long>> countersForProcessInstance = new HashMap<String, Map<String, Long>>();
         try {
             // Active flownodes:
             final List<SFlowNodeInstanceStateCounter> flownodes = serviceAccessor.getActivityInstanceService().getNumberOfFlownodesInAllStates(
                     processInstanceId);
-            for (SFlowNodeInstanceStateCounter nodeCounter : flownodes) {
-                String flownodeName = nodeCounter.getFlownodeName();
-                Map<String, Long> flownodeCounters = getFlownodeCounters(countersForProcessInstance, flownodeName);
+            for (final SFlowNodeInstanceStateCounter nodeCounter : flownodes) {
+                final String flownodeName = nodeCounter.getFlownodeName();
+                final Map<String, Long> flownodeCounters = getFlownodeCounters(countersForProcessInstance, flownodeName);
                 flownodeCounters.put(nodeCounter.getStateName(), nodeCounter.getNumberOf());
                 countersForProcessInstance.put(flownodeName, flownodeCounters);
             }
             // Archived flownodes:
             final List<SFlowNodeInstanceStateCounter> archivedFlownodes = serviceAccessor.getActivityInstanceService().getNumberOfArchivedFlownodesInAllStates(
                     processInstanceId);
-            for (SFlowNodeInstanceStateCounter nodeCounter : archivedFlownodes) {
-                String flownodeName = nodeCounter.getFlownodeName();
-                Map<String, Long> flownodeCounters = getFlownodeCounters(countersForProcessInstance, flownodeName);
+            for (final SFlowNodeInstanceStateCounter nodeCounter : archivedFlownodes) {
+                final String flownodeName = nodeCounter.getFlownodeName();
+                final Map<String, Long> flownodeCounters = getFlownodeCounters(countersForProcessInstance, flownodeName);
                 flownodeCounters.put(nodeCounter.getStateName(), nodeCounter.getNumberOf());
                 countersForProcessInstance.put(flownodeName, flownodeCounters);
             }
-        } catch (SBonitaReadException e) {
+        } catch (final SBonitaReadException e) {
             throw new RetrieveException(e);
         }
         return countersForProcessInstance;
     }
 
-    private Map<String, Long> getFlownodeCounters(HashMap<String, Map<String, Long>> counters, String flownodeName) {
+    private Map<String, Long> getFlownodeCounters(final HashMap<String, Map<String, Long>> counters, final String flownodeName) {
         Map<String, Long> flownodeCounters = counters.get(flownodeName);
         if (flownodeCounters == null) {
             flownodeCounters = new HashMap<String, Long>();

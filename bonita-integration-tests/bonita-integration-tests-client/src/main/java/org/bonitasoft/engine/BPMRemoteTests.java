@@ -1,15 +1,8 @@
 package org.bonitasoft.engine;
 
 import org.bonitasoft.engine.accessors.TenantAccessorTest;
-import org.bonitasoft.engine.activity.CallActivityTest;
-import org.bonitasoft.engine.activity.LoopTest;
-import org.bonitasoft.engine.activity.MultiInstanceTest;
-import org.bonitasoft.engine.activity.UserTaskContractITest;
-import org.bonitasoft.engine.command.AdvancedStartProcessCommandIT;
-import org.bonitasoft.engine.command.CommandTest;
-import org.bonitasoft.engine.command.web.ExternalCommandsTest;
-import org.bonitasoft.engine.connectors.RemoteConnectorExecutionTest;
 import org.bonitasoft.engine.activity.TaskTests;
+import org.bonitasoft.engine.activity.UserTaskContractITest;
 import org.bonitasoft.engine.command.CommandsTests;
 import org.bonitasoft.engine.connectors.RemoteConnectorExecutionIT;
 import org.bonitasoft.engine.event.EventTests;
