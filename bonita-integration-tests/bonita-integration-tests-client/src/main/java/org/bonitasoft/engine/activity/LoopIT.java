@@ -1,6 +1,7 @@
 package org.bonitasoft.engine.activity;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.util.Map;
 
 import org.bonitasoft.engine.TestWithUser;
 import org.bonitasoft.engine.api.ProcessManagementAPI;
+import org.bonitasoft.engine.bpm.data.DataInstance;
 import org.bonitasoft.engine.bpm.flownode.ActivityInstanceCriterion;
 import org.bonitasoft.engine.bpm.flownode.ArchivedActivityInstance;
 import org.bonitasoft.engine.bpm.flownode.ArchivedLoopActivityInstance;
@@ -20,6 +22,7 @@ import org.bonitasoft.engine.bpm.process.InvalidProcessDefinitionException;
 import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.bpm.process.impl.UserTaskDefinitionBuilder;
 import org.bonitasoft.engine.connectors.VariableStorage;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.expression.Expression;
@@ -32,6 +35,7 @@ import org.bonitasoft.engine.test.TestStates;
 import org.bonitasoft.engine.test.annotation.Cover;
 import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -145,6 +149,38 @@ public class LoopIT extends TestWithUser {
         }
         waitForUserTaskAndcheckPendingHumanTaskInstances("step2", processInstance);
 
+        disableAndDeleteProcess(processDefinition);
+    }
+
+    @Test
+    @Ignore("BS-11655")
+    public void executeAStandardLoopWithDataUsingLoopCounter() throws Exception {
+        final Expression condition = new ExpressionBuilder().createGroovyScriptExpression("executeAStandardLoopWithDataUsingLoopCounter",
+                "loopCounter < 3", Boolean.class.getName(), Arrays.asList(new ExpressionBuilder().createEngineConstant(ExpressionConstants.LOOP_COUNTER)));
+
+        final ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("executeAStandardLoopUserTask", "1.0");
+        builder.addActor(ACTOR_NAME).addDescription("ACTOR_NAME all day and night long");
+
+        final Expression defaultValueExpression = new ExpressionBuilder().createGroovyScriptExpression("useLoopCounter",
+                "loopCounter", Integer.class.getName(), Arrays.asList(new ExpressionBuilder().createEngineConstant(ExpressionConstants.LOOP_COUNTER)));
+
+        final UserTaskDefinitionBuilder userTask = builder.addUserTask("step1", ACTOR_NAME);
+        userTask.addData("loopCounterData", Integer.class.getName(), defaultValueExpression);
+        userTask.addLoop(false, condition);
+
+        builder.addUserTask("step2", ACTOR_NAME).addTransition("step1", "step2");
+
+        final ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), ACTOR_NAME, user);
+        final ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        for (int i = 1; i <= 3; i++) {
+            final long stepId;
+            stepId = waitForUserTaskAndcheckPendingHumanTaskInstances("step1", processInstance);
+            assignAndExecuteStep(stepId, user);
+            final DataInstance loopCounterData = getProcessAPI().getActivityDataInstance("loopCounterData", stepId);
+            assertEquals(loopCounterData.getValue(), i);
+        }
+        waitForUserTaskAndcheckPendingHumanTaskInstances("step2", processInstance);
         disableAndDeleteProcess(processDefinition);
     }
 
