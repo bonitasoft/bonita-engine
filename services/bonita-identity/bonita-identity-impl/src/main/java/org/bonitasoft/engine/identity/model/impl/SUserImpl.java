@@ -278,7 +278,6 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
         return "SUserImpl{" +
                 "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", password='" + password + '\'' +
                 ", userName='" + userName + '\'' +
                 ", iconName='" + iconName + '\'' +
                 ", iconPath='" + iconPath + '\'' +
