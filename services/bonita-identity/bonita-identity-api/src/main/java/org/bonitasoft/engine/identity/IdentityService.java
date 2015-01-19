@@ -1215,13 +1215,4 @@ public interface IdentityService {
      */
     @Deprecated
     SUser createUserWithoutEncryptingPassword(SUser user) throws SUserCreationException;
-
-    /**
-     * update the last connection date of the user
-     * @param sUser
-     *      the user to update the last connection date
-     * @param lastConnectionDate
-     *      the actual last connection date
-     */
-    void updateLastConnection(SUser sUser, long lastConnectionDate);
 }

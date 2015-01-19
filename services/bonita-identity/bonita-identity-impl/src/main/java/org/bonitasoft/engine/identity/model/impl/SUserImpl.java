@@ -220,6 +220,10 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
         this.sUserLogin = sUserLogin;
     }
 
+    public void setLastConnection(Long lastConnection){
+        sUserLogin.setLastConnection(lastConnection);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -267,5 +271,26 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
         result = 31 * result + (enabled ? 1 : 0);
         result = 31 * result + (sUserLogin != null ? sUserLogin.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "SUserImpl{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", password='" + password + '\'' +
+                ", userName='" + userName + '\'' +
+                ", iconName='" + iconName + '\'' +
+                ", iconPath='" + iconPath + '\'' +
+                ", managerUserId=" + managerUserId +
+                ", delegeeUserName='" + delegeeUserName + '\'' +
+                ", title='" + title + '\'' +
+                ", jobTitle='" + jobTitle + '\'' +
+                ", creationDate=" + creationDate +
+                ", createdBy=" + createdBy +
+                ", lastUpdate=" + lastUpdate +
+                ", enabled=" + enabled +
+                ", sUserLogin=" + sUserLogin +
+                '}';
     }
 }

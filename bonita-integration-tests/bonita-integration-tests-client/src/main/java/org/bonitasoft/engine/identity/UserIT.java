@@ -10,6 +10,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -1098,6 +1099,38 @@ public class UserIT extends TestWithTechnicalUser {
         assertThat(apiSession).isNotNull();
 
         getIdentityAPI().deleteUser(jyri.getId());
+    }
+
+
+
+    @Test
+    public void theTest() throws Exception {
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+        User john = createUser("john", "bpm");
+        User jack = createUser("jack", "bpm");
+        Date connection1 = getIdentityAPI().getUserByUserName("john").getLastConnection();
+        Thread.sleep(20);
+        logoutOnTenant();
+        loginOnDefaultTenantWith("john", "bpm");
+        Date connection2 = getIdentityAPI().getUserByUserName("john").getLastConnection();
+        getIdentityAPI().getUserByUserName("john").getLastConnection();
+        Thread.sleep(20);
+        logoutOnTenant();
+        loginOnDefaultTenantWith("john", "bpm");
+        Date connection3 = getIdentityAPI().getUserByUserName("john").getLastConnection();
+        Thread.sleep(20);
+        logoutOnTenant();
+        loginOnDefaultTenantWith("jack", "bpm");
+        Date connection4 = getIdentityAPI().getUserByUserName("john").getLastConnection();
+        logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+
+        deleteUsers(john, jack);
+
+        assertThat(connection1).isNull();
+        assertThat(connection2).isBefore(connection3);
+        assertThat(connection3).isEqualTo(connection4);
+
     }
 
 }

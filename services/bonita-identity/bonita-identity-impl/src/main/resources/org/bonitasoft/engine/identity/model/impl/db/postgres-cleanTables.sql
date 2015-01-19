@@ -6,9 +6,9 @@ DELETE FROM custom_usr_inf_def;
 
 DELETE FROM user_contactinfo;
 
-DELETE FROM user_login;
-
 DELETE FROM user_;
+
+DELETE FROM user_login;
 
 DELETE FROM role;
 

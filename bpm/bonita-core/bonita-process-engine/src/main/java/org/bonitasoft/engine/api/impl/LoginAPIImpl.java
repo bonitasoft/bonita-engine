@@ -188,7 +188,11 @@ public class LoginAPIImpl extends AbstractLoginApiImpl implements LoginAPI {
                     if (!sUser.isEnabled()) {
                         throw new LoginException("Unable to login : the user is disable.");
                     }
-                    identityService.updateLastConnection(sUser, System.currentTimeMillis());
+                    final SUserUpdateBuilder userUpdateBuilder = BuilderFactory.get(SUserUpdateBuilderFactory.class).createNewInstance();
+                    final long lastConnection = System.currentTimeMillis();
+                    final EntityUpdateDescriptor updateDescriptor = userUpdateBuilder.updateLastConnection(lastConnection).done();
+                    final UpdateUser updateUser = new UpdateUser(identityService, sUser.getId(), updateDescriptor, null, null);
+                    updateUser.execute();
                 }
             } finally {
                 if (sessionAccessor != null) {

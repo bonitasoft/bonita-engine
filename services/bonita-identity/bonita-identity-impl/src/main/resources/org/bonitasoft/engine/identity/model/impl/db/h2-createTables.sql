@@ -79,7 +79,6 @@ CREATE TABLE user_contactinfo (
   country VARCHAR(50),
   website VARCHAR(50),
   personal BOOLEAN NOT NULL,
-  login_id BIGINT,
   UNIQUE (tenantid, userId, personal),
   PRIMARY KEY (tenantid, id)
 );

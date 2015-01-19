@@ -265,14 +265,13 @@ public class IdentityServiceImpl implements IdentityService {
             //no insert event for user login objects
             final InsertRecord insertRecord = new InsertRecord(hashedUser);
             final SInsertEvent insertEvent = getInsertEvent(hashedUser, USER);
-            SUserLogin sUserLogin = hashedUser.getSUserLogin();
-            if(sUserLogin == null){
-                sUserLogin = new SUserLoginImpl();
-            }
-            ((SUserImpl)hashedUser).setsUserLogin(sUserLogin);
-            ((SUserLoginImpl)sUserLogin).setsUser(hashedUser);
-            recorder.recordInsert(new InsertRecord(sUserLogin), null);
+            SUserLoginImpl sUserLogin = new SUserLoginImpl();
             recorder.recordInsert(insertRecord, insertEvent);
+            ((SUserImpl)hashedUser).setsUserLogin(sUserLogin);
+            sUserLogin.setsUser(hashedUser);
+            sUserLogin.setId(hashedUser.getId());
+            sUserLogin.setTenantId(((SUserImpl)hashedUser).getTenantId());
+            recorder.recordInsert(new InsertRecord(sUserLogin), null);
             initiateLogBuilder(hashedUser.getId(), SQueriableLog.STATUS_OK, logBuilder, methodName);
             logAfterMethod(methodName);
             return hashedUser;
@@ -1818,10 +1817,5 @@ public class IdentityServiceImpl implements IdentityService {
         final List<SCustomUserInfoValue> result = persistenceService.searchEntity(SCustomUserInfoValue.class, options, null);
         logAfterMethod(methodName);
         return result;
-    }
-
-    @Override
-    public void updateLastConnection(SUser sUser, long lastConnectionDate) {
-        sUser.getSUserLogin().setLastConnection(lastConnectionDate);
     }
 }
