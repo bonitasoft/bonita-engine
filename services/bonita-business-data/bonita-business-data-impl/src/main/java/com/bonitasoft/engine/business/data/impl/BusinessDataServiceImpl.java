@@ -2,7 +2,9 @@ package com.bonitasoft.engine.business.data.impl;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -131,7 +133,8 @@ public class BusinessDataServiceImpl implements BusinessDataService {
             valueToSet = getPersistedValue((Entity) valueToSetObjectWith, relationType);
         }
         else if (isListOfEntities(valueToSetObjectWith)) {
-            valueToSet = getPersistedValues((List<Entity>) valueToSetObjectWith);
+            final Type relationType = getRelationType(businessObject, methodName);
+            valueToSet = getPersistedValues((List<Entity>) valueToSetObjectWith, relationType);
         } else {
             valueToSet = valueToSetObjectWith;
         }
@@ -150,11 +153,16 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         return primaryKeys;
     }
 
-    private Object getPersistedValues(final List<Entity> entities) throws SBusinessDataNotFoundException {
+    private Object getPersistedValues(final List<Entity> entities, Type type) throws SBusinessDataNotFoundException {
         if (entities.isEmpty()) {
             return new ArrayList<Entity>();
         }
-        return businessDataRepository.findByIds(entities.get(0).getClass(), getPrimaryKeys(entities));
+        if (Type.AGGREGATION.equals(type)) {
+            return businessDataRepository.findByIds(entities.get(0).getClass(), getPrimaryKeys(entities));
+        }
+        else {
+            return copyForServer(entities);
+        }
     }
 
     private Entity getPersistedValue(final Entity entity, final Type type) throws SBusinessDataNotFoundException {
@@ -164,11 +172,13 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         else {
             return copyForServer(entity);
         }
+    }
 
+    private List<Entity> copyForServer(List<Entity> entities) {
+        return entities;
     }
 
     private Entity copyForServer(final Entity entity) {
-        // TODO Auto-generated method stub
         return entity;
     }
 
@@ -185,12 +195,17 @@ public class BusinessDataServiceImpl implements BusinessDataService {
         for (final Annotation annotation : annotations) {
             final Set<Class<? extends Annotation>> annotationKeySet = getAnnotationKeySet();
             if (annotationKeySet.contains(annotation.annotationType())) {
-                final CascadeType[] cascade = ((OneToOne) annotation).cascade();
-                if (cascade[0].equals(CascadeType.MERGE)) {
-                    return Type.AGGREGATION;
-                }
-                if (cascade[0].equals(CascadeType.ALL)) {
-                    return Type.COMPOSITION;
+                try {
+                    final Method cascade = annotation.getClass().getMethod("cascade");
+                    CascadeType[] cascadeTypes = (CascadeType[]) cascade.invoke(annotation);
+                    if (CascadeType.MERGE.equals(cascadeTypes[0])) {
+                        return Type.AGGREGATION;
+                    }
+                    if (CascadeType.ALL.equals(cascadeTypes[0])) {
+                        return Type.COMPOSITION;
+                    }
+                } catch (Exception e) {
+                    throw new SBusinessDataRepositoryException(e);
                 }
             }
         }
