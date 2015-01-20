@@ -12,6 +12,8 @@ GO
 
 DELETE FROM user_
 GO
+DELETE FROM user_login
+GO
 
 DELETE FROM role
 GO

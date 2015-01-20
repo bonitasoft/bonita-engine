@@ -1215,5 +1215,4 @@ public interface IdentityService {
      */
     @Deprecated
     SUser createUserWithoutEncryptingPassword(SUser user) throws SUserCreationException;
-
 }

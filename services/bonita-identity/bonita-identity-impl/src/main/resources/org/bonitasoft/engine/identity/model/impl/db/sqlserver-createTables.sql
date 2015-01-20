@@ -51,8 +51,15 @@ CREATE TABLE user_ (
   createdBy NUMERIC(19, 0),
   creationDate NUMERIC(19, 0),
   lastUpdate NUMERIC(19, 0),
-  lastConnection NUMERIC(19, 0),
   UNIQUE (tenantid, userName),
+  PRIMARY KEY (tenantid, id)
+)
+GO
+
+CREATE TABLE user_login (
+  tenantid NUMERIC(19, 0) NOT NULL,
+  id NUMERIC(19, 0) NOT NULL,
+  lastConnection NUMERIC(19, 0),
   PRIMARY KEY (tenantid, id)
 )
 GO
