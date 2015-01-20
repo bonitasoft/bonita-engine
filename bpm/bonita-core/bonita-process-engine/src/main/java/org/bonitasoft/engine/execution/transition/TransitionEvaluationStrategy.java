@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2011 BonitaSoft S.A.
+/*******************************************************************************
+ * Copyright (C) 2015 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -10,23 +10,15 @@
  * You should have received a copy of the GNU Lesser General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
- **/
-package org.bonitasoft.engine.core.process.definition.model;
+ ******************************************************************************/
 
-import org.bonitasoft.engine.expression.model.SExpression;
+package org.bonitasoft.engine.execution.transition;
 
 /**
  * @author Elias Ricken de Medeiros
- * @author Celine Souchet
  */
-public interface STransitionDefinition extends SNamedElement {
+public interface TransitionEvaluationStrategy {
 
-    long getSource();
-
-    long getTarget();
-
-    SExpression getCondition();
-
-    boolean hasCondition();
+    boolean shouldContinue(boolean alreadyFound);
 
 }

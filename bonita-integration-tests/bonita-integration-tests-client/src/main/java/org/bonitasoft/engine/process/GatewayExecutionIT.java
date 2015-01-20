@@ -19,6 +19,7 @@ import org.bonitasoft.engine.bpm.flownode.ArchivedFlowNodeInstanceSearchDescript
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstance;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.flownode.FlowNodeType;
+import org.bonitasoft.engine.bpm.flownode.GatewayDefinition;
 import org.bonitasoft.engine.bpm.flownode.GatewayInstance;
 import org.bonitasoft.engine.bpm.flownode.GatewayType;
 import org.bonitasoft.engine.bpm.flownode.HumanTaskInstance;
@@ -31,6 +32,7 @@ import org.bonitasoft.engine.bpm.process.ProcessDefinition;
 import org.bonitasoft.engine.bpm.process.ProcessDeploymentInfo;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.impl.ProcessDefinitionBuilder;
+import org.bonitasoft.engine.expression.ComparisonOperator;
 import org.bonitasoft.engine.expression.Expression;
 import org.bonitasoft.engine.expression.ExpressionBuilder;
 import org.bonitasoft.engine.expression.InvalidExpressionException;
@@ -1057,4 +1059,80 @@ public class GatewayExecutionIT extends TestWithUser {
 
         disableAndDeleteProcess(processDefinition);
     }
+
+    @Cover(classes = {GatewayDefinition.class, TransitionDefinition.class}, concept = Cover.BPMNConcept.GATEWAY, jira = "BS-10329", keywords = {"transition", "condition", "logical complement", "null variable"})
+    @Test
+    public void can_evaluate_transitions_with_logical_complement_expression_using_null_variable() throws Exception {
+        //given
+
+        Expression booleanVarExpr = new ExpressionBuilder().createDataExpression("b", Boolean.class.getName());
+        Expression notB = new ExpressionBuilder().createLogicalComplementExpression("notB", booleanVarExpr);
+
+        String start = "start";
+        String gateway = "gateway";
+        String step1 = "step1";
+        String step2 = "step2";
+
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("proc", "1.0");
+        builder.addActor("delivery");
+        builder.addBooleanData("b", null);
+        builder.addStartEvent(start);
+        builder.addGateway(gateway, GatewayType.EXCLUSIVE);
+        builder.addUserTask(step1, "delivery");
+        builder.addUserTask(step2, "delivery");
+        builder.addTransition(start, gateway);
+        builder.addDefaultTransition(gateway, step1);
+        builder.addTransition(gateway, step2, notB);
+
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "delivery", user);
+
+
+        //when
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        //then
+        waitForFlowNodeInReadyState(processInstance, "step1", true);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+
+    @Cover(classes = {GatewayDefinition.class, TransitionDefinition.class}, concept = Cover.BPMNConcept.GATEWAY, jira = "BS-10329", keywords = {"transition", "condition", "comparison", "null variable"})
+    @Test
+    public void can_evaluate_transitions_with_comparison_expression_using_null_variable() throws Exception {
+        //given
+
+        Expression integerVarExpr = new ExpressionBuilder().createDataExpression("count", Integer.class.getName());
+        Expression fiveExpr = new ExpressionBuilder().createConstantIntegerExpression(5);
+        Expression greaterThan = new ExpressionBuilder().createComparisonExpression("greaterThan", integerVarExpr, ComparisonOperator.GREATER_THAN, fiveExpr);
+
+        String start = "start";
+        String gateway = "gateway";
+        String step1 = "step1";
+        String step2 = "step2";
+
+        ProcessDefinitionBuilder builder = new ProcessDefinitionBuilder().createNewInstance("proc", "1.0");
+        builder.addActor("delivery");
+        builder.addIntegerData("count", null);
+        builder.addStartEvent(start);
+        builder.addGateway(gateway, GatewayType.EXCLUSIVE);
+        builder.addUserTask(step1, "delivery");
+        builder.addUserTask(step2, "delivery");
+        builder.addTransition(start, gateway);
+        builder.addDefaultTransition(gateway, step1);
+        builder.addTransition(gateway, step2, greaterThan);
+
+        ProcessDefinition processDefinition = deployAndEnableProcessWithActor(builder.done(), "delivery", user);
+
+
+        //when
+        ProcessInstance processInstance = getProcessAPI().startProcess(processDefinition.getId());
+
+        //then
+        waitForFlowNodeInReadyState(processInstance, "step1", true);
+
+        disableAndDeleteProcess(processDefinition);
+    }
+
+
 }
