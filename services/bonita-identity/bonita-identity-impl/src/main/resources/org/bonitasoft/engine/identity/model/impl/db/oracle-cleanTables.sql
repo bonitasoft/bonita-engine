@@ -8,6 +8,8 @@ DELETE FROM user_contactinfo;
 
 DELETE FROM user_;
 
+DELETE FROM user_login;
+
 DELETE FROM role;
 
 DELETE FROM group_;

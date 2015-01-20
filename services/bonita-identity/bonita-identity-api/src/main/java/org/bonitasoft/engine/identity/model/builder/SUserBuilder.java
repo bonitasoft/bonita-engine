@@ -41,8 +41,6 @@ public interface SUserBuilder {
 
     SUserBuilder setLastUpdate(final long lastUpdate);
 
-    SUserBuilder setLastConnection(final Long lastConnecton);
-
     SUserBuilder setCreatedBy(final long createdBy);
 
     SUserBuilder setCreationDate(final long creationDate);

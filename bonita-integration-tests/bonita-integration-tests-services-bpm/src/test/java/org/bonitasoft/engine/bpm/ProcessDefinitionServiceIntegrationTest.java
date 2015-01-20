@@ -270,8 +270,8 @@ public class ProcessDefinitionServiceIntegrationTest extends CommonBPMServicesTe
         final OrderByOption orderByFirstName = new OrderByOption(SUser.class, UserSearchDescriptor.FIRST_NAME, OrderByType.ASC);
         final QueryOptions searchOptions = new QueryOptions(0, 5, Arrays.asList(orderByFirstName), Arrays.asList(filterManagedBy), null);
         final List<SUser> result = processDefinitionService.searchUsersWhoCanStartProcessDeploymentInfo(sProcessDefinition.getId(), searchOptions);
-        assertEquals(sUser2, result.get(0));
         getTransactionService().complete();
+        assertEquals(sUser2, result.get(0));
 
         // clean-up
         deleteSProcessDefinition(sProcessDefinition);

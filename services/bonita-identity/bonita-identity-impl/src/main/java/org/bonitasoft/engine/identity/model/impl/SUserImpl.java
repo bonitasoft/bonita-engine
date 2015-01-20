@@ -14,6 +14,7 @@
 package org.bonitasoft.engine.identity.model.impl;
 
 import org.bonitasoft.engine.identity.model.SUser;
+import org.bonitasoft.engine.identity.model.SUserLogin;
 
 /**
  * @author Anthony Birembaut
@@ -53,9 +54,10 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
 
     private long lastUpdate;
 
-    private Long lastConnection;
-
     private boolean enabled;
+
+    private SUserLogin sUserLogin;
+
 
     public SUserImpl() {
         super();
@@ -74,7 +76,6 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
         createdBy = user.getCreatedBy();
         creationDate = user.getCreationDate();
         lastUpdate = user.getLastUpdate();
-        lastConnection = user.getLastConnection();
         title = user.getTitle();
         enabled = user.isEnabled();
     }
@@ -150,8 +151,8 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
     }
 
     @Override
-    public Long getLastConnection() {
-        return lastConnection;
+    public SUserLogin getSUserLogin() {
+        return sUserLogin;
     }
 
     @Override
@@ -211,142 +212,84 @@ public class SUserImpl extends SPersistentObjectImpl implements SUser {
         this.lastUpdate = lastUpdate;
     }
 
-    public void setLastConnection(final Long lastConnection) {
-        this.lastConnection = lastConnection;
-    }
-
     public void setEnabled(final boolean enabled) {
         this.enabled = enabled;
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (createdBy ^ createdBy >>> 32);
-        result = prime * result + (int) (creationDate ^ creationDate >>> 32);
-        result = prime * result + (delegeeUserName == null ? 0 : delegeeUserName.hashCode());
-        result = prime * result + (firstName == null ? 0 : firstName.hashCode());
-        result = prime * result + (iconName == null ? 0 : iconName.hashCode());
-        result = prime * result + (iconPath == null ? 0 : iconPath.hashCode());
-        result = prime * result + (jobTitle == null ? 0 : jobTitle.hashCode());
-        result = prime * result + (lastConnection == null ? 0 : lastConnection.hashCode());
-        result = prime * result + (lastName == null ? 0 : lastName.hashCode());
-        result = prime * result + (int) (lastUpdate ^ lastUpdate >>> 32);
-        result = prime * result + (int) (managerUserId ^ managerUserId >>> 32);
-        result = prime * result + (password == null ? 0 : password.hashCode());
-        result = prime * result + (title == null ? 0 : title.hashCode());
-        result = prime * result + (userName == null ? 0 : userName.hashCode());
-        result = prime * result + Boolean.valueOf(enabled).hashCode();
-        return result;
+    public void setsUserLogin(SUserLogin sUserLogin) {
+        this.sUserLogin = sUserLogin;
+    }
+
+    public void setLastConnection(Long lastConnection){
+        sUserLogin.setLastConnection(lastConnection);
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SUserImpl)) return false;
+        if (!super.equals(o)) return false;
+
+        SUserImpl sUser = (SUserImpl) o;
+
+        if (createdBy != sUser.createdBy) return false;
+        if (creationDate != sUser.creationDate) return false;
+        if (enabled != sUser.enabled) return false;
+        if (lastUpdate != sUser.lastUpdate) return false;
+        if (managerUserId != sUser.managerUserId) return false;
+        if (delegeeUserName != null ? !delegeeUserName.equals(sUser.delegeeUserName) : sUser.delegeeUserName != null)
+            return false;
+        if (firstName != null ? !firstName.equals(sUser.firstName) : sUser.firstName != null) return false;
+        if (iconName != null ? !iconName.equals(sUser.iconName) : sUser.iconName != null) return false;
+        if (iconPath != null ? !iconPath.equals(sUser.iconPath) : sUser.iconPath != null) return false;
+        if (jobTitle != null ? !jobTitle.equals(sUser.jobTitle) : sUser.jobTitle != null) return false;
+        if (lastName != null ? !lastName.equals(sUser.lastName) : sUser.lastName != null) return false;
+        if (password != null ? !password.equals(sUser.password) : sUser.password != null) return false;
+        if (sUserLogin != null ? !sUserLogin.equals(sUser.sUserLogin) : sUser.sUserLogin != null) return false;
+        if (title != null ? !title.equals(sUser.title) : sUser.title != null) return false;
+        if (userName != null ? !userName.equals(sUser.userName) : sUser.userName != null) return false;
+
             return true;
         }
-        if (!super.equals(obj)) {
-            return false;
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
+        result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
+        result = 31 * result + (password != null ? password.hashCode() : 0);
+        result = 31 * result + (userName != null ? userName.hashCode() : 0);
+        result = 31 * result + (iconName != null ? iconName.hashCode() : 0);
+        result = 31 * result + (iconPath != null ? iconPath.hashCode() : 0);
+        result = 31 * result + (int) (managerUserId ^ (managerUserId >>> 32));
+        result = 31 * result + (delegeeUserName != null ? delegeeUserName.hashCode() : 0);
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (jobTitle != null ? jobTitle.hashCode() : 0);
+        result = 31 * result + (int) (creationDate ^ (creationDate >>> 32));
+        result = 31 * result + (int) (createdBy ^ (createdBy >>> 32));
+        result = 31 * result + (int) (lastUpdate ^ (lastUpdate >>> 32));
+        result = 31 * result + (enabled ? 1 : 0);
+        result = 31 * result + (sUserLogin != null ? sUserLogin.hashCode() : 0);
+        return result;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SUserImpl other = (SUserImpl) obj;
-        if (createdBy != other.createdBy) {
-            return false;
-        }
-        if (creationDate != other.creationDate) {
-            return false;
-        }
-        if (delegeeUserName == null) {
-            if (other.delegeeUserName != null) {
-                return false;
-            }
-        } else if (!delegeeUserName.equals(other.delegeeUserName)) {
-            return false;
-        }
-        if (firstName == null) {
-            if (other.firstName != null) {
-                return false;
-            }
-        } else if (!firstName.equals(other.firstName)) {
-            return false;
-        }
-        if (iconName == null) {
-            if (other.iconName != null) {
-                return false;
-            }
-        } else if (!iconName.equals(other.iconName)) {
-            return false;
-        }
-        if (iconPath == null) {
-            if (other.iconPath != null) {
-                return false;
-            }
-        } else if (!iconPath.equals(other.iconPath)) {
-            return false;
-        }
-        if (jobTitle == null) {
-            if (other.jobTitle != null) {
-                return false;
-            }
-        } else if (!jobTitle.equals(other.jobTitle)) {
-            return false;
-        }
-        if (lastConnection == null) {
-            if (other.lastConnection != null) {
-                return false;
-            }
-        } else if (!lastConnection.equals(other.lastConnection)) {
-            return false;
-        }
-        if (lastName == null) {
-            if (other.lastName != null) {
-                return false;
-            }
-        } else if (!lastName.equals(other.lastName)) {
-            return false;
-        }
-        if (lastUpdate != other.lastUpdate) {
-            return false;
-        }
-        if (managerUserId != other.managerUserId) {
-            return false;
-        }
-        if (password == null) {
-            if (other.password != null) {
-                return false;
-            }
-        } else if (!password.equals(other.password)) {
-            return false;
-        }
-        if (title == null) {
-            if (other.title != null) {
-                return false;
-            }
-        } else if (!title.equals(other.title)) {
-            return false;
-        }
-        if (userName == null) {
-            if (other.userName != null) {
-                return false;
-            }
-        } else if (!userName.equals(other.userName)) {
-            return false;
-        }
-        if (enabled != other.enabled) {
-            return false;
-        }
-        return true;
-    }
 
     @Override
     public String toString() {
-        return "SUserImpl (" + getId() + ") [firstName=" + firstName + ", lastName=" + lastName + ", userName=" + userName
-                + ", iconName=" + iconName + ", iconPath=" + iconPath + ", managerUserId=" + managerUserId + ", delegeeUserName=" + delegeeUserName
-                + ", title=" + title + ", jobTitle=" + jobTitle + ", creationDate=" + creationDate + ", createdBy=" + createdBy + ", lastUpdate=" + lastUpdate
-                + ", lastConnection=" + lastConnection + ", enabled=" + enabled + "]";
+        return "SUserImpl{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", userName='" + userName + '\'' +
+                ", iconName='" + iconName + '\'' +
+                ", iconPath='" + iconPath + '\'' +
+                ", managerUserId=" + managerUserId +
+                ", delegeeUserName='" + delegeeUserName + '\'' +
+                ", title='" + title + '\'' +
+                ", jobTitle='" + jobTitle + '\'' +
+                ", creationDate=" + creationDate +
+                ", createdBy=" + createdBy +
+                ", lastUpdate=" + lastUpdate +
+                ", enabled=" + enabled +
+                ", sUserLogin=" + sUserLogin +
+                '}';
     }
-
 }
