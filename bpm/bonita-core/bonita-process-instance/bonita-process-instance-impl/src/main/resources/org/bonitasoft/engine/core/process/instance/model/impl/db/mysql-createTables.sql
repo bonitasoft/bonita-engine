@@ -25,6 +25,8 @@ CREATE TABLE process_instance (
   PRIMARY KEY (tenantid, id)
 ) ENGINE = INNODB;
 
+CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (processdefinitionid, stateid);
+
 CREATE TABLE token (
   tenantid BIGINT NOT NULL,
   id BIGINT NOT NULL,
