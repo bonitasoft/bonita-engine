@@ -3,7 +3,7 @@
 
 	<bean id="parameterService" class="com.bonitasoft.engine.parameter.propertyfile.PropertyFileParameterService">
 		<constructor-arg name="sessionAccessor" ref="sessionAccessor" />
-		<constructor-arg name="cacheService" ref="cacheService" />
+		<constructor-arg name="cacheService" ref="platformCacheService" />
 	</bean>
 	
 	<bean id="parameterExpressionExecutorStrategy" class="com.bonitasoft.engine.expression.ParameterExpressionExecutorStrategy">
