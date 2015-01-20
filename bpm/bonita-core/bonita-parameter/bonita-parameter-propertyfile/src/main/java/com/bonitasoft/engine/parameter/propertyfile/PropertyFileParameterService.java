@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009, 2013 - 2014 BonitaSoft S.A.
+ * Copyright (C) 2009, 2015 BonitaSoft S.A.
  * BonitaSoft is a trademark of BonitaSoft SA.
  * This software file is BONITASOFT CONFIDENTIAL. Not For Distribution.
  * For commercial licensing information, contact:
@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.bonitasoft.engine.cache.CacheService;
+import org.bonitasoft.engine.cache.PlatformCacheService;
 import org.bonitasoft.engine.cache.SCacheException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.home.BonitaHomeServer;
@@ -49,9 +49,9 @@ public class PropertyFileParameterService implements ParameterService {
 
     private final ReadSessionAccessor sessionAccessor;
 
-    private final CacheService cacheService;
+    private final PlatformCacheService cacheService;
 
-    public PropertyFileParameterService(final ReadSessionAccessor sessionAccessor, final CacheService cacheService) {
+    public PropertyFileParameterService(final ReadSessionAccessor sessionAccessor, final PlatformCacheService cacheService) {
         this.sessionAccessor = sessionAccessor;
         this.cacheService = cacheService;
     }
