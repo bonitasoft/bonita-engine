@@ -561,14 +561,30 @@ public class BDRepositoryIT extends CommonAPISPIT {
         final Map<Expression, Map<String, Serializable>> expressions = new HashMap<Expression, Map<String, Serializable>>(1);
         final String getLastNameWithDAOExpression = "retrieveEmployeeByFirstName";
         expressions.put(
-                new ExpressionBuilder().createGroovyScriptExpression(getLastNameWithDAOExpression, employeeDAOName + ".findByFirstName('" + firstName
-                        + "', 0, 10).get(0).getAddresses().get(0).city", String.class.getName(),
+                new ExpressionBuilder().createGroovyScriptExpression(getLastNameWithDAOExpression, "import " + EMPLOYEE_QUALIF_CLASSNAME + "; Employee e = "
+                        + employeeDAOName + ".findByFirstName('" + firstName + "', 0, 10).get(0); e.getAddresses().get(0).city", String.class.getName(),
                         new ExpressionBuilder().buildBusinessObjectDAOExpression(employeeDAOName, EMPLOYEE_QUALIF_CLASSNAME + "DAO")), null);
-        final Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
-        final String returnedLastName = (String) evaluatedExpressions.get(getLastNameWithDAOExpression);
+        Map<String, Serializable> evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
+        String returnedLastName = (String) evaluatedExpressions.get(getLastNameWithDAOExpression);
         assertThat(returnedLastName).isEqualTo("Grenoble");
 
+        logoutOnTenant();
+
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+        getTenantManagementAPI().pause();
+        getTenantManagementAPI().resume();
+        logoutOnTenant();
+
+        loginOnDefaultTenantWith("matti", "bpm");
+
+        evaluatedExpressions = getProcessAPI().evaluateExpressionsOnProcessInstance(processInstanceId, expressions);
+        returnedLastName = (String) evaluatedExpressions.get(getLastNameWithDAOExpression);
+        assertThat(returnedLastName).isEqualTo("Grenoble");
+        logoutOnTenant();
+        loginOnDefaultTenantWithDefaultTechnicalUser();
+
         assertCount(processInstanceId);
+
         disableAndDeleteProcess(definition.getId());
     }
 
