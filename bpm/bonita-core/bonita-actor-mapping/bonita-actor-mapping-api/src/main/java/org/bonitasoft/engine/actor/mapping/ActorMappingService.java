@@ -371,35 +371,4 @@ public interface ActorMappingService {
      */
     SActorMember getActorMember(long actorId, long userId, long groupId, long roleId) throws SBonitaReadException;
 
-    /**
-     * return true if the user is in an actor member of this actor or if the user is a manager of this kind of user
-     *
-     * @param userId
-     * @param actorId
-     * @return
-     * @throws SBonitaReadException
-     * @since 6.3.2
-     */
-    boolean isUserInActorMemberOrManagerOfAUserInActorMember(long userId, long actorId) throws SBonitaReadException;
-
-    /**
-     * Determines if the user is in an actor member of the specified actor.
-     *
-     * @param userId ID of the user to check the membership of the specified actor.
-     * @param actorId the ID of the actor to check if the user is member of.
-     * @return true if the user is in an actor member of the specified actor.
-     * @throws SBonitaReadException if a read error occured.
-     */
-    public boolean isUserInActorMember(final long userId, final long actorId) throws SBonitaReadException;
-
-    /**
-     * Determines if a specific user is a manager of users members of the specified actor.
-     *
-     * @param managerUserId the ID of the user who is manager of users members of the specified actor.
-     * @param actorId the ID of the actor to check if at least one subordinates <code>managerUserId</code> is member of.
-     * @return true if the manager has at least one user member of the specified actor.
-     * @throws SBonitaReadException if a read error occured.
-     */
-    public boolean isUserManagerOfAUserInActorMember(final long managerUserId, final long actorId) throws SBonitaReadException;
-
 }
