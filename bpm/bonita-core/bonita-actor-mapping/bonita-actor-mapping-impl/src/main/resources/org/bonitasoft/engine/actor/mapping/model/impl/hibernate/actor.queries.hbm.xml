@@ -204,4 +204,42 @@
             )
     </query>
 
+    <query name="isUserMemberOfActor">
+        SELECT COUNT(user)
+        FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
+             org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+        WHERE user.enabled = TRUE
+            AND user.id = :userId
+            AND actormember.actorId = :actorId
+            AND (
+                actormember.userId = user.id
+                OR user.id IN (
+                    SELECT um.userId
+                    FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+                    WHERE (actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
+                       OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+                       OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+                )
+             )
+    </query>
+
+    <query name="isUserManagerOfAUserInActorMember">
+        SELECT COUNT(user)
+        FROM org.bonitasoft.engine.identity.model.impl.SUserImpl AS user,
+        org.bonitasoft.engine.actor.mapping.model.impl.SActorMemberImpl AS actormember
+        WHERE user.enabled = TRUE
+            AND user.managerUserId = :managerUserId
+            AND actormember.actorId = :actorId
+            AND (
+                actormember.userId = user.id
+                OR user.id IN (
+                    SELECT um.userId
+                    FROM org.bonitasoft.engine.identity.model.impl.SUserMembershipImpl as um
+                    WHERE (actormember.groupId = um.groupId AND actormember.roleId &lt;= 0)
+                       OR (actormember.roleId = um.roleId AND actormember.groupId &lt;= 0)
+                       OR (actormember.groupId = um.groupId AND actormember.roleId = um.roleId)
+                )
+            )
+    </query>
+
 </hibernate-mapping>
