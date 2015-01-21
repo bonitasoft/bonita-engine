@@ -14,7 +14,6 @@
  */
 package org.bonitasoft.engine.actor.mapping.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -588,39 +587,4 @@ public class ActorMappingServiceImplTest {
         actorMappingServiceImpl.deleteAllActorMembers();
     }
 
-    @Test
-    public final void isUserInActorMember_ShouldReturnFalseIfZeroIsReturned() throws Exception {
-        doReturn(0L).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
-        assertThat(actorMappingServiceImpl.isUserInActorMember(22L, 33L)).isFalse();
-    }
-
-    @Test
-    public final void isUserInActorMember_ShouldReturnTrueIfOneIsReturned() throws Exception {
-        doReturn(1L).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
-        assertThat(actorMappingServiceImpl.isUserInActorMember(22L, 33L)).isTrue();
-    }
-
-    @Test
-    public final void isUserInActorMember_ShouldReturnTrueIfMoreThantOneIsReturned() throws Exception {
-        doReturn(82L).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
-        assertThat(actorMappingServiceImpl.isUserInActorMember(22L, 33L)).isTrue();
-    }
-
-    @Test
-    public final void isUserManagerOfAUserInActorMember_ShouldReturnFalseIfZeroIsReturned() throws Exception {
-        doReturn(0L).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
-        assertThat(actorMappingServiceImpl.isUserManagerOfAUserInActorMember(22L, 33L)).isFalse();
-    }
-
-    @Test
-    public final void isUserManagerOfAUserInActorMember_ShouldReturnTrueIfOneIsReturned() throws Exception {
-        doReturn(1L).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
-        assertThat(actorMappingServiceImpl.isUserManagerOfAUserInActorMember(22L, 33L)).isTrue();
-    }
-
-    @Test
-    public final void isUserManagerOfAUserInActorMember_ShouldReturnTrueIfMoreThantOneIsReturned() throws Exception {
-        doReturn(251L).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
-        assertThat(actorMappingServiceImpl.isUserManagerOfAUserInActorMember(22L, 33L)).isTrue();
-    }
 }

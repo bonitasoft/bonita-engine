@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.bonitasoft.engine.actor.mapping.ActorMappingService;
+import org.bonitasoft.engine.bpm.flownode.HumanTaskInstanceSearchDescriptor;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
@@ -30,6 +30,7 @@ import org.bonitasoft.engine.core.process.instance.model.archive.builder.SAUserT
 import org.bonitasoft.engine.core.process.instance.model.builder.SUserTaskInstanceBuilderFactory;
 import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
+import org.bonitasoft.engine.exception.SearchException;
 import org.bonitasoft.engine.identity.IdentityService;
 import org.bonitasoft.engine.identity.SUserNotFoundException;
 import org.bonitasoft.engine.identity.model.SUser;
@@ -39,6 +40,7 @@ import org.bonitasoft.engine.persistence.OrderByOption;
 import org.bonitasoft.engine.persistence.OrderByType;
 import org.bonitasoft.engine.persistence.QueryOptions;
 import org.bonitasoft.engine.persistence.SBonitaReadException;
+import org.bonitasoft.engine.search.SearchOptionsBuilder;
 import org.bonitasoft.engine.service.TenantServiceAccessor;
 
 /**
@@ -65,19 +67,10 @@ public class ProcessInvolvementAPIImpl {
             if (userId == processInstance.getStartedBy()) {
                 return true;
             }
-            QueryOptions queryOptions = buildActiveTasksQueryOptions(processInstanceId);
-            List<SHumanTaskInstance> sHumanTaskInstances = activityInstanceService.searchHumanTasks(queryOptions);
-            while (!sHumanTaskInstances.isEmpty()) {
-                for (final SHumanTaskInstance sHumanTaskInstance : sHumanTaskInstances) {
-                    if (userId == sHumanTaskInstance.getAssigneeId()) {
-                        return true;
-                    }
-                    if (checkIfUserIsActorMember(userId, sHumanTaskInstance.getActorId(), serviceAccessor)) {
-                        return true;
-                    }
-                }
-                queryOptions = QueryOptions.getNextPage(queryOptions);
-                sHumanTaskInstances = activityInstanceService.searchHumanTasks(queryOptions);
+            // is user assigned or has pending tasks on this process instance:
+            if (processAPI.searchMyAvailableHumanTasks(userId,
+                    new SearchOptionsBuilder(0, 1).filter(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstanceId).done()).getCount() > 0) {
+                return true;
             }
         } catch (final ProcessInstanceNotFoundException exc) {
             // process instance may be completed already:
@@ -91,7 +84,7 @@ public class ProcessInvolvementAPIImpl {
             } catch (final SBonitaException e) {
                 throw new ProcessInstanceNotFoundException(processInstanceId);
             }
-        } catch (final SBonitaReadException e) {
+        } catch (final SearchException e) {
             throw new BonitaRuntimeException(e);
         }
 
@@ -132,14 +125,18 @@ public class ProcessInvolvementAPIImpl {
                     return true;
                 }
 
+                // Has the manager at least one subordinates with at least one pending task in this process instance:
+                if (processAPI.searchPendingTasksManagedBy(managerUserId,
+                        new SearchOptionsBuilder(0, 1).filter(HumanTaskInstanceSearchDescriptor.PROCESS_INSTANCE_ID, processInstanceId).done())
+                        .getCount() > 0) {
+                    return true;
+                }
+
                 QueryOptions queryOptions = buildActiveTasksQueryOptions(processInstanceId);
                 List<SHumanTaskInstance> sHumanTaskInstances = activityInstanceService.searchHumanTasks(queryOptions);
                 while (!sHumanTaskInstances.isEmpty()) {
                     for (final SHumanTaskInstance sHumanTaskInstance : sHumanTaskInstances) {
                         if (isTaskAssignedToAUserInTheList(sHumanTaskInstance, subordinates)) {
-                            return true;
-                        }
-                        if (checkIfUserIsManagerOfActorMember(managerUserId, sHumanTaskInstance.getActorId(), serviceAccessor)) {
                             return true;
                         }
                     }
@@ -249,17 +246,6 @@ public class ProcessInvolvementAPIImpl {
             return true;
         }
         return false;
-    }
-
-    private boolean checkIfUserIsActorMember(final long userId, final long actorId, final TenantServiceAccessor serviceAccessor) throws SBonitaReadException {
-        final ActorMappingService actorMappingService = serviceAccessor.getActorMappingService();
-        return actorMappingService.isUserInActorMember(userId, actorId);
-    }
-
-    private boolean checkIfUserIsManagerOfActorMember(final long managerUserId, final long actorId, final TenantServiceAccessor serviceAccessor)
-            throws SBonitaReadException {
-        final ActorMappingService actorMappingService = serviceAccessor.getActorMappingService();
-        return actorMappingService.isUserManagerOfAUserInActorMember(managerUserId, actorId);
     }
 
 }
