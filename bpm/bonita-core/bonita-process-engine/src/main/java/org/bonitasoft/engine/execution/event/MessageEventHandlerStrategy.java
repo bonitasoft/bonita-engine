@@ -189,10 +189,10 @@ public class MessageEventHandlerStrategy extends CoupleEventHandlerStrategy {
         final SExpression targetProcess = messageTrigger.getTargetProcess();
         final SExpression targetFlowNode = messageTrigger.getTargetFlowNode();
         // evaluate expression
-        final String stringTargetProcess = (String) expressionResolverService.evaluate(targetProcess);
+        final String stringTargetProcess = (String) expressionResolverService.evaluate(targetProcess, expressionContext);
         String stringTargetFlowNode = null;
         if (targetFlowNode != null) {
-            stringTargetFlowNode = (String) expressionResolverService.evaluate(targetFlowNode);
+            stringTargetFlowNode = (String) expressionResolverService.evaluate(targetFlowNode, expressionContext);
         }
 
         final SThrowMessageEventTriggerInstance messageEventTriggerInstance = BuilderFactory.get(SThrowMessageEventTriggerInstanceBuilderFactory.class)
