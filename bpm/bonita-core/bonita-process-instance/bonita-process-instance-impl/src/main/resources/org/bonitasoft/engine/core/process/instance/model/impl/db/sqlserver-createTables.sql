@@ -26,7 +26,7 @@ CREATE TABLE process_instance (
 )
 GO
 
-CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (processdefinitionid, stateid)
+CREATE INDEX idx1_proc_inst_pdef_state ON process_instance (tenantid, stateid, processdefinitionid)
 GO
 
 CREATE TABLE token (
