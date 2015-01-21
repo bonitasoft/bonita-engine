@@ -13,6 +13,8 @@
  **/
 package org.bonitasoft.engine.api.impl.transaction.process;
 
+import java.util.List;
+
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstance;
 import org.bonitasoft.engine.bpm.process.ArchivedProcessInstancesSearchDescriptor;
 import org.bonitasoft.engine.commons.exceptions.SBonitaException;
@@ -25,8 +27,8 @@ import org.bonitasoft.engine.search.descriptor.SearchEntitiesDescriptor;
 import org.bonitasoft.engine.search.process.SearchArchivedProcessInstances;
 
 /**
- * Returns the most recent archived process instance from the SLIDING archive.
- * 
+ * Returns the most recent archived process instance from the archives.
+ *
  * @author Emmanuel Duchastenier
  * @author Celine Souchet
  * @author Matthieu Chaffotte
@@ -58,11 +60,11 @@ public class GetLastArchivedProcessInstance implements TransactionContentWithRes
         final SearchArchivedProcessInstances searchArchivedProcessInstances = new SearchArchivedProcessInstances(processInstanceService,
                 searchEntitiesDescriptor.getSearchArchivedProcessInstanceDescriptor(), searchOptionsBuilder.done());
         searchArchivedProcessInstances.execute();
-        try {
-            processInstance = searchArchivedProcessInstances.getResult().getResult().get(0);
-        } catch (final IndexOutOfBoundsException e) {
+        final List<ArchivedProcessInstance> processInstances = searchArchivedProcessInstances.getResult().getResult();
+        if (processInstances.isEmpty()) {
             throw new SProcessInstanceNotFoundException(processInstanceId);
         }
+        processInstance = processInstances.get(0);
     }
 
     @Override

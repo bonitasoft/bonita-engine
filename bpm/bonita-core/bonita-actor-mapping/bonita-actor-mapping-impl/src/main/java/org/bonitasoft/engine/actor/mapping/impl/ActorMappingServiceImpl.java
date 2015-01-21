@@ -211,7 +211,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
 
     @Override
     public SActor updateActor(final long actorId, final EntityUpdateDescriptor descriptor) throws SActorNotFoundException, SActorUpdateException,
-    SBonitaReadException {
+            SBonitaReadException {
         final SActor actor = getActor(actorId);
         final SActorLogBuilder logBuilder = getQueriableLog(ActionType.UPDATED, "Updating an actor");
         final UpdateRecord updateRecord = UpdateRecord.buildSetFields(actor, descriptor);
@@ -348,7 +348,7 @@ public class ActorMappingServiceImpl implements ActorMappingService {
 
     @Override
     public SActorMember addRoleAndGroupToActor(final long actorId, final long roleId, final long groupId) throws SActorNotFoundException,
-    SActorMemberCreationException {
+            SActorMemberCreationException {
         try {
             final SActorMember addActorMember = addOnlyThisRoleAndGroupToActor(actorId, roleId, groupId);
             int i = 0;
@@ -505,6 +505,24 @@ public class ActorMappingServiceImpl implements ActorMappingService {
         final SelectOneDescriptor<SUser> descriptor = new SelectOneDescriptor<SUser>("getUserInActorMemberOrManagerOfAUserInActorMember", parameters,
                 SUser.class);
         return persistenceService.selectOne(descriptor) != null;
+    }
+
+    @Override
+    public boolean isUserInActorMember(final long userId, final long actorId) throws SBonitaReadException {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("userId", userId);
+        parameters.put("actorId", actorId);
+        final SelectOneDescriptor<Long> descriptor = new SelectOneDescriptor<Long>("isUserMemberOfActor", parameters, SUser.class, Long.class);
+        return persistenceService.selectOne(descriptor) > 0L;
+    }
+
+    @Override
+    public boolean isUserManagerOfAUserInActorMember(final long managerUserId, final long actorId) throws SBonitaReadException {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("managerUserId", managerUserId);
+        parameters.put("actorId", actorId);
+        final SelectOneDescriptor<Long> descriptor = new SelectOneDescriptor<Long>("isUserManagerOfAUserInActorMember", parameters, SUser.class, Long.class);
+        return persistenceService.selectOne(descriptor) > 0L;
     }
 
 }

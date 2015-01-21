@@ -57,6 +57,7 @@ import org.bonitasoft.engine.bpm.process.ProcessExecutionException;
 import org.bonitasoft.engine.bpm.process.ProcessInstance;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceCriterion;
 import org.bonitasoft.engine.bpm.process.ProcessInstanceNotFoundException;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.CreationException;
 import org.bonitasoft.engine.exception.DeletionException;
 import org.bonitasoft.engine.exception.ExecutionException;
@@ -1836,16 +1837,15 @@ public interface ProcessRuntimeAPI {
     List<Long> getChildrenInstanceIdsOfProcessInstance(long processInstanceId, int startIndex, int maxResults, ProcessInstanceCriterion criterion);
 
     /**
-     * Check whether a specified user is involved in a process instance.<br/>
+     * Check whether a specific user is involved in a given process instance.<br/>
      * User A is involved with a process instance if any of the following is true:
      * <ul>
      * <li>user A has started the process instance</li>
      * <li>a task in the process instance is assigned to user A</li>
      * <li>a task in the process instance is pending for user A</li>
-     * <li>the process instance has been started by a user managed by user A</li>
-     * <li>a task in the process instance is assigned to a user managed by user A</li>
-     * <li>a task in the process instance is pending for a user managed by user A</li>
+     * <li>a task in the process instance has been performed by user A</li>
      * </ul>
+     * This method also applies to completed instances of process.
      *
      * @param userId
      *        The identifier of the user.
@@ -1859,8 +1859,30 @@ public interface ProcessRuntimeAPI {
      * @throws UserNotFoundException
      *         If there is no user with the specified identifier.
      * @since 6.0
+     * @see #isManagerOfUserInvolvedInProcessInstance(long, long)
      */
     boolean isInvolvedInProcessInstance(long userId, long processInstanceId) throws ProcessInstanceNotFoundException, UserNotFoundException;
+
+    /**
+     * Check whether a specific user has at least one subordinate (person he / she is the manager of) involved in a given process instance.<br/>
+     * User A is involved with a process instance if any of the following is true:
+     * <ul>
+     * <li>user A has started the process instance</li>
+     * <li>a task in the process instance is assigned to user A</li>
+     * <li>a task in the process instance is pending for user A</li>
+     * <li>a task in the process instance has been performed by user A</li>
+     * </ul>
+     * This method also applies to completed instances of process.
+     *
+     * @param managerUserId the ID of the manager of the user involved.
+     * @param processInstanceId the ID of the process instance we are interested in.
+     * @return true if the specified manager has subordinates involved in the given process instance.
+     * @throws ProcessInstanceNotFoundException if the process instance does not exist.
+     * @throws BonitaException if an error occured while searching for users involved.
+     * @since 6.4.2
+     * @see #isInvolvedInProcessInstance(long, long)
+     */
+    boolean isManagerOfUserInvolvedInProcessInstance(long managerUserId, long processInstanceId) throws ProcessInstanceNotFoundException, BonitaException;
 
     /**
      * Get the process instance id from an activity instance id.

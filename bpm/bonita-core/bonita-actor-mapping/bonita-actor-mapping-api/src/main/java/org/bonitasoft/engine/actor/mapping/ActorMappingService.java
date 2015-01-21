@@ -36,7 +36,7 @@ public interface ActorMappingService {
 
     /**
      * Create an actor by given actor
-     * 
+     *
      * @param actor
      *        The given actor without id
      * @return the new created actor with id
@@ -46,7 +46,7 @@ public interface ActorMappingService {
 
     /**
      * Create actors by given actors
-     * 
+     *
      * @param actors
      *        The given actors without IDs
      * @return The set of the new created actors
@@ -57,7 +57,7 @@ public interface ActorMappingService {
     /**
      * Get actor by actor id
      * If the actor by a given actorId is not found, it will throw SActorNotFoundException
-     * 
+     *
      * @param actorId
      *        Id of actor
      * @return SActor object response to the given actorId
@@ -69,7 +69,7 @@ public interface ActorMappingService {
     /**
      * Get actor by actor name and scope id
      * If the actor by a given actorName and scopeId is not found, it will throw SActorNotFoundException
-     * 
+     *
      * @param actorName
      *        Name of actor
      * @param scopeId
@@ -82,7 +82,7 @@ public interface ActorMappingService {
 
     /**
      * Get a list of all actors for the id specified user in certain scopes specified by scopeIds
-     * 
+     *
      * @param scopeIds
      *        Ids of scope, it can be processDefinitionId
      * @param userId
@@ -95,7 +95,7 @@ public interface ActorMappingService {
     /**
      * Update actor by its id
      * If the actor by a given actorId is not found, it will throw processDefinitionNotFountExcetion
-     * 
+     *
      * @param actorId
      *        Id of actor
      * @param updateDescriptor
@@ -111,7 +111,7 @@ public interface ActorMappingService {
 
     /**
      * Delete actors in the id specified scope
-     * 
+     *
      * @param scopeId
      *        Id of scope, it can be processDefinitionId
      * @throws SActorDeletionException
@@ -121,7 +121,7 @@ public interface ActorMappingService {
 
     /**
      * Add the userId specified user to the actorId specified actor
-     * 
+     *
      * @param actorId
      *        Id of actor
      * @param userId
@@ -136,7 +136,7 @@ public interface ActorMappingService {
 
     /**
      * Add the groupId specified group to the actorId specified actor
-     * 
+     *
      * @param actorId
      *        Id of actor
      * @param groupId
@@ -151,7 +151,7 @@ public interface ActorMappingService {
 
     /**
      * Add the roleId specified role to the actorId specified actor
-     * 
+     *
      * @param actorId
      *        Id of actor
      * @param roleId
@@ -166,7 +166,7 @@ public interface ActorMappingService {
 
     /**
      * Add the roleId and groupId specified relationship to the actorId specified actor
-     * 
+     *
      * @param actorId
      *        Id of actor
      * @param roleId
@@ -183,7 +183,7 @@ public interface ActorMappingService {
 
     /**
      * Remove actorMember for the give actorMemberId
-     * 
+     *
      * @param actorMemberId
      *        Id of actorMember
      * @throws SActorMemberNotFoundException
@@ -195,7 +195,7 @@ public interface ActorMappingService {
 
     /**
      * Remove an actor member
-     * 
+     *
      * @param actorMember
      *        the actorMember to remove
      * @throws SActorMemberDeletionException
@@ -205,7 +205,7 @@ public interface ActorMappingService {
 
     /**
      * Get list of SActorMember objects by pagination
-     * 
+     *
      * @param actorId
      *        Id of actor
      * @param index
@@ -219,7 +219,7 @@ public interface ActorMappingService {
 
     /**
      * Get number of ActorMembers for give actorId
-     * 
+     *
      * @param actorId
      *        Id of actor
      * @return the number of ActorMembers
@@ -229,7 +229,7 @@ public interface ActorMappingService {
 
     /**
      * Get a list of SActorMember objects for given userId
-     * 
+     *
      * @param userId
      *        Id of user
      * @param fromIndex
@@ -243,7 +243,7 @@ public interface ActorMappingService {
 
     /**
      * Get a list of SActorMember objects for given groupId
-     * 
+     *
      * @param groupId
      *        Id of group
      * @return a list of SActorMember objects, ordered by id ascending
@@ -253,7 +253,7 @@ public interface ActorMappingService {
 
     /**
      * Get a list of SActorMember objects for given roleId
-     * 
+     *
      * @param roleId
      *        Id of role
      * @return a list of SActorMember objects, ordered by id ascending
@@ -263,7 +263,7 @@ public interface ActorMappingService {
 
     /**
      * Get a list of actors for id specified user who can start the id specified process definition
-     * 
+     *
      * @param userId
      *        Id of user
      * @param processDefinitionId
@@ -280,7 +280,7 @@ public interface ActorMappingService {
 
     /**
      * Get a list of actors by the given list of actor ids
-     * 
+     *
      * @param actorIds
      *        the list of actor ids to retrieve
      * @return a list of actors
@@ -291,7 +291,7 @@ public interface ActorMappingService {
 
     /**
      * Get paginated actors
-     * 
+     *
      * @param processDefinitionId
      *        identifier of process definition
      * @param pageNumber
@@ -309,7 +309,7 @@ public interface ActorMappingService {
 
     /**
      * Return the number of users corresponding to an actor
-     * 
+     *
      * @param actorId
      *        the id of the actor to retrieve the users from
      * @return Number of users mapped to actor
@@ -318,7 +318,7 @@ public interface ActorMappingService {
 
     /**
      * Get the number of roles of an actor
-     * 
+     *
      * @param actorId
      *        the id corresponding to an actor
      * @return Number of roles mapped to actor
@@ -327,7 +327,7 @@ public interface ActorMappingService {
 
     /**
      * Get the number of groups corresponding to an actor
-     * 
+     *
      * @param actorId
      *        the id of the actor to retrieve the groups from
      * @return Number of groups mapped to actor
@@ -337,7 +337,7 @@ public interface ActorMappingService {
 
     /**
      * Get the number of memberships (role and group) of an actor
-     * 
+     *
      * @param actorId
      *        the id of the actor to retrieve the memberships from
      * @return Number of memberships mapped to actor
@@ -346,7 +346,7 @@ public interface ActorMappingService {
 
     /**
      * Delete all actor members for the connected tenant
-     * 
+     *
      * @throws SActorMemberDeletionException
      * @since 6.1
      */
@@ -356,7 +356,7 @@ public interface ActorMappingService {
 
     /**
      * Get the actor member
-     * 
+     *
      * @param actorId
      *        The identifier of the actor
      * @param userId
@@ -373,7 +373,7 @@ public interface ActorMappingService {
 
     /**
      * return true if the user is in an actor member of this actor or if the user is a manager of this kind of user
-     * 
+     *
      * @param userId
      * @param actorId
      * @return
@@ -381,5 +381,25 @@ public interface ActorMappingService {
      * @since 6.3.2
      */
     boolean isUserInActorMemberOrManagerOfAUserInActorMember(long userId, long actorId) throws SBonitaReadException;
+
+    /**
+     * Determines if the user is in an actor member of the specified actor.
+     *
+     * @param userId ID of the user to check the membership of the specified actor.
+     * @param actorId the ID of the actor to check if the user is member of.
+     * @return true if the user is in an actor member of the specified actor.
+     * @throws SBonitaReadException if a read error occured.
+     */
+    public boolean isUserInActorMember(final long userId, final long actorId) throws SBonitaReadException;
+
+    /**
+     * Determines if a specific user is a manager of users members of the specified actor.
+     *
+     * @param managerUserId the ID of the user who is manager of users members of the specified actor.
+     * @param actorId the ID of the actor to check if at least one subordinates <code>managerUserId</code> is member of.
+     * @return true if the manager has at least one user member of the specified actor.
+     * @throws SBonitaReadException if a read error occured.
+     */
+    public boolean isUserManagerOfAUserInActorMember(final long managerUserId, final long actorId) throws SBonitaReadException;
 
 }
