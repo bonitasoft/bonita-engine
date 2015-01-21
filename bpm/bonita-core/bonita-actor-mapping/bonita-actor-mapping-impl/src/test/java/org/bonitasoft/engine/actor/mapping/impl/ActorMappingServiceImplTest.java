@@ -14,6 +14,9 @@ package org.bonitasoft.engine.actor.mapping.impl;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+package org.bonitasoft.engine.actor.mapping.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -108,7 +111,7 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActor(long)}.
-     * 
+     *
      * @throws SBonitaReadException
      * @throws SActorNotFoundException
      */
@@ -129,7 +132,7 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getNumberOfActorMembers(long)}.
-     * 
+     *
      * @throws SBonitaReadException
      */
     @Test
@@ -143,7 +146,7 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getNumberOfUsersOfActor(long)}.
-     * 
+     *
      * @throws SBonitaReadException
      */
     @Test
@@ -163,7 +166,7 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getNumberOfRolesOfActor(long)}.
-     * 
+     *
      * @throws SBonitaReadException
      */
     @Test
@@ -183,7 +186,7 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getNumberOfGroupsOfActor(long)}.
-     * 
+     *
      * @throws SBonitaReadException
      */
     @Test
@@ -203,7 +206,7 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getNumberOfMembershipsOfActor(long)}.
-     * 
+     *
      * @throws SBonitaReadException
      */
     @Test
@@ -223,7 +226,7 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActor(java.lang.String, long)}.
-     * 
+     *
      * @throws SBonitaReadException
      * @throws SActorNotFoundException
      */
@@ -251,7 +254,7 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembers(long, int, int)}.
-     * 
+     *
      * @throws SBonitaReadException
      */
     @Test
@@ -264,7 +267,7 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembersOfGroup(long)}.
-     * 
+     *
      * @throws SBonitaReadException
      */
     @Test
@@ -277,7 +280,7 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorMembersOfRole(long)}.
-     * 
+     *
      * @throws SBonitaReadException
      */
     @Test
@@ -324,7 +327,7 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActors(java.util.List)}.
-     * 
+     *
      * @throws SBonitaReadException
      */
     @Test
@@ -350,7 +353,7 @@ public class ActorMappingServiceImplTest {
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActors(long, org.bonitasoft.engine.persistence.QueryOptions)}
      * .
-     * 
+     *
      * @throws SBonitaReadException
      */
     @Test
@@ -364,7 +367,7 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActorsOfUserCanStartProcessDefinition(long, long)}.
-     * 
+     *
      * @throws SBonitaReadException
      */
     @Test
@@ -377,7 +380,7 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#getActors(java.util.Set, java.lang.Long)}.
-     * 
+     *
      * @throws SBonitaReadException
      */
     @Test
@@ -390,7 +393,7 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#addActors(java.util.Set)}.
-     * 
+     *
      * @throws SActorCreationException
      */
     @Test
@@ -437,7 +440,7 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#addActor(org.bonitasoft.engine.actor.mapping.model.SActor)}.
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -462,7 +465,7 @@ public class ActorMappingServiceImplTest {
     /**
      * Test method for
      * {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#updateActor(long, org.bonitasoft.engine.recorder.model.EntityUpdateDescriptor)}.
-     * 
+     *
      * @throws SBonitaReadException
      * @throws SActorUpdateException
      * @throws SActorNotFoundException
@@ -511,7 +514,7 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#deleteActors(long)}.
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -567,7 +570,7 @@ public class ActorMappingServiceImplTest {
 
     /**
      * Test method for {@link org.bonitasoft.engine.actor.mapping.impl.ActorMappingServiceImpl#deleteAllActorMembers()}.
-     * 
+     *
      * @throws SRecorderException
      * @throws SActorMemberDeletionException
      */
@@ -585,4 +588,39 @@ public class ActorMappingServiceImplTest {
         actorMappingServiceImpl.deleteAllActorMembers();
     }
 
+    @Test
+    public final void isUserInActorMember_ShouldReturnFalseIfZeroIsReturned() throws Exception {
+        doReturn(0L).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+        assertThat(actorMappingServiceImpl.isUserInActorMember(22L, 33L)).isFalse();
+    }
+
+    @Test
+    public final void isUserInActorMember_ShouldReturnTrueIfOneIsReturned() throws Exception {
+        doReturn(1L).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+        assertThat(actorMappingServiceImpl.isUserInActorMember(22L, 33L)).isTrue();
+    }
+
+    @Test
+    public final void isUserInActorMember_ShouldReturnTrueIfMoreThantOneIsReturned() throws Exception {
+        doReturn(82L).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+        assertThat(actorMappingServiceImpl.isUserInActorMember(22L, 33L)).isTrue();
+    }
+
+    @Test
+    public final void isUserManagerOfAUserInActorMember_ShouldReturnFalseIfZeroIsReturned() throws Exception {
+        doReturn(0L).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+        assertThat(actorMappingServiceImpl.isUserManagerOfAUserInActorMember(22L, 33L)).isFalse();
+    }
+
+    @Test
+    public final void isUserManagerOfAUserInActorMember_ShouldReturnTrueIfOneIsReturned() throws Exception {
+        doReturn(1L).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+        assertThat(actorMappingServiceImpl.isUserManagerOfAUserInActorMember(22L, 33L)).isTrue();
+    }
+
+    @Test
+    public final void isUserManagerOfAUserInActorMember_ShouldReturnTrueIfMoreThantOneIsReturned() throws Exception {
+        doReturn(251L).when(persistenceService).selectOne(any(SelectOneDescriptor.class));
+        assertThat(actorMappingServiceImpl.isUserManagerOfAUserInActorMember(22L, 33L)).isTrue();
+    }
 }

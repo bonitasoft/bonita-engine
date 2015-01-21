@@ -304,6 +304,7 @@ import org.bonitasoft.engine.dependency.DependencyService;
 import org.bonitasoft.engine.dependency.model.ScopeType;
 import org.bonitasoft.engine.document.SDocumentNotFoundException;
 import org.bonitasoft.engine.exception.AlreadyExistsException;
+import org.bonitasoft.engine.exception.BonitaException;
 import org.bonitasoft.engine.exception.BonitaHomeNotSetException;
 import org.bonitasoft.engine.exception.BonitaRuntimeException;
 import org.bonitasoft.engine.exception.CreationException;
@@ -2815,59 +2816,13 @@ public class ProcessAPIImpl implements ProcessAPI {
 
     @Override
     public boolean isInvolvedInProcessInstance(final long userId, final long processInstanceId) throws ProcessInstanceNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-        try {
-            final List<OrderByOption> orderByOptions = Arrays.asList(new OrderByOption(SHumanTaskInstance.class, "id", OrderByType.ASC));
-            final List<FilterOption> filterOptions = Arrays.asList(new FilterOption(SHumanTaskInstance.class, "logicalGroup4", processInstanceId));
-            QueryOptions queryOptions = new QueryOptions(0, BATCH_SIZE, orderByOptions, filterOptions, null);
-
-            List<SHumanTaskInstance> sHumanTaskInstances = activityInstanceService.searchHumanTasks(queryOptions);
-            while (!sHumanTaskInstances.isEmpty()) {
-                for (final SHumanTaskInstance sHumanTaskInstance : sHumanTaskInstances) {
-                    if (userId == sHumanTaskInstance.getAssigneeId()) {
-                        return true;
-                    }
-                    final boolean isActorMemberOrManagerOfActorMember = checkIfUserIsActorMemberOrManagerOfActorMember(userId,
-                            sHumanTaskInstance.getActorId());
-                    if (isActorMemberOrManagerOfActorMember) {
-                        return true;
-                    }
-                }
-                queryOptions = QueryOptions.getNextPage(queryOptions);
-                sHumanTaskInstances = activityInstanceService.searchHumanTasks(queryOptions);
-            }
-
-            checkIfProcessInstanceExistsWhenNoHumanTask(processInstanceId);
-            return false;
-        } catch (final SBonitaException e) {
-            // no rollback, read only method
-            throw new BonitaRuntimeException(e);// TODO refactor Exceptions!!!!!!!!!!!!!!!!!!!
-        }
+        return new ProcessInvolvementAPIImpl(this).isInvolvedInProcessInstance(userId, processInstanceId);
     }
 
-    private void checkIfProcessInstanceExistsWhenNoHumanTask(final long processInstanceId) throws SBonitaSearchException, SProcessInstanceReadException,
-            ProcessInstanceNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ActivityInstanceService activityInstanceService = tenantAccessor.getActivityInstanceService();
-
-        final List<FilterOption> filterOptions = Arrays.asList(new FilterOption(SHumanTaskInstance.class, "logicalGroup4", processInstanceId));
-        final QueryOptions queryOptions = new QueryOptions(filterOptions, null);
-        if (activityInstanceService.getNumberOfHumanTasks(queryOptions) == 0) {
-            // check if the process exists in case of there is no results
-            try {
-                tenantAccessor.getProcessInstanceService().getProcessInstance(processInstanceId);
-            } catch (final SProcessInstanceNotFoundException e) {
-                throw new ProcessInstanceNotFoundException(processInstanceId);
-            }
-        }
-    }
-
-    private boolean checkIfUserIsActorMemberOrManagerOfActorMember(final long userId, final long actorId) throws SBonitaReadException, SUserNotFoundException {
-        final TenantServiceAccessor tenantAccessor = getTenantAccessor();
-        final ActorMappingService actorMappingService = tenantAccessor.getActorMappingService();
-
-        return actorMappingService.isUserInActorMemberOrManagerOfAUserInActorMember(userId, actorId);
+    @Override
+    public boolean isManagerOfUserInvolvedInProcessInstance(final long managerUserId, final long processInstanceId) throws ProcessInstanceNotFoundException,
+            BonitaException {
+        return new ProcessInvolvementAPIImpl(this).isManagerOfUserInvolvedInProcessInstance(managerUserId, processInstanceId);
     }
 
     @Override
@@ -5680,7 +5635,6 @@ public class ProcessAPIImpl implements ProcessAPI {
         final SearchEntitiesDescriptor searchEntitiesDescriptor = tenantAccessor.getSearchEntitiesDescriptor();
         final GetLastArchivedProcessInstance searchArchivedProcessInstances = new GetLastArchivedProcessInstance(processInstanceService, processInstanceId,
                 searchEntitiesDescriptor);
-
         searchArchivedProcessInstances.execute();
         return searchArchivedProcessInstances.getResult();
     }
