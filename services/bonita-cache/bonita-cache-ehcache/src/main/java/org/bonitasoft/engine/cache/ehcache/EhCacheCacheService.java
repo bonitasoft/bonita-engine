@@ -105,7 +105,9 @@ public class EhCacheCacheService extends CommonEhCacheCacheService implements Ca
 
     @Override
     public void resume() {
-        // nothing to do
+        if (cacheManager == null) {
+            start();
+        }
     }
 
 }
